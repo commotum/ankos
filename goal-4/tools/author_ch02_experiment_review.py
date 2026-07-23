@@ -451,7 +451,7 @@ add_evidence(
         "evidence_limit",
     ],
 )
-eca["source_status"] = ["DEFECTIVE"]
+eca["source_status"] = ["CLEAR", "DEFECTIVE"]
 eca["uncertainties"] = [
     (
         "U004988 contains the defective phrase “tries to updates”; the "
@@ -1868,6 +1868,53 @@ profile_candidate(
     aliases=["five-neighbor growth rule"],
 )
 
+for key in {
+    "k-color-range",
+    "rectangular-dd-ca",
+    "offset-ca",
+    "totalistic-ca",
+    "weighted-ca",
+    "nine-neighbor-totalistic",
+    "five-neighbor-totalistic",
+    "outer-totalistic",
+    "growth-profile",
+}:
+    profile_spec = next(
+        item for item in ALL_CANDIDATE_SPECS if item["key"] == key
+    )
+    add_evidence(
+        profile_spec,
+        label=f"{key}-evolution-contract",
+        unit="U005010",
+        claim=(
+            "The built-in contract states that a rule/profile, initial "
+            "condition, and step count produce an ordered evolution list."
+        ),
+        fields=[
+            "native_time",
+            "complete_state",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+    )
+    add_evidence(
+        profile_spec,
+        label=f"{key}-integer-value-schema",
+        unit="U005017",
+        claim=(
+            "The source states that ordinary initial and evolution values are "
+            "integers from 0 through k-1."
+        ),
+        fields=[
+            "alphabet_or_value_schema",
+            "complete_state",
+            "parameters_and_variants",
+            "evidence_limit",
+        ],
+    )
+
 
 def seed_or_query_candidate(
     *,
@@ -2058,7 +2105,7 @@ explicit_cyclic_seed = source_candidate(
         "stopping condition beyond the requested run length."
     ),
 )
-explicit_cyclic_seed["source_status"] = ["DEFECTIVE", "AMBIGUOUS"]
+explicit_cyclic_seed["source_status"] = ["CLEAR", "DEFECTIVE"]
 explicit_cyclic_seed["uncertainties"] = [
     (
         "U005043 contains the damaged sentence “The runs rule 30 with 5 cells "
@@ -2812,6 +2859,65 @@ add_evidence(
     ],
 )
 
+ca_cantor_correspondence = source_candidate(
+    key="ca-cantor-continuous-map",
+    name="infinite one-dimensional CA/Cantor self-map correspondence",
+    anchor="U005110",
+    aliases=["cellular automaton as continuous Cantor-set map"],
+    facts={
+        "object_kind": "A formal mathematical correspondence/interpretation.",
+        "carrier": "Infinite one-dimensional cellular configurations.",
+        "support": "An infinite one-dimensional cellular line.",
+        "topology": (
+            "The configuration state space is viewed with the Cantor-set topology."
+        ),
+        "complete_state": "One value at every position of the infinite cellular line.",
+        "input": "An infinite one-dimensional cellular-automaton state space and local rule.",
+        "law_kind": "A correspondence between local CA rules and continuous self-maps.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "View the infinite configuration space as a Cantor set; the local "
+            "cellular-automaton rule corresponds to a continuous map from that "
+            "Cantor set to itself, with continuity following from locality."
+        ),
+        "result_kind": "The corresponding continuous Cantor-set self-map interpretation.",
+        "successor_cardinality": (
+            "One interpreted self-map for the supplied cellular-automaton rule."
+        ),
+        "determinism_branching_or_measure": "A deterministic formal correspondence.",
+        "parameters_and_variants": (
+            "The supplied one-dimensional local cellular-automaton rule and "
+            "its finite cell alphabet."
+        ),
+        "excluded_observers_and_representations": (
+            "The Cantor-set language is a mathematical interpretation of the "
+            "same CA state space and rule, not an additional evolution law."
+        ),
+        "evidence_limit": (
+            "The passage states the correspondence and continuity rationale but "
+            "does not give a metric, proof, inverse characterization, or "
+            "treatment of nonlocal/infinite-alphabet systems."
+        ),
+    },
+    claim=(
+        "The source explicitly identifies the infinite 1D CA state space with "
+        "a Cantor set and its local rule with a continuous self-map."
+    ),
+    missing=(
+        "The passage states the correspondence and continuity rationale but "
+        "does not give a metric, proof, inverse characterization, or treatment "
+        "of nonlocal/infinite-alphabet systems."
+    ),
+    route_keys=["cantor-map-page959"],
+    parameters=[
+        (
+            "interpreted CA rule",
+            "The relation is parameterized by the supplied local rule on an "
+            "infinite one-dimensional cellular state space.",
+            ["ca-cantor-continuous-map-source"],
+        )
+    ],
+)
+
 
 pascal_mod2 = declarative_pattern(
     key="pascal-mod2",
@@ -2926,7 +3032,7 @@ rule60_pattern = declarative_pattern(
     ),
     support="Nonnegative integer row and position coordinates.",
     values="Binary parity values.",
-    result="A uniquely determined distorted nested binary pattern.",
+    result="A uniquely determined distorted binary pattern.",
     aliases=["Rule 60 binomial pattern"],
     route_keys=["rule60-bit-page583"],
 )
@@ -2979,6 +3085,10 @@ rule60_ca = source_candidate(
         ),
         "law_kind": "A deterministic elementary cellular-automaton lookup rule.",
         "result_kind": "A uniquely determined evolution once the Rule 60 lookup is supplied.",
+        "successor_cardinality": (
+            "Exactly one successor configuration for each complete input configuration."
+        ),
+        "determinism_branching_or_measure": "Deterministic.",
         "parameters_and_variants": "The source fixes elementary rule number 60.",
         "excluded_observers_and_representations": (
             "The binomial formula is a direct denotation of one canonical "
@@ -3063,7 +3173,7 @@ rule90_background = source_candidate(
         )
     ],
 )
-rule90_background["source_status"] = ["AMBIGUOUS"]
+rule90_background["source_status"] = ["CLEAR", "AMBIGUOUS"]
 rule90_background["uncertainties"] = [
     (
         "The inline striped background symbol is construction-bearing but its "
@@ -3540,7 +3650,7 @@ munching = declarative_pattern(
     support="A two-dimensional integer-coordinate grid indexed by t.",
     values="Boolean membership in the equality relation.",
     result="A sequence of relation-defined grid patterns.",
-    aliases=["munching squares", "munching foos"],
+    aliases=["munching squares"],
     route_keys=[],
 )
 add_candidate_image(
@@ -3714,6 +3824,10 @@ rule102 = source_candidate(
             "eight lookup outputs differs from Rule 110."
         ),
         "result_kind": "A unique successor once the eight-case lookup is expanded.",
+        "successor_cardinality": (
+            "Exactly one successor configuration for each complete input configuration."
+        ),
+        "determinism_branching_or_measure": "Deterministic.",
         "parameters_and_variants": "Elementary rule number 102.",
         "excluded_observers_and_representations": (
             "The comparison with Rule 110 and reflection description are "
@@ -3751,9 +3865,11 @@ def procedure_candidate(
     state: str,
     result: str,
     missing: str,
+    topology: str | None = None,
+    structural_invariant: str | None = None,
     aliases: list[str] | None = None,
 ) -> CandidateSpec:
-    return source_candidate(
+    spec = source_candidate(
         key=key,
         name=name,
         anchor=anchor,
@@ -3781,6 +3897,13 @@ def procedure_candidate(
             ("construction profile", description, [f"{key}-source"]),
         ],
     )
+    if topology is not None:
+        spec["facts"]["topology"] = topology
+        spec["evidence"][0]["fields"].append("topology")
+    if structural_invariant is not None:
+        spec["facts"]["structural_invariants"] = structural_invariant
+        spec["evidence"][0]["fields"].append("structural_invariants")
+    return spec
 
 
 def attach_procedure_images(
@@ -3892,6 +4015,8 @@ triangle_circles = procedure_candidate(
     support="A planar triangular lattice of holes.",
     state="The fixed center array together with circles already drawn.",
     result="A repeated overlapping-circle ornament.",
+    topology="Circle centers occupy a triangular lattice of holes.",
+    structural_invariant="Exactly one circle is centered at every retained hole.",
     missing=(
         "The passage omits array extent, circle radius, edge clipping, and a "
         "formal completion convention."
@@ -3911,6 +4036,8 @@ celtic_circles = procedure_candidate(
     support="A bounded planar ornament region.",
     state="The partial collection of touching circular arcs.",
     result="The Desborough-style tangent-circle pattern.",
+    topology="Circular parts meet through the source-stated tangency relation.",
+    structural_invariant="The retained circular portions are arranged to touch one another.",
     missing=(
         "The source does not give exact centers, radii, arc-selection rules, "
         "scale, or a textual step order."
@@ -3941,6 +4068,11 @@ roman_rosette = procedure_candidate(
     support="A planar circular construction region.",
     state="The accumulated straight and circular construction lines.",
     result="A completed 48-fold rosette pattern.",
+    topology=(
+        "Forty-eight radial spokes determine semicircle centers and intersection "
+        "points through which concentric circles pass."
+    ),
+    structural_invariant="The construction preserves 48-fold radial organization.",
     missing=(
         "The passage does not specify the initial radius, compass orientation, "
         "which semicircle side to retain, or degeneracy handling."
@@ -3982,6 +4114,11 @@ cosmati = procedure_candidate(
     support="A bounded equilateral-triangle region.",
     state="The collection of triangles present at each nesting level.",
     result="A finite approximately nested Cosmati mosaic pattern.",
+    topology="Equilateral triangular regions contain smaller triangular regions.",
+    structural_invariant=(
+        "Equilateral-triangle structure recurs at smaller scales while several "
+        "triangle sizes coexist at a given level."
+    ),
     missing=(
         "The source does not provide an exact recursion depth, triangle-choice "
         "order, size ratios for every branch, or treatment of material gaps."
@@ -4023,6 +4160,8 @@ triangle_push = procedure_candidate(
     support="A two-dimensional triangular tiling.",
     state="The current placement/deformation of every triangle side.",
     result="A repeated interlocking tiled ornament.",
+    topology="A triangular tiling whose neighboring triangles share sides.",
+    structural_invariant="Every triangle side is consistently displaced inward or outward.",
     missing=(
         "The source does not state the exact push assignment, displacement "
         "magnitude, boundary handling, or consistency rule at shared sides."
@@ -4042,6 +4181,11 @@ rope = procedure_candidate(
     support="A finite hierarchical cross-section and longitudinal twist.",
     state="The nested grouping and twist orientation of all component strands.",
     result="A multilevel rope or wire-rope assembly.",
+    topology="Strands are recursively grouped into larger twisted strands.",
+    structural_invariant=(
+        "The explicit wire-rope example preserves a 7 by 7 by 7 recursive "
+        "strand-grouping hierarchy."
+    ),
     missing=(
         "The source does not state handedness, pitch, exact geometric placement, "
         "material constraints, or failure/completion tolerances."
@@ -4055,6 +4199,129 @@ attach_procedure_images(
         ("U005211", "BACK-MATTER/NOTES/_page_889_Picture_20.jpeg"),
         ("U005212", "BACK-MATTER/NOTES/_page_889_Picture_21.jpeg"),
     ],
+)
+
+persian_garden_subdivision = procedure_candidate(
+    key="persian-garden-fourfold-subdivision",
+    name="successive fourfold Persian-garden subdivision construction",
+    anchor="U005207",
+    aliases=["nested Persian garden layout"],
+    description=(
+        "Apply a few successive fourfold subdivisions to a garden region to "
+        "obtain the source-stated fairly regular nested structure."
+    ),
+    carrier="Planar garden regions and their subdivision boundaries.",
+    support="A bounded planar garden layout.",
+    state="The current hierarchy of regions after each fourfold subdivision.",
+    result="A finite roughly nested garden partition.",
+    topology="Regions are related by planar containment across subdivision levels.",
+    structural_invariant=(
+        "Each retained subdivision level refines regions fourfold and preserves "
+        "the nested containment hierarchy."
+    ),
+    missing=(
+        "The source does not state the subdivision geometry, which regions are "
+        "refined, exact number of levels, boundary proportions, planting "
+        "semantics, or completion/failure behavior."
+    ),
+)
+
+sestina = source_candidate(
+    key="sestina-rhyme-permutation",
+    name="sestina iterated length-six rhyme-permutation form",
+    anchor="U005218",
+    aliases=["sestina"],
+    facts={
+        "object_kind": "A rule-governed poetic rhyme-order construction.",
+        "native_time": "Successive applications across the poem's rhyme sequence.",
+        "carrier": "Six rhyme labels occupying ordered positions.",
+        "support": "An ordered six-position rhyme pattern at each iteration.",
+        "topology": "A finite ordered set of six rhyme positions.",
+        "complete_state": "The current ordering of the six rhyme labels.",
+        "schedule": "Apply the same length-six permutation repeatedly.",
+        "law_kind": "Iteration of a fixed length-six permutation.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Permute the six rhyme positions by the sestina's fixed permutation "
+            "at each repetition; the actual mapping is not printed here."
+        ),
+        "write_replacement_assembly_or_commit": (
+            "Assemble the next rhyme order by applying the permutation to all six positions."
+        ),
+        "result_kind": "An iterated sequence of six-rhyme orderings.",
+        "successor_cardinality": "Exactly one next ordering for a fixed permutation.",
+        "determinism_branching_or_measure": "Deterministic for the fixed poetic form.",
+        "parameters_and_variants": (
+            "The length is fixed at six; the exact permutation and stanza count "
+            "are not supplied in this passage."
+        ),
+        "excluded_observers_and_representations": (
+            "Historical use by Dante and poetic interpretation are contextual."
+        ),
+        "evidence_limit": (
+            "The passage names iteration and length six but omits the six-entry "
+            "permutation, initial rhyme order, stanza grouping, terminal envoy, "
+            "and malformed-input semantics."
+        ),
+    },
+    claim=(
+        "The source explicitly identifies the sestina rhyme pattern as an "
+        "iterated length-six permutation."
+    ),
+    missing=(
+        "The passage names iteration and length six but omits the six-entry "
+        "permutation, initial rhyme order, stanza grouping, terminal envoy, and "
+        "malformed-input semantics."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    parameters=[
+        (
+            "permutation length",
+            "The source fixes the iterated permutation length at six.",
+            ["sestina-rhyme-permutation-source"],
+        )
+    ],
+)
+
+terza_rima = source_candidate(
+    key="terza-rima-interleaved-rhyme",
+    name="terza rima interleaved repetitive rhyme-sequence form",
+    anchor="U005218",
+    aliases=["terza rima"],
+    facts={
+        "object_kind": "A rule-governed poetic rhyme-sequence construction.",
+        "native_time": "Successive positions or groups in an ordered rhyme sequence.",
+        "carrier": "Rhyme labels in ordered poetic positions.",
+        "support": "A linearly ordered sequence of rhyme positions.",
+        "topology": "Ordered positions connected by an unstated interleaving relation.",
+        "structural_invariants": "Rhyme labels recur through an interleaved repetitive structure.",
+        "complete_state": "The rhyme labels assigned across the retained sequence prefix.",
+        "law_kind": "An interleaved repetition schema.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Generate an interleaved repetitive sequence of rhyme labels; the "
+            "exact interleaving pattern is not printed here."
+        ),
+        "result_kind": "An interleaved repetitive rhyme sequence.",
+        "parameters_and_variants": (
+            "The exact period, group size, interleaving map, seed labels, and "
+            "poem length are not supplied."
+        ),
+        "excluded_observers_and_representations": (
+            "Historical use by Dante and poetic interpretation are contextual."
+        ),
+        "evidence_limit": (
+            "Only the interleaved/repetitive mechanic and form identity are "
+            "given; the exact sequence law and completion convention are absent."
+        ),
+    },
+    claim=(
+        "The source explicitly identifies terza rima as an interleaved "
+        "repetitive rhyme-sequence form."
+    ),
+    missing=(
+        "Only the interleaved/repetitive mechanic and form identity are given; "
+        "the exact sequence law and completion convention are absent."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
 
 truchet = source_candidate(
@@ -4399,6 +4666,10 @@ code20 = source_candidate(
         "read_dependencies_or_neighborhood": "Two neighbors on each side plus the cell itself.",
         "law_kind": "A deterministic totalistic local cellular-automaton rule.",
         "result_kind": "A uniquely determined next configuration once code 20 is decoded.",
+        "successor_cardinality": (
+            "Exactly one successor configuration under the fixed totalistic code."
+        ),
+        "determinism_branching_or_measure": "Deterministic.",
         "parameters_and_variants": "k = 2, r = 2, totalistic code 20.",
         "excluded_observers_and_representations": (
             "Its historical motivation as a one-dimensional analog of Life is contextual."
@@ -4438,6 +4709,9 @@ lfsr = source_candidate(
         "visible_history": "Successive output digits form a generated sequence.",
         "law_kind": "A linear feedback/shift law, equivalently an additive CA law.",
         "result_kind": "A deterministic output sequence for a fixed register and seed.",
+        "successor_cardinality": (
+            "Exactly one output sequence for a fixed register law, seed, and output convention."
+        ),
         "determinism_branching_or_measure": (
             "Deterministic; apparent complexity is generated without a stated probability law."
         ),
@@ -4490,6 +4764,10 @@ shift_block_maps = source_candidate(
             "Apply the same finite-block mapping equivariantly at every sequence position."
         ),
         "result_kind": "One output binary sequence.",
+        "successor_cardinality": (
+            "Exactly one output sequence for each input sequence and fixed block map."
+        ),
+        "determinism_branching_or_measure": "Deterministic for a fixed block map.",
         "parameters_and_variants": "The finite block radius and local mapping vary.",
         "excluded_observers_and_representations": (
             "Symbolic-dynamics terminology, cryptographic use, and global theorem "
@@ -5206,6 +5484,7 @@ direct_object_reason = (
 for key in {
     "ca-time-slice-query",
     "ca-space-slice-query",
+    "ca-cantor-continuous-map",
     "rule90-row-black-count",
     "rule90-row-black-positions",
     "k-color-rule90-row-count",
@@ -5231,7 +5510,6 @@ for key in {
         next(item for item in ALL_CANDIDATE_SPECS if item["key"] == key),
         [
             "native_time",
-            "structural_invariants",
             "visible_history",
             "control_state",
             "seed",
@@ -5274,6 +5552,7 @@ for key in {
         next(item for item in ALL_CANDIDATE_SPECS if item["key"] == key),
         [
             "native_time",
+            "structural_invariants",
             "visible_history",
             "control_state",
             "external_data",
@@ -5847,7 +6126,7 @@ def candidate_secondary_roles(
         roles.append("APPLICATION")
     if unit_id == "U005129":
         roles.append("HISTORICAL_MENTION")
-    if unit_id in {"U004988", "U005043", "U005148"}:
+    if unit_id in {"U004988", "U005043", "U005148", "U005199"}:
         roles.append("SOURCE_DEFECT")
     return list(dict.fromkeys(roles))
 
@@ -5955,7 +6234,7 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             )
         else:
             disposition, secondary, statement = default_reading_judgment(row)
-        if unit_id in {"U004988", "U005043", "U005148"}:
+        if unit_id in {"U004988", "U005043", "U005148", "U005199"}:
             secondary = list(dict.fromkeys([*secondary, "SOURCE_DEFECT"]))
         row.update(
             {
@@ -5964,7 +6243,7 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                 "review_disposition": disposition,
                 "source_status": (
                     "DEFECTIVE"
-                    if unit_id in {"U004988", "U005043", "U005148"}
+                    if unit_id in {"U004988", "U005043", "U005148", "U005199"}
                     else "AMBIGUOUS"
                     if unit_id == "U005120"
                     else "CLEAR"
@@ -5988,7 +6267,13 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                                 "the intended nonrepetition claim and page route "
                                 "remain unambiguous."
                                 if unit_id == "U005148"
-                                else ""
+                                else (
+                                    "The phrase “used in architectural ornamental” "
+                                    "is grammatically defective; the surrounding "
+                                    "historical statement remains understandable."
+                                    if unit_id == "U005199"
+                                    else ""
+                                )
                             )
                         )
                     )
