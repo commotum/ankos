@@ -302,7 +302,7 @@ Canonical tests are the semantic-oracle partitions above plus static absence of 
 - [x] Current API/runtime/principles fit and smallest Goal 2 delta are implementation-ready.
 - [x] All profiles classify in categories 1–3; no new execution algebra is claimed.
 - [x] Independent hostile review and all oracle/test/Markdown/diff/scope gates pass.
-- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` are synchronized; the final cross-stage `goal-2-handoff.md` remains the goal-level synthesis deliverable.
+- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` are synchronized; the final cross-stage `../goal-2/goal-2-handoff.md` remains the goal-level synthesis deliverable.
 
 ## Stage Results
 

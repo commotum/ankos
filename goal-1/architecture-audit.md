@@ -399,4 +399,4 @@ The current audit does **not** yet admit stochastic/probabilistic execution mere
 - [x] Fresh independent review, Markdown-fence checks, `git diff --check`, and scope checks pass.
 - [x] The original audit gates passed before T06 and the bounded asset repairs resumed.
 - [x] The final stage-disposition table contains every T01-T45 exactly once, including the previously omitted T06/T07/T11/T14/T15/T36 summary rows.
-- [x] D141, `47-SYNTHESIS.md`, and `goal-2-handoff.md` pass final hostile review and global verification.
+- [x] D141, `47-SYNTHESIS.md`, and `../goal-2/goal-2-handoff.md` pass final hostile review and global verification.

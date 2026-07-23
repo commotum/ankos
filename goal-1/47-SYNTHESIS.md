@@ -205,7 +205,7 @@ No unresolved contradiction remains, but implementation must preserve these hone
 3. Replace the current family-branched rollout with one generic `step` and repeated-run routine over closed axis descriptors.
 4. Generalize current alphabets, loci/selectors, neighborhoods, rules, seeds, specifications, and raw traces; add configuration/support, UPDATE, outcome, structural value, relation/query, certificate, and serialization responsibilities only where the audit establishes them.
 5. Migrate current CA constructors and manifests directly to ordinary SimpleProgram presets. Do not retain a legacy executor, `family` switch, or adapter that secretly calls it.
-6. Implement the dependency-aware stages and one-per-row conformance matrix in `goal-2-handoff.md`.
+6. Implement the dependency-aware stages and one-per-row conformance matrix in `../goal-2/goal-2-handoff.md`.
 
 ## No-Cheating Gates
 
@@ -222,7 +222,7 @@ No unresolved contradiction remains, but implementation must preserve these hone
 
 Before this stage becomes complete:
 
-- [x] `goal-1/goal-2-handoff.md` defines dependencies, target files, tests, completion evidence, and re-derivation triggers for every Goal 2 stage.
+- [x] `goal-2/goal-2-handoff.md` defines dependencies, target files, tests, completion evidence, and re-derivation triggers for every Goal 2 stage.
 - [x] Its coverage matrix contains every CSV row exactly once and no duplicate T-ID.
 - [x] D141 records this synthesis in `design-ledger.md`; `architecture-audit.md`, `evidence-index.md`, and `0-plan.md` agree.
 - [x] T42's completion checklist and Stage Results are closed against the final frozen oracles.

@@ -223,7 +223,7 @@ After every completed type stage, answer all of the following in the stage file 
 
 ## Final Verification
 
-- Mechanically compare the 45 CSV names with completed stage files, `evidence-index.md`, and `goal-2-handoff.md`.
+- Mechanically compare the 45 CSV names with completed stage files, `evidence-index.md`, and `../goal-2/goal-2-handoff.md`.
 - Audit duplicate excerpts and unresolved search candidates.
 - Audit proposed abstractions for family branches, `Any`, unrestricted callbacks, hidden state, fake capacity, global formula bypasses, and semantic padding.
 - Confirm all contradictions and reopened stages are resolved.

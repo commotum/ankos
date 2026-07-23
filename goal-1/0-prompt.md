@@ -13,5 +13,5 @@ For every stage: sync against actual files; update 0-plan.md with current facts;
 
 Do not mark a type complete until all aliases, variants, captions, Notes, Index references, cross-references, candidate matches, and false positives are accounted for. Search hits are not evidence until their context is read. CA-Types.md is a search guide, not a substitute for the book.
 
-Completion means all 45 types have auditable evidence and design stages, every excerpt and semantic proposal is traceable, contradictions have been resolved rather than patched, the final construction algebra or algebras remain substantive and cohesive, and goal-1/goal-2-handoff.md provides a dependency-aware implementation and conformance plan covering every catalog row. Open issues must remain explicit next work; do not declare success around an easier subset.
+Completion means all 45 types have auditable evidence and design stages, every excerpt and semantic proposal is traceable, contradictions have been resolved rather than patched, the final construction algebra or algebras remain substantive and cohesive, and goal-2/goal-2-handoff.md provides a dependency-aware implementation and conformance plan covering every catalog row. Open issues must remain explicit next work; do not declare success around an easier subset.
 ```

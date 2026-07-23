@@ -3,8 +3,10 @@
 Status: COMPLETE
 
 > **Historical release record.** The finished 29-document corpus is the
-> repository's canonical source at `ref/A-New-Kind-of-Science/`. Goal 5's
-> build machinery and intermediary evidence remain recoverable from Git commit
+> repository's canonical source at `ref/A-New-Kind-of-Science/`. This work was
+> executed as Goal 5 before being re-indexed as completed Goal 3, so later
+> Goal 5 references in this release record are historical. Its build machinery
+> and intermediary evidence remain recoverable from Git commit
 > `bc4d240c9e12f73d11039f5f1a2a251e0174e804`.
 
 ## Big-Picture Objective

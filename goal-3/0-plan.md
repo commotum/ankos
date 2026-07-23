@@ -1,725 +1,1188 @@
-# Goal 3: Whole-Book ANKoS Construction Taxonomy Audit
+# Goal 3: Reliable ANKoS Markdown Source
 
-Shorthand: `BOOK-TAXONOMY`
+Shorthand: `BOOK-SOURCE`
+
+> **Historical completion record.** Goal 3 is complete and is not an active
+> build system. It was executed as Goal 5 before the repository's goals were
+> re-indexed. References below to Goal 5, Goal 4, retired paths, builders,
+> validators, and tests describe that historical execution and are not live
+> instructions. The canonical book source now lives directly at
+> `ref/A-New-Kind-of-Science/`. The complete production machinery remains
+> recoverable from Git commit
+> `bc4d240c9e12f73d11039f5f1a2a251e0174e804`.
 
 ## Big-Picture Objective
 
-Audit the complete local *A New Kind of Science* corpus independently of the existing T01–T45 catalog and determine every book-grounded construction, generator, relation, constraint, input-processing mechanism, or other finitely described formal system that deserves traceable coverage.
+Create a reliable Markdown source of the complete *A New Kind of Science* book
+with the OCR errors corrected.
 
-The audit must answer two different questions:
+The result must preserve the book's actual text and organization across front
+matter, all 12 chapters, General Notes, all 12 chapter Notes sections, formulas,
+Wolfram Language code, tables, captions, figures, Index, and Colophon. It must
+also be easy to navigate and reproducibly build from preserved inputs.
 
-1. What named constructions, presets, restrictions, seed/input classes, declarative systems, and materially distinct variants does the Book require the project to cover?
-2. What is the smaller set of genuinely distinct semantic families after aliases, presets, properties, representations, observers, applications, and lossless parameterizations are separated?
+Goal 5 keeps the fidelity objective that motivated Goal 4 while discarding the
+process machinery that does not help correct or verify the book. The first
+stage cleans up Goal 4's unnecessary schemas, locks, authority models, race
+defenses, generated ledgers, tests, caches, and unfinished pipeline work. It
+retains or migrates only source facts and tools that directly reduce the work
+of producing and checking the corrected book.
 
-Success is not a preferred count. Success is an evidence-complete census in which every part of the Book has been screened, every candidate has a source-grounded semantic fingerprint and orthogonal catalog/role/family classifications, every relevant cross-reference and image has been accounted for, the existing 45 entries are independently rediscovered or diagnosed, and every proposed addition or close exclusion survives hostile review.
+Completion is not “best effort with disclosed OCR errors.” Completion means the
+entire corpus has been reviewed against an authoritative source, all discovered
+OCR errors have been corrected, all review coverage is accounted for, and no
+known transcription ambiguity remains open. Literal errors present in the book
+itself are preserved as source text rather than silently corrected.
 
-Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not implement runtime changes, rewrite Goal 1, renumber T01–T45, or modify the Book sources or current catalog unless the user later authorizes a separate integration step.
+## What “Reliable” Means
 
-## Governing Questions
+The repaired corpus is reliable when:
 
-1. Is the current 45-row catalog exhaustive for the whole Book, rather than merely exhaustive for its original Chapters 3–5 seed scope?
-2. Which unlisted passages specify genuinely new constructions, and which are variants, compositions, properties, seed classes, observers, applications, or emulations of existing constructions?
-3. Which Book names deserve distinct catalog coverage even when they share one semantic implementation family?
-4. Which apparently similar systems differ in state, history, update schedule, probability semantics, structural mutation, branching, completion, or witness requirements?
-5. Do any newly discovered constructions invalidate the current proposed SimpleProgram API or require a principled clarification?
-6. What exact changes should a later authorized integration make to `ref/notes/CA-Types.csv`, Goal 1, Goal 2, and API planning?
+- every part of the book has received a sequential source comparison rather
+  than only detector-driven spot checking;
+- corrections are grounded in an authoritative edition-identical source, not
+  language-model plausibility or agreement between correlated OCR derivatives;
+- prose, punctuation, capitalization, spacing, headings, lists, formulas, code,
+  rule tables, captions, Index entries, and reading order are all in scope;
+- high-risk technical and multi-column material receives a dedicated second
+  pass;
+- automated searches are used to find residual defects but never treated as a
+  substitute for reading;
+- a separate verification pass confirms the corrected corpus and closes or
+  reopens every discrepancy;
+- the final Markdown builds deterministically, links and images resolve, and the
+  legacy corpus remains byte-for-byte unchanged.
+
+This is source-fidelity work, but it does not require a forensic publication
+system. Reliability comes from complete comparison, careful correction, a
+simple coverage record, focused review, and reproducible output—not from a
+large schema graph or hostile-filesystem security model.
+
+## In Scope
+
+- Clean up Goal 4 artifacts that do not directly support book correction.
+- Preserve the legacy corpus as immutable raw evidence.
+- Establish a lawful, readable, edition-identical authoritative source for the
+  complete book.
+- Produce 29 correctly owned canonical Markdown documents: publication and
+  contents, Preface, 12 chapters, General Notes, 12 chapter Notes documents,
+  Index, and Colophon.
+- Correct all OCR transcription errors found through complete sequential
+  comparison and follow-up detector passes.
+- Correct document boundaries, paragraph/list/heading structure, reading order,
+  Markdown fences, formulas, code, captions, and Index column flattening where
+  the authoritative source establishes the answer.
+- Account for and correctly place every legacy image; add a missing visual only
+  when a lawful authoritative source establishes that it belongs in the book
+  and permits the chosen handling.
+- Add generated contents and navigation without presenting editorial material
+  as author text.
+- Build and validate the repaired sibling corpus reproducibly.
+
+## Out of Scope
+
+- Correcting factual, mathematical, historical, or typographical errors that
+  are actually present in the authoritative book. Those may be noted in a
+  separate errata file, but the canonical transcription preserves them.
+- Creating a generalized document compiler, workflow engine, evidence database,
+  reviewer-identity system, or security boundary.
+- A census of covers, endpapers, blank leaves, trim, bleed, file inodes, or
+  other publication/security details that do not affect the Markdown book.
+- Adversarial caller authorization, forged-ledger defense, atomic no-replace
+  race handling, implementation proof locks, or large mutation matrices.
+- Migrating Goal 1/3 consumers or replacing the immutable legacy corpus.
+- Claiming human review when work was performed by an agent.
 
 ## Non-Negotiable Constraints
 
-1. **Book-first discovery.** Do not use T01–T45, `CA-Types.md`, Goal 1 stage conclusions, the proposed API, or runtime capabilities to decide what exists in the Book during the blind discovery phase.
-2. **Artifact-level independence, not a false claim of amnesia.** Prior context is known, but blind discovery artifacts use provisional `B####` candidate IDs and contain no T-ID mappings or API-fit decisions until Stage 19.
-3. **Sequential coverage precedes search saturation.** Keyword searches, headings, and Index terms can find omissions but cannot substitute for reading every source unit in order.
-4. **The ordered 29-document corpus is canonical.** Start from `ref/A-New-Kind-of-Science/Contents.md`, follow its document order, and use those linked Markdown files for completeness and provenance.
-5. **Main text and Notes are paired.** Review each chapter document together with its corresponding Notes document.
-6. **Figures count as evidence.** Visually screen every image at least once, using contact sheets or thumbnails where appropriate. Inspect construction-bearing, text-bearing, ambiguous, or caption-incomplete figures at original resolution with their surrounding context; do not infer exact rules from pixels when the source does not establish them.
-7. **No count target.** Do not protect 45, inflate the number of additions, or collapse candidates merely to preserve an elegant API.
-8. **Coverage catalog and semantic families remain separate.** A named preset can deserve a catalog row without a new executor. Conversely, two systems can fit the same five fields while remaining semantically distinct.
-9. **Names do not establish identity.** Different names may be aliases or presets; the same name may cover several constructions.
-10. **API fit does not establish taxonomy.** Do not decide that two systems are one type merely because both fit `seed/alphabet/frontier/neighborhood/rule`.
-11. **Equivalence requires a real proof.** Claims of same-family reuse require a lossless complete-state representation, an inverse on the valid image, and preservation of one native event/result—including schedule, branching/probability, completion, and witnesses—without a hidden source interpreter.
-12. **New-family claims require a counterexample.** Show a concrete native event or denotation that the nearest existing family cannot preserve honestly. Opaque packing, callbacks, phase hidden in an executor, or multi-step simulation are not evidence of reuse.
-13. **Do not conflate semantic roles.** Keep construction, property/restriction, seed/input/boundary class, representation, observer/analyzer, solver, application, emulation, and historical mention distinct.
-14. **Randomness distinctions are explicit.** Separate random initial data, a stochastic transition law, an external draw stream, a finite PRNG realization, and a downstream distribution.
-15. **Declarative objects are not fake trajectories.** A constraint, function, constant, equation, or model set may be in scope without a native update.
-16. **Insufficient source evidence is a resolved boundary, not permission to invent.** Record the exact missing mechanics and classify the candidate as `INSUFFICIENT_BOOK_EVIDENCE` after exhaustive review.
-17. **External sources are auxiliary only.** They may clarify terminology or document a source defect, but they cannot create Book coverage or silently fill absent Book semantics.
-18. **Preserve the canonical source.** Do not edit the Book corpus during the taxonomy audit. Record any apparent textual, visual, or semantic ambiguity as an audit finding rather than silently changing source material.
-19. **Scope writes to Goal 3.** During execution, preserve current dirty work and write audit artifacts only under `goal-3/` unless the user explicitly authorizes integration elsewhere.
-20. **No stage completes on green tooling alone.** Validators prove ledger integrity; they do not prove that a human or agent read and correctly understood the source.
-
-## Definitions
-
-### Source Unit
-
-A deterministic, hash-bound unit of one canonical book document: heading, paragraph, list item, code/formula block, caption, table-like block, image reference, or other indivisible review unit. Source units must partition the ordered 29-document corpus without silent gaps or overlaps.
-
-### Candidate
-
-A source-grounded possibility that the Book specifies a construction or a catalog-worthy semantic role. Candidates use stable provisional IDs `B0001`, `B0002`, and so on until final reconciliation.
-
-### Semantic Fingerprint
-
-Every candidate records:
-
-- object kind and native notion of time, if any;
-- carrier, support, topology, and structural invariants;
-- alphabet or value schema;
-- complete state, visible history, and control;
-- seed, input, boundary, and external data;
-- frontier, activation, or schedule;
-- readable dependencies or neighborhood;
-- rule, relation, constraint, function, or probability law;
-- writes, replacement, assembly, or commit semantics;
-- successor cardinality, determinism, branching, or stochastic measure;
-- termination, completion, failure, and witness semantics;
-- parameters and variants;
-- observers and representations kept outside native identity;
-- evidence strength and any missing mechanics.
-
-### Coverage Catalog
-
-The traceable inventory of Book constructions and separately named coverage obligations. It may include presets, restrictions, seed classes, or declarative categories that do not require distinct execution machinery.
-
-### Semantic Family
-
-A group whose members either have an explicit lossless structural/relational correspondence preserving complete native semantics or are proved instances/restrictions of the same explicit parameterized semantic schema with unchanged mechanics. Similar behavior, a shared renderer, emulation, or a common top-level API shape is insufficient.
-
-### Orthogonal Final Classification
-
-Every candidate must receive three independent final fields so catalog coverage is never confused with semantic-family novelty.
-
-`catalog_action` has exactly one value:
-
-- `EXISTING_ENTRY_SUFFICIENT`
-- `EXISTING_ENTRY_NEEDS_CORRECTION`
-- `ADD_CATALOG_ENTRY`
-- `NO_SEPARATE_CATALOG_ENTRY`
-- `INSUFFICIENT_BOOK_EVIDENCE`
-
-`semantic_role` has exactly one primary value, with optional secondary tags:
-
-- `NATIVE_TRANSITION_OR_GENERATOR`
-- `STOCHASTIC_OR_BRANCHING_PROCESS`
-- `INPUT_PROCESSOR_OR_TRANSDUCER`
-- `RELATION_CONSTRAINT_OR_MODEL_SET`
-- `IMMUTABLE_DEFINITION_OR_QUERY`
-- `SPECIALIZATION_OR_PRESET`
-- `PROPERTY_OR_RESTRICTION`
-- `SEED_INPUT_OR_BOUNDARY_CLASS`
-- `COMPOSITION_OR_HYBRID`
-- `REPRESENTATION_CODEC_OR_OBSERVER`
-- `APPLICATION_OR_EMULATION`
-- `DUPLICATE_OR_ALIAS`
-- `SOURCE_INSUFFICIENT_ROLE`
-
-`family_action` has exactly one value:
-
-- `EXISTING_SEMANTIC_FAMILY`
-- `NEW_SEMANTIC_FAMILY`
-- `SOURCE_INSUFFICIENT_FOR_FAMILY`
-
-A candidate may therefore justify a new catalog entry while remaining a preset, property, seed class, composition, declarative object, or other member of an existing semantic family. A new-family counterexample is required only for `NEW_SEMANTIC_FAMILY`, never merely because `catalog_action=ADD_CATALOG_ENTRY`.
-
-## Authoritative Inputs
-
-- User directions and `principles.md`.
-- [Canonical source overview](../ref/A-New-Kind-of-Science/README.md).
-- [Ordered contents](../ref/A-New-Kind-of-Science/Contents.md), linking all 29 canonical book documents.
-- The 1,607 colocated Book images referenced by those documents.
-- [The canonical Index](../ref/A-New-Kind-of-Science/BACK-MATTER/Index.md): alias and cross-reference discovery, not construction proof by itself.
-- `ref/notes/CA-Types.csv`, `ref/notes/CA-Types.md`, Goal 1, Goal 2, `api.md`, `simple_programs.md`, and `src/ca`: withheld during blind discovery and opened only for reconciliation and architecture-pressure analysis.
+1. **Preserve the legacy corpus.** Do not modify, rename, delete, or reformat
+   `ref/A-New-Kind-of-Science/**`.
+2. **Protect unrelated work.** Inspect `git status` and diffs before cleanup or
+   bulk changes. Goal 4 files may be changing concurrently; never assume an old
+   inventory is current.
+3. **Clean up by utility.** Retain a Goal 4 artifact only if it is directly used
+   to locate, correct, build, or verify book content and is simpler to retain
+   than to replace. Git history is sufficient archival storage for discarded
+   process machinery.
+4. **Use an authoritative source.** A transcription-changing decision must be
+   checked against a lawful, edition-identical book source. The monolith, split
+   files, and extracted JPEGs are correlated or incomplete OCR evidence and
+   cannot alone prove corrected wording.
+5. **Respect source permissions.** Do not scrape, bulk-download, commit, or send
+   copyrighted source material to tools when the applicable license or user
+   authorization does not permit it. A user-provided or mounted source must
+   have a clear allowed-use boundary.
+6. **Do not guess.** Plausibility, spell-checking, parsers, execution, rendering,
+   and model consensus may identify candidates but cannot authorize a change.
+7. **Preserve authorial errors.** Distinguish OCR error from an error printed in
+   the book. Canonical Markdown transcribes the latter faithfully.
+8. **Review everything.** Every canonical source span and every authoritative
+   source region containing book content must belong to a completed review
+   batch. Detectors and samples do not replace this coverage requirement.
+9. **Use simple records.** Keep a compact correction log and coverage checklist.
+   Do not recreate Goal 4's per-block authority, workflow, provenance, lock, or
+   review schema system.
+10. **Build from preserved inputs.** Never use a previous repaired tree as the
+    source for the next build.
+11. **Keep editorial additions separate.** Generated anchors, page markers,
+    navigation, alternative text, and errata must not masquerade as book text.
+12. **Do not release with known ambiguity.** An unreadable or unavailable
+    authorial source region is a real blocker to the “without OCR errors” goal;
+    obtain better evidence or continue the review rather than weakening the
+    objective.
 
 ## Current Facts
 
-These are current cutover facts to reverify and hash-pin in Stage 2:
+These facts have been rechecked against the live worktree, immutable corpus,
+and pinned fixed-layout source unless explicitly described as a review risk.
 
-- `CA-Types.md` explicitly says its source scope is Chapters 3–5. Goal 1 makes the 45-row CSV exhaustive relative to that seed catalog, not relative to an independent whole-book discovery pass.
-- The current catalog has stable identifiers T01–T45, and Goal 1 reports all 45 type stages plus synthesis and the implementation handoff complete.
-- The canonical source tree contains exactly 29 ordered book documents, plus `README.md` and `Contents.md`.
-- The 29 documents cover publication information and printed contents, Preface, Chapters 1–12, General Notes, Notes for Chapters 1–12, Index, and Colophon.
-- The canonical source tree contains 1,607 JPEGs colocated with their owning document groups.
-- The source documents and their image references were validated before canonical cutover; Stage 2 must independently reverify counts, hashes, ordering, and link resolution rather than inherit that verdict.
-- The EPUB briefly inspected in the repository was deleted and is not an audit source.
-- Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
-- Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
-
-## Canonical Corpus Map
-
-Stage 2 must rederive this map rather than trust it blindly:
-
-| Material | Canonical logical lines |
-|---|---:|
-| Cover, copyright, printed contents | 1–85 |
-| Preface | 86–167 |
-| Chapter 1 | 168–399 |
-| Chapter 2 | 400–681 |
-| Chapter 3 | 682–1369 |
-| Chapter 4 | 1370–2143 |
-| Chapter 5 | 2144–2701 |
-| Chapter 6 | 2702–3421 |
-| Chapter 7 | 3422–4337 |
-| Chapter 8 | 4338–5165 |
-| Chapter 9 | 5166–6587 |
-| Chapter 10 | 6588–7693 |
-| Chapter 11 | 7694–8609 |
-| Chapter 12 | 8610–10622 |
-| General Notes | 10623–10817 |
-| Chapter 1 Notes | 10818–10894 |
-| Chapter 2 Notes | 10895–11630 |
-| Chapter 3 Notes | 11631–12498 |
-| Chapter 4 Notes | 12499–13459 |
-| Chapter 5 Notes | 13460–14198 |
-| Chapter 6 Notes | 14199–14847 |
-| Chapter 7 Notes | 14848–15582 |
-| Chapter 8 Notes | 15583–16011 |
-| Chapter 9 Notes | 16012–17086 |
-| Chapter 10 Notes | 17087–18194 |
-| Chapter 11 Notes | 18195–19027 |
-| Chapter 12 Notes | 19028–20825 |
-| Actual Index | 20826–22457 |
-| Actual Colophon | 22458–22498 |
+- The legacy corpus contains 19 Markdown files and 1,444 JPEGs.
+- The monolith is 3,780,628 bytes and 22,498 logical lines.
+- The monolith references 1,444 images; the split Markdown omits three image
+  references.
+- Chapter 12 runs into General Notes, and nominal Notes, Index, and Colophon
+  files contain displaced Notes and actual back matter.
+- The Index is flattened from multiple columns and requires layout-aware source
+  comparison.
+- Known defects include broken headings, word joins/splits, prose inside code
+  fences, malformed formulas, damaged Wolfram Language, caption interleaving,
+  OCR substitutions, and back-matter reading-order errors.
+- Stage 1 removed Goal 4's generated planning, schema, lock, pipeline,
+  validation, and test machinery after migrating four compact fact sets. Goal
+  4 had not corrected the book text.
+- The sibling `ref/A-New-Kind-of-Science-Repaired/` is reproducibly generated
+  from the immutable monolith plus guarded corrections. It is the completed
+  source-verified Goal 5 release; its generated README accurately distinguishes
+  the corrected release from the raw diagnostic projection.
+- A complete local First-edition, First-printing PDF is pinned as the
+  user-authorized fixed-layout witness for local agent-assisted comparison and
+  repaired workspace output. It is Git-ignored and is not authorized here for
+  redistribution.
 
 ## Assumptions To Challenge
 
-- The current 45 entries are all independently recoverable from a blind Book pass.
-- The Book provides enough mechanics to settle every candidate rather than only name it.
-- Every important construction appears in prose or headings rather than only in captions, code, formulas, or images.
-- Chapter boundaries and Book terminology align with semantic-family boundaries.
-- Applications in Chapters 7–10 only reuse earlier mechanics rather than defining new coupled or stochastic constructions.
-- Reversibility, conservation, symmetry, universality, and behavior classes are always properties rather than sometimes being enforced by a different construction.
-- A schedule can always be treated as ordinary visible state without changing the construction's semantic family.
-- Probability-bearing rules, structural mutation, multi-time state, and input streams fit existing families without semantic loss.
-- The final five-field API can express every new candidate without hidden state, a separate update policy, or a vacuous callback.
-- One catalog row should correspond to one semantic family.
+- The pinned edition-identical source remains readable at every location needed
+  for the full comparison; any unreadable region must be carried as a blocker.
+- The raw monolith contains all author text even where its transcription or
+  layout is damaged.
+- The proposed 29-document organization accounts for all book content.
+- Existing JPEGs cover all printed figures and are associated with the correct
+  captions.
+- A CommonMark-oriented representation can preserve the relevant structure of
+  formulas, code, tables, captions, and Index entries.
+- Fixed-layout margin figures require an explicit one-dimensional
+  serialization: place each image and caption after the earliest complete
+  paragraph that explicitly refers to it (or, when there is no reference,
+  after the closest complete paragraph beside it), without splitting printed
+  prose. This is a documented canonical Markdown choice, not a claim that the
+  two-dimensional page has one uniquely implied linear order.
+- When one or more full-page plates interrupt a prose paragraph in the raw
+  extraction, join the complete printed paragraph first, then serialize the
+  ordered plate group immediately after it. Preserve the source order and keep
+  each lead caption, continuation marker, image subgroup, and back caption with
+  the plate sequence it governs. This is likewise an explicit canonical
+  one-dimensional choice rather than an alteration of printed prose.
+- Four-chapter review batches are small enough to review carefully without
+  losing continuity or skipping content.
+- A fresh second review plus targeted detectors can reach zero open OCR
+  discrepancies without requiring Goal 4's formal machinery.
 
-## Required Goal 3 Artifacts
+## Minimal Working Architecture
 
-Execution of the stages will create, refine, and verify:
+The exact shape is frozen in Stage 2, but the intended system is small:
 
-- `goal-3/corpus-manifest.json`: hashes, file/asset counts, canonical segments, split anomalies, and chapter↔Notes pairings.
-- `goal-3/source-units.jsonl`: deterministic canonical source units with stable IDs and hashes.
-- `goal-3/reading-ledger.csv`: one review disposition and candidate/support links for every source unit.
-- `goal-3/candidate-ledger.jsonl`: stable B IDs, provenance, aliases, evidence strength, semantic fingerprints, and uncertainty.
-- `goal-3/search-rounds.json`: reproducible query rounds, result digests, match dispositions, and fixed-point evidence.
-- `goal-3/cross-reference-ledger.csv`: relevant page/section/Notes/Index routes and their reviewed targets.
-- `goal-3/asset-ledger.csv`: image references, physical paths/hashes, source ownership, evidence role, inspection status, and uncertainty.
-- `goal-3/classification-ledger.csv`: orthogonal `catalog_action`, `semantic_role`, and `family_action` fields plus proof for every candidate.
-- `goal-3/coverage-matrix.csv`: B candidates, existing T01–T45 obligations, proposed additions, and source coverage joins.
-- `goal-3/near-pair-matrix.md`: explicit comparisons among easily conflated candidates.
-- `goal-3/whole-book-catalog.md`: the final traceable coverage catalog.
-- `goal-3/semantic-families.md`: the deduplicated semantic-family inventory and equivalence/non-equivalence arguments.
-- `goal-3/hostile-review.md`: independent findings and reclosure records.
-- `goal-3/taxonomy-report.md`: final answer, counts, evidence limits, corrections, and integration consequences.
-- `goal-3/integration-handoff.md`: proposed T46+ additions and Goal 1/2/API work, without performing those changes.
-- Small validators/oracles under `goal-3/tools/` that fail closed when coverage, joins, hashes, or dispositions are incomplete.
+```text
+goal-5/
+├── 0-plan.md
+├── 0-loop.md
+├── 0-prompt.md
+├── build.py
+├── validate.py
+├── corrections.jsonl
+├── added-assets.jsonl
+├── coverage.csv
+├── unresolved.md
+└── tests/
+
+ref/A-New-Kind-of-Science-Repaired/
+├── README.md
+├── Contents.md
+├── FRONT-MATTER/
+├── CHAPTERS/
+└── BACK-MATTER/
+    ├── NOTES/
+    ├── Index.md
+    └── Colophon.md
+```
+
+`corrections.jsonl` records actual author-text changes with an absolute raw
+byte offset, exact before/after text, source page/location, reason, and reviewer
+status.
+`added-assets.jsonl` pins the small number of authoritative visuals absent from
+the immutable legacy extraction by owner, source location, hash, and decoded
+dimensions; zero-correction builds deliberately exclude them.
+`coverage.csv` records sequential review ranges and second-pass completion.
+Neither file is a generalized workflow database.
 
 ## Success Metrics
 
-- All 29 canonical book documents, both navigation documents, and all 1,607 physical images are present in the source manifest or explicitly diagnosed.
-- Every canonical logical line belongs to exactly one segment and every deterministic source unit has exactly one reading-ledger disposition.
-- Preface/bookends, 12/12 main chapters, General Notes, 12/12 chapter Notes documents, canonical Index, and Colophon are screened.
-- Every image reference has an asset-ledger row and every physical image is visually screened at least once; construction-bearing, text-bearing, ambiguous, and caption-incomplete images receive original-resolution review with surrounding context.
-- Every relevant cross-reference reaches a reviewed target or a documented missing target.
-- Sequential discovery and recursive search reach a declared fixed point with no undispositioned search hit.
-- Every candidate has complete provenance, a semantic fingerprint, and exactly one value for each final classification axis.
-- Every T01–T45 entry is independently rediscovered or receives a source-backed diagnostic.
-- Every proposed new catalog entry and every close collapse/exclusion receives independent hostile review.
-- The final coverage-catalog count and semantic-family count are both reported and never conflated.
-- Zero source units, candidates, search hits, cross-references, and required assets remain silently unresolved.
-- Genuine `INSUFFICIENT_BOOK_EVIDENCE` dispositions identify the exact missing mechanics and the evidence boundary.
-- Input hashes and all audit ledgers are reproducible; mutation tests prove the validators detect missing units, links, classifications, and source changes.
+- Unnecessary Goal 4 machinery is removed without harming useful source facts,
+  the legacy corpus, or unrelated work.
+- A lawful edition-identical source covers the complete book text, technical
+  material, figures/captions, Index, and Colophon at readable quality.
+- Exactly 29 canonical author-text Markdown documents contain the complete book
+  in correct order and ownership.
+- Every canonical span is included in a sequential authoritative-source review
+  batch, and every batch is complete.
+- Every authoritative book-content region maps to the corrected Markdown; no
+  paragraph, heading, formula, code block, caption, table, Index entry, or
+  Colophon text is silently omitted.
+- Every applied transcription change has an exact preimage, source location,
+  rationale, and completed verification state.
+- Every high-risk formula, Wolfram Language block, rule table, caption, and
+  reconstructed Index region receives a dedicated second comparison.
+- All 1,444 legacy assets are accounted for, all repaired image references
+  resolve, and figure/caption placement agrees with the authoritative source.
+- Residual OCR detectors have no unexplained hits, and repeated full review
+  rounds produce no new discrepancies.
+- Zero known or unresolved transcription ambiguity remains at release.
+- The repaired Markdown parses/renders as intended, navigation resolves, and
+  two clean builds are byte-identical.
+- The complete legacy tree and existing Goal 1/3 consumers remain unchanged.
 
 ## Verification Requirements
 
-- Independently parse all 29 ordered documents and compare them with the manifest and source-unit ledger; do not derive expected coverage from the same ledger being tested.
-- Prove segment and source-unit union equals the canonical corpus with no gaps or overlaps.
-- Verify every source reference, document link, image path, and hash resolves or has an explicit finding.
-- Verify candidate IDs, source-unit links, cross-reference targets, search dispositions, classification rows, and coverage-matrix joins are total and unique.
-- Verify blind artifacts were frozen before T reconciliation and contain no T-ID mapping or API-fit fields.
-- Re-run all search rounds and compare query/result digests.
-- Mutation-test deletion or corruption of a source unit, candidate link, search disposition, cross-reference, asset row, and classification; each mutation must fail verification.
-- Run validators from the repository root and a relocated copy, byte-compile/import silently where applicable, fail closed under optimized Python if assertions are used, and avoid working-directory assumptions.
-- Run direct trailing-whitespace, Markdown-fence, path, and schema checks over tracked and untracked `goal-3/**`; when files are intentionally staged, also run `git diff --cached --check -- goal-3`. Inspect scope with `git status --short`.
-- Confirm Goal 3 did not edit Book sources, `ref/notes`, Goal 1, Goal 2, runtime, tests, or root API documents without explicit authorization.
+- Hash the legacy corpus before cleanup and after release.
+- Inspect all modified/untracked Goal 4 content before deletion and record the
+  keep/delete/migrate decision.
+- Verify authoritative source identity, completeness, legibility, and allowed
+  use without constructing a physical-book forensics system.
+- Partition both raw and authoritative book content into simple, ordered review
+  ranges and prove no range is skipped or duplicated.
+- Build a zero-correction 29-document projection first and prove raw-content
+  conservation before applying corrections.
+- Guard every correction by exact preimage and expected occurrence count.
+- For every content batch, perform a complete forward source comparison, run
+  focused detectors, render changed material, and perform a separate second
+  pass before closing it.
+- Compare technical material character/token by character/token where ordinary
+  prose review is insufficient.
+- Compare the Index in printed column/entry order against fixed-layout evidence.
+- Verify image order, file identity, caption association, and link resolution.
+- Run corpus-wide searches for common OCR confusions, broken words,
+  punctuation/Unicode anomalies, malformed Markdown/math/code, and suspicious
+  vocabulary; disposition every hit.
+- Repeat the final review/detector pass after the last correction until a full
+  pass finds no new discrepancy.
+- Build twice in fresh directories, compare outputs, run focused tests and
+  affected repository tests, and run `git diff --check` plus scope inspection.
+
+## Current Execution State
+
+- Synced: 2026-07-20 (America/Los_Angeles).
+- Final stage: `12-RELEASE` (`COMPLETE`). All Goal 5 stages are complete.
+  Stage 11 found and repaired nine source-backed N12 defects and one
+  source-backed N06 table defect. Two apparent N06 formula/subscript defects
+  were disproved against fresh high-resolution source evidence and rolled
+  back. The affected technical and document passes were restarted before the
+  required wholly fresh final saturation round closed all 29 documents and all
+  1,280 pages at zero finding and zero ambiguity.
+- The current repaired tree has exactly 29 canonical documents, 1,607 images,
+  4,834 guarded corrections, 29 completed second-pass coverage rows, and 1,638
+  total files. Its length-prefixed SHA-256 is
+  `d3d2d96b6d4516e76f37b1fbf28c31f524a65d41f3799dbba15a06f17d340660`.
+- N12 is 398,142 bytes, 1,843 LF, and SHA-256
+  `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
+  Its wholly fresh post-fix technical closure and 76-page Round 1 document
+  restart are accepted with zero mismatch or ambiguity; no pre-repair N12
+  verdict receives credit. A separate fresh 76-page Round 2 review is also
+  accepted at `0/0`.
+- N06 is 85,452 bytes, 666 LF, and SHA-256
+  `23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`.
+  Its prior technical seal and pre-repair saturation receipts remain void. The
+  wholly fresh replacement technical closure plus complete 20-page Round 1
+  and Round 2 reviews are accepted at `0/0`.
+- Round 1 closed all 29 documents, 1,280 pages, 812 runs, and 35,479
+  candidates after root replayed every final lane mutation suite and strict
+  verifier. The wholly fresh Round 2 then repeated the same complete scope
+  from zero review credit: Lane 1 closed 10/430 documents/pages and
+  280/5,271 runs/candidates; Lane 2 closed 10/425 and 280/6,352; Lane 3
+  closed 9/425 and 252/23,856. All three final packets have exact intended
+  member inventories and report `0/0`; Lane 1's two current verifier-pass
+  receipts are deliberately outside its member manifest.
+- The final zero-credit Round 1 preflight is
+  `/tmp/g5-stage11-round1-final-preflight-20260720-a1`: 29 documents, 1,280
+  pages, 812 detector runs, and 35,479 candidates. Its Stage 9 gate is
+  explicitly satisfied; root semantic verification and two strict replays
+  reproduce manifest SHA-256
+  `25616b366b8f48a981d15eb4d6b3e4fdecd06b0d0255084a609cce15d8571884`
+  and all 16 mutation rejections.
+- After Round 1 closure and the N06/N12 coverage-note update, a wholly fresh
+  Round 2 preflight was generated at
+  `/tmp/g5-stage11-round2-final-preflight-20260720-a1`. It binds all three
+  accepted Round 1 seals while explicitly inheriting no disposition or review
+  credit; root semantic verification and two strict replays reproduce manifest
+  SHA-256
+  `941ef2ef335512872de16a3d7f0b425affc8b00afc63f96e31dbbefe39553ecc`
+  and all 20 mutation rejections. Three new reviewers completed their full
+  page/candidate/run lanes from zero. Root reproduced all final mutation and
+  verifier gates; the stable 3,622,684-byte author-text corpus hashes to
+  `ec7f22f801d157076d33446f2fb5ee01dadaa6b18f3e89d0a123acc0000f2725`.
+- Stage 12 changed only generated navigation/release documentation and its
+  focused builder/validator assertions. The 1,636 author-text/image payload
+  files remain byte-identical to the accepted Stage 11 tree at SHA-256
+  `63d702f88f644df70158c1dbf31124bd56e9e2efa04325a8fbf754daf2bb8f61`.
+  Two fresh normal builds and the published sibling match exactly; the raw
+  diagnostic projection reassembles to the immutable monolith and validates.
+- `python3 goal-5/validate.py` passes. The complete repository suite passes
+  311 tests and 6,268 subtests against the final release.
+
+### Chronological Stage Record
+
+- Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
+  and the empty `goal-4/` directory were removed by exact path. No commit
+  range was reverted, and Goal 4 had corrected no book text.
+- The legacy tree currently contains exactly 1,463 files: 19 Markdown and 1,444
+  JPEG. A sorted path-and-file-digest snapshot hashes to
+  `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
+- The monolith remains 3,780,628 bytes with SHA-256
+  `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
+- At the recorded pre-Stage-9 snapshot,
+  `ref/A-New-Kind-of-Science-Repaired/` contained 29 generated author-text
+  documents, 1,444 mapped image positions, 163 source-added images, generated
+  README/Contents files, and 4,534 guarded source-verified corrections. That
+  snapshot was not yet a complete OCR-corrected edition.
+- A repository-wide scan found no code, test, or document outside Goal 4 that
+  consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
+  intentional historical cleanup references to Goal 4 and intentional repaired
+  sibling references, but no dependency on its machinery.
+- Goal 5 contains four compact working datasets: 29 source-confirmed raw/PDF
+  ranges, 57 known-defect/guardrail candidates, a 1,444-row image-to-asset map,
+  and a concise legacy/routing/source summary. Content claims remain pending
+  until their sequential comparison passes.
+- `known-defects.jsonl` is a routing/intake inventory, not the live owner-pass
+  disposition ledger. Its per-row status records the state in which a candidate
+  entered Goal 5; current repair and closure evidence lives in
+  `corrections.jsonl`, `coverage.csv`, focused tests, and stage results.
+- The pinned source is `A New Kind of Science/A New Kind of Science.pdf`, a
+  complete, readable 1,280-page First-edition, First-printing fixed-layout
+  witness whose copyright-page identity matches the immutable monolith. Its
+  SHA-256 is
+  `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
+- Stage 2 is complete. The zero-correction build conserves all monolith bytes;
+  two fresh builds match; the focused validator protects the legacy snapshot,
+  exact source identity, 29 raw/PDF partitions, correction evidence, and image
+  ownership; `10` tests plus `26` mutation subtests pass.
+- Source comparison corrected twelve chapter-start raw boundaries and eight
+  opener-image owners. All 1,444 image filenames now place their source page
+  inside their owning canonical document. `FOUNDATION-SOURCE-001` is closed.
+- `PUBLICATION_AND_CONTENTS` is complete after two sequential agent passes over
+  PDF pages 1–8 and a clean closing pass against the rebuilt Markdown. Its 20
+  guarded corrections are `G5-C-0001`–`G5-C-0020`; focused render and tests
+  pass.
+- `PREFACE` is complete after a sequential first pass over PDF pages 9–16 and
+  an independent clean second pass against the rebuilt Markdown. Its 59 guarded
+  corrections are `G5-C-0021`–`G5-C-0079`; exact text/emphasis comparison,
+  detector scans, rendering, deterministic builds, and focused tests pass.
+- `CH01` is complete after a sequential first pass over PDF pages 17–38 and an
+  independent clean second pass against the final rebuilt Markdown and assets.
+  Its 27 guarded corrections are `G5-C-0080`–`G5-C-0106`; the exact prose-token
+  sequence, punctuation, hierarchy, emphasis, paragraph joins, three figures,
+  captions, and source-faithful repaired-only opener were rechecked.
+- `CH02` is complete after a forward first pass, pre-closure residual review,
+  and independent clean second pass over PDF pages 39–66. Its 26 guarded
+  corrections are
+  `G5-C-0107`–`G5-C-0132`; all 19 inherited figures/captions
+  were checked, three source-backed missing visuals were restored, and two
+  full-page plate sequences plus the rule-90 figure group were canonically
+  serialized after complete prose paragraphs. The final source/candidate
+  sequence matched at 6,685 tokens with no punctuation, technical, visual, or
+  caption discrepancy.
+- `CH03` is complete after a forward first pass and an independent clean second
+  pass over all 64 PDF pages 67–130, including the intentional blank final
+  page. Its 61 guarded corrections are `G5-C-0133`–`G5-C-0193`; all 248 final
+  live-text blocks and 87 final images were independently verified, one omitted
+  rules plate was restored, and three damaged/raster-text images use pinned
+  repaired-only overrides. Focused tests, residual detectors, rendering,
+  deterministic builds, and legacy checks pass. The final Markdown SHA-256 is
+  `f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f35`.
+- `CH04` is complete after a forward first pass and a clean independent pass
+  restarted against the post-`G5-C-0303` final document. Its 110 guarded
+  corrections are `G5-C-0194`–`G5-C-0303`; all 243 live blocks, 172 TeX spans,
+  11 reconstructed tables, and 63 assets were independently verified over all
+  54 PDF pages 131–184. The final Markdown SHA-256 is
+  `33b0521073b7d212d181903a71b1917b7647b006ef09618f93d89697f8942248`.
+- `CH05` is complete after a forward first pass and an independent clean second
+  pass over all 54 PDF pages 185–238, including the intentional blank final
+  page. Its 52 guarded corrections are `G5-C-0304`–`G5-C-0355`; all 80 final
+  image references were independently verified, including 11 repaired-only
+  overrides and three restored source visuals. Focused detectors, rendering,
+  two fresh deterministic builds, strict zero-correction validation, the
+  cumulative 55-test Goal 5 suite, the complete 157-test repository suite,
+  and legacy checks pass. The final Markdown SHA-256 is
+  `79705293cb790968285d12f4d46f1f96337a0cff7f8eaeb87b142adc5bf751c1`.
+- `CH06` is complete after a forward first pass and three independent clean
+  closing audits over all 74 PDF pages 239–312. Its 44 guarded corrections are
+  `G5-C-0356`–`G5-C-0399`; all author text and structure, 29 inline math
+  spans, 105 accounting references, 99 mapped assets, six additions, seven
+  repaired-only overrides, and the complete 85-page render were rechecked.
+  Focused detectors, strict zero-correction validation, two fresh deterministic
+  builds, the cumulative 62-test Goal 5 suite, the complete 164-test repository
+  suite with 135 subtests, and legacy checks pass. The final Markdown SHA-256
+  is `0eb4ebc5400c3e3ed39fb2dd8fd9c38a2977eaef1ffefb528fd4c2708a42dca5`.
+- `CH07` is complete at `YES/YES` after a forward pass and fresh independent
+  source, technical, and visual closing passes over all 66 PDF pages 313–378
+  and all 92 accounting references. Its 53 guarded corrections are
+  `G5-C-0400`–`G5-C-0452`; 12 source-backed mapped overrides repair incomplete
+  or contaminated figures, and no source-added asset was required. The final
+  closing visual traversal caught and repaired two truncated class-1 rule
+  strips before restarting cleanly. All three final ledgers close with zero
+  discrepancy or ambiguity. Default and zero-correction validation both pass
+  with nine closed second-pass documents; two fresh normal builds are
+  byte-identical, and the complete 171-test repository suite plus 171 subtests
+  passes. The final Markdown SHA-256 is
+  `e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`.
+- `CH08` is complete at `YES/YES` after independent source, technical, and
+  visual first passes, integration, and fresh independent source, technical,
+  and visual closing passes over all 70 PDF pages 379–448. Its 47 guarded
+  corrections are `G5-C-0453`–`G5-C-0499`; nine mapped overrides repair
+  ordinals 444, 446–450, 452, 453, and 468, and additions `G5-A-0018` and
+  `G5-A-0019` restore two omitted flow panels. All three final ledgers close
+  with zero discrepancy or ambiguity across the final 770-line Markdown and
+  all 45 live references. The focused six-test CH08 suite, 75-test Goal 5
+  suite, complete 177-test repository suite, rendering, default and strict
+  zero-correction validation, two fresh deterministic builds, legacy digest,
+  and scope gates pass. The final Markdown SHA-256 is
+  `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`.
+- Stage 5 is complete over `CH09`–`CH12`: PDF pages 449–864, printed pages
+  433–848, raw lines 5,164–10,622, bytes `[728322,1540232)`, and mapped
+  ordinals 480–822. `CH09` is complete at `YES/YES` after forward first and
+  fresh source, technical, and visual final-output passes over all 114 PDF
+  pages 449–562. Its 77 guarded corrections are `G5-C-0500`–`G5-C-0576`;
+  all 113 final JPEG references and the live rule-94 swatch close with zero
+  discrepancy or ambiguity. One mapped override and additions `G5-A-0020`–
+  `G5-A-0022` repair the PDF-493 and PDF-527 omissions. The final Markdown
+  SHA-256 is
+  `c4786895ea852253233767f683f69ffce0f6e5576e948e4bbe3bf33c26cbc66c`.
+  `CH10` is complete at `YES/YES` after forward first passes and fresh
+  independent source, technical, and visual final-output passes over all 90 PDF
+  pages 563–652, including the blank closing leaf. Its 90 guarded corrections
+  are `G5-C-0577`–`G5-C-0666`; five mapped overrides repair ordinals 610, 613,
+  641, 651, and 652, while additions `G5-A-0023`–`G5-A-0033` restore eleven
+  omitted source visuals. All three final ledgers close with zero discrepancy
+  or ambiguity across 1,014 Markdown lines and all 78 final references. The
+  final Markdown is 164,487 bytes with SHA-256
+  `82217582690509ef97acd14ca12f0f9680e380ce6a1d8f8a0373e569114b2bc3`.
+  Focused and cumulative tests, complete rendering, default and strict
+  zero-correction validation, two fresh byte-identical builds, legacy digest,
+  and scope gates pass. `CH11` is complete at `YES/YES` after forward first
+  passes and wholly fresh independent source, technical, and visual
+  final-output passes over all 78 PDF pages 653–730. Its 64 guarded corrections
+  are `G5-C-0667`–`G5-C-0730`; 107 mapped references plus `G5-A-0034`
+  produce 108 final references, with 14 mapped references using repaired-only
+  overrides. The final 103,952-byte, 874-line Markdown hashes to
+  `94e20302298935e73ad11c300d267d05ab23682bf14978e67fe0c3b09ef7080c`.
+  Source, technical, and visual closing reports hash respectively to
+  `47632497b0d234b3f4fecef81fe61398e66017d6304df9a13127fc5b33728b2a`,
+  `5acbfc73fb485ac1faf4b2e347555d1a6340c4f94a8265deb6529bc5bd8e5b96`,
+  and `3f8b746226b218af9cbfde2e5bfe68e73b76df3ff3e5845e89f5dc5b73d93095`;
+  each closes with zero discrepancy and zero ambiguity. The 85-page render
+  hashes to
+  `b97e7ab8ce4fbca72866e09e54bb579255e3b23f2dbee1837be0e4aebad47937`.
+  Nine focused tests, the 98-test Goal 5 suite, and the complete 200-test
+  repository suite with 450 subtests pass. Two fresh normal builds and the
+  published sibling are byte-identical at tree SHA-256
+  `34ec72379ae65788d03dbc195708c71ae7743955de636261a118b61598d4f9b9`;
+  strict zero-correction output hashes to
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+  Recurrence searches found both earlier `guite` instances already corrected
+  in `CH07` and pinned two source-confirmed future instances to `N09` and
+  `N10`; styled ordinal, technical-span, page-join, plate-placement, furniture,
+  and visual-boundary detector families remain carried forward for their
+  owning passes. `CH12` is complete at `YES/YES` after its full first pass and
+  wholly fresh post-recrop source, technical, and visual closing passes over
+  all 134 PDF pages 731–864. Its 131 guarded corrections are
+  `G5-C-0731`–`G5-C-0861`; 59 mapped originals plus additions
+  `G5-A-0035`–`G5-A-0041` produce 66 unique final references. The final
+  252,955-byte, 1,686-line Markdown hashes to
+  `a1384ad5ada245f65d5ba8c5ff2af275ec1101252775a33ad69a7279216688d7`.
+  A final visual traversal reopened two theorem plates whose first crops omitted
+  terminal continuation ellipses; both were recropped and all three closing
+  passes restarted from PDF 731. Their final source, technical, and visual
+  reports hash to
+  `7ed3469133169de183c663d2366b6cd239a111c681842ccf11107248dd643166`,
+  `8c638f311105881f0502170d7b5d70506fb9401706744e4405f4e1f2bedb134c`,
+  and `5d551a5b503388fd4630a956bc6387b6358c9e5ba1eb01d55e3a94ba598b4be4`;
+  every discrepancy and ambiguity ledger closes at zero. The final 119-page
+  render hashes to
+  `087f84eec6ee4a68f012568e301333e3853bc1aa413bb9937cce348be0db9a70`.
+  Six focused CH12 tests, the 104-test Goal 5 suite, and the complete 206-test
+  repository suite with 613 subtests pass. At Stage 5 closure, default
+  validation reported 29 documents, 1,485 images, 861 corrections, and 14
+  completed second passes.
+  Two fresh normal builds and the published sibling were byte-identical at
+  1,516 files with tree SHA-256
+  `098f7979614a1bdfc4168491f68ae89e6de6ca1b2f764c1afdcb49f805086c2f`;
+  strict zero-correction output remains
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+  Fourteen documents had both passes complete. Stage 6 started at
+  `GENERAL_NOTES` PDF 865, raw line 10,623, byte 1540232, and its first mapped
+  visual is ordinal 823 on PDF 867. The initial Stage 6 IDs were `G5-C-0862`
+  and `G5-A-0042`.
+- `GENERAL_NOTES` is complete at `YES/YES` after a full first pass and wholly
+  fresh post-integration source, technical, and visual closing passes over PDF
+  pages 865–874. Its 21 guarded corrections are `G5-C-0862`–`G5-C-0882`.
+  The final 44,301-byte, 191-line Markdown hashes to
+  `1a5b294ecc1be93f0ed1f565646eaedaab10775f87ca314e0225c76bad76a10c`;
+  all 32 main notes, five program subgroups, 45 program expressions, 32 table
+  cells, two inline patterns, and mapped ordinal 823 close with zero discrepancy
+  and zero ambiguity. The closing source, technical, and visual reports hash to
+  `bde3ca484129a34ae5f29ca07a9f76eb3c6ff344b36f9f0d76358d0076e14bb5`,
+  `5d62c26ee888b0d1eb40dd1486d1a8d7c99c423de9c08f71874411e865c96c28`,
+  and `dc8ca77ae8f9e215f9b97e91d096950d6a1f41f7da2ace2930fd8025cb2328ed`;
+  the fresh 13-page render hashes to
+  `44f10b9346c797850d07935be6a8a17eeef57bf046408eb17545f0e5f4ea9b29`.
+  Default validation now reports 882 corrections and 15 completed second-pass
+  documents. Five focused tests, the 109-test Goal 5 suite, and the complete
+  211-test repository suite with 649 subtests pass. Two fresh normal builds and
+  the published sibling are byte-identical at tree SHA-256
+  `008e7a5a76abc7eba70832b0dc35277a84c0eeb067e7b37eb516f973c5c5f3ba`.
+  This was the clean baseline used to start `N01`.
+- `N01` is complete at `YES/YES` after a full first pass and wholly fresh
+  post-italic-fix source, technical, and visual closing passes over PDF pages
+  875–880. Its 23 guarded corrections are `G5-C-0883`–`G5-C-0905`. The final
+  29,769-byte, 75-line Markdown hashes to
+  `3321cc8267ac42e44506e911348764e0698e2bd0b147886e115decd994a12c47`;
+  all 22 main notes, five Timeline subitems, nine italic spans, 65 references,
+  155 numeric-bearing spans, punctuation, structure, and the source-confirmed
+  absence of mapped images close with zero discrepancy and zero ambiguity. A
+  fresh closing traversal found the John Ray title-final comma outside the
+  Markdown emphasis; the guarded target was repaired and all three closing
+  passes restarted from PDF 875. Their final source, technical, and visual
+  reports hash respectively to
+  `2fc709fd033ab8db237d79867816772c5afde05b16aaf5a8d8ddda63aa619b4c`,
+  `8d91d25e466b24d7eb2667a37051b3f377971b156c4b45ece86139ec7546e9d5`,
+  and `5c0a62c233453c8501e92254845ac7ab93cc735e2c438519e44bc82b64172a3f`;
+  the fresh eight-page render hashes to
+  `c4f1462d9589cf3c395a5d657d75abfe3acc3846263275f217b5e20d83959b0a`.
+  Default validation now reports 905 corrections and 16 completed second-pass
+  documents. Five focused tests, the 114-test Goal 5 suite, and the complete
+  216-test repository suite with 690 subtests pass. Two fresh normal builds and
+  the published sibling are byte-identical at tree SHA-256
+  `1dde0107282feb217c20984c122e5218fdba4f28546e191179ec9d9291417d7a`;
+  strict zero-correction output remains
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+- `N02` is complete at `YES/YES` after a complete first pass and wholly fresh
+  post-Science-Citation source, technical, and visual closing passes over PDF
+  pages 881–898, with PDF 880 and 899 checked as ownership boundaries. Its 43
+  guarded corrections are `G5-C-0906`–`G5-C-0948`. The final 86,695-byte,
+  915-line Markdown hashes to
+  `8eab0420ff8fbe512d7731c6539742bf0c16bf28dab4ff27fec7dee2ae8f43b0`;
+  54 mapped references plus `G5-A-0042` and `G5-A-0043` produce 56 final
+  references, with eight mapped references using repaired-only overrides. All
+  47 fenced blocks, 105 inline-code spans, 175 emphasis spans, and 27 reopened
+  typography regions close with zero discrepancy, zero ambiguity, and zero
+  source omission. The final source report, manifest, and `SHA256SUMS` hash
+  respectively to
+  `477bc5e764bc11c1dca9abaeddc504a19d5af08230221537f895edf1538d9f80`,
+  `5ba7a8e990991c66a09f0723ac3de02afba3e4bb6d754a838bda56141ddad66d`,
+  and `d3388b811a84fa34f16c3e43b4ebaf8d393b1b924535393763e8eca6b3483d03`.
+  The final technical and visual reports hash to
+  `067ebaf65e2a65a695508be3fb64744bc1268c739ddfe4e192a404ff76af9ee6`
+  and `6a306875d15947cf7d4c5efd3ad7da2859bc38fb1585d6a01c2e687d59802d75`;
+  the final render hashes to
+  `d082121c86fa72a5c9b80375c90e4bc03cad3beb153eaba146b337cd9b9c8b7b`.
+  Default validation reports 948 corrections and 17 completed second-pass
+  documents. The focused N02, Goal 5, and complete repository suites pass at
+  10, 124, and 226 tests with 768 repository subtests. Two fresh normal builds
+  and the published sibling are byte-identical at 1,518 files with tree
+  SHA-256
+  `aad13eb645fcfb252b5ade650cbf2316c5c67c60139c78e518ae556c28bb92f6`.
+  This was the clean baseline used to start `N03`.
+- `N03` is complete at `YES/YES` after first-pass integration and wholly fresh
+  post-operator source, technical, and visual closing passes over PDF pages
+  899–916, including the intentional blank PDF 916 and both ownership
+  boundaries. Its 25 guarded corrections are `G5-C-0949`–`G5-C-0973`. The
+  final 82,769-byte, 867-line Markdown hashes to
+  `897cae5d2988c0e4d746aad431cffc411a81d2766e057d184f2c47f718755007`.
+  All 11 headings, 83 main notes, 39 subitems, 351 technical objects, 256
+  Boolean rules, 135 printed page-reference phrases, and 45 live image
+  references close with zero discrepancy, ambiguity, or source omission.
+  Ordinal 894 is a source-confirmed rasterized-prose false positive; four
+  mapped operator panels use source-isolated overrides, and additions
+  `G5-A-0044`–`G5-A-0049` restore six omitted visuals. The fresh source,
+  technical, and visual closing reports hash respectively to
+  `d77aaaba75f41845e4a30ab21d93c4a075bce56a0a1b842b0f56f1de0e39b8bf`,
+  `4d113c8b6037ac688017925f7d036cca4e281e21b059291f1c87b7afb5eacf26`,
+  and `4ccb764d7bff13deb7cdec8a2a16387532dd0e00f4749d21c1d5216f0576051c`.
+  Default validation reports 1,493 images, 973 corrections, and 18 completed
+  second passes. The focused N03, Goal 5, and complete repository suites pass
+  at 9, 133, and 235 tests with 1,097 repository subtests; two fresh normal
+  builds and the published sibling are byte-identical at 1,524 files with tree
+  SHA-256
+  `6723d7eb843f6beb6d344591a5d36145f821f46c0146e7d319dd6b22705a19f8`.
+  This was the clean baseline used to start `N04`.
+- `N04` is complete at `YES/YES` after its complete first pass and repeated
+  mandatory fresh source, technical, and visual closing restarts against the
+  final rebuilt target over PDF pages 917–942, with both ownership boundaries
+  checked. Its 76 guarded corrections are `G5-C-0974`–`G5-C-1049`; its final
+  115,687-byte, 1,040-line Markdown hashes to
+  `2c3aa3a04768d9472e365aafef9eac13a984e29cba9e91bafa5737307e7beeed`.
+  All 71 mapped rows were source-dispositioned: 30 source-redundant partial
+  crops are omitted, while 41 retained rows plus additions `G5-A-0050`–
+  `G5-A-0060` produce 52 live image references. The final source, technical,
+  and visual reports hash respectively to
+  `3aa639f69edf93368798bccd1ca4e80c3b5ad0fba926c2c9a2d579bc8837b4c1`,
+  `41095776bac647d7481c79149ee475681b3c8e4063fa3036b9d00bbaa1e034c6`,
+  and `bc5192055c3fea1378944178ae12653d0f3b8e1f3031b110ca12b8f413b43660`.
+  Every final ledger closes with zero discrepancy, zero ambiguity, and zero
+  source omission. Post-coverage validation reports 29 documents, 1,504
+  images, 1,049 corrections, and 19 completed second passes. The focused N04,
+  Goal 5, and complete repository suites pass at 7, 140, and 242 tests; the
+  latter two each report 1,305 subtests. Two fresh normal builds and the
+  published sibling are byte-identical at 1,535 files with tree SHA-256
+  `88b9fc5124f10a4defa30e9f641fa7550ff96538cb5b35a856b307623bdacb39`.
+  These are inherited Stage 6 closure results; this Stage 7 activation edit did
+  not rerun them.
+- `N05` is complete at `YES/YES` after its complete forward first pass and
+  wholly fresh post-repair source/content, technical, and visual closing
+  restarts over PDF pages 943–962, with the N06 handoff on PDF 963 checked.
+  Its 164 guarded corrections are `G5-C-1050`–`G5-C-1213`; 59 mapped rows
+  include 33 source-redundant partial-crop dispositions and four repaired-only
+  overrides, while additions `G5-A-0061`–`G5-A-0071` produce 37 final live
+  references. The final 86,868-byte, 757-line Markdown hashes to
+  `e1e7e6c733ee874c1d7dff7fdb86a18f36da5d7e55ac67a5a76f8f4fb1dcddaa`.
+  The wholly fresh source/content, technical, and visual reports hash
+  respectively to
+  `210387869967a39d958dd5e87873e3ca2f642290ce7edbeeaf15ed1c97c1c675`,
+  `5d065fa158442a7505067d73d39b455769ecc650fa41b7c07d2d980e2b6080bd`,
+  and `e39ec0283abc03702312b7e20f1467751d7a4b21f74e03a6ccd76efd36724ed1`;
+  each closes with zero discrepancy, zero ambiguity, and zero source omission.
+  Default validation reports 29 documents, 1,515 images, 1,213 corrections,
+  and 20 completed second passes. The focused N05, Goal 5, and complete
+  repository suites pass at 6, 146, and 248 tests. Two fresh normal builds and
+  the published sibling are byte-identical at 1,546 files with tree SHA-256
+  `6deb5c50789cebcb265d8bfc4668c0b5d6b97d6d8dd4a5a483a0da622c4262f5`;
+  strict zero-correction output remains
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+- `N06` is complete at `YES/YES` after a full first pass and wholly fresh
+  post-grouping-and-column-join R4 source, technical, and visual closing
+  traversals over PDF 962–983. Its 188 guarded corrections are
+  `G5-C-1214`–`G5-C-1401`; 64 mapped rows comprise 30 omitted redundant
+  partials, 28 retained originals, and six repaired-only overrides, while
+  additions `G5-A-0072`–`G5-A-0079` produce 42 live references. The final
+  85,467-byte, 666-line Markdown hashes to
+  `54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437`.
+  The final source, technical, and visual reports hash respectively to
+  `1ad9878e74315fe246fd7077ddf62b9447edfb1689980dbd282e49c734850d8f`,
+  `cc003058bb1ec22f4a896db2463908a8b5fa0adc71734fadabdaccddb9a61283`,
+  and `6f313c25158310eeb03a5fc84fe518f319f897d699a82b4c065e8e382ea9af4b`;
+  each closes with zero discrepancy, ambiguity, or omission. The 30-page
+  final render hashes to
+  `bb620243b6bd7076dcaa2922e15b552804cc27b585eae7402b485ff54409b9c8`.
+  Post-coverage validation reports 29 documents, 1,523 images, 1,401
+  corrections, and 21 completed second passes. The focused N06, Goal 5, and
+  complete repository suites pass at 6, 152, and 254 tests with 318, 1,951,
+  and 1,951 subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,554 files with tree SHA-256
+  `dd188b36e430c60ed3e6192a93553c7ea64346d12250a62661dbba05343236b4`.
+- `N07` is complete at `YES/YES` after its complete forward first pass and
+  wholly fresh post-R2 source/content, technical, and visual R3 closing
+  traversals over all 24 owned PDF pages 983–1006, with boundary pages 982 and
+  1007 independently checked. Its 217 guarded corrections are
+  `G5-C-1402`–`G5-C-1618`; the final 115,684-byte, 692-LF Markdown hashes to
+  `fd8696100529789964578841267bbd841411691d05248840ede6e0b4b7bd69f3`.
+  All 88 mapped rows were source-dispositioned as 59 omitted redundant
+  partials, 20 retained originals, and nine repaired-only overrides; additions
+  `G5-A-0080`–`G5-A-0093` produce 43 live references. The final source,
+  technical, and visual reports hash respectively to
+  `5f67608aa4bc0ccd9b2221ea6f5ec758e5d204397c308b2374a3681534dd45fb`,
+  `67e46056a5748b30532a59339013c2270b87e47766931e78e09153a6e97bb28f`,
+  and `33cf0cca3ab3055f1d99f9d681498860725804065a4fc3f03bba1d63e480c21c`;
+  all final ledgers close with zero discrepancy, ambiguity, or source
+  omission. Post-coverage validation reports 29 documents, 1,537 images,
+  1,618 corrections, and 22 completed second passes. The focused N07,
+  combined N06+N07, Goal 5, and repository suites pass at 6, 12, 158, and 260
+  tests, with 2,395 repository subtests. Two fresh normal builds and the
+  published sibling are byte-identical at 1,568 files with tree SHA-256
+  `82410c48a7f8d362a64cb1e11e2b29dd6579f115d5e3de8f17e3043d18501c9f`.
+- `N08` is complete at `YES/YES` after its 26-page first pass and wholly fresh
+  post-five-repair source/content, technical, and visual closing restarts over
+  PDF 1007–1032, with blank PDF 1032 and boundaries 1006/1033 checked. Its 293
+  guarded corrections are `G5-C-1619`–`G5-C-1911`; the final 134,385-byte,
+  358-LF Markdown hashes to
+  `86e49c4265e2e00567d2964c83d1272575c5dc36a83d7acb7bece7e7aa7997cd`.
+  The 32 mapped rows comprise 29 omitted redundant partials and three retained
+  originals; additions `G5-A-0094`–`G5-A-0102` produce 12 live references.
+  The fresh final source, technical, and visual reports hash respectively to
+  `efc334026604a86540986ec293010067ad68db0a5bc5d501150cacb44644c43a`,
+  `920374d14ca6b003a3d8dfc2bd615c8344dfd3c88d36817d8eb224b1517e71d4`,
+  and `7fbb2e4c2439ee576ca7e74141ddd8fd8d8f3aa15cc68f095a10511cee516e71`;
+  every final ledger closes at zero findings. Post-coverage validation reports
+  29 documents, 1,546 images, 1,911 corrections, and 23 completed second
+  passes; the Goal 5 and repository suites pass 168 and 270 tests with 2,800
+  repository subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,577 files with tree SHA-256
+  `17c5fb5f9c6c46acb50bad20098614eab536988cb27acc10bd6b8be84f5d08e8`.
+- `N09` is complete at `YES/YES` after its complete forward first pass and
+  wholly fresh post-punctuation-repair source/content, technical, and
+  visual/caption closing traversals over PDF 1033–1082, with boundaries
+  1032/1083 checked. Its 894 guarded corrections are
+  `G5-C-1912`–`G5-C-2805`; the final 262,097-byte, 1,000-LF Markdown hashes to
+  `72c07a44ac1c2879c123ee0871a68cef6ba28a0de6b284169353abb85915eda1`.
+  The 70 mapped rows comprise 54 omitted redundant partials, 13 retained
+  originals, and three repaired-only overrides; additions
+  `G5-A-0103`–`G5-A-0118` produce 32 live references. The fresh final
+  source/content, technical, and visual/caption reports hash respectively to
+  `24135aef1c029ee4ffd771d41aa0e97a3ee3125436bfabda912fa5e5d85e0589`,
+  `6b5e3e974c6b1711bf35f3707e34e9262d6ad7dfcac588b6a13026bba741caed`,
+  and `d2ea2e16995a0badc2cb865d01a187c0e027e67e4dcb2087e078204b139ee598`;
+  all close with zero discrepancy, ambiguity, or source omission. The technical
+  manifest hashes to
+  `467038260562900858efc14d814712a1ca9ca67e3b3c2ca1ce5e5df85069e505`
+  and accounts for 558/558 objects. The final render report and 61-page PDF
+  hash respectively to
+  `680e9ff5710dc3f39db1ab9ad81ab9a8ac962e4efe8f7acbacdb300140380377`
+  and `672fd099b2b2329ed6b0bb1f158186e1c2cd7f029cb74fd24353e992ba7e80b9`.
+  Post-coverage validation reports 29 documents, 1,562 images, 2,805
+  corrections, and 24 completed second passes; the focused N09, Goal 5, and
+  repository suites pass at 7, 175, and 277 tests with 3,765 repository
+  subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,593 files with length-prefixed tree SHA-256
+  `def3951ddfd3c7fb4ab3666aaca1ac9e61631ac1c6110cbe9d03c0b9fa845861`;
+  strict zero-correction output remains 1,475 files with length-prefixed tree
+  SHA-256
+  `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`.
+- `N10` is complete again at `YES/YES`. A strict read-only sweep of all PDF pages
+  1083–1122, boundaries 1082/1123, and all 642 inventoried objects found 24
+  stale line groups represented by 33 exact overlays. Its exhaustive relation
+  census distinguishes 183 nonoverlapping tokens: eight collapsed printed
+  `==` glyphs are repaired, no reverse mismatch exists, and the ordinary
+  `\xi[r] = \lambda^r` is deliberately preserved. The sealed sweep projects
+  the exact 197,955-byte, 1,098-LF target SHA-256
+  `6044152950100dc26031174038686d69fcf3e2c5482e85283e2c8757016f036a`.
+  The integrated document owns 584 rows: `G5-C-2806`–`G5-C-3360` plus
+  `G5-C-4446`–`G5-C-4474`. Its 91 mapped rows and additions
+  `G5-A-0119`–`G5-A-0141` are unchanged. Every prior closer was invalidated.
+  Three wholly fresh source, technical, and visual traversals then restarted
+  from PDF 1083 and independently sealed `CLEAN_ZERO_FINDINGS` over all 40
+  owned pages plus both boundaries. Root reproduced their verifiers and
+  manifests. Their source, technical, and visual manifest hashes are
+  `c399a6cc78ec2b3478e41bc38e84e567381a946625243a5cfdcb2a7208ae9271`,
+  `8aa83f6724425461ca808c90bf7caf68f27fcb831d242c16d9671f5e48440a35`,
+  and `32f95664b3689964d019b8475bfbcd9d2560c0de558b9fbe2355dd6b1feb5f9b`.
+- `N11` is complete at `YES/YES` over PDF pages 1123–1140 plus boundaries
+  1122/1141. The 147 source and 100 technical proposals
+  initially merged into 213 nonoverlapping guarded corrections; all 26
+  cross-lane overlap components preserve both lanes. The first wholly fresh
+  closing round then independently found two omitted source connectives,
+  repaired as `G5-C-3574`–`G5-C-3575`. A restarted source and visual diagnostic
+  found no further issue, but the restarted technical traversal found 12
+  atomic printed operator/grouping defects across six row actions. Five
+  existing records (`G5-C-3389`, `G5-C-3406`, `G5-C-3422`, `G5-C-3435`, and
+  `G5-C-3446`) were extended and new record `G5-C-3576` restores two further
+  printed RuleDelayed operators. An independent sealed glyph and repair audit
+  verified all 12 source glyphs, all six actions, two shadow builds, validation,
+  and strict-zero preservation without qualification. The third wholly fresh
+  closing round then found exactly two further literal-source defects in
+  `G5-C-3476`: PDF 1132 prints `s3` twice where the target had normalized both
+  tokens to `s[3]`. All three sealed lanes independently source-confirmed those
+  two tokens and found nothing else; the existing row is now repaired without
+  changing its guard, offset, ID, or line count. N11 owns 216 corrections,
+  `G5-C-3361`–`G5-C-3576`. All 14 mapped visuals are retained,
+  and additions `G5-A-0142`–`G5-A-0148` restore seven missing source visuals.
+  The current 87,971-byte, 986-LF target hashes to
+  `0724347e91da98fdae48104af86f458248ba016c9ffb3db2c550990457800b4c`
+  and contains 21 resolving image references and 66 fenced programs. Two fresh
+  post-repair normal builds and the published sibling are byte-identical at
+  1,623 files with length-prefixed tree SHA-256
+  `82b17a8d6f39f8452d87f5a3b72ec94e71b23f2ede49ea0ece4e88af8d11f4c4`;
+  strict zero-correction output remains the frozen 1,475-file tree. The latest
+  Goal 5 and repository suites pass 188 and 290 tests with 4,708 subtests.
+  The fourth wholly fresh source, technical, and visual closers all sealed
+  `CLEAN_ZERO_FINDINGS` against this exact target. Their final report hashes
+  are respectively
+  `37538ff98b2b64c9bc4380fe7602d0027be66ef05cd9813e3cb05b26ccb46f99`,
+  `d0f88d9dabe98fc27cac850adea798c419ebfef51a5b5328d17cb2ddb66685a1`,
+  and `cf0d64a75b7914b1e15cc64450ffc7c9c7981569a941f03ef00c56955306d5c2`.
+  Coverage is promoted to `YES/YES`; validation reports 26 completed second
+  passes, and the focused N09–N11 suite passes 20 tests with 1,908 subtests.
+- `N12` is complete at `YES/YES` after its prior first-pass and repair cycles.
+  Reopened spacing/token, technical/syntax, Zeta, and NAND-glyph audits
+  amended 36 existing N12 rows and added 59 document-unique semantic guards
+  `G5-C-4475`–`G5-C-4533`. A subsequent whole-target whitespace saturation
+  check found seven extraction-only terminal ASCII spaces: six owning guards
+  were amended and exact guard `G5-C-4534` was added. Direct page-local PDF
+  checks confirm that none represents printed content. The resulting 929-row,
+  397,424-byte, 1,857-LF target hashes to
+  `44a64dc63fdf70e139d74ab8f960880fe3f44df5a116af69506dc05e4d4dabeb`.
+  It restores source-visible factor boundaries, Part syntax, literal code
+  braces, a missing subtraction, the lowercase item `(l)`, membership and
+  epsilon forms, and all 78 stale overbarred NAND glyphs as N12-local
+  `\bar{\land}` while rejecting the superseded false `b y^2` reading. Two
+  independent merge implementations reproduce the target byte-for-byte. Its
+  53 references, additions `G5-A-0149`–`G5-A-0163`, and nine mapped repair
+  overrides are unchanged. Every prior N12 closer and the earlier `6ed667...`
+  pin were invalidated. Three wholly fresh source, technical, and visual
+  closers restarted from PDF 1141 against `44a64d...` and independently sealed
+  `CLEAN_ZERO_FINDINGS`; root reproduced every manifest check and verifier.
+  Their source, technical, and visual manifest hashes are
+  `a0f6f8e69fad9ded035b9a301b6c2fcad630a27375b864e6bd2fb37f23b35671`,
+  `eef649d0eda07b92a9f18b38d317113fc38cbcb47783846ef9b3462830f0777f`,
+  and `57477733f74fac3828476abfd5e525884dacc694547bbad3c17878732c610036`.
+- The combined correction ledger has 4,534 rows and SHA-256
+  `80b89a99dbbd54b73682d07a6ffcb236d5c9c49ee36e23b317fb0305fe6dfbf6`.
+  The sealed integration packet has manifest SHA-256
+  `ec259b384fc58225f4b76f0e28bb56c8684b1c8cadf40ab950b74aa8db3a9ae0`,
+  43 amended rows, 88 new guards, 213 normalized transforms, and zero
+  cross-provenance changes. Two fresh normal builds and the published sibling
+  match at 1,638 files with length-prefixed tree SHA-256
+  `8ebbf72662760277c57666ffcb75bf411b203f717607fbcef39b0b2a049bc715`;
+  strict zero remains the frozen `1971cbef...` tree and the protected legacy
+  digest is unchanged. Validation reports 27 completed second passes. The
+  focused Stage 8, Goal 5, and complete repository suites pass 30, 198, and
+  300 tests, with 3,073 focused and 5,873 cumulative subtests.
+- Stage 8 is complete with `N09` through `N12` closed at `YES/YES`. The next
+  available IDs are `G5-C-4535` and `G5-A-0164`.
+
+## Stage Status
+
+| Stage | Status | Prerequisites |
+|---|---|---|
+| 1-CLEANUP | `COMPLETE` | none |
+| 2-FOUNDATION | `COMPLETE` | 1 |
+| 3-FRONT-CH04 | `COMPLETE` | 2 |
+| 4-CH05-08 | `COMPLETE` | 2 |
+| 5-CH09-12 | `COMPLETE` | 2 |
+| 6-NOTES-00-04 | `COMPLETE` | 2 |
+| 7-NOTES-05-08 | `COMPLETE` | 2 |
+| 8-NOTES-09-12 | `COMPLETE` | 2 |
+| 9-TECHNICAL | `COMPLETE` | 3–8 |
+| 10-FIGURES-INDEX | `COMPLETE` | 3–8 plus fixed-layout source evidence |
+| 11-SATURATION | `COMPLETE` | 3–10 |
+| 12-RELEASE | `COMPLETE` | 11; zero open source ambiguity |
 
 ## Stages
 
-### 1-GUARDRAILS
+### 1-CLEANUP
 
 #### Big Picture Objective
 
-Fix the audit's inclusion threshold, evidence model, candidate identity, disposition vocabulary, semantic-equivalence standard, blind-discovery boundary, and success/failure criteria before inspecting the Book for additions.
+Remove Goal 4 process overhead while preserving any compact source facts or
+content-oriented tools that genuinely help produce the reliable book.
 
 #### Detailed Implementation Plan
 
-- Read `principles.md` and this scaffold in full.
-- Define construction-bearing eligibility broadly enough to include transitions, generators, input processors, stochastic laws, relations, constraints, functions/constants/equations, and structural replacement systems.
-- Define exclusion and secondary-role categories without pre-classifying known examples.
-- Freeze provisional B-ID allocation, source-evidence strength, semantic-fingerprint fields, and the three final classification vocabularies.
-- Specify how isolated discovery workers receive only assigned Book ranges, Goal 3 guardrails, and ledger schemas.
-- Define the proof obligations for same-family, specialization, composition, new construction, and insufficient evidence.
+- Sync the live worktree and inspect every modified/untracked Goal 4 file.
+- Inventory Goal 4 artifacts by purpose: source fact, content detector/builder,
+  or process machinery.
+- Keep or migrate only directly useful corpus manifests, boundary facts, known
+  defect locations, image mappings, or small content checks after independently
+  validating them.
+- Remove generalized schemas, proof/implementation locks, licensing/workflow
+  state machines, authority and reviewer models, synthetic overlay systems,
+  promotion-race defenses, redundant validators/tests, generated reports,
+  caches, and unfinished pipeline work.
+- Inspect the repaired sibling and remove only unverified Goal 4 output so Goal
+  5 starts from a clean build target.
+- Confirm no live documentation or consumer is left pointing at removed Goal 4
+  machinery.
 
 #### Completion Requirements
 
-- Eligibility and all disposition categories have necessary and sufficient operational criteria.
-- The distinction between coverage catalog and semantic family is explicit and testable.
-- Blind-phase allowed/forbidden inputs are recorded.
-- No current candidate is accepted, rejected, or mapped to T01–T45.
-- The stage records commands, facts, and any changes folded back into this plan.
+- The stage report records pre-cleanup status and a complete keep/delete/migrate
+  decision by artifact category.
+- No unrelated modification is lost and the legacy corpus hash is unchanged.
+- No retained artifact exists merely to validate another retained Goal 4
+  artifact; every retained item directly supports correction or verification.
+- Goal 4's generalized pipeline/security/workflow infrastructure and caches are
+  absent.
+- Goal 5 has a short, understandable starting dataset rather than a dependency
+  on Goal 4's trust chain.
+- `git diff --check`, broken-reference inspection, and explicit scope review
+  pass.
 
-### 2-CORPUS-MAP
+### 2-FOUNDATION
 
 #### Big Picture Objective
 
-Create a trustworthy, hash-pinned map of the complete canonical Book corpus.
+Secure the complete authoritative source, freeze the 29-document layout, and
+implement the minimal reproducible build and coverage model.
 
 #### Detailed Implementation Plan
 
-- Inventory and hash all canonical Markdown and image files.
-- Verify that `Contents.md` names exactly the 29 book documents in canonical order.
-- Partition each document into deterministic source units and bind every unit to its document, byte range, logical-line range, and hash.
-- Resolve every document and image link from its owning Markdown file.
-- Reconcile the physical image inventory with all Markdown references without rewriting source files.
+- Recompute the legacy corpus inventory, hashes, document boundaries, image
+  sequence, and known structural failures.
+- Establish a complete lawful edition-identical source and document its edition,
+  access boundary, page/location convention, completeness, and legibility.
+- Define ordered review ranges that cover all book content without requiring a
+  per-block evidence graph.
+- Freeze the 29 output paths and a minimal Markdown serialization policy.
+- Implement a straightforward builder that projects raw content into 29
+  documents and then applies guarded corrections.
+- Implement a focused validator for source range coverage, correction preimages,
+  document counts, image/link resolution, and deterministic output.
+- Create the initial `coverage.csv`, `corrections.jsonl`, and `unresolved.md`
+  formats with only fields used by the workflow.
 
 #### Completion Requirements
 
-- `corpus-manifest.json` accounts for all 29 book documents, the two navigation documents, and all 1,607 physical images.
-- Canonical source units cover every book-document byte and logical line exactly once.
-- Every image reference resolves to its intended colocated file and hash or has an explicit finding.
-- Document order and ownership mappings are machine-verifiable.
-- Independent source-manifest verification and mutation checks pass.
+- The complete authoritative source is lawful, edition-matched, readable, and
+  sufficient for all later batches; otherwise the stage stays blocked with an
+  exact acquisition action.
+- Exactly 29 ordered source/output ranges cover the complete raw book stream
+  without gap, overlap, or duplication.
+- A zero-correction build succeeds and reassembles to the selected raw stream.
+- All 1,444 raw image references and physical legacy assets are inventoried.
+- Builder, validator, correction record, and coverage record are small and
+  documented.
+- Focused raw-drift, boundary, skipped-range, duplicate-range, and correction-
+  preimage tests pass.
 
-### 3-AUDIT-HARNESS
+### 3-FRONT-CH04
 
 #### Big Picture Objective
 
-Build the ledgers and validators that make sequential reading, candidate capture, cross-reference closure, asset inspection, and final classification auditable.
+Correct and verify publication matter, Preface, and Chapters 1–4 against the
+authoritative source.
 
 #### Detailed Implementation Plan
 
-- Deterministically extract source units with stable IDs and hashes.
-- Create schemas for the reading, candidate, search-round, cross-reference, asset, classification, and coverage ledgers.
-- Implement validators for total unit coverage, unique IDs, resolvable provenance, complete joins, empty work queues, and stale source hashes.
-- Add mutation fixtures proving each required row/link is enforced.
-- Keep discovery schemas free of T mappings and API-fit fields until Stage 19.
+- Review every assigned range sequentially, including headings, page furniture,
+  prose, lists, formulas, code, captions, tables, and images.
+- Record and apply exact source-backed corrections.
+- Run prose, punctuation, word-split, fence, math, code, and image/caption
+  detectors over the batch.
+- Render changed and structurally complex regions.
+- Perform a separate second comparison of the complete batch and close all
+  discrepancies.
 
 #### Completion Requirements
 
-- Validators detect missing/duplicate source units, broken provenance, unresolved cross-references, undispositioned hits/candidates, missing assets, and stale hashes.
-- The source-unit ledger partitions the canonical corpus without gaps or overlaps.
-- The harness runs from root and a relocated copy and fails closed under declared modes.
-- Stage 4 can begin with empty, valid, resumable ledgers.
+- Every assigned source range has first- and second-pass coverage.
+- All discovered OCR/layout discrepancies are corrected and verified.
+- Every correction is guarded and source-located.
+- No unresolved author-text item remains in the batch.
+- Focused detectors, rendering checks, builder, and validator pass.
 
-### 4-BOOKENDS
+### 4-CH05-08
 
 #### Big Picture Objective
 
-Blindly screen cover/contents, Preface, General Notes, and Colophon for construction-bearing material and establish the sequential review discipline before chapter work.
+Correct and verify Chapters 5–8 against the authoritative source.
 
 #### Detailed Implementation Plan
 
-- Read every assigned source unit in order with no current-catalog reconciliation.
-- Inspect each owned image and surrounding caption/context.
-- Create B candidates with complete provisional fingerprints whenever mechanics may be present.
-- Record supports, controls, applications, historical-only material, and no-construction units explicitly.
-- Queue every relevant page/section/alias route that points outside the assigned spans.
+- Apply the complete sequential comparison, correction, detector, rendering,
+  and separate second-pass procedure from Stage 3.
+- Pay extra attention to higher-dimensional layouts, formulas, rule diagrams,
+  scientific notation, captions, and application-specific vocabulary.
+- Fold newly discovered OCR patterns into corpus-wide detector queries without
+  treating matches as automatic corrections.
 
 #### Completion Requirements
 
-- All assigned source units and images have review dispositions.
-- Every candidate and support claim has canonical provenance.
-- No within-stage cross-reference remains unreviewed; routed edges are in the global queue.
-- The stage contains no T-ID mapping or API-fit conclusion.
+- Chapters 5–8 have complete first- and second-pass coverage.
+- All discovered discrepancies are corrected and source-verified.
+- New defect patterns are searched across already reviewed and future material.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 5-CH01-FOUNDATIONS
+### 5-CH09-12
 
 #### Big Picture Objective
 
-Blindly audit Chapter 1 main text and Chapter 1 Notes for construction-bearing systems.
+Correct and verify Chapters 9–12 against the authoritative source.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md` and `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
-- Inspect all owned captions, code/formulas, tables, and images in their canonical document context.
-- Record B candidates and full provisional semantic fingerprints.
-- Run a range-local trigger/alias search only after sequential reading.
-- Queue cross-range references without consulting the existing catalog.
+- Apply the complete batch procedure from Stage 3.
+- Give formulas, symbolic notation, networks, computation diagrams, code, and
+  Chapter 12's transition into General Notes explicit attention.
+- Recheck any corpus-wide patterns discovered in earlier chapter batches.
 
 #### Completion Requirements
 
-- Every source unit/image in the paired spans is dispositioned.
-- Every local trigger hit is reconciled to a reviewed unit.
-- Candidate provenance and fingerprints are complete to the limit of the source.
-- No blind-phase boundary is violated.
+- Chapters 9–12 have complete first- and second-pass coverage.
+- All discovered discrepancies and the Chapter 12 ending boundary are correct.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 6-CH02-EXPERIMENT
+### 6-NOTES-00-04
 
 #### Big Picture Objective
 
-Blindly audit Chapter 2 main text and Chapter 2 Notes.
+Correct and verify General Notes and Chapter 1–4 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/02-The-Crucial-Experiment.md` and `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md`.
-- Apply the same source-unit, image, candidate, local-search, and cross-reference protocol established in Stage 5.
-- Treat rules, initial conditions, behavior classes, properties, renderings, and historical commentary as distinct roles.
+- Review every Notes range sequentially with its printed page/source context.
+- Preserve Notes headings, page references, cross-references, formulas, code,
+  citations, captions, and image ownership accurately.
+- Apply detectors and a separate full second pass, including prior corpus-wide
+  defect patterns.
 
 #### Completion Requirements
 
-- The paired ranges have zero unreviewed units/images and zero undispositioned local search hits.
-- Every construction candidate has a source-grounded fingerprint.
-- Properties and observed behavior are not silently promoted to constructions.
-- Cross-range routes are recorded for later closure.
+- General Notes and Chapter 1–4 Notes have complete two-pass coverage.
+- Note ownership and main-text boundaries are correct.
+- All discovered discrepancies are source-verified and corrected.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 7-CH03-PROGRAMS
+### 7-NOTES-05-08
 
 #### Big Picture Objective
 
-Blindly audit Chapter 3 main text and Chapter 3 Notes without using the catalog originally derived from this chapter.
+Correct and verify Chapter 5–8 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/03-The-World-of-Simple-Programs.md` and `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md`.
-- Inspect implementation code, rule tables, figure-only mechanics, variants, histories, and cross-system comparisons.
-- Allocate B candidates independently of T IDs or familiar names.
-- Preserve distinctions among native construction, restriction, representation, emulation, observer, and behavior.
+- Apply the complete two-pass Notes review procedure from Stage 6 to every
+  source page, including blank and image-only pages.
+- Recheck dense formulas, programs, references, and figure/caption associations
+  with surrounding source context.
+- Verify the `N04`/`N05` and `N08`/`N09` ownership boundaries and disposition
+  every mapped row and every printed visual against the fixed-layout source.
+- After the last correction or asset change, restart independent source,
+  technical, and visual closing passes from the document's first source page.
 
 #### Completion Requirements
 
-- Every unit/image in both spans has a disposition.
-- Every rule/mechanism passage and local search hit is linked to candidates or an explicit exclusion.
-- No current taxonomy row or Goal 1 conclusion is used as discovery evidence.
-- All outgoing cross-references are queued.
+- Chapter 5–8 Notes have complete first- and second-pass coverage.
+- All discovered discrepancies are corrected and source-verified.
+- All 243 mapped rows and every printed visual have explicit source
+  dispositions, with correct identity, crop, order, ownership, and captions.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 8-CH04-NUMBERS
+### 8-NOTES-09-12
 
 #### Big Picture Objective
 
-Blindly audit Chapter 4 main text and Chapter 4 Notes.
+Correct and verify Chapter 9–12 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/04-Systems-Based-on-Numbers.md` and `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
-- Separate immutable definitions, representation queries, iterative work procedures, sequences, filters, maps, continuous systems, equations, observations, and numerical methods.
-- Inspect every formula, implementation fragment, caption, and governed image.
-- Record exactness, partiality, completion, and hidden-work-state requirements in candidate fingerprints.
+- Apply the complete Notes review procedure from Stage 6.
+- Verify the displaced material currently found in nominal Index/Colophon files
+  is assigned to the correct Notes document and source order.
 
 #### Completion Requirements
 
-- All paired source units/images and local search hits are dispositioned.
-- Denotations, algorithms, trajectories, queries, and observers are not conflated.
-- Every candidate has explicit result kind and evidence strength.
-- Cross-range references are queued with no silent omissions.
+- Chapter 9–12 Notes have complete first- and second-pass coverage.
+- All displaced Notes boundaries and all discovered discrepancies are correct.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 9-CH05-DIMENSIONS
+### 9-TECHNICAL
 
 #### Big Picture Objective
 
-Blindly audit Chapter 5 main text and Chapter 5 Notes.
+Perform a corpus-wide specialist-style fidelity pass over formulas, Wolfram
+Language, rule tables, symbolic data, and other token-sensitive material.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/05-Two-Dimensions-and-Beyond.md` and `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md`.
-- Record topology, dimensionality, structural replacement, graph identity, branching, constraints, schedules, and witness semantics explicitly.
-- Inspect rule diagrams and construction-bearing images in full context.
-- Preserve underdetermined variants rather than choosing convenient conventions.
+- Enumerate technical regions from the corrected Markdown and compare each one
+  directly with the authoritative source.
+- Check symbols, delimiters, superscripts/subscripts, whitespace where
+  meaningful, row/column order, code identifiers, operators, and line wrapping.
+- Parse, render, or execute material where useful for defect discovery, while
+  keeping the source comparison authoritative.
+- Reopen owning content batches for any newly discovered discrepancy.
 
 #### Completion Requirements
 
-- Every unit/image and local search hit in the paired spans is dispositioned.
-- Structural variants have complete fingerprints or explicit missing-mechanics fields.
-- Constraints, solvers, networks, multiway histories, and renderings remain distinct.
-- All relevant outgoing references are queued.
+- Every technical region is enumerated and receives a dedicated source check.
+- Every changed token is source-verified and correction records are complete.
+- Parsing/rendering diagnostics have no undispositioned hit.
+- No unresolved technical transcription ambiguity remains.
+- Reopened batch checks and cumulative validation pass.
 
-### 10-CH06-RANDOMNESS
+### 10-FIGURES-INDEX
 
 #### Big Picture Objective
 
-Blindly audit Chapter 6 main text and Chapter 6 Notes.
+Verify all figure/caption associations and reconstruct the Index and Colophon
+accurately from layout-aware source evidence.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/06-Starting-from-Randomness.md` and `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md`.
-- Distinguish behavior classes, ensembles, random seeds, attractors, perturbations, finite-size protocols, and any native construction changes.
-- Record probability laws only where the Book specifies them.
-- Inspect all captions/images and run local saturation after reading.
+- Compare every printed figure and caption with the existing asset sequence,
+  detecting missing, partial, swapped, duplicated, or misowned images.
+- Correct caption text and placement from source evidence.
+- Reconstruct the Index in printed column and entry order, preserving headings,
+  subentries, cross-references, punctuation, and page ranges.
+- Verify the Colophon and all actual Index/Colophon boundaries.
+- Perform a separate second pass over the complete Index and all changed figure
+  groups.
 
 #### Completion Requirements
 
-- All paired units/images and trigger hits are dispositioned.
-- Initial-condition randomness is not confused with stochastic transition semantics.
-- Behavior/property/analyzer records are separated from construction candidates.
-- Cross-range references are completely queued.
+- Every printed figure/caption group has a checked Markdown/asset disposition.
+- All image references resolve and agree with their source placement.
+- The complete Index has two-pass fixed-layout coverage and correct entry order.
+- Colophon content and boundaries match the authoritative source.
+- No unresolved figure, caption, Index, or Colophon ambiguity remains.
+- Focused and cumulative validation passes.
 
-### 11-CH07-MECHANISMS
+### 11-SATURATION
 
 #### Big Picture Objective
 
-Blindly audit Chapter 7 main text and Chapter 7 Notes.
+Find and eliminate residual OCR errors across the assembled corrected corpus.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` and `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md`.
-- Pay explicit attention to stochastic movement, aggregation, constraint satisfaction, continuity/discreteness mechanisms, and systems introduced as explanatory examples.
-- Record event selection, probability, frontier growth, and ensemble/observer distinctions.
-- Inspect every construction-bearing figure and follow local references.
+- Run corpus-wide detectors for common OCR substitutions, improbable tokens,
+  broken joins/splits, punctuation/Unicode anomalies, malformed Markdown,
+  formula/code errors, headings, captions, cross-references, and Index forms.
+- Review every detector hit against the authoritative source.
+- Conduct a fresh sequential verification pass over all 29 documents using the
+  coverage checklist, with special attention to unchanged passages surrounding
+  prior corrections.
+- Reopen the owning stage for every discovered discrepancy.
+- Repeat the complete detector and verification round after the last correction
+  until a full round yields no new discrepancy.
 
 #### Completion Requirements
 
-- All paired source units/images and search hits are dispositioned.
-- Stochastic laws, random inputs, averaged observations, and deterministic intrinsic randomness are distinguished.
-- Candidate fingerprints include draw/event timing and measure semantics where evidenced.
-- No relevant reference is lost.
+- Every detector hit has a source-backed disposition.
+- All 29 documents have a completed fresh verification pass.
+- The final complete round finds no new discrepancy.
+- `unresolved.md` contains zero author-text transcription ambiguity.
+- Coverage, correction, structure, image, link, and cumulative tests pass.
 
-### 12-CH08-EVERYDAY
+### 12-RELEASE
 
 #### Big Picture Objective
 
-Blindly audit Chapter 8 main text and Chapter 8 Notes.
+Publish the corrected Markdown source and prove the full-book reliability claim
+without reintroducing Goal 4's process overhead.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/08-Implications-for-Everyday-Systems.md` and `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md`.
-- Determine whether each application merely instantiates earlier mechanics or specifies new coupling, mutation, global selection, growth, stochastic, or hybrid semantics.
-- Keep physical interpretation and display conventions outside native construction identity unless the Book makes them causal.
-- Inspect all figures and implementation details.
+- Build twice from immutable legacy inputs and the correction set into fresh
+  directories; compare outputs byte-for-byte.
+- Validate document/source coverage, corrections, technical regions,
+  figures/captions, Index, navigation, assets, and Markdown rendering.
+- Rehash the legacy corpus and compare it with the initial snapshot.
+- Run focused Goal 5 tests, affected repository tests, `git diff --check`, and
+  explicit scope inspection.
+- Publish the verified sibling tree and write concise build, source, review,
+  correction, and maintenance documentation.
+- State reviewer types accurately and distinguish corrected OCR from optional
+  source errata annotations.
 
 #### Completion Requirements
 
-- Every paired unit/image and local trigger hit is dispositioned.
-- Each application candidate states whether new mechanics are actually specified.
-- Hybrid/composed systems identify component boundaries and coupling laws.
-- All cross-range routes are queued.
-
-### 13-CH09-PHYSICS
-
-#### Big Picture Objective
-
-Blindly audit Chapter 9 main text and Chapter 9 Notes.
-
-#### Detailed Implementation Plan
-
-- Sequentially review `CHAPTERS/09-Fundamental-Physics.md` and `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md`.
-- Record multi-time state, reversibility constructions, block schedules, conserved systems, network rewrites, causal event structures, branching, and sequencing evidence without forcing them into prior categories.
-- Distinguish derived causal representations from native evolution and distinguish property restrictions from construction-enforced mechanics.
-- Inspect all relevant rule diagrams, network figures, and formulas.
-
-#### Completion Requirements
-
-- Every paired unit/image and local search hit is dispositioned.
-- Schedule, visible history, structural mutation, and causal witness semantics are explicit.
-- Close property-versus-construction cases retain evidence on both sides.
-- Outgoing references are fully queued.
-
-### 14-CH10-PERCEPTION
-
-#### Big Picture Objective
-
-Blindly audit Chapter 10 main text and Chapter 10 Notes.
-
-#### Detailed Implementation Plan
-
-- Sequentially review `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` and `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md`.
-- Separate analyzers and compression/view procedures from generative probabilistic models, transducers, automata, and stochastic cellular systems.
-- Record consumed input, hidden state, output semantics, likelihood/probability roles, and learning/fitting procedures where specified.
-- Inspect code, formulas, captions, and all governed images.
-
-#### Completion Requirements
-
-- All paired units/images and search hits are dispositioned.
-- Model definitions, inference algorithms, observers, and data transformations are not conflated.
-- Input-processing candidates have complete input/state/output fingerprints.
-- Every relevant reference is queued.
-
-### 15-CH11-COMPUTATION
-
-#### Big Picture Objective
-
-Blindly audit Chapter 11 main text and Chapter 11 Notes.
-
-#### Detailed Implementation Plan
-
-- Sequentially review `CHAPTERS/11-The-Notion-of-Computation.md` and `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md`.
-- Distinguish native constructions from emulations, universal presets, encodings, proof artifacts, and computational properties.
-- Record any construction mechanics introduced only to establish universality.
-- Inspect all diagrams, encodings, implementation passages, and cross-references.
-
-#### Completion Requirements
-
-- Every paired unit/image and local trigger hit is dispositioned.
-- Emulation and universality do not create false native types.
-- Any genuinely specified machine/system has a complete provisional fingerprint.
-- Cross-range routes are fully queued.
-
-### 16-CH12-EQUIVALENCE
-
-#### Big Picture Objective
-
-Blindly audit Chapter 12 main text and Chapter 12 Notes.
-
-#### Detailed Implementation Plan
-
-- Sequentially review `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` and `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md`.
-- Separate philosophical claims, mathematical examples, axiom systems, proof/search relations, computations, and actual formal constructions.
-- Record any explicitly instantiated rewrite, proof, equation, machine, or generative mechanism.
-- Inspect all images and follow every locally resolvable route.
-
-#### Completion Requirements
-
-- Every paired unit/image and local search hit is dispositioned.
-- Abstract discussion is not mistaken for executable mechanics, and declarative formal systems are not discarded merely for lacking time evolution.
-- Candidate evidence boundaries are explicit.
-- All outgoing routes are queued for Stage 18.
-
-### 17-INDEX-CLOSURE
-
-#### Big Picture Objective
-
-Screen the complete canonical Index for names, aliases, cross-references, and sections missed by sequential reading without treating Index entries alone as primary construction evidence.
-
-#### Detailed Implementation Plan
-
-- Sequentially inspect every source unit and headword in `BACK-MATTER/Index.md`, assigning explicit no-construction dispositions where appropriate.
-- Follow every construction-relevant page route to an already reviewed source unit or reopen the owning chapter stage.
-- Record Index-only leads, false positives, and unresolved routes.
-
-#### Completion Requirements
-
-- Every actual-Index source unit/headword is screened; every construction-relevant route is mapped, excluded with reason, or assigned a documented missing target.
-- Any missed construction reopens and re-closes its owning stage.
-- Index text is never the sole mechanics evidence for an accepted candidate.
-
-### 18-SATURATION
-
-#### Big Picture Objective
-
-Reach a reproducible vocabulary and cross-reference fixed point across the full corpus after sequential discovery is complete.
-
-#### Detailed Implementation Plan
-
-- Run frozen search families over headings, captions, Notes labels, mechanism nouns, update verbs, schedules, probability terms, constraints, generators, equations, and input/output language.
-- Add every alias, operation, named example, and parameter learned from reviewed candidates to the next search round.
-- Partition every hit into governed candidate/support, duplicate, cross-reference, control, or exclusion.
-- Drain all page/section/alias cross-reference queues and inspect every remaining construction-adjacent image.
-- Repeat until a full round adds no new vocabulary, candidate, evidence group, or unresolved route.
-
-#### Completion Requirements
-
-- `search-rounds.json` reproduces every round and result digest.
-- Every search hit has a disposition and there is no remainder.
-- The final round adds zero vocabulary, candidates, evidence, or routes.
-- All cross-reference and asset work queues are empty.
-- Blind B-candidate artifacts are frozen before Stage 19.
-
-### 19-REDISCOVERY
-
-#### Big Picture Objective
-
-Reveal the existing catalog only after blind discovery, then test whether T01–T45 were independently recovered from the Book.
-
-#### Detailed Implementation Plan
-
-- Snapshot current `CA-Types.csv`, `CA-Types.md`, Goal 1 ledgers/stages, Goal 2 plans, and relevant architecture documents.
-- Map each T entry to one or more frozen B candidates without changing blind records.
-- Identify T entries not independently rediscovered and diagnose whether the blind pass failed, the catalog is a preset/property rather than a construction, or source support is defective.
-- Mine existing exclusion/boundary/future-stage records for candidates the blind audit may have missed; reopen owning discovery stages as needed.
-
-#### Completion Requirements
-
-- Every T01–T45 row has a unique reconciliation record and source-backed result.
-- Every B candidate is linked to zero or more T entries without premature final classification.
-- Missed Book evidence reopens and re-closes the responsible stage.
-- The baseline snapshot and joins are hash-pinned and reproducible.
-
-### 20-DISPOSITIONS
-
-#### Big Picture Objective
-
-Assign every B candidate orthogonal catalog, semantic-role, and family actions and identify proposed catalog additions without conflating them with new semantic families.
-
-#### Detailed Implementation Plan
-
-- Assign one `catalog_action`, one primary `semantic_role`, and one `family_action` to every candidate.
-- Compare every candidate against its nearest existing and newly discovered neighbors.
-- Require explicit base construction and parameter/predicate for presets and restrictions.
-- Require absence of native mechanics for observer/application/emulation roles.
-- Require exact missing facts for source-insufficient actions.
-- Require a concrete non-preservation counterexample only for `NEW_SEMANTIC_FAMILY`.
-- Permit `ADD_CATALOG_ENTRY` for source-important presets, restrictions, seed classes, compositions, declarative categories, or other coverage obligations that reuse an existing family.
-- Allocate proposed T46+ identifiers only after all earlier IDs remain stable.
-
-#### Completion Requirements
-
-- Every B candidate has exactly one value on all three classification axes with evidence-backed rationale.
-- No `AMBIGUOUS`, `UNREVIEWED`, or silent catch-all row remains on any axis.
-- Every proposed T46+ entry has a complete Book evidence packet and justified catalog-level identity.
-- Every `NEW_SEMANTIC_FAMILY` row has a nearest-family counterexample; existing-family T46+ rows name their reused family and exact role.
-- Every close exclusion/collapse is flagged for hostile review.
-
-### 21-SEMANTIC-FAMILIES
-
-#### Big Picture Objective
-
-Build the deduplicated semantic-family inventory and test newly discovered constructions against the proposed API without allowing API convenience to rewrite the taxonomy.
-
-#### Detailed Implementation Plan
-
-- Group catalog entries when either complete fingerprints and lossless native-result correspondences justify it, or both are proved instances/restrictions of the same explicit parameterized semantic schema with unchanged native mechanics.
-- Build near-pair comparisons for schedule, history, branching/probability, structural mutation, input consumption, completion, and witness differences.
-- Map each accepted construction to the minimal API fields and result semantics.
-- Record where the five-field design fits directly, needs clarification, or genuinely fails.
-- State implementation sharing separately from Book catalog identity.
-
-#### Completion Requirements
-
-- Every final catalog entry—including declarative entries—maps to exactly one semantic-family record.
-- Every same-family claim includes either a lossless native-result correspondence or a proof of membership in the same explicit parameterized schema with unchanged mechanics.
-- Every close non-equivalence includes a concrete counterexample.
-- Every accepted addition has an honest API-pressure disposition with no callback or opaque-packing escape hatch.
-
-### 22-HOSTILE-REVIEW
-
-#### Big Picture Objective
-
-Independently challenge source coverage, every proposed addition, every close exclusion/collapse, every semantic-family grouping, and the audit validators.
-
-#### Detailed Implementation Plan
-
-- Give independent reviewers raw source ranges, frozen ledgers, and explicit challenge assignments.
-- Re-read all proposed-new evidence and nearest-family evidence.
-- Sample exclusions and no-construction source units across every chapter.
-- Test high-risk distinctions: property versus mechanics, seed versus stochastic law, synchronous versus sequential/block schedule, hidden history, graph label evolution versus graph rewrite, application versus coupling, equation versus flow/solver, and emulation versus native construction.
-- Run independent coverage arithmetic and destructive mutation tests against copies of the ledgers.
-- Route every finding back to the owning stage; no waiver closes a failure.
-
-#### Completion Requirements
-
-- Every proposed addition and close classification has at least one independent review record.
-- Sampling covers every canonical segment and every value used on all three final classification axes.
-- All validator mutation tests fail when required evidence is removed or corrupted.
-- Every hostile finding is resolved by re-opening/re-closing its owning stage.
-- `hostile-review.md` has zero unresolved blocking findings.
-
-### 23-FINAL-CENSUS
-
-#### Big Picture Objective
-
-Produce the final evidence-backed whole-book catalog, semantic-family inventory, exact coverage proof, and a non-mutating integration handoff.
-
-#### Detailed Implementation Plan
-
-- Freeze source, ledger, search, classification, and report hashes.
-- Generate final catalog and semantic-family counts from verified ledger rows rather than handwritten summaries.
-- Report every T01–T45 correction, every proposed T46+ addition, every insufficient-evidence boundary, and every API pressure.
-- Explain why every high-risk candidate was included, collapsed, or excluded.
-- Write a dependency-aware handoff for later authorized changes to `ref/notes`, Goal 1, Goal 2, API documents, and runtime planning.
-- Run all final source, join, mutation, relocation, Markdown, diff, and scope gates.
-
-#### Completion Requirements
-
-- The coverage catalog and semantic-family inventory are complete, internally consistent, and separately counted.
-- Every source unit, image, search hit, cross-reference, candidate, T entry, proposed addition, and family join is accounted for.
-- No unresolved hostile finding or silent evidence gap remains.
-- Final reports state limitations honestly and do not convert insufficient evidence into invented semantics.
-- Only `goal-3/` changed unless separate integration was explicitly authorized.
-- The original objective—determining whether and how the whole Book expands or corrects the current taxonomy—is actually answered.
+- All prior stages are complete with zero open author-text ambiguity.
+- Exactly 29 canonical documents contain the complete book in correct order.
+- Complete first-pass, second-pass, technical, figure/Index, and saturation
+  coverage is verified.
+- Two clean builds are byte-identical and match the published sibling.
+- All links and image references resolve and Markdown renders as intended.
+- Legacy hashes and existing consumer behavior remain unchanged.
+- The final documentation gives exact rebuild/validate commands and accurately
+  supports the claim that known OCR errors have been removed.

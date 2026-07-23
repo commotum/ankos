@@ -185,7 +185,7 @@ Execution of this plan will create:
 - One evidence-and-design stage file for each of the 45 catalog types.
 - `goal-1/evidence-index.md`: coverage ledger linking every CSV row to searches, excerpts, stage status, and unresolved candidates.
 - `goal-1/design-ledger.md`: evolving inventory of proposed state models, selectors, read models, result types, update algebras, invariants, and rejected abstractions.
-- `goal-1/goal-2-handoff.md`: dependency-aware implementation plan with a traceable conformance stage for every type.
+- `goal-2/goal-2-handoff.md`: dependency-aware implementation plan with a traceable conformance stage for every type.
 - One synthesis stage and one Goal 2 handoff stage.
 
 Do not create empty type stage files in advance. Create each from `0-loop.md` when its work begins so it reflects current facts.
@@ -228,7 +228,7 @@ Each type stage must perform this loop:
 - Proposed semantic additions are deduplicated across types and justified by at least one real construction.
 - No proposal relies on prohibited fallbacks, opaque packing, family-specific rollout, or vacuous callback interfaces.
 - The final design ledger names the genuinely shared execution algebra or algebras and explains any irreducible split.
-- `goal-2-handoff.md` contains a dependency-aware implementation and verification path covering all 45 entries.
+- `../goal-2/goal-2-handoff.md` contains a dependency-aware implementation and verification path covering all 45 entries.
 - Each type remains separately traceable in Goal 2 even when implementation is organized around shared primitives.
 - The final `0-plan.md` is internally cohesive and contains no stale decision contradicted by later evidence.
 
@@ -238,7 +238,7 @@ Each type stage must perform this loop:
 - Confirm every type stage contains its search log, excerpts, construction model, comparison, principles audit, Goal 2 handoff, and integration result.
 - Confirm all excerpt paths and line references resolve against current repository files.
 - Confirm every proposed new primitive is used by a documented construction and is not equivalent to an existing primitive.
-- Confirm all 45 types appear in `evidence-index.md` and `goal-2-handoff.md` exactly once as coverage obligations.
+- Confirm all 45 types appear in `evidence-index.md` and `../goal-2/goal-2-handoff.md` exactly once as coverage obligations.
 - Review the final design for hidden family branches, `Any` escape hatches, padding-as-semantics, global formula bypasses, and duplicated execution logic.
 - Run `git diff --check` and verify Goal 1 has not modified runtime, tests, or root API documents.
 
@@ -1286,7 +1286,7 @@ COMPLETE. D141 reduces every catalog construction with canonical evolution to on
 
 ### 48-GOAL2-HANDOFF
 
-Status: **COMPLETE** in `goal-1/goal-2-handoff.md`.
+Status: **COMPLETE** in `goal-2/goal-2-handoff.md`.
 
 #### Big Picture Objective
 
@@ -1294,7 +1294,7 @@ Turn the evidence-grounded architecture into a complete, dependency-aware Goal 2
 
 #### Detailed Implementation Plan
 
-- Consolidate each type's Goal 2 handoff into `goal-1/goal-2-handoff.md`.
+- Consolidate each type's Goal 2 handoff into `goal-2/goal-2-handoff.md`.
 - Order shared semantic primitives before the type conformance stages that depend on them.
 - Preserve a distinct traceable implementation/conformance obligation for every CSV row without duplicating shared implementation.
 - Define migrations, canonical examples, tests, coverage matrix, no-cheating checks, and final ANKoS universality verification.

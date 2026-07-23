@@ -1,12 +1,12 @@
-# Goal 3 Execution Loop
+# Goal 4 Execution Loop
 
-This loop governs every stage in `goal-3/0-plan.md`. The plan is authoritative but revisable when direct Book evidence or verification invalidates an assumption. Goal 3 audits and classifies; it does not implement runtime changes or mutate the existing catalog without separate authorization.
+This loop governs every stage in `goal-4/0-plan.md`. The plan is authoritative but revisable when direct Book evidence or verification invalidates an assumption. Goal 4 audits and classifies; it does not implement runtime changes or mutate the existing catalog without separate authorization.
 
 ## Phase Boundaries
 
 ### Blind discovery: Stages 1–18
 
-- Discovery uses `principles.md`, the canonical Book corpus, Goal 3 guardrails, and Goal 3 ledger schemas.
+- Discovery uses `principles.md`, the canonical Book corpus, Goal 4 guardrails, and Goal 4 ledger schemas.
 - Discovery candidates use provisional `B####` IDs.
 - Do not consult or import T01–T45 mappings, `CA-Types.md` summaries, Goal 1 type conclusions, Goal 2 plans, `api.md`, `simple_programs.md`, or `src/ca` to decide what the Book contains.
 - Do not claim cognitive amnesia. Instead, make the artifacts structurally independent: no T-ID mapping columns, API-fit fields, or existing-family dispositions are allowed before the blind candidate ledger is frozen.
@@ -22,19 +22,19 @@ This loop governs every stage in `goal-3/0-plan.md`. The plan is authoritative b
 
 - Independent review may reopen any earlier stage.
 - No waiver, deadline, preferred count, or green validator substitutes for resolving a substantive finding.
-- Final integration outside `goal-3/` remains a handoff unless the user explicitly authorizes it.
+- Final integration outside `goal-4/` remains a handoff unless the user explicitly authorizes it.
 
 ## Repeatable Loop
 
 1. Sync current state with actual repository files, source hashes, Git diff, completed stage files, ledgers, work queues, and verification results.
-2. Read `principles.md` and update `goal-3/0-plan.md` with current facts before starting the next stage.
+2. Read `principles.md`, `goal-4/0-baseline.md`, and update `goal-4/0-plan.md` with current facts before starting the next stage.
 3. Select the first incomplete stage whose dependencies are satisfied; reopen an earlier stage first when later evidence invalidates it.
-4. Create or refresh `goal-3/[INDEX]-[SHORTHAND].md` from the stage template below.
-5. Implement only that stage. In Goal 3, implementation means corpus accounting, sequential reading, evidence capture, classification, verification, or reporting—not runtime or catalog integration.
+4. Create or refresh `goal-4/[INDEX]-[SHORTHAND].md` from the stage template below.
+5. Implement only that stage. In Goal 4, implementation means corpus accounting, sequential reading, evidence capture, classification, verification, or reporting—not runtime or catalog integration.
 6. Add verification and no-cheating checks that directly cover the stage requirements.
 7. Run focused checks, the current full audit-verifier set, relevant mutation/relocation checks, and whitespace/diff checks.
 8. Record facts, searches, source coverage, candidate changes, cross-references, classifications, commands, and outcomes in the stage file.
-9. Fold results back into `goal-3/0-plan.md` and the shared Goal 3 ledgers; update assumptions and reopen contradicted stages.
+9. Fold results back into `goal-4/0-plan.md` and the shared Goal 4 ledgers; update assumptions and reopen contradicted stages.
 10. Continue toward the original objective. If stopping for the session, leave the goal resumable with exact ledger state, open queues, next source unit/stage, failed checks, unblock actions, and assumptions to challenge.
 
 ## Global Invariants
@@ -53,17 +53,17 @@ This loop governs every stage in `goal-3/0-plan.md`. The plan is authoritative b
 - Do not fabricate semantics when the Book is incomplete or contradictory.
 - Do not treat random initial conditions, stochastic transition laws, external draw streams, finite PRNG realizations, and observed distributions as interchangeable.
 - Do not treat a solver trace as a constraint's native evolution, a numerical integrator as a PDE's identity, a renderer as a construction, or an emulation as the emulated system's native mechanics.
-- Do not edit Book files, `ref/notes`, Goal 1, Goal 2, root API documents, `src/ca`, or tests during Goal 3 without explicit authorization.
+- Do not edit Book files, `ref/notes`, Goal 1, Goal 2, root API documents, `src/ca`, or tests during Goal 4 without explicit authorization.
 - Do not create empty future stage files. Create a stage file only when its stage begins.
 
 ## Start-of-Stage Sync
 
 Before any stage work:
 
-1. Read `goal-3/0-plan.md`, this loop, the previous completed stage, and current shared-ledger summaries.
+1. Read `goal-4/0-plan.md`, this loop, the previous completed stage, and current shared-ledger summaries.
 2. Run `git status --short` and identify all pre-existing user changes. Preserve them.
 3. Verify canonical Book and asset hashes against `corpus-manifest.json` once that artifact exists.
-4. Run current Goal 3 validators before editing.
+4. Run current Goal 4 validators before editing.
 5. Confirm the stage's allowed source inputs and phase boundary.
 6. Record the exact starting counts for source units, reviewed units, candidates, cross-reference queue, asset queue, search hits, catalog/role/family classifications, and hostile findings as applicable.
 7. If source drift is detected, stop classification work and reopen `2-CORPUS-MAP` and `3-AUDIT-HARNESS`.
@@ -374,8 +374,8 @@ At the end of every stage, answer:
 - Verify every proposed T46+ entry and close exclusion/collapse has hostile review; require nearest-family counterexamples only for new semantic families.
 - Verify catalog and semantic-family counts are separately derived from ledgers.
 - Verify no unsupported Book claim was silently repaired or inferred.
-- Run all Goal 3 validators, mutation cases, relocation checks, byte-compilation/import checks, direct whitespace/fence checks over tracked and untracked `goal-3/**`, staged-diff checks when intentionally staged, and final scope inspection.
-- Confirm only `goal-3/` changed unless the user separately authorized integration.
+- Run all Goal 4 validators, mutation cases, relocation checks, byte-compilation/import checks, direct whitespace/fence checks over tracked and untracked `goal-4/**`, staged-diff checks when intentionally staged, and final scope inspection.
+- Confirm only `goal-4/` changed unless the user separately authorized integration.
 
 ## Session Stop / Resume Contract
 
