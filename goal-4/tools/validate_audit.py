@@ -1482,15 +1482,25 @@ def _validate_atomic_prefix_state(
     evidence_by_id: dict[str, tuple[str, dict[str, Any]]] = {}
     evidence_group_ids: set[str] = set()
     search_hit_by_id: dict[str, tuple[int, dict[str, Any]]] = {}
+    replayed_vocabulary: list[str] = []
     for round_record in search_state.get("rounds", []):
         if not isinstance(round_record, dict):
             continue
+        replayed_vocabulary.extend(
+            value
+            for value in round_record.get("new_vocabulary", [])
+            if isinstance(value, str)
+        )
         round_epoch = round_record.get("epoch")
         if not isinstance(round_epoch, int):
             continue
         for hit in round_record.get("hits", []):
             if isinstance(hit, dict) and isinstance(hit.get("hit_id"), str):
                 search_hit_by_id[hit["hit_id"]] = (round_epoch, hit)
+    if search_state.get("vocabulary") != replayed_vocabulary:
+        errors.append(
+            f"{prefix} search vocabulary differs from ordered round deltas"
+        )
     for candidate_id, candidate in candidate_state.items():
         for evidence in candidate.get("source_evidence", []):
             if not isinstance(evidence, dict):
@@ -4421,6 +4431,7 @@ def validate_objects(
     hit_by_id: dict[str, dict[str, Any]] = {}
     hit_round_meta: dict[str, tuple[int, int, str]] = {}
     seen_new_vocabulary: set[str] = set()
+    replayed_vocabulary: list[str] = []
     seen_new_candidates: set[str] = set()
     seen_new_evidence_groups: set[str] = set()
     seen_new_routes: set[str] = set()
@@ -4784,6 +4795,7 @@ def validate_objects(
                     f"{sorted(duplicates)}"
                 )
             seen.update(delta_values[key])
+        replayed_vocabulary.extend(delta_values["new_vocabulary"])
         ordered_stage18_candidates.extend(delta_values["new_candidates"])
         ordered_stage18_routes.extend(delta_values["new_routes"])
 
@@ -4884,6 +4896,11 @@ def validate_objects(
             errors.append(
                 f"route anchor {anchor_identity} ordinals are not contiguous"
             )
+
+    if vocabulary != replayed_vocabulary:
+        errors.append(
+            "search vocabulary differs from ordered per-round new_vocabulary"
+        )
 
     fixed_point = search.get("fixed_point")
     if fixed_point is not None:
@@ -5746,6 +5763,159 @@ def mutation_checks(
     if base_errors:
         return ["valid candidate/route mutation fixture failed: " + "; ".join(base_errors)]
 
+    def expect_prefix_error(
+        name: str,
+        expected_fragment: str,
+        candidate_record: dict[str, Any],
+        *,
+        route_record: dict[str, str] | None = None,
+        search_state: dict[str, Any] | None = None,
+        unit_epochs: dict[str, set[int]] | None = None,
+    ) -> None:
+        prefix_errors: list[str] = []
+        selected_route = route if route_record is None else route_record
+        _validate_atomic_prefix_state(
+            {candidate_record["id"]: candidate_record},
+            {selected_route["route_id"]: selected_route},
+            {path: base_history[-1]["path_changes"][0]},
+            base_search if search_state is None else search_state,
+            {asset["asset_id"]: asset for asset in base_assets},
+            {unit_id: {1}} if unit_epochs is None else unit_epochs,
+            {},
+            prefix_errors,
+            name,
+        )
+        if not any(
+            expected_fragment in error for error in prefix_errors
+        ):
+            failures.append(
+                f"{name} missed prefix error {expected_fragment!r}: "
+                + "; ".join(prefix_errors)
+            )
+
+    future_source_anchor = copy.deepcopy(candidate)
+    future_source_anchor["source_evidence"][0]["discovery_anchor"][
+        "epoch"
+    ] = 2
+    expect_prefix_error(
+        "V000001 future source-anchor regression",
+        "future source review anchor",
+        future_source_anchor,
+    )
+
+    future_hit_anchor = copy.deepcopy(candidate)
+    future_hit_anchor["source_evidence"][0]["discovery_anchor"] = {
+        "epoch": 2,
+        "kind": "SEARCH_HIT",
+        "id": "H000001",
+        "ordinal": 1,
+    }
+    expect_prefix_error(
+        "V000001 future hit-anchor regression",
+        "future SEARCH_HIT",
+        future_hit_anchor,
+    )
+
+    alternate_unit_id = next(
+        item["id"]
+        for item in units
+        if item["path"] == path and item["id"] != unit_id
+    )
+    mismatched_hit_anchor = copy.deepcopy(future_hit_anchor)
+    prefix_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": [],
+        "vocabulary": [],
+        "rounds": [
+            {
+                "epoch": 2,
+                "queries": [],
+                "hits": [
+                    {
+                        "hit_id": "H000001",
+                        "source_unit_id": alternate_unit_id,
+                        "candidate_ids": ["B0001"],
+                        "route_ids": [],
+                    }
+                ],
+                "new_vocabulary": [],
+                "new_candidates": [],
+                "new_evidence_groups": [],
+                "new_routes": [],
+            }
+        ],
+        "fixed_point": None,
+    }
+    expect_prefix_error(
+        "V000002 mismatched hit-source regression",
+        "source unit differs from its SEARCH_HIT",
+        mismatched_hit_anchor,
+        search_state=prefix_search,
+    )
+
+    prefix_provenance_gap = copy.deepcopy(candidate)
+    prefix_provenance_gap["source_unit_ids"].append(alternate_unit_id)
+    expect_prefix_error(
+        "V000001 candidate provenance regression",
+        "source_unit_ids are not the exact evidence-unit join",
+        prefix_provenance_gap,
+    )
+
+    prefix_allocation_gap = copy.deepcopy(candidate)
+    prefix_allocation_gap["source_evidence"][0].update(
+        {
+            "evidence_id": "E000002",
+            "evidence_group_id": "G000002",
+        }
+    )
+    expect_prefix_error(
+        "V000001 evidence allocation regression",
+        "evidence IDs are not a contiguous prefix allocation",
+        prefix_allocation_gap,
+    )
+    expect_prefix_error(
+        "V000001 evidence-group allocation regression",
+        "evidence groups are not a contiguous minimum-E prefix allocation",
+        prefix_allocation_gap,
+    )
+
+    premature_pending_route = copy.deepcopy(route)
+    premature_pending_route["target_unit_ids"] = f'["{unit_id}"]'
+    expect_prefix_error(
+        "V000001 pending-route regression",
+        "carries premature resolution fields",
+        candidate,
+        route_record=premature_pending_route,
+    )
+
+    unreported_vocabulary = copy.deepcopy(base_search)
+    unreported_vocabulary["vocabulary"] = ["unreported"]
+    expect_prefix_error(
+        "V000001 search-vocabulary regression",
+        "search vocabulary differs from ordered round deltas",
+        candidate,
+        search_state=unreported_vocabulary,
+    )
+    unreported_vocabulary_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        unreported_vocabulary,
+        base_history,
+    )
+    if (
+        "search vocabulary differs from ordered per-round new_vocabulary"
+        not in unreported_vocabulary_errors
+    ):
+        failures.append(
+            "unreported top-level vocabulary escaped final validation: "
+            + "; ".join(unreported_vocabulary_errors)
+        )
+
     defect_reading = copy.deepcopy(base_reading)
     defect_unit = units[1]
     defect_document = next(
@@ -6152,6 +6322,161 @@ def mutation_checks(
             history_state,
         ):
             failures.append(f"history mutation unexpectedly passed: {name}")
+
+    missing_final_route = copy.deepcopy(route)
+    missing_final_route.update(
+        {
+            "status": "MISSING_TARGET_FINAL",
+            "attempts": '["reviewed available corpus targets"]',
+            "defect_boundary": (
+                "The referenced target is absent from the available corpus."
+            ),
+        }
+    )
+    missing_final_core = {
+        "review_id": "V000002",
+        "epoch": 1,
+        "stage": 18,
+        "mode": "ROUTE_RESOLUTION",
+        "reviewer": "fixture-reviewer",
+        "source_paths": [path],
+        "candidate_changes": [],
+        "route_changes": [
+            close_route_change(
+                "UPDATE",
+                copy.deepcopy(missing_final_route),
+                before_route=copy.deepcopy(route),
+                previous_route_result_sha256=canonical_sha256(route),
+            )
+        ],
+        "search_change": None,
+    }
+    missing_final_core["path_changes"] = [
+        close_path_change(
+            missing_final_core,
+            {
+                "source_path": path,
+                "source_unit_ids": [
+                    item["id"] for item in units if item["path"] == path
+                ],
+                "asset_ids": [
+                    item["asset_id"]
+                    for item in base_assets
+                    if item["assignment_path"] == path
+                ],
+                "previous_path_result_sha256": base_history[-1][
+                    "path_changes"
+                ][0]["result_projection_sha256"],
+            },
+            unit_by_fixture_id,
+            {
+                item["source_unit_id"]: item for item in base_reading
+            },
+            {item["asset_id"]: item for item in base_assets},
+        )
+    ]
+    premature_missing_history = [
+        *base_history,
+        close_review_event(
+            missing_final_core,
+            base_history[-1]["event_sha256"],
+        ),
+    ]
+    premature_missing_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        [missing_final_route],
+        base_assets,
+        base_search,
+        premature_missing_history,
+    )
+    for expected_fragment in (
+        "before complete reading/asset review",
+        "before applicable LOCAL closure",
+        "before current-epoch Stage-18 SATURATION",
+    ):
+        if not any(
+            expected_fragment in error
+            for error in premature_missing_errors
+        ):
+            failures.append(
+                "premature MISSING_TARGET_FINAL missed prerequisite "
+                f"{expected_fragment!r}: "
+                + "; ".join(premature_missing_errors)
+            )
+
+    saturation_scope_paths = [
+        document["path"]
+        for document in sorted(
+            manifest["documents"],
+            key=lambda document: (
+                stage_for_document(document),
+                int(document["order"]),
+            ),
+        )
+    ]
+    premature_saturation = zero_local_round(
+        1,
+        1,
+        1,
+        18,
+        saturation_scope_paths,
+    )
+    premature_saturation["kind"] = "SATURATION"
+    premature_saturation_digest = search_result_digest(
+        premature_saturation
+    )
+    premature_saturation["result_digest"] = premature_saturation_digest
+    premature_saturation["rerun_digest"] = premature_saturation_digest
+    premature_fixed_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": [
+            "Deterministic zero-result history fixture."
+        ],
+        "vocabulary": [],
+        "rounds": [premature_saturation],
+        "fixed_point": {
+            "round_id": "S001",
+            "zero_delta": True,
+            "rerun_reproduced": True,
+            "result_digest": premature_saturation_digest,
+        },
+    }
+    premature_fixed_history = append_history_event(
+        base_history,
+        base_reading,
+        base_assets,
+        path,
+        1,
+        "SEARCH_APPEND",
+        "fixture-searcher",
+        [premature_saturation],
+        full_search_state=premature_fixed_search,
+    )
+    premature_fixed_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        premature_fixed_search,
+        premature_fixed_history,
+    )
+    for expected_error in (
+        "review-history event 2 sets fixed_point with pending routes",
+        "search fixed_point exists with pending routes",
+        "review-history event 2 sets fixed_point before applicable LOCAL closure",
+    ):
+        if expected_error not in premature_fixed_errors:
+            failures.append(
+                "premature fixed-point regression missed "
+                f"{expected_error!r}: "
+                + "; ".join(premature_fixed_errors)
+            )
 
     expect_history_failure(
         "reviewed rows without history",
@@ -6703,7 +7028,7 @@ def mutation_checks(
         {path: revision_path_change},
         base_search,
         {asset["asset_id"]: asset for asset in lineage_assets},
-        {unit_id: {1}},
+        {unit_id: {1, 2}},
         {},
         lineage_revision_errors,
         "atomic Stage 18 lineage revision",
@@ -7246,7 +7571,7 @@ def mutation_checks(
                 "result_ids": [],
                 "result_digest": "",
                 "hits": [],
-                "new_vocabulary": [],
+                "new_vocabulary": ["fixture"],
                 "new_candidates": [],
                 "new_evidence_groups": [],
                 "new_routes": [],
@@ -7428,6 +7753,37 @@ def mutation_checks(
             for hit in active_search_round["hits"]
             if hit["source_unit_id"] == unit_id
         )
+        mismatched_search_evidence = copy.deepcopy(candidate)
+        mismatched_search_evidence["source_evidence"][0].update(
+            {
+                "discovery_anchor": {
+                    "epoch": 2,
+                    "kind": "SEARCH_HIT",
+                    "id": governed_hit["hit_id"],
+                    "ordinal": 1,
+                },
+                "source_unit_id": alternate_unit_id,
+            }
+        )
+        mismatched_search_evidence_errors = validate_objects(
+            manifest,
+            units,
+            search_reading,
+            [mismatched_search_evidence],
+            base_routes,
+            search_assets,
+            search_fixture,
+            search_history,
+        )
+        if not any(
+            "evidence source unit differs from anchor hit" in error
+            for error in mismatched_search_evidence_errors
+        ):
+            failures.append(
+                "SEARCH_HIT evidence source mismatch escaped final "
+                "validation: "
+                + "; ".join(mismatched_search_evidence_errors)
+            )
         local_enriched_reading = copy.deepcopy(search_reading)
         local_enriched_reading[0]["evidence_statement"] = (
             "The original review plus the later LOCAL hit supports this "

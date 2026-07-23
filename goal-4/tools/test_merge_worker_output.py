@@ -1942,12 +1942,89 @@ def test_missing_target_final_rejects_premature_review_and_search_state(
             goal_dir=no_local_goal,
         )
 
+    no_saturation_goal = _copy_goal_template(
+        closed_review_goal_template,
+        tmp_path / "no-saturation",
+    )
+    no_saturation_proposal, _ = _missing_route_proposal(
+        no_saturation_goal,
+        tmp_path,
+        filename="no-saturation-missing-route.json",
+    )
+    with pytest.raises(
+        merge.MergeError,
+        match="requires a Stage 18 SATURATION search round.*epoch 1",
+    ):
+        merge.prepare_route_resolution(
+            no_saturation_proposal,
+            goal_dir=no_saturation_goal,
+        )
+
+    with pytest.raises(
+        merge.MergeError,
+        match="requires a Stage 18 SATURATION search round.*epoch 2",
+    ):
+        merge._validate_stage18_context_ready(
+            label="MISSING_TARGET_FINAL",
+            manifest={"documents": [{"path": "fixture.md"}]},
+            history=[
+                {
+                    "mode": "INITIAL",
+                    "stage": 4,
+                    "epoch": 1,
+                    "source_paths": ["fixture.md"],
+                },
+                {
+                    "mode": "REOPEN",
+                    "stage": 4,
+                    "epoch": 2,
+                    "source_paths": ["fixture.md"],
+                },
+            ],
+            reading=[{"review_status": "REVIEWED"}],
+            assets=[{"inspection_status": "SCREENED"}],
+            search={
+                "rounds": [
+                    {
+                        "kind": "LOCAL",
+                        "owning_stage": 4,
+                        "epoch": 1,
+                        "queries": [{"scope_paths": ["fixture.md"]}],
+                    },
+                    {
+                        "kind": "SATURATION",
+                        "owning_stage": 18,
+                        "epoch": 1,
+                        "queries": [{"scope_paths": ["fixture.md"]}],
+                    },
+                    {
+                        "kind": "LOCAL",
+                        "owning_stage": 4,
+                        "epoch": 2,
+                        "queries": [{"scope_paths": ["fixture.md"]}],
+                    },
+                ]
+            },
+        )
+
 
 def test_missing_target_final_reachable_after_review_and_local_closure(
     closed_review_goal_template: Path,
     tmp_path: Path,
 ) -> None:
     goal = _copy_goal_template(closed_review_goal_template, tmp_path)
+    saturation_proposal, _ = _stage18_saturation_proposal(
+        goal,
+        tmp_path,
+        filename="pre-route-saturation.json",
+        establish_fixed_point=False,
+    )
+    merge.apply_merge(
+        merge.prepare_search_append(
+            saturation_proposal,
+            goal_dir=goal,
+        )
+    )
     proposal_path, expected_update = _missing_route_proposal(
         goal,
         tmp_path,
@@ -2098,6 +2175,104 @@ def test_candidate_revision_default_dry_run_then_transactional_apply(
     assert change["action"] == "UPDATE"
     assert change["before_candidate"] == before_candidate
     assert change["after_candidate"] == updated_candidate
+
+
+def test_final_fixed_point_rejects_open_local_scope(
+    closed_review_goal_template: Path,
+    tmp_path: Path,
+) -> None:
+    goal = _copy_goal_template(closed_review_goal_template, tmp_path)
+    history = [
+        event
+        for event in merge._read_jsonl(
+            goal / merge.REVIEW_HISTORY_NAME
+        )
+        if event["mode"] != "SEARCH_APPEND"
+    ]
+    search = json.loads(
+        (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    search.update(
+        {
+            "tool_assumptions": [],
+            "vocabulary": [],
+            "rounds": [],
+            "fixed_point": None,
+        }
+    )
+    (goal / merge.REVIEW_HISTORY_NAME).write_bytes(
+        merge._jsonl_bytes(history)
+    )
+    (goal / merge.SEARCH_NAME).write_bytes(canonical_json_bytes(search))
+    proposal_path, _ = _stage18_saturation_proposal(
+        goal,
+        tmp_path,
+        filename="fixed-point-with-open-local-scope.json",
+        establish_fixed_point=True,
+    )
+
+    with pytest.raises(
+        merge.MergeError,
+        match="fixed-point establishment requires exact LOCAL search closure",
+    ):
+        merge.prepare_search_append(proposal_path, goal_dir=goal)
+
+
+def test_final_fixed_point_rejects_pending_routes_and_unreported_vocabulary(
+    closed_review_goal_template: Path,
+    tmp_path: Path,
+) -> None:
+    pending_goal = _copy_goal_template(
+        closed_review_goal_template,
+        tmp_path / "pending-route",
+    )
+    pending_proposal, _ = _stage18_saturation_proposal(
+        pending_goal,
+        tmp_path,
+        filename="fixed-point-with-pending-route.json",
+        establish_fixed_point=True,
+    )
+    with pytest.raises(
+        merge.MergeError,
+        match="requires all cross-reference routes to be terminal.*R000001",
+    ):
+        merge.prepare_search_append(
+            pending_proposal,
+            goal_dir=pending_goal,
+        )
+
+    vocabulary_goal = _copy_goal_template(
+        closed_review_goal_template,
+        tmp_path / "unreported-vocabulary",
+    )
+    route_proposal = _resolved_route_proposal(vocabulary_goal, tmp_path)
+    merge.apply_merge(
+        merge.prepare_route_resolution(
+            route_proposal,
+            goal_dir=vocabulary_goal,
+        )
+    )
+    vocabulary_proposal, _ = _stage18_saturation_proposal(
+        vocabulary_goal,
+        tmp_path,
+        filename="fixed-point-with-unreported-vocabulary.json",
+        establish_fixed_point=True,
+    )
+    payload = json.loads(
+        vocabulary_proposal.read_text(encoding="utf-8")
+    )
+    payload["proposed_search"]["vocabulary"].append(
+        "unreported zero-delta alias"
+    )
+    vocabulary_proposal.write_bytes(canonical_json_bytes(payload))
+    with pytest.raises(
+        merge.MergeError,
+        match="top-level vocabulary differs from exact ordered.*replay",
+    ):
+        merge.prepare_search_append(
+            vocabulary_proposal,
+            goal_dir=vocabulary_goal,
+        )
 
 
 def test_final_zero_hit_saturation_default_dry_run_then_apply(

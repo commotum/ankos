@@ -1840,7 +1840,16 @@ def _validate_stage18_context_ready(
                 f"(expected={sorted(expected_paths)}, "
                 f"actual={sorted(actual_paths)})"
             )
-    active_epoch = _active_review_epoch(history)
+    active_epochs = [
+        event.get("epoch")
+        for event in history
+        if isinstance(event, dict)
+        and isinstance(event.get("epoch"), int)
+        and not isinstance(event.get("epoch"), bool)
+    ]
+    if not active_epochs:
+        raise MergeError(f"{label} has no active review epoch")
+    active_epoch = max(active_epochs)
     if not any(
         isinstance(round_record, dict)
         and round_record.get("kind") == "SATURATION"
@@ -1851,6 +1860,35 @@ def _validate_stage18_context_ready(
         raise MergeError(
             f"{label} requires a Stage 18 SATURATION search round in "
             f"the active review epoch {active_epoch}"
+        )
+
+
+def _validate_search_vocabulary_replay(
+    search: dict[str, Any],
+    *,
+    label: str,
+) -> None:
+    """Require top-level vocabulary to be the exact ordered round replay."""
+
+    rounds = search.get("rounds")
+    vocabulary = search.get("vocabulary")
+    if not isinstance(rounds, list) or not isinstance(vocabulary, list):
+        raise MergeError(f"{label} search vocabulary state is malformed")
+    replayed: list[str] = []
+    for round_record in rounds:
+        if not isinstance(round_record, dict) or not isinstance(
+            round_record.get("new_vocabulary"),
+            list,
+        ):
+            raise MergeError(f"{label} search vocabulary delta is malformed")
+        new_vocabulary = round_record["new_vocabulary"]
+        if not all(isinstance(value, str) for value in new_vocabulary):
+            raise MergeError(f"{label} search vocabulary delta is malformed")
+        replayed.extend(new_vocabulary)
+    if vocabulary != replayed:
+        raise MergeError(
+            f"{label} top-level vocabulary differs from exact ordered "
+            "round new_vocabulary replay"
         )
 
 
@@ -2944,6 +2982,10 @@ def _prepare_search_append_locked(
             assets=proposed_assets,
             search=proposed_search,
         )
+        _validate_search_vocabulary_replay(
+            proposed_search,
+            label="fixed-point establishment",
+        )
         pending_route_ids = [
             route["route_id"]
             for route in proposed_routes
@@ -3344,6 +3386,10 @@ def _prepare_route_resolution_locked(
             reading=reading,
             assets=assets,
             search=search,
+        )
+        _validate_search_vocabulary_replay(
+            search,
+            label="MISSING_TARGET_FINAL",
         )
     route_changes.sort(key=lambda change: int(change["route_id"][1:]))
     source_paths = tuple(_ordered_audit_paths(manifest, resolution_paths))
