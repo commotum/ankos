@@ -665,6 +665,22 @@ algebraic_ca = transition(
 )
 add_support(
     algebraic_ca,
+    label="algebraic-native-law",
+    unit="U005374",
+    claim=(
+        "The fenced formula gives the exact native update "
+        "a[t,i]=f[a[t-1,i-1],a[t-1,i]]."
+    ),
+    fields=[
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+    ],
+    modality="CODE",
+)
+add_support(
+    algebraic_ca,
     label="algebraic-evolve",
     unit="U005375",
     claim="NestList with RotateRight supplies the exact list evolution.",
@@ -757,6 +773,11 @@ mobile = transition(
 mobile["facts"]["visible_history"] = (
     "MAEvolveList can retain the successive {list, active-position} states."
 )
+mobile["facts"]["control_state"] = (
+    "The active-cell position n is explicit control state separate from the "
+    "cell-value list."
+)
+mobile["evidence"][0]["fields"].append("control_state")
 add_support(
     mobile,
     label="mobile-step",
@@ -848,6 +869,11 @@ generalized_mobile = transition(
         "happens when different active positions request conflicting writes."
     ),
 )
+generalized_mobile["facts"]["control_state"] = (
+    "The active-position list nlist is explicit control state separate from "
+    "the cell-value list."
+)
+generalized_mobile["evidence"][0]["fields"].append("control_state")
 add_support(
     generalized_mobile,
     label="generalized-mobile-code",
@@ -880,14 +906,24 @@ turing = transition(
     result="A new head state, tape state, and head position.",
     input_text="A complete transition table and initial tape/head state.",
     neighborhood="The head state and value of the single scanned tape cell.",
-    parameters="State count s, color count k, rule table/number, initial tape, and boundary.",
+    parameters="State count s, color count k, rule table/number, and initial tape/head state.",
 )
 turing["facts"]["visible_history"] = (
     "TMEvolveList retains successive {state, tape, head-position} triples."
 )
+turing["facts"]["control_state"] = (
+    "The finite head state s and head position n are explicit control state "
+    "separate from the tape values."
+)
+turing["evidence"][0]["fields"].append("control_state")
 turing["facts"]["seed"] = (
-    "The stated blank-tape constructor uses a finite all-zero tape with the "
-    "head at its center and the initial finite-control state."
+    "The stated blank-tape constructor sets state s=1, gives every indexed "
+    "tape cell the default value 0, and places the head at index n=0."
+)
+turing["parameters"][0] = (
+    turing["parameters"][0][0],
+    turing["facts"]["parameters_and_variants"],
+    turing["parameters"][0][2],
 )
 for unit, label, fields in [
     ("U005413", "tm-step", ["complete_state", "schedule", "read_dependencies_or_neighborhood", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit"]),
@@ -902,6 +938,25 @@ for unit, label, fields in [
         fields=fields,
         modality="CODE",
     )
+add_support(
+    turing,
+    label="tm-alternate-state-step",
+    unit="U005417",
+    claim=(
+        "The alternate exact step embeds the finite-control state at the head "
+        "position and rewrites the scanned cell while moving left or right."
+    ),
+    fields=[
+        "complete_state",
+        "control_state",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+    ],
+    modality="CODE",
+)
 
 tm78 = preset(
     key="tm-page78",
