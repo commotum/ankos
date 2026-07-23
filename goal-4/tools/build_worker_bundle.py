@@ -14,9 +14,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator
-from jsonschema.exceptions import SchemaError
-
 from audit_contract import (
     ASSET_HEADER,
     GOAL_DIR,
@@ -296,6 +293,112 @@ def schema_set_digest(schema_root: Path) -> str:
     )
 
 
+def _json_equal(left: Any, right: Any) -> bool:
+    return json.dumps(left, sort_keys=True, separators=(",", ":")) == json.dumps(
+        right,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _matches_json_type(value: Any, expected: str) -> bool:
+    return {
+        "object": isinstance(value, dict),
+        "array": isinstance(value, list),
+        "string": isinstance(value, str),
+        "integer": isinstance(value, int) and not isinstance(value, bool),
+        "number": isinstance(value, (int, float)) and not isinstance(value, bool),
+        "boolean": isinstance(value, bool),
+        "null": value is None,
+    }.get(expected, False)
+
+
+def json_schema_errors(
+    value: Any,
+    schema: dict[str, Any],
+    path: str = "<root>",
+) -> list[str]:
+    """Validate the closed schema subset emitted by audit_contract.py."""
+    errors: list[str] = []
+    if "oneOf" in schema:
+        branches = schema["oneOf"]
+        branch_results = [
+            json_schema_errors(value, branch, path) for branch in branches
+        ]
+        if sum(not result for result in branch_results) != 1:
+            errors.append(f"{path}: value must satisfy exactly one oneOf branch")
+            return errors
+    expected_type = schema.get("type")
+    if expected_type is not None:
+        expected_types = (
+            expected_type if isinstance(expected_type, list) else [expected_type]
+        )
+        if not all(isinstance(item, str) for item in expected_types):
+            return [f"{path}: schema contains an invalid type declaration"]
+        if not any(_matches_json_type(value, item) for item in expected_types):
+            errors.append(
+                f"{path}: expected type {' or '.join(expected_types)}, "
+                f"got {type(value).__name__}"
+            )
+            return errors
+    if "const" in schema and not _json_equal(value, schema["const"]):
+        errors.append(f"{path}: value differs from required const")
+    if "enum" in schema and not any(
+        _json_equal(value, choice) for choice in schema["enum"]
+    ):
+        errors.append(f"{path}: value is not in the allowed enum")
+    if isinstance(value, str):
+        if "pattern" in schema:
+            try:
+                matched = re.search(schema["pattern"], value)
+            except (re.error, TypeError):
+                errors.append(f"{path}: schema contains an invalid pattern")
+            else:
+                if matched is None:
+                    errors.append(f"{path}: string does not match required pattern")
+        if len(value) < schema.get("minLength", 0):
+            errors.append(f"{path}: string is shorter than minLength")
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if "minimum" in schema and value < schema["minimum"]:
+            errors.append(f"{path}: value is below minimum")
+        if "maximum" in schema and value > schema["maximum"]:
+            errors.append(f"{path}: value is above maximum")
+    if isinstance(value, list):
+        if schema.get("uniqueItems") is True:
+            serialized = [
+                json.dumps(item, sort_keys=True, separators=(",", ":"))
+                for item in value
+            ]
+            if len(serialized) != len(set(serialized)):
+                errors.append(f"{path}: array items are not unique")
+        item_schema = schema.get("items")
+        if isinstance(item_schema, dict):
+            for index, item in enumerate(value):
+                errors.extend(
+                    json_schema_errors(item, item_schema, f"{path}/{index}")
+                )
+    if isinstance(value, dict):
+        required = schema.get("required", [])
+        for field in required:
+            if field not in value:
+                errors.append(f"{path}: missing required field {field}")
+        properties = schema.get("properties", {})
+        if schema.get("additionalProperties") is False:
+            for field in value:
+                if field not in properties:
+                    errors.append(f"{path}: unexpected field {field}")
+        for field, field_schema in properties.items():
+            if field in value:
+                errors.extend(
+                    json_schema_errors(
+                        value[field],
+                        field_schema,
+                        f"{path}/{field}",
+                    )
+                )
+    return errors
+
+
 def build_bundle(
     output: Path,
     worker_id: str,
@@ -435,9 +538,11 @@ def _validate_worker_output(
     schema_path = bundle / "input" / "schemas" / "worker-output.schema.json"
     try:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        Draft202012Validator.check_schema(schema)
-    except (OSError, json.JSONDecodeError, SchemaError) as exc:
+    except (OSError, json.JSONDecodeError) as exc:
         errors.append(f"cannot load worker-output schema: {exc}")
+        return
+    if not isinstance(schema, dict):
+        errors.append("worker-output schema is not an object")
         return
 
     nonuse = output.get("prohibited_input_nonuse")
@@ -461,13 +566,8 @@ def _validate_worker_output(
             "completed worker output must declare prohibited_input_nonuse=true"
         )
 
-    validator = Draft202012Validator(schema)
-    for error in sorted(
-        validator.iter_errors(validation_value),
-        key=lambda item: [str(part) for part in item.absolute_path],
-    ):
-        location = "/".join(str(part) for part in error.absolute_path) or "<root>"
-        errors.append(f"worker output schema error at {location}: {error.message}")
+    for error in json_schema_errors(validation_value, schema):
+        errors.append(f"worker output schema error at {error}")
 
     expected_declarations = {
         "worker_id": manifest.get("worker_id"),
@@ -501,6 +601,11 @@ def _validate_worker_output(
             "asset input",
         )
         if row.get("asset_id")
+    }
+    assigned_image_paths = {
+        row.get("physical_path")
+        for row in assigned_assets.values()
+        if row.get("physical_path")
     }
 
     reading_updates = output.get("reading_updates", [])
@@ -555,24 +660,36 @@ def _validate_worker_output(
                     f"candidate {candidate_id} discovery_stage differs from bundle"
                 )
             source_ids = row.get("source_unit_ids", [])
-            if isinstance(source_ids, list) and not set(source_ids) <= set(
-                assigned_units
+            if isinstance(source_ids, list) and (
+                not all(isinstance(item, str) for item in source_ids)
+                or not set(source_ids) <= set(assigned_units)
             ):
                 errors.append(
                     f"candidate {candidate_id} cites a source outside assignment"
                 )
             image_ids = row.get("image_witnesses", [])
-            if isinstance(image_ids, list) and not set(image_ids) <= set(
-                assigned_assets
+            if isinstance(image_ids, list) and (
+                not all(isinstance(item, str) for item in image_ids)
+                or not set(image_ids) <= assigned_image_paths
             ):
                 errors.append(
                     f"candidate {candidate_id} cites an image outside assignment"
                 )
             related_ids = row.get("related_candidate_ids", [])
-            if isinstance(related_ids, list) and not set(related_ids) <= proposal_ids:
-                errors.append(
-                    f"candidate {candidate_id} relates to an undeclared worker candidate"
-                )
+            if isinstance(related_ids, list):
+                relation_targets = {
+                    relation.get("candidate_id")
+                    for relation in related_ids
+                    if isinstance(relation, dict)
+                    and isinstance(relation.get("candidate_id"), str)
+                }
+                if len(relation_targets) != len(related_ids) or not (
+                    relation_targets <= proposal_ids
+                ):
+                    errors.append(
+                        f"candidate {candidate_id} relates to an undeclared "
+                        "worker candidate"
+                    )
 
     routes = output.get("route_proposals", [])
     if isinstance(routes, list):
@@ -581,6 +698,9 @@ def _validate_worker_output(
             if not isinstance(row, dict):
                 continue
             route_id = row.get("route_id")
+            if not isinstance(route_id, str):
+                errors.append("route proposal has a non-string route_id")
+                continue
             if route_id in route_ids:
                 errors.append(f"duplicate route proposal: {route_id}")
             route_ids.add(route_id)
@@ -807,7 +927,7 @@ def verify_bundle(
         errors.append(f"cannot verify sanitized guardrails: {exc}")
 
     units = load_source_units(input_root / "source-units.jsonl", errors)
-    unit_ids = [unit.get("source_unit_id") for unit in units]
+    unit_ids = [unit.get("id") for unit in units]
     if not all(isinstance(unit_id, str) and unit_id for unit_id in unit_ids):
         errors.append("bundle source-unit IDs must be nonempty strings")
         valid_unit_ids: set[str] = {

@@ -273,6 +273,15 @@ def validate_candidate(
         4 <= row["discovery_stage"] <= 18
     ):
         errors.append(f"{prefix} has invalid discovery_stage")
+    anchor = row["discovery_anchor"]
+    if (
+        not isinstance(anchor, dict)
+        or set(anchor) != {"kind", "id"}
+        or anchor.get("kind") not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
+        or not isinstance(anchor.get("id"), str)
+        or not anchor["id"]
+    ):
+        errors.append(f"{prefix} has invalid discovery_anchor")
 
     source_units = exact_string_list(
         row["source_unit_ids"],
@@ -327,6 +336,8 @@ def validate_candidate(
     local_evidence_ids: set[str] = set()
     evidence_fields: dict[str, set[str]] = {}
     evidence_strengths: set[str] = set()
+    evidence_units: set[str] = set()
+    evidence_images: set[str] = set()
     for item in evidence:
         if not isinstance(item, dict):
             errors.append(f"{prefix} evidence item must be object")
@@ -359,12 +370,16 @@ def validate_candidate(
             errors.append(
                 f"{prefix} evidence unit is absent from source_unit_ids"
             )
+        if isinstance(source_unit_id, str):
+            evidence_units.add(source_unit_id)
         if image_path is not None and image_path not in image_paths:
             errors.append(f"{prefix} evidence references unknown image")
         if image_path is not None and image_path not in image_witnesses:
             errors.append(
                 f"{prefix} evidence image is absent from image_witnesses"
             )
+        if isinstance(image_path, str):
+            evidence_images.add(image_path)
         if item["source_unit_id"] is None and item["image_path"] is None:
             errors.append(f"{prefix} evidence has no canonical witness")
         if item["strength"] not in EVIDENCE_STRENGTHS:
@@ -390,6 +405,14 @@ def validate_candidate(
     if set(aggregate_strengths) != evidence_strengths:
         errors.append(
             f"{prefix} aggregate evidence_strength differs from source evidence"
+        )
+    if set(source_units) != evidence_units:
+        errors.append(
+            f"{prefix} source_unit_ids are not the exact evidence-unit join"
+        )
+    if set(image_witnesses) != evidence_images:
+        errors.append(
+            f"{prefix} image_witnesses are not the exact evidence-image join"
         )
 
     if not isinstance(row["field_support"], dict) or set(
@@ -446,9 +469,10 @@ def validate_candidate(
             if reason not in ("", None):
                 errors.append(f"{prefix}.{field} supported value has a reason")
         elif support == "NOT_APPLICABLE":
-            if value["value"] is not None or field_evidence_ids:
+            if value["value"] is not None or not field_evidence_ids:
                 errors.append(
-                    f"{prefix}.{field} not-applicable value carries value/evidence"
+                    f"{prefix}.{field} not-applicable value must be null and "
+                    "evidence-justified"
                 )
             if not isinstance(reason, str) or not reason.strip():
                 errors.append(f"{prefix}.{field} not-applicable value lacks reason")
@@ -713,6 +737,19 @@ def validate_objects(
                 and not linked_routes
             ):
                 errors.append(f"{prefix} cross-reference disposition has no route")
+            if row.get("review_disposition") == "NO_CONSTRUCTION" and (
+                linked_candidates or linked_routes
+            ):
+                errors.append(
+                    f"{prefix} NO_CONSTRUCTION row carries candidate/route links"
+                )
+            if (
+                row.get("review_disposition") == "SOURCE_DEFECT_OR_AMBIGUITY"
+                and row.get("source_status") == "CLEAR"
+            ):
+                errors.append(
+                    f"{prefix} source-defect disposition has CLEAR source status"
+                )
         else:
             errors.append(f"{prefix} has invalid review_status")
 
@@ -754,9 +791,10 @@ def validate_objects(
             owning_stage = -1
         if source_unit is not None:
             expected_stage = stage_by_path[source_unit["path"]]
-            if owning_stage != expected_stage:
+            if owning_stage not in {expected_stage, 18}:
                 errors.append(
-                    f"{prefix} owning stage differs from source-unit stage"
+                    f"{prefix} owning stage is neither source-unit stage nor "
+                    "saturation stage"
                 )
             source_reading = reading_by_unit.get(row["source_unit_id"])
             if (
@@ -795,22 +833,67 @@ def validate_objects(
             errors,
         )
 
+    candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
+    split_children: set[str] = set()
+    for candidate in candidates:
+        source_number = int(candidate["id"][1:]) if B_ID.fullmatch(candidate["id"]) else -1
+        for relation in candidate.get("related_candidate_ids", []):
+            if not isinstance(relation, dict):
+                continue
+            relation_kind = relation.get("relation")
+            if relation_kind not in {"MERGED_INTO", "SPLIT_INTO"}:
+                continue
+            target_id = relation.get("candidate_id")
+            target = candidate_by_id.get(target_id)
+            if target is None:
+                continue
+            if target["record_status"] != "ACTIVE":
+                errors.append(
+                    f"candidate {candidate['id']} supersession target "
+                    f"{target_id} is not ACTIVE"
+                )
+            target_number = (
+                int(target_id[1:]) if isinstance(target_id, str) and B_ID.fullmatch(target_id) else -1
+            )
+            if relation_kind == "MERGED_INTO" and target_number >= source_number:
+                errors.append(
+                    f"candidate {candidate['id']} does not merge into an earlier ID"
+                )
+            if relation_kind == "SPLIT_INTO":
+                if target_number <= source_number:
+                    errors.append(
+                        f"candidate {candidate['id']} split child is not a new ID"
+                    )
+                if target_id in split_children:
+                    errors.append(f"candidate {target_id} has multiple split parents")
+                split_children.add(target_id)
+
     candidate_source_links: dict[str, set[str]] = {
         unit_id: set() for unit_id in unit_ids
     }
     for candidate in candidates:
         candidate_id = candidate["id"]
-        for source_unit_id in candidate["source_unit_ids"]:
-            if source_unit_id in candidate_source_links:
-                candidate_source_links[source_unit_id].add(candidate_id)
+        if candidate["record_status"] == "ACTIVE":
+            for source_unit_id in candidate["source_unit_ids"]:
+                if source_unit_id in candidate_source_links:
+                    candidate_source_links[source_unit_id].add(candidate_id)
         linked_rows = [
             reading_by_unit[source_unit_id]
             for source_unit_id in candidate["source_unit_ids"]
             if source_unit_id in reading_by_unit
         ]
-        if not linked_rows:
+        actual_linked_units = {
+            unit_id
+            for unit_id, links in reading_candidate_links.items()
+            if candidate_id in links
+        }
+        if candidate["record_status"] == "ACTIVE" and not linked_rows:
             errors.append(f"candidate {candidate_id} has no reading-ledger join")
             continue
+        if candidate["record_status"] != "ACTIVE" and actual_linked_units:
+            errors.append(
+                f"candidate {candidate_id} tombstone retains reading-ledger links"
+            )
         if any(row["review_status"] != "REVIEWED" for row in linked_rows):
             errors.append(f"candidate {candidate_id} links an unreviewed source unit")
         expected_statuses = {row["source_status"] for row in linked_rows}
@@ -957,8 +1040,9 @@ def validate_objects(
     asset_candidate_links: dict[str, set[str]] = {
         candidate_id: set() for candidate_id in candidate_ids
     }
+    asset_by_path = {row["physical_path"]: row for row in assets}
     for row in assets:
-        for candidate_id in parse_array(
+        for candidate_id in parsed_string_list(
             row["candidate_ids"],
             f"asset {row['asset_id']}.candidate_ids",
             errors,
@@ -969,33 +1053,86 @@ def validate_objects(
     for candidate in candidates:
         candidate_id = candidate["id"]
         witnesses = set(candidate["image_witnesses"])
-        if asset_candidate_links.get(candidate_id, set()) != witnesses:
+        expected_witness_links = (
+            witnesses if candidate["record_status"] == "ACTIVE" else set()
+        )
+        if asset_candidate_links.get(candidate_id, set()) != expected_witness_links:
             errors.append(
                 f"candidate {candidate_id} image witnesses lack exact asset reverse joins"
             )
+        for evidence in candidate["source_evidence"]:
+            image_path = evidence.get("image_path")
+            if image_path is None:
+                continue
+            asset = asset_by_path.get(image_path)
+            if asset is None or asset["inspection_status"] != "SCREENED":
+                errors.append(
+                    f"candidate {candidate_id} image evidence is not screened"
+                )
+                continue
+            if evidence.get("strength") in {
+                "DIRECT_IDENTITY",
+                "DIRECT_PARTIAL_MECHANICS",
+                "DIRECT_COMPLETE_MECHANICS",
+            } and (
+                asset["original_resolution_status"] != "REVIEWED"
+                or asset["transcription_status"] != "CHECKED"
+            ):
+                errors.append(
+                    f"candidate {candidate_id} direct image evidence lacks "
+                    "resolution/transcription verification"
+                )
 
     if require_all_reviewed and screened_count != len(assets):
         errors.append("not every physical image is screened")
 
-    if set(search) != {
+    search_fields = {
         "schema_version",
         "phase",
         "tool_assumptions",
         "vocabulary",
         "rounds",
         "fixed_point",
-    }:
+    }
+    if not isinstance(search, dict):
+        errors.append("search-rounds root is not an object")
+        search = {}
+    if set(search) != search_fields:
         errors.append("search-rounds fields do not match blind allowlist")
     if forbidden_keys(search):
         errors.append("search-rounds contains forbidden blind field")
     if search.get("schema_version") != 1 or search.get("phase") != "blind_discovery":
         errors.append("search-rounds schema/phase is invalid")
-    if not isinstance(search.get("tool_assumptions"), list) or not isinstance(
-        search.get("vocabulary"), list
-    ) or not isinstance(search.get("rounds"), list):
-        errors.append("search-rounds list fields are invalid")
+    search_assumptions = exact_string_list(
+        search.get("tool_assumptions"),
+        "search-rounds.tool_assumptions",
+        errors,
+    )
+    vocabulary = exact_string_list(
+        search.get("vocabulary"),
+        "search-rounds.vocabulary",
+        errors,
+    )
+    rounds = search.get("rounds")
+    if not isinstance(rounds, list):
+        errors.append("search-rounds.rounds must be an array")
+        rounds = []
+    if rounds and reviewed_count != len(units):
+        errors.append("search rounds began before complete sequential reading")
+    if rounds and screened_count != len(assets):
+        errors.append("search rounds began before complete asset screening")
+
+    seen_queries: set[str] = set()
     seen_hits: set[str] = set()
-    for round_index, round_record in enumerate(search.get("rounds", []), start=1):
+    hit_by_id: dict[str, dict[str, Any]] = {}
+    seen_new_vocabulary: set[str] = set()
+    seen_new_candidates: set[str] = set()
+    seen_new_evidence_groups: set[str] = set()
+    seen_new_routes: set[str] = set()
+    ordered_stage18_candidates: list[str] = []
+    ordered_stage18_routes: list[str] = []
+    expected_next_hit = 1
+    for round_index, round_record in enumerate(rounds, start=1):
         required = {
             "round_id",
             "queries",
@@ -1014,12 +1151,75 @@ def validate_objects(
             continue
         if round_record["round_id"] != f"S{round_index:03d}":
             errors.append(f"search round {round_index} ID is invalid")
-        if not HEX64.fullmatch(str(round_record["result_digest"])) or not HEX64.fullmatch(
-            str(round_record["rerun_digest"])
-        ):
-            errors.append(f"search round {round_index} digest is invalid")
+
+        queries = round_record["queries"]
+        if not isinstance(queries, list) or not queries:
+            errors.append(f"search round {round_index} requires queries")
+            queries = []
+        current_query_ids: set[str] = set()
+        current_query_scopes: dict[str, set[str]] = {}
+        for query_index, query in enumerate(queries, start=1):
+            expected_query_fields = {
+                "query_id",
+                "family",
+                "pattern",
+                "flags",
+                "scope_paths",
+            }
+            if not isinstance(query, dict) or set(query) != expected_query_fields:
+                errors.append(
+                    f"search round {round_index} query {query_index} fields are invalid"
+                )
+                continue
+            query_id = query["query_id"]
+            if not isinstance(query_id, str) or not Q_ID.fullmatch(query_id):
+                errors.append(f"search query {query_id!r} has invalid ID")
+            if query_id in seen_queries:
+                errors.append(f"duplicate search query ID: {query_id}")
+            seen_queries.add(query_id)
+            current_query_ids.add(query_id)
+            if not isinstance(query["family"], str) or not query["family"].strip():
+                errors.append(f"search query {query_id} lacks family")
+            if not isinstance(query["pattern"], str) or not query["pattern"]:
+                errors.append(f"search query {query_id} lacks pattern")
+            exact_string_list(
+                query["flags"], f"search query {query_id}.flags", errors
+            )
+            scope_paths = exact_string_list(
+                query["scope_paths"],
+                f"search query {query_id}.scope_paths",
+                errors,
+                nonempty=True,
+            )
+            if any(path not in document_by_path for path in scope_paths):
+                errors.append(f"search query {query_id} has unknown scope path")
+            if any(
+                reading_row["review_status"] != "REVIEWED"
+                for reading_row in reading
+                if reading_row["path"] in scope_paths
+            ):
+                errors.append(
+                    f"search query {query_id} scopes an unreviewed document"
+                )
+            current_query_scopes[query_id] = set(scope_paths)
+
+        round_assumptions = exact_string_list(
+            round_record["tool_assumptions"],
+            f"search round {round_index}.tool_assumptions",
+            errors,
+        )
+        if any(item not in search_assumptions for item in round_assumptions):
+            errors.append(
+                f"search round {round_index} has undeclared tool assumption"
+            )
+
         hit_ids: list[str] = []
-        for hit in round_record["hits"]:
+        result_pairs: set[tuple[str, str]] = set()
+        hits = round_record["hits"]
+        if not isinstance(hits, list):
+            errors.append(f"search round {round_index}.hits must be an array")
+            hits = []
+        for hit in hits:
             expected = {
                 "hit_id",
                 "query_id",
@@ -1034,22 +1234,175 @@ def validate_objects(
                 errors.append(f"search round {round_index} hit fields are invalid")
                 continue
             hit_id = hit["hit_id"]
+            expected_hit_id = f"H{expected_next_hit:06d}"
+            expected_next_hit += 1
+            if not isinstance(hit_id, str) or not H_ID.fullmatch(hit_id):
+                errors.append(f"search hit {hit_id!r} has invalid ID")
+            if hit_id != expected_hit_id:
+                errors.append(
+                    f"search hit {hit_id} violates canonical append-only sequence"
+                )
             if hit_id in seen_hits:
                 errors.append(f"duplicate search hit ID: {hit_id}")
             seen_hits.add(hit_id)
+            if isinstance(hit_id, str):
+                hit_by_id[hit_id] = hit
             hit_ids.append(hit_id)
-            if hit["source_unit_id"] not in unit_ids:
+            if hit["query_id"] not in current_query_ids:
+                errors.append(
+                    f"search hit {hit_id} references a query outside its round"
+                )
+            pair = (hit["query_id"], hit["source_unit_id"])
+            if pair in result_pairs:
+                errors.append(f"search hit {hit_id} duplicates query/unit result")
+            result_pairs.add(pair)
+            source_unit = unit_by_id.get(hit["source_unit_id"])
+            if source_unit is None:
                 errors.append(f"search hit {hit_id} has unknown source unit")
+            else:
+                if hit["context_sha256"] != source_unit["sha256"]:
+                    errors.append(f"search hit {hit_id} has stale context hash")
+                if source_unit["path"] not in current_query_scopes.get(
+                    hit["query_id"], set()
+                ):
+                    errors.append(f"search hit {hit_id} lies outside query scope")
+                source_reading = reading_by_unit.get(hit["source_unit_id"])
+                if (
+                    source_reading is None
+                    or source_reading["review_status"] != "REVIEWED"
+                ):
+                    errors.append(
+                        f"search hit {hit_id} points to an unreviewed unit"
+                    )
             if hit["disposition"] not in SEARCH_HIT_DISPOSITIONS:
                 errors.append(f"search hit {hit_id} lacks final blind disposition")
-            if any(value not in candidate_ids for value in hit["candidate_ids"]):
+            hit_candidates = exact_string_list(
+                hit["candidate_ids"],
+                f"search hit {hit_id}.candidate_ids",
+                errors,
+            )
+            hit_routes = exact_string_list(
+                hit["route_ids"],
+                f"search hit {hit_id}.route_ids",
+                errors,
+            )
+            if any(value not in candidate_ids for value in hit_candidates):
                 errors.append(f"search hit {hit_id} links unknown candidate")
-            if any(value not in route_ids for value in hit["route_ids"]):
+            if any(value not in route_ids for value in hit_routes):
                 errors.append(f"search hit {hit_id} links unknown route")
-            if not hit["rationale"].strip():
+            if not isinstance(hit["rationale"], str) or not hit[
+                "rationale"
+            ].strip():
                 errors.append(f"search hit {hit_id} lacks rationale")
-        if round_record["result_ids"] != hit_ids:
+
+        result_ids = exact_string_list(
+            round_record["result_ids"],
+            f"search round {round_index}.result_ids",
+            errors,
+        )
+        if result_ids != hit_ids:
             errors.append(f"search round {round_index} result IDs differ from hits")
+        try:
+            computed_digest = search_result_digest(round_record)
+        except (KeyError, TypeError):
+            computed_digest = None
+            errors.append(f"search round {round_index} digest payload is invalid")
+        if round_record["result_digest"] != computed_digest:
+            errors.append(f"search round {round_index} result digest is stale")
+        if round_record["rerun_digest"] != computed_digest:
+            errors.append(f"search round {round_index} rerun did not reproduce")
+
+        delta_values: dict[str, list[str]] = {}
+        for key in (
+            "new_vocabulary",
+            "new_candidates",
+            "new_evidence_groups",
+            "new_routes",
+        ):
+            delta_values[key] = exact_string_list(
+                round_record[key],
+                f"search round {round_index}.{key}",
+                errors,
+            )
+        if any(
+            item not in vocabulary for item in delta_values["new_vocabulary"]
+        ):
+            errors.append(
+                f"search round {round_index} new vocabulary absent from final set"
+            )
+        if any(
+            item not in candidate_ids for item in delta_values["new_candidates"]
+        ):
+            errors.append(
+                f"search round {round_index} names unknown new candidate"
+            )
+        if any(item not in route_ids for item in delta_values["new_routes"]):
+            errors.append(f"search round {round_index} names unknown new route")
+        for key, seen in (
+            ("new_vocabulary", seen_new_vocabulary),
+            ("new_candidates", seen_new_candidates),
+            ("new_evidence_groups", seen_new_evidence_groups),
+            ("new_routes", seen_new_routes),
+        ):
+            duplicates = set(delta_values[key]) & seen
+            if duplicates:
+                errors.append(
+                    f"search round {round_index} repeats prior {key}: "
+                    f"{sorted(duplicates)}"
+                )
+            seen.update(delta_values[key])
+        ordered_stage18_candidates.extend(delta_values["new_candidates"])
+        ordered_stage18_routes.extend(delta_values["new_routes"])
+
+    stage18_candidates = [
+        candidate["id"]
+        for candidate in candidates
+        if candidate["discovery_stage"] == 18
+    ]
+    if stage18_candidates != ordered_stage18_candidates:
+        errors.append(
+            "Stage 18 candidate sequence differs from search-round discovery order"
+        )
+    stage18_routes = [
+        route["route_id"] for route in routes if route["owning_stage"] == "18"
+    ]
+    if stage18_routes != ordered_stage18_routes:
+        errors.append("Stage 18 route sequence differs from search-round discovery order")
+
+    fixed_point = search.get("fixed_point")
+    if fixed_point is not None:
+        required_fixed = {
+            "round_id",
+            "zero_delta",
+            "rerun_reproduced",
+            "result_digest",
+        }
+        if not isinstance(fixed_point, dict) or set(fixed_point) != required_fixed:
+            errors.append("search fixed_point fields are invalid")
+        elif not rounds:
+            errors.append("search fixed_point exists without rounds")
+        else:
+            last = rounds[-1]
+            if fixed_point["round_id"] != last.get("round_id"):
+                errors.append("search fixed_point does not name the final round")
+            if fixed_point["zero_delta"] is not True:
+                errors.append("search fixed_point does not certify zero delta")
+            if fixed_point["rerun_reproduced"] is not True:
+                errors.append("search fixed_point does not certify rerun")
+            if fixed_point["result_digest"] != last.get("result_digest"):
+                errors.append("search fixed_point digest differs from final round")
+            if any(
+                last.get(key)
+                for key in (
+                    "new_vocabulary",
+                    "new_candidates",
+                    "new_evidence_groups",
+                    "new_routes",
+                )
+            ):
+                errors.append("search fixed_point final round is not zero-delta")
+            if last.get("result_digest") != last.get("rerun_digest"):
+                errors.append("search fixed_point final rerun differs")
 
     for required_stage in require_stages:
         assigned_paths = {

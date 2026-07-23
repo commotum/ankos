@@ -127,6 +127,7 @@
     "provisional_name",
     "aliases",
     "discovery_stage",
+    "discovery_anchor",
     "source_unit_ids",
     "source_evidence",
     "source_status",

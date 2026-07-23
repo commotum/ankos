@@ -157,6 +157,7 @@ CANDIDATE_FIELDS = [
     "provisional_name",
     "aliases",
     "discovery_stage",
+    "discovery_anchor",
     "source_unit_ids",
     "source_evidence",
     "source_status",
@@ -317,6 +318,18 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         "provisional_name": {"type": "string", "minLength": 1},
         "aliases": _string_array(),
         "discovery_stage": {"type": "integer", "minimum": 4, "maximum": 18},
+        "discovery_anchor": {
+            "type": "object",
+            "required": ["kind", "id"],
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "enum": ["SOURCE_UNIT", "IMAGE", "SEARCH_HIT"],
+                },
+                "id": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
         "source_unit_ids": _string_array(),
         "source_evidence": {"type": "array", "items": evidence_schema},
         "source_status": _string_array(SOURCE_STATUSES),
