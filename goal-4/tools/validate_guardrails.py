@@ -26,13 +26,34 @@ EXPECTED_DISPOSITIONS = {
     "SOURCE_DEFECT_OR_AMBIGUITY",
 }
 EXPECTED_EVIDENCE = {
-    "DIRECT_COMPLETE",
-    "DIRECT_PARTIAL",
-    "DIRECT_IDENTITY_ONLY",
+    "LEAD_ONLY",
+    "DIRECT_IDENTITY",
+    "DIRECT_PARTIAL_MECHANICS",
+    "DIRECT_COMPLETE_MECHANICS",
     "CORROBORATING",
-    "VISUAL_EXPLICIT",
-    "VISUAL_CONTEXT_ONLY",
+    "CONTEXTUAL",
     "DEFECT_LIMITED",
+}
+EXPECTED_FIELD_SUPPORT = {
+    "SUPPORTED",
+    "NOT_APPLICABLE",
+    "UNKNOWN_FROM_SOURCE",
+    "CONFLICTING_SOURCE",
+}
+EXPECTED_SOURCE_STATUSES = {
+    "CLEAR",
+    "AMBIGUOUS",
+    "DEFECTIVE",
+    "CONFLICTING",
+}
+EXPECTED_MODALITIES = {
+    "PROSE",
+    "FORMULA",
+    "CODE",
+    "TABLE",
+    "CAPTION",
+    "IMAGE",
+    "CROSS_REFERENCE",
 }
 EXPECTED_FINGERPRINT_FIELDS = {
     "object_kind",
@@ -84,6 +105,7 @@ EXPECTED_CLASSIFICATIONS = {
         "COMPOSITION_OR_HYBRID",
         "REPRESENTATION_CODEC_OR_OBSERVER",
         "APPLICATION_OR_EMULATION",
+        "SOLVER_OR_NUMERICAL_METHOD",
         "DUPLICATE_OR_ALIAS",
         "SOURCE_INSUFFICIENT_ROLE",
     },
@@ -104,15 +126,38 @@ EXPECTED_PROOFS = {
 }
 REQUIRED_FORBIDDEN_FIELDS = {
     "t_ids",
+    "proposed_t_ids",
     "catalog_mapping",
     "catalog_action",
+    "catalog_verdict",
     "semantic_role",
     "family_action",
     "existing_family",
+    "nearest_family",
+    "reuse_verdict",
+    "equivalence_verdict",
+    "novelty_verdict",
     "api_fit",
     "api_mapping",
     "implementation_target",
+    "implementation_priority",
+    "implementation_cost",
+    "executor",
+    "runtime_class",
     "runtime_support",
+}
+EXPECTED_FAMILY_RELATIONS = {
+    "MEMBER_OF",
+    "INSTANCE_OF",
+    "RESTRICTS",
+    "SEEDS",
+    "REPRESENTS",
+    "OBSERVES",
+    "APPLIES",
+    "EMULATES",
+    "SOLVES",
+    "COMPOSES",
+    "ALIASES",
 }
 
 
@@ -133,6 +178,19 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("schema_version must equal 1")
     if data.get("phase") != "blind_discovery":
         errors.append("phase must equal blind_discovery")
+    capture_rule = data.get("candidate_capture_rule")
+    if not isinstance(capture_rule, dict):
+        errors.append("candidate_capture_rule must be an object")
+    else:
+        for key in (
+            "necessary",
+            "sufficient",
+            "nonqualifying",
+            "formula_boundary",
+            "unnamed_boundary",
+        ):
+            if not isinstance(capture_rule.get(key), str) or not capture_rule[key].strip():
+                errors.append(f"candidate_capture_rule.{key} must be non-empty")
 
     policy = data.get("candidate_id_policy")
     if not isinstance(policy, dict):
@@ -192,6 +250,19 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("evidence_strengths do not match the frozen vocabulary")
     elif any(not isinstance(value, str) or not value.strip() for value in strengths.values()):
         errors.append("evidence strength definitions must be non-empty")
+    for key, expected in (
+        ("field_support_statuses", EXPECTED_FIELD_SUPPORT),
+        ("source_statuses", EXPECTED_SOURCE_STATUSES),
+        ("evidence_modalities", EXPECTED_MODALITIES),
+    ):
+        values = data.get(key)
+        if not isinstance(values, list) or set(values) != expected:
+            errors.append(f"{key} does not match the frozen vocabulary")
+        elif _duplicates(values):
+            errors.append(f"{key} contains duplicates")
+    for key in ("evidence_application", "visual_evidence_rule"):
+        if not isinstance(data.get(key), str) or not data[key].strip():
+            errors.append(f"{key} must be non-empty")
 
     blind_fields = data.get("blind_candidate_fields")
     if not isinstance(blind_fields, list) or not blind_fields:
@@ -238,6 +309,31 @@ def validate(data: dict[str, Any]) -> list[str]:
             elif _duplicates(values):
                 errors.append(f"{axis} contains duplicates")
 
+    axis_rules = data.get("final_axis_rules")
+    if not isinstance(axis_rules, dict):
+        errors.append("final_axis_rules must be an object")
+    else:
+        for key in (
+            "semantic_role_primary",
+            "axis_local_insufficiency",
+            "existing_family_reference",
+            "failed_reuse_rule",
+        ):
+            if not isinstance(axis_rules.get(key), str) or not axis_rules[key].strip():
+                errors.append(f"final_axis_rules.{key} must be non-empty")
+
+    family_relations = data.get("family_relations")
+    if not isinstance(family_relations, list) or set(family_relations) != (
+        EXPECTED_FAMILY_RELATIONS
+    ):
+        errors.append("family_relations do not match the frozen vocabulary")
+    elif _duplicates(family_relations):
+        errors.append("family_relations contain duplicates")
+    if not isinstance(data.get("family_relation_rule"), str) or not data[
+        "family_relation_rule"
+    ].strip():
+        errors.append("family_relation_rule must be non-empty")
+
     proofs = data.get("proof_obligations")
     if not isinstance(proofs, dict) or set(proofs) != EXPECTED_PROOFS:
         errors.append("proof_obligations do not match the required cases")
@@ -267,10 +363,49 @@ def validate(data: dict[str, Any]) -> list[str]:
         ):
             if required not in forbidden_text:
                 errors.append(f"worker isolation does not forbid {required}")
+        context_mode = isolation.get("context_mode")
+        if not isinstance(context_mode, str) or not all(
+            token in context_mode.lower() for token in ("sealed", "sandbox")
+        ):
+            errors.append("worker isolation must require a sealed sandbox")
+
+    schema_policy = data.get("blind_schema_policy")
+    if not isinstance(schema_policy, dict):
+        errors.append("blind_schema_policy must be an object")
+    else:
+        for key in (
+            "allowlist_only",
+            "additional_properties",
+            "generic_extension_objects_allowed",
+            "separate_reconciliation_schema_until_stage_19",
+        ):
+            if not isinstance(schema_policy.get(key), bool):
+                errors.append(f"blind_schema_policy.{key} must be boolean")
+        if schema_policy.get("allowlist_only") is not True:
+            errors.append("blind schemas must be allowlist-only")
+        if schema_policy.get("additional_properties") is not False:
+            errors.append("blind schemas must reject additional properties")
+        if schema_policy.get("generic_extension_objects_allowed") is not False:
+            errors.append("blind schemas must reject generic extension objects")
+        if schema_policy.get("separate_reconciliation_schema_until_stage_19") is not True:
+            errors.append("reconciliation schemas must remain separate until Stage 19")
+        patterns = schema_policy.get("free_text_review_patterns")
+        if not isinstance(patterns, list) or len(patterns) < 6:
+            errors.append("blind free-text review patterns are incomplete")
+        post_freeze = schema_policy.get("post_freeze_policy")
+        if not isinstance(post_freeze, str) or not post_freeze.strip():
+            errors.append("blind post-freeze policy must be non-empty")
 
     freeze = data.get("blind_freeze_requirements")
     if not isinstance(freeze, list) or len(freeze) < 6:
         errors.append("blind_freeze_requirements must contain the full closure contract")
+    triggers = data.get("close_review_triggers")
+    if not isinstance(triggers, list) or len(triggers) < 6:
+        errors.append("close_review_triggers must define hostile-review coverage")
+    if not isinstance(data.get("saturation_fixed_point"), str) or not data[
+        "saturation_fixed_point"
+    ].strip():
+        errors.append("saturation_fixed_point must be non-empty")
 
     return errors
 
@@ -299,6 +434,16 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
     weak_isolation = copy.deepcopy(data)
     weak_isolation["worker_isolation"]["forbidden_inputs"] = []
     mutations.append(("missing worker isolation barrier", weak_isolation))
+
+    open_schema = copy.deepcopy(data)
+    open_schema["blind_schema_policy"]["additional_properties"] = True
+    mutations.append(("blind schema permits additional properties", open_schema))
+
+    missing_solver = copy.deepcopy(data)
+    missing_solver["final_classification_vocabularies"]["semantic_role"].remove(
+        "SOLVER_OR_NUMERICAL_METHOD"
+    )
+    mutations.append(("missing solver/numerical-method role", missing_solver))
 
     for name, mutated in mutations:
         if not validate(mutated):

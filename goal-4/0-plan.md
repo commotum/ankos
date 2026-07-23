@@ -36,7 +36,13 @@ Goal 4 is a research, taxonomy, and architecture-pressure audit. It does not imp
 8. **Coverage catalog and semantic families remain separate.** A named preset can deserve a catalog row without a new executor. Conversely, two systems can fit the same five fields while remaining semantically distinct.
 9. **Names do not establish identity.** Different names may be aliases or presets; the same name may cover several constructions.
 10. **API fit does not establish taxonomy.** Do not decide that two systems are one type merely because both fit `seed/alphabet/frontier/neighborhood/rule`.
-11. **Equivalence requires a real proof.** Claims of same-family reuse require a lossless complete-state representation, an inverse on the valid image, and preservation of one native event/result—including schedule, branching/probability, completion, and witnesses—without a hidden source interpreter.
+11. **Equivalence requires a real proof.** Claims of same-family reuse require
+    maps on valid program/specification data and configurations/inputs, an
+    inverse on the valid image, and preservation of one native semantic
+    judgment—including schedule, branching/probability, completion, and
+    witnesses—without a hidden source interpreter. The preservation law must
+    match the object kind: transition, stochastic kernel, successor relation,
+    satisfaction/model relation, partial function, or denotation/flow.
 12. **New-family claims require a counterexample.** Show a concrete native event or denotation that the nearest existing family cannot preserve honestly. Opaque packing, callbacks, phase hidden in an executor, or multi-step simulation are not evidence of reuse.
 13. **Do not conflate semantic roles.** Keep construction, property/restriction, seed/input/boundary class, representation, observer/analyzer, solver, application, emulation, and historical mention distinct.
 14. **Randomness distinctions are explicit.** Separate random initial data, a stochastic transition law, an external draw stream, a finite PRNG realization, and a downstream distribution.
@@ -82,7 +88,15 @@ The traceable inventory of Book constructions and separately named coverage obli
 
 ### Semantic Family
 
-A group whose members either have an explicit lossless structural/relational correspondence preserving complete native semantics or are proved instances/restrictions of the same explicit parameterized semantic schema with unchanged mechanics. Similar behavior, a shared renderer, emulation, or a common top-level API shape is insufficient.
+A group whose native/declarative members either have an explicit lossless
+structural/relational correspondence preserving program data and complete
+native judgments, or are proved instances/restrictions of the same substantive
+typed parameterized semantic schema with unchanged mechanics. Similar behavior,
+a shared renderer, emulation, an auditor-invented universal schema, or a common
+top-level API shape is insufficient. Properties, seeds, representations,
+observers, applications, emulations, solvers, aliases, and compositions use
+typed relations to affected families rather than being forced into false
+membership.
 
 ### Orthogonal Final Classification
 
@@ -109,6 +123,7 @@ Every candidate must receive three independent final fields so catalog coverage 
 - `COMPOSITION_OR_HYBRID`
 - `REPRESENTATION_CODEC_OR_OBSERVER`
 - `APPLICATION_OR_EMULATION`
+- `SOLVER_OR_NUMERICAL_METHOD`
 - `DUPLICATE_OR_ALIAS`
 - `SOURCE_INSUFFICIENT_ROLE`
 
@@ -137,6 +152,10 @@ These are current cutover facts to reverify and hash-pin in Stage 2:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   no taxonomy-audit stage or generated audit artifact had begun.
+- Stage 1 is complete in `1-GUARDRAILS.md`. The frozen machine-readable
+  discovery contract is `guardrails.json`; it adds orthogonal source/evidence
+  status, object-kind native-judgment proofs, an explicit solver role, typed
+  family relations, allowlist-only blind schemas, and sealed-worker isolation.
 - `CA-Types.md` explicitly says its source scope is Chapters 3–5. Goal 1 makes the 45-row CSV exhaustive relative to that seed catalog, not relative to an independent whole-book discovery pass.
 - The current catalog has stable identifiers T01–T45, and Goal 1 reports all 45 type stages plus synthesis and the implementation handoff complete.
 - The canonical source tree contains exactly 29 ordered book documents, plus `README.md` and `Contents.md`.
@@ -249,6 +268,8 @@ Execution of the stages will create, refine, and verify:
 ## Stages
 
 ### 1-GUARDRAILS
+
+Status: **COMPLETE** in `goal-4/1-GUARDRAILS.md`.
 
 #### Big Picture Objective
 
@@ -644,6 +665,8 @@ Assign every B candidate orthogonal catalog, semantic-role, and family actions a
 #### Detailed Implementation Plan
 
 - Assign one `catalog_action`, one primary `semantic_role`, and one `family_action` to every candidate.
+- Assign the exact subtype required by combined roles and typed family
+  relations for non-member coverage obligations.
 - Compare every candidate against its nearest existing and newly discovered neighbors.
 - Require explicit base construction and parameter/predicate for presets and restrictions.
 - Require absence of native mechanics for observer/application/emulation roles.
@@ -668,7 +691,15 @@ Build the deduplicated semantic-family inventory and test newly discovered const
 
 #### Detailed Implementation Plan
 
-- Group catalog entries when either complete fingerprints and lossless native-result correspondences justify it, or both are proved instances/restrictions of the same explicit parameterized semantic schema with unchanged native mechanics.
+- Group native/declarative catalog entries when either complete fingerprints
+  and lossless native-judgment correspondences justify it, or both are proved
+  instances/restrictions of the same substantive typed parameterized semantic
+  schema with unchanged native mechanics.
+- Attach properties, restrictions, seeds, representations, observers,
+  applications, emulations, solvers, aliases, and compositions through typed
+  `MEMBER_OF`/`INSTANCE_OF`/`RESTRICTS`/`SEEDS`/`REPRESENTS`/`OBSERVES`/
+  `APPLIES`/`EMULATES`/`SOLVES`/`COMPOSES`/`ALIASES` relations instead of
+  inventing family membership.
 - Build near-pair comparisons for schedule, history, branching/probability, structural mutation, input consumption, completion, and witness differences.
 - Map each accepted construction to the minimal API fields and result semantics.
 - Record where the five-field design fits directly, needs clarification, or genuinely fails.
@@ -676,8 +707,12 @@ Build the deduplicated semantic-family inventory and test newly discovered const
 
 #### Completion Requirements
 
-- Every final catalog entry—including declarative entries—maps to exactly one semantic-family record.
-- Every same-family claim includes either a lossless native-result correspondence or a proof of membership in the same explicit parameterized schema with unchanged mechanics.
+- Every native or declarative construction has exactly one own-family
+  membership; every secondary coverage obligation has at least one typed,
+  evidence-backed family relation and no false membership.
+- Every same-family claim includes either a lossless native-judgment
+  correspondence or a proof of membership in the same substantive typed
+  parameterized schema with unchanged mechanics.
 - Every close non-equivalence includes a concrete counterexample.
 - Every accepted addition has an honest API-pressure disposition with no callback or opaque-packing escape hatch.
 

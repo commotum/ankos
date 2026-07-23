@@ -166,6 +166,7 @@ After Stage 18 freezes blind discovery, assign every candidate one value on each
 - `COMPOSITION_OR_HYBRID`
 - `REPRESENTATION_CODEC_OR_OBSERVER`
 - `APPLICATION_OR_EMULATION`
+- `SOLVER_OR_NUMERICAL_METHOD`
 - `DUPLICATE_OR_ALIAS`
 - `SOURCE_INSUFFICIENT_ROLE`
 
@@ -184,9 +185,19 @@ Do not retain `AMBIGUOUS` or `UNRESOLVED` on any axis at final closure. If the B
 Require:
 
 - complete source-grounded fingerprints for both sides; and either:
-  - an explicit total structural map on valid configurations/denotations, an inverse on the mapped image, and one-native-event/result commutation; or
-  - proof that both are instances/restrictions of the same explicit parameterized semantic schema with unchanged native mechanics.
+  - an explicit total structural map on valid program/specification data and
+    configurations/inputs, an inverse on the mapped image, and one-native-
+    judgment commutation appropriate to the object kind; or
+  - proof that both are instances/restrictions of the same substantive typed
+    parameterized semantic schema with unchanged native mechanics.
 - In both cases preserve immutable program data, invariants, target selection, schedule, read snapshot, writes/replacement, branching/probability, failure/completion, witnesses, and event granularity without a hidden source interpreter.
+- For stochastic systems preserve probability kernels by pushforward; for
+  nondeterministic systems preserve successor multiplicity and witnesses; for
+  constraints/relations preserve satisfaction, models, and witnesses; for
+  partial functions preserve domain, undefinedness, and outputs; for
+  denotational/continuous objects preserve their native denotation or flow.
+- Failure to prove reuse is not proof of novelty; unresolved family placement
+  takes the explicit source-insufficient outcome.
 
 ### Specialization, preset, property, or seed class
 
