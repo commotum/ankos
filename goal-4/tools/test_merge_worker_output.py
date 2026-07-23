@@ -272,6 +272,45 @@ def test_default_cli_is_dry_run_and_rewrites_all_id_families(
     assert _bytes(goal) == before
 
 
+def test_apply_uses_validated_staged_ledgers_and_preserves_search(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    search_before = (goal / merge.SEARCH_NAME).read_bytes()
+
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    merge.apply_merge(plan)
+
+    assert (goal / merge.SEARCH_NAME).read_bytes() == search_before
+    candidates = merge._read_jsonl(goal / merge.CANDIDATE_NAME)
+    routes = merge._read_csv(
+        goal / merge.ROUTE_NAME,
+        merge.CROSS_REFERENCE_HEADER,
+    )
+    reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
+    assets = merge._read_csv(goal / merge.ASSET_NAME, ASSET_HEADER)
+    assert [row["id"] for row in candidates] == ["B0001"]
+    assert [row["route_id"] for row in routes] == ["R000001"]
+    assert [
+        item["evidence_id"] for item in candidates[0]["source_evidence"]
+    ] == ["E000001", "E000002"]
+    assert json.loads(
+        next(
+            row["candidate_ids"]
+            for row in reading
+            if row["source_unit_id"] == candidates[0]["source_unit_ids"][0]
+        )
+    ) == ["B0001"]
+    assert json.loads(
+        next(
+            row["route_ids"]
+            for row in assets
+            if row["physical_path"] == candidates[0]["image_witnesses"][0]
+        )
+    ) == ["R000001"]
+
+
 def test_bad_completed_bundle_is_rejected(tmp_path: Path) -> None:
     bundle = _completed_bundle(tmp_path)
     goal = _copy_global_state(tmp_path)

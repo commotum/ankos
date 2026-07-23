@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib.util
 import csv
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -207,7 +206,7 @@ def test_full_harness_runs_from_relocated_copy(tmp_path: Path) -> None:
     shutil.copytree(
         MODULE.REPO_ROOT / "ref" / "A-New-Kind-of-Science",
         source_target,
-        copy_function=os.link,
+        copy_function=shutil.copy2,
     )
     shutil.copytree(
         MODULE.GOAL_DIR,

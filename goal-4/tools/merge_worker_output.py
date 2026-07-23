@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -103,15 +104,28 @@ class MergePlan:
 
 
 def _read_csv(path: Path, header: list[str]) -> list[dict[str, str]]:
-    with path.open(newline="", encoding="utf-8") as handle:
-        reader = csv.DictReader(handle)
-        if reader.fieldnames != header:
-            raise MergeError(
-                f"{path.name} header mismatch: {reader.fieldnames!r}"
-            )
-        rows = list(reader)
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise MergeError(f"cannot read {path}: {exc}") from exc
+    return _read_csv_bytes(payload, path.name, header)
+
+
+def _read_csv_bytes(
+    payload: bytes,
+    label: str,
+    header: list[str],
+) -> list[dict[str, str]]:
+    try:
+        text = payload.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise MergeError(f"{label} is not UTF-8") from exc
+    reader = csv.DictReader(io.StringIO(text, newline=""))
+    if reader.fieldnames != header:
+        raise MergeError(f"{label} header mismatch: {reader.fieldnames!r}")
+    rows = list(reader)
     if any(None in row for row in rows):
-        raise MergeError(f"{path.name} contains an over-wide row")
+        raise MergeError(f"{label} contains an over-wide row")
     return rows
 
 
@@ -501,12 +515,10 @@ def _append_csv(
     return original + separator + body
 
 
-def _load_output(bundle: Path) -> dict[str, Any]:
+def _load_output(payload: bytes) -> dict[str, Any]:
     try:
-        output = json.loads(
-            (bundle / "output" / "output.json").read_text(encoding="utf-8")
-        )
-    except (OSError, json.JSONDecodeError) as exc:
+        output = json.loads(payload)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise MergeError(f"cannot load worker output: {exc}") from exc
     if not isinstance(output, dict):
         raise MergeError("worker output is not an object")
@@ -534,6 +546,18 @@ def prepare_merge(
 
     bundle = bundle.resolve()
     goal_dir = goal_dir.resolve()
+    bundle_paths = {
+        "manifest": bundle / "allowed-manifest.json",
+        "reading": bundle / "input" / "reading-input.csv",
+        "assets": bundle / "input" / "asset-input.csv",
+        "output": bundle / "output" / "output.json",
+    }
+    try:
+        bundle_bytes = {
+            label: path.read_bytes() for label, path in bundle_paths.items()
+        }
+    except OSError as exc:
+        raise MergeError(f"cannot snapshot bundle: {exc}") from exc
     verification_errors = build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
@@ -542,6 +566,9 @@ def prepare_merge(
         raise MergeError(
             "bundle verification failed:\n- " + "\n- ".join(verification_errors)
         )
+    for label, path in bundle_paths.items():
+        if path.read_bytes() != bundle_bytes[label]:
+            raise MergeError(f"bundle changed during verification: {label}")
 
     original_bytes, original_modes = _snapshot(goal_dir)
     try:
@@ -552,9 +579,7 @@ def prepare_merge(
         routes = _read_csv(goal_dir / ROUTE_NAME, CROSS_REFERENCE_HEADER)
         assets = _read_csv(goal_dir / ASSET_NAME, ASSET_HEADER)
         search = json.loads(original_bytes[SEARCH_NAME])
-        bundle_manifest = json.loads(
-            (bundle / "allowed-manifest.json").read_text(encoding="utf-8")
-        )
+        bundle_manifest = json.loads(bundle_bytes["manifest"])
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         raise MergeError(f"cannot load merge state: {exc}") from exc
     if not isinstance(manifest, dict) or not isinstance(search, dict):
@@ -570,12 +595,14 @@ def prepare_merge(
     source_paths = tuple(source_paths_value)
     source_path_set = set(source_paths)
 
-    bundle_reading = _read_csv(
-        bundle / "input" / "reading-input.csv",
+    bundle_reading = _read_csv_bytes(
+        bundle_bytes["reading"],
+        "reading-input.csv",
         READING_HEADER,
     )
-    bundle_assets = _read_csv(
-        bundle / "input" / "asset-input.csv",
+    bundle_assets = _read_csv_bytes(
+        bundle_bytes["assets"],
+        "asset-input.csv",
         ASSET_HEADER,
     )
     current_reading_projection = [
@@ -600,7 +627,7 @@ def prepare_merge(
                 f"asset merge collision: {row.get('asset_id')} is not PENDING"
             )
 
-    output = _load_output(bundle)
+    output = _load_output(bundle_bytes["output"])
     forbidden_paths = validate_audit.forbidden_keys(output)
     if forbidden_paths:
         raise MergeError(
@@ -785,6 +812,9 @@ def prepare_merge(
     }
     if original_bytes[SEARCH_NAME] != (goal_dir / SEARCH_NAME).read_bytes():
         raise MergeError("search ledger changed while preparing the merge")
+    for label, path in bundle_paths.items():
+        if path.read_bytes() != bundle_bytes[label]:
+            raise MergeError(f"verified bundle changed during merge planning: {label}")
 
     return MergePlan(
         bundle=bundle,
@@ -824,6 +854,7 @@ def apply_merge(plan: MergePlan) -> None:
     new_root = stage / "new"
     old_root = stage / "old"
     replaced: list[str] = []
+    cleanup_stage = True
     try:
         new_root.mkdir()
         old_root.mkdir()
@@ -838,6 +869,8 @@ def apply_merge(plan: MergePlan) -> None:
 
         _assert_snapshot_unchanged(plan)
         for name in WRITE_NAMES:
+            if (plan.goal_dir / name).read_bytes() != plan.original_bytes[name]:
+                raise MergeError(f"global audit state changed concurrently: {name}")
             os.replace(new_root / name, plan.goal_dir / name)
             replaced.append(name)
     except BaseException as exc:
@@ -848,13 +881,16 @@ def apply_merge(plan: MergePlan) -> None:
             except OSError as rollback_exc:
                 rollback_errors.append(f"{name}: {rollback_exc}")
         if rollback_errors:
+            cleanup_stage = False
             raise MergeError(
                 f"merge failed ({exc}); rollback also failed: "
                 + "; ".join(rollback_errors)
+                + f"; staged recovery files remain at {stage}"
             ) from exc
         raise
     finally:
-        shutil.rmtree(stage, ignore_errors=True)
+        if cleanup_stage:
+            shutil.rmtree(stage, ignore_errors=True)
 
     for name in WRITE_NAMES:
         if (plan.goal_dir / name).read_bytes() != plan.proposed_bytes[name]:
