@@ -1005,6 +1005,97 @@ preset(
     aliases=["page 79 Turing machine (f)"],
 )
 
+localized_tm = base.source_candidate(
+    key="tm-localized-backgrounds",
+    name="page-81 Turing-machine localized-background seed family",
+    anchor="U005429",
+    aliases=["localized Turing-machine structures"],
+    facts={
+        "object_kind": (
+            "A coverage-bearing family of repetitive tape backgrounds for the "
+            "Turing machine identified on page 81."
+        ),
+        "carrier": (
+            "The page-81 machine's one-dimensional tape, head, and finite "
+            "control state."
+        ),
+        "seed": (
+            "Five specific repetitive backgrounds delimited by the five "
+            "successive source images."
+        ),
+        "input": (
+            "The page-81 Turing-machine rule together with one of the five "
+            "displayed repetitive backgrounds."
+        ),
+        "parameters_and_variants": (
+            "Five image-delimited repetitive-background variants are shown."
+        ),
+        "result_kind": (
+            "A simple repetitive head trace localized on the selected "
+            "repetitive background."
+        ),
+        "evidence_limit": (
+            "The assigned Notes state the background role and show five "
+            "variants, but the small captionless rasters do not reliably fix "
+            "complete period words, phase, head state, or the page-81 rule."
+        ),
+    },
+    claim=(
+        "The source explicitly delimits five repetitive-background seed "
+        "variants that support localized motion of the page-81 Turing machine."
+    ),
+    missing=(
+        "The page-81 transition table and exact background words, phases, "
+        "head positions, and head states require the routed target or a "
+        "source-preserving visual transcription."
+    ),
+    strength="DIRECT_IDENTITY",
+    modality="PROSE",
+    parameters=[
+        (
+            "five localized-background seed variants",
+            (
+                "The five successive images delimit distinct repetitive "
+                "backgrounds, but their exact finite words remain ambiguous."
+            ),
+            ["tm-localized-backgrounds-source"],
+        )
+    ],
+    route_keys=["tm-localized-page81"],
+)
+localized_tm["source_status"] = ["AMBIGUOUS"]
+localized_tm["uncertainties"] = [
+    (
+        "The five localized-background images identify distinct seed "
+        "variants but do not reliably expose complete background words, "
+        "phases, initial head state, or head position."
+    )
+]
+for index, (unit, path) in enumerate(
+    [
+        ("U005430", "BACK-MATTER/NOTES/_page_904_Picture_3.jpeg"),
+        ("U005431", "BACK-MATTER/NOTES/_page_904_Picture_4.jpeg"),
+        ("U005432", "BACK-MATTER/NOTES/_page_904_Picture_5.jpeg"),
+        ("U005433", "BACK-MATTER/NOTES/_page_904_Picture_6.jpeg"),
+        ("U005434", "BACK-MATTER/NOTES/_page_904_Picture_7.jpeg"),
+    ],
+    1,
+):
+    add_support(
+        localized_tm,
+        label=f"tm-localized-background-{index}",
+        unit=unit,
+        image_path=path,
+        claim=(
+            f"Original-resolution inspection distinguishes localized-background "
+            f"variant {index}, while the exact repeating word and initial "
+            "control placement remain visually underdetermined."
+        ),
+        fields=["seed", "parameters_and_variants", "result_kind", "evidence_limit"],
+        strength="DEFECT_LIMITED",
+        modality="IMAGE",
+    )
+
 busy = direct_object(
     key="busy-beaver",
     name="Busy Beaver halting-time optimization problem",
@@ -1016,7 +1107,7 @@ busy = direct_object(
         "before halting; a stated variant maximizes final black-cell count."
     ),
     result="The maximum and one or more witness machines attaining or bounding it.",
-    parameters="State count, tape alphabet, blank-tape convention, and objective variant.",
+    parameters="State count, halt-state convention, and objective variant.",
     missing=(
         "The five-state optimum is explicitly unknown; the image tables are "
         "preserved as witnesses without inventing an external transcription."
@@ -1036,6 +1127,135 @@ for unit, path, label in [
         strength="CORROBORATING",
         modality="IMAGE",
     )
+
+busy_witnesses: list[dict[str, Any]] = []
+for key, name, state_count, steps, black_cells, group_name in [
+    (
+        "busy-witness-2",
+        "two-state 6-step Busy Beaver witness Turing-machine preset",
+        2,
+        6,
+        4,
+        "first",
+    ),
+    (
+        "busy-witness-3",
+        "three-state 21-step Busy Beaver witness Turing-machine preset",
+        3,
+        21,
+        5,
+        "second",
+    ),
+    (
+        "busy-witness-4",
+        "four-state 107-step Busy Beaver witness Turing-machine preset",
+        4,
+        107,
+        13,
+        "third",
+    ),
+]:
+    witness = preset(
+        key=key,
+        name=name,
+        anchor="U005437",
+        law=(
+            f"Use the {group_name} finite transition table printed in "
+            "A000418 for the stated witness machine."
+        ),
+        family="single-tape Turing machines",
+        modality="PROSE",
+        extra={
+            "parameters_and_variants": (
+                f"The source identifies this as the {state_count}-state "
+                "halting-time witness."
+            ),
+            "result_kind": (
+                f"The machine reaches halt state 0 after {steps} steps and "
+                f"leaves {black_cells} black cells."
+            ),
+            "termination_completion_failure": (
+                f"The stated witness reaches halt state 0 after {steps} steps."
+            ),
+        },
+        missing=(
+            "The printed transition glyphs are preserved and checked at "
+            "original resolution without importing an outside transcription."
+        ),
+    )
+    witness["evidence"][0]["fields"].remove(
+        "rule_relation_constraint_function_or_probability_law"
+    )
+    add_support(
+        witness,
+        label=f"{key}-rule-table",
+        unit="U005438",
+        image_path=(
+            "BACK-MATTER/NOTES/_page_904_busy_beaver_2_3_4_state_rules.jpeg"
+        ),
+        claim=(
+            f"Original-resolution inspection confirms the {group_name} "
+            f"printed transition table for the {state_count}-state witness."
+        ),
+        fields=[
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+            "evidence_limit",
+        ],
+        strength="DIRECT_PARTIAL_MECHANICS",
+        modality="IMAGE",
+    )
+    busy_witnesses.append(witness)
+
+busy5 = preset(
+    key="busy-witness-5",
+    name="five-state 47176870-step Busy Beaver lower-bound witness preset",
+    anchor="U005439",
+    law="Use the finite transition table printed in A000419.",
+    family="single-tape Turing machines",
+    modality="PROSE",
+    extra={
+        "parameters_and_variants": (
+            "The source identifies a five-state lower-bound witness and does "
+            "not claim that it is optimal."
+        ),
+        "result_kind": (
+            "The machine halts after 47,176,870 steps and leaves 4098 black cells."
+        ),
+        "termination_completion_failure": (
+            "The stated witness halts after 47,176,870 steps."
+        ),
+        "evidence_limit": (
+            "The five-state optimum is explicitly unknown; this record is a "
+            "witness preset, not the optimum."
+        ),
+    },
+    missing=(
+        "The source states that the five-state optimum is unknown and preserves "
+        "this concrete machine only as a lower-bound witness."
+    ),
+)
+busy5["evidence"][0]["fields"].remove(
+    "rule_relation_constraint_function_or_probability_law"
+)
+add_support(
+    busy5,
+    label="busy-witness-5-rule-table",
+    unit="U005440",
+    image_path="BACK-MATTER/NOTES/_page_904_busy_beaver_5_state_rule.jpeg",
+    claim=(
+        "Original-resolution inspection confirms the printed five-state "
+        "lower-bound witness transition table."
+    ),
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+        "evidence_limit",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+    modality="IMAGE",
+)
+busy_witnesses.append(busy5)
 
 # Substitution systems, sequence objects, and digit transducers.
 substitution = transition(
@@ -1128,6 +1348,20 @@ add_support(
     fields=["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
     modality="FORMULA",
 )
+add_support(
+    thue,
+    label="thue-generating-series",
+    unit="U005461",
+    claim=(
+        "The explicit generating-series coefficient formula gives the first "
+        "n Thue-Morse values."
+    ),
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
+    modality="FORMULA",
+)
 
 direct_object(
     key="fibonacci-substitution-sequence",
@@ -1202,6 +1436,106 @@ add_support(
     fields=["excluded_observers_and_representations", "parameters_and_variants"],
     modality="CODE",
 )
+for unit, label, claim in [
+    (
+        "U005474",
+        "fibonacci-binet",
+        "The GoldenRatio closed form is an exact definition of Fibonacci[n].",
+    ),
+    (
+        "U005475",
+        "fibonacci-rounded-binet",
+        "The rounded GoldenRatio expression is an exact integer evaluator.",
+    ),
+    (
+        "U005476",
+        "fibonacci-coefficient",
+        "The coefficient expression is an exact alternative definition.",
+    ),
+    (
+        "U005477",
+        "fibonacci-matrix",
+        "The matrix-power entry is an exact alternative definition.",
+    ),
+    (
+        "U005478",
+        "fibonacci-continued-fraction",
+        "The nested-rational numerator is an exact alternative definition.",
+    ),
+    (
+        "U005479",
+        "fibonacci-series",
+        "The generating-series coefficient is an exact alternative definition.",
+    ),
+    (
+        "U005480",
+        "fibonacci-binomial-sum",
+        "The binomial sum is an exact alternative definition.",
+    ),
+    (
+        "U005481",
+        "fibonacci-binary-count",
+        "The binary-digit pattern count is an exact alternative definition.",
+    ),
+]:
+    add_support(
+        fibonacci,
+        label=label,
+        unit=unit,
+        claim=claim,
+        fields=[
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        ],
+        modality="FORMULA",
+    )
+
+direct_object(
+    key="fibonacci-inverse-index",
+    name="Fibonacci inverse-index query",
+    anchor="U005484",
+    object_kind="A partial inverse query on Fibonacci values greater than one.",
+    input_text="A Fibonacci value m greater than 1.",
+    law="Return Round[Log[GoldenRatio, Sqrt[5] m]].",
+    result="The index n for which m == Fibonacci[n].",
+    parameters="The supplied Fibonacci value m > 1.",
+)
+
+fibonacci_mod_k = direct_object(
+    key="fibonacci-mod-k",
+    name="Fibonacci modulo-k sequence family",
+    anchor="U005485",
+    object_kind="A parameterized residue sequence derived from Fibonacci numbers.",
+    input_text="A positive index n and modulus k.",
+    law="Return Mod[Fibonacci[n], k].",
+    result="The nth residue; the source states that each fixed-k sequence is purely repetitive.",
+    parameters="Index n and modulus k.",
+)
+fibonacci_mod_k["route_keys"] = ["fibonacci-period"]
+
+fibonacci_mod_n = direct_object(
+    key="fibonacci-mod-n",
+    name="Fibonacci modulo-index sequence",
+    anchor="U005486",
+    object_kind="An integer sequence taking each Fibonacci number modulo its index.",
+    input_text="A positive index n.",
+    law="Return Mod[Fibonacci[n], n].",
+    result="The nth residue in the stated sequence.",
+    parameters="Positive index n.",
+)
+add_support(
+    fibonacci_mod_n,
+    label="fibonacci-mod-n-plot",
+    unit="U005487",
+    image_path="BACK-MATTER/NOTES/_page_906_Figure_6.jpeg",
+    claim=(
+        "The source-delimited plot is a contextual observer of the "
+        "Fibonacci-modulo-index values."
+    ),
+    fields=["result_kind", "excluded_observers_and_representations"],
+    strength="CORROBORATING",
+    modality="IMAGE",
+)
 
 golden = direct_object(
     key="golden-ratio",
@@ -1222,7 +1556,7 @@ add_support(
     modality="FORMULA",
 )
 
-direct_object(
+lucas = direct_object(
     key="lucas-numbers",
     name="Lucas number sequence",
     anchor="U005498",
@@ -1231,6 +1565,28 @@ direct_object(
     law="f[n]=f[n-1]+f[n-2] with f[1]=1 and f[2]=3.",
     result="The nth Lucas integer.",
     parameters="Index n and the stated initial values.",
+)
+add_support(
+    lucas,
+    label="lucas-fibonacci-identity",
+    unit="U005499",
+    claim="The source gives Lucas[n] as Fibonacci[n-1] + Fibonacci[n+1].",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
+    modality="FORMULA",
+)
+add_support(
+    lucas,
+    label="lucas-golden-ratio-identity",
+    unit="U005500",
+    claim="The source gives the exact GoldenRatio, Lucas, and Fibonacci identity.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
+    modality="FORMULA",
 )
 direct_object(
     key="linear-recurrence-sequences",
@@ -1251,6 +1607,38 @@ direct_object(
     law="f[n]=f[n-2]+f[n-3], with f[0]=3, f[1]=0, f[2]=2.",
     result="The nth Perrin integer.",
     parameters="Index n and the three stated initial values.",
+)
+
+thue_digit_transducer = direct_object(
+    key="thue-morse-digit-transducer",
+    name="two-state Thue-Morse digit-transducer preset",
+    anchor="U005502",
+    object_kind=(
+        "A concrete two-state finite automaton evaluating the Thue-Morse "
+        "substitution-sequence value from the base-2 digits of an index."
+    ),
+    input_text="A positive position n, read as IntegerDigits[n-1,2].",
+    law=(
+        "Starting in state/color 1, fold the table "
+        "{{0,0}->0,{0,1}->1,{1,0}->1,{1,1}->0} over the base-2 digits."
+    ),
+    result="The Thue-Morse color at position n.",
+    parameters="The fixed two-state rule table, start state 1, and index n.",
+    modality="PROSE",
+)
+thue_digit_transducer["route_keys"] = ["digit-patterns"]
+add_support(
+    thue_digit_transducer,
+    label="thue-digit-transducer-code",
+    unit="U005503",
+    claim="The Fold expression gives the exact concrete transducer evaluator.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
 )
 
 digit_fa = transition(
@@ -1275,6 +1663,21 @@ add_support(
     fields=[
         "rule_relation_constraint_function_or_probability_law",
         "termination_completion_failure",
+        "result_kind",
+    ],
+    modality="CODE",
+)
+add_support(
+    digit_fa,
+    label="digit-fa-concrete-thue-evaluator",
+    unit="U005503",
+    claim=(
+        "The exact two-state Fold evaluator is a source-delimited concrete "
+        "instance of the finite-automaton digit-sequence class."
+    ),
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
         "result_kind",
     ],
     modality="CODE",
@@ -1389,6 +1792,43 @@ sequential = transition(
 sequential["facts"]["visible_history"] = (
     "SSSEvolveList retains the successive words produced by the ordered rules."
 )
+for unit, label, claim, fields, modality in [
+    (
+        "U005538",
+        "sequential-flat-carrier",
+        "The Flat attribute supplies the associative symbolic-word carrier.",
+        ["carrier", "complete_state", "read_dependencies_or_neighborhood"],
+        "CODE",
+    ),
+    (
+        "U005540",
+        "sequential-page82-rule",
+        "The source gives the exact page-82 subword replacement rule.",
+        [
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        ],
+        "CODE",
+    ),
+    (
+        "U005542",
+        "sequential-page85-rules",
+        "The source gives the exact ordered page-85 replacement rules.",
+        [
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        ],
+        "CODE",
+    ),
+]:
+    add_support(
+        sequential,
+        label=label,
+        unit=unit,
+        claim=claim,
+        fields=fields,
+        modality=modality,
+    )
 add_support(
     sequential,
     label="sequential-evolve",
@@ -1442,6 +1882,22 @@ add_support(
         "rule_relation_constraint_function_or_probability_law",
         "write_replacement_assembly_or_commit",
         "termination_completion_failure",
+    ],
+    modality="CODE",
+)
+add_support(
+    tag,
+    label="tag-alternative-step",
+    unit="U005555",
+    claim=(
+        "The list-pattern rules give the exact alternative delete-and-append "
+        "step for the displayed binary tag system."
+    ),
+    fields=[
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
     ],
     modality="CODE",
 )
@@ -1523,6 +1979,41 @@ add_support(
     modality="CODE",
 )
 
+direct_object(
+    key="cyclic-tag-leading-elements",
+    name="binary cyclic-tag leading-element generator",
+    anchor="U005562",
+    object_kind=(
+        "A direct generator of the leading elements produced across many "
+        "binary cyclic-tag steps."
+    ),
+    input_text="A cyclic block list, an initial binary word, and iteration count t.",
+    law=(
+        "Iterate CTListStep on the rule rotation and generated list, rotating "
+        "by the list length and selecting blocks at positions of 1, then flatten."
+    ),
+    result="A flattened sequence of leading elements spanning many more than t native steps.",
+    parameters="Cyclic blocks, initial binary list, and iteration count t.",
+    modality="PROSE",
+)
+add_support(
+    next(
+        item
+        for item in base.ALL_CANDIDATE_SPECS
+        if item["key"] == "cyclic-tag-leading-elements"
+    ),
+    label="cyclic-leading-elements-code",
+    unit="U005563",
+    claim="CTList and CTListStep give the complete direct generator.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+
 multivalue_cyclic = transition(
     key="multivalue-cyclic-tag",
     name="nonnegative-integer-valued cyclic tag system class",
@@ -1544,6 +2035,104 @@ add_support(
     claim="The CTStep rule gives the exact n-copy append law.",
     fields=["rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit"],
     modality="CODE",
+)
+
+direct_object(
+    key="multivalue-cyclic-leading-elements",
+    name="arbitrary-value cyclic-tag leading-element generator",
+    anchor="U005566",
+    object_kind=(
+        "A direct generator of leading elements for nonnegative-integer-valued "
+        "cyclic tag systems."
+    ),
+    input_text=(
+        "A cyclic block list and an integer-valued list partitioned against "
+        "the rule-cycle length."
+    ),
+    law=(
+        "Partition the list by the rule-cycle length, pair each value with its "
+        "rule block, repeat that block by the value, flatten, and rotate by "
+        "the list length."
+    ),
+    result="The generated arbitrary-value leading-element list and next rule rotation.",
+    parameters="Rule cycle, nonnegative list values, and current rule rotation.",
+    modality="PROSE",
+)
+add_support(
+    next(
+        item
+        for item in base.ALL_CANDIDATE_SPECS
+        if item["key"] == "multivalue-cyclic-leading-elements"
+    ),
+    label="multivalue-cyclic-leading-code",
+    unit="U005567",
+    claim="The generalized CTListStep gives the complete direct generator.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+
+mechanical_cyclic = transition(
+    key="mechanical-cyclic-tag",
+    name="mechanical trough cyclic-tag implementation",
+    anchor="U005568",
+    object_kind=(
+        "A physical cyclic-tag implementation using black and white balls in "
+        "a finite-capacity trough."
+    ),
+    carrier=(
+        "An ordered trough of black/white balls, a rotary rule selector, a "
+        "left release, and a right append mechanism."
+    ),
+    state="The trough contents and current rotary rule case.",
+    law=(
+        "Release the leftmost ball; advance the rotary rule case; when the "
+        "released ball is black, append the selected new block at the right."
+    ),
+    result="The next trough contents and rotary rule case, or overflow failure.",
+    input_text="A cyclic rule-block supply, initial ball sequence, and trough capacity.",
+    neighborhood="The released leftmost ball and current rotary rule case.",
+    parameters=(
+        "Rule-block cycle, black/white encoding, initial ball sequence, "
+        "mechanism realization, and finite trough capacity."
+    ),
+    termination="The physical implementation inevitably fails if the trough overflows.",
+)
+mechanical_cyclic["facts"]["frontier_or_activation"] = (
+    "The leftmost release position is active for reading/removal and the "
+    "right-hand end is writable when the released ball is black."
+)
+mechanical_cyclic["facts"]["control_state"] = (
+    "The rotary element explicitly records which cyclic rule case is current."
+)
+mechanical_cyclic["facts"]["write_replacement_assembly_or_commit"] = (
+    "Remove the released ball and conditionally append the selected block at "
+    "the right-hand end as one mechanical step."
+)
+mechanical_cyclic["evidence"][0]["fields"].append("control_state")
+mechanical_cyclic["route_keys"] = ["cyclic-rule-e"]
+add_support(
+    mechanical_cyclic,
+    label="mechanical-cyclic-trough",
+    unit="U005569",
+    image_path="BACK-MATTER/NOTES/_page_910_cyclic_tag_trough.jpeg",
+    claim=(
+        "The source-delimited rendering contextually confirms the trough, "
+        "left release, rotary selector, and right-hand supply arrangement."
+    ),
+    fields=[
+        "carrier",
+        "frontier_or_activation",
+        "control_state",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
+    modality="IMAGE",
 )
 
 preset(
