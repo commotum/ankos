@@ -393,6 +393,7 @@ eca["evidence"][0]["fields"] = [
     "parameters_and_variants",
     "evidence_limit",
 ]
+eca["route_keys"].append("rule-numbering-page53")
 add_evidence(
     eca,
     label="eca-schema",
@@ -792,6 +793,13 @@ add_evidence(
     ],
     strength="CONTEXTUAL",
 )
+rule90["route_keys"].extend(
+    [
+        "rule90-dimension-page933",
+        "rule90-sierpinski-page934",
+        "rule90-additive-page955",
+    ]
+)
 
 rule30 = ca_preset(
     key="rule30",
@@ -955,6 +963,32 @@ add_evidence(
     ],
     modality="FORMULA",
 )
+for candidate, key, unit, expression in [
+    (rule254, "rule254", "U005101", "Or[p,q,r]"),
+    (rule250, "rule250", "U005102", "Or[p,r]"),
+    (rule90, "rule90", "U005103", "Xor[p,r]"),
+    (rule30, "rule30", "U005104", "Xor[p,Or[q,r]]"),
+    (rule110, "rule110", "U005105", "Xor[Or[p,q],And[p,q,r]]"),
+]:
+    add_evidence(
+        candidate,
+        label=f"{key}-logical-form",
+        unit=unit,
+        claim=(
+            f"The Notes give the exact Boolean representation {expression} "
+            f"for {candidate['name']}."
+        ),
+        fields=[
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "determinism_branching_or_measure",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        modality="FORMULA",
+        strength="CORROBORATING",
+    )
 for label, unit, claim, fields, modality in [
     (
         "eca-formula-description",
@@ -1273,6 +1307,24 @@ add_evidence(
 )
 add_evidence(
     general_1d,
+    label="general-1d-wrapper-rationale",
+    unit="U005005",
+    claim=(
+        "The source explicitly introduces rule-form wrappers as the mechanism "
+        "for handling several local-rule representations through one interface."
+    ),
+    fields=[
+        "object_kind",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
+)
+add_evidence(
+    general_1d,
     label="general-1d-range",
     unit="U005007",
     claim=(
@@ -1504,6 +1556,34 @@ add_evidence(
     ),
     fields=list(centered_seed["facts"]),
     modality="CODE",
+)
+add_evidence(
+    centered_seed,
+    label="centered-single-seed-implementation-comment",
+    unit="U004990",
+    claim=(
+        "The implementation note independently states that CenterList creates "
+        "n zeros and replaces the middle zero by one."
+    ),
+    fields=[
+        "object_kind",
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "input",
+        "seed",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
 )
 add_evidence(
     centered_seed,
@@ -3019,6 +3099,9 @@ add_evidence(
     ],
     strength="CONTEXTUAL",
 )
+pascal_mod2["route_keys"].extend(
+    ["rule90-dimension-page933", "rule90-sierpinski-page934"]
+)
 
 rule90_row_count = direct_query_candidate(
     key="rule90-row-black-count",
@@ -3349,6 +3432,13 @@ add_evidence(
     ],
     strength="CONTEXTUAL",
 )
+k_rule90["route_keys"].extend(
+    [
+        "additive-page952",
+        "additive-continuous-page922",
+        "k-color-count-dimension-page955",
+    ]
+)
 
 k_rule90_row_count = direct_query_candidate(
     key="k-color-rule90-row-count",
@@ -3456,7 +3546,11 @@ additive = source_candidate(
     missing=(
         "The complete additive-rule parameterization is deferred to page 952."
     ),
-    route_keys=["additive-page952"],
+    route_keys=[
+        "additive-page952",
+        "additive-continuous-page922",
+        "k-color-count-dimension-page955",
+    ],
 )
 
 def pictured_integer_pattern(
@@ -3625,8 +3719,8 @@ def bitwise_function_candidate(
 ) -> CandidateSpec:
     missing = (
         "The source names and relates the bitwise function but does not give a "
-        "complete bit-by-bit definition, signed-integer convention, domain "
-        "boundary, or invalid-argument behavior."
+        "complete bit-by-bit definition, signed-integer/domain convention, or "
+        "invalid-argument behavior."
     )
     spec = source_candidate(
         key=key,
@@ -4190,6 +4284,7 @@ cosmati["evidence"][0]["claim"] = (
     "to the following diagrams while explicitly marking that creation account "
     "as presumed."
 )
+cosmati["route_keys"].append("cosmati-apollonian-page986")
 attach_procedure_images(
     cosmati,
     label_prefix="cosmati-stage",
@@ -4459,7 +4554,7 @@ constraint_puzzle = source_candidate(
         "evidence_limit": (
             "The passage establishes the constraint/solution-set semantics but "
             "does not supply a particular variable domain, constraint language, "
-            "solver, solution count, failure convention, or sampling measure."
+            "solver, solution count, or sampling measure."
         ),
     },
     claim=(
@@ -4469,7 +4564,7 @@ constraint_puzzle = source_candidate(
     missing=(
         "The passage establishes the constraint/solution-set semantics but does "
         "not supply a particular variable domain, constraint language, solver, "
-        "solution count, failure convention, or sampling measure."
+        "solution count, or sampling measure."
     ),
     strength="DIRECT_PARTIAL_MECHANICS",
 )
@@ -4507,7 +4602,7 @@ truchet = source_candidate(
         ),
         "evidence_limit": (
             "The passage does not specify a selection measure, adjacency "
-            "constraint, enumeration order, or completion boundary."
+            "constraint, enumeration order, or finite grid domain/extent."
         ),
     },
     claim=(
@@ -4516,7 +4611,7 @@ truchet = source_candidate(
     ),
     missing=(
         "The passage does not specify a selection measure, adjacency constraint, "
-        "enumeration order, or completion boundary."
+        "enumeration order, or finite grid domain/extent."
     ),
 )
 
@@ -4579,6 +4674,30 @@ random_ca_seed = source_candidate(
             ["random-ca-initial-condition-source"],
         )
     ],
+)
+add_evidence(
+    random_ca_seed,
+    label="random-ca-initial-condition-early-experiment",
+    unit="U005286",
+    claim=(
+        "The historical account independently states that the early cellular-"
+        "automaton experiments used random initial conditions and distinguishes "
+        "their randomness from later single-seed Rule 30 behavior."
+    ),
+    fields=[
+        "object_kind",
+        "complete_state",
+        "input",
+        "seed",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
 )
 
 
@@ -4798,6 +4917,26 @@ fredkin_rule90 = source_candidate(
     strength="DIRECT_IDENTITY",
     route_keys=["fredkin-page1179"],
 )
+add_evidence(
+    fredkin_rule90,
+    label="fredkin-rule90-history-summary",
+    unit="U005270",
+    claim=(
+        "The timeline independently repeats the 1961 two-dimensional Rule 90 "
+        "analog identity and records nesting as an observed property."
+    ),
+    fields=[
+        "object_kind",
+        "native_time",
+        "support",
+        "law_kind",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+)
 
 code20 = source_candidate(
     key="code20",
@@ -4986,6 +5125,28 @@ code10 = source_candidate(
         "boundary, code-number convention, completion, or witness semantics."
     ),
     strength="DIRECT_PARTIAL_MECHANICS",
+)
+add_evidence(
+    experiment,
+    label="experiment-toffoli-rule-space-survey",
+    unit="U005279",
+    claim=(
+        "The timeline records a concrete exhaustive survey of all 4096 simplest "
+        "two-dimensional cellular automata, with stabilization from random "
+        "initial conditions as the observer criterion."
+    ),
+    fields=[
+        "object_kind",
+        "carrier",
+        "input",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
 )
 
 
@@ -5567,6 +5728,7 @@ HISTORICAL_CANDIDATE_KEYS = {
 }
 RELATION_IMAGE_UNITS = {
     "U000264",
+    "U005194",
     "U005200",
     "U005201",
     "U005202",
