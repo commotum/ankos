@@ -204,6 +204,43 @@
             "minimum": 4,
             "type": "integer"
           },
+          "evidence_reassignments": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "from_evidence_id": {
+                  "type": "string"
+                },
+                "targets": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "candidate_id": {
+                        "pattern": "^W[0-9]{4}$",
+                        "type": "string"
+                      },
+                      "evidence_id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "candidate_id",
+                      "evidence_id"
+                    ],
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "from_evidence_id",
+                "targets"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "evidence_strength": {
             "items": {
               "enum": [
@@ -1884,7 +1921,8 @@
           "missing_mechanics",
           "uncertainties",
           "related_candidate_ids",
-          "cross_reference_ids"
+          "cross_reference_ids",
+          "evidence_reassignments"
         ],
         "title": "Blind candidate record",
         "type": "object"

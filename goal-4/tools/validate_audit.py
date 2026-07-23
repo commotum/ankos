@@ -2291,6 +2291,123 @@ def mutation_checks(
     search: dict[str, Any],
 ) -> list[str]:
     failures: list[str] = []
+    base_reading = copy.deepcopy(reading)
+    base_assets = copy.deepcopy(assets)
+    base_search = copy.deepcopy(search)
+    unit = units[0]
+    unit_id = unit["id"]
+    path = unit["path"]
+    stage = stage_for_document(
+        next(document for document in manifest["documents"] if document["path"] == path)
+    )
+
+    base_reading[0].update(
+        {
+            "review_status": "REVIEWED",
+            "review_disposition": "CANDIDATE",
+            "source_status": "CLEAR",
+            "secondary_roles": "[]",
+            "candidate_ids": '["B0001"]',
+            "route_ids": '["R000001"]',
+            "evidence_statement": "Introduces a bounded fixture construction.",
+            "review_stage": str(stage),
+            "reviewer": "fixture-reviewer",
+        }
+    )
+    evidence = {
+        "evidence_id": "E000001",
+        "evidence_group_id": "G000001",
+        "discovery_anchor": {
+            "epoch": 1,
+            "kind": "SOURCE_UNIT",
+            "id": unit_id,
+            "ordinal": 1,
+        },
+        "source_unit_id": unit_id,
+        "image_path": None,
+        "strength": "DIRECT_COMPLETE_MECHANICS",
+        "modality": "PROSE",
+        "claim": "The fixture supplies every test fingerprint field.",
+        "fingerprint_fields": list(FINGERPRINT_FIELDS),
+    }
+    candidate = {key: [] for key in CANDIDATE_FIELDS}
+    candidate.update(
+        {
+            "id": "B0001",
+            "record_status": "ACTIVE",
+            "provisional_name": "bounded fixture construction",
+            "aliases": [],
+            "discovery_stage": stage,
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": "SOURCE_UNIT",
+                "id": unit_id,
+                "ordinal": 1,
+            },
+            "source_unit_ids": [unit_id],
+            "source_evidence": [evidence],
+            "source_status": ["CLEAR"],
+            "image_witnesses": [],
+            "evidence_strength": ["DIRECT_COMPLETE_MECHANICS"],
+            "field_support": {
+                field: "SUPPORTED" for field in FINGERPRINT_FIELDS
+            },
+            "fingerprint": {
+                field: {
+                    "status": "SUPPORTED",
+                    "value": f"fixture {field}",
+                    "evidence_ids": ["E000001"],
+                    "reason": "",
+                }
+                for field in FINGERPRINT_FIELDS
+            },
+            "parameters": [],
+            "variants": [],
+            "missing_mechanics": [],
+            "uncertainties": [],
+            "related_candidate_ids": [],
+            "cross_reference_ids": ["R000001"],
+            "evidence_reassignments": [],
+        }
+    )
+    route = {key: "" for key in CROSS_REFERENCE_HEADER}
+    route.update(
+        {
+            "route_id": "R000001",
+            "source_unit_id": unit_id,
+            "source_asset_id": "",
+            "discovery_epoch": "1",
+            "discovery_kind": "SOURCE_UNIT",
+            "discovery_id": unit_id,
+            "discovery_ordinal": "1",
+            "literal_target": "later fixture page",
+            "route_kind": "PAGE",
+            "expected_topic": "fixture mechanics",
+            "owning_stage": str(stage),
+            "closure_scope": "CROSS_RANGE",
+            "status": "PENDING",
+            "target_unit_ids": "[]",
+            "target_asset_ids": "[]",
+            "attempts": "[]",
+            "vocabulary_terms": '["fixture mechanics"]',
+            "defect_boundary": "",
+        }
+    )
+    base_candidates = [candidate]
+    base_routes = [route]
+
+    base_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+    )
+    if base_errors:
+        return ["valid candidate/route mutation fixture failed: " + "; ".join(base_errors)]
+
     mutations: list[
         tuple[
             str,
@@ -2302,128 +2419,344 @@ def mutation_checks(
         ]
     ] = []
 
-    missing_reading = copy.deepcopy(reading)
+    missing_reading = copy.deepcopy(base_reading)
     missing_reading.pop()
     mutations.append(
-        ("missing reading row", missing_reading, candidates, routes, assets, search)
+        (
+            "missing reading row",
+            missing_reading,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
     )
-
-    corrupt_hash = copy.deepcopy(reading)
+    corrupt_hash = copy.deepcopy(base_reading)
     corrupt_hash[0]["unit_sha256"] = "0" * 64
     mutations.append(
-        ("stale reading hash", corrupt_hash, candidates, routes, assets, search)
+        (
+            "stale reading hash",
+            corrupt_hash,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
     )
-
-    missing_asset = copy.deepcopy(assets)
+    missing_asset = copy.deepcopy(base_assets)
     missing_asset.pop()
     mutations.append(
-        ("missing asset row", reading, candidates, routes, missing_asset, search)
+        (
+            "missing asset row",
+            base_reading,
+            base_candidates,
+            base_routes,
+            missing_asset,
+            base_search,
+        )
     )
 
-    bad_route = copy.deepcopy(routes)
-    bad_route.append(
-        {
-            key: value
-            for key, value in zip(
-                CROSS_REFERENCE_HEADER,
-                [
-                    "R000001",
-                    "U999999",
-                    "page 1",
-                    "PAGE",
-                    "unknown",
-                    "4",
-                    "PENDING",
-                    "[]",
-                    "[]",
-                    "[]",
-                    "",
-                ],
-            )
-        }
-    )
+    missing_provenance = copy.deepcopy(base_candidates)
+    missing_provenance[0]["source_unit_ids"] = []
     mutations.append(
-        ("route with unknown source", reading, candidates, bad_route, assets, search)
+        (
+            "candidate provenance reverse join",
+            base_reading,
+            missing_provenance,
+            base_routes,
+            base_assets,
+            base_search,
+        )
     )
-
-    leaked_candidate = {
-        key: [] for key in CANDIDATE_FIELDS
-    }
-    leaked_candidate.update(
-        {
-            "id": "B0001",
-            "record_status": "ACTIVE",
-            "provisional_name": "mutation",
-            "discovery_stage": 4,
-            "source_unit_ids": ["U000001"],
-            "source_evidence": [],
-            "source_status": ["CLEAR"],
-            "evidence_strength": ["DIRECT_IDENTITY"],
-            "field_support": {
-                field: "UNKNOWN_FROM_SOURCE" for field in FINGERPRINT_FIELDS
-            },
-            "fingerprint": {
-                field: {
-                    "status": "UNKNOWN_FROM_SOURCE",
-                    "value": None,
-                    "evidence_ids": [],
-                    "reason": "mutation",
-                }
-                for field in FINGERPRINT_FIELDS
-            },
-            "catalog_action": "ADD_CATALOG_ENTRY",
-        }
+    undeclared_field = copy.deepcopy(base_candidates)
+    undeclared_field[0]["source_evidence"][0]["fingerprint_fields"].pop()
+    mutations.append(
+        (
+            "fingerprint evidence declaration",
+            base_reading,
+            undeclared_field,
+            base_routes,
+            base_assets,
+            base_search,
+        )
     )
+    missing_field_evidence = copy.deepcopy(base_candidates)
+    missing_field_evidence[0]["fingerprint"][FINGERPRINT_FIELDS[0]][
+        "evidence_ids"
+    ] = []
+    mutations.append(
+        (
+            "supported field without evidence",
+            base_reading,
+            missing_field_evidence,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    forbidden_field = copy.deepcopy(base_candidates)
+    forbidden_field[0]["catalog_action"] = "ADD_CATALOG_ENTRY"
     mutations.append(
         (
             "forbidden candidate field",
-            reading,
-            [leaked_candidate],
-            routes,
-            assets,
-            search,
+            base_reading,
+            forbidden_field,
+            base_routes,
+            base_assets,
+            base_search,
         )
     )
-
-    bad_search = copy.deepcopy(search)
-    bad_search["rounds"] = [
-        {
-            "round_id": "S001",
-            "queries": [],
-            "tool_assumptions": [],
-            "result_ids": ["H000001"],
-            "result_digest": "0" * 64,
-            "hits": [
-                {
-                    "hit_id": "H000001",
-                    "query_id": "Q001",
-                    "source_unit_id": "U000001",
-                    "context_sha256": "0" * 64,
-                    "disposition": "",
-                    "candidate_ids": [],
-                    "route_ids": [],
-                    "rationale": "",
-                }
-            ],
-            "new_vocabulary": [],
-            "new_candidates": [],
-            "new_evidence_groups": [],
-            "new_routes": [],
-            "rerun_digest": "0" * 64,
-        }
-    ]
+    forbidden_text = copy.deepcopy(base_candidates)
+    forbidden_text[0]["source_evidence"][0]["claim"] = "Matches T01."
     mutations.append(
         (
-            "undispositioned search hit",
-            reading,
-            candidates,
-            routes,
-            assets,
-            bad_search,
+            "forbidden reconciliation free text",
+            base_reading,
+            forbidden_text,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    missing_candidate_backlink = copy.deepcopy(base_reading)
+    missing_candidate_backlink[0]["candidate_ids"] = "[]"
+    mutations.append(
+        (
+            "missing reading candidate backlink",
+            missing_candidate_backlink,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    unknown_route_source = copy.deepcopy(base_routes)
+    unknown_route_source[0]["source_unit_id"] = "U999999"
+    unknown_route_source[0]["discovery_id"] = "U999999"
+    mutations.append(
+        (
+            "route with unknown source",
+            base_reading,
+            base_candidates,
+            unknown_route_source,
+            base_assets,
+            base_search,
+        )
+    )
+    unresolved_resolved_route = copy.deepcopy(base_routes)
+    unresolved_resolved_route[0]["status"] = "RESOLVED"
+    mutations.append(
+        (
+            "resolved route without typed target",
+            base_reading,
+            base_candidates,
+            unresolved_resolved_route,
+            base_assets,
+            base_search,
+        )
+    )
+    wrong_assignment = copy.deepcopy(base_assets)
+    wrong_assignment[0]["assignment_path"] = manifest["documents"][-1]["path"]
+    mutations.append(
+        (
+            "wrong known asset assignment",
+            base_reading,
+            base_candidates,
+            base_routes,
+            wrong_assignment,
+            base_search,
+        )
+    )
+    risky_asset = copy.deepcopy(base_assets)
+    risky_asset[0].update(
+        {
+            "inspection_status": "SCREENED",
+            "visual_role": "CONTROL",
+            "source_status": "CLEAR",
+            "risk_flags": '["TEXT_BEARING"]',
+            "original_resolution_status": "NOT_REQUIRED",
+            "transcription_status": "CHECKED",
+            "evidence_statement": "Fixture text was screened.",
+            "review_stage": risky_asset[0]["assignment_stage"],
+            "reviewer": "fixture-reviewer",
+        }
+    )
+    mutations.append(
+        (
+            "risky asset without original resolution",
+            base_reading,
+            base_candidates,
+            base_routes,
+            risky_asset,
+            base_search,
         )
     )
 
-    for name, changed_reading, changed_candidates, changed_routes, changed_assets, changed_search in mutations:
+    search_reading = copy.deepcopy(base_reading)
+    for row in search_reading:
+        if row["path"] != path or row["review_status"] == "REVIEWED":
+            continue
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_disposition": "NO_CONSTRUCTION",
+                "source_status": "CLEAR",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction in this fixture unit.",
+                "review_stage": str(stage),
+                "reviewer": "fixture-reviewer",
+            }
+        )
+    search_fixture = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": ["Literal UTF-8 line search."],
+        "vocabulary": ["fixture"],
+        "rounds": [
+            {
+                "round_id": "S001",
+                "epoch": 1,
+                "kind": "LOCAL",
+                "owning_stage": stage,
+                "queries": [
+                    {
+                        "query_id": "Q0001",
+                        "family": "fixture noun",
+                        "pattern": "fixture",
+                        "flags": ["--fixed-strings"],
+                        "scope_paths": [path],
+                    }
+                ],
+                "tool_assumptions": ["Literal UTF-8 line search."],
+                "result_ids": ["H000001"],
+                "result_digest": "",
+                "hits": [
+                    {
+                        "hit_id": "H000001",
+                        "query_id": "Q0001",
+                        "source_unit_id": unit_id,
+                        "context_sha256": unit["sha256"],
+                        "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+                        "candidate_ids": ["B0001"],
+                        "route_ids": [],
+                        "rationale": "Already governed by the fixture candidate.",
+                    }
+                ],
+                "new_vocabulary": [],
+                "new_candidates": [],
+                "new_evidence_groups": [],
+                "new_routes": [],
+                "rerun_digest": "",
+            }
+        ],
+        "fixed_point": None,
+    }
+    digest = search_result_digest(search_fixture["rounds"][0])
+    search_fixture["rounds"][0]["result_digest"] = digest
+    search_fixture["rounds"][0]["rerun_digest"] = digest
+    search_errors = validate_objects(
+        manifest,
+        units,
+        search_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        search_fixture,
+    )
+    if search_errors:
+        failures.append(
+            "valid local-search mutation fixture failed: " + "; ".join(search_errors)
+        )
+    else:
+        stale_digest = copy.deepcopy(search_fixture)
+        stale_digest["rounds"][0]["result_digest"] = "0" * 64
+        mutations.append(
+            (
+                "stale search digest",
+                search_reading,
+                base_candidates,
+                base_routes,
+                base_assets,
+                stale_digest,
+            )
+        )
+        stale_context = copy.deepcopy(search_fixture)
+        stale_context["rounds"][0]["hits"][0]["context_sha256"] = "0" * 64
+        mutations.append(
+            (
+                "stale search context",
+                search_reading,
+                base_candidates,
+                base_routes,
+                base_assets,
+                stale_context,
+            )
+        )
+        ungoverned_hit = copy.deepcopy(search_fixture)
+        ungoverned_hit["rounds"][0]["hits"][0]["candidate_ids"] = []
+        updated_digest = search_result_digest(ungoverned_hit["rounds"][0])
+        ungoverned_hit["rounds"][0]["result_digest"] = updated_digest
+        ungoverned_hit["rounds"][0]["rerun_digest"] = updated_digest
+        mutations.append(
+            (
+                "governed hit without candidate",
+                search_reading,
+                base_candidates,
+                base_routes,
+                base_assets,
+                ungoverned_hit,
+            )
+        )
+        fake_group = copy.deepcopy(search_fixture)
+        fake_group["rounds"][0]["new_evidence_groups"] = ["G999999"]
+        mutations.append(
+            (
+                "search delta with fake evidence group",
+                search_reading,
+                base_candidates,
+                base_routes,
+                base_assets,
+                fake_group,
+            )
+        )
+
+    cross_stage_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+        {stage},
+    )
+    if any("pending within-stage routes" in error for error in cross_stage_errors):
+        failures.append("cross-range pending route incorrectly blocks stage closure")
+    within_routes = copy.deepcopy(base_routes)
+    within_routes[0]["closure_scope"] = "WITHIN_STAGE"
+    within_stage_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        within_routes,
+        base_assets,
+        base_search,
+        {stage},
+    )
+    if not any("pending within-stage routes" in error for error in within_stage_errors):
+        failures.append("pending within-stage route did not block stage closure")
+
+    for (
+        name,
+        changed_reading,
+        changed_candidates,
+        changed_routes,
+        changed_assets,
+        changed_search,
+    ) in mutations:
         if not validate_objects(
             manifest,
             units,

@@ -67,6 +67,8 @@ EXECUTION_REQUIREMENT_FIELDS = {
     "runtime_os_sandbox_required",
     "bundle_preparation_enforces_sandbox",
     "coordinator_merge_validation_required",
+    "worker_search_allowed",
+    "worker_route_resolution_allowed",
 }
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 CHAPTER_PATH_RE = re.compile(
@@ -159,8 +161,9 @@ Stage: `{stage}`
 Discovery epoch: `{epoch}`
 
 Read only the files in this bundle, in the exact source-unit order provided.
-Do not search before completing sequential reading. Do not use outside
-knowledge to fill missing mechanics, and do not decide implementation,
+Do not run search in this worker bundle; the coordinator performs and records
+typed local-search rounds after merging the sequential review. Do not use
+outside knowledge to fill missing mechanics, and do not decide implementation,
 equivalence, reuse, or final taxonomy.
 
 Assigned canonical documents:
@@ -179,7 +182,8 @@ For every source unit:
 6. Review every assigned image at least as a thumbnail; require original
    resolution for construction-bearing, text-bearing, ambiguous, or
    caption-incomplete images.
-7. Queue cross-range targets; do not follow anything outside the bundle.
+7. Emit routes only as `PENDING` proposals; do not resolve them or declare a
+   final missing target. The coordinator performs global routing.
 
 Write only `output/output.json` and preserve every required hash/declaration.
 Network use and access outside this bundle are prohibited. If the bundle lacks
@@ -425,6 +429,46 @@ def parse_string_array(
     return parsed
 
 
+def discovery_anchor_orders(
+    assigned_units: dict[str, dict[str, str]],
+    assigned_assets: dict[str, dict[str, str]],
+) -> tuple[dict[str, int], dict[str, int], dict[str, int]]:
+    """Return document-first unit/image traversal orders for local anchors."""
+    document_order: dict[str, int] = {}
+    for row in assigned_units.values():
+        path = row.get("path")
+        try:
+            order = int(row.get("document_order", ""))
+        except ValueError:
+            continue
+        if path:
+            document_order[path] = min(order, document_order.get(path, order))
+    next_order = max(document_order.values(), default=0) + 1
+    for row in assigned_assets.values():
+        path = row.get("assignment_path")
+        if path and path not in document_order:
+            document_order[path] = next_order
+            next_order += 1
+
+    unit_order: dict[str, int] = {}
+    asset_order: dict[str, int] = {}
+    image_path_order: dict[str, int] = {}
+    ordinal = 1
+    for path in sorted(document_order, key=lambda item: document_order[item]):
+        for unit_id, row in assigned_units.items():
+            if row.get("path") == path:
+                unit_order[unit_id] = ordinal
+                ordinal += 1
+        for asset_id, row in assigned_assets.items():
+            if row.get("assignment_path") == path:
+                asset_order[asset_id] = ordinal
+                physical_path = row.get("physical_path")
+                if physical_path:
+                    image_path_order[physical_path] = ordinal
+                ordinal += 1
+    return unit_order, asset_order, image_path_order
+
+
 def build_bundle(
     output: Path,
     worker_id: str,
@@ -527,6 +571,8 @@ def build_bundle(
             "runtime_os_sandbox_required": True,
             "bundle_preparation_enforces_sandbox": False,
             "coordinator_merge_validation_required": True,
+            "worker_search_allowed": False,
+            "worker_route_resolution_allowed": False,
         },
         "allowed_inputs": allowed,
     }
@@ -638,8 +684,19 @@ def _validate_worker_output(
         for row in assigned_assets.values()
         if row.get("physical_path")
     }
+    (
+        assigned_unit_anchor_order,
+        assigned_asset_anchor_order,
+        assigned_image_anchor_order,
+    ) = discovery_anchor_orders(assigned_units, assigned_assets)
     if nonuse is not True:
         return
+    bundle_epoch = manifest.get("discovery_epoch")
+    valid_bundle_epoch = (
+        isinstance(bundle_epoch, int)
+        and not isinstance(bundle_epoch, bool)
+        and bundle_epoch >= 1
+    )
 
     reading_updates = output.get("reading_updates", [])
     candidate_sources_from_reading: dict[str, set[str]] = {}
@@ -763,15 +820,6 @@ def _validate_worker_output(
                 "worker candidate IDs must be a complete ordered W0001 sequence"
             )
         proposal_id_set = set(proposal_ids)
-        unit_anchor_order = {
-            unit_id: index
-            for index, unit_id in enumerate(assigned_units, start=1)
-        }
-        image_anchor_order = {
-            asset.get("physical_path"): len(unit_anchor_order) + index
-            for index, asset in enumerate(assigned_assets.values(), start=1)
-            if asset.get("physical_path")
-        }
         for row in proposals:
             if not isinstance(row, dict):
                 continue
@@ -793,7 +841,7 @@ def _validate_worker_output(
                 anchor_kind = anchor.get("kind")
                 anchor_id = anchor.get("id")
                 anchor_ordinal = anchor.get("ordinal")
-                if anchor.get("epoch") != manifest.get("discovery_epoch"):
+                if anchor.get("epoch") != bundle_epoch:
                     errors.append(
                         f"candidate {candidate_id} discovery epoch differs "
                         "from bundle"
@@ -804,7 +852,7 @@ def _validate_worker_output(
                         f"candidate {candidate_id} anchor ID must be a string"
                     )
                 elif anchor_kind == "SOURCE_UNIT":
-                    anchor_order = unit_anchor_order.get(anchor_id)
+                    anchor_order = assigned_unit_anchor_order.get(anchor_id)
                     if anchor_order is None:
                         errors.append(
                             f"candidate {candidate_id} anchor is outside assignment"
@@ -814,7 +862,7 @@ def _validate_worker_output(
                             f"candidate {candidate_id} source anchor is not evidence"
                         )
                 elif anchor_kind == "IMAGE":
-                    anchor_order = image_anchor_order.get(anchor_id)
+                    anchor_order = assigned_image_anchor_order.get(anchor_id)
                     if anchor_order is None:
                         errors.append(
                             f"candidate {candidate_id} anchor is outside assignment"
@@ -833,10 +881,11 @@ def _validate_worker_output(
                     and isinstance(anchor_ordinal, int)
                     and not isinstance(anchor_ordinal, bool)
                     and anchor_ordinal >= 1
+                    and valid_bundle_epoch
                 ):
                     proposal_anchor_keys.append(
                         (
-                            manifest.get("discovery_epoch"),
+                            bundle_epoch,
                             anchor_order,
                             anchor_ordinal,
                         )
@@ -1024,6 +1073,7 @@ def _validate_worker_output(
 
     routes = output.get("route_proposals", [])
     route_ids: set[str] = set()
+    route_anchor_keys: list[tuple[int, int, int]] = []
     if isinstance(routes, list):
         for row in routes:
             if not isinstance(row, dict):
@@ -1047,17 +1097,67 @@ def _validate_worker_output(
                     )
             if row.get("owning_stage") != str(manifest.get("stage")):
                 errors.append(f"route {route_id} owning_stage differs from bundle")
+            if row.get("status") != "PENDING":
+                errors.append(
+                    f"route {route_id} must remain PENDING for coordinator routing"
+                )
+            target_unit_ids = parse_string_array(
+                row.get("target_unit_ids"),
+                f"route {route_id} target_unit_ids",
+                errors,
+            )
+            target_asset_ids = parse_string_array(
+                row.get("target_asset_ids"),
+                f"route {route_id} target_asset_ids",
+                errors,
+            )
+            parse_string_array(
+                row.get("attempts"),
+                f"route {route_id} attempts",
+                errors,
+            )
+            parse_string_array(
+                row.get("vocabulary_terms"),
+                f"route {route_id} vocabulary_terms",
+                errors,
+            )
+            if target_unit_ids or target_asset_ids or row.get("defect_boundary"):
+                errors.append(
+                    f"route {route_id} PENDING proposal cannot claim a target "
+                    "or final defect boundary"
+                )
+            if not row.get("literal_target") or not row.get("expected_topic"):
+                errors.append(
+                    f"route {route_id} lacks its literal target or expected topic"
+                )
             if row.get("discovery_epoch") != str(
-                manifest.get("discovery_epoch")
+                bundle_epoch
             ):
                 errors.append(
                     f"route {route_id} discovery_epoch differs from bundle"
                 )
+            ordinal_text = row.get("discovery_ordinal")
+            ordinal = (
+                int(ordinal_text)
+                if isinstance(ordinal_text, str)
+                and re.fullmatch(r"[1-9][0-9]*", ordinal_text)
+                else None
+            )
+            if ordinal is None:
+                errors.append(
+                    f"route {route_id} discovery_ordinal must be a canonical "
+                    "positive integer string"
+                )
+            anchor_order: int | None = None
             if row.get("discovery_kind") == "SOURCE_UNIT":
                 if row.get("source_asset_id") or row.get("discovery_id") != row.get(
                     "source_unit_id"
                 ):
                     errors.append(f"route {route_id} source-unit anchor differs")
+                else:
+                    anchor_order = assigned_unit_anchor_order.get(
+                        row.get("source_unit_id")
+                    )
                 if route_sources_from_reading.get(route_id, set()) != {
                     row.get("source_unit_id")
                 } or route_sources_from_assets.get(route_id, set()):
@@ -1067,6 +1167,10 @@ def _validate_worker_output(
                     "source_asset_id"
                 ):
                     errors.append(f"route {route_id} image anchor differs")
+                else:
+                    anchor_order = assigned_asset_anchor_order.get(
+                        row.get("source_asset_id")
+                    )
                 if route_sources_from_assets.get(route_id, set()) != {
                     row.get("source_asset_id")
                 } or route_sources_from_reading.get(route_id, set()):
@@ -1076,12 +1180,40 @@ def _validate_worker_output(
                     f"route {route_id} SEARCH_HIT/unknown discovery is invalid "
                     "for a Stage 4–17 reading bundle"
                 )
+            if (
+                anchor_order is not None
+                and ordinal is not None
+                and valid_bundle_epoch
+            ):
+                route_anchor_keys.append(
+                    (
+                        bundle_epoch,
+                        anchor_order,
+                        ordinal,
+                    )
+                )
         if set(route_sources_from_reading) | set(
             route_sources_from_assets
         ) != route_ids:
             errors.append(
                 "reading/asset route IDs differ from worker route proposals"
             )
+        if len(route_anchor_keys) == len(routes):
+            if route_anchor_keys != sorted(route_anchor_keys):
+                errors.append(
+                    "worker route order differs from discovery-anchor traversal"
+                )
+            ordinals_by_anchor: dict[tuple[int, int], list[int]] = {}
+            for epoch, anchor_order, ordinal in route_anchor_keys:
+                ordinals_by_anchor.setdefault((epoch, anchor_order), []).append(
+                    ordinal
+                )
+            for anchor_key, ordinals in ordinals_by_anchor.items():
+                if ordinals != list(range(1, len(ordinals) + 1)):
+                    errors.append(
+                        "worker route discovery ordinals are not complete for "
+                        f"anchor {anchor_key}"
+                    )
 
     for candidate_id, row in proposal_by_id.items():
         cross_reference_ids = row.get("cross_reference_ids", [])
@@ -1171,6 +1303,8 @@ def verify_bundle(
         "runtime_os_sandbox_required": True,
         "bundle_preparation_enforces_sandbox": False,
         "coordinator_merge_validation_required": True,
+        "worker_search_allowed": False,
+        "worker_route_resolution_allowed": False,
     }
     if not isinstance(requirements, dict) or set(requirements) != (
         EXECUTION_REQUIREMENT_FIELDS

@@ -229,6 +229,73 @@ SEARCH_HIT_DISPOSITIONS = [
     "CONTROL_OR_RELATIONSHIP",
     "EXCLUSION",
 ]
+CATALOG_ACTIONS = [
+    "EXISTING_ENTRY_SUFFICIENT",
+    "EXISTING_ENTRY_NEEDS_CORRECTION",
+    "ADD_CATALOG_ENTRY",
+    "NO_SEPARATE_CATALOG_ENTRY",
+    "INSUFFICIENT_BOOK_EVIDENCE",
+]
+SEMANTIC_ROLES = [
+    "NATIVE_TRANSITION_OR_GENERATOR",
+    "STOCHASTIC_OR_BRANCHING_PROCESS",
+    "INPUT_PROCESSOR_OR_TRANSDUCER",
+    "RELATION_CONSTRAINT_OR_MODEL_SET",
+    "IMMUTABLE_DEFINITION_OR_QUERY",
+    "SPECIALIZATION_OR_PRESET",
+    "PROPERTY_OR_RESTRICTION",
+    "SEED_INPUT_OR_BOUNDARY_CLASS",
+    "COMPOSITION_OR_HYBRID",
+    "REPRESENTATION_CODEC_OR_OBSERVER",
+    "APPLICATION_OR_EMULATION",
+    "SOLVER_OR_NUMERICAL_METHOD",
+    "DUPLICATE_OR_ALIAS",
+    "SOURCE_INSUFFICIENT_ROLE",
+]
+SEMANTIC_SUBTYPES = [
+    "SPECIALIZATION",
+    "PRESET",
+    "PROPERTY",
+    "RESTRICTION",
+    "SEED_CLASS",
+    "INPUT_CLASS",
+    "BOUNDARY_CLASS",
+    "REPRESENTATION",
+    "CODEC",
+    "OBSERVER",
+    "ANALYZER",
+    "APPLICATION",
+    "EMULATION",
+    "SOLVER",
+    "NUMERICAL_METHOD",
+]
+FAMILY_ACTIONS = [
+    "EXISTING_SEMANTIC_FAMILY",
+    "NEW_SEMANTIC_FAMILY",
+    "SOURCE_INSUFFICIENT_FOR_FAMILY",
+]
+FAMILY_RELATIONS = [
+    "MEMBER_OF",
+    "INSTANCE_OF",
+    "RESTRICTS",
+    "SEEDS",
+    "REPRESENTS",
+    "OBSERVES",
+    "APPLIES",
+    "EMULATES",
+    "SOLVES",
+    "COMPOSES",
+    "ALIASES",
+]
+PROOF_CASES = [
+    "same_family",
+    "specialization_preset_property_seed",
+    "composition_hybrid",
+    "representation_observer_application_emulation",
+    "new_catalog_entry",
+    "new_semantic_family",
+    "source_insufficient",
+]
 
 
 def _string_array(enum: list[str] | None = None) -> dict[str, Any]:
