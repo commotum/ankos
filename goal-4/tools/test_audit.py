@@ -58,6 +58,8 @@ def append_history_event(
     mode,
     reviewer,
     prior_rounds,
+    trigger_search_kind=None,
+    trigger_hit_ids=None,
 ):
     document = next(
         item for item in manifest["documents"] if item["path"] == source_path
@@ -91,8 +93,8 @@ def append_history_event(
                 if prior_path_event is not None
                 else None
             ),
-            "trigger_search_kind": None,
-            "trigger_hit_ids": [],
+            "trigger_search_kind": trigger_search_kind,
+            "trigger_hit_ids": trigger_hit_ids or [],
         },
         {item["id"]: item for item in units},
         {item["source_unit_id"]: item for item in reading},
@@ -308,6 +310,90 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         assets,
         search,
         history,
+        {18},
+        True,
+    ) == []
+
+    saturation_enrichment_search = copy.deepcopy(search)
+    enrichment_saturation = saturation_enrichment_search["rounds"][-1]
+    enrichment_saturation["queries"][0]["pattern"] = (
+        "STEPHEN WOLFRAM A NEW KIND OF SCIENCE"
+    )
+    enrichment_saturation["queries"][0]["family"] = (
+        "post-review saturation fixture"
+    )
+    enrichment_pairs, enrichment_query_errors = MODULE.execute_frozen_queries(
+        enrichment_saturation["queries"],
+        units,
+        MODULE.REPO_ROOT / "ref" / "A-New-Kind-of-Science",
+    )
+    assert enrichment_query_errors == []
+    enrichment_saturation["result_ids"] = []
+    enrichment_saturation["hits"] = []
+    trigger_hit_id = None
+    unit_by_id = {unit["id"]: unit for unit in units}
+    for hit_number, (query_id, hit_unit_id) in enumerate(
+        enrichment_pairs, start=1
+    ):
+        hit_id = f"H{hit_number:06d}"
+        if hit_unit_id == units[0]["id"]:
+            trigger_hit_id = hit_id
+        enrichment_saturation["result_ids"].append(hit_id)
+        enrichment_saturation["hits"].append(
+            {
+                "hit_id": hit_id,
+                "query_id": query_id,
+                "source_unit_id": hit_unit_id,
+                "context_sha256": unit_by_id[hit_unit_id]["sha256"],
+                "disposition": (
+                    "CONTROL_OR_RELATIONSHIP"
+                    if hit_unit_id == units[0]["id"]
+                    else "EXCLUSION"
+                ),
+                "candidate_ids": [],
+                "route_ids": [],
+                "rationale": (
+                    "Author/title hit records the post-review saturation trigger."
+                    if hit_unit_id == units[0]["id"]
+                    else "Repeated title text does not change this source unit."
+                ),
+            }
+        )
+    assert trigger_hit_id is not None
+    enrichment_digest = MODULE.search_result_digest(enrichment_saturation)
+    enrichment_saturation["result_digest"] = enrichment_digest
+    enrichment_saturation["rerun_digest"] = enrichment_digest
+    saturation_enrichment_search["fixed_point"]["result_digest"] = (
+        enrichment_digest
+    )
+    saturation_enriched_reading = copy.deepcopy(reading)
+    saturation_enriched_reading[0]["evidence_statement"] = (
+        "The initial review is retained and a later SATURATION hit records "
+        "the title-bearing control context."
+    )
+    saturation_enrichment_history = append_history_event(
+        history,
+        manifest,
+        units,
+        saturation_enriched_reading,
+        assets,
+        units[0]["path"],
+        1,
+        "SEARCH_ENRICHMENT",
+        "saturation-enricher",
+        saturation_enrichment_search["rounds"],
+        "SATURATION",
+        [trigger_hit_id],
+    )
+    assert MODULE.validate_objects(
+        manifest,
+        units,
+        saturation_enriched_reading,
+        candidates,
+        routes,
+        assets,
+        saturation_enrichment_search,
+        saturation_enrichment_history,
         {18},
         True,
     ) == []

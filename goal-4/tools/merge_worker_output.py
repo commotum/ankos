@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preview or apply one verified blind-worker output to the global audit ledgers."""
+"""Preview/apply a blind-worker merge or typed search-enrichment proposal."""
 
 from __future__ import annotations
 
@@ -260,7 +260,14 @@ def _enrichment_proposal_schema() -> dict[str, Any]:
             },
             "candidate_updates": {
                 "type": "array",
-                "items": {"type": "object"},
+                "items": {
+                    "type": "object",
+                    "required": CANDIDATE_FIELDS,
+                    "properties": {
+                        field: {} for field in CANDIDATE_FIELDS
+                    },
+                    "additionalProperties": False,
+                },
             },
             "route_appends": {
                 "type": "array",
@@ -463,8 +470,7 @@ def _existing_evidence_sequences(
     candidates: list[dict[str, Any]],
 ) -> tuple[list[str], list[str]]:
     evidence_ids: list[str] = []
-    group_ids: list[str] = []
-    seen_groups: set[str] = set()
+    group_first_evidence: dict[str, int] = {}
     for candidate in candidates:
         evidence = candidate.get("source_evidence")
         if not isinstance(evidence, list):
@@ -479,9 +485,25 @@ def _existing_evidence_sequences(
             if not isinstance(evidence_id, str) or not isinstance(group_id, str):
                 raise MergeError("global candidate ledger has incomplete evidence IDs")
             evidence_ids.append(evidence_id)
-            if group_id not in seen_groups:
-                seen_groups.add(group_id)
-                group_ids.append(group_id)
+            if (
+                not evidence_id.startswith("E")
+                or not evidence_id[1:].isdigit()
+            ):
+                raise MergeError(
+                    f"global candidate ledger has invalid evidence ID {evidence_id}"
+                )
+            evidence_number = int(evidence_id[1:])
+            group_first_evidence[group_id] = min(
+                evidence_number,
+                group_first_evidence.get(group_id, evidence_number),
+            )
+    if len(evidence_ids) != len(set(evidence_ids)):
+        raise MergeError("global evidence ID collision")
+    evidence_ids.sort(key=lambda value: int(value[1:]))
+    group_ids = sorted(
+        group_first_evidence,
+        key=lambda value: group_first_evidence[value],
+    )
     return evidence_ids, group_ids
 
 
@@ -919,9 +941,12 @@ def _mechanics_changes_use_new_evidence(
             raise MergeError(
                 f"candidate {candidate_id}.{collection_name} is malformed"
             )
-        for index, item in enumerate(new_items):
-            if index < len(old_items) and item == old_items[index]:
-                continue
+        if not _is_exact_prefix(old_items, new_items):
+            raise MergeError(
+                f"candidate {candidate_id}.{collection_name} must preserve "
+                "prior entries exactly"
+            )
+        for item in new_items[len(old_items) :]:
             evidence_ids = item.get("evidence_ids") if isinstance(item, dict) else None
             if not isinstance(evidence_ids, list) or not (
                 set(evidence_ids) & new_evidence_ids
@@ -930,6 +955,168 @@ def _mechanics_changes_use_new_evidence(
                     f"candidate {candidate_id}.{collection_name} changed "
                     "without newly appended evidence"
                 )
+
+
+def _validate_enrichment_candidate_update(
+    old: dict[str, Any] | None,
+    new: dict[str, Any],
+    *,
+    trigger_hits: dict[str, dict[str, Any]],
+    round_evidence_groups: set[str],
+) -> None:
+    candidate_id = new.get("id")
+    if not isinstance(candidate_id, str):
+        raise MergeError("candidate update lacks a string ID")
+    if set(new) != set(CANDIDATE_FIELDS):
+        raise MergeError(
+            f"candidate {candidate_id} fields differ from the global schema"
+        )
+    if old is not None:
+        if old.get("record_status") != "ACTIVE":
+            raise MergeError(
+                f"only ACTIVE candidate {candidate_id} may be enriched"
+            )
+        for field in CANDIDATE_ENRICHMENT_IMMUTABLE:
+            if new.get(field) != old.get(field):
+                raise MergeError(
+                    f"candidate {candidate_id} enrichment changes immutable "
+                    f"field {field}"
+                )
+        if new == old:
+            raise MergeError(f"candidate {candidate_id} update is unchanged")
+
+    new_evidence_ids = _candidate_new_evidence(
+        old,
+        new,
+        trigger_hits=trigger_hits,
+        round_evidence_groups=round_evidence_groups,
+    )
+    if old is None:
+        if new.get("record_status") != "ACTIVE":
+            raise MergeError(
+                f"new search candidate {candidate_id} must be ACTIVE"
+            )
+        anchor = new.get("discovery_anchor")
+        if (
+            not isinstance(anchor, dict)
+            or anchor.get("kind") != "SEARCH_HIT"
+            or anchor.get("id") not in trigger_hits
+        ):
+            raise MergeError(
+                f"new candidate {candidate_id} is not anchored to a new hit"
+            )
+        return
+
+    for field in (
+        "aliases",
+        "source_unit_ids",
+        "image_witnesses",
+        "source_status",
+        "evidence_strength",
+        "cross_reference_ids",
+    ):
+        old_values = old.get(field)
+        new_values = new.get(field)
+        if (
+            not isinstance(old_values, list)
+            or not isinstance(new_values, list)
+            or not _is_ordered_subset(old_values, new_values)
+        ):
+            raise MergeError(
+                f"candidate {candidate_id}.{field} deletes or rewrites "
+                "prior provenance"
+            )
+    _mechanics_changes_use_new_evidence(old, new, new_evidence_ids)
+
+
+def _canonical_audit_paths(
+    manifest: dict[str, Any],
+    requested: list[str],
+) -> list[str]:
+    document_by_path = {
+        document["path"]: document for document in manifest["documents"]
+    }
+    if (
+        not requested
+        or len(requested) != len(set(requested))
+        or any(path not in document_by_path for path in requested)
+    ):
+        raise MergeError(
+            "enrichment source_paths must be nonempty, unique corpus documents"
+        )
+    canonical = sorted(
+        requested,
+        key=lambda path: (
+            validate_audit.stage_for_document(document_by_path[path]),
+            int(document_by_path[path]["order"]),
+        ),
+    )
+    if requested != canonical:
+        raise MergeError(
+            "enrichment source_paths are not in canonical audit order"
+        )
+    return canonical
+
+
+def _validate_monotonic_search_append(
+    current: dict[str, Any],
+    proposed: dict[str, Any],
+    *,
+    epoch: int,
+) -> dict[str, Any]:
+    required_fields = {
+        "schema_version",
+        "phase",
+        "tool_assumptions",
+        "vocabulary",
+        "rounds",
+        "fixed_point",
+    }
+    if set(current) != required_fields or set(proposed) != required_fields:
+        raise MergeError("search state differs from the closed root contract")
+    if (
+        proposed["schema_version"] != current["schema_version"]
+        or proposed["phase"] != current["phase"]
+    ):
+        raise MergeError("search enrichment changes schema or phase")
+    for field in ("tool_assumptions", "vocabulary"):
+        old_values = current.get(field)
+        new_values = proposed.get(field)
+        if (
+            not isinstance(old_values, list)
+            or not isinstance(new_values, list)
+            or len(new_values) != len(set(new_values))
+            or not _is_exact_prefix(old_values, new_values)
+        ):
+            raise MergeError(
+                f"search enrichment may only append unique {field}"
+            )
+    current_rounds = current.get("rounds")
+    proposed_rounds = proposed.get("rounds")
+    if (
+        not isinstance(current_rounds, list)
+        or not isinstance(proposed_rounds, list)
+        or len(proposed_rounds) != len(current_rounds) + 1
+        or proposed_rounds[: len(current_rounds)] != current_rounds
+    ):
+        raise MergeError(
+            "search enrichment must preserve all rounds exactly and append one"
+        )
+    if proposed.get("fixed_point") is not None:
+        raise MergeError("search enrichment must invalidate fixed_point")
+    new_round = proposed_rounds[-1]
+    if (
+        not isinstance(new_round, dict)
+        or new_round.get("epoch") != epoch
+        or new_round.get("kind") not in {"LOCAL", "SATURATION"}
+    ):
+        raise MergeError(
+            "appended search round must be LOCAL or SATURATION in the active epoch"
+        )
+    hits = new_round.get("hits")
+    if not isinstance(hits, list) or not hits:
+        raise MergeError("search enrichment round must contain trigger hits")
+    return new_round
 
 
 def _snapshot(goal_dir: Path) -> tuple[dict[str, bytes], dict[str, int]]:
@@ -1610,14 +1797,562 @@ def prepare_merge(
     )
 
 
-def _assert_snapshot_unchanged(plan: MergePlan) -> None:
+def prepare_search_enrichment(
+    proposal_path: Path,
+    *,
+    goal_dir: Path = GOAL_DIR,
+) -> SearchEnrichmentPlan:
+    """Validate one prepared search-enrichment proposal without writing it."""
+
+    proposal_path = proposal_path.resolve()
+    goal_dir = goal_dir.resolve()
+    proposal_bytes, proposal = _load_enrichment_proposal(proposal_path)
+    original_bytes, original_modes = _snapshot(goal_dir)
+
+    declared_base = proposal["base_artifact_sha256"]
+    expected_base = {
+        name: hashlib.sha256(original_bytes[name]).hexdigest()
+        for name in WRITE_NAMES
+    }
+    if declared_base != expected_base:
+        raise MergeError(
+            "enrichment proposal base artifact digests are stale or incomplete"
+        )
+
+    try:
+        manifest = _load_json_object_bytes(
+            original_bytes[MANIFEST_NAME],
+            MANIFEST_NAME,
+        )
+        units = _read_jsonl_bytes(original_bytes[UNITS_NAME], UNITS_NAME)
+        reading = _read_csv_bytes(
+            original_bytes[READING_NAME],
+            READING_NAME,
+            READING_HEADER,
+        )
+        candidates = _read_jsonl_bytes(
+            original_bytes[CANDIDATE_NAME],
+            CANDIDATE_NAME,
+        )
+        routes = _read_csv_bytes(
+            original_bytes[ROUTE_NAME],
+            ROUTE_NAME,
+            CROSS_REFERENCE_HEADER,
+        )
+        assets = _read_csv_bytes(
+            original_bytes[ASSET_NAME],
+            ASSET_NAME,
+            ASSET_HEADER,
+        )
+        search = _load_json_object_bytes(
+            original_bytes[SEARCH_NAME],
+            SEARCH_NAME,
+        )
+        review_history = _read_jsonl_bytes(
+            original_bytes[REVIEW_HISTORY_NAME],
+            REVIEW_HISTORY_NAME,
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise MergeError(f"cannot load current audit state: {exc}") from exc
+
+    current_errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        review_history,
+    )
+    if current_errors:
+        raise MergeError(
+            "search enrichment requires a valid current audit state:\n- "
+            + "\n- ".join(current_errors)
+        )
+
+    epoch = proposal["epoch"]
+    active_epoch = _active_review_epoch(review_history)
+    if epoch != active_epoch:
+        raise MergeError(
+            f"search enrichment epoch {epoch} differs from active epoch "
+            f"{active_epoch}"
+        )
+    source_paths = tuple(
+        _canonical_audit_paths(manifest, proposal["source_paths"])
+    )
+    source_path_set = set(source_paths)
+    reading_by_id = {row["source_unit_id"]: row for row in reading}
+    asset_by_id = {row["asset_id"]: row for row in assets}
+    unit_by_id = {unit["id"]: unit for unit in units}
+    document_by_path = {
+        document["path"]: document for document in manifest["documents"]
+    }
+    for path in source_paths:
+        if not _path_is_complete(path, reading, assets):
+            raise MergeError(
+                f"search enrichment path is not already fully reviewed: {path}"
+            )
+
+    proposed_search = proposal["proposed_search"]
+    try:
+        search_schema = json.loads(
+            (
+                goal_dir
+                / "schemas"
+                / "blind"
+                / "search-rounds.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+    except (OSError, json.JSONDecodeError) as exc:
+        raise MergeError(f"cannot load search schema: {exc}") from exc
+    search_schema_errors = build_worker_bundle.json_schema_errors(
+        proposed_search,
+        search_schema,
+        "proposed-search",
+    )
+    if search_schema_errors:
+        raise MergeError(
+            "proposed search schema failed:\n- "
+            + "\n- ".join(search_schema_errors)
+        )
+    new_round = _validate_monotonic_search_append(
+        search,
+        proposed_search,
+        epoch=epoch,
+    )
+    search_round_id = new_round.get("round_id")
+    if not isinstance(search_round_id, str):
+        raise MergeError("appended search round lacks a round_id")
+    hit_rows = new_round.get("hits", [])
+    trigger_hits: dict[str, dict[str, Any]] = {}
+    hit_paths: dict[str, str] = {}
+    candidate_ids_by_unit: dict[str, set[str]] = {}
+    route_ids_by_unit: dict[str, set[str]] = {}
+    candidate_ids_by_path: dict[str, set[str]] = {}
+    route_ids_by_path: dict[str, set[str]] = {}
+    for hit in hit_rows:
+        if not isinstance(hit, dict):
+            raise MergeError("appended search round contains a non-object hit")
+        hit_id = hit.get("hit_id")
+        unit_id = hit.get("source_unit_id")
+        if (
+            not isinstance(hit_id, str)
+            or hit_id in trigger_hits
+            or not isinstance(unit_id, str)
+            or unit_id not in unit_by_id
+        ):
+            raise MergeError("appended search round has invalid trigger hits")
+        trigger_hits[hit_id] = hit
+        path = unit_by_id[unit_id]["path"]
+        hit_paths[hit_id] = path
+        candidate_links = hit.get("candidate_ids")
+        route_links = hit.get("route_ids")
+        if not isinstance(candidate_links, list) or not all(
+            isinstance(value, str) for value in candidate_links
+        ):
+            raise MergeError(f"search hit {hit_id} has invalid candidate links")
+        if not isinstance(route_links, list) or not all(
+            isinstance(value, str) for value in route_links
+        ):
+            raise MergeError(f"search hit {hit_id} has invalid route links")
+        candidate_ids_by_unit.setdefault(unit_id, set()).update(candidate_links)
+        route_ids_by_unit.setdefault(unit_id, set()).update(route_links)
+        candidate_ids_by_path.setdefault(path, set()).update(candidate_links)
+        route_ids_by_path.setdefault(path, set()).update(route_links)
+
+    hits_for_declared_paths = {
+        hit_id: hit
+        for hit_id, hit in trigger_hits.items()
+        if hit_paths[hit_id] in source_path_set
+    }
+    if any(
+        not any(hit_paths[hit_id] == path for hit_id in hits_for_declared_paths)
+        for path in source_paths
+    ):
+        raise MergeError(
+            "every enrichment source path must have a new trigger hit"
+        )
+
+    reading_updates = proposal["reading_updates"]
+    reading_update_by_id: dict[str, dict[str, str]] = {}
+    changed_paths: set[str] = set()
+    for update in reading_updates:
+        unit_id = update["source_unit_id"]
+        if unit_id in reading_update_by_id:
+            raise MergeError(f"duplicate enrichment reading update: {unit_id}")
+        old = reading_by_id.get(unit_id)
+        if old is None:
+            raise MergeError(f"enrichment reading update is unknown: {unit_id}")
+        path = old["path"]
+        if path not in source_path_set:
+            raise MergeError(
+                f"enrichment reading update lies outside source_paths: {unit_id}"
+            )
+        if update == old:
+            raise MergeError(f"enrichment reading update is unchanged: {unit_id}")
+        if unit_id not in candidate_ids_by_unit and unit_id not in route_ids_by_unit:
+            if not any(
+                hit.get("source_unit_id") == unit_id
+                for hit in hits_for_declared_paths.values()
+            ):
+                raise MergeError(
+                    f"reading {unit_id} changed without a new search hit"
+                )
+        allowed = READING_ENRICHMENT_SCALARS | READING_ENRICHMENT_ARRAYS
+        for field in READING_HEADER:
+            if field not in allowed and update[field] != old[field]:
+                raise MergeError(
+                    f"reading {unit_id} changes completion/identity field {field}"
+                )
+        for field in READING_ENRICHMENT_ARRAYS:
+            _, additions = _validate_string_array_additions(
+                old[field],
+                update[field],
+                f"reading {unit_id}.{field}",
+            )
+            if field == "candidate_ids" and not set(additions).issubset(
+                candidate_ids_by_unit.get(unit_id, set())
+            ):
+                raise MergeError(
+                    f"reading {unit_id} adds candidate links absent from its hit"
+                )
+            if field == "route_ids" and not set(additions).issubset(
+                route_ids_by_unit.get(unit_id, set())
+            ):
+                raise MergeError(
+                    f"reading {unit_id} adds route links absent from its hit"
+                )
+        reading_update_by_id[unit_id] = update
+        changed_paths.add(path)
+    proposed_reading = [
+        reading_update_by_id.get(row["source_unit_id"], row)
+        for row in reading
+    ]
+
+    asset_updates = proposal["asset_updates"]
+    asset_update_by_id: dict[str, dict[str, str]] = {}
+    for update in asset_updates:
+        asset_id = update["asset_id"]
+        if asset_id in asset_update_by_id:
+            raise MergeError(f"duplicate enrichment asset update: {asset_id}")
+        old = asset_by_id.get(asset_id)
+        if old is None:
+            raise MergeError(f"enrichment asset update is unknown: {asset_id}")
+        path = old["assignment_path"]
+        if path not in source_path_set:
+            raise MergeError(
+                f"enrichment asset update lies outside source_paths: {asset_id}"
+            )
+        if update == old:
+            raise MergeError(f"enrichment asset update is unchanged: {asset_id}")
+        for field in ASSET_HEADER:
+            if field not in ASSET_ENRICHMENT_ARRAYS and update[field] != old[field]:
+                raise MergeError(
+                    f"asset {asset_id} changes visual/completion field {field}"
+                )
+        for field in ASSET_ENRICHMENT_ARRAYS:
+            _, additions = _validate_string_array_additions(
+                old[field],
+                update[field],
+                f"asset {asset_id}.{field}",
+            )
+            permitted = (
+                candidate_ids_by_path
+                if field == "candidate_ids"
+                else route_ids_by_path
+            )
+            if not set(additions).issubset(permitted.get(path, set())):
+                raise MergeError(
+                    f"asset {asset_id} adds {field} absent from path hits"
+                )
+        asset_update_by_id[asset_id] = update
+        changed_paths.add(path)
+    proposed_assets = [
+        asset_update_by_id.get(row["asset_id"], row) for row in assets
+    ]
+
+    candidate_updates = proposal["candidate_updates"]
+    candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
+    candidate_update_by_id: dict[str, dict[str, Any]] = {}
+    appended_candidates: list[dict[str, Any]] = []
+    appended_evidence: list[dict[str, Any]] = []
+    round_evidence_groups = set(new_round.get("new_evidence_groups", []))
+    for update in candidate_updates:
+        candidate_id = update.get("id")
+        if not isinstance(candidate_id, str) or candidate_id in candidate_update_by_id:
+            raise MergeError("candidate updates have invalid or duplicate IDs")
+        old = candidate_by_id.get(candidate_id)
+        _validate_enrichment_candidate_update(
+            old,
+            update,
+            trigger_hits=hits_for_declared_paths,
+            round_evidence_groups=round_evidence_groups,
+        )
+        if candidate_id not in {
+            value
+            for hit in hits_for_declared_paths.values()
+            for value in hit.get("candidate_ids", [])
+        }:
+            raise MergeError(
+                f"candidate {candidate_id} update is absent from trigger hits"
+            )
+        prior_evidence_count = (
+            len(old["source_evidence"]) if old is not None else 0
+        )
+        new_evidence = update["source_evidence"][prior_evidence_count:]
+        appended_evidence.extend(new_evidence)
+        for evidence in new_evidence:
+            anchor = evidence["discovery_anchor"]
+            changed_paths.add(hit_paths[anchor["id"]])
+        candidate_update_by_id[candidate_id] = update
+        if old is None:
+            appended_candidates.append(update)
+
+    existing_candidate_ids = [candidate["id"] for candidate in candidates]
+    appended_candidate_ids = [
+        candidate["id"] for candidate in appended_candidates
+    ]
+    _sequence(
+        existing_candidate_ids + appended_candidate_ids,
+        "B",
+        4,
+        "proposed candidate",
+    )
+    existing_evidence_ids, existing_group_ids = _existing_evidence_sequences(
+        candidates
+    )
+    appended_evidence_ids = [
+        str(evidence.get("evidence_id")) for evidence in appended_evidence
+    ]
+    _sequence(
+        existing_evidence_ids + appended_evidence_ids,
+        "E",
+        6,
+        "proposed evidence",
+    )
+    seen_groups = set(existing_group_ids)
+    appended_group_ids: list[str] = []
+    for evidence in appended_evidence:
+        group_id = evidence.get("evidence_group_id")
+        if not isinstance(group_id, str):
+            raise MergeError("appended evidence lacks an evidence group")
+        if group_id not in seen_groups:
+            seen_groups.add(group_id)
+            appended_group_ids.append(group_id)
+    _sequence(
+        existing_group_ids + appended_group_ids,
+        "G",
+        6,
+        "proposed evidence-group",
+    )
+    if appended_group_ids != new_round.get("new_evidence_groups"):
+        raise MergeError(
+            "appended candidate evidence groups differ from search-round delta"
+        )
+    proposed_candidates = [
+        candidate_update_by_id.get(candidate["id"], candidate)
+        for candidate in candidates
+    ] + appended_candidates
+
+    route_appends = proposal["route_appends"]
+    appended_route_ids: list[str] = []
+    for route in route_appends:
+        route_id = route["route_id"]
+        if route_id in appended_route_ids:
+            raise MergeError(f"duplicate appended route: {route_id}")
+        appended_route_ids.append(route_id)
+        if (
+            route.get("discovery_kind") != "SEARCH_HIT"
+            or route.get("discovery_id") not in hits_for_declared_paths
+            or route_id
+            not in route_ids_by_path.get(
+                hit_paths.get(route.get("discovery_id"), ""),
+                set(),
+            )
+        ):
+            raise MergeError(
+                f"appended route {route_id} is not tied to a new trigger hit"
+            )
+        changed_paths.add(hit_paths[route["discovery_id"]])
+    _sequence(
+        [route["route_id"] for route in routes] + appended_route_ids,
+        "R",
+        6,
+        "proposed route",
+    )
+    if appended_route_ids != new_round.get("new_routes"):
+        raise MergeError(
+            "appended routes differ from the search-round route delta"
+        )
+    proposed_routes = routes + route_appends
+
+    if appended_candidate_ids != new_round.get("new_candidates"):
+        raise MergeError(
+            "appended candidates differ from the search-round candidate delta"
+        )
+    if not (
+        reading_updates
+        or asset_updates
+        or candidate_updates
+        or route_appends
+    ):
+        raise MergeError("search enrichment has no semantic ledger delta")
+    if changed_paths != source_path_set:
+        raise MergeError(
+            "enrichment source_paths differ from paths with semantic deltas"
+        )
+
+    next_review_number = _review_sequence(review_history) + 1
+    prior_event_sha256 = review_history[-1]["event_sha256"]
+    latest_path_result_sha256 = {
+        event["source_paths"][0]: event["result_projection_sha256"]
+        for event in review_history
+        if isinstance(event, dict)
+        and isinstance(event.get("source_paths"), list)
+        and len(event["source_paths"]) == 1
+        and isinstance(event.get("result_projection_sha256"), str)
+    }
+    proposed_reading_by_id = {
+        row["source_unit_id"]: row for row in proposed_reading
+    }
+    proposed_asset_by_id = {row["asset_id"]: row for row in proposed_assets}
+    coordinator_id = proposal["coordinator_id"]
+    review_events: list[dict[str, Any]] = []
+    for offset, path in enumerate(source_paths):
+        previous_path_digest = latest_path_result_sha256.get(path)
+        if previous_path_digest is None:
+            raise MergeError(
+                f"search enrichment path lacks prior result history: {path}"
+            )
+        path_hit_ids = [
+            hit["hit_id"]
+            for hit in hit_rows
+            if hit.get("source_unit_id") in unit_by_id
+            and unit_by_id[hit["source_unit_id"]]["path"] == path
+        ]
+        event_core = {
+            "review_id": f"V{next_review_number + offset:06d}",
+            "epoch": epoch,
+            "stage": validate_audit.stage_for_document(
+                document_by_path[path]
+            ),
+            "mode": "SEARCH_ENRICHMENT",
+            "reviewer": coordinator_id,
+            "source_paths": [path],
+            "source_unit_ids": [
+                unit["id"] for unit in units if unit["path"] == path
+            ],
+            "asset_ids": [
+                asset["asset_id"]
+                for asset in assets
+                if asset["assignment_path"] == path
+            ],
+            "previous_path_result_sha256": previous_path_digest,
+            "trigger_search_kind": new_round["kind"],
+            "trigger_hit_ids": path_hit_ids,
+        }
+        event = close_review_event(
+            event_core,
+            unit_by_id,
+            proposed_reading_by_id,
+            proposed_asset_by_id,
+            prior_event_sha256,
+            proposed_search["rounds"],
+        )
+        event = {field: event[field] for field in REVIEW_HISTORY_FIELDS}
+        review_events.append(event)
+        prior_event_sha256 = event["event_sha256"]
+        latest_path_result_sha256[path] = event[
+            "result_projection_sha256"
+        ]
+    proposed_review_history = review_history + review_events
+
+    validation_errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        proposed_reading,
+        proposed_candidates,
+        proposed_routes,
+        proposed_assets,
+        proposed_search,
+        proposed_review_history,
+    )
+    if validation_errors:
+        raise MergeError(
+            "proposed search enrichment failed full validation:\n- "
+            + "\n- ".join(validation_errors)
+        )
+
+    proposed_bytes = {
+        CANDIDATE_NAME: _jsonl_bytes(proposed_candidates),
+        ROUTE_NAME: _append_csv(
+            original_bytes[ROUTE_NAME],
+            CROSS_REFERENCE_HEADER,
+            route_appends,
+        ),
+        READING_NAME: build_worker_bundle.csv_bytes(
+            READING_HEADER,
+            proposed_reading,
+        ),
+        ASSET_NAME: build_worker_bundle.csv_bytes(
+            ASSET_HEADER,
+            proposed_assets,
+        ),
+        SEARCH_NAME: build_worker_bundle.canonical_json_bytes(
+            proposed_search
+        ),
+        REVIEW_HISTORY_NAME: _append_jsonl(
+            original_bytes[REVIEW_HISTORY_NAME],
+            review_events,
+        ),
+    }
+    if proposal_path.read_bytes() != proposal_bytes:
+        raise MergeError("enrichment proposal changed during validation")
+    for name, expected in original_bytes.items():
+        path = goal_dir / name
+        if (
+            not path.is_file()
+            or path.is_symlink()
+            or path.read_bytes() != expected
+            or (path.stat().st_mode & 0o777) != original_modes[name]
+        ):
+            raise MergeError(
+                f"global audit state changed during enrichment planning: {name}"
+            )
+
+    return SearchEnrichmentPlan(
+        proposal=proposal_path,
+        goal_dir=goal_dir,
+        coordinator_id=coordinator_id,
+        epoch=epoch,
+        source_paths=source_paths,
+        search_round_id=search_round_id,
+        trigger_hit_ids=tuple(trigger_hits),
+        review_ids=tuple(event["review_id"] for event in review_events),
+        reading_update_count=len(reading_updates),
+        asset_update_count=len(asset_updates),
+        candidate_update_count=(
+            len(candidate_updates) - len(appended_candidates)
+        ),
+        candidate_append_count=len(appended_candidates),
+        route_append_count=len(route_appends),
+        original_bytes=original_bytes,
+        original_modes=original_modes,
+        proposed_bytes=proposed_bytes,
+    )
+
+
+def _assert_snapshot_unchanged(
+    plan: MergePlan | SearchEnrichmentPlan,
+) -> None:
     for name, expected in plan.original_bytes.items():
         path = plan.goal_dir / name
         if not path.is_file() or path.is_symlink() or path.read_bytes() != expected:
             raise MergeError(f"global audit state changed concurrently: {name}")
 
 
-def apply_merge(plan: MergePlan) -> None:
+def apply_merge(plan: MergePlan | SearchEnrichmentPlan) -> None:
     """Commit a validated plan from same-filesystem staging files."""
 
     _assert_snapshot_unchanged(plan)
@@ -1704,7 +2439,17 @@ def apply_merge(plan: MergePlan) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("bundle", type=Path)
+    parser.add_argument(
+        "bundle",
+        type=Path,
+        nargs="?",
+        help="sealed sequential-review worker bundle",
+    )
+    parser.add_argument(
+        "--search-enrichment",
+        type=Path,
+        help="closed SEARCH_ENRICHMENT coordinator proposal JSON",
+    )
     parser.add_argument("--goal-dir", type=Path, default=GOAL_DIR)
     parser.add_argument(
         "--apply",
@@ -1713,7 +2458,20 @@ def main() -> int:
     )
     args = parser.parse_args()
     try:
-        plan = prepare_merge(args.bundle, goal_dir=args.goal_dir)
+        if (args.bundle is None) == (args.search_enrichment is None):
+            raise MergeError(
+                "provide exactly one worker bundle or --search-enrichment proposal"
+            )
+        if args.search_enrichment is not None:
+            plan: MergePlan | SearchEnrichmentPlan = (
+                prepare_search_enrichment(
+                    args.search_enrichment,
+                    goal_dir=args.goal_dir,
+                )
+            )
+        else:
+            assert args.bundle is not None
+            plan = prepare_merge(args.bundle, goal_dir=args.goal_dir)
         if args.apply:
             apply_merge(plan)
         summary = plan.preview()

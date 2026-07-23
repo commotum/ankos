@@ -1689,7 +1689,10 @@ def validate_review_history(
     search_rounds = search.get("rounds", []) if isinstance(search, dict) else []
     if not isinstance(search_rounds, list):
         search_rounds = []
-    hit_meta: dict[str, tuple[int, int, str, str]] = {}
+    hit_meta: dict[
+        str,
+        tuple[int, int, str, str, str, set[str], set[str]],
+    ] = {}
     for round_position, round_record in enumerate(search_rounds, start=1):
         if not isinstance(round_record, dict):
             continue
@@ -1708,6 +1711,17 @@ def validate_review_history(
                     epoch,
                     kind,
                     hit["source_unit_id"],
+                    str(hit.get("disposition", "")),
+                    {
+                        value
+                        for value in hit.get("candidate_ids", [])
+                        if isinstance(value, str)
+                    },
+                    {
+                        value
+                        for value in hit.get("route_ids", [])
+                        if isinstance(value, str)
+                    },
                 )
 
     history_epochs: set[int] = set()
@@ -1896,6 +1910,10 @@ def validate_review_history(
             errors,
         )
         trigger_unit_ids: set[str] = set()
+        trigger_candidate_ids_by_unit: dict[str, set[str]] = {}
+        trigger_route_ids_by_unit: dict[str, set[str]] = {}
+        trigger_candidate_ids: set[str] = set()
+        trigger_route_ids: set[str] = set()
         if is_review_event:
             if trigger_kind is not None or trigger_hit_ids:
                 errors.append(f"{prefix} review event carries search triggers")
@@ -1918,7 +1936,15 @@ def validate_review_history(
                 if meta is None:
                     errors.append(f"{prefix} trigger hit {hit_id} is unknown")
                     continue
-                round_position, hit_epoch, hit_kind, unit_id = meta
+                (
+                    round_position,
+                    hit_epoch,
+                    hit_kind,
+                    unit_id,
+                    disposition,
+                    hit_candidate_ids,
+                    hit_route_ids,
+                ) = meta
                 if not prior_path_prefix_count < round_position <= prefix_count:
                     errors.append(
                         f"{prefix} trigger hit {hit_id} is not newly visible"
@@ -1927,6 +1953,10 @@ def validate_review_history(
                     errors.append(
                         f"{prefix} trigger hit {hit_id} has wrong epoch/kind"
                     )
+                if disposition == "EXCLUSION":
+                    errors.append(
+                        f"{prefix} EXCLUSION hit {hit_id} cannot authorize enrichment"
+                    )
                 source_unit = unit_by_id.get(unit_id)
                 if source_unit is None or source_unit["path"] != event_path:
                     errors.append(
@@ -1934,6 +1964,14 @@ def validate_review_history(
                     )
                 else:
                     trigger_unit_ids.add(unit_id)
+                    trigger_candidate_ids_by_unit.setdefault(
+                        unit_id, set()
+                    ).update(hit_candidate_ids)
+                    trigger_route_ids_by_unit.setdefault(
+                        unit_id, set()
+                    ).update(hit_route_ids)
+                    trigger_candidate_ids.update(hit_candidate_ids)
+                    trigger_route_ids.update(hit_route_ids)
 
         snapshot = _validate_history_snapshot(
             event,
@@ -1973,6 +2011,10 @@ def validate_review_history(
                         previous_snapshot,
                         snapshot,
                         trigger_unit_ids,
+                        trigger_candidate_ids_by_unit,
+                        trigger_route_ids_by_unit,
+                        trigger_candidate_ids,
+                        trigger_route_ids,
                         errors,
                         prefix,
                     )
@@ -2548,34 +2590,63 @@ def validate_objects(
         for evidence in candidate.get("source_evidence", [])
         if isinstance(evidence, dict)
     ]
-    expected_evidence_id_order = [
+    expected_evidence_ids = {
         f"E{index:06d}" for index in range(1, len(evidence_id_order) + 1)
-    ]
-    if evidence_id_order != expected_evidence_id_order:
+    }
+    if (
+        len(evidence_id_order) != len(set(evidence_id_order))
+        or set(evidence_id_order) != expected_evidence_ids
+    ):
         errors.append(
-            "evidence IDs are not in exact append-only E allocation order"
+            "global evidence IDs are not a unique contiguous E allocation"
         )
+    for candidate in candidates:
+        local_ids = [
+            evidence.get("evidence_id")
+            for evidence in candidate.get("source_evidence", [])
+            if isinstance(evidence, dict)
+        ]
+        if local_ids != sorted(
+            local_ids,
+            key=lambda value: (
+                int(value[1:])
+                if isinstance(value, str) and E_ID.fullmatch(value)
+                else 10**9
+            ),
+        ):
+            errors.append(
+                f"candidate {candidate.get('id')} evidence IDs are not "
+                "strictly increasing"
+            )
 
     candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
     evidence_by_group: dict[str, list[tuple[str, dict[str, Any]]]] = {}
-    evidence_group_first_order: list[str] = []
+    evidence_group_minimum_e: dict[str, int] = {}
     for candidate in candidates:
         for evidence in candidate.get("source_evidence", []):
             if isinstance(evidence, dict):
                 group_id = str(evidence.get("evidence_group_id", ""))
-                if group_id not in evidence_by_group:
-                    evidence_group_first_order.append(group_id)
                 evidence_by_group.setdefault(group_id, []).append(
                     (candidate["id"], evidence)
                 )
-    expected_group_first_order = [
-        f"G{index:06d}"
-        for index in range(1, len(evidence_group_first_order) + 1)
+                evidence_id = evidence.get("evidence_id")
+                if isinstance(evidence_id, str) and E_ID.fullmatch(evidence_id):
+                    evidence_group_minimum_e[group_id] = min(
+                        evidence_group_minimum_e.get(group_id, 10**9),
+                        int(evidence_id[1:]),
+                    )
+    expected_group_ids = [
+        f"G{index:06d}" for index in range(1, len(evidence_by_group) + 1)
     ]
-    if evidence_group_first_order != expected_group_first_order:
+    if set(evidence_by_group) != set(expected_group_ids):
+        errors.append("global evidence-group IDs are not contiguous")
+    groups_by_first_evidence = sorted(
+        evidence_by_group,
+        key=lambda group_id: evidence_group_minimum_e.get(group_id, 10**9),
+    )
+    if groups_by_first_evidence != expected_group_ids:
         errors.append(
-            "evidence-group first occurrences are not in exact append-only "
-            "G allocation order"
+            "evidence-group numeric order differs from minimum-E allocation order"
         )
     split_children: set[str] = set()
     supersession_targets: dict[str, list[str]] = {
@@ -5661,6 +5732,181 @@ def mutation_checks(
                     f"{mutation_name} did not preserve replay/digest validity: "
                     + "; ".join(replay_or_digest_errors)
                 )
+
+        governed_hit = next(
+            hit
+            for hit in active_search_round["hits"]
+            if hit["source_unit_id"] == unit_id
+        )
+        local_enriched_reading = copy.deepcopy(search_reading)
+        local_enriched_reading[0]["evidence_statement"] = (
+            "The original review plus the later LOCAL hit supports this "
+            "fixture construction."
+        )
+        local_enrichment_history = append_history_event(
+            search_history,
+            local_enriched_reading,
+            search_assets,
+            path,
+            2,
+            "SEARCH_ENRICHMENT",
+            "fixture-search-enricher",
+            search_fixture["rounds"],
+            "LOCAL",
+            [governed_hit["hit_id"]],
+        )
+        local_enrichment_errors = validate_objects(
+            manifest,
+            units,
+            local_enriched_reading,
+            base_candidates,
+            base_routes,
+            search_assets,
+            search_fixture,
+            local_enrichment_history,
+        )
+        if local_enrichment_errors:
+            failures.append(
+                "valid post-review LOCAL enrichment fixture failed: "
+                + "; ".join(local_enrichment_errors)
+            )
+
+        expect_history_failure(
+            "silent evidence amendment without enrichment event",
+            local_enriched_reading,
+            base_candidates,
+            base_routes,
+            search_assets,
+            search_fixture,
+            search_history,
+        )
+        silent_disposition = copy.deepcopy(search_reading)
+        silent_disposition[0]["review_disposition"] = "SUPPORTS_CANDIDATE"
+        expect_history_failure(
+            "silent disposition amendment without enrichment event",
+            silent_disposition,
+            base_candidates,
+            base_routes,
+            search_assets,
+            search_fixture,
+            search_history,
+        )
+        untriggered_history = append_history_event(
+            search_history,
+            local_enriched_reading,
+            search_assets,
+            path,
+            2,
+            "SEARCH_ENRICHMENT",
+            "fixture-search-enricher",
+            search_fixture["rounds"],
+        )
+        expect_history_failure(
+            "untriggered search enrichment",
+            local_enriched_reading,
+            base_candidates,
+            base_routes,
+            search_assets,
+            search_fixture,
+            untriggered_history,
+        )
+
+        exclusion_hit = next(
+            (
+                hit
+                for hit in active_search_round["hits"]
+                if hit["disposition"] == "EXCLUSION"
+            ),
+            None,
+        )
+        if exclusion_hit is not None:
+            exclusion_reading = copy.deepcopy(search_reading)
+            exclusion_index = next(
+                index
+                for index, row in enumerate(exclusion_reading)
+                if row["source_unit_id"] == exclusion_hit["source_unit_id"]
+            )
+            exclusion_reading[exclusion_index]["evidence_statement"] = (
+                "An EXCLUSION result must not authorize this amendment."
+            )
+            exclusion_history = append_history_event(
+                search_history,
+                exclusion_reading,
+                search_assets,
+                path,
+                2,
+                "SEARCH_ENRICHMENT",
+                "fixture-search-enricher",
+                search_fixture["rounds"],
+                "LOCAL",
+                [exclusion_hit["hit_id"]],
+            )
+            expect_history_failure(
+                "EXCLUSION hit authorizes an amendment",
+                exclusion_reading,
+                base_candidates,
+                base_routes,
+                search_assets,
+                search_fixture,
+                exclusion_history,
+            )
+
+        previous_snapshot = search_history[-1]["result_snapshot"]
+        unrelated_snapshot = copy.deepcopy(
+            local_enrichment_history[-1]["result_snapshot"]
+        )
+        unrelated_snapshot["reading_results"][0][
+            "candidate_ids"
+        ] = '["B0001","B9999"]'
+        unrelated_errors: list[str] = []
+        _validate_search_enrichment_diff(
+            previous_snapshot,
+            unrelated_snapshot,
+            {unit_id},
+            {unit_id: {"B0001"}},
+            {unit_id: set()},
+            {"B0001"},
+            set(),
+            unrelated_errors,
+            "unrelated-link fixture",
+        )
+        if not any("unrelated candidate links" in error for error in unrelated_errors):
+            failures.append(
+                "unrelated candidate-link enrichment mutation unexpectedly passed"
+            )
+
+        asset_snapshot = defect_asset_history[-1]["result_snapshot"]
+        illegal_asset_snapshot = copy.deepcopy(asset_snapshot)
+        illegal_asset_snapshot["asset_results"][0]["visual_role"] = "CONTROL"
+        illegal_asset_errors: list[str] = []
+        _validate_search_enrichment_diff(
+            asset_snapshot,
+            illegal_asset_snapshot,
+            set(),
+            {},
+            {},
+            set(),
+            set(),
+            illegal_asset_errors,
+            "illegal-asset fixture",
+        )
+        if not any(
+            "immutable asset fields" in error for error in illegal_asset_errors
+        ):
+            failures.append(
+                "illegal image-role enrichment mutation unexpectedly passed"
+            )
+        silent_image_role = copy.deepcopy(defect_asset)
+        silent_image_role[defect_asset_index]["visual_role"] = "CONTROL"
+        expect_history_failure(
+            "silent image-role amendment without enrichment event",
+            defect_asset_reading,
+            base_candidates,
+            base_routes,
+            silent_image_role,
+            base_search,
+            defect_asset_history,
+        )
 
         stale_digest = copy.deepcopy(search_fixture)
         stale_digest["rounds"][1]["result_digest"] = "0" * 64
