@@ -608,7 +608,7 @@ context_evidence(
     "eca-rule-45-name",
     "U000345",
     "The following label names the preceding evolution as rule 45.",
-    strength="DIRECT_IDENTITY",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 eca_rules[73] = eca_preset(
     73,
@@ -966,6 +966,7 @@ tot_codes[1635]["source_status"] = ["CLEAR", "DEFECTIVE"]
 tot_codes[1635]["uncertainties"].append(
     "The page-81 trajectory is intact but its code-1635 label is clipped; the later continuation and explicit label resolve the identity."
 )
+tot_codes[1635]["evidence"][0]["fields"] = ["visible_history", "result_kind"]
 tot_codes[2049] = totalistic_preset(
     2049,
     "U000375",
@@ -994,12 +995,17 @@ context_evidence(
     image_path="CHAPTERS/_page_82_Picture_1.jpeg",
     strength="CORROBORATING",
 )
-context_evidence(
+evidence(
     tot_codes[1635],
     "totalistic-code-1635-name",
     "U000378",
-    "The following source label identifies the long evolution as code 1635.",
-    strength="DIRECT_IDENTITY",
+    (
+        "The explicit code-1635 label resolves the earlier clipped trajectory; "
+        "together with the already established seven-case ternary codec, it "
+        "fixes the preset's identity and complete local law."
+    ),
+    list(tot_codes[1635]["facts"]) + list(tot_codes[1635]["not_applicable"]),
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 tot_codes[1599] = totalistic_preset(
     1599,
@@ -1201,7 +1207,7 @@ MOBILE_BASE = trajectory_facts(
     schedule="One active-cell update and one left/right move per step.",
     read="The old colors of left neighbor, active cell, and right neighbor.",
     law_kind="A deterministic eight-case active-cell lookup.",
-    law="For each three-color case, choose the active cell's new color and move direction left or right.",
+    law="For each three-cell color case, choose the active cell's new color and move direction left or right.",
     write="Update the source active cell's color and move the active marker one cell.",
     result="A new binary line and active-cell position.",
     variants="There are 65,536 standard rules; extended rules may also write neighbors.",
@@ -2952,51 +2958,11 @@ random_seed = source_candidate(
 
 # Literal construction-bearing routes.  Workers propose them but do not resolve.
 add_route(
-    "four-ca-previous-chapter",
-    "U000315",
-    "Four basic examples from the previous chapter of behavior produced by cellular automata with simple underlying rules.",
-    "the four prior cellular-automaton construction examples",
-    ["previous chapter", "four basic examples", "cellular automata"],
-    kind="SECTION",
-)
-add_route(
-    "ca-setup-previous-chapter",
-    "U000316",
-    "the array of black and white cells in the cellular automata of the previous chapter",
-    "the prior chapter's cellular-automaton setup",
-    ["previous chapter", "cellular automata", "black and white cells"],
-    kind="SECTION",
-)
-add_route(
     "rule90-page26",
     "U000339",
     "rule 90 from page 26",
     "rule 90 construction and comparison",
     ["rule 90", "page 26", "nested pattern"],
-)
-add_route(
-    "randomness-previous-chapter",
-    "U000340",
-    "as we saw in the previous chapter",
-    "prior cellular-automaton examples of apparent randomness",
-    ["previous chapter", "cellular automata", "apparent randomness"],
-    kind="SECTION",
-)
-add_route(
-    "rule110-previous-chapter",
-    "U000348",
-    "the last example in the previous chapter was rule 110",
-    "prior rule-110 construction and localized-structure behavior",
-    ["previous chapter", "rule 110", "regular and irregular parts"],
-    kind="SECTION",
-)
-add_route(
-    "ca-phenomena-previous-chapter",
-    "U000372",
-    "the fundamental phenomena that we discovered in the previous chapter",
-    "prior cellular-automaton phenomena used for the chapter-wide comparison",
-    ["previous chapter", "cellular automata", "fundamental phenomena"],
-    kind="SECTION",
 )
 add_route(
     "rule110-page32",
@@ -3096,14 +3062,6 @@ add_route(
     kind="SECTION",
 )
 add_route(
-    "behavior-themes-previous-chapter",
-    "U000598",
-    "the basic themes of repetition, nesting, randomness and localized structures that we already saw in specific cellular automata in the previous chapter",
-    "prior cellular-automaton examples of the four behavior themes",
-    ["previous chapter", "repetition", "nesting", "randomness", "localized structures"],
-    kind="SECTION",
-)
-add_route(
     "register-page122",
     "U000560",
     "As discussed on page 122",
@@ -3142,12 +3100,41 @@ add_route(
     scope="WITHIN_STAGE",
 )
 
+# Bind construction-bearing routes to the candidates they qualify or locate.
+for _spec, _route_key in [
+    (eca_rules[90], "rule90-page26"),
+    (eca_rules[110], "rule110-page32"),
+    (tot_codes[1635], "totalistic-last-two-page66"),
+    (tot_codes[2049], "totalistic-last-two-page66"),
+    (balanced_sub, "substitution-original-page82-a"),
+    (balanced_sub, "substitution-original-page82-b"),
+    (sequential, "sequential-previous-substitution-section"),
+    (tag1, "tag1-page83-a"),
+    (tag1, "tag1-page83-b"),
+    (cyclic, "cyclic-previous-tag-section"),
+    (cyclic_survey, "cyclic-case-c-page83"),
+    (cyclic_seed, "cyclic-page83"),
+    (zero_observer, "register-page122"),
+    (arith_map, "register-page122"),
+    (k_totalistic, "totalistic-page60"),
+    (eca_rules[30], "rule30-page27"),
+    (mobile_random_color, "mobile-page74"),
+    (mobile_random_motion, "mobile-page75"),
+]:
+    if _route_key not in _spec["route_keys"]:
+        _spec["route_keys"].append(_route_key)
+
 # Attach later route-source evidence to candidates so every route is provenance-bound.
 for _spec, _label, _unit in [
     (eca_rules[90], "eca-rule-90-route-context", "U000339"),
     (eca_rules[110], "eca-rule-110-route-context", "U000376"),
+    (tot_codes[1635], "totalistic-code-1635-page66-route", "U000381"),
+    (tot_codes[2049], "totalistic-code-2049-page66-route", "U000381"),
+    (balanced_sub, "substitution-original-page82-route-a", "U000481"),
+    (balanced_sub, "substitution-original-page82-route-b", "U000482"),
     (tag1, "tag-delete-one-route-a", "U000524"),
     (tag1, "tag-delete-one-route-b", "U000525"),
+    (cyclic, "cyclic-tag-previous-section-route", "U000530"),
     (cyclic_seed, "cyclic-tag-route-context", "U000539"),
     (zero_observer, "register-zero-route-context", "U000560"),
     (arith_map, "register-map-route-context", "U000560"),
@@ -3425,19 +3412,14 @@ DEFECT_UNITS = {
         "The assigned image is a severely cropped 42×14 fragment containing "
         "only part of the 'rule 30' label; no evolution or rule mechanics can "
         "be recovered from it."
-    )
-}
-AMBIGUOUS_UNITS = {
+    ),
     "U000374": (
-        "The middle page-81 totalistic evolution is present, but the assigned "
-        "asset and adjacent source omit its code label."
-    ),
-    "U000375": (
-        "The crop contains a top-edge spill label 'code 1635' and a clear "
-        "bottom label 'code 2049'; later explicit labels resolve the continued "
-        "runs, but this asset boundary is ambiguous in isolation."
+        "The page-81 code-1635 trajectory is intact, but its identifying label "
+        "is clipped at the bottom edge; U000377--U000378 recover the identity "
+        "without inferring mechanics from the clipped pixels."
     ),
 }
+AMBIGUOUS_UNITS: dict[str, str] = {}
 
 
 def default_reading(row: dict[str, str]) -> tuple[str, list[str], str]:
@@ -3504,7 +3486,20 @@ def candidate_roles(
 RULE_IMAGES = {
     "CHAPTERS/_page_68_Figure_7.jpeg",
     "CHAPTERS/_page_68_Picture_3.jpeg",
+    "CHAPTERS/_page_69_Rules_100_139.jpeg",
+    "CHAPTERS/_page_70_Picture_2.jpeg",
+    "CHAPTERS/_page_71_Picture_2.jpeg",
+    "CHAPTERS/_page_73_Figure_1.jpeg",
     "CHAPTERS/_page_75_Figure_6.jpeg",
+    "CHAPTERS/_page_76_Figure_2.jpeg",
+    "CHAPTERS/_page_77_Figure_6.jpeg",
+    "CHAPTERS/_page_78_Figure_2.jpeg",
+    "CHAPTERS/_page_78_Figure_4.jpeg",
+    "CHAPTERS/_page_79_Picture_2.jpeg",
+    "CHAPTERS/_page_81_Picture_1.jpeg",
+    "CHAPTERS/_page_81_Picture_2.jpeg",
+    "CHAPTERS/_page_81_Picture_3.jpeg",
+    "CHAPTERS/_page_84_Picture_2.jpeg",
     "CHAPTERS/_page_86_Picture_8.jpeg",
     "CHAPTERS/_page_87_Figure_2.jpeg",
     "CHAPTERS/_page_88_Picture_8.jpeg",
@@ -3519,6 +3514,7 @@ RULE_IMAGES = {
     "CHAPTERS/_page_97_Picture_6.jpeg",
     "CHAPTERS/_page_97_Picture_7.jpeg",
     "CHAPTERS/_page_98_Figure_2.jpeg",
+    "CHAPTERS/_page_99_Figure_1.jpeg",
     "CHAPTERS/_page_100_Picture_3.jpeg",
     "CHAPTERS/_page_101_Picture_5.jpeg",
     "CHAPTERS/_page_102_Figure_4.jpeg",
@@ -3732,9 +3728,9 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             "route_proposals": routes,
             "uncertainties": [
                 "The 42×14 page-74 rule-30 label crop is defective; complete earlier rule evidence prevents mechanics loss.",
-                "The middle page-81 three-color totalistic evolution is retained as an unnamed candidate because its code label is absent.",
-                "The adjacent page-81 code-1635/code-2049 crop boundary is ambiguous in isolation; later explicit labels resolve the two continued runs.",
-                "Finite survey figures are retained as survey candidates where individual visual rules are explicit but not separately transcribed; no unseen rule text is invented.",
+                "The page-81 code-1635 trajectory has a clipped label; its identity and law are recovered from the later continuation, explicit code label, and established ternary codec.",
+                "Finite survey figures are retained as bounded survey candidates with typed member variants where complete visual rules are explicit but not safely transcribed; no unseen rule text is invented.",
+                "The random initial-condition ensemble remains measure-valued but its probability law, dependence structure, and support convention are unknown from this source.",
             ],
         }
     )
