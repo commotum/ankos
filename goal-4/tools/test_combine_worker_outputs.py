@@ -90,6 +90,7 @@ def _candidate(
     field_support = {
         field: "UNKNOWN_FROM_SOURCE" for field in FINGERPRINT_FIELDS
     }
+    field_support["object_kind"] = "SUPPORTED"
     fingerprint = {
         field: {
             "status": "UNKNOWN_FROM_SOURCE",
@@ -98,6 +99,12 @@ def _candidate(
             "reason": missing,
         }
         for field in FINGERPRINT_FIELDS
+    }
+    fingerprint["object_kind"] = {
+        "status": "SUPPORTED",
+        "value": "test construction",
+        "evidence_ids": ["WE000001"],
+        "reason": "The assigned source identifies a construction.",
     }
     values: dict[str, Any] = {
         "id": "W0001",
@@ -127,7 +134,7 @@ def _candidate(
                 "strength": "LEAD_ONLY",
                 "modality": "PROSE",
                 "claim": "The assigned source unit supplies a construction lead.",
-                "fingerprint_fields": [],
+                "fingerprint_fields": ["object_kind"],
             }
         ],
         "source_status": ["CLEAR"],
@@ -135,11 +142,33 @@ def _candidate(
         "evidence_strength": ["LEAD_ONLY"],
         "field_support": field_support,
         "fingerprint": fingerprint,
-        "parameters": [],
-        "variants": [],
+        "parameters": [
+            {
+                "name": "test parameter",
+                "source_description": "The source supplies a test parameter.",
+                "evidence_ids": ["WE000001"],
+            }
+        ],
+        "variants": [
+            {
+                "name": "test variant",
+                "source_description": "The source supplies a test variant.",
+                "evidence_ids": ["WE000001"],
+            }
+        ],
         "missing_mechanics": [missing],
         "uncertainties": [],
-        "related_candidate_ids": [],
+        "related_candidate_ids": [
+            {
+                "candidate_id": "W0001",
+                "relation": "SOURCE_COMPARE",
+                "proof_kind": "PROVISIONAL_COMPARISON",
+                "evidence_ids": ["WE000001"],
+                "before_rationale": "The worker retained the source comparison.",
+                "after_rationale": "The union must retain the source comparison.",
+                "uncertainty": "The comparison remains provisional.",
+            }
+        ],
         "cross_reference_ids": ["WR0001"],
         "evidence_reassignments": [],
     }
@@ -361,6 +390,26 @@ def test_combines_completed_disjoint_outputs_and_rewrites_every_join(
         row["cross_reference_ids"]
         for row in output["candidate_proposals"]
     ] == [["WR0001"], ["WR0002"]]
+    assert [
+        row["fingerprint"]["object_kind"]["evidence_ids"]
+        for row in output["candidate_proposals"]
+    ] == [["WE000001"], ["WE000002"]]
+    assert [
+        row["parameters"][0]["evidence_ids"]
+        for row in output["candidate_proposals"]
+    ] == [["WE000001"], ["WE000002"]]
+    assert [
+        row["variants"][0]["evidence_ids"]
+        for row in output["candidate_proposals"]
+    ] == [["WE000001"], ["WE000002"]]
+    assert [
+        row["related_candidate_ids"][0]["candidate_id"]
+        for row in output["candidate_proposals"]
+    ] == ["W0001", "W0002"]
+    assert [
+        row["related_candidate_ids"][0]["evidence_ids"]
+        for row in output["candidate_proposals"]
+    ] == [["WE000001"], ["WE000002"]]
 
     reading_by_id = {
         row["source_unit_id"]: row for row in output["reading_updates"]

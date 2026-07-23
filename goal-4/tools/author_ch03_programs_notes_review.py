@@ -2044,7 +2044,7 @@ def build(bundle: Path) -> tuple[bytes, dict[str, Any]]:
         else:
             role = "OBSERVER"
             status = "CLEAR"
-            flags = ["CONSTRUCTION_BEARING"]
+            flags = []
             uncertainty = ""
             statement = (
                 "Thumbnail/context screening confirms an evolution, plot, path, "
