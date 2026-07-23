@@ -1156,6 +1156,12 @@ def validate_objects(
             evidence_ids_global,
             errors,
         )
+    expected_evidence_ids = {
+        f"E{index:06d}"
+        for index in range(1, len(evidence_ids_global) + 1)
+    }
+    if evidence_ids_global != expected_evidence_ids:
+        errors.append("evidence IDs are not a complete append-only E sequence")
 
     candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
     evidence_by_group: dict[str, list[tuple[str, dict[str, Any]]]] = {}
@@ -1165,6 +1171,15 @@ def validate_objects(
                 evidence_by_group.setdefault(
                     str(evidence.get("evidence_group_id", "")), []
                 ).append((candidate["id"], evidence))
+    evidence_group_ids = set(evidence_by_group)
+    expected_group_ids = {
+        f"G{index:06d}"
+        for index in range(1, len(evidence_group_ids) + 1)
+    }
+    if evidence_group_ids != expected_group_ids:
+        errors.append(
+            "evidence-group IDs are not a complete append-only G sequence"
+        )
     split_children: set[str] = set()
     supersession_targets: dict[str, list[str]] = {
         candidate_id: [] for candidate_id in candidate_ids
@@ -1971,6 +1986,11 @@ def validate_objects(
             seen.update(delta_values[key])
         ordered_stage18_candidates.extend(delta_values["new_candidates"])
         ordered_stage18_routes.extend(delta_values["new_routes"])
+
+    if seen_queries != {
+        f"Q{index:04d}" for index in range(1, len(seen_queries) + 1)
+    }:
+        errors.append("search query IDs are not a complete append-only Q sequence")
 
     search_discovered_candidates = [
         candidate["id"]

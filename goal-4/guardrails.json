@@ -121,6 +121,41 @@
     "CROSS_REFERENCE"
   ],
   "visual_evidence_rule": "An image may carry direct mechanics strength only after original-resolution inspection, contextual anchoring, and independent transcription/check. Otherwise its mechanics strength is CONTEXTUAL or DIRECT_PARTIAL_MECHANICS; hidden rule data, timing, colors, and coordinates are never inferred from proximity.",
+  "visual_roles": [
+    "NATIVE_EVIDENCE",
+    "RELATION",
+    "CONTROL",
+    "OBSERVER",
+    "DECORATIVE",
+    "SOURCE_DEFECT"
+  ],
+  "visual_risk_flags": [
+    "CONSTRUCTION_BEARING",
+    "TEXT_BEARING",
+    "AMBIGUOUS",
+    "CAPTION_INCOMPLETE"
+  ],
+  "discovery_anchor_contract": "Candidates and evidence use immutable {epoch, kind, id, ordinal} anchors. Routes use the corresponding CSV fields. SOURCE_UNIT and IMAGE anchors belong to the owning sequential range; SEARCH_HIT anchors belong to a typed LOCAL or SATURATION round. Epoch 1 is the initial traversal and every formal blind reopen increments the epoch.",
+  "route_closure_scopes": {
+    "WITHIN_STAGE": "The expected target lies in the discovery stage and must close before that stage closes.",
+    "CROSS_RANGE": "The expected target lies outside the discovery stage and may remain queued until the target range is reviewed, but must close by Stage 18."
+  },
+  "search_query_language": {
+    "modes": [
+      "LITERAL",
+      "REGEX"
+    ],
+    "fields": [
+      "query_id",
+      "family",
+      "pattern",
+      "mode",
+      "case_sensitive",
+      "whole_word",
+      "scope_paths"
+    ],
+    "execution": "Queries execute deterministically over decoded canonical source-unit byte ranges in query order and source-unit order. REGEX uses Unicode multiline semantics; case sensitivity and whole-word boundaries are explicit. Every recorded query/unit hit pair and context hash must equal an independent validator rerun."
+  },
   "blind_candidate_fields": [
     "id",
     "record_status",
@@ -356,7 +391,7 @@
       "whole-corpus trigger searches before assigned sequential reading"
     ],
     "output_contract": [
-      "Use worker-local W identifiers.",
+      "Use ordered worker-local W#### candidate, WR#### route, WE###### evidence, and WG###### evidence-group identifiers; only the root coordinator maps them to append-only global IDs.",
       "Return source-unit dispositions, candidate proposals, image reviews, routes, and uncertainties only for the assigned range.",
       "Include every required fingerprint key and never include a forbidden blind field.",
       "Do not edit shared ledgers; the root merge allocates B IDs in canonical order and records provenance.",

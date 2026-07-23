@@ -55,6 +55,42 @@ EXPECTED_MODALITIES = {
     "IMAGE",
     "CROSS_REFERENCE",
 }
+EXPECTED_VISUAL_ROLES = {
+    "NATIVE_EVIDENCE",
+    "RELATION",
+    "CONTROL",
+    "OBSERVER",
+    "DECORATIVE",
+    "SOURCE_DEFECT",
+}
+EXPECTED_VISUAL_RISK_FLAGS = {
+    "CONSTRUCTION_BEARING",
+    "TEXT_BEARING",
+    "AMBIGUOUS",
+    "CAPTION_INCOMPLETE",
+}
+EXPECTED_BLIND_CANDIDATE_FIELDS = {
+    "id",
+    "record_status",
+    "provisional_name",
+    "aliases",
+    "discovery_stage",
+    "discovery_anchor",
+    "source_unit_ids",
+    "source_evidence",
+    "source_status",
+    "image_witnesses",
+    "evidence_strength",
+    "field_support",
+    "fingerprint",
+    "parameters",
+    "variants",
+    "missing_mechanics",
+    "uncertainties",
+    "related_candidate_ids",
+    "cross_reference_ids",
+    "evidence_reassignments",
+}
 EXPECTED_FINGERPRINT_FIELDS = {
     "object_kind",
     "native_time",
@@ -278,6 +314,49 @@ def validate(data: dict[str, Any]) -> list[str]:
     for key in ("evidence_application", "visual_evidence_rule"):
         if not isinstance(data.get(key), str) or not data[key].strip():
             errors.append(f"{key} must be non-empty")
+    for key, expected in (
+        ("visual_roles", EXPECTED_VISUAL_ROLES),
+        ("visual_risk_flags", EXPECTED_VISUAL_RISK_FLAGS),
+    ):
+        values = data.get(key)
+        if not isinstance(values, list) or set(values) != expected:
+            errors.append(f"{key} does not match the frozen vocabulary")
+        elif _duplicates(values):
+            errors.append(f"{key} contains duplicates")
+    if not isinstance(data.get("discovery_anchor_contract"), str) or not data[
+        "discovery_anchor_contract"
+    ].strip():
+        errors.append("discovery_anchor_contract must be non-empty")
+    route_scopes = data.get("route_closure_scopes")
+    if not isinstance(route_scopes, dict) or set(route_scopes) != {
+        "WITHIN_STAGE",
+        "CROSS_RANGE",
+    }:
+        errors.append("route_closure_scopes do not match the frozen contract")
+    elif any(
+        not isinstance(value, str) or not value.strip()
+        for value in route_scopes.values()
+    ):
+        errors.append("route_closure_scopes definitions must be non-empty")
+    search_language = data.get("search_query_language")
+    if (
+        not isinstance(search_language, dict)
+        or set(search_language) != {"modes", "fields", "execution"}
+        or search_language.get("modes") != ["LITERAL", "REGEX"]
+        or set(search_language.get("fields", []))
+        != {
+            "query_id",
+            "family",
+            "pattern",
+            "mode",
+            "case_sensitive",
+            "whole_word",
+            "scope_paths",
+        }
+        or not isinstance(search_language.get("execution"), str)
+        or not search_language["execution"].strip()
+    ):
+        errors.append("search_query_language does not match the frozen contract")
 
     blind_fields = data.get("blind_candidate_fields")
     if not isinstance(blind_fields, list) or not blind_fields:
@@ -285,6 +364,8 @@ def validate(data: dict[str, Any]) -> list[str]:
         blind_field_set: set[str] = set()
     else:
         blind_field_set = set(blind_fields)
+        if blind_field_set != EXPECTED_BLIND_CANDIDATE_FIELDS:
+            errors.append("blind_candidate_fields do not match the frozen contract")
         if _duplicates(blind_fields):
             errors.append("blind_candidate_fields contain duplicates")
 
@@ -358,6 +439,8 @@ def validate(data: dict[str, Any]) -> list[str]:
                 errors.append(f"proof_obligations.{key} must be non-empty")
             elif any(not isinstance(item, str) or not item.strip() for item in obligations):
                 errors.append(f"proof_obligations.{key} contains an empty obligation")
+            elif _duplicates(obligations):
+                errors.append(f"proof_obligations.{key} contains duplicates")
 
     isolation = data.get("worker_isolation")
     if not isinstance(isolation, dict):
@@ -459,6 +542,28 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
         "SOLVER_OR_NUMERICAL_METHOD"
     )
     mutations.append(("missing solver/numerical-method role", missing_solver))
+
+    missing_reassignment = copy.deepcopy(data)
+    missing_reassignment["blind_candidate_fields"].remove(
+        "evidence_reassignments"
+    )
+    mutations.append(
+        ("missing tombstone evidence reassignment field", missing_reassignment)
+    )
+
+    missing_visual_risk = copy.deepcopy(data)
+    missing_visual_risk["visual_risk_flags"].remove("TEXT_BEARING")
+    mutations.append(("missing visual risk flag", missing_visual_risk))
+
+    open_search_language = copy.deepcopy(data)
+    open_search_language["search_query_language"]["fields"].append("command")
+    mutations.append(("open-ended search query language", open_search_language))
+
+    duplicate_proof = copy.deepcopy(data)
+    duplicate_proof["proof_obligations"]["same_family"].append(
+        duplicate_proof["proof_obligations"]["same_family"][0]
+    )
+    mutations.append(("duplicate proof obligation", duplicate_proof))
 
     for name, mutated in mutations:
         if not validate(mutated):

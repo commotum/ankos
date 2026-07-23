@@ -137,6 +137,10 @@ def sanitized_guardrails(guardrails: dict[str, Any]) -> dict[str, Any]:
         "source_statuses",
         "evidence_modalities",
         "visual_evidence_rule",
+        "visual_roles",
+        "visual_risk_flags",
+        "discovery_anchor_contract",
+        "route_closure_scopes",
         "blind_candidate_fields",
         "candidate_record_statuses",
         "fingerprint_fields",
@@ -824,6 +828,16 @@ def _validate_worker_output(
     worker_evidence_ids: list[str] = []
     worker_group_ids: list[str] = []
     seen_worker_group_ids: set[str] = set()
+    reading_status_by_unit = {
+        row.get("source_unit_id"): row.get("source_status")
+        for row in reading_updates
+        if isinstance(row, dict) and isinstance(row.get("source_unit_id"), str)
+    }
+    asset_status_by_image = {
+        row.get("physical_path"): row.get("source_status")
+        for row in asset_updates
+        if isinstance(row, dict) and isinstance(row.get("physical_path"), str)
+    }
     if isinstance(proposals, list):
         proposal_ids = [
             row.get("id")
@@ -940,29 +954,6 @@ def _validate_worker_output(
                     errors.append(
                         f"candidate {candidate_id} source-unit/read-ledger join differs"
                     )
-                source_statuses = {
-                    next(
-                        (
-                            read_row.get("source_status")
-                            for read_row in reading_updates
-                            if isinstance(read_row, dict)
-                            and read_row.get("source_unit_id") == source_id
-                        ),
-                        None,
-                    )
-                    for source_id in source_set
-                }
-                declared_statuses = row.get("source_status", [])
-                if (
-                    not isinstance(declared_statuses, list)
-                    or not all(
-                        isinstance(item, str) for item in declared_statuses
-                    )
-                    or set(declared_statuses) != source_statuses
-                ):
-                    errors.append(
-                        f"candidate {candidate_id} source-status join differs"
-                    )
             if isinstance(image_ids, list) and all(
                 isinstance(item, str) for item in image_ids
             ) and candidate_images_from_assets.get(candidate_id, set()) != set(
@@ -971,6 +962,30 @@ def _validate_worker_output(
                 errors.append(
                     f"candidate {candidate_id} image/asset-ledger join differs"
                 )
+            if (
+                isinstance(source_ids, list)
+                and all(isinstance(item, str) for item in source_ids)
+                and isinstance(image_ids, list)
+                and all(isinstance(item, str) for item in image_ids)
+            ):
+                provenance_statuses = {
+                    reading_status_by_unit.get(source_id)
+                    for source_id in source_ids
+                } | {
+                    asset_status_by_image.get(image_path)
+                    for image_path in image_ids
+                }
+                declared_statuses = row.get("source_status", [])
+                if (
+                    not isinstance(declared_statuses, list)
+                    or not all(
+                        isinstance(item, str) for item in declared_statuses
+                    )
+                    or set(declared_statuses) != provenance_statuses
+                ):
+                    errors.append(
+                        f"candidate {candidate_id} source-status join differs"
+                    )
 
             evidence_rows = row.get("source_evidence", [])
             evidence_by_id: dict[str, dict[str, Any]] = {}
