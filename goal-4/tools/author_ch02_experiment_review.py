@@ -3827,9 +3827,13 @@ munching = declarative_pattern(
     support="A two-dimensional integer-coordinate grid indexed by t.",
     values="Boolean membership in the equality relation.",
     input_text="A successive integer index t and an integer-coordinate pair (x,y).",
-    result="A sequence of relation-defined grid patterns.",
+    result="One Boolean membership judgment for the supplied (t,x,y) triple.",
     aliases=["munching squares"],
     route_keys=[],
+)
+munching["facts"]["carrier"] = "Integer triples (t,x,y)."
+munching["facts"]["complete_state"] = (
+    "For one supplied triple, the complete denotation is whether BitXor[x,y] equals t."
 )
 add_candidate_image(
     munching,
@@ -3865,6 +3869,16 @@ def unary_bitwise_curve(key: str, operation: str) -> CandidateSpec:
         input_text="A requested finite run of successive integer indices n.",
         result="A deterministic nested curve.",
         aliases=[f"{operation} n and 2n curve"],
+    )
+    spec["facts"]["carrier"] = (
+        "An ordered sequence of integer function values indexed by successive n."
+    )
+    spec["facts"]["support"] = "The requested finite ordered run of successive indices n."
+    spec["facts"]["complete_state"] = (
+        "All ordered operation values/curve points for the requested finite n-run."
+    )
+    spec["facts"]["successor_cardinality"] = (
+        "Exactly one ordered curve result for each valid requested finite n-run."
     )
     spec["facts"]["structural_invariants"] = (
         "The curve has the source-stated nested structure induced by comparing "
