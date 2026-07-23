@@ -83,10 +83,18 @@ Q_ID = re.compile(r"^Q[0-9]{4}$")
 H_ID = re.compile(r"^H[0-9]{6}$")
 V_ID = re.compile(r"^V[0-9]{6}$")
 PAGE_NUMBER = re.compile(r"_page_(\d+)")
-SUPPORTED_SOURCE_ABSENCE = re.compile(
-    r"\b(?:unknown from source|unstated|not stated|not specified|"
-    r"not identified)\b",
-    re.IGNORECASE,
+# Reject only a value whose entire content is an absence sentinel. A supported
+# value may make a positive claim while accurately qualifying a different,
+# unspecified aspect; searching for these words anywhere misclassifies it.
+SUPPORTED_SOURCE_ABSENCE_ONLY = re.compile(
+    r"""
+    \s*
+    (?:unknown(?:\s+from\s+(?:the\s+)?source)?|
+       unstated|unspecified|unidentified|
+       not\s+(?:stated|specified|identified))
+    \s*[.!?]?\s*
+    """,
+    re.IGNORECASE | re.VERBOSE,
 )
 SEARCH_QUERY_FIELDS = frozenset(
     {
@@ -716,7 +724,7 @@ def validate_candidate(
                 errors.append(f"{prefix}.{field} supported value lacks evidence")
             elif (
                 field != "evidence_limit"
-                and SUPPORTED_SOURCE_ABSENCE.search(value["value"])
+                and SUPPORTED_SOURCE_ABSENCE_ONLY.fullmatch(value["value"])
             ):
                 errors.append(
                     f"{prefix}.{field} supported value encodes source absence"
@@ -5677,6 +5685,40 @@ def mutation_checks(
     review_history: list[dict[str, Any]],
 ) -> list[str]:
     failures: list[str] = []
+    source_absence_cases = {
+        "Unknown from source.": True,
+        "Not stated.": True,
+        "Unspecified.": True,
+        "Not identified.": True,
+        (
+            "For a valid finite query input, direct evaluation completes with "
+            "the finite query result; invalid-input behavior is unstated."
+        ): False,
+        (
+            "Ordered positions connected by an unstated interleaving "
+            "relation."
+        ): False,
+        "A particularly simple but unstated game rule set.": False,
+        (
+            "A probability/sampling law for initial configurations, with its "
+            "actual measure left unstated in this passage."
+        ): False,
+        (
+            "Stochastic or ensemble-valued; the probability measure is not "
+            "stated."
+        ): False,
+        (
+            "Distribution, finite extent, and random seed are unstated "
+            "parameters."
+        ): False,
+    }
+    for value, expected in source_absence_cases.items():
+        actual = bool(SUPPORTED_SOURCE_ABSENCE_ONLY.fullmatch(value))
+        if actual != expected:
+            failures.append(
+                "supported-source-absence classifier mismatch for "
+                f"{value!r}: expected {expected}, got {actual}"
+            )
     base_reading = copy.deepcopy(reading)
     base_assets = copy.deepcopy(assets)
     # Mutation fixtures exercise the validator contract, not the current audit
