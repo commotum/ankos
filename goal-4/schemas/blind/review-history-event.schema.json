@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "asset_ids": {
+      "items": {
+        "pattern": "^A[0-9]{6}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "epoch": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "event_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "input_projection_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "INITIAL",
+        "REOPEN"
+      ],
+      "type": "string"
+    },
+    "previous_event_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      ]
+    },
+    "prior_search_round_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "prior_search_rounds_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "result_projection_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "review_id": {
+      "pattern": "^V[0-9]{6}$",
+      "type": "string"
+    },
+    "reviewer": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "source_unit_ids": {
+      "items": {
+        "pattern": "^U[0-9]{6}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "stage": {
+      "maximum": 17,
+      "minimum": 4,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "review_id",
+    "epoch",
+    "stage",
+    "mode",
+    "reviewer",
+    "source_paths",
+    "source_unit_ids",
+    "asset_ids",
+    "prior_search_round_count",
+    "prior_search_rounds_sha256",
+    "input_projection_sha256",
+    "result_projection_sha256",
+    "previous_event_sha256",
+    "event_sha256"
+  ],
+  "title": "Append-only blind review-history event",
+  "type": "object"
+}

@@ -877,6 +877,7 @@ def validate_review_history(
     reading: list[dict[str, str]],
     assets: list[dict[str, str]],
     review_history: list[dict[str, Any]],
+    search: dict[str, Any],
     stage_by_path: dict[str, int],
 ) -> tuple[
     list[str],
@@ -890,9 +891,18 @@ def validate_review_history(
     unit_by_id = {unit["id"]: unit for unit in units}
     reading_by_id = {row.get("source_unit_id", ""): row for row in reading}
     asset_by_id = {row.get("asset_id", ""): row for row in assets}
+    audit_paths = [
+        document["path"]
+        for document in sorted(
+            manifest["documents"],
+            key=lambda document: (
+                stage_by_path[document["path"]],
+                int(document["order"]),
+            ),
+        )
+    ]
     document_position = {
-        document["path"]: index
-        for index, document in enumerate(manifest["documents"], start=1)
+        path: index for index, path in enumerate(audit_paths, start=1)
     }
     unit_position = {
         unit["id"]: index for index, unit in enumerate(units, start=1)
@@ -914,6 +924,11 @@ def validate_review_history(
     prior_event_hash: str | None = None
     prior_event_epoch: int | None = None
     prior_event_document_position: int | None = None
+    prior_search_round_count = 0
+    next_initial_path_index = 0
+    search_rounds = search.get("rounds", []) if isinstance(search, dict) else []
+    if not isinstance(search_rounds, list):
+        search_rounds = []
 
     if not isinstance(review_history, list):
         return (
@@ -978,6 +993,7 @@ def validate_review_history(
             errors.append(f"{prefix} source paths are not in canonical corpus order")
         if any(stage_by_path.get(path) != stage for path in source_paths):
             errors.append(f"{prefix} source path lies outside its stage")
+        event_path = source_paths[0] if len(source_paths) == 1 else None
 
         expected_units = [
             unit["id"] for unit in units if unit["path"] in set(source_paths)
@@ -1024,6 +1040,14 @@ def validate_review_history(
                     f"{prefix} violates strict frozen document traversal "
                     "within its epoch"
                 )
+            if epoch > prior_event_epoch and mode != "REOPEN":
+                errors.append(
+                    f"{prefix} opens a new epoch without a REOPEN event"
+                )
+        elif epoch != 1 or mode != "INITIAL":
+            errors.append(
+                f"{prefix} must begin history with INITIAL epoch 1"
+            )
         prior_event_epoch = epoch
         prior_event_document_position = event_document_position
 
@@ -1034,6 +1058,18 @@ def validate_review_history(
             errors.append(f"{prefix} INITIAL scope contains previously reviewed rows")
         if mode == "REOPEN" and (not already_seen or not all(already_seen)):
             errors.append(f"{prefix} REOPEN scope is not wholly previously reviewed")
+        if mode == "INITIAL" and event_path is not None:
+            expected_initial_path = (
+                audit_paths[next_initial_path_index]
+                if next_initial_path_index < len(audit_paths)
+                else None
+            )
+            if event_path != expected_initial_path:
+                errors.append(
+                    f"{prefix} INITIAL path is not the first unread audit path"
+                )
+            elif not any(already_seen):
+                next_initial_path_index += 1
         for unit_id in source_unit_ids:
             if (epoch, unit_id) in seen_epoch_units:
                 errors.append(
@@ -1057,6 +1093,62 @@ def validate_review_history(
         expected_local_scopes.setdefault((stage, epoch), set()).update(
             source_paths
         )
+
+        prefix_count = event.get("prior_search_round_count")
+        prefix_digest = event.get("prior_search_rounds_sha256")
+        if not isinstance(prefix_count, int) or prefix_count < 0:
+            errors.append(f"{prefix} has invalid prior search round count")
+            prefix_count = 0
+        if prefix_count < prior_search_round_count:
+            errors.append(f"{prefix} moves backward to an earlier search prefix")
+        if prefix_count > len(search_rounds):
+            errors.append(f"{prefix} search prefix exceeds recorded rounds")
+            search_prefix = search_rounds
+        else:
+            search_prefix = search_rounds[:prefix_count]
+        if prefix_digest != canonical_sha256(search_prefix):
+            errors.append(f"{prefix} prior search-round prefix hash is stale")
+        if any(
+            isinstance(round_record, dict)
+            and isinstance(round_record.get("epoch"), int)
+            and round_record["epoch"] > epoch
+            for round_record in search_prefix
+        ):
+            errors.append(f"{prefix} search prefix contains a future epoch")
+        previous_history_event = (
+            review_history[index - 2] if index > 1 else None
+        )
+        is_first_event_of_epoch = (
+            not isinstance(previous_history_event, dict)
+            or previous_history_event.get("epoch") != epoch
+        )
+        if is_first_event_of_epoch and epoch > 1:
+            for (prior_stage, prior_epoch), prior_paths in (
+                expected_local_scopes.items()
+            ):
+                if prior_epoch >= epoch:
+                    continue
+                local_rounds = [
+                    round_record
+                    for round_record in search_prefix
+                    if isinstance(round_record, dict)
+                    and round_record.get("kind") == "LOCAL"
+                    and round_record.get("owning_stage") == prior_stage
+                    and round_record.get("epoch") == prior_epoch
+                ]
+                local_scope = {
+                    path
+                    for round_record in local_rounds
+                    for query in round_record.get("queries", [])
+                    if isinstance(query, dict)
+                    for path in query.get("scope_paths", [])
+                }
+                if not local_rounds or local_scope != prior_paths:
+                    errors.append(
+                        f"{prefix} advances epoch before Stage {prior_stage} "
+                        f"epoch {prior_epoch} LOCAL closure"
+                    )
+        prior_search_round_count = prefix_count
 
         previous_hash = event.get("previous_event_sha256")
         if previous_hash != prior_event_hash:
@@ -1232,6 +1324,7 @@ def validate_objects(
         reading,
         assets,
         review_history,
+        search,
         stage_by_path,
     )
     errors.extend(history_errors)
@@ -3115,6 +3208,102 @@ def mutation_checks(
             "reviewer": "fixture-reviewer",
         }
     )
+    for row in base_reading[1:]:
+        if row["path"] != path:
+            continue
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "1",
+                "review_disposition": "NO_CONSTRUCTION",
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction in this fixture unit.",
+                "review_stage": str(stage),
+                "reviewer": "fixture-reviewer",
+            }
+        )
+    for row in base_assets:
+        if row["assignment_path"] != path:
+            continue
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "1",
+                "visual_role": "DECORATIVE",
+                "source_status": "CLEAR",
+                "risk_flags": "[]",
+                "original_resolution_status": "NOT_REQUIRED",
+                "transcription_status": "NOT_REQUIRED",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction-bearing visual content.",
+                "review_stage": str(stage),
+                "reviewer": "fixture-reviewer",
+                "uncertainty": "",
+            }
+        )
+
+    unit_by_fixture_id = {item["id"]: item for item in units}
+
+    def append_history_event(
+        prior: list[dict[str, Any]],
+        reading_state: list[dict[str, str]],
+        asset_state: list[dict[str, str]],
+        source_path: str,
+        epoch: int,
+        mode: str,
+        reviewer: str,
+        prior_rounds: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        result = copy.deepcopy(prior)
+        event = close_review_event(
+            {
+                "review_id": f"V{len(result) + 1:06d}",
+                "epoch": epoch,
+                "stage": stage_for_document(
+                    next(
+                        document
+                        for document in manifest["documents"]
+                        if document["path"] == source_path
+                    )
+                ),
+                "mode": mode,
+                "reviewer": reviewer,
+                "source_paths": [source_path],
+                "source_unit_ids": [
+                    item["id"] for item in units if item["path"] == source_path
+                ],
+                "asset_ids": [
+                    item["asset_id"]
+                    for item in asset_state
+                    if item["assignment_path"] == source_path
+                ],
+            },
+            unit_by_fixture_id,
+            {
+                item["source_unit_id"]: item for item in reading_state
+            },
+            {item["asset_id"]: item for item in asset_state},
+            result[-1]["event_sha256"] if result else None,
+            prior_rounds,
+        )
+        result.append(event)
+        return result
+
+    base_history = append_history_event(
+        [],
+        base_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+    )
     evidence = {
         "evidence_id": "E000001",
         "evidence_group_id": "G000001",
@@ -3205,6 +3394,7 @@ def mutation_checks(
         base_routes,
         base_assets,
         base_search,
+        base_history,
     )
     if base_errors:
         return ["valid candidate/route mutation fixture failed: " + "; ".join(base_errors)]
@@ -3237,6 +3427,16 @@ def mutation_checks(
             "reviewer": "fixture-reviewer",
         }
     )
+    defect_reading_history = append_history_event(
+        [],
+        defect_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+    )
     defect_reading_errors = validate_objects(
         manifest,
         units,
@@ -3245,6 +3445,7 @@ def mutation_checks(
         base_routes,
         base_assets,
         base_search,
+        defect_reading_history,
     )
     if defect_reading_errors:
         failures.append(
@@ -3276,6 +3477,16 @@ def mutation_checks(
             ),
         }
     )
+    defect_asset_history = append_history_event(
+        [],
+        base_reading,
+        defect_asset,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+    )
     defect_asset_errors = validate_objects(
         manifest,
         units,
@@ -3284,6 +3495,7 @@ def mutation_checks(
         base_routes,
         defect_asset,
         base_search,
+        defect_asset_history,
     )
     if defect_asset_errors:
         failures.append(
@@ -3291,7 +3503,55 @@ def mutation_checks(
             + "; ".join(defect_asset_errors)
         )
 
+    def zero_local_round(
+        round_number: int,
+        query_number: int,
+        epoch: int,
+        owning_stage: int,
+        scope_paths: list[str],
+    ) -> dict[str, Any]:
+        round_record = {
+            "round_id": f"S{round_number:03d}",
+            "epoch": epoch,
+            "kind": "LOCAL",
+            "owning_stage": owning_stage,
+            "queries": [
+                {
+                    "query_id": f"Q{query_number:04d}",
+                    "family": "zero-result history fixture",
+                    "pattern": "__AUDIT_HISTORY_IMPOSSIBLE_MATCH_83F2D1__",
+                    "mode": "LITERAL",
+                    "case_sensitive": True,
+                    "whole_word": False,
+                    "scope_paths": scope_paths,
+                }
+            ],
+            "tool_assumptions": ["Deterministic zero-result history fixture."],
+            "result_ids": [],
+            "result_digest": "",
+            "hits": [],
+            "new_vocabulary": [],
+            "new_candidates": [],
+            "new_evidence_groups": [],
+            "new_routes": [],
+            "rerun_digest": "",
+        }
+        digest = search_result_digest(round_record)
+        round_record["result_digest"] = digest
+        round_record["rerun_digest"] = digest
+        return round_record
+
+    epoch1_round = zero_local_round(1, 1, 1, stage, [path])
+    reopened_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": ["Deterministic zero-result history fixture."],
+        "vocabulary": [],
+        "rounds": [epoch1_round],
+        "fixed_point": None,
+    }
     reopened_reading = copy.deepcopy(base_reading)
+    reopened_assets = copy.deepcopy(base_assets)
     reopened_route = copy.deepcopy(route)
     reopened_route.update(
         {
@@ -3304,22 +3564,337 @@ def mutation_checks(
         }
     )
     reopened_routes = [copy.deepcopy(route), reopened_route]
-    reopened_reading[0]["review_epoch"] = "2"
+    for row in reopened_reading:
+        if row["path"] == path:
+            row["review_epoch"] = "2"
+    for row in reopened_assets:
+        if row["assignment_path"] == path:
+            row["review_epoch"] = "2"
     reopened_reading[0]["route_ids"] = '["R000001","R000002"]'
+    reopened_history = append_history_event(
+        base_history,
+        reopened_reading,
+        reopened_assets,
+        path,
+        2,
+        "REOPEN",
+        "fixture-reviewer",
+        reopened_search["rounds"],
+    )
     reopened_errors = validate_objects(
         manifest,
         units,
         reopened_reading,
         base_candidates,
         reopened_routes,
-        base_assets,
-        base_search,
+        reopened_assets,
+        reopened_search,
+        reopened_history,
     )
     if reopened_errors:
         failures.append(
             "valid reopened discovery-epoch fixture failed: "
             + "; ".join(reopened_errors)
         )
+
+    audit_paths = [
+        document["path"]
+        for document in sorted(
+            manifest["documents"],
+            key=lambda document: (
+                stage_for_document(document),
+                int(document["order"]),
+            ),
+        )
+    ]
+    next_path = audit_paths[1]
+    next_stage = stage_for_document(
+        next(
+            document
+            for document in manifest["documents"]
+            if document["path"] == next_path
+        )
+    )
+    forward_reading = copy.deepcopy(reopened_reading)
+    forward_assets = copy.deepcopy(reopened_assets)
+    for row in forward_reading:
+        if row["path"] != next_path:
+            continue
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "2",
+                "review_disposition": "NO_CONSTRUCTION",
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction in this fixture unit.",
+                "review_stage": str(next_stage),
+                "reviewer": "fixture-reviewer",
+            }
+        )
+    for row in forward_assets:
+        if row["assignment_path"] != next_path:
+            continue
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "2",
+                "visual_role": "DECORATIVE",
+                "source_status": "CLEAR",
+                "risk_flags": "[]",
+                "original_resolution_status": "NOT_REQUIRED",
+                "transcription_status": "NOT_REQUIRED",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction-bearing visual content.",
+                "review_stage": str(next_stage),
+                "reviewer": "fixture-reviewer",
+                "uncertainty": "",
+            }
+        )
+    forward_history = append_history_event(
+        reopened_history,
+        forward_reading,
+        forward_assets,
+        next_path,
+        2,
+        "INITIAL",
+        "fixture-reviewer",
+        reopened_search["rounds"],
+    )
+    epoch2_round = zero_local_round(
+        2,
+        2,
+        2,
+        stage,
+        [path, next_path],
+    )
+    epoch3_search = copy.deepcopy(reopened_search)
+    epoch3_search["rounds"].append(epoch2_round)
+    repeated_reading = copy.deepcopy(forward_reading)
+    repeated_assets = copy.deepcopy(forward_assets)
+    for row in repeated_reading:
+        if row["path"] == path:
+            row["review_epoch"] = "3"
+    for row in repeated_assets:
+        if row["assignment_path"] == path:
+            row["review_epoch"] = "3"
+    repeated_history = append_history_event(
+        forward_history,
+        repeated_reading,
+        repeated_assets,
+        path,
+        3,
+        "REOPEN",
+        "fixture-reviewer",
+        epoch3_search["rounds"],
+    )
+    repeated_errors = validate_objects(
+        manifest,
+        units,
+        repeated_reading,
+        base_candidates,
+        reopened_routes,
+        repeated_assets,
+        epoch3_search,
+        repeated_history,
+    )
+    if repeated_errors:
+        failures.append(
+            "valid partial epoch1/reopen epoch2/forward epoch2/repeated epoch3 "
+            "fixture failed: " + "; ".join(repeated_errors)
+        )
+
+    def expect_history_failure(
+        name: str,
+        reading_state: list[dict[str, str]],
+        candidate_state: list[dict[str, Any]],
+        route_state: list[dict[str, str]],
+        asset_state: list[dict[str, str]],
+        search_state: dict[str, Any],
+        history_state: list[dict[str, Any]],
+    ) -> None:
+        if not validate_objects(
+            manifest,
+            units,
+            reading_state,
+            candidate_state,
+            route_state,
+            asset_state,
+            search_state,
+            history_state,
+        ):
+            failures.append(f"history mutation unexpectedly passed: {name}")
+
+    expect_history_failure(
+        "reviewed rows without history",
+        base_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+        [],
+    )
+    forged_history = copy.deepcopy(base_history)
+    forged_history[0]["input_projection_sha256"] = "0" * 64
+    expect_history_failure(
+        "forged history projection",
+        base_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+        forged_history,
+    )
+    expect_history_failure(
+        "stale latest review epoch",
+        reopened_reading,
+        base_candidates,
+        reopened_routes,
+        reopened_assets,
+        reopened_search,
+        base_history,
+    )
+    backfilled_reopen_history = append_history_event(
+        base_history,
+        reopened_reading,
+        reopened_assets,
+        path,
+        2,
+        "REOPEN",
+        "fixture-reviewer",
+        [],
+    )
+    expect_history_failure(
+        "epoch advancement before prior local closure",
+        reopened_reading,
+        base_candidates,
+        reopened_routes,
+        reopened_assets,
+        reopened_search,
+        backfilled_reopen_history,
+    )
+    backward_epoch_history = append_history_event(
+        reopened_history,
+        forward_reading,
+        forward_assets,
+        next_path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        reopened_search["rounds"],
+    )
+    expect_history_failure(
+        "review history moves backward in epoch",
+        forward_reading,
+        base_candidates,
+        reopened_routes,
+        forward_assets,
+        reopened_search,
+        backward_epoch_history,
+    )
+
+    skipped_reading = copy.deepcopy(reading)
+    skipped_assets = copy.deepcopy(assets)
+    for row in skipped_reading:
+        if row["path"] != next_path:
+            continue
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "1",
+                "review_disposition": "NO_CONSTRUCTION",
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction in this fixture unit.",
+                "review_stage": str(next_stage),
+                "reviewer": "fixture-reviewer",
+            }
+        )
+    for row in skipped_assets:
+        if row["assignment_path"] != next_path:
+            continue
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "1",
+                "visual_role": "DECORATIVE",
+                "source_status": "CLEAR",
+                "risk_flags": "[]",
+                "original_resolution_status": "NOT_REQUIRED",
+                "transcription_status": "NOT_REQUIRED",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction-bearing visual content.",
+                "review_stage": str(next_stage),
+                "reviewer": "fixture-reviewer",
+                "uncertainty": "",
+            }
+        )
+    skipped_history = append_history_event(
+        [],
+        skipped_reading,
+        skipped_assets,
+        next_path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+    )
+    expect_history_failure(
+        "INITIAL event skips an unread canonical path",
+        skipped_reading,
+        [],
+        [],
+        skipped_assets,
+        base_search,
+        skipped_history,
+    )
+
+    multipath_history = [
+        close_review_event(
+            {
+                "review_id": "V000001",
+                "epoch": 1,
+                "stage": stage,
+                "mode": "INITIAL",
+                "reviewer": "fixture-reviewer",
+                "source_paths": [path, next_path],
+                "source_unit_ids": [
+                    item["id"]
+                    for item in units
+                    if item["path"] in {path, next_path}
+                ],
+                "asset_ids": [
+                    item["asset_id"]
+                    for item in forward_assets
+                    if item["assignment_path"] in {path, next_path}
+                ],
+            },
+            unit_by_fixture_id,
+            {
+                item["source_unit_id"]: item for item in forward_reading
+            },
+            {item["asset_id"]: item for item in forward_assets},
+            None,
+            [],
+        )
+    ]
+    expect_history_failure(
+        "one event covers multiple or noncontiguous paths",
+        forward_reading,
+        base_candidates,
+        base_routes,
+        forward_assets,
+        base_search,
+        multipath_history,
+    )
 
     allocation_candidate = copy.deepcopy(candidate)
     second_evidence = copy.deepcopy(evidence)
@@ -3351,6 +3926,7 @@ def mutation_checks(
         base_routes,
         base_assets,
         base_search,
+        base_history,
     )
     if allocation_errors:
         failures.append(
@@ -3478,16 +4054,33 @@ def mutation_checks(
     )
     lineage_candidates[3]["cross_reference_ids"] = []
     lineage_reading = copy.deepcopy(base_reading)
-    lineage_reading[0]["review_epoch"] = "2"
+    lineage_assets = copy.deepcopy(base_assets)
+    for row in lineage_reading:
+        if row["path"] == path:
+            row["review_epoch"] = "2"
+    for row in lineage_assets:
+        if row["assignment_path"] == path:
+            row["review_epoch"] = "2"
     lineage_reading[0]["candidate_ids"] = '["B0003","B0004"]'
+    lineage_history = append_history_event(
+        base_history,
+        lineage_reading,
+        lineage_assets,
+        path,
+        2,
+        "REOPEN",
+        "fixture-reviewer",
+        reopened_search["rounds"],
+    )
     lineage_errors = validate_objects(
         manifest,
         units,
         lineage_reading,
         lineage_candidates,
         base_routes,
-        base_assets,
-        base_search,
+        lineage_assets,
+        reopened_search,
+        lineage_history,
     )
     if lineage_errors:
         failures.append(
@@ -3926,24 +4519,13 @@ def mutation_checks(
     )
 
     search_reading = copy.deepcopy(base_reading)
-    search_reading[0]["review_epoch"] = "2"
     for row in search_reading:
-        if row["path"] != path or row["review_status"] == "REVIEWED":
-            continue
-        row.update(
-            {
-                "review_status": "REVIEWED",
-                "review_epoch": "2",
-                "review_disposition": "NO_CONSTRUCTION",
-                "source_status": "CLEAR",
-                "secondary_roles": "[]",
-                "candidate_ids": "[]",
-                "route_ids": "[]",
-                "evidence_statement": "No construction in this fixture unit.",
-                "review_stage": str(stage),
-                "reviewer": "fixture-reviewer",
-            }
-        )
+        if row["path"] == path:
+            row["review_epoch"] = "2"
+    search_assets = copy.deepcopy(base_assets)
+    for row in search_assets:
+        if row["assignment_path"] == path:
+            row["review_epoch"] = "2"
     source_bytes = (
         REPO_ROOT / "ref" / "A-New-Kind-of-Science" / path
     ).read_bytes()
@@ -3953,17 +4535,21 @@ def mutation_checks(
     search_fixture = {
         "schema_version": 1,
         "phase": "blind_discovery",
-        "tool_assumptions": ["Literal UTF-8 line search."],
+        "tool_assumptions": [
+            "Deterministic zero-result history fixture.",
+            "Literal UTF-8 line search.",
+        ],
         "vocabulary": ["fixture"],
         "rounds": [
+            copy.deepcopy(epoch1_round),
             {
-                "round_id": "S001",
+                "round_id": "S002",
                 "epoch": 2,
                 "kind": "LOCAL",
                 "owning_stage": stage,
                 "queries": [
                     {
-                        "query_id": "Q0001",
+                        "query_id": "Q0002",
                         "family": "fixture noun",
                         "pattern": fixture_pattern,
                         "mode": "LITERAL",
@@ -3985,8 +4571,9 @@ def mutation_checks(
         ],
         "fixed_point": None,
     }
+    active_search_round = search_fixture["rounds"][1]
     fixture_pairs, fixture_query_errors = execute_frozen_queries(
-        search_fixture["rounds"][0]["queries"],
+        active_search_round["queries"],
         units,
         REPO_ROOT / "ref" / "A-New-Kind-of-Science",
     )
@@ -3997,8 +4584,8 @@ def mutation_checks(
     ):
         hit_id = f"H{hit_index:06d}"
         governed = hit_unit_id == unit_id
-        search_fixture["rounds"][0]["result_ids"].append(hit_id)
-        search_fixture["rounds"][0]["hits"].append(
+        active_search_round["result_ids"].append(hit_id)
+        active_search_round["hits"].append(
             {
                 "hit_id": hit_id,
                 "query_id": query_id,
@@ -4018,17 +4605,28 @@ def mutation_checks(
                 ),
             }
         )
-    digest = search_result_digest(search_fixture["rounds"][0])
-    search_fixture["rounds"][0]["result_digest"] = digest
-    search_fixture["rounds"][0]["rerun_digest"] = digest
+    digest = search_result_digest(active_search_round)
+    active_search_round["result_digest"] = digest
+    active_search_round["rerun_digest"] = digest
+    search_history = append_history_event(
+        base_history,
+        search_reading,
+        search_assets,
+        path,
+        2,
+        "REOPEN",
+        "fixture-reviewer",
+        search_fixture["rounds"][:1],
+    )
     search_errors = validate_objects(
         manifest,
         units,
         search_reading,
         base_candidates,
         base_routes,
-        base_assets,
+        search_assets,
         search_fixture,
+        search_history,
     )
     if search_errors:
         failures.append(
@@ -4036,7 +4634,7 @@ def mutation_checks(
         )
     else:
         stale_digest = copy.deepcopy(search_fixture)
-        stale_digest["rounds"][0]["result_digest"] = "0" * 64
+        stale_digest["rounds"][1]["result_digest"] = "0" * 64
         mutations.append(
             (
                 "stale search digest",
@@ -4048,7 +4646,7 @@ def mutation_checks(
             )
         )
         stale_context = copy.deepcopy(search_fixture)
-        stale_context["rounds"][0]["hits"][0]["context_sha256"] = "0" * 64
+        stale_context["rounds"][1]["hits"][0]["context_sha256"] = "0" * 64
         mutations.append(
             (
                 "stale search context",
@@ -4060,10 +4658,10 @@ def mutation_checks(
             )
         )
         ungoverned_hit = copy.deepcopy(search_fixture)
-        ungoverned_hit["rounds"][0]["hits"][0]["candidate_ids"] = []
-        updated_digest = search_result_digest(ungoverned_hit["rounds"][0])
-        ungoverned_hit["rounds"][0]["result_digest"] = updated_digest
-        ungoverned_hit["rounds"][0]["rerun_digest"] = updated_digest
+        ungoverned_hit["rounds"][1]["hits"][0]["candidate_ids"] = []
+        updated_digest = search_result_digest(ungoverned_hit["rounds"][1])
+        ungoverned_hit["rounds"][1]["result_digest"] = updated_digest
+        ungoverned_hit["rounds"][1]["rerun_digest"] = updated_digest
         mutations.append(
             (
                 "governed hit without candidate",
@@ -4075,7 +4673,7 @@ def mutation_checks(
             )
         )
         fake_group = copy.deepcopy(search_fixture)
-        fake_group["rounds"][0]["new_evidence_groups"] = ["G999999"]
+        fake_group["rounds"][1]["new_evidence_groups"] = ["G999999"]
         mutations.append(
             (
                 "search delta with fake evidence group",
@@ -4087,10 +4685,10 @@ def mutation_checks(
             )
         )
         gap_search_epoch = copy.deepcopy(search_fixture)
-        gap_search_epoch["rounds"][0]["epoch"] = 7
-        gap_digest = search_result_digest(gap_search_epoch["rounds"][0])
-        gap_search_epoch["rounds"][0]["result_digest"] = gap_digest
-        gap_search_epoch["rounds"][0]["rerun_digest"] = gap_digest
+        gap_search_epoch["rounds"][1]["epoch"] = 7
+        gap_digest = search_result_digest(gap_search_epoch["rounds"][1])
+        gap_search_epoch["rounds"][1]["result_digest"] = gap_digest
+        gap_search_epoch["rounds"][1]["rerun_digest"] = gap_digest
         mutations.append(
             (
                 "search round opens a gapped global discovery epoch",
@@ -4110,6 +4708,7 @@ def mutation_checks(
         base_routes,
         base_assets,
         base_search,
+        base_history,
         {stage},
     )
     if any("pending within-stage routes" in error for error in cross_stage_errors):
@@ -4124,6 +4723,7 @@ def mutation_checks(
         within_routes,
         base_assets,
         base_search,
+        base_history,
         {stage},
     )
     if not any("pending within-stage routes" in error for error in within_stage_errors):
@@ -4145,6 +4745,7 @@ def mutation_checks(
             changed_routes,
             changed_assets,
             changed_search,
+            base_history,
         ):
             failures.append(f"mutation unexpectedly passed: {name}")
     return failures

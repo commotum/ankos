@@ -27,10 +27,7 @@ from audit_contract import (
     GOAL_DIR,
     READING_HEADER,
     REVIEW_HISTORY_FIELDS,
-    canonical_sha256,
-    review_event_sha256,
-    review_input_projection,
-    review_result_projection,
+    close_review_event,
 )
 
 
@@ -1187,7 +1184,6 @@ def prepare_merge(
 
     worker_id = str(bundle_manifest.get("worker_id"))
     unit_by_id = {unit["id"]: unit for unit in units}
-    input_asset_by_id = {row["asset_id"]: row for row in assets}
     result_reading_by_id = {
         row["source_unit_id"]: row for row in proposed_reading
     }
@@ -1199,7 +1195,7 @@ def prepare_merge(
     review_events: list[dict[str, Any]] = []
     for offset, source_path in enumerate(source_paths):
         review_id = f"V{next_review_number + offset:06d}"
-        review_event: dict[str, Any] = {
+        review_event_core: dict[str, Any] = {
             "review_id": review_id,
             "epoch": discovery_epoch,
             "stage": stage,
@@ -1216,32 +1212,21 @@ def prepare_merge(
                 for row in bundle_assets
                 if row["assignment_path"] == source_path
             ],
-            "input_projection_sha256": "",
-            "result_projection_sha256": "",
-            "previous_event_sha256": prior_event_sha256,
-            "event_sha256": "",
         }
         try:
-            review_event["input_projection_sha256"] = canonical_sha256(
-                review_input_projection(
-                    review_event,
-                    unit_by_id,
-                    input_asset_by_id,
-                )
-            )
-            review_event["result_projection_sha256"] = canonical_sha256(
-                review_result_projection(
-                    review_event,
-                    result_reading_by_id,
-                    result_asset_by_id,
-                )
+            review_event = close_review_event(
+                review_event_core,
+                unit_by_id,
+                result_reading_by_id,
+                result_asset_by_id,
+                prior_event_sha256,
+                search["rounds"],
             )
         except KeyError as exc:
             raise MergeError(
                 f"cannot bind review event {review_id} to its exact "
                 f"projection: {exc}"
             ) from exc
-        review_event["event_sha256"] = review_event_sha256(review_event)
         review_event = {
             field: review_event[field] for field in REVIEW_HISTORY_FIELDS
         }

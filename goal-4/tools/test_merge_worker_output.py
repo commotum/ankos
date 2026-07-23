@@ -26,6 +26,8 @@ from audit_contract import (  # noqa: E402
 
 
 ASSIGNMENT_PATH = "FRONT-MATTER/01-Preface.md"
+FIRST_STAGE_4_PATH = "FRONT-MATTER/00-Publication-and-Contents.md"
+INITIAL_STAGE_4_PREFIX = [FIRST_STAGE_4_PATH, ASSIGNMENT_PATH]
 STAGE_5_PATH = "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
 STAGE_5_NOTES_PATH = (
     "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
@@ -134,7 +136,7 @@ def _completed_bundle(
         bundle,
         worker_id,
         4,
-        [ASSIGNMENT_PATH],
+        INITIAL_STAGE_4_PREFIX if epoch == 1 else [ASSIGNMENT_PATH],
         epoch=epoch,
     )
     manifest = json.loads(
@@ -144,7 +146,11 @@ def _completed_bundle(
     assets = _read_csv(bundle / "input" / "asset-input.csv")
     assert reading
     assert len(assets) == 1
-    source_unit_id = reading[0]["source_unit_id"]
+    source_unit_id = next(
+        row["source_unit_id"]
+        for row in reading
+        if row["path"] == ASSIGNMENT_PATH
+    )
     asset_id = assets[0]["asset_id"]
     image_path = assets[0]["physical_path"]
 
@@ -442,7 +448,7 @@ def test_default_cli_is_dry_run_and_rewrites_all_id_families(
     assert completed.returncode == 0, completed.stderr
     preview = json.loads(completed.stdout)
     assert preview["mode"] == "dry-run"
-    assert preview["review_ids"] == ["V000001"]
+    assert preview["review_ids"] == ["V000001", "V000002"]
     assert preview["review_mode"] == "INITIAL"
     assert preview["mappings"] == {
         "candidates": {"W0001": "B0001"},
@@ -472,9 +478,13 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
 
     assert (goal / merge.SEARCH_NAME).read_bytes() == search_before
     history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
-    assert [event["review_id"] for event in history] == ["V000001"]
-    assert history[0]["source_paths"] == [ASSIGNMENT_PATH]
+    assert [event["review_id"] for event in history] == ["V000001", "V000002"]
+    assert [event["source_paths"] for event in history] == [
+        [FIRST_STAGE_4_PATH],
+        [ASSIGNMENT_PATH],
+    ]
     assert history[0]["previous_event_sha256"] is None
+    assert history[1]["previous_event_sha256"] == history[0]["event_sha256"]
     candidates = merge._read_jsonl(goal / merge.CANDIDATE_NAME)
     routes = merge._read_csv(
         goal / merge.ROUTE_NAME,
@@ -503,7 +513,7 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
     ) == ["R000001"]
 
 
-@pytest.mark.parametrize("failure_call", [2, 3])
+@pytest.mark.parametrize("failure_call", [2, 3, len(merge.WRITE_NAMES)])
 def test_apply_pre_replace_failure_restores_bytes_modes_and_cleans_staging(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -533,9 +543,11 @@ def test_apply_pre_replace_failure_restores_bytes_modes_and_cleans_staging(
     assert _merge_staging_dirs(goal) == []
 
 
+@pytest.mark.parametrize("interrupt_call", [2, len(merge.WRITE_NAMES)])
 def test_apply_replace_then_interrupt_restores_every_target_and_cleans_staging(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    interrupt_call: int,
 ) -> None:
     bundle = _completed_bundle(tmp_path)
     goal = _copy_global_state(tmp_path)
@@ -551,7 +563,7 @@ def test_apply_replace_then_interrupt_restores_every_target_and_cleans_staging(
         nonlocal calls
         calls += 1
         real_replace(source, target)
-        if calls == 2:
+        if calls == interrupt_call:
             raise injected
 
     monkeypatch.setattr(merge.os, "replace", replace_then_interrupt)
@@ -717,6 +729,28 @@ def test_stage_five_notes_cannot_merge_before_main_chapter(
         merge.prepare_merge(bundle, goal_dir=goal)
 
 
+def test_bundle_rejects_mixed_pending_and_reviewed_projection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal = _goal_after_initial_merge(tmp_path)
+    monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
+    with pytest.raises(
+        ValueError,
+        match="uniformly PENDING or uniformly REVIEWED/SCREENED",
+    ):
+        build_worker_bundle.build_bundle(
+            tmp_path / "mixed-bundle",
+            "mixed-projection-worker",
+            4,
+            [
+                ASSIGNMENT_PATH,
+                "BACK-MATTER/NOTES/00-General-Notes.md",
+            ],
+            epoch=1,
+        )
+
+
 def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -726,7 +760,7 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
         goal,
         epoch=1,
         stage=4,
-        source_paths=[ASSIGNMENT_PATH],
+        source_paths=INITIAL_STAGE_4_PREFIX,
     )
     monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
     bundle = _completed_bundle(
@@ -741,7 +775,7 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     plan = merge.prepare_merge(bundle, goal_dir=goal)
     preview = plan.preview()
     assert preview["discovery_epoch"] == 2
-    assert preview["review_ids"] == ["V000002"]
+    assert preview["review_ids"] == ["V000003"]
     assert preview["review_mode"] == "REOPEN"
     assert preview["search_ledger_preserved"] is False
     assert preview["search_fixed_point_cleared"] is True
@@ -786,9 +820,10 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     assert [event["review_id"] for event in history] == [
         "V000001",
         "V000002",
+        "V000003",
     ]
-    assert [event["epoch"] for event in history] == [1, 2]
-    assert history[1]["previous_event_sha256"] == history[0]["event_sha256"]
+    assert [event["epoch"] for event in history] == [1, 1, 2]
+    assert history[2]["previous_event_sha256"] == history[1]["event_sha256"]
 
 
 def test_epoch_two_reopen_requires_current_epoch_local_search_closure(
@@ -808,6 +843,118 @@ def test_epoch_two_reopen_requires_current_epoch_local_search_closure(
         match="LOCAL search scopes are not closed",
     ):
         merge.prepare_merge(bundle, goal_dir=goal)
+
+
+def test_same_path_can_reopen_again_at_epoch_three_after_epoch_two_closure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal = _goal_after_initial_merge(tmp_path)
+    _add_local_closure(
+        goal,
+        epoch=1,
+        stage=4,
+        source_paths=INITIAL_STAGE_4_PREFIX,
+    )
+    monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
+    epoch_two = _completed_bundle(
+        tmp_path / "epoch-two",
+        epoch=2,
+        worker_id="repeat-reopen-epoch-two",
+    )
+    merge.apply_merge(merge.prepare_merge(epoch_two, goal_dir=goal))
+    _add_local_closure(
+        goal,
+        epoch=2,
+        stage=4,
+        source_paths=[ASSIGNMENT_PATH],
+    )
+
+    epoch_three = _completed_bundle(
+        tmp_path / "epoch-three",
+        epoch=3,
+        worker_id="repeat-reopen-epoch-three",
+    )
+    plan = merge.prepare_merge(epoch_three, goal_dir=goal)
+    assert plan.discovery_epoch == 3
+    assert plan.review_ids == ("V000004",)
+    merge.apply_merge(plan)
+
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    assert [event["epoch"] for event in history] == [1, 1, 2, 3]
+    assert [event["source_paths"] for event in history] == [
+        [FIRST_STAGE_4_PATH],
+        [ASSIGNMENT_PATH],
+        [ASSIGNMENT_PATH],
+        [ASSIGNMENT_PATH],
+    ]
+    assert history[3]["previous_event_sha256"] == history[2]["event_sha256"]
+
+
+def test_pending_stage_five_forward_merge_uses_active_epoch_two(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = json.loads(
+        (merge.GOAL_DIR / merge.MANIFEST_NAME).read_text(encoding="utf-8")
+    )
+    stage_four_paths = build_worker_bundle.ordered_stage_paths(manifest, 4)
+    initial_bundle = _completed_no_construction_bundle(
+        tmp_path / "initial-stage-four",
+        stage=4,
+        assignment_paths=stage_four_paths,
+        worker_id="complete-stage-four",
+    )
+    goal = _copy_global_state(tmp_path / "state")
+    merge.apply_merge(merge.prepare_merge(initial_bundle, goal_dir=goal))
+    _add_local_closure(
+        goal,
+        epoch=1,
+        stage=4,
+        source_paths=stage_four_paths,
+    )
+
+    monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
+    reopened_bundle = _completed_no_construction_bundle(
+        tmp_path / "reopen-stage-four",
+        stage=4,
+        assignment_path=ASSIGNMENT_PATH,
+        epoch=2,
+        worker_id="reopen-stage-four",
+    )
+    merge.apply_merge(merge.prepare_merge(reopened_bundle, goal_dir=goal))
+    _add_local_closure(
+        goal,
+        epoch=2,
+        stage=4,
+        source_paths=[ASSIGNMENT_PATH],
+    )
+
+    stage_five_bundle = _completed_no_construction_bundle(
+        tmp_path / "forward-stage-five",
+        stage=5,
+        assignment_path=STAGE_5_PATH,
+        epoch=2,
+        worker_id="forward-stage-five-at-active-epoch",
+    )
+    plan = merge.prepare_merge(stage_five_bundle, goal_dir=goal)
+    assert plan.review_mode == "INITIAL"
+    assert plan.discovery_epoch == 2
+    assert plan.review_ids == ("V000006",)
+    merge.apply_merge(plan)
+
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    assert [event["review_id"] for event in history] == [
+        "V000001",
+        "V000002",
+        "V000003",
+        "V000004",
+        "V000005",
+        "V000006",
+    ]
+    assert [event["epoch"] for event in history] == [1, 1, 1, 1, 2, 2]
+    assert history[-1]["mode"] == "INITIAL"
+    assert history[-1]["source_paths"] == [STAGE_5_PATH]
 
 
 def test_reopen_epoch_must_be_next_global_epoch(
@@ -871,6 +1018,26 @@ def test_epoch_two_reopen_rejects_loss_of_existing_links(
     with pytest.raises(
         merge.MergeError,
         match="reopened pass must retain existing global links",
+    ):
+        merge.prepare_merge(bundle, goal_dir=goal)
+
+
+def test_reopen_rejects_loss_of_prior_review_history(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal = _goal_after_initial_merge(tmp_path)
+    monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
+    bundle = _completed_bundle(
+        tmp_path / "reopened",
+        epoch=2,
+        worker_id="merge-history-loss-worker",
+    )
+    (goal / merge.REVIEW_HISTORY_NAME).write_bytes(b"")
+
+    with pytest.raises(
+        merge.MergeError,
+        match="no authoritative prior review-history event",
     ):
         merge.prepare_merge(bundle, goal_dir=goal)
 
