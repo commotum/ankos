@@ -225,6 +225,7 @@ def ca_preset(
             )
         ],
     )
+    return spec
 
 
 # ---------------------------------------------------------------------------
@@ -450,6 +451,14 @@ add_evidence(
         "evidence_limit",
     ],
 )
+eca["source_status"] = ["DEFECTIVE"]
+eca["uncertainties"] = [
+    (
+        "U004988 contains the defective phrase “tries to updates”; the "
+        "surrounding sentence still clearly supports old-snapshot update "
+        "semantics without silently repairing the source wording."
+    )
+]
 add_evidence(
     eca,
     label="eca-cyclic-boundary",
@@ -1627,7 +1636,7 @@ def profile_candidate(
         "number decoding, invalid-input behavior, boundary, completion, or "
         "witness semantics."
     )
-    return source_candidate(
+    spec = source_candidate(
         key=key,
         name=name,
         anchor=anchor,
@@ -1666,6 +1675,7 @@ def profile_candidate(
             )
         ],
     )
+    return spec
 
 
 profile_candidate(
@@ -1865,6 +1875,9 @@ def seed_or_query_candidate(
     name: str,
     anchor: str,
     description: str,
+    carrier: str,
+    support: str,
+    topology: str,
     result: str,
     aliases: list[str] | None = None,
     seed_boundary: bool = True,
@@ -1875,6 +1888,9 @@ def seed_or_query_candidate(
     )
     facts = {
         "object_kind": "A cellular-automaton initial-state constructor class.",
+        "carrier": carrier,
+        "support": support,
+        "topology": topology,
         "complete_state": result,
         "input": description,
         "seed": description,
@@ -1925,6 +1941,9 @@ seed_or_query_candidate(
         "An explicit finite list of values used as a cyclic cellular-automaton "
         "configuration."
     ),
+    carrier="An ordered finite list of cell values.",
+    support="A finite one-dimensional row.",
+    topology="Cyclic adjacency joins the two endpoints.",
     result="A finite cyclic initial configuration.",
 )
 seed_or_query_candidate(
@@ -1935,6 +1954,9 @@ seed_or_query_candidate(
         "A finite list of foreground values superimposed on either one "
         "background value or a repeating background block."
     ),
+    carrier="Cell positions carrying foreground or background values.",
+    support="A one-dimensional line with a finite foreground and unbounded background.",
+    topology="Integer-ordered linear positions with an aligned repeating background.",
     result="An initial configuration with a finite foreground and infinite background.",
 )
 seed_or_query_candidate(
@@ -1945,6 +1967,9 @@ seed_or_query_candidate(
         "Several finite value blocks placed at explicit coordinate offsets on "
         "a declared background."
     ),
+    carrier="Cells grouped into finite blocks with explicit coordinate offsets.",
+    support="A cellular coordinate array with a declared background.",
+    topology="The coordinate topology implied by the supplied offset vectors.",
     result="A composed initial cellular configuration.",
 )
 seed_or_query_candidate(
@@ -1955,8 +1980,38 @@ seed_or_query_candidate(
         "A d-dimensional finite array specification embedded using a "
         "d-dimensional padding/background specification."
     ),
+    carrier="Cells in a d-dimensional finite value array.",
+    support="A d-dimensional cellular array embedded in declared padding/background.",
+    topology="The d-dimensional rectangular coordinate topology of the array.",
     result="A d-dimensional initial cellular configuration.",
 )
+for key in {"background-seed", "offset-block-seed", "dd-padded-seed"}:
+    seed_spec = next(
+        item for item in ALL_CANDIDATE_SPECS if item["key"] == key
+    )
+    add_evidence(
+        seed_spec,
+        label=f"{key}-alignment",
+        unit="U005022",
+        claim=(
+            "The source fixes the origin-relative alignment of the finite "
+            "foreground array and its background/padding array."
+        ),
+        fields=[
+            "topology",
+            "complete_state",
+            "input",
+            "seed",
+            "boundary",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        strength="CORROBORATING",
+    )
 
 explicit_cyclic_seed = source_candidate(
     key="explicit-cyclic-seed",
@@ -2181,7 +2236,7 @@ def explicit_ca_example(
         "The example does not state an infinite-support boundary, invalid-rule "
         "behavior, native completion/failure, or witness semantics."
     )
-    return source_candidate(
+    spec = source_candidate(
         key=key,
         name=name,
         anchor=anchor,
@@ -3161,6 +3216,21 @@ k_rule90_row_count = direct_query_candidate(
     aliases=["k-color additive row population"],
 )
 
+binomial_k_exponent = direct_query_candidate(
+    key="binomial-k-exponent-borrow-count",
+    name="Binomial k-exponent borrow-count function",
+    anchor="U005125",
+    object_kind="A direct integer-valued arithmetic query.",
+    input_text="Nonnegative integers t and n together with the base/factor k.",
+    law=(
+        "Return the number of borrows in the base-k subtraction of n from t; "
+        "the source identifies this with IntegerExponent[Binomial[t,n],k]."
+    ),
+    result="The k-exponent of Binomial[t,n].",
+    parameters_text="The integers t and n and the base/factor k.",
+    aliases=["binomial valuation by base-k borrows"],
+)
+
 binomial_mod_k = declarative_pattern(
     key="binomial-mod-k-prime",
     name="prime-k Binomial modulo-k array",
@@ -3770,7 +3840,8 @@ pylos["uncertainties"] = [
     )
 ]
 pylos["evidence"][0]["claim"] = (
-    "The source presents a five-stage procedure for the Pylos labyrinth while "
+    "The source presents a four-stage square procedure plus a rounded-form "
+    "variant for the Pylos labyrinth while "
     "explicitly qualifying its attribution to the historical tablet as presumed."
 )
 attach_procedure_images(
@@ -4721,6 +4792,13 @@ add_route(
     vocabulary=["additive", "continuous case", "page 922"],
 )
 add_route(
+    key="k-color-count-dimension-page955",
+    unit="U005127",
+    literal="For prime k ... fractal dimension ... (see page 955).",
+    topic="prime-k additive cellular-automaton counts and fractal dimensions",
+    vocabulary=["prime k", "non-white cells", "fractal dimension", "page 955"],
+)
+add_route(
     key="rule90-dimension-page933",
     unit="U005119",
     literal="fractal dimension ... (see page 933)",
@@ -4777,6 +4855,13 @@ add_route(
     vocabulary=["rule 30", "boundary", "average motion"],
 )
 add_route(
+    key="rule30-randomness-tests-page1084",
+    unit="U005141",
+    literal="the eight listed on page 1084",
+    topic="eight statistical tests applied to Rule 30 randomness",
+    vocabulary=["tests of randomness", "statistical tests", "rule 30", "page 1084"],
+)
+add_route(
     key="rule30-column-page1087",
     unit="U005148",
     literal="the arguments on page 1087",
@@ -4810,6 +4895,13 @@ add_route(
     literal="See also page 929.",
     topic="rule-based design and weaving construction boundary",
     vocabulary=["design", "weaving patterns", "cellular automata"],
+)
+add_route(
+    key="design-rule-selection-page929",
+    unit="U005168",
+    literal="(Compare page 929.)",
+    topic="rule-selection and evaluation methods for generated designs",
+    vocabulary=["rules", "design", "selection", "page 929"],
 )
 add_route(
     key="cosmati-apollonian-page986",
@@ -5018,7 +5110,6 @@ for key, unit, literal, topic, vocabulary, scope in [
 
 SEED_KEYS = {
     "centered-single-seed",
-    "cyclic-boundary",
     "cyclic-explicit-seed",
     "background-seed",
     "offset-block-seed",
@@ -5027,6 +5118,7 @@ SEED_KEYS = {
     "periodic-patch-seed",
     "positioned-patch-preset",
     "rule90-background-seed",
+    "random-ca-initial-condition",
 }
 HISTORICAL_CANDIDATE_KEYS = {
     "pylos-labyrinth",
@@ -5112,6 +5204,13 @@ direct_object_reason = (
     "coordinates; it has no native iterated transition for this field."
 )
 for key in {
+    "ca-time-slice-query",
+    "ca-space-slice-query",
+    "rule90-row-black-count",
+    "rule90-row-black-positions",
+    "k-color-rule90-row-count",
+    "binomial-k-exponent-borrow-count",
+    "binomial-mod-k-prime",
     "pascal-mod2",
     "rule60-pattern",
     "binomial-mod2-array",
@@ -5132,6 +5231,7 @@ for key in {
         next(item for item in ALL_CANDIDATE_SPECS if item["key"] == key),
         [
             "native_time",
+            "structural_invariants",
             "visible_history",
             "control_state",
             "seed",
@@ -5145,6 +5245,118 @@ for key in {
         ],
         direct_object_reason,
     )
+justify_not_applicable(
+    experiment,
+    ["external_data"],
+    (
+        "Observed run histories are results inspected by the experiment, not "
+        "external data consumed by the sampled programs or protocol."
+    ),
+)
+
+seed_constructor_reason = (
+    "This candidate constructs or samples an initial configuration; it has no "
+    "native iterated transition for this field."
+)
+for key in {
+    "centered-single-seed",
+    "cyclic-explicit-seed",
+    "background-seed",
+    "offset-block-seed",
+    "dd-padded-seed",
+    "explicit-cyclic-seed",
+    "periodic-patch-seed",
+    "positioned-patch-preset",
+    "rule90-background-seed",
+    "random-ca-initial-condition",
+}:
+    justify_not_applicable(
+        next(item for item in ALL_CANDIDATE_SPECS if item["key"] == key),
+        [
+            "native_time",
+            "visible_history",
+            "control_state",
+            "external_data",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "termination_completion_failure",
+            "witness_semantics",
+        ],
+        seed_constructor_reason,
+    )
+justify_not_applicable(
+    centered_seed,
+    ["boundary"],
+    (
+        "This constructor returns a finite row but does not itself evolve it; "
+        "an evolution boundary is a downstream program choice."
+    ),
+)
+
+justify_not_applicable(
+    cyclic_boundary,
+    [
+        "native_time",
+        "visible_history",
+        "control_state",
+        "seed",
+        "external_data",
+        "frontier_or_activation",
+        "schedule",
+        "write_replacement_assembly_or_commit",
+        "termination_completion_failure",
+        "witness_semantics",
+    ],
+    (
+        "This candidate is a direct boundary lookup relation, not an iterated "
+        "transition or state-writing program."
+    ),
+)
+
+justify_not_applicable(
+    symbolic_ca_formula,
+    [
+        "native_time",
+        "visible_history",
+        "control_state",
+        "seed",
+        "boundary",
+        "external_data",
+        "frontier_or_activation",
+        "schedule",
+        "write_replacement_assembly_or_commit",
+        "witness_semantics",
+    ],
+    (
+        "This candidate symbolically derives a formula from a supplied CA law; "
+        "it does not define a second native transition system."
+    ),
+)
+
+justify_not_applicable(
+    truchet,
+    [
+        "native_time",
+        "visible_history",
+        "control_state",
+        "seed",
+        "boundary",
+        "external_data",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "write_replacement_assembly_or_commit",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "termination_completion_failure",
+    ],
+    (
+        "This candidate denotes the complete model set of tile assignments; "
+        "it is not a stepwise tile-placement process or a sampler that chooses "
+        "one assignment."
+    ),
+)
 justify_not_applicable(
     center_column,
     [
@@ -5460,6 +5672,30 @@ def allocate_semantic_records(
                     f"{spec['key']} route {route_key} lacks candidate provenance"
                 )
 
+        structured_parameters = spec["parameters"]
+        structured_variants = spec["variants"]
+        if (
+            "parameters_and_variants" in spec["facts"]
+            and not structured_parameters
+            and not structured_variants
+        ):
+            support_labels = [
+                item["label"]
+                for item in spec["evidence"]
+                if "parameters_and_variants" in item["fields"]
+            ]
+            if not support_labels:
+                raise AuthoringError(
+                    f"{spec['key']} claims parameter support without evidence"
+                )
+            structured_parameters = [
+                (
+                    "source-delimited parameters and variants",
+                    spec["facts"]["parameters_and_variants"],
+                    support_labels,
+                )
+            ]
+
         values: dict[str, Any] = {
             "id": candidate_id,
             "record_status": "ACTIVE",
@@ -5474,15 +5710,15 @@ def allocate_semantic_records(
             },
             "source_unit_ids": source_unit_ids,
             "source_evidence": local_evidence,
-            "source_status": ["CLEAR"],
+            "source_status": spec.get("source_status", ["CLEAR"]),
             "image_witnesses": image_witnesses,
             "evidence_strength": list(
                 dict.fromkeys(item["strength"] for item in local_evidence)
             ),
             "field_support": field_support,
             "fingerprint": fingerprint,
-            "parameters": parameter_records(spec["parameters"]),
-            "variants": parameter_records(spec["variants"]),
+            "parameters": parameter_records(structured_parameters),
+            "variants": parameter_records(structured_variants),
             "missing_mechanics": list(
                 dict.fromkeys([spec["missing"], *unknown_reasons])
             ),
@@ -5607,6 +5843,12 @@ def candidate_secondary_roles(
         roles.append("REPRESENTATION")
     if unit_id in {"U005145", "U005146"}:
         roles.append("OBSERVER_OR_ANALYZER")
+    if unit_id == "U005291":
+        roles.append("APPLICATION")
+    if unit_id == "U005129":
+        roles.append("HISTORICAL_MENTION")
+    if unit_id in {"U004988", "U005043", "U005148"}:
+        roles.append("SOURCE_DEFECT")
     return list(dict.fromkeys(roles))
 
 
@@ -5713,13 +5955,44 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             )
         else:
             disposition, secondary, statement = default_reading_judgment(row)
+        if unit_id in {"U004988", "U005043", "U005148"}:
+            secondary = list(dict.fromkeys([*secondary, "SOURCE_DEFECT"]))
         row.update(
             {
                 "review_status": "REVIEWED",
                 "review_epoch": "1",
                 "review_disposition": disposition,
-                "source_status": "CLEAR",
-                "uncertainty": "",
+                "source_status": (
+                    "DEFECTIVE"
+                    if unit_id in {"U004988", "U005043", "U005148"}
+                    else "AMBIGUOUS"
+                    if unit_id == "U005120"
+                    else "CLEAR"
+                ),
+                "uncertainty": (
+                    "The phrase “tries to updates” is grammatically defective; "
+                    "the surrounding sentence still unambiguously states the "
+                    "old-snapshot update requirement."
+                    if unit_id == "U004988"
+                    else (
+                        "The sentence omits or corrupts the subject of the Rule "
+                        "30 example call; U005044 supplies the exact call and output."
+                        if unit_id == "U005043"
+                        else (
+                            "The striped inline seed symbol is identifiable, but "
+                            "its individual binary cells and exact repeated value "
+                            "sequence cannot be recovered unambiguously."
+                            if unit_id == "U005120"
+                            else (
+                                "The phrase “I would amazed” is missing “be”; "
+                                "the intended nonrepetition claim and page route "
+                                "remain unambiguous."
+                                if unit_id == "U005148"
+                                else ""
+                            )
+                        )
+                    )
+                ),
                 "secondary_roles": compact(secondary),
                 "candidate_ids": compact(candidate_ids),
                 "route_ids": compact(route_ids),
@@ -5739,6 +6012,11 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
         if candidate_ids:
             visual_role = "NATIVE_EVIDENCE"
             risk_flags = ["CONSTRUCTION_BEARING"]
+            if (
+                image_path
+                == "BACK-MATTER/NOTES/_page_885_inline_black_gradient_white_block.jpeg"
+            ):
+                risk_flags.append("AMBIGUOUS")
             transcription_status = "CHECKED"
             statement = (
                 "Original-resolution inspection confirms construction-bearing "
@@ -5784,7 +6062,12 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                 "inspection_status": "SCREENED",
                 "review_epoch": "1",
                 "visual_role": visual_role,
-                "source_status": "CLEAR",
+                "source_status": (
+                    "AMBIGUOUS"
+                    if image_path
+                    == "BACK-MATTER/NOTES/_page_885_inline_black_gradient_white_block.jpeg"
+                    else "CLEAR"
+                ),
                 "risk_flags": compact(risk_flags),
                 "original_resolution_status": "REVIEWED",
                 "transcription_status": transcription_status,
@@ -5793,7 +6076,14 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                 "evidence_statement": statement,
                 "review_stage": "6",
                 "reviewer": EXPECTED_WORKER,
-                "uncertainty": "",
+                "uncertainty": (
+                    "The striped background block is visible as a qualitative "
+                    "symbol, but its individual binary cells and exact repeated "
+                    "value sequence cannot be recovered unambiguously."
+                    if image_path
+                    == "BACK-MATTER/NOTES/_page_885_inline_black_gradient_white_block.jpeg"
+                    else ""
+                ),
             }
         )
         asset_updates.append(row)
