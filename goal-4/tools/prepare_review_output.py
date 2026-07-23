@@ -6,6 +6,10 @@ risk flag, evidence statement, candidate, route, or uncertainty.  It copies
 the immutable bundle projections into ``output/output.json`` and leaves every
 human judgment visibly incomplete.  The existing bundle verifier remains the
 authority for a completed output.
+
+Mutating commands serialize with other invocations of this helper through an
+advisory lock on the bundle's output directory.  Editors and other
+non-cooperating writers must be quiescent while a mutating command runs.
 """
 
 from __future__ import annotations
@@ -272,6 +276,15 @@ def validate_row_identity(
         if set(update) != set(header):
             errors.append(f"{label} update {index} fields differ from the contract")
             continue
+        non_string_fields = [
+            field for field in header if not isinstance(update.get(field), str)
+        ]
+        if non_string_fields:
+            errors.append(
+                f"{label} update {index} has non-string fields: "
+                + ",".join(non_string_fields)
+            )
+            continue
         identifier = update.get(id_field)
         if not isinstance(identifier, str):
             errors.append(f"{label} update {index} has a non-string identity")
@@ -297,7 +310,11 @@ def validate_row_identity(
             )
     if actual_ids != expected_ids:
         missing = [identifier for identifier in expected_ids if identifier not in seen]
-        extra = [identifier for identifier in actual_ids if identifier not in assigned_by_id]
+        extra = [
+            identifier
+            for identifier in actual_ids
+            if identifier not in assigned_by_id
+        ]
         if missing:
             errors.append(f"{label} assignment rows are missing: {','.join(missing)}")
         if extra:
@@ -326,8 +343,20 @@ def resume_rows(
             raise PreparationError(
                 f"{label} update {index} fields differ from the contract"
             )
+        non_string_fields = [
+            field for field in header if not isinstance(update.get(field), str)
+        ]
+        if non_string_fields:
+            raise PreparationError(
+                f"{label} update {index} has non-string fields: "
+                + ",".join(non_string_fields)
+            )
         identifier = update.get(id_field)
-        if not isinstance(identifier, str) or identifier not in assigned_by_id:
+        if not isinstance(identifier, str):
+            raise PreparationError(
+                f"{label} update {index} has a non-string identity"
+            )
+        if identifier not in assigned_by_id:
             raise PreparationError(
                 f"{label} update {index} has an unknown assignment identity"
             )
@@ -528,16 +557,10 @@ def atomic_replace(path: Path, payload: bytes, expected: bytes) -> None:
             raise PreparationError("worker output changed before atomic replacement")
         os.replace(temporary_name, path)
         temporary_name = ""
-        directory_flags = os.O_RDONLY
-        if hasattr(os, "O_DIRECTORY"):
-            directory_flags |= os.O_DIRECTORY
-        directory_descriptor = os.open(path.parent, directory_flags)
-        try:
-            os.fsync(directory_descriptor)
-        finally:
-            os.close(directory_descriptor)
     except OSError as exc:
-        raise PreparationError(f"cannot atomically replace worker output: {exc}") from exc
+        raise PreparationError(
+            f"cannot atomically replace worker output: {exc}"
+        ) from exc
     finally:
         if descriptor >= 0:
             os.close(descriptor)

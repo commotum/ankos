@@ -13,7 +13,11 @@ sys.path.insert(0, str(TOOLS_DIR))
 
 import build_worker_bundle  # noqa: E402
 import prepare_review_output as prepare  # noqa: E402
-from audit_contract import ASSET_HEADER, READING_HEADER, canonical_json_bytes  # noqa: E402
+from audit_contract import (  # noqa: E402
+    ASSET_HEADER,
+    READING_HEADER,
+    canonical_json_bytes,
+)
 
 
 PREFACE_PATH = "FRONT-MATTER/01-Preface.md"
@@ -245,6 +249,129 @@ def test_resume_rejects_identity_changes_and_nonrow_semantic_work(
     with pytest.raises(prepare.PreparationError, match="candidate_proposals"):
         prepare.prepare(bundle, resume=True)
     assert output_path.read_bytes() == candidate_bytes
+
+
+def test_malformed_mutable_row_value_fails_closed_without_traceback(
+    tmp_path: Path,
+) -> None:
+    bundle = _build_bundle(tmp_path, paths=[PREFACE_PATH])
+    prepare.prepare(bundle)
+    output_path = bundle / "output" / "output.json"
+    output = _output(bundle)
+    output["reading_updates"][0]["evidence_statement"] = 17
+    _write_output(bundle, output)
+    malformed_bytes = output_path.read_bytes()
+
+    errors, incomplete, finalized = prepare.check(bundle)
+    assert any("non-string fields: evidence_statement" in error for error in errors)
+    assert incomplete == []
+    assert finalized is False
+    with pytest.raises(prepare.PreparationError, match="non-string fields"):
+        prepare.finalize_declaration(bundle)
+    with pytest.raises(prepare.PreparationError, match="non-string fields"):
+        prepare.prepare(bundle, resume=True)
+    assert output_path.read_bytes() == malformed_bytes
+
+    checked = subprocess.run(
+        [
+            sys.executable,
+            str(TOOLS_DIR / "prepare_review_output.py"),
+            str(bundle),
+            "--check",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert checked.returncode == 1
+    assert "non-string fields: evidence_statement" in checked.stderr
+    assert "Traceback" not in checked.stderr
+    assert output_path.read_bytes() == malformed_bytes
+
+
+def test_atomic_replace_rejects_snapshot_change_before_install(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = _build_bundle(tmp_path, paths=[PREFACE_PATH])
+    prepare.prepare(bundle)
+    output_path = bundle / "output" / "output.json"
+    expected = output_path.read_bytes()
+    proposed = expected + b"\n"
+    external = b'{"external":"manual edit"}\n'
+    original_read_bytes = Path.read_bytes
+    target_reads = 0
+
+    def raced_read_bytes(path: Path) -> bytes:
+        nonlocal target_reads
+        if path == output_path:
+            target_reads += 1
+            if target_reads == 2:
+                path.write_bytes(external)
+                return external
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", raced_read_bytes)
+    with pytest.raises(prepare.PreparationError, match="changed before"):
+        prepare.atomic_replace(output_path, proposed, expected)
+    assert original_read_bytes(output_path) == external
+    assert not list(
+        (bundle / "output").glob(".prepare-review-output-*.tmp")
+    )
+
+
+def test_output_lock_serializes_two_helper_processes(tmp_path: Path) -> None:
+    bundle = _build_bundle(tmp_path, paths=[PREFACE_PATH])
+    holder_code = """
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import prepare_review_output as helper
+with helper.output_lock(Path(sys.argv[2])):
+    print("LOCKED", flush=True)
+    sys.stdin.readline()
+"""
+    waiter_code = """
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import prepare_review_output as helper
+with helper.output_lock(Path(sys.argv[2])):
+    print("ACQUIRED", flush=True)
+"""
+    holder = subprocess.Popen(
+        [sys.executable, "-c", holder_code, str(TOOLS_DIR), str(bundle)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    waiter: subprocess.Popen[str] | None = None
+    try:
+        assert holder.stdout is not None
+        assert holder.stdout.readline().strip() == "LOCKED"
+        waiter = subprocess.Popen(
+            [sys.executable, "-c", waiter_code, str(TOOLS_DIR), str(bundle)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        with pytest.raises(subprocess.TimeoutExpired):
+            waiter.wait(timeout=0.2)
+        assert holder.stdin is not None
+        holder.stdin.write("\n")
+        holder.stdin.flush()
+        assert holder.wait(timeout=5) == 0
+        stdout, stderr = waiter.communicate(timeout=5)
+        assert waiter.returncode == 0, stderr
+        assert stdout.strip() == "ACQUIRED"
+    finally:
+        if holder.poll() is None:
+            holder.terminate()
+            holder.wait(timeout=5)
+        if waiter is not None and waiter.poll() is None:
+            waiter.terminate()
+            waiter.wait(timeout=5)
 
 
 def test_finalize_is_failure_safe_and_completed_verifier_compatible(

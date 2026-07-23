@@ -148,10 +148,11 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current cutover facts to reverify and hash-pin in Stage 2:
+These are current facts after completion of Stages 1–3:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
-  no taxonomy-audit stage or generated audit artifact had begun.
+  that pre-execution state is retained only as historical provenance in
+  `0-baseline.md`.
 - Stage 1 is complete in `1-GUARDRAILS.md`. The frozen machine-readable
   discovery contract is `guardrails.json`; it adds orthogonal source/evidence
   status, object-kind native-judgment proofs, an explicit solver role, typed
