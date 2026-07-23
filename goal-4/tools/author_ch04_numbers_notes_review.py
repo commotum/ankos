@@ -463,6 +463,16 @@ SPECS.append(
         params=("initial n",),
         images=("BACK-MATTER/NOTES/_page_919_Figure_10.jpeg",),
         facts={
+            "native_time": FF(
+                "discrete applications counted until value 1 is reached",
+                "U005694",
+            ),
+            "seed": FF("the starting integer n", "U005694"),
+            "input": FF("initial integer n", "U005694"),
+            "parameters_and_variants": FF(
+                "parameter: initial n; case (b) is distinct from cases (a) and (c)",
+                "U005694",
+            ),
             "termination_completion_failure": FF(
                 "The source states that the number of steps to reach 1 equals the number of base-2 digits in n.",
                 "U005694",
@@ -1436,7 +1446,7 @@ def supported(
         "SUPPORTED",
         value,
         anchors,
-        f"{spec['name']}: the cited anchor states or directly fixes {field.replace('_', ' ')} at this exact scope.",
+        "",
     )
 
 
@@ -1473,6 +1483,8 @@ def choose_law_anchor(
 ) -> str:
     if spec["identity_image"]:
         return spec["identity_image"]
+    if spec["name"] == "case-b binary-length stopping-time map":
+        return "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg"
     if spec["image_direct"] and spec["images"]:
         return spec["images"][0]
     if spec["law_uid"] is not None:
@@ -1916,15 +1928,20 @@ def field_decisions(
 
     # Candidate-specific facts are authoritative over the conservative base.
     for field, fact in spec["facts"].items():
+        fact_reason = (
+            ""
+            if fact["status"] == "SUPPORTED"
+            else fact["reason"]
+            or (
+                f"{name}: the cited source leaves "
+                f"{field.replace('_', ' ')} unresolved."
+            )
+        )
         d[field] = decision(
             fact["status"],
             fact["value"],
             fact["anchors"],
-            fact["reason"]
-            or (
-                f"{name}: the cited anchor directly states "
-                f"{field.replace('_', ' ')} at this scope."
-            ),
+            fact_reason,
         )
 
     # The visible case-(b) rule is image-native but defect-limited because the
@@ -2024,10 +2041,20 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
     kind_by_name = {spec["name"]: spec["kind"] for spec in SPECS}
     kind_counts: dict[str, int] = defaultdict(int)
     evidence_strength_counts: dict[str, int] = defaultdict(int)
+    field_status_counts: dict[str, int] = defaultdict(int)
+    related_count = 0
+    maximum_evidence_width = 0
     for candidate in candidates:
         kind_counts[kind_by_name[candidate["provisional_name"]]] += 1
+        related_count += len(candidate["related_candidate_ids"])
+        for item in candidate["fingerprint"].values():
+            field_status_counts[item["status"]] += 1
         for evidence in candidate["source_evidence"]:
             evidence_strength_counts[evidence["strength"]] += 1
+            maximum_evidence_width = max(
+                maximum_evidence_width,
+                len(evidence["fingerprint_fields"]),
+            )
 
     unfinalized = copy.deepcopy(output)
     unfinalized["prohibited_input_nonuse"] = False
@@ -2083,8 +2110,11 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         f"- Asset transcription partition: `{json.dumps(count_values(assets, 'transcription_status'), sort_keys=True)}`.",
         f"- Candidate proposals: `{len(candidates)}` active worker-local candidates.",
         f"- Candidate-kind partition: `{json.dumps(dict(sorted(kind_counts.items())), sort_keys=True)}`.",
+        f"- Fingerprint-field status partition: `{json.dumps(dict(sorted(field_status_counts.items())), sort_keys=True)}`.",
         f"- Evidence records/groups: `{sum(len(c['source_evidence']) for c in candidates)}` / `{len({e['evidence_group_id'] for c in candidates for e in c['source_evidence']})}`.",
         f"- Evidence-strength partition: `{json.dumps(dict(sorted(evidence_strength_counts.items())), sort_keys=True)}`.",
+        f"- Maximum fields claimed by one evidence record: `{maximum_evidence_width}` (no blanket 28-field evidence records).",
+        f"- Source-grounded provisional candidate relations: `{related_count}`.",
         f"- Pending typed routes: `{len(routes)}`.",
         f"- Candidates with explicitly missing mechanics: `{len(incomplete)}`.",
         "",
@@ -2109,13 +2139,14 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         "",
         "## Pending route proposals",
         "",
-        "| Route | Source | Literal target | Expected mechanics |",
-        "|---|---|---|---|",
+        "| Route | Source | Literal target | Scope | Expected mechanics |",
+        "|---|---|---|---|---|",
     ])
     for route in routes:
         lines.append(
             f"| `{route['route_id']}` | `{route['source_unit_id']}` | "
-            f"`{route['literal_target']}` | {route['expected_topic']} |"
+            f"`{route['literal_target']}` | `{route['closure_scope']}` | "
+            f"{route['expected_topic']} |"
         )
 
     lines.extend([
@@ -2134,7 +2165,7 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         "",
         "## Asset audit",
         "",
-        "- The only clean composites used as direct image-native mechanics are:",
+        "- The six assets classified as native construction evidence are:",
     ])
     for asset in direct_assets:
         lines.append(
@@ -2142,9 +2173,16 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
             f"original `REVIEWED`, transcription `CHECKED`, candidates "
             f"`{asset['candidate_ids']}`."
         )
-    lines.append(
-        "- Nine clean composite families supersede the 30 unreferenced physical fragments:"
-    )
+    a443 = asset_by_id["A000443"]
+    lines.extend([
+        "- `A000443` is separately retained as referenced `SOURCE_DEFECT` / "
+        "`DEFECTIVE`: cases (a) and (b) are visible, case (c) is bottom-clipped, "
+        "and every image claim is `DEFECT_LIMITED`.",
+        f"  - Original `{a443['original_resolution_status']}`; transcription "
+        f"`{a443['transcription_status']}`; risks `{a443['risk_flags']}`; "
+        f"candidates `{a443['candidate_ids']}`.",
+        "- Nine clean composite families supersede the 30 unreferenced physical fragments:",
+    ])
     for asset_id in clean_composite_ids:
         asset = asset_by_id[asset_id]
         lines.append(f"  - `{asset_id}` `{asset['physical_path']}`")
@@ -2157,6 +2195,15 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         lines.append(f"  - `{asset['asset_id']}` `{asset['physical_path']}`")
 
     lines.extend([
+        "",
+        "## Hostile-review repair summary",
+        "",
+        "- Replaced the kind-wide profile template with 28 explicit source-limited decisions per candidate.",
+        "- Every `UNKNOWN_FROM_SOURCE` reason is reproduced verbatim in that candidate's `missing_mechanics`; every supported/N/A/conflicting field cites only its declared unit/image anchors.",
+        "- Split, corrected, or added the Gray/bitwise, universal/per-seed 3n+1, case-(b)/(c), evaluation-policy, prime approximation, perfect/pluperfect/quasiperfect, Stoneham, continuous-CA-rule, and non-autonomous-ODE records identified by hostile review.",
+        "- Removed the overcaptured named numerical-method list, retained failure/partiality/conflict semantics, and represented local candidate comparisons with worker-local provisional relations.",
+        "- Reconciled all nine Notes routes, including the page-132 sieve route and five `WITHIN_STAGE` scopes. Case (c) has no invented route because the source supplies no literal target.",
+        "- Reclassified the six image-native bitwise laws as integer iterations and folded the commutatively identical U005649 rule-60 law into the first iteration candidate.",
         "",
         "## Recorded uncertainties",
         "",
@@ -2337,7 +2384,11 @@ def author(bundle: Path) -> dict[str, Any]:
             if role == "NATIVE_EVIDENCE":
                 return (
                     "DIRECT_COMPLETE_MECHANICS"
-                    if anchor in {BITWISE_IMAGE, OTHER_PDE_IMAGE}
+                    if (
+                        anchor in {BITWISE_IMAGE, OTHER_PDE_IMAGE}
+                        and "rule_relation_constraint_function_or_probability_law"
+                        in fields
+                    )
                     else "DIRECT_PARTIAL_MECHANICS"
                 )
             return "CONTEXTUAL"
@@ -2381,33 +2432,71 @@ def author(bundle: Path) -> dict[str, Any]:
                         f"{spec['name']}.{field} uses unavailable anchor {anchor}"
                     )
                 fields_by_anchor[anchor].append(field)
+        evidence_field_groups = (
+            ("object_kind", "law_kind"),
+            (
+                "native_time", "carrier", "support", "topology",
+                "structural_invariants", "alphabet_or_value_schema",
+            ),
+            (
+                "complete_state", "visible_history", "control_state", "seed",
+                "input", "boundary", "external_data",
+            ),
+            (
+                "frontier_or_activation", "schedule",
+                "read_dependencies_or_neighborhood",
+            ),
+            (
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+            ),
+            (
+                "result_kind", "successor_cardinality",
+                "determinism_branching_or_measure",
+                "termination_completion_failure", "witness_semantics",
+            ),
+            (
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ),
+        )
+        group_index = {
+            field: index
+            for index, group in enumerate(evidence_field_groups, 1)
+            for field in group
+        }
         for anchor in sorted(fields_by_anchor, key=anchor_order.__getitem__):
-            fields = ordered_unique(fields_by_anchor[anchor])
-            exact_claims = []
-            for field in fields:
-                item = decisions[field]
-                exact_claims.append(
-                    f"{field}={item['value']!r}"
-                    if item["value"] is not None
-                    else f"{field}=NOT_APPLICABLE ({item['reason']})"
+            grouped_fields: dict[int, list[str]] = defaultdict(list)
+            for field in ordered_unique(fields_by_anchor[anchor]):
+                grouped_fields[group_index[field]].append(field)
+            for field_group in sorted(grouped_fields):
+                fields = grouped_fields[field_group]
+                exact_claims = []
+                for field in fields:
+                    item = decisions[field]
+                    exact_claims.append(
+                        f"{field}={item['value']!r}"
+                        if item["value"] is not None
+                        else f"{field}=NOT_APPLICABLE ({item['reason']})"
+                    )
+                append_request(
+                    spec=spec,
+                    anchor=anchor,
+                    sort_slot=field_group,
+                    strength=mechanics_strength(spec, anchor, fields),
+                    modality=(
+                        "IMAGE"
+                        if anchor in image_order
+                        else source_modality(anchor, fields)
+                    ),
+                    claim=(
+                        f"For {spec['name']}, this anchor supports only: "
+                        + "; ".join(exact_claims)
+                        + "."
+                    ),
+                    fields=fields,
                 )
-            append_request(
-                spec=spec,
-                anchor=anchor,
-                sort_slot=1,
-                strength=mechanics_strength(spec, anchor, fields),
-                modality=(
-                    "IMAGE"
-                    if anchor in image_order
-                    else source_modality(anchor, fields)
-                ),
-                claim=(
-                    f"For {spec['name']}, this anchor supports only: "
-                    + "; ".join(exact_claims)
-                    + "."
-                ),
-                fields=fields,
-            )
 
         existing_anchors = {
             request["anchor_id"]
@@ -2420,7 +2509,7 @@ def author(bundle: Path) -> dict[str, Any]:
             append_request(
                 spec=spec,
                 anchor=uid,
-                sort_slot=2,
+                sort_slot=99,
                 strength="CONTEXTUAL",
                 modality=source_modality(uid, []),
                 claim=(
@@ -2443,7 +2532,7 @@ def author(bundle: Path) -> dict[str, Any]:
             append_request(
                 spec=spec,
                 anchor=image_path,
-                sort_slot=2,
+                sort_slot=99,
                 strength="DEFECT_LIMITED" if asset_id == "A000443" else "CONTEXTUAL",
                 modality="IMAGE",
                 claim=(

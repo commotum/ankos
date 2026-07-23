@@ -550,6 +550,8 @@ context_evidence(
     "U000799",
     "The nested base-10 formula directly instantiates fractional positional assembly.",
     fields=[
+        "topology",
+        "structural_invariants",
         "rule_relation_constraint_function_or_probability_law",
         "termination_completion_failure",
         "witness_semantics",
@@ -1220,7 +1222,7 @@ for key, name, law, initial, read in variable_recurrences:
         claim=f"Original-resolution inspection directly transcribes {law} with {initial}.",
         strength="DEFECT_LIMITED",
         image_path="CHAPTERS/_page_144_Figure_3.jpeg",
-        source_status=["DEFECTIVE"],
+        source_status=["CLEAR", "DEFECTIVE"],
         uncertainties=[
             "The recurrence formulas and shown prefixes are legible, but the asset has hard bottom-edge bleed/cut through the following plot row."
         ],
@@ -2028,6 +2030,8 @@ evidence(
         "native_time",
         "carrier",
         "support",
+        "topology",
+        "structural_invariants",
         "alphabet_or_value_schema",
         "complete_state",
         "input",
@@ -2115,6 +2119,8 @@ evidence(
         "native_time",
         "carrier",
         "support",
+        "topology",
+        "structural_invariants",
         "alphabet_or_value_schema",
         "law_kind",
         "rule_relation_constraint_function_or_probability_law",
@@ -2699,7 +2705,6 @@ context_evidence(
         "visible_history",
         "seed",
         "input",
-        "boundary",
         "frontier_or_activation",
         "schedule",
         "read_dependencies_or_neighborhood",
@@ -3224,6 +3229,14 @@ context_evidence(
 )
 context_evidence(
     pde_family,
+    "pde-symbolic-formula-variation",
+    "U000914",
+    "The prose states that arbitrary mathematical formulas may occur and proposes discrete symbolic components as a way to vary sampled PDE formulas.",
+    fields=["parameters_and_variants"],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    pde_family,
     "pde-family-general-failure",
     "U000915",
     "The prose states only a family-level failure mode: many sampled PDEs cease determining future behavior after blow-up or infinitely rapid variation.",
@@ -3703,7 +3716,6 @@ for _spec, _label, _unit in [
     (continuous_ca_family, "iterated-maps-prior-section-route", "U000865"),
     (fractional_three_half_ca, "iterated-map-a-route", "U000873"),
     (additive_presets["0.3299"], "localized-structure-page160-route", "U000882"),
-    (neighbor_difference, "localized-difference-page160-route", "U000882"),
     (diffusion_pde, "continuous-average-route", "U000897"),
     (additive_ca_family, "continuous-rules-route", "U000886"),
     (nonlinear_pdes[1], "nonlinear-pde-route-1", "U000936"),
@@ -3718,6 +3730,142 @@ for _spec, _label, _unit in [
         strength="LEAD_ONLY",
         modality="CROSS_REFERENCE",
     )
+
+# Contextual image links preserve the distinction between a candidate and a
+# control/observer that displays it.  Empty field lists are intentional: these
+# assets add visual provenance without independently proving fingerprint
+# mechanics already grounded in prose, formulas, tables, or native panels.
+ASSET_CONTEXT_LINKS: list[
+    tuple[str, str, list[CandidateSpec], str]
+] = [
+    (
+        "A000780",
+        "CHAPTERS/_page_132_Figure_10.jpeg",
+        [radix_presets[2], addition_presets[1]],
+        "U000665",
+    ),
+    (
+        "A000781",
+        "CHAPTERS/_page_132_Figure_10_Overview.jpeg",
+        [radix_presets[2], addition_presets[1]],
+        "U000664",
+    ),
+    ("A000785", "CHAPTERS/_page_135_Figure_2.jpeg", [times_three], "U000681"),
+    (
+        "A000787",
+        "CHAPTERS/_page_137_Digit_Matrix.jpeg",
+        [three_half_parity_map, parity_observer],
+        "U000691",
+    ),
+    ("A000788", "CHAPTERS/_page_137_Figure_1.jpeg", [fractional_part], "U000687"),
+    (
+        "A000789",
+        "CHAPTERS/_page_137_Picture_7.jpeg",
+        [three_half_parity_map, parity_observer],
+        "U000692",
+    ),
+    ("A000790", "CHAPTERS/_page_138_Figure_6.jpeg", [five_half_map], "U000699"),
+    (
+        "A000791",
+        "CHAPTERS/_page_139_Figure_1.jpeg",
+        [five_half_map, six_seed, digit_length_observer],
+        "U000702",
+    ),
+    (
+        "A000792",
+        "CHAPTERS/_page_140_Picture_5.jpeg",
+        [reverse_add, seed_16],
+        "U000711",
+    ),
+    (
+        "A000793",
+        "CHAPTERS/_page_141_Picture_2.jpeg",
+        [reverse_add, seed_512],
+        "U000713",
+    ),
+    (
+        "A000794",
+        "CHAPTERS/_page_142_Picture_2.jpeg",
+        [reverse_add, seed_512],
+        "U000715",
+    ),
+    (
+        "A000803",
+        "CHAPTERS/_page_150_Figure_4.jpeg",
+        [four_square_count],
+        "U000756",
+    ),
+    (
+        "A000804",
+        "CHAPTERS/_page_150_Figure_5.jpeg",
+        [goldbach_count],
+        "U000757",
+    ),
+    (
+        "A000805",
+        "CHAPTERS/_page_151_Figure_7.jpeg",
+        [pi_digits, pi_walk],
+        "U000767",
+    ),
+    (
+        "A000808",
+        "CHAPTERS/_page_156_Figure_1.jpeg",
+        [square_root_function, sqrt_generator],
+        "U000789",
+    ),
+    (
+        "A000809",
+        "CHAPTERS/_page_160_Figure_4.jpeg",
+        [cube_root_family, fourth_root_family, log_family, exp_family],
+        "U000814",
+    ),
+    (
+        "A000812",
+        "CHAPTERS/_page_163_Figure_4.jpeg",
+        [zeta_function, riemann_siegel, riemann_hypothesis],
+        "U000825",
+    ),
+    (
+        "A000814",
+        "CHAPTERS/_page_166_Figure_2.jpeg",
+        [pi_quarter_seed, *map_specs.values()],
+        "U000837",
+    ),
+    (
+        "A000815",
+        "CHAPTERS/_page_168_Figure_4.jpeg",
+        [map_specs["iterated-map-d"], nearby_pair_seed],
+        "U000848",
+    ),
+    (
+        "A000816",
+        "CHAPTERS/_page_168_Figure_5.jpeg",
+        [map_specs["iterated-map-d"], nearby_pair_seed],
+        "U000849",
+    ),
+    (
+        "A000819",
+        "CHAPTERS/_page_168_Picture_3.jpeg",
+        [map_specs["iterated-map-d"], nearby_pair_seed],
+        "U000847",
+    ),
+    (
+        "A000824",
+        "CHAPTERS/_page_173_Picture_3.jpeg",
+        [additive_ca_family, additive_presets["0.25"]],
+        "U000877",
+    ),
+]
+for _asset_id, _path, _specs, _unit in ASSET_CONTEXT_LINKS:
+    for _spec in _specs:
+        context_evidence(
+            _spec,
+            f"{_spec['key']}-{_asset_id.lower()}-context",
+            _unit,
+            "Original-resolution inspection links this control or observer to the candidate without treating the display as an independent law.",
+            image_path=_path,
+            strength="CORROBORATING",
+        )
 
 
 UNKNOWN_LABELS = {
