@@ -452,43 +452,69 @@ def seed_facts(kind: str, carrier: str, support: str, value: str, variants: str)
 # Sequential-review judgments: number representations and arithmetic maps.
 
 RADIX_FACTS = declarative_facts(
-    kind="A positional radix representation codec for numbers.",
+    kind="A positional radix denotation relation for numbers.",
     carrier="An ordered sequence of digits together with a radix b.",
     support="Digit positions indexed from the units position outward, with optional fractional positions.",
     alphabet="Digits 0 through b-1 and positional weights that are powers of b.",
-    state="A radix b digit sequence, or the number it denotes.",
-    input_value="A radix b digit sequence for decoding, or a number for representation.",
-    law_kind="A positional weighted-sum representation and its inverse.",
+    state="A radix b digit sequence.",
+    input_value="A radix b digit sequence and its radix.",
+    law_kind="A positional weighted-sum denotation relation.",
     law=(
         "Starting at the right, multiply successive digits by 1, b, b^2, ... "
         "and sum them; fractional positions use reciprocal powers of b."
     ),
-    result="The represented number, or its radix b digit sequence.",
-    successor="One value is denoted by every digit sequence; the usual canonical expansion is intended in the reverse direction.",
+    result="The number denoted by the supplied radix digit sequence.",
+    successor="One value is denoted by every admitted digit sequence.",
     determinism="Deterministic for a fixed radix and digit sequence.",
     termination="Finite sequences decode by a finite sum; nonterminating fractional expansions denote limiting values.",
     witness="The weighted positional sum equals the represented number.",
     variants="The radix b varies; the source explicitly displays bases 2 through 10.",
     excluded="Typography, black/white cell rendering, and stacked histories do not change the denoted number.",
-    limit="The source does not discuss the two-expansion ambiguity for terminating fractions.",
+    limit="The source does not supply a number-to-digits extraction algorithm or a canonical convention for dual terminating/nonterminating fractional expansions.",
 )
-radix = source_candidate(
+radix = candidate(
     "radix-family",
-    "positional radix representation codec",
+    "positional radix denotation relation",
     "U000653",
     RADIX_FACTS,
     aliases=["base-b digit-sequence representation"],
     not_applicable=DECLARATIVE_NA,
-    missing="The convention for dual terminating/nonterminating fractional expansions is not discussed.",
-    claim="The passage defines a base by its digit choices and the adjacent table gives the positional weighted sums.",
-    strength="DIRECT_COMPLETE_MECHANICS",
+    missing="Number-to-digits extraction and the convention for dual terminating/nonterminating fractional expansions are not stated.",
+)
+evidence(
+    radix,
+    "radix-introduction",
+    "U000653",
+    "The passage identifies positional digit-sequence representations and the radix-dependent digit alphabet.",
+    [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "input",
+        "law_kind",
+        "result_kind",
+        *DECLARATIVE_NA,
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
 context_evidence(
     radix,
     "radix-table",
     "U000654",
     "The table explicitly decomposes 3829 into positional weights in bases 2 through 10.",
-    fields=["parameters_and_variants"],
+    fields=[
+        "support",
+        "topology",
+        "structural_invariants",
+        "rule_relation_constraint_function_or_probability_law",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "termination_completion_failure",
+        "witness_semantics",
+        "parameters_and_variants",
+    ],
     strength="DIRECT_COMPLETE_MECHANICS",
     modality="TABLE",
 )
@@ -497,27 +523,112 @@ context_evidence(
     "radix-caption",
     "U000655",
     "The caption states the right-to-left powers-of-base convention and digit alphabets.",
-    fields=["rule_relation_constraint_function_or_probability_law"],
+    fields=[
+        "alphabet_or_value_schema",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
     strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    radix,
+    "radix-fractional-assembly",
+    "U000798",
+    "The passage explicitly treats a digit representation as a procedure for constructing its denoted number.",
+    fields=[
+        "support",
+        "law_kind",
+        "result_kind",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    radix,
+    "radix-pi-base10-formula",
+    "U000799",
+    "The nested base-10 formula directly instantiates fractional positional assembly.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "termination_completion_failure",
+        "witness_semantics",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
+)
+context_evidence(
+    radix,
+    "radix-pi-base2-formula",
+    "U000800",
+    "The nested base-2 formula independently instantiates fractional positional assembly.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "termination_completion_failure",
+        "witness_semantics",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
 )
 
 
 def radix_preset(base: int) -> CandidateSpec:
     facts = deepcopy(RADIX_FACTS)
-    facts["object_kind"] = f"The positional base-{base} representation codec."
+    facts["object_kind"] = f"The displayed positional base-{base} representation of 3829."
+    facts["support"] = "Nonnegative whole-number digit positions in the displayed finite decomposition."
     facts["alphabet_or_value_schema"] = f"Digits 0 through {base - 1} with positional weights that are powers of {base}."
-    facts["parameters_and_variants"] = f"The radix is fixed at b={base}."
-    return source_candidate(
+    facts["complete_state"] = f"The displayed finite base-{base} digit sequence for 3829."
+    facts["input"] = f"The displayed finite base-{base} digit sequence."
+    facts["result_kind"] = "The represented whole number 3829."
+    facts["termination_completion_failure"] = "The displayed finite weighted sum completes after its last digit."
+    facts["parameters_and_variants"] = f"The radix is fixed at b={base}; only the displayed whole-number decomposition is asserted."
+    facts["evidence_limit"] = "This row does not supply fractional, inverse-conversion, or canonical-expansion mechanics."
+    spec = candidate(
         f"radix-base-{base}",
         f"base-{base} positional representation",
-        "U000654",
+        "U000653",
         facts,
         not_applicable=DECLARATIVE_NA,
-        missing="The convention for dual terminating/nonterminating fractional expansions is not discussed.",
-        claim=f"The table directly supplies the base-{base} weighted decomposition of 3829.",
+        missing="Fractional representation, number-to-digits extraction, and canonical expansion are not established by this table row.",
+    )
+    evidence(
+        spec,
+        f"radix-base-{base}-family",
+        "U000653",
+        "The passage identifies base-dependent positional digit representations.",
+        [
+            "native_time",
+            "carrier",
+            "law_kind",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+            *DECLARATIVE_NA,
+        ],
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        spec,
+        f"radix-base-{base}-table",
+        "U000654",
+        f"The table directly supplies the base-{base} digit sequence and weighted decomposition of 3829.",
+        [
+            field
+            for field in facts
+            if field
+            not in {
+                "native_time",
+                "carrier",
+                "law_kind",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            }
+        ],
         strength="DIRECT_COMPLETE_MECHANICS",
         modality="TABLE",
     )
+    return spec
 
 
 radix_presets = {base: radix_preset(base) for base in range(2, 11)}
@@ -656,6 +767,122 @@ times_three_halves = multiplication_preset(
     "repeated multiplication by 3/2",
     "3/2",
     "U000680",
+)
+context_evidence(
+    times_three_halves,
+    "three-halves-native-panel",
+    "U000684",
+    "Original-resolution inspection confirms the displayed multiplier 3/2 and the corresponding numeric/digit trajectory.",
+    image_path="CHAPTERS/_page_136_Figure_2.jpeg",
+    fields=[
+        "object_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
+DIGIT_SHIFT_NA = {
+    field: reason
+    for field, reason in DECLARATIVE_NA.items()
+    if field != "read_dependencies_or_neighborhood"
+}
+binary_shift_relation = candidate(
+    "binary-arithmetic-shift-relation",
+    "base-2 multiplication/division shift correspondence",
+    "U000671",
+    {
+        "object_kind": "A representation-level correspondence between factor-2 arithmetic and base-2 digit shifts.",
+        "native_time": "No independent native time; one digit transformation corresponds to one arithmetic operation.",
+        "carrier": "An ordered base-2 digit sequence.",
+        "support": "Whole and fractional binary digit positions.",
+        "topology": "Digit positions are linearly ordered by positional weight.",
+        "structural_invariants": "The shifted digit sequence denotes twice or half the original represented value in the stated direction.",
+        "alphabet_or_value_schema": "Binary digits 0 and 1.",
+        "complete_state": "The complete positional base-2 digit sequence.",
+        "input": "A base-2 digit sequence and a choice of multiplication or division by 2.",
+        "read_dependencies_or_neighborhood": "A factor-2 shift reads the aligned source digit, while general arithmetic carries can make an output digit depend on arbitrarily distant input digits.",
+        "law_kind": "A deterministic digit-representation transformation and arithmetic correspondence.",
+        "rule_relation_constraint_function_or_probability_law": "Multiplication by 2 shifts all base-2 digits one place left and appends 0; division by 2 shifts them one place right. Multiplication by 3/2 is multiplication by 3 followed by the right shift.",
+        "result_kind": "The shifted base-2 digit sequence representing the multiplied or divided number.",
+        "successor_cardinality": "Exactly one shifted digit sequence for each complete input sequence and direction.",
+        "determinism_branching_or_measure": "Deterministic.",
+        "termination_completion_failure": "A finite displayed shift completes directly; the correspondence also applies positionwise to the stated unbounded positional representation.",
+        "witness_semantics": "The positional value of the output is twice or half the positional value of the input, as selected.",
+        "parameters_and_variants": "Left shift represents multiplication by 2; right shift represents division by 2; the latter is composed with multiplication by 3 in the 3/2 example.",
+        "excluded_observers_and_representations": "The stacked digit histories display repeated uses of the correspondence but are not extra native state.",
+        "evidence_limit": "The source does not supply a complete digitwise multiplication-by-3 algorithm; it explicitly warns that carries in general arithmetic can propagate arbitrarily far.",
+    },
+    not_applicable=DIGIT_SHIFT_NA,
+    missing="A complete digitwise multiplication-by-3 procedure and its carry mechanics are not supplied.",
+)
+evidence(
+    binary_shift_relation,
+    "binary-shift-left",
+    "U000671",
+    "The prose states that multiplication by 2 shifts a base-2 digit sequence one place left and appends a zero.",
+    [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "topology",
+        "structural_invariants",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "input",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "termination_completion_failure",
+        "witness_semantics",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        *DIGIT_SHIFT_NA,
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    binary_shift_relation,
+    "binary-shift-caption",
+    "U000674",
+    "The caption independently identifies the left shift as multiplication by 2.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "witness_semantics",
+    ],
+    strength="CORROBORATING",
+)
+context_evidence(
+    binary_shift_relation,
+    "binary-shift-right",
+    "U000685",
+    "The caption states that division by 2 is the opposite right shift and that multiplication by 3/2 composes multiplication by 3 with that shift.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    binary_shift_relation,
+    "binary-shift-three-halves-panel",
+    "U000684",
+    "Original-resolution inspection confirms the factor-3/2 identity and its shifted base-2 trajectory.",
+    image_path="CHAPTERS/_page_136_Figure_2.jpeg",
+    fields=["result_kind", "parameters_and_variants"],
+    strength="DIRECT_IDENTITY",
+)
+context_evidence(
+    binary_shift_relation,
+    "binary-arithmetic-nonlocal-carry",
+    "U000707",
+    "The prose states that carries may propagate arbitrarily far left and that an output digit can depend on input digits originally far away.",
+    fields=["read_dependencies_or_neighborhood", "evidence_limit"],
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
 
 fractional_part = source_candidate(
@@ -835,6 +1062,15 @@ digit_length_observer = source_candidate(
     claim="The caption says the logarithmic height is essentially the length of the represented digit sequence.",
     strength="DIRECT_PARTIAL_MECHANICS",
 )
+mark_unknown(
+    digit_length_observer,
+    {
+        "parameters_and_variants": (
+            "The assigned passage does not state the logarithm base or plot "
+            "normalization used by the size observer."
+        )
+    },
+)
 
 reverse_add = source_candidate(
     "reverse-binary-add-map",
@@ -905,6 +1141,40 @@ recursive_schema = source_candidate(
     claim="The passage defines f[n] notation and the construction of each next term from previous ones.",
     strength="DIRECT_PARTIAL_MECHANICS",
 )
+context_evidence(
+    recursive_schema,
+    "recursive-variable-index-class",
+    "U000724",
+    "The passage introduces recurrences whose dependency index is computed from earlier sequence values.",
+    fields=[
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    recursive_schema,
+    "recursive-variable-index-partiality",
+    "U000725",
+    "The prose explicitly states that a computed dependency can be nonpositive and make terms such as f[0] or f[-1] meaningless.",
+    fields=[
+        "termination_completion_failure",
+        "evidence_limit",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    recursive_schema,
+    "recursive-variable-index-survival",
+    "U000727",
+    "The prose distinguishes the displayed recurrences as examples that avoid the common undefined-index failure.",
+    fields=[
+        "termination_completion_failure",
+        "parameters_and_variants",
+    ],
+    strength="CORROBORATING",
+)
 
 fixed_recurrences = [
     ("fixed-rec-a", "fixed-lag recurrence f[n]=1+f[n-1]", "f[n]=1+f[n-1]", "f[1]=1", "Read f[n-1]."),
@@ -954,6 +1224,42 @@ for key, name, law, initial, read in variable_recurrences:
         uncertainties=[
             "The recurrence formulas and shown prefixes are legible, but the asset has hard bottom-edge bleed/cut through the following plot row."
         ],
+    )
+    variable_specs[key]["anchor"] = "U000724"
+    variable_specs[key]["evidence"][0]["fields"] = [
+        field
+        for field in variable_specs[key]["evidence"][0]["fields"]
+        if field
+        not in {
+            "termination_completion_failure",
+            "evidence_limit",
+        }
+    ]
+    context_evidence(
+        variable_specs[key],
+        f"{key}-class-anchor",
+        "U000724",
+        "The passage introduces the value-indexed recurrence class to which this displayed case belongs.",
+        strength="DIRECT_IDENTITY",
+    )
+    context_evidence(
+        variable_specs[key],
+        f"{key}-partiality",
+        "U000725",
+        "The passage states the exact undefined-index failure mode for this recurrence class.",
+        fields=[
+            "termination_completion_failure",
+            "evidence_limit",
+        ],
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    context_evidence(
+        variable_specs[key],
+        f"{key}-survival",
+        "U000727",
+        "The prose states that the particular displayed rules avoid the otherwise common nonpositive-index failure.",
+        fields=["termination_completion_failure"],
+        strength="CORROBORATING",
     )
 
 
@@ -1238,6 +1544,15 @@ proper_divisor_difference = number_property_sequence(
     "The sum of proper divisors minus n.",
     image_path="CHAPTERS/_page_150_Figure_2.jpeg",
 )
+for _exact_property in [divisor_count, proper_divisor_difference]:
+    _exact_property["facts"]["evidence_limit"] = (
+        "The caption fixes the divisor inclusion/exclusion convention needed "
+        "for this exact scalar observer."
+    )
+    _exact_property["missing"] = (
+        "No mechanics are missing within the stated positive-integer scope."
+    )
+    _exact_property["evidence"][0]["strength"] = "DIRECT_COMPLETE_MECHANICS"
 three_square_count = number_property_sequence(
     "three-square-count",
     "three-square representation-count sequence",
@@ -1402,6 +1717,57 @@ pi_digits = source_candidate(
     missing="The source supplies the denotation and prefixes but no algorithm for generating arbitrary later digits.",
     claim="The passage explicitly presents pi's base-10 and base-2 digit sequences as representations of the defined constant.",
     strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    pi_digits,
+    "pi-dense-digit-page",
+    "U000769",
+    "Original-resolution inspection and independent checking confirm that the dense page is a finite base-10/base-2 prefix of pi.",
+    image_path="CHAPTERS/_page_152_Pi_Digits.jpeg",
+    fields=[
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+    ],
+    strength="DIRECT_IDENTITY",
+)
+context_evidence(
+    pi_digits,
+    "pi-radix-assembly-principle",
+    "U000798",
+    "The passage identifies a digit representation as a procedure for constructing its denoted number.",
+    fields=[
+        "law_kind",
+        "result_kind",
+        "excluded_observers_and_representations",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    pi_digits,
+    "pi-base10-assembly-formula",
+    "U000799",
+    "The nested base-10 formula directly assembles pi from the displayed decimal digits.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "witness_semantics",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
+)
+context_evidence(
+    pi_digits,
+    "pi-base2-assembly-formula",
+    "U000800",
+    "The nested base-2 formula directly assembles pi from the displayed binary digits.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "witness_semantics",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
 )
 
 pi_walk = observer_candidate(
@@ -1582,28 +1948,33 @@ def partial_function_family(key: str, name: str, anchor: str, law: str, result: 
         key,
         name,
         anchor,
-        declarative_facts(
-            kind=name,
-            carrier="Scalar numeric inputs and real outputs.",
-            support="One scalar argument.",
-            alphabet="Real or positive-real values as displayed.",
-            state="The input scalar.",
-            input_value="The displayed numeric argument.",
-            law_kind="A named mathematical function.",
-            law=law,
-            result=result,
-            successor="The source treats the function as single-valued on the displayed inputs.",
-            determinism="Deterministic under the conventional branch used by the displayed real values.",
-            termination="The denotation is fixed, though no evaluation algorithm is given.",
-            witness="The displayed decimal and binary expansions witness the identified output values.",
-            variants="The table displays multiple arguments or powers.",
-            excluded="Digit expansions are representations of the results.",
-            limit="The assigned source names and exemplifies the operation but does not define its full domain, branch, or evaluation law.",
-        ),
+        {
+            "object_kind": f"Displayed {name} expressions and their value representations.",
+            "native_time": "No native time; these are fixed displayed denotations.",
+            "input": "Only the named expressions and arguments printed in the table.",
+            "law_kind": "A named mathematical-function denotation.",
+            "rule_relation_constraint_function_or_probability_law": law,
+            "result_kind": result,
+            "parameters_and_variants": "Only the explicitly displayed expressions and arguments are in scope.",
+            "excluded_observers_and_representations": "The decimal and binary digit strings are representations of the displayed values.",
+            "evidence_limit": "The table identifies examples but does not state a full domain, branch convention, general law, or evaluator.",
+        },
         not_applicable=DECLARATIVE_NA,
         missing="The full domain, branch convention, and native evaluation mechanics are not defined in the assigned source.",
-        claim=f"The table materially delimits {name} by named expressions and result digit sequences.",
+        claim=f"The table identifies displayed {name} expressions and their result digit sequences, without defining a general evaluator.",
         strength="DIRECT_IDENTITY",
+        unknown_reasons={
+            "carrier": "The table does not delimit a carrier or full domain for this named function.",
+            "support": "The table gives examples, not a support set for a general function object.",
+            "topology": "No topology is specified for the displayed denotations.",
+            "structural_invariants": "No structural invariant is stated for a general evaluator.",
+            "alphabet_or_value_schema": "No formal input or result schema is stated beyond the displayed expressions.",
+            "complete_state": "The fixed denotations have no stated operational state.",
+            "successor_cardinality": "The table does not define a general successor or branch convention.",
+            "determinism_branching_or_measure": "A general branch convention is not stated.",
+            "termination_completion_failure": "No evaluation procedure or completion criterion is supplied.",
+            "witness_semantics": "The displayed digits identify results but no general witness relation is defined.",
+        },
     )
 
 
@@ -1620,44 +1991,169 @@ exp_family = partial_function_family(
     "exponential-family", "exponential function and constant-e family", "U000793", "Use e and its displayed powers or roots.", "The displayed exponential-derived value."
 )
 
-continued_fraction = source_candidate(
+continued_fraction = candidate(
     "continued-fraction-representation",
-    "continued-fraction representation codec",
+    "continued-fraction coefficient-sequence denotation",
     "U000801",
-    declarative_facts(
-        kind="A continued-fraction representation of a number.",
+    {
+        **declarative_facts(
+        kind="A one-way denotation from a continued-fraction coefficient sequence to a number.",
         carrier="An ordered sequence of integer coefficients.",
         support="Successive nested denominator positions.",
         alphabet="Integer coefficients.",
         state="A coefficient sequence {a0,a1,a2,...}.",
-        input_value="A coefficient sequence for decoding, or a number for representation.",
+        input_value="A coefficient sequence.",
         law_kind="A nested addition-and-reciprocal assembly.",
         law="Assemble a0 + 1/(a1 + 1/(a2 + 1/(...))).",
-        result="The represented number, or its coefficient sequence.",
-        successor="One value per convergent/infinite coefficient sequence under the stated convention.",
+        result="The number represented by the nested expression.",
+        successor="One represented value for a fixed convergent coefficient sequence.",
         determinism="Deterministic for a fixed coefficient sequence.",
-        termination="Finite sequences evaluate finitely; infinite sequences denote a limit when convergent.",
+        termination="The source states that rational numbers have finite representations and other numbers have infinite representations.",
         witness="Successive finite convergents approach the represented value.",
         variants="Rational numbers yield finite sequences; other displayed constants yield infinite sequences.",
         excluded="Braces and line breaking are printed representations.",
-        limit="The extraction algorithm from a number to coefficients is not stated.",
-    ),
+        limit="The reverse extraction algorithm, convergence domain, and canonical finite terminal convention are not stated.",
+        )
+    },
     not_applicable=DECLARATIVE_NA,
-    missing="The coefficient-extraction algorithm and canonical terminal convention are not stated.",
-    claim="The passage and formula explicitly define construction by successive additions and divisions.",
+    missing="The number-to-coefficients extraction algorithm, convergence domain, and canonical finite terminal convention are not stated.",
+)
+evidence(
+    continued_fraction,
+    "continued-fraction-introduction",
+    "U000801",
+    "The prose introduces continued fractions as a different representation of numbers.",
+    [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "input",
+        "law_kind",
+        "result_kind",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+        *DECLARATIVE_NA,
+    ],
+    strength="DIRECT_IDENTITY",
+)
+context_evidence(
+    continued_fraction,
+    "continued-fraction-assembly-formula",
+    "U000802",
+    "The displayed nested addition-and-reciprocal formula defines assembly from coefficients to a represented value.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "witness_semantics",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
+)
+context_evidence(
+    continued_fraction,
+    "continued-fraction-caption",
+    "U000804",
+    "The caption identifies the coefficient-list notation as a continued-fraction representation.",
+    fields=["object_kind", "complete_state", "input", "result_kind"],
+    strength="CORROBORATING",
+    modality="CAPTION",
+)
+context_evidence(
+    continued_fraction,
+    "continued-fraction-finite-infinite-scope",
+    "U000805",
+    "The prose states the finite-rational versus infinite-other-number distinction.",
+    fields=["termination_completion_failure", "parameters_and_variants"],
     strength="DIRECT_PARTIAL_MECHANICS",
 )
+context_evidence(
+    continued_fraction,
+    "continued-fraction-properties",
+    "U000808",
+    "The table supplies properties of the displayed continued-fraction representations without an extraction algorithm.",
+    fields=["parameters_and_variants", "evidence_limit"],
+    strength="CORROBORATING",
+    modality="TABLE",
+)
+context_evidence(
+    continued_fraction,
+    "continued-fraction-properties-caption",
+    "U000809",
+    "The caption delimits the table as properties of continued fractions.",
+    fields=["parameters_and_variants"],
+    strength="CORROBORATING",
+    modality="CAPTION",
+)
 
-pi_cf = source_candidate(
+pi_cf = candidate(
     "pi-continued-fraction",
     "continued-fraction representation of pi",
     "U000802",
-    {**deepcopy(continued_fraction["facts"]), "object_kind": "The continued-fraction representation of pi.", "input": "The constant pi.", "complete_state": "The displayed coefficient sequence beginning {3,7,15,1,292,...}.", "parameters_and_variants": "The represented value is fixed at pi."},
+    {
+        **deepcopy(continued_fraction["facts"]),
+        "object_kind": "The displayed continued-fraction coefficient sequence denoting pi.",
+        "input": "The displayed coefficient sequence beginning {3,7,15,1,292,...}.",
+        "complete_state": "The displayed coefficient sequence beginning {3,7,15,1,292,...}.",
+        "result_kind": "The represented value pi.",
+        "parameters_and_variants": "The represented value is fixed at pi; only a displayed coefficient prefix is supplied.",
+        "evidence_limit": "The source supplies the nested denotation and a coefficient prefix, but no procedure for generating arbitrary later coefficients.",
+    },
     not_applicable=DECLARATIVE_NA,
     missing="The source supplies a coefficient prefix but no procedure for generating arbitrary later coefficients.",
-    claim="The nested formula and following coefficient list explicitly give pi's continued fraction.",
-    strength="DIRECT_PARTIAL_MECHANICS",
+)
+evidence(
+    pi_cf,
+    "pi-continued-fraction-formula",
+    "U000802",
+    "The nested formula explicitly identifies pi as the value denoted by the continued fraction.",
+    [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "witness_semantics",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+        *DECLARATIVE_NA,
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
     modality="FORMULA",
+)
+context_evidence(
+    pi_cf,
+    "pi-continued-fraction-coefficients",
+    "U000803",
+    "The following source line supplies the displayed coefficient prefix {3,7,15,1,292,...}.",
+    fields=["complete_state", "input", "parameters_and_variants"],
+    strength="DIRECT_IDENTITY",
+    modality="FORMULA",
+)
+context_evidence(
+    pi_cf,
+    "pi-continued-fraction-caption",
+    "U000804",
+    "The caption explicitly labels the displayed coefficient sequence as the continued-fraction representation of pi.",
+    fields=["object_kind", "result_kind"],
+    strength="CORROBORATING",
+    modality="CAPTION",
+)
+context_evidence(
+    pi_cf,
+    "pi-continued-fraction-finite-infinite-context",
+    "U000805",
+    "The prose distinguishes finite rational representations from the infinite representation used here.",
+    fields=["termination_completion_failure", "parameters_and_variants"],
+    strength="CORROBORATING",
 )
 
 symbolic_representation = source_candidate(
@@ -1666,19 +2162,19 @@ symbolic_representation = source_candidate(
     "U000806",
     declarative_facts(
         kind="A representation of a number by a symbolic mathematical expression.",
-        carrier="Expression trees built from constants and mathematical operations.",
-        support="The syntactic positions of a finite expression.",
-        alphabet="Numbers, operation symbols, and grouping.",
-        state="A symbolic expression such as sqrt(2)+e^sqrt(3).",
-        input_value="A well-formed symbolic expression.",
-        law_kind="Expression evaluation.",
-        law="Evaluate the represented operations to obtain the number denoted by the expression.",
+        carrier="The displayed symbolic expression.",
+        support="The printed positions of the displayed finite expression.",
+        alphabet="The symbols occurring in the displayed example.",
+        state="The displayed symbolic expression such as sqrt(2)+e^sqrt(3).",
+        input_value="The displayed symbolic expression.",
+        law_kind="A symbolic-expression denotation relation.",
+        law="The displayed expression denotes a number assembled from its named constants and operations.",
         result="The denoted number.",
-        successor="The source intends one value for each valid expression.",
-        determinism="Deterministic when every operation and branch is fixed.",
-        termination="Evaluation effort may be difficult; no uniform algorithm or bound is supplied.",
-        witness="A correct evaluation derives the denoted numeric value.",
-        variants="The expression grammar and available operations are left open.",
+        successor="The source does not specify a general expression language or its branch semantics.",
+        determinism="The source does not specify a general expression language or evaluator.",
+        termination="No general evaluator or evaluation bound is supplied.",
+        witness="No general proof or evaluation certificate is defined.",
+        variants="Only the displayed examples are delimited; the expression grammar and available operations are left open.",
         excluded="Expression brevity is not the same as digit-sequence simplicity or evaluation cost.",
         limit="No formal grammar, branch convention, or evaluator is specified.",
     ),
@@ -1687,6 +2183,16 @@ symbolic_representation = source_candidate(
     claim="The passage explicitly identifies symbolic expressions as number representations and distinguishes denotation from evaluation effort.",
     strength="DIRECT_PARTIAL_MECHANICS",
     uncertainties=["The representation class is deliberately open-ended in this source."],
+)
+mark_unknown(
+    symbolic_representation,
+    {
+        "alphabet_or_value_schema": "The source does not define a formal expression alphabet or grammar.",
+        "successor_cardinality": "The source does not define denotation for every member of a formal expression language.",
+        "determinism_branching_or_measure": "No general branch convention or evaluator is specified.",
+        "termination_completion_failure": "No evaluation procedure or completion bound is specified.",
+        "witness_semantics": "No general evaluation certificate is defined.",
+    },
 )
 
 
@@ -1896,6 +2402,16 @@ riemann_siegel = source_candidate(
     strength="DIRECT_IDENTITY",
     uncertainties=["The exact Riemann-Siegel Z definition is underdetermined by 'essentially'."],
 )
+mark_unknown(
+    riemann_siegel,
+    {
+        "rule_relation_constraint_function_or_probability_law": "The word 'essentially' does not specify the exact Riemann-Siegel phase or normalization.",
+        "successor_cardinality": "The assigned source does not state a complete function law from which output cardinality can be established.",
+        "determinism_branching_or_measure": "Determinism cannot be documented without the omitted exact transformation.",
+        "termination_completion_failure": "No evaluation procedure or completion/failure semantics are supplied.",
+        "parameters_and_variants": "No parameterization or variant family is stated for the named plotted function.",
+    },
+)
 
 riemann_hypothesis = yes_no_query(
     "riemann-hypothesis-query",
@@ -2084,14 +2600,14 @@ random_interval_seed = source_candidate(
         "complete_state": "One sampled scalar x.",
         "seed": "A random number subject only to a size-range constraint.",
         "input": "The allowed numeric interval.",
-        "law_kind": "A measure-valued sampling rule.",
+        "law_kind": "A qualitative range-constrained random-selection principle.",
         "rule_relation_constraint_function_or_probability_law": "Pick a number at random subject to lying in the specified range.",
         "result_kind": "A sampled initial scalar, overwhelmingly likely under the intended idealization to have an apparently random digit sequence.",
-        "successor_cardinality": "Many possible samples with a measure that is not formally specified.",
-        "determinism_branching_or_measure": "Random/measure-valued.",
-        "termination_completion_failure": "One sample completes a generator call.",
+        "successor_cardinality": "The statement permits more than one number in the specified range.",
+        "determinism_branching_or_measure": "The source calls the selection random but supplies no probability measure.",
+        "termination_completion_failure": "No operational sampling or completion procedure is supplied.",
         "witness_semantics": "A valid sample lies inside the selected range.",
-        "parameters_and_variants": "The interval and unstated measure are parameters.",
+        "parameters_and_variants": "The source refers only to a specified size range; its endpoints and other sampling parameters are not given here.",
         "excluded_observers_and_representations": "The subsequent shift-map trajectory is not part of the seed generator.",
         "evidence_limit": "The probability measure, endpoint convention, and finite/infinite precision are not specified.",
     },
@@ -2109,6 +2625,14 @@ random_interval_seed = source_candidate(
     claim="The passage explicitly describes random selection subject only to a size-range constraint.",
     strength="DIRECT_PARTIAL_MECHANICS",
     uncertainties=["The intended probability measure is not formalized."],
+)
+mark_unknown(
+    random_interval_seed,
+    {
+        "determinism_branching_or_measure": "The source says 'at random' but gives no probability measure or sampling semantics.",
+        "termination_completion_failure": "The source gives no operational sampler, completion criterion, or failure behavior.",
+        "parameters_and_variants": "The assigned passage does not state interval endpoints, endpoint convention, or other sampler parameters.",
+    },
 )
 
 

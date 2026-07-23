@@ -329,8 +329,8 @@ def spec_named(name: str) -> dict[str, Any]:
     return matches[0]
 
 
-def amend_spec(name: str, **changes: Any) -> None:
-    spec = spec_named(name)
+def amend_spec(existing_name: str, **changes: Any) -> None:
+    spec = spec_named(existing_name)
     if "facts" in changes:
         merged = dict(spec.get("facts", {}))
         merged.update(changes.pop("facts"))
