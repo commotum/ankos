@@ -61,6 +61,14 @@ def _crash_on(expected_event: str) -> Any:
     return inject
 
 
+def _error_on(expected_event: str) -> Any:
+    def inject(event: str) -> None:
+        if event == expected_event:
+            raise OSError(expected_event)
+
+    return inject
+
+
 def _pending_journal(goal: Path) -> tuple[bytes, dict[str, Any]]:
     raw = (
         goal
@@ -215,6 +223,59 @@ def test_recovery_keeps_all_proposed_after_committed_journal(
     assert recovered.action == "FINALIZED_PROPOSED"
     assert recovered.journal_state == "COMMITTED"
     assert _state_bytes(goal) == proposed
+
+
+@pytest.mark.parametrize(
+    "event",
+    [
+        f"apply:after_replace:{transaction.ARTIFACT_NAMES[-1]}",
+        "apply:committed",
+        "apply:after_pending_retired",
+    ],
+)
+def test_handled_error_after_physical_commit_returns_committed_success(
+    tmp_path: Path,
+    event: str,
+) -> None:
+    goal, base, proposed, modes = _make_goal(tmp_path)
+
+    result = transaction.apply_transaction(
+        goal,
+        base,
+        proposed,
+        modes,
+        fault_injector=_error_on(event),
+    )
+
+    assert result.state == "COMMITTED"
+    assert _state_bytes(goal) == proposed
+    assert _state_modes(goal) == modes
+    assert not os.path.lexists(goal / transaction.PENDING_NAME)
+
+
+def test_crash_before_pending_publication_leaves_safe_removable_orphan(
+    tmp_path: Path,
+) -> None:
+    goal, base, proposed, modes = _make_goal(tmp_path)
+
+    with pytest.raises(SimulatedCrash):
+        transaction.apply_transaction(
+            goal,
+            base,
+            proposed,
+            modes,
+            fault_injector=_crash_on("apply:before_publish"),
+        )
+
+    assert _state_bytes(goal) == base
+    assert not os.path.lexists(goal / transaction.PENDING_NAME)
+    orphans = sorted(goal.glob(f"{transaction.BUILD_PREFIX}*"))
+    assert len(orphans) == 1
+    with transaction.read_guard(goal):
+        assert _state_bytes(goal) == base
+
+    assert transaction.recover_transaction(goal).action == "NO_PENDING"
+    assert sorted(goal.glob(f"{transaction.BUILD_PREFIX}*")) == []
 
 
 def test_mixed_prepared_state_rolls_back_to_staged_base(

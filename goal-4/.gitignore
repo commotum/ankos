@@ -1,0 +1,8 @@
+# Advisory-lock inode is intentionally persistent; never unlink it while a
+# cooperating process may hold flock(2).
+.audit-transaction.lock
+
+# Durable pending state and crash-only staging/cleanup remnants.
+.audit-transaction/
+.audit-transaction-build-*/
+.audit-transaction-cleanup-*/

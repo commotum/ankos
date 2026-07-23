@@ -1428,12 +1428,13 @@ def _validate_candidate_enrichment_update(
         )
 
 
-def _validate_review_history_per_path_legacy(
+def validate_review_history(
     manifest: dict[str, Any],
     units: list[dict[str, Any]],
     reading: list[dict[str, str]],
     assets: list[dict[str, str]],
     candidates: list[dict[str, Any]],
+    routes: list[dict[str, str]],
     review_history: list[dict[str, Any]],
     search: dict[str, Any],
     stage_by_path: dict[str, int],
@@ -1444,11 +1445,23 @@ def _validate_review_history_per_path_legacy(
     dict[str, set[int]],
     dict[tuple[int, int], set[str]],
 ]:
-    """Validate immutable review snapshots and typed search enrichments."""
+    """Replay atomic blind transactions and validate every live projection."""
     errors: list[str] = []
+    if not isinstance(review_history, list):
+        return (
+            ["review-history root must be an ordered JSONL record list"],
+            set(),
+            {},
+            {},
+            {},
+        )
+
     unit_by_id = {unit["id"]: unit for unit in units}
     reading_by_id = {row.get("source_unit_id", ""): row for row in reading}
     asset_by_id = {row.get("asset_id", ""): row for row in assets}
+    assets_by_physical_path = {
+        row.get("physical_path", ""): row for row in assets
+    }
     audit_paths = [
         document["path"]
         for document in sorted(
@@ -1460,78 +1473,87 @@ def _validate_review_history_per_path_legacy(
         )
     ]
     document_position = {
-        path: index for index, path in enumerate(audit_paths, start=1)
+        path: position for position, path in enumerate(audit_paths)
     }
-    unit_position = {
-        unit["id"]: index for index, unit in enumerate(units, start=1)
+    empty_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": [],
+        "vocabulary": [],
+        "rounds": [],
+        "fixed_point": None,
     }
-    asset_position = {
-        row.get("asset_id", ""): index
-        for index, row in enumerate(assets, start=1)
-    }
-    search_rounds = search.get("rounds", []) if isinstance(search, dict) else []
-    if not isinstance(search_rounds, list):
-        search_rounds = []
-    hit_meta: dict[
-        str,
-        tuple[int, int, str, str, str, set[str], set[str]],
-    ] = {}
-    for round_position, round_record in enumerate(search_rounds, start=1):
-        if not isinstance(round_record, dict):
-            continue
-        epoch = round_record.get("epoch")
-        kind = round_record.get("kind")
-        for hit in round_record.get("hits", []):
-            if (
-                isinstance(hit, dict)
-                and isinstance(hit.get("hit_id"), str)
-                and isinstance(epoch, int)
-                and kind in {"LOCAL", "SATURATION"}
-                and isinstance(hit.get("source_unit_id"), str)
-            ):
-                hit_meta[hit["hit_id"]] = (
-                    round_position,
-                    epoch,
-                    kind,
-                    hit["source_unit_id"],
-                    str(hit.get("disposition", "")),
-                    {
-                        value
-                        for value in hit.get("candidate_ids", [])
-                        if isinstance(value, str)
-                    },
-                    {
-                        value
-                        for value in hit.get("route_ids", [])
-                        if isinstance(value, str)
-                    },
-                )
-
+    search_state: dict[str, Any] = copy.deepcopy(empty_search)
+    search_result_sha256 = canonical_sha256(search_state)
+    candidate_state: dict[str, dict[str, Any]] = {}
+    candidate_result_sha256: dict[str, str] = {}
+    route_state: dict[str, dict[str, str]] = {}
+    route_result_sha256: dict[str, str] = {}
+    latest_path_change: dict[str, dict[str, Any]] = {}
+    latest_review_unit_event: dict[str, dict[str, Any]] = {}
+    latest_review_asset_event: dict[str, dict[str, Any]] = {}
     history_epochs: set[int] = set()
     unit_history_epochs: dict[str, set[int]] = {}
     asset_path_history_epochs: dict[str, set[int]] = {}
     expected_local_scopes: dict[tuple[int, int], set[str]] = {}
-    latest_review_unit_event: dict[str, dict[str, Any]] = {}
-    latest_review_asset_event: dict[str, dict[str, Any]] = {}
-    latest_path_event: dict[str, dict[str, Any]] = {}
-    candidate_state: dict[str, dict[str, Any]] = {}
-    candidate_result_hashes: dict[str, str] = {}
-    seen_paths: set[str] = set()
-    seen_review_path_epochs: set[tuple[int, str]] = set()
+    reviewed_paths: set[str] = set()
+    reviewed_path_epochs: set[tuple[int, str]] = set()
     next_initial_path_index = 0
-    prior_event_hash: str | None = None
-    prior_event_epoch: int | None = None
-    prior_search_round_count = 0
-    last_review_position_by_epoch: dict[int, int] = {}
+    active_epoch = 0
+    prior_event_sha256: str | None = None
 
-    if not isinstance(review_history, list):
-        return (
-            ["review-history root must be an ordered JSONL record list"],
-            set(),
-            {},
-            {},
-            {},
+    def canonical_paths(values: set[str]) -> list[str]:
+        return sorted(
+            values,
+            key=lambda path: document_position.get(path, 10**9),
         )
+
+    def exact_local_closure(
+        state: dict[str, Any],
+        stage: int,
+        epoch: int,
+        expected: set[str],
+    ) -> bool:
+        rounds = state.get("rounds", [])
+        local_rounds = [
+            record
+            for record in rounds
+            if isinstance(record, dict)
+            and record.get("kind") == "LOCAL"
+            and record.get("owning_stage") == stage
+            and record.get("epoch") == epoch
+        ]
+        actual = {
+            path
+            for record in local_rounds
+            for query in record.get("queries", [])
+            if isinstance(query, dict)
+            for path in query.get("scope_paths", [])
+            if isinstance(path, str)
+        }
+        return bool(local_rounds) and actual == expected
+
+    def anchor_path(
+        anchor: Any,
+        all_hit_paths: dict[str, str],
+    ) -> str | None:
+        if not isinstance(anchor, dict):
+            return None
+        kind = anchor.get("kind")
+        anchor_id = anchor.get("id")
+        if kind == "SOURCE_UNIT":
+            unit = unit_by_id.get(anchor_id)
+            return unit.get("path") if isinstance(unit, dict) else None
+        if kind == "IMAGE":
+            asset = assets_by_physical_path.get(str(anchor_id))
+            return (
+                asset.get("assignment_path")
+                if isinstance(asset, dict)
+                else None
+            )
+        if kind == "SEARCH_HIT":
+            return all_hit_paths.get(str(anchor_id))
+        return None
 
     for index, event in enumerate(review_history, start=1):
         prefix = f"review-history event {index}"
@@ -1543,259 +1565,415 @@ def _validate_review_history_per_path_legacy(
             continue
         if event.get("review_id") != f"V{index:06d}":
             errors.append(f"{prefix} violates the append-only V sequence")
+        mode = event.get("mode")
         epoch = event.get("epoch")
         stage = event.get("stage")
-        mode = event.get("mode")
         reviewer = event.get("reviewer")
-        if not isinstance(epoch, int) or epoch < 1:
-            errors.append(f"{prefix} has invalid epoch")
-            continue
-        history_epochs.add(epoch)
-        if not isinstance(stage, int) or not 4 <= stage <= 17:
-            errors.append(f"{prefix} has invalid stage")
-            continue
         if mode not in REVIEW_MODES:
             errors.append(f"{prefix} has invalid mode")
+        if (
+            not isinstance(epoch, int)
+            or isinstance(epoch, bool)
+            or epoch < 1
+        ):
+            errors.append(f"{prefix} has invalid epoch")
+            epoch = -1
+        else:
+            history_epochs.add(epoch)
+        if (
+            not isinstance(stage, int)
+            or isinstance(stage, bool)
+            or not 4 <= stage <= 18
+        ):
+            errors.append(f"{prefix} has invalid stage")
+            stage = -1
         if not isinstance(reviewer, str) or not reviewer.strip():
             errors.append(f"{prefix} lacks reviewer")
-        is_review_event = mode in {"INITIAL", "REOPEN"}
-        is_enrichment = mode == "SEARCH_ENRICHMENT"
+
+        if active_epoch == 0:
+            if epoch != 1 or mode != "INITIAL":
+                errors.append(
+                    f"{prefix} must begin epoch 1 with INITIAL review"
+                )
+            active_epoch = max(epoch, 1)
+        elif mode == "REOPEN":
+            if epoch != active_epoch + 1:
+                errors.append(f"{prefix} REOPEN does not begin the next epoch")
+            else:
+                for (closed_stage, closed_epoch), scope in (
+                    expected_local_scopes.items()
+                ):
+                    if closed_epoch < epoch and not exact_local_closure(
+                        search_state,
+                        closed_stage,
+                        closed_epoch,
+                        scope,
+                    ):
+                        errors.append(
+                            f"{prefix} advances epoch before Stage "
+                            f"{closed_stage} epoch {closed_epoch} LOCAL closure"
+                        )
+                active_epoch = epoch
+        elif epoch != active_epoch:
+            errors.append(f"{prefix} is not in the active epoch")
 
         source_paths = exact_string_list(
             event.get("source_paths"),
             f"{prefix}.source_paths",
             errors,
-            nonempty=True,
         )
-        if len(source_paths) != 1:
-            errors.append(f"{prefix} must cover exactly one canonical source path")
-        event_path = source_paths[0] if len(source_paths) == 1 else None
-        source_unit_ids = exact_string_list(
-            event.get("source_unit_ids"),
-            f"{prefix}.source_unit_ids",
-            errors,
-            nonempty=True,
-        )
-        asset_ids = exact_string_list(
-            event.get("asset_ids"),
-            f"{prefix}.asset_ids",
-            errors,
-        )
-        if event_path not in stage_by_path:
-            errors.append(f"{prefix} contains an unknown source path")
-        elif stage_by_path[event_path] != stage:
-            errors.append(f"{prefix} source path lies outside its stage")
-        expected_units = [
-            unit["id"] for unit in units if unit["path"] == event_path
-        ]
-        expected_assets = [
-            row.get("asset_id", "")
-            for row in assets
-            if row.get("assignment_path") == event_path
-        ]
-        if source_unit_ids != expected_units:
-            errors.append(
-                f"{prefix} source-unit scope is not the exact ordered path scope"
-            )
-        if asset_ids != expected_assets:
-            errors.append(
-                f"{prefix} asset scope is not the exact ordered path scope"
-            )
-        if source_unit_ids != sorted(
-            source_unit_ids, key=lambda value: unit_position.get(value, 10**9)
-        ):
-            errors.append(f"{prefix} source units are not in canonical order")
-        if asset_ids != sorted(
-            asset_ids, key=lambda value: asset_position.get(value, 10**9)
-        ):
-            errors.append(f"{prefix} assets are not in canonical order")
-
-        opens_epoch = prior_event_epoch is None or epoch > prior_event_epoch
-        if prior_event_epoch is None:
-            if epoch != 1 or mode != "INITIAL":
-                errors.append(f"{prefix} must begin history with INITIAL epoch 1")
+        path_changes_value = event.get("path_changes")
+        if not isinstance(path_changes_value, list):
+            errors.append(f"{prefix}.path_changes is not an array")
+            path_changes: list[dict[str, Any]] = []
         else:
-            if epoch < prior_event_epoch:
-                errors.append(f"{prefix} moves backward to an earlier epoch")
-            elif epoch > prior_event_epoch + 1:
-                errors.append(f"{prefix} skips a global review epoch")
-            if epoch > prior_event_epoch and mode != "REOPEN":
-                errors.append(f"{prefix} opens a new epoch without REOPEN")
-        if is_enrichment and prior_event_epoch != epoch:
+            path_changes = [
+                value for value in path_changes_value if isinstance(value, dict)
+            ]
+            if len(path_changes) != len(path_changes_value):
+                errors.append(f"{prefix}.path_changes contains a non-object")
+        path_change_paths = [
+            change.get("source_path") for change in path_changes
+        ]
+        if source_paths != path_change_paths:
             errors.append(
-                f"{prefix} SEARCH_ENRICHMENT is not in the active epoch"
+                f"{prefix} source_paths differ from ordered path changes"
             )
+        if source_paths != canonical_paths(set(source_paths)) or len(
+            source_paths
+        ) != len(set(source_paths)):
+            errors.append(f"{prefix} source paths are not unique canonical order")
+        if any(path not in document_position for path in source_paths):
+            errors.append(f"{prefix} names a non-canonical source path")
 
-        prefix_count = event.get("prior_search_round_count")
-        prefix_digest = event.get("prior_search_rounds_sha256")
-        if not isinstance(prefix_count, int) or prefix_count < 0:
-            errors.append(f"{prefix} has invalid prior search round count")
-            prefix_count = 0
-        if prefix_count < prior_search_round_count:
-            errors.append(f"{prefix} moves backward to an earlier search prefix")
-        if prefix_count > len(search_rounds):
-            errors.append(f"{prefix} search prefix exceeds recorded rounds")
-            search_prefix = search_rounds
-        else:
-            search_prefix = search_rounds[:prefix_count]
-        if prefix_digest != canonical_sha256(search_prefix):
-            errors.append(f"{prefix} prior search-round prefix hash is stale")
-        if any(
-            isinstance(round_record, dict)
-            and isinstance(round_record.get("epoch"), int)
-            and round_record["epoch"] > epoch
-            for round_record in search_prefix
-        ):
-            errors.append(f"{prefix} search prefix contains a future epoch")
-        if opens_epoch and epoch > 1:
-            for (prior_stage, prior_epoch), prior_paths in (
-                expected_local_scopes.items()
-            ):
-                if prior_epoch >= epoch:
-                    continue
-                local_rounds = [
-                    round_record
-                    for round_record in search_prefix
-                    if isinstance(round_record, dict)
-                    and round_record.get("kind") == "LOCAL"
-                    and round_record.get("owning_stage") == prior_stage
-                    and round_record.get("epoch") == prior_epoch
-                ]
-                local_scope = {
-                    path
-                    for round_record in local_rounds
-                    for query in round_record.get("queries", [])
-                    if isinstance(query, dict)
-                    for path in query.get("scope_paths", [])
-                }
-                if not local_rounds or local_scope != prior_paths:
-                    errors.append(
-                        f"{prefix} advances epoch before Stage {prior_stage} "
-                        f"epoch {prior_epoch} LOCAL closure"
-                    )
-        prior_search_round_count = prefix_count
-
-        prior_path_event = latest_path_event.get(event_path or "")
-        expected_previous_path_digest = (
-            prior_path_event.get("result_projection_sha256")
-            if prior_path_event is not None
-            else None
-        )
-        if event.get("previous_path_result_sha256") != expected_previous_path_digest:
-            errors.append(f"{prefix} breaks its per-path result chain")
-        if mode == "INITIAL" and prior_path_event is not None:
-            errors.append(f"{prefix} INITIAL path was already reviewed")
-        if mode in {"REOPEN", "SEARCH_ENRICHMENT"} and prior_path_event is None:
-            errors.append(f"{prefix} {mode} path has no prior snapshot")
-
-        trigger_kind = event.get("trigger_search_kind")
-        trigger_hit_ids = exact_string_list(
-            event.get("trigger_hit_ids"),
-            f"{prefix}.trigger_hit_ids",
-            errors,
-        )
-        trigger_unit_ids: set[str] = set()
-        trigger_candidate_ids_by_unit: dict[str, set[str]] = {}
-        trigger_route_ids_by_unit: dict[str, set[str]] = {}
-        trigger_candidate_ids: set[str] = set()
-        trigger_route_ids: set[str] = set()
         candidate_changes = event.get("candidate_changes")
+        route_changes = event.get("route_changes")
+        search_change = event.get("search_change")
         if not isinstance(candidate_changes, list):
             errors.append(f"{prefix}.candidate_changes is not an array")
             candidate_changes = []
-        if is_review_event:
-            if trigger_kind is not None or trigger_hit_ids:
-                errors.append(f"{prefix} review event carries search triggers")
-        elif is_enrichment:
-            if trigger_kind not in SEARCH_ENRICHMENT_TRIGGER_KINDS:
-                errors.append(f"{prefix} has invalid enrichment trigger kind")
-            if not trigger_hit_ids:
-                errors.append(f"{prefix} enrichment lacks trigger hit IDs")
-            prior_path_prefix_count = (
-                prior_path_event.get("prior_search_round_count", 0)
-                if prior_path_event is not None
-                else 0
-            )
-            if prefix_count <= prior_path_prefix_count:
-                errors.append(
-                    f"{prefix} enrichment does not advance its path search prefix"
-                )
-            for hit_id in trigger_hit_ids:
-                meta = hit_meta.get(hit_id)
-                if meta is None:
-                    errors.append(f"{prefix} trigger hit {hit_id} is unknown")
-                    continue
-                (
-                    round_position,
-                    hit_epoch,
-                    hit_kind,
-                    unit_id,
-                    disposition,
-                    hit_candidate_ids,
-                    hit_route_ids,
-                ) = meta
-                if not prior_path_prefix_count < round_position <= prefix_count:
-                    errors.append(
-                        f"{prefix} trigger hit {hit_id} is not newly visible"
-                    )
-                if hit_epoch != epoch or hit_kind != trigger_kind:
-                    errors.append(
-                        f"{prefix} trigger hit {hit_id} has wrong epoch/kind"
-                    )
-                if disposition == "EXCLUSION":
-                    errors.append(
-                        f"{prefix} EXCLUSION hit {hit_id} cannot authorize enrichment"
-                    )
-                source_unit = unit_by_id.get(unit_id)
-                if source_unit is None or source_unit["path"] != event_path:
-                    errors.append(
-                        f"{prefix} trigger hit {hit_id} lies outside its path"
-                    )
-                else:
-                    trigger_unit_ids.add(unit_id)
-                    trigger_candidate_ids_by_unit.setdefault(
-                        unit_id, set()
-                    ).update(hit_candidate_ids)
-                    trigger_route_ids_by_unit.setdefault(
-                        unit_id, set()
-                    ).update(hit_route_ids)
-                    trigger_candidate_ids.update(hit_candidate_ids)
-                    trigger_route_ids.update(hit_route_ids)
+        if not isinstance(route_changes, list):
+            errors.append(f"{prefix}.route_changes is not an array")
+            route_changes = []
 
-        snapshot = _validate_history_snapshot(
-            event,
-            source_unit_ids,
-            asset_ids,
-            errors,
-            prefix,
-        )
-        if isinstance(snapshot, dict):
-            if event.get("result_projection_sha256") != canonical_sha256(snapshot):
-                errors.append(f"{prefix} full result snapshot hash is stale")
-            if is_review_event:
-                for row in snapshot["reading_results"]:
+        appended_round: dict[str, Any] | None = None
+        trigger_hit_ids: set[str] = set()
+        trigger_unit_ids: set[str] = set()
+        trigger_candidate_ids: set[str] = set()
+        trigger_route_ids: set[str] = set()
+        trigger_candidate_ids_by_unit: dict[str, set[str]] = {}
+        trigger_route_ids_by_unit: dict[str, set[str]] = {}
+        trigger_hit_paths: dict[str, str] = {}
+        all_hit_paths: dict[str, str] = {}
+        for round_record in search_state.get("rounds", []):
+            if not isinstance(round_record, dict):
+                continue
+            for hit in round_record.get("hits", []):
+                if not isinstance(hit, dict):
+                    continue
+                unit = unit_by_id.get(hit.get("source_unit_id"))
+                if unit is not None and isinstance(hit.get("hit_id"), str):
+                    all_hit_paths[hit["hit_id"]] = unit["path"]
+
+        if search_change is None:
+            if mode == "SEARCH_APPEND":
+                errors.append(f"{prefix} SEARCH_APPEND lacks search_change")
+        elif not isinstance(search_change, dict) or set(search_change) != set(
+            SEARCH_CHANGE_FIELDS
+        ):
+            errors.append(f"{prefix} search_change fields differ from contract")
+        else:
+            before_search = search_change.get("before_search")
+            after_search = search_change.get("after_search")
+            if not isinstance(before_search, dict) or not isinstance(
+                after_search, dict
+            ):
+                errors.append(f"{prefix} search_change snapshots are malformed")
+            else:
+                before_digest = canonical_sha256(before_search)
+                after_digest = canonical_sha256(after_search)
+                if search_change.get("before_search_sha256") != before_digest:
+                    errors.append(f"{prefix} before-search hash is stale")
+                if search_change.get("after_search_sha256") != after_digest:
+                    errors.append(f"{prefix} after-search hash is stale")
+                if (
+                    search_change.get("previous_search_result_sha256")
+                    != search_result_sha256
+                    or before_search != search_state
+                    or before_digest != search_result_sha256
+                ):
+                    errors.append(f"{prefix} breaks search version replay")
+                before_rounds = before_search.get("rounds")
+                after_rounds = after_search.get("rounds")
+                if mode == "SEARCH_APPEND":
+                    if (
+                        not isinstance(before_rounds, list)
+                        or not isinstance(after_rounds, list)
+                        or after_rounds[: len(before_rounds)] != before_rounds
+                        or len(after_rounds) != len(before_rounds) + 1
+                    ):
+                        errors.append(
+                            f"{prefix} SEARCH_APPEND does not append exactly "
+                            "one round"
+                        )
+                    else:
+                        appended_round = after_rounds[-1]
+                    for field in ("tool_assumptions", "vocabulary"):
+                        before_values = before_search.get(field)
+                        after_values = after_search.get(field)
+                        if (
+                            not isinstance(before_values, list)
+                            or not isinstance(after_values, list)
+                            or after_values[: len(before_values)] != before_values
+                        ):
+                            errors.append(
+                                f"{prefix} rewrites prior search {field}"
+                            )
+                    if before_search.get("fixed_point") is not None:
+                        errors.append(
+                            f"{prefix} appends search after a fixed point"
+                        )
+                elif mode == "REOPEN":
+                    unchanged = {
+                        key: value
+                        for key, value in before_search.items()
+                        if key != "fixed_point"
+                    } == {
+                        key: value
+                        for key, value in after_search.items()
+                        if key != "fixed_point"
+                    }
+                    if (
+                        before_search.get("fixed_point") is None
+                        or after_search.get("fixed_point") is not None
+                        or not unchanged
+                    ):
+                        errors.append(
+                            f"{prefix} REOPEN search_change is not an exact "
+                            "fixed-point clear"
+                        )
+                else:
+                    errors.append(
+                        f"{prefix} mode cannot carry a search_change"
+                    )
+                search_state = copy.deepcopy(after_search)
+                search_result_sha256 = after_digest
+
+        if isinstance(appended_round, dict):
+            round_kind = appended_round.get("kind")
+            if (
+                round_kind not in SEARCH_APPEND_TRIGGER_KINDS
+                or appended_round.get("epoch") != epoch
+                or appended_round.get("owning_stage") != stage
+            ):
+                errors.append(
+                    f"{prefix} appended search round has wrong kind/epoch/stage"
+                )
+            for hit in appended_round.get("hits", []):
+                if not isinstance(hit, dict):
+                    continue
+                hit_id = hit.get("hit_id")
+                unit_id = hit.get("source_unit_id")
+                unit = unit_by_id.get(unit_id)
+                if isinstance(hit_id, str) and unit is not None:
+                    all_hit_paths[hit_id] = unit["path"]
+                    trigger_hit_paths[hit_id] = unit["path"]
+                if hit.get("disposition") == "EXCLUSION":
+                    continue
+                if not isinstance(hit_id, str) or unit is None:
+                    continue
+                trigger_hit_ids.add(hit_id)
+                trigger_unit_ids.add(unit_id)
+                hit_candidates = {
+                    value
+                    for value in hit.get("candidate_ids", [])
+                    if isinstance(value, str)
+                }
+                hit_routes = {
+                    value
+                    for value in hit.get("route_ids", [])
+                    if isinstance(value, str)
+                }
+                trigger_candidate_ids.update(hit_candidates)
+                trigger_route_ids.update(hit_routes)
+                trigger_candidate_ids_by_unit.setdefault(
+                    unit_id, set()
+                ).update(hit_candidates)
+                trigger_route_ids_by_unit.setdefault(
+                    unit_id, set()
+                ).update(hit_routes)
+
+        if mode in {"INITIAL", "REOPEN"} and not source_paths:
+            errors.append(f"{prefix} full review transaction has no paths")
+        if mode == "INITIAL":
+            expected = audit_paths[
+                next_initial_path_index : next_initial_path_index
+                + len(source_paths)
+            ]
+            if source_paths != expected:
+                errors.append(
+                    f"{prefix} INITIAL does not consume the next unread "
+                    "canonical path prefix"
+                )
+            else:
+                next_initial_path_index += len(source_paths)
+            if any(path in reviewed_paths for path in source_paths):
+                errors.append(f"{prefix} INITIAL repeats a reviewed path")
+        if mode == "REOPEN":
+            if any(path not in reviewed_paths for path in source_paths):
+                errors.append(f"{prefix} REOPEN includes an unread path")
+        if mode in {"INITIAL", "REOPEN"} and any(
+            stage_by_path.get(path) != stage for path in source_paths
+        ):
+            errors.append(f"{prefix} review transaction crosses its stage")
+        if mode == "ROUTE_RESOLUTION" and (
+            candidate_changes or search_change is not None
+        ):
+            errors.append(f"{prefix} ROUTE_RESOLUTION carries unrelated changes")
+        if mode == "CANDIDATE_REVISION":
+            if stage != 18:
+                errors.append(f"{prefix} candidate revision is not Stage 18")
+            if route_changes or search_change is not None:
+                errors.append(
+                    f"{prefix} CANDIDATE_REVISION carries unrelated changes"
+                )
+            if next_initial_path_index != len(audit_paths):
+                errors.append(
+                    f"{prefix} candidate revision precedes sequential review "
+                    "closure"
+                )
+            for (closed_stage, closed_epoch), scope in (
+                expected_local_scopes.items()
+            ):
+                if not exact_local_closure(
+                    search_state,
+                    closed_stage,
+                    closed_epoch,
+                    scope,
+                ):
+                    errors.append(
+                        f"{prefix} candidate revision precedes LOCAL closure"
+                    )
+                    break
+
+        revision_changed_paths: set[str] = set()
+        revision_snapshot_pairs: list[
+            tuple[str, dict[str, Any], dict[str, Any], str]
+        ] = []
+        for path_index, path_change in enumerate(path_changes, start=1):
+            change_prefix = f"{prefix} path change {path_index}"
+            if set(path_change) != set(PATH_CHANGE_FIELDS):
+                errors.append(f"{change_prefix} fields differ from contract")
+                continue
+            path = path_change.get("source_path")
+            if path not in document_position:
+                continue
+            expected_unit_ids = [
+                unit["id"] for unit in units if unit["path"] == path
+            ]
+            expected_asset_ids = [
+                asset["asset_id"]
+                for asset in assets
+                if asset["assignment_path"] == path
+            ]
+            source_unit_ids = exact_string_list(
+                path_change.get("source_unit_ids"),
+                f"{change_prefix}.source_unit_ids",
+                errors,
+            )
+            asset_ids = exact_string_list(
+                path_change.get("asset_ids"),
+                f"{change_prefix}.asset_ids",
+                errors,
+            )
+            if source_unit_ids != expected_unit_ids:
+                errors.append(
+                    f"{change_prefix} does not cover exact ordered path units"
+                )
+            if asset_ids != expected_asset_ids:
+                errors.append(
+                    f"{change_prefix} does not cover exact ordered path assets"
+                )
+            prior_path_change = latest_path_change.get(path)
+            expected_previous_digest = (
+                prior_path_change.get("result_projection_sha256")
+                if prior_path_change is not None
+                else None
+            )
+            if (
+                path_change.get("previous_path_result_sha256")
+                != expected_previous_digest
+            ):
+                errors.append(f"{change_prefix} breaks its per-path result chain")
+            if mode == "INITIAL" and prior_path_change is not None:
+                errors.append(f"{change_prefix} INITIAL path already has history")
+            if mode != "INITIAL" and prior_path_change is None:
+                errors.append(f"{change_prefix} has no prior path snapshot")
+            snapshot = _validate_history_snapshot(
+                path_change,
+                source_unit_ids,
+                asset_ids,
+                errors,
+                change_prefix,
+            )
+            if isinstance(snapshot, dict) and path_change.get(
+                "result_projection_sha256"
+            ) != canonical_sha256(snapshot):
+                errors.append(f"{change_prefix} result snapshot hash is stale")
+            try:
+                expected_input_digest = canonical_sha256(
+                    review_input_projection(
+                        event,
+                        path_change,
+                        unit_by_id,
+                        asset_by_id,
+                    )
+                )
+            except (KeyError, TypeError):
+                expected_input_digest = None
+            if (
+                expected_input_digest is not None
+                and path_change.get("input_projection_sha256")
+                != expected_input_digest
+            ):
+                errors.append(
+                    f"{change_prefix} immutable input projection hash is stale"
+                )
+            if isinstance(snapshot, dict) and mode in {"INITIAL", "REOPEN"}:
+                for row in snapshot.get("reading_results", []):
                     if isinstance(row, dict) and (
                         row.get("review_epoch") != str(epoch)
                         or row.get("review_stage") != str(stage)
                         or row.get("reviewer") != reviewer
                     ):
                         errors.append(
-                            f"{prefix} reading snapshot completion metadata "
-                            "differs from review event"
+                            f"{change_prefix} reading completion metadata "
+                            "differs from review transaction"
                         )
-                for row in snapshot["asset_results"]:
+                for row in snapshot.get("asset_results", []):
                     if isinstance(row, dict) and (
                         row.get("review_epoch") != str(epoch)
                         or row.get("review_stage") != str(stage)
                         or row.get("reviewer") != reviewer
                     ):
                         errors.append(
-                            f"{prefix} asset snapshot completion metadata "
-                            "differs from review event"
+                            f"{change_prefix} asset completion metadata "
+                            "differs from review transaction"
                         )
-            elif is_enrichment and prior_path_event is not None:
-                previous_snapshot = prior_path_event.get("result_snapshot")
-                if isinstance(previous_snapshot, dict):
+            if (
+                isinstance(snapshot, dict)
+                and prior_path_change is not None
+                and isinstance(
+                    prior_path_change.get("result_snapshot"), dict
+                )
+            ):
+                previous_snapshot = prior_path_change["result_snapshot"]
+                changed = snapshot != previous_snapshot
+                if mode == "SEARCH_APPEND":
+                    if not changed:
+                        errors.append(
+                            f"{change_prefix} SEARCH_APPEND path is unchanged"
+                        )
                     _validate_search_enrichment_diff(
                         previous_snapshot,
                         snapshot,
@@ -1805,11 +1983,68 @@ def _validate_review_history_per_path_legacy(
                         trigger_candidate_ids,
                         trigger_route_ids,
                         errors,
-                        prefix,
-                        bool(candidate_changes),
+                        change_prefix,
                     )
+                elif mode == "ROUTE_RESOLUTION" and changed:
+                    errors.append(
+                        f"{change_prefix} ROUTE_RESOLUTION changes row state"
+                    )
+                elif mode == "CANDIDATE_REVISION":
+                    revision_snapshot_pairs.append(
+                        (
+                            path,
+                            previous_snapshot,
+                            snapshot,
+                            change_prefix,
+                        )
+                    )
+            latest_path_change[path] = path_change
+            if mode in {"INITIAL", "REOPEN"}:
+                if (epoch, path) in reviewed_path_epochs:
+                    errors.append(
+                        f"{change_prefix} repeats a review path in one epoch"
+                    )
+                reviewed_path_epochs.add((epoch, path))
+                reviewed_paths.add(path)
+                expected_local_scopes.setdefault((stage, epoch), set()).add(
+                    path
+                )
+                for unit_id in source_unit_ids:
+                    latest_review_unit_event[unit_id] = event
+                    unit_history_epochs.setdefault(unit_id, set()).add(epoch)
+                for asset_id in asset_ids:
+                    latest_review_asset_event[asset_id] = event
+                    physical_path = asset_by_id.get(asset_id, {}).get(
+                        "physical_path"
+                    )
+                    if isinstance(physical_path, str) and physical_path:
+                        asset_path_history_epochs.setdefault(
+                            physical_path, set()
+                        ).add(epoch)
 
-        change_ids: list[str] = []
+        event_snapshot = {
+            "schema_version": 1,
+            "source_path": source_paths[0] if source_paths else "",
+            "reading_results": [
+                row
+                for change in path_changes
+                for row in change.get("result_snapshot", {}).get(
+                    "reading_results", []
+                )
+                if isinstance(row, dict)
+            ],
+            "asset_results": [
+                row
+                for change in path_changes
+                for row in change.get("result_snapshot", {}).get(
+                    "asset_results", []
+                )
+                if isinstance(row, dict)
+            ],
+        }
+        candidate_change_ids: list[str] = []
+        revision_evidence_paths: set[str] = set()
+        revision_relation_evidence_ids: set[str] = set()
         for change_index, change in enumerate(candidate_changes, start=1):
             change_prefix = f"{prefix} candidate change {change_index}"
             if not isinstance(change, dict) or set(change) != set(
@@ -1828,7 +2063,7 @@ def _validate_review_history_per_path_legacy(
             ):
                 errors.append(f"{change_prefix} has invalid candidate ID")
                 continue
-            change_ids.append(candidate_id)
+            candidate_change_ids.append(candidate_id)
             if (
                 not isinstance(after_candidate, dict)
                 or set(after_candidate) != set(CANDIDATE_FIELDS)
@@ -1838,20 +2073,28 @@ def _validate_review_history_per_path_legacy(
                 continue
             if forbidden_keys(after_candidate):
                 errors.append(f"{change_prefix} after candidate has forbidden field")
-            if change.get("after_candidate_sha256") != canonical_sha256(
-                after_candidate
-            ):
+            after_digest = canonical_sha256(after_candidate)
+            if change.get("after_candidate_sha256") != after_digest:
                 errors.append(f"{change_prefix} after-candidate hash is stale")
-
             prior_candidate = candidate_state.get(candidate_id)
-            prior_candidate_hash = candidate_result_hashes.get(candidate_id)
+            prior_digest = candidate_result_sha256.get(candidate_id)
+
             if action == "CREATE":
-                if mode not in {"INITIAL", "REOPEN", "SEARCH_ENRICHMENT"}:
-                    errors.append(f"{change_prefix} CREATE has invalid event mode")
+                if mode not in {
+                    "INITIAL",
+                    "REOPEN",
+                    "SEARCH_APPEND",
+                    "CANDIDATE_REVISION",
+                }:
+                    errors.append(
+                        f"{change_prefix} CREATE is invalid for event mode"
+                    )
                 if prior_candidate is not None:
-                    errors.append(f"{change_prefix} recreates an existing candidate")
-                expected_candidate_id = f"B{len(candidate_state) + 1:04d}"
-                if candidate_id != expected_candidate_id:
+                    errors.append(
+                        f"{change_prefix} recreates an existing candidate"
+                    )
+                expected_id = f"B{len(candidate_state) + 1:04d}"
+                if candidate_id != expected_id:
                     errors.append(
                         f"{change_prefix} does not allocate the next B ID"
                     )
@@ -1864,50 +2107,34 @@ def _validate_review_history_per_path_legacy(
                         f"{change_prefix} CREATE carries a prior candidate version"
                     )
                 anchor = after_candidate.get("discovery_anchor")
-                anchor_path = None
-                if isinstance(anchor, dict):
-                    anchor_kind = anchor.get("kind")
-                    anchor_id = anchor.get("id")
-                    if anchor.get("epoch") != epoch:
-                        errors.append(
-                            f"{change_prefix} discovery epoch differs from event"
-                        )
-                    if anchor_kind == "SOURCE_UNIT":
-                        anchor_path = unit_by_id.get(anchor_id, {}).get("path")
-                    elif anchor_kind == "IMAGE":
-                        anchor_asset = next(
-                            (
-                                row
-                                for row in assets
-                                if row.get("physical_path") == anchor_id
-                            ),
-                            None,
-                        )
-                        anchor_path = (
-                            anchor_asset.get("assignment_path")
-                            if anchor_asset is not None
-                            else None
-                        )
-                    elif anchor_kind == "SEARCH_HIT":
-                        meta = hit_meta.get(str(anchor_id))
-                        if meta is not None:
-                            anchor_unit = unit_by_id.get(meta[3])
-                            anchor_path = (
-                                anchor_unit["path"]
-                                if anchor_unit is not None
-                                else None
-                            )
-                        if mode != "SEARCH_ENRICHMENT" or anchor_id not in set(
-                            trigger_hit_ids
-                        ):
-                            errors.append(
-                                f"{change_prefix} search discovery is not triggered"
-                            )
-                if anchor_path != event_path:
+                candidate_anchor_path = anchor_path(anchor, all_hit_paths)
+                if (
+                    not isinstance(anchor, dict)
+                    or anchor.get("epoch") != epoch
+                ):
                     errors.append(
-                        f"{change_prefix} CREATE is attached to the wrong path event"
+                        f"{change_prefix} discovery epoch differs from event"
                     )
-                if mode == "SEARCH_ENRICHMENT":
+                if mode in {"INITIAL", "REOPEN", "CANDIDATE_REVISION"}:
+                    if candidate_anchor_path not in set(source_paths):
+                        errors.append(
+                            f"{change_prefix} CREATE anchor path is absent "
+                            "from its transaction"
+                        )
+                if mode == "SEARCH_APPEND":
+                    anchor_id = (
+                        anchor.get("id") if isinstance(anchor, dict) else None
+                    )
+                    if (
+                        not isinstance(anchor, dict)
+                        or anchor.get("kind") != "SEARCH_HIT"
+                        or anchor_id not in trigger_hit_ids
+                        or candidate_id not in trigger_candidate_ids
+                    ):
+                        errors.append(
+                            f"{change_prefix} SEARCH_APPEND discovery is not "
+                            "trigger-authorized"
+                        )
                     for evidence in after_candidate.get("source_evidence", []):
                         evidence_anchor = (
                             evidence.get("discovery_anchor", {})
@@ -1917,32 +2144,23 @@ def _validate_review_history_per_path_legacy(
                         if (
                             evidence_anchor.get("kind") != "SEARCH_HIT"
                             or evidence_anchor.get("id")
-                            not in set(trigger_hit_ids)
+                            not in trigger_hit_ids
                             or evidence_anchor.get("epoch") != epoch
                         ):
                             errors.append(
                                 f"{change_prefix} CREATE evidence is not "
                                 "trigger-authorized"
                             )
-                    if candidate_id not in trigger_candidate_ids:
-                        errors.append(
-                            f"{change_prefix} CREATE is not named by a trigger hit"
-                        )
-                candidate_state[candidate_id] = copy.deepcopy(after_candidate)
-                candidate_result_hashes[candidate_id] = change[
-                    "after_candidate_sha256"
-                ]
+                prior_evidence_length = 0
             elif action == "UPDATE":
-                if mode != "SEARCH_ENRICHMENT":
-                    errors.append(
-                        f"{change_prefix} UPDATE is outside SEARCH_ENRICHMENT"
-                    )
                 if prior_candidate is None:
-                    errors.append(f"{change_prefix} updates an unknown candidate")
+                    errors.append(
+                        f"{change_prefix} updates an unknown candidate"
+                    )
                     continue
                 if (
                     change.get("previous_candidate_result_sha256")
-                    != prior_candidate_hash
+                    != prior_digest
                 ):
                     errors.append(
                         f"{change_prefix} breaks candidate version hash chain"
@@ -1951,117 +2169,357 @@ def _validate_review_history_per_path_legacy(
                     errors.append(
                         f"{change_prefix} before candidate differs from replay state"
                     )
-                if not isinstance(before_candidate, dict) or change.get(
-                    "before_candidate_sha256"
-                ) != canonical_sha256(before_candidate):
+                if (
+                    not isinstance(before_candidate, dict)
+                    or change.get("before_candidate_sha256")
+                    != canonical_sha256(before_candidate)
+                    or change.get("before_candidate_sha256") != prior_digest
+                ):
                     errors.append(
                         f"{change_prefix} before-candidate hash is stale"
                     )
-                if change.get("before_candidate_sha256") != prior_candidate_hash:
-                    errors.append(
-                        f"{change_prefix} prior result and before hash differ"
+                if mode == "SEARCH_APPEND":
+                    _validate_candidate_enrichment_update(
+                        prior_candidate,
+                        after_candidate,
+                        event,
+                        trigger_hit_ids,
+                        trigger_unit_ids,
+                        trigger_candidate_ids,
+                        trigger_route_ids,
+                        event_snapshot,
+                        errors,
+                        change_prefix,
                     )
-                _validate_candidate_enrichment_update(
-                    prior_candidate,
-                    after_candidate,
-                    event,
-                    set(trigger_hit_ids),
-                    trigger_unit_ids,
-                    trigger_candidate_ids,
-                    trigger_route_ids,
-                    snapshot,
-                    errors,
-                    change_prefix,
+                elif mode == "CANDIDATE_REVISION":
+                    _validate_candidate_revision_update(
+                        prior_candidate,
+                        after_candidate,
+                        errors,
+                        change_prefix,
+                    )
+                else:
+                    errors.append(
+                        f"{change_prefix} UPDATE is invalid for event mode"
+                    )
+                prior_evidence_length = len(
+                    prior_candidate.get("source_evidence", [])
                 )
-                candidate_state[candidate_id] = copy.deepcopy(after_candidate)
-                candidate_result_hashes[candidate_id] = change[
-                    "after_candidate_sha256"
-                ]
-        if change_ids != sorted(
-            change_ids,
-            key=lambda value: int(value[1:]) if B_ID.fullmatch(value) else 10**9,
-        ) or len(change_ids) != len(set(change_ids)):
+            else:
+                continue
+
+            if mode == "CANDIDATE_REVISION":
+                for evidence in after_candidate.get("source_evidence", [])[
+                    prior_evidence_length:
+                ]:
+                    evidence_anchor = (
+                        evidence.get("discovery_anchor", {})
+                        if isinstance(evidence, dict)
+                        else {}
+                    )
+                    evidence_path = anchor_path(
+                        evidence_anchor,
+                        all_hit_paths,
+                    )
+                    if evidence_path is None:
+                        errors.append(
+                            f"{change_prefix} appends evidence without a "
+                            "canonical source path"
+                        )
+                    else:
+                        revision_evidence_paths.add(evidence_path)
+                prior_relations_length = (
+                    len(prior_candidate.get("related_candidate_ids", []))
+                    if isinstance(prior_candidate, dict)
+                    else 0
+                )
+                for relation in after_candidate.get(
+                    "related_candidate_ids", []
+                )[prior_relations_length:]:
+                    if (
+                        isinstance(relation, dict)
+                        and relation.get("relation")
+                        in {"MERGED_INTO", "SPLIT_INTO"}
+                    ):
+                        revision_relation_evidence_ids.update(
+                            evidence_id
+                            for evidence_id in relation.get(
+                                "evidence_ids", []
+                            )
+                            if isinstance(evidence_id, str)
+                        )
+            candidate_state[candidate_id] = copy.deepcopy(after_candidate)
+            candidate_result_sha256[candidate_id] = after_digest
+
+        if candidate_change_ids != sorted(
+            candidate_change_ids,
+            key=lambda value: int(value[1:]),
+        ) or len(candidate_change_ids) != len(set(candidate_change_ids)):
             errors.append(
                 f"{prefix} candidate changes are not unique increasing B order"
             )
 
-        if is_review_event and event_path is not None:
-            event_position = document_position.get(event_path, 10**9)
-            prior_position = last_review_position_by_epoch.get(epoch)
-            if prior_position is not None and event_position <= prior_position:
-                errors.append(
-                    f"{prefix} violates strict frozen document traversal "
-                    "within its epoch"
-                )
-            last_review_position_by_epoch[epoch] = event_position
-            if (epoch, event_path) in seen_review_path_epochs:
-                errors.append(f"{prefix} repeats a reviewed path in one epoch")
-            seen_review_path_epochs.add((epoch, event_path))
-            if mode == "INITIAL":
-                expected_initial_path = (
-                    audit_paths[next_initial_path_index]
-                    if next_initial_path_index < len(audit_paths)
-                    else None
-                )
-                if event_path != expected_initial_path:
+        route_change_ids: list[str] = []
+        resolution_paths: set[str] = set()
+        for change_index, change in enumerate(route_changes, start=1):
+            change_prefix = f"{prefix} route change {change_index}"
+            if not isinstance(change, dict) or set(change) != set(
+                ROUTE_CHANGE_FIELDS
+            ):
+                errors.append(f"{change_prefix} fields differ from contract")
+                continue
+            action = change.get("action")
+            route_id = change.get("route_id")
+            before_route = change.get("before_route")
+            after_route = change.get("after_route")
+            if action not in ROUTE_CHANGE_ACTIONS:
+                errors.append(f"{change_prefix} has invalid action")
+            if not isinstance(route_id, str) or not R_ID.fullmatch(route_id):
+                errors.append(f"{change_prefix} has invalid route ID")
+                continue
+            route_change_ids.append(route_id)
+            if (
+                not isinstance(after_route, dict)
+                or set(after_route) != set(CROSS_REFERENCE_HEADER)
+                or after_route.get("route_id") != route_id
+                or any(not isinstance(value, str) for value in after_route.values())
+            ):
+                errors.append(f"{change_prefix} has malformed after route")
+                continue
+            after_digest = canonical_sha256(after_route)
+            if change.get("after_route_sha256") != after_digest:
+                errors.append(f"{change_prefix} after-route hash is stale")
+            prior_route = route_state.get(route_id)
+            prior_digest = route_result_sha256.get(route_id)
+
+            if action == "CREATE":
+                if mode not in {"INITIAL", "REOPEN", "SEARCH_APPEND"}:
                     errors.append(
-                        f"{prefix} INITIAL path is not the first unread audit path"
+                        f"{change_prefix} CREATE is invalid for event mode"
+                    )
+                if prior_route is not None:
+                    errors.append(f"{change_prefix} recreates an existing route")
+                expected_id = f"R{len(route_state) + 1:06d}"
+                if route_id != expected_id:
+                    errors.append(
+                        f"{change_prefix} does not allocate the next R ID"
+                    )
+                if (
+                    change.get("previous_route_result_sha256") is not None
+                    or before_route is not None
+                    or change.get("before_route_sha256") is not None
+                ):
+                    errors.append(
+                        f"{change_prefix} CREATE carries a prior route version"
+                    )
+                discovery_kind = after_route.get("discovery_kind")
+                discovery_id = after_route.get("discovery_id")
+                if after_route.get("discovery_epoch") != str(epoch):
+                    errors.append(
+                        f"{change_prefix} discovery epoch differs from event"
+                    )
+                if discovery_kind == "SOURCE_UNIT":
+                    route_anchor_path = anchor_path(
+                        {
+                            "kind": "SOURCE_UNIT",
+                            "id": discovery_id,
+                        },
+                        all_hit_paths,
+                    )
+                elif discovery_kind == "IMAGE":
+                    source_asset = asset_by_id.get(
+                        after_route.get("source_asset_id", "")
+                    )
+                    route_anchor_path = (
+                        source_asset.get("assignment_path")
+                        if isinstance(source_asset, dict)
+                        else None
                     )
                 else:
-                    next_initial_path_index += 1
-            elif mode == "REOPEN" and event_path not in seen_paths:
-                errors.append(f"{prefix} REOPEN path was not previously reviewed")
-            seen_paths.add(event_path)
-            expected_local_scopes.setdefault((stage, epoch), set()).add(event_path)
-            for unit_id in source_unit_ids:
-                latest_review_unit_event[unit_id] = event
-                unit_history_epochs.setdefault(unit_id, set()).add(epoch)
-            for asset_id in asset_ids:
-                latest_review_asset_event[asset_id] = event
-                physical_path = asset_by_id.get(asset_id, {}).get("physical_path")
-                if physical_path:
-                    asset_path_history_epochs.setdefault(
-                        physical_path, set()
-                    ).add(epoch)
-        elif is_enrichment and event_path not in seen_paths:
-            errors.append(f"{prefix} enrichment path was never reviewed")
+                    route_anchor_path = all_hit_paths.get(str(discovery_id))
+                if mode in {"INITIAL", "REOPEN"} and route_anchor_path not in set(
+                    source_paths
+                ):
+                    errors.append(
+                        f"{change_prefix} CREATE anchor path is absent from "
+                        "its review transaction"
+                    )
+                if mode == "SEARCH_APPEND" and (
+                    discovery_kind != "SEARCH_HIT"
+                    or discovery_id not in trigger_hit_ids
+                    or route_id not in trigger_route_ids
+                ):
+                    errors.append(
+                        f"{change_prefix} SEARCH_APPEND route is not "
+                        "trigger-authorized"
+                    )
+            elif action == "UPDATE":
+                if mode != "ROUTE_RESOLUTION":
+                    errors.append(
+                        f"{change_prefix} UPDATE is outside ROUTE_RESOLUTION"
+                    )
+                if prior_route is None:
+                    errors.append(f"{change_prefix} updates an unknown route")
+                    continue
+                if (
+                    change.get("previous_route_result_sha256") != prior_digest
+                    or before_route != prior_route
+                    or not isinstance(before_route, dict)
+                    or change.get("before_route_sha256")
+                    != canonical_sha256(before_route)
+                    or change.get("before_route_sha256") != prior_digest
+                ):
+                    errors.append(
+                        f"{change_prefix} breaks route version replay"
+                    )
+                _validate_route_resolution_update(
+                    prior_route,
+                    after_route,
+                    stage,
+                    errors,
+                    change_prefix,
+                )
+                if after_route.get("status") == "RESOLVED":
+                    for unit_id in parsed_string_list(
+                        after_route.get("target_unit_ids", ""),
+                        f"{change_prefix}.target_unit_ids",
+                        errors,
+                    ):
+                        unit = unit_by_id.get(unit_id)
+                        if unit is not None:
+                            resolution_paths.add(unit["path"])
+                    for asset_id in parsed_string_list(
+                        after_route.get("target_asset_ids", ""),
+                        f"{change_prefix}.target_asset_ids",
+                        errors,
+                    ):
+                        asset = asset_by_id.get(asset_id)
+                        if asset is not None:
+                            resolution_paths.add(asset["assignment_path"])
+                elif after_route.get("status") == "MISSING_TARGET_FINAL":
+                    source_unit = unit_by_id.get(
+                        after_route.get("source_unit_id")
+                    )
+                    source_asset = asset_by_id.get(
+                        after_route.get("source_asset_id")
+                    )
+                    if source_unit is not None:
+                        resolution_paths.add(source_unit["path"])
+                    elif source_asset is not None:
+                        resolution_paths.add(source_asset["assignment_path"])
+            else:
+                continue
+            route_state[route_id] = copy.deepcopy(after_route)
+            route_result_sha256[route_id] = after_digest
 
-        previous_hash = event.get("previous_event_sha256")
-        if previous_hash != prior_event_hash:
-            errors.append(f"{prefix} previous-event hash breaks append chain")
-        for field in (
-            "input_projection_sha256",
-            "result_projection_sha256",
-            "event_sha256",
-        ):
-            if not isinstance(event.get(field), str) or not HEX64.fullmatch(
-                event[field]
-            ):
-                errors.append(f"{prefix} has invalid {field}")
-        try:
-            expected_input_digest = canonical_sha256(
-                review_input_projection(event, unit_by_id, asset_by_id)
+        if route_change_ids != sorted(
+            route_change_ids,
+            key=lambda value: int(value[1:]),
+        ) or len(route_change_ids) != len(set(route_change_ids)):
+            errors.append(
+                f"{prefix} route changes are not unique increasing R order"
             )
-        except (KeyError, TypeError):
-            expected_input_digest = None
-        if (
-            expected_input_digest is not None
-            and event.get("input_projection_sha256") != expected_input_digest
-        ):
-            errors.append(f"{prefix} immutable input projection hash is stale")
+
+        if mode == "ROUTE_RESOLUTION":
+            if not route_changes:
+                errors.append(f"{prefix} ROUTE_RESOLUTION has no route changes")
+            if source_paths != canonical_paths(resolution_paths):
+                errors.append(
+                    f"{prefix} route-resolution paths differ from canonical "
+                    "target/source union"
+                )
+        if mode == "CANDIDATE_REVISION":
+            if not candidate_changes:
+                errors.append(
+                    f"{prefix} CANDIDATE_REVISION has no candidate changes"
+                )
+            for (
+                path,
+                previous_snapshot,
+                snapshot,
+                change_prefix,
+            ) in revision_snapshot_pairs:
+                if _validate_candidate_revision_path_diff(
+                    previous_snapshot,
+                    snapshot,
+                    candidate_state,
+                    errors,
+                    change_prefix,
+                ):
+                    revision_changed_paths.add(path)
+            for candidate in candidate_state.values():
+                for evidence in candidate.get("source_evidence", []):
+                    if (
+                        not isinstance(evidence, dict)
+                        or evidence.get("evidence_id")
+                        not in revision_relation_evidence_ids
+                    ):
+                        continue
+                    evidence_path = anchor_path(
+                        evidence.get("discovery_anchor"),
+                        all_hit_paths,
+                    )
+                    if evidence_path is None:
+                        errors.append(
+                            f"{prefix} definitive relation cites evidence "
+                            "without a canonical source path"
+                        )
+                    else:
+                        revision_evidence_paths.add(evidence_path)
+            expected_revision_paths = (
+                revision_changed_paths | revision_evidence_paths
+            )
+            if source_paths != canonical_paths(expected_revision_paths):
+                errors.append(
+                    f"{prefix} candidate-revision paths differ from affected "
+                    "link/evidence union"
+                )
+
+        if mode == "SEARCH_APPEND" and isinstance(appended_round, dict):
+            fixed_point = search_state.get("fixed_point")
+            if fixed_point is not None:
+                semantic_delta = bool(
+                    source_paths or candidate_changes or route_changes
+                )
+                new_delta = any(
+                    appended_round.get(field)
+                    for field in (
+                        "new_vocabulary",
+                        "new_candidates",
+                        "new_evidence_groups",
+                        "new_routes",
+                    )
+                )
+                if (
+                    stage != 18
+                    or appended_round.get("kind") != "SATURATION"
+                    or semantic_delta
+                    or new_delta
+                    or not isinstance(fixed_point, dict)
+                    or fixed_point.get("round_id")
+                    != appended_round.get("round_id")
+                    or fixed_point.get("zero_delta") is not True
+                    or fixed_point.get("rerun_reproduced") is not True
+                    or fixed_point.get("result_digest")
+                    != appended_round.get("result_digest")
+                ):
+                    errors.append(
+                        f"{prefix} sets fixed_point without a final "
+                        "zero-delta saturation round"
+                    )
+
+        if event.get("previous_event_sha256") != prior_event_sha256:
+            errors.append(f"{prefix} breaks the append-only event hash chain")
         try:
-            expected_event_digest = review_event_sha256(event)
+            expected_event_sha256 = review_event_sha256(event)
         except (KeyError, TypeError):
-            expected_event_digest = None
+            expected_event_sha256 = None
         if (
-            expected_event_digest is not None
-            and event.get("event_sha256") != expected_event_digest
+            expected_event_sha256 is not None
+            and event.get("event_sha256") != expected_event_sha256
         ):
             errors.append(f"{prefix} closed event hash is stale")
-        prior_event_hash = event.get("event_sha256")
-        prior_event_epoch = epoch
-        if event_path is not None:
-            latest_path_event[event_path] = event
+        prior_event_sha256 = event.get("event_sha256")
 
     for row in reading:
         unit_id = row.get("source_unit_id", "")
@@ -2075,17 +2533,14 @@ def _validate_review_history_per_path_legacy(
         if event is None:
             errors.append(f"reading {unit_id} is reviewed without review history")
             continue
-        if row.get("review_epoch") != str(event["epoch"]):
+        if (
+            row.get("review_epoch") != str(event.get("epoch"))
+            or row.get("review_stage") != str(event.get("stage"))
+            or row.get("reviewer") != event.get("reviewer")
+        ):
             errors.append(
-                f"reading {unit_id} review epoch is not its latest review event"
-            )
-        if row.get("review_stage") != str(event["stage"]):
-            errors.append(
-                f"reading {unit_id} review stage differs from latest review event"
-            )
-        if row.get("reviewer") != event["reviewer"]:
-            errors.append(
-                f"reading {unit_id} reviewer differs from latest review event"
+                f"reading {unit_id} completion metadata differs from latest "
+                "full review transaction"
             )
     for row in assets:
         asset_id = row.get("asset_id", "")
@@ -2099,37 +2554,41 @@ def _validate_review_history_per_path_legacy(
         if event is None:
             errors.append(f"asset {asset_id} is screened without review history")
             continue
-        if row.get("review_epoch") != str(event["epoch"]):
+        if (
+            row.get("review_epoch") != str(event.get("epoch"))
+            or row.get("review_stage") != str(event.get("stage"))
+            or row.get("reviewer") != event.get("reviewer")
+        ):
             errors.append(
-                f"asset {asset_id} review epoch is not its latest review event"
-            )
-        if row.get("review_stage") != str(event["stage"]):
-            errors.append(
-                f"asset {asset_id} review stage differs from latest review event"
-            )
-        if row.get("reviewer") != event["reviewer"]:
-            errors.append(
-                f"asset {asset_id} reviewer differs from latest review event"
+                f"asset {asset_id} completion metadata differs from latest "
+                "full review transaction"
             )
 
-    for path, event in latest_path_event.items():
+    for path, path_change in latest_path_change.items():
         try:
             current_snapshot = review_result_projection(
-                event, reading_by_id, asset_by_id
+                path_change,
+                reading_by_id,
+                asset_by_id,
             )
-        except (KeyError, TypeError, IndexError):
+        except (KeyError, TypeError):
             continue
-        if event.get("result_snapshot") != current_snapshot:
+        if path_change.get("result_snapshot") != current_snapshot:
             errors.append(
                 f"review-history latest snapshot for {path} differs from "
                 "current full row projection"
             )
-    replayed_candidates = [
-        candidate_state[candidate_id] for candidate_id in candidate_state
-    ]
-    if replayed_candidates != candidates:
+    if list(candidate_state.values()) != candidates:
         errors.append(
             "review-history candidate-version replay differs from candidate ledger"
+        )
+    if list(route_state.values()) != routes:
+        errors.append(
+            "review-history route-version replay differs from route ledger"
+        )
+    if search_state != search:
+        errors.append(
+            "review-history search-version replay differs from search ledger"
         )
 
     return (
@@ -2185,6 +2644,31 @@ def _validate_candidate_revision_update(
             errors.append(
                 f"{prefix} reorders or rewrites prior candidate {field}"
             )
+    before_evidence = before.get("source_evidence", [])
+    after_evidence = after.get("source_evidence", [])
+    appended_evidence_ids = {
+        evidence.get("evidence_id")
+        for evidence in after_evidence[len(before_evidence) :]
+        if isinstance(evidence, dict)
+        and isinstance(evidence.get("evidence_id"), str)
+    }
+    for field in FINGERPRINT_FIELDS:
+        before_value = before.get("fingerprint", {}).get(field)
+        after_value = after.get("fingerprint", {}).get(field)
+        before_support = before.get("field_support", {}).get(field)
+        after_support = after.get("field_support", {}).get(field)
+        if before_value == after_value and before_support == after_support:
+            continue
+        cited_ids = (
+            after_value.get("evidence_ids", [])
+            if isinstance(after_value, dict)
+            else []
+        )
+        if not appended_evidence_ids.intersection(cited_ids):
+            errors.append(
+                f"{prefix} changes fingerprint/support {field} without "
+                "newly appended evidence"
+            )
 
 
 def _validate_route_resolution_update(
@@ -2200,6 +2684,7 @@ def _validate_route_resolution_update(
         "target_unit_ids",
         "target_asset_ids",
         "attempts",
+        "vocabulary_terms",
         "defect_boundary",
     }
     for field in CROSS_REFERENCE_HEADER:
@@ -2218,6 +2703,19 @@ def _validate_route_resolution_update(
             f"{prefix}.{field}",
             errors,
         )
+    for field in ("attempts", "vocabulary_terms"):
+        before_values = parsed_string_list(
+            before.get(field, ""),
+            f"{prefix}.before.{field}",
+            errors,
+        )
+        after_values = parsed_string_list(
+            after.get(field, ""),
+            f"{prefix}.after.{field}",
+            errors,
+        )
+        if after_values[: len(before_values)] != before_values:
+            errors.append(f"{prefix} rewrites prior route {field}")
 
 
 def _terminal_active_descendants(
@@ -2375,6 +2873,7 @@ def validate_objects(
         reading,
         assets,
         candidates,
+        routes,
         review_history,
         search,
         stage_by_path,
@@ -4340,30 +4839,114 @@ def mutation_checks(
         trigger_search_kind: str | None = None,
         trigger_hit_ids: list[str] | None = None,
         candidate_changes: list[dict[str, Any]] | None = None,
+        route_changes: list[dict[str, Any]] | None = None,
+        full_search_state: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         result = copy.deepcopy(prior)
-        prior_path_event = next(
+        current_search = copy.deepcopy(base_search)
+        for prior_event in result:
+            prior_search_change = prior_event.get("search_change")
+            if isinstance(prior_search_change, dict):
+                current_search = copy.deepcopy(
+                    prior_search_change["after_search"]
+                )
+
+        normalized_mode = (
+            "SEARCH_APPEND" if mode == "SEARCH_ENRICHMENT" else mode
+        )
+        missing_rounds = prior_rounds[
+            len(current_search.get("rounds", [])) :
+        ]
+        preappend_rounds = (
+            missing_rounds[:-1]
+            if normalized_mode == "SEARCH_APPEND" and missing_rounds
+            else missing_rounds
+        )
+        for round_record in preappend_rounds:
+            after_search = copy.deepcopy(current_search)
+            after_search["rounds"].append(copy.deepcopy(round_record))
+            for value in round_record.get("tool_assumptions", []):
+                if value not in after_search["tool_assumptions"]:
+                    after_search["tool_assumptions"].append(value)
+            for value in round_record.get("new_vocabulary", []):
+                if value not in after_search["vocabulary"]:
+                    after_search["vocabulary"].append(value)
+            search_event = close_review_event(
+                {
+                    "review_id": f"V{len(result) + 1:06d}",
+                    "epoch": round_record["epoch"],
+                    "stage": round_record["owning_stage"],
+                    "mode": "SEARCH_APPEND",
+                    "reviewer": reviewer,
+                    "source_paths": [],
+                    "path_changes": [],
+                    "candidate_changes": [],
+                    "route_changes": [],
+                    "search_change": close_search_change(
+                        current_search,
+                        after_search,
+                    ),
+                },
+                result[-1]["event_sha256"] if result else None,
+            )
+            result.append(search_event)
+            current_search = after_search
+
+        prior_path_change = next(
             (
-                item
-                for item in reversed(result)
-                if item.get("source_paths") == [source_path]
+                path_change
+                for prior_event in reversed(result)
+                for path_change in prior_event.get("path_changes", [])
+                if path_change.get("source_path") == source_path
             ),
             None,
         )
-        event = close_review_event(
+        event_stage = stage_for_document(
+            next(
+                document
+                for document in manifest["documents"]
+                if document["path"] == source_path
+            )
+        )
+        search_change = None
+        if normalized_mode == "SEARCH_APPEND":
+            after_search = (
+                copy.deepcopy(full_search_state)
+                if full_search_state is not None
+                else copy.deepcopy(current_search)
+            )
+            if full_search_state is None and missing_rounds:
+                after_search["rounds"].append(
+                    copy.deepcopy(missing_rounds[-1])
+                )
+                for value in missing_rounds[-1].get(
+                    "tool_assumptions", []
+                ):
+                    if value not in after_search["tool_assumptions"]:
+                        after_search["tool_assumptions"].append(value)
+                for value in missing_rounds[-1].get(
+                    "new_vocabulary", []
+                ):
+                    if value not in after_search["vocabulary"]:
+                        after_search["vocabulary"].append(value)
+            search_change = close_search_change(current_search, after_search)
+            if after_search.get("rounds"):
+                event_stage = after_search["rounds"][-1]["owning_stage"]
+        event_core = {
+            "review_id": f"V{len(result) + 1:06d}",
+            "epoch": epoch,
+            "stage": event_stage,
+            "mode": normalized_mode,
+            "reviewer": reviewer,
+            "source_paths": [source_path],
+            "candidate_changes": candidate_changes or [],
+            "route_changes": route_changes or [],
+            "search_change": search_change,
+        }
+        path_change = close_path_change(
+            event_core,
             {
-                "review_id": f"V{len(result) + 1:06d}",
-                "epoch": epoch,
-                "stage": stage_for_document(
-                    next(
-                        document
-                        for document in manifest["documents"]
-                        if document["path"] == source_path
-                    )
-                ),
-                "mode": mode,
-                "reviewer": reviewer,
-                "source_paths": [source_path],
+                "source_path": source_path,
                 "source_unit_ids": [
                     item["id"] for item in units if item["path"] == source_path
                 ],
@@ -4373,21 +4956,21 @@ def mutation_checks(
                     if item["assignment_path"] == source_path
                 ],
                 "previous_path_result_sha256": (
-                    prior_path_event["result_projection_sha256"]
-                    if prior_path_event is not None
+                    prior_path_change["result_projection_sha256"]
+                    if prior_path_change is not None
                     else None
                 ),
-                "trigger_search_kind": trigger_search_kind,
-                "trigger_hit_ids": trigger_hit_ids or [],
-                "candidate_changes": candidate_changes or [],
             },
             unit_by_fixture_id,
             {
                 item["source_unit_id"]: item for item in reading_state
             },
             {item["asset_id"]: item for item in asset_state},
+        )
+        event_core["path_changes"] = [path_change]
+        event = close_review_event(
+            event_core,
             result[-1]["event_sha256"] if result else None,
-            prior_rounds,
         )
         result.append(event)
         return result
@@ -4484,6 +5067,9 @@ def mutation_checks(
         [],
         candidate_changes=[
             close_candidate_change("CREATE", copy.deepcopy(candidate))
+        ],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(route))
         ],
     )
 

@@ -26,6 +26,14 @@ Recovery validates the journal and both complete staged byte sets.  An
 all-base state is cleared, an all-proposed state is finalized, and a mixed
 base/proposed state is conservatively rolled back to the staged base.  A
 target matching neither recorded digest causes fail-closed retention.
+
+A process loss before step 2 can leave only a private
+``.audit-transaction-build-*`` directory: no target has changed and no
+pending journal has been published.  Readers ignore that orphan, and the next
+exclusive apply/recovery removes it.  A loss after the pending directory has
+been atomically retired can similarly leave a private cleanup directory; the
+target decision is already complete and the next exclusive operation removes
+the orphan.
 """
 
 from __future__ import annotations
@@ -107,6 +115,7 @@ class TransactionResult:
 
     transaction_id: str
     state: str = "COMMITTED"
+    cleanup_deferred: bool = False
 
 
 @dataclass(frozen=True)
@@ -640,6 +649,8 @@ def _publish_prepared(
     proposed_bytes: Mapping[str, bytes],
     artifact_modes: Mapping[str, int],
     journal: Mapping[str, Any],
+    *,
+    fault_injector: FaultInjector | None,
 ) -> tuple[Path, Path]:
     build = Path(tempfile.mkdtemp(prefix=BUILD_PREFIX, dir=goal))
     pending = goal / PENDING_NAME
@@ -667,10 +678,13 @@ def _publish_prepared(
         _fsync_directory(work)
         _write_journal(build, journal)
         _fsync_directory(build)
+        _call_fault(fault_injector, "apply:before_publish")
         os.replace(build, pending)
         _fsync_directory(goal)
         return pending, build
-    except BaseException:
+    except BaseException as exc:
+        if isinstance(exc, Exception) and _lexists(build):
+            _remove_internal_directory(goal, build)
         raise
 
 
@@ -748,12 +762,20 @@ def _verify_target_state(
         )
 
 
-def _retire_pending(goal: Path, pending: Path, transaction_id: str) -> None:
+def _retire_pending(
+    goal: Path,
+    pending: Path,
+    transaction_id: str,
+    *,
+    fault_injector: FaultInjector | None,
+    event_prefix: str,
+) -> None:
     cleanup = goal / f"{CLEANUP_PREFIX}{transaction_id}"
     if _lexists(cleanup):
         _remove_internal_directory(goal, cleanup)
     os.replace(pending, cleanup)
     _fsync_directory(goal)
+    _call_fault(fault_injector, f"{event_prefix}:after_pending_retired")
     try:
         shutil.rmtree(cleanup)
     finally:
@@ -848,7 +870,13 @@ def _recover_locked(
             journal_state = "COMMITTED"
         _call_fault(fault_injector, "recovery:committed")
         _call_fault(fault_injector, "recovery:before_cleanup")
-        _retire_pending(goal, pending, transaction_id)
+        _retire_pending(
+            goal,
+            pending,
+            transaction_id,
+            fault_injector=fault_injector,
+            event_prefix="recovery",
+        )
         return RecoveryResult(
             "FINALIZED_PROPOSED",
             transaction_id,
@@ -874,7 +902,13 @@ def _recover_locked(
             label="base",
         )
         _call_fault(fault_injector, "recovery:before_cleanup")
-        _retire_pending(goal, pending, transaction_id)
+        _retire_pending(
+            goal,
+            pending,
+            transaction_id,
+            fault_injector=fault_injector,
+            event_prefix="recovery",
+        )
         return RecoveryResult("CLEARED_BASE", transaction_id, journal_state)
 
     _restore_all(
@@ -891,7 +925,13 @@ def _recover_locked(
         label="rolled-back base",
     )
     _call_fault(fault_injector, "recovery:before_cleanup")
-    _retire_pending(goal, pending, transaction_id)
+    _retire_pending(
+        goal,
+        pending,
+        transaction_id,
+        fault_injector=fault_injector,
+        event_prefix="recovery",
+    )
     return RecoveryResult("ROLLED_BACK_MIXED", transaction_id, journal_state)
 
 
@@ -968,6 +1008,7 @@ def apply_transaction(
                 proposed,
                 modes,
                 journal,
+                fault_injector=fault_injector,
             )
             _call_fault(fault_injector, "apply:prepared")
 
@@ -1011,6 +1052,8 @@ def apply_transaction(
                 goal,
                 pending,
                 journal["transaction_id"],
+                fault_injector=fault_injector,
+                event_prefix="apply",
             )
             return TransactionResult(journal["transaction_id"])
         except BaseException as exc:
@@ -1027,7 +1070,32 @@ def apply_transaction(
                     f"apply failed ({exc}); recovery also failed and pending "
                     f"state remains at {goal / PENDING_NAME}: {recovery_exc}"
                 ) from exc
+            if recovery.action == "FINALIZED_PROPOSED":
+                return TransactionResult(journal["transaction_id"])
+            if recovery.action == "NO_PENDING":
+                try:
+                    _verify_target_state(
+                        goal,
+                        journal["proposed_sha256"],
+                        modes,
+                        label="post-retirement proposed",
+                    )
+                    _fsync_directory(goal)
+                except Exception as verification_exc:
+                    raise TransactionRecoveryError(
+                        f"apply failed ({exc}); the pending directory was "
+                        "retired but proposed targets could not be verified: "
+                        f"{verification_exc}"
+                    ) from exc
+                cleanup_deferred = False
+                try:
+                    _cleanup_orphans(goal)
+                except TransactionError:
+                    cleanup_deferred = True
+                return TransactionResult(
+                    journal["transaction_id"],
+                    cleanup_deferred=cleanup_deferred,
+                )
             raise TransactionApplyError(
                 f"apply failed ({exc}); recovery action={recovery.action}"
             ) from exc
-

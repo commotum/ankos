@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preview/apply a blind-worker merge or typed search-enrichment proposal."""
+"""Preview/apply a blind-worker merge or typed coordinator proposal."""
 
 from __future__ import annotations
 
@@ -9,15 +9,14 @@ import hashlib
 import io
 import json
 import os
-import shutil
 import sys
-import tempfile
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import build_worker_bundle
+import audit_transaction
 import validate_audit
 from audit_contract import (
     ASSET_HEADER,
@@ -28,7 +27,10 @@ from audit_contract import (
     READING_HEADER,
     REVIEW_HISTORY_FIELDS,
     close_candidate_change,
+    close_path_change,
     close_review_event,
+    close_route_change,
+    close_search_change,
 )
 
 
@@ -128,7 +130,7 @@ class MergePlan:
 
 
 @dataclass(frozen=True)
-class SearchEnrichmentPlan:
+class SearchAppendPlan:
     proposal: Path
     goal_dir: Path
     coordinator_id: str
@@ -148,7 +150,7 @@ class SearchEnrichmentPlan:
 
     def preview(self) -> dict[str, Any]:
         return {
-            "proposal_kind": "SEARCH_ENRICHMENT",
+            "proposal_kind": "SEARCH_APPEND",
             "proposal": str(self.proposal),
             "goal_dir": str(self.goal_dir),
             "coordinator_id": self.coordinator_id,
@@ -177,7 +179,7 @@ class SearchEnrichmentPlan:
         }
 
 
-ENRICHMENT_PROPOSAL_FIELDS = (
+SEARCH_APPEND_PROPOSAL_FIELDS = (
     "schema_version",
     "proposal_kind",
     "coordinator_id",
@@ -212,7 +214,7 @@ CANDIDATE_ENRICHMENT_IMMUTABLE = {
 }
 
 
-def _enrichment_proposal_schema() -> dict[str, Any]:
+def _search_append_proposal_schema() -> dict[str, Any]:
     digest_properties = {
         name: {"type": "string", "pattern": "^[0-9a-f]{64}$"}
         for name in WRITE_NAMES
@@ -220,17 +222,15 @@ def _enrichment_proposal_schema() -> dict[str, Any]:
     string_row = {"type": "string"}
     return {
         "type": "object",
-        "required": list(ENRICHMENT_PROPOSAL_FIELDS),
+        "required": list(SEARCH_APPEND_PROPOSAL_FIELDS),
         "properties": {
             "schema_version": {"const": 1},
-            "proposal_kind": {"const": "SEARCH_ENRICHMENT"},
+            "proposal_kind": {"const": "SEARCH_APPEND"},
             "coordinator_id": {"type": "string", "minLength": 1},
             "epoch": {"type": "integer", "minimum": 1},
             "source_paths": {
                 "type": "array",
                 "items": {"type": "string", "minLength": 1},
-                "minItems": 1,
-                "maxItems": 1,
                 "uniqueItems": True,
             },
             "base_artifact_sha256": {
@@ -831,24 +831,26 @@ def _load_json_object_bytes(payload: bytes, label: str) -> dict[str, Any]:
     return value
 
 
-def _load_enrichment_proposal(path: Path) -> tuple[bytes, dict[str, Any]]:
+def _load_search_append_proposal(
+    path: Path,
+) -> tuple[bytes, dict[str, Any]]:
     if not path.is_file() or path.is_symlink():
-        raise MergeError(f"enrichment proposal is missing or unsafe: {path}")
+        raise MergeError(f"SEARCH_APPEND proposal is missing or unsafe: {path}")
     try:
         payload = path.read_bytes()
     except OSError as exc:
-        raise MergeError(f"cannot read enrichment proposal: {exc}") from exc
-    proposal = _load_json_object_bytes(payload, "enrichment proposal")
+        raise MergeError(f"cannot read SEARCH_APPEND proposal: {exc}") from exc
+    proposal = _load_json_object_bytes(payload, "SEARCH_APPEND proposal")
     if payload != build_worker_bundle.canonical_json_bytes(proposal):
-        raise MergeError("enrichment proposal is not canonically serialized")
+        raise MergeError("SEARCH_APPEND proposal is not canonically serialized")
     schema_errors = build_worker_bundle.json_schema_errors(
         proposal,
-        _enrichment_proposal_schema(),
-        "enrichment-proposal",
+        _search_append_proposal_schema(),
+        "search-append-proposal",
     )
     if schema_errors:
         raise MergeError(
-            "enrichment proposal schema failed:\n- "
+            "SEARCH_APPEND proposal schema failed:\n- "
             + "\n- ".join(schema_errors)
         )
     return payload, proposal
@@ -1061,17 +1063,19 @@ def _validate_enrichment_candidate_update(
 def _canonical_audit_paths(
     manifest: dict[str, Any],
     requested: list[str],
+    *,
+    allow_empty: bool = False,
 ) -> list[str]:
     document_by_path = {
         document["path"]: document for document in manifest["documents"]
     }
     if (
-        not requested
+        (not requested and not allow_empty)
         or len(requested) != len(set(requested))
         or any(path not in document_by_path for path in requested)
     ):
         raise MergeError(
-            "enrichment source_paths must be nonempty, unique corpus documents"
+            "source_paths must be unique corpus documents"
         )
     canonical = sorted(
         requested,
@@ -1082,7 +1086,7 @@ def _canonical_audit_paths(
     )
     if requested != canonical:
         raise MergeError(
-            "enrichment source_paths are not in canonical audit order"
+            "source_paths are not in canonical audit order"
         )
     return canonical
 
@@ -1107,7 +1111,7 @@ def _validate_monotonic_search_append(
         proposed["schema_version"] != current["schema_version"]
         or proposed["phase"] != current["phase"]
     ):
-        raise MergeError("search enrichment changes schema or phase")
+        raise MergeError("SEARCH_APPEND changes schema or phase")
     for field in ("tool_assumptions", "vocabulary"):
         old_values = current.get(field)
         new_values = proposed.get(field)
@@ -1118,7 +1122,7 @@ def _validate_monotonic_search_append(
             or not _is_exact_prefix(old_values, new_values)
         ):
             raise MergeError(
-                f"search enrichment may only append unique {field}"
+                f"SEARCH_APPEND may only append unique {field}"
             )
     current_rounds = current.get("rounds")
     proposed_rounds = proposed.get("rounds")
@@ -1129,10 +1133,12 @@ def _validate_monotonic_search_append(
         or proposed_rounds[: len(current_rounds)] != current_rounds
     ):
         raise MergeError(
-            "search enrichment must preserve all rounds exactly and append one"
+            "SEARCH_APPEND must preserve all rounds exactly and append one"
         )
-    if proposed.get("fixed_point") is not None:
-        raise MergeError("search enrichment must invalidate fixed_point")
+    if current.get("fixed_point") is not None:
+        raise MergeError(
+            "SEARCH_APPEND cannot extend a certified fixed point; reopen it first"
+        )
     new_round = proposed_rounds[-1]
     if (
         not isinstance(new_round, dict)
@@ -1143,8 +1149,8 @@ def _validate_monotonic_search_append(
             "appended search round must be LOCAL or SATURATION in the active epoch"
         )
     hits = new_round.get("hits")
-    if not isinstance(hits, list) or not hits:
-        raise MergeError("search enrichment round must contain trigger hits")
+    if not isinstance(hits, list):
+        raise MergeError("SEARCH_APPEND round hits must be an array")
     return new_round
 
 
@@ -1690,9 +1696,7 @@ def prepare_merge(
         row["source_unit_id"]: row for row in proposed_reading
     }
     result_asset_by_id = {row["asset_id"]: row for row in proposed_assets}
-    candidate_changes_by_path: dict[str, list[dict[str, Any]]] = {
-        source_path: [] for source_path in source_paths
-    }
+    candidate_changes: list[dict[str, Any]] = []
     for candidate in mapped_candidates:
         anchor_path = _candidate_anchor_path(
             candidate,
@@ -1704,45 +1708,51 @@ def prepare_merge(
                 f"candidate {candidate['id']} discovery anchor lies outside "
                 "the worker assignment"
             )
-        candidate_changes_by_path[anchor_path].append(
+        candidate_changes.append(
             close_candidate_change("CREATE", candidate)
         )
-    for changes in candidate_changes_by_path.values():
-        changes.sort(key=lambda change: int(change["candidate_id"][1:]))
-    ordered_created_ids = [
-        change["candidate_id"]
-        for source_path in source_paths
-        for change in candidate_changes_by_path[source_path]
-    ]
-    if ordered_created_ids != [
+    candidate_changes.sort(
+        key=lambda change: int(change["candidate_id"][1:])
+    )
+    if [
+        change["candidate_id"] for change in candidate_changes
+    ] != [
         candidate["id"] for candidate in mapped_candidates
     ]:
         raise MergeError(
-            "candidate proposal order differs from canonical discovery-anchor "
-            "path order"
+            "candidate proposal order differs from global candidate ID order"
         )
     next_review_number = _review_sequence(review_history) + 1
     prior_event_sha256 = (
         review_history[-1]["event_sha256"] if review_history else None
     )
     latest_path_result_sha256 = {
-        event["source_paths"][0]: event["result_projection_sha256"]
+        path_change["source_path"]: path_change[
+            "result_projection_sha256"
+        ]
         for event in review_history
         if isinstance(event, dict)
-        and isinstance(event.get("source_paths"), list)
-        and len(event["source_paths"]) == 1
-        and isinstance(event.get("result_projection_sha256"), str)
+        for path_change in event.get("path_changes", [])
+        if isinstance(path_change, dict)
+        and isinstance(path_change.get("source_path"), str)
+        and isinstance(
+            path_change.get("result_projection_sha256"),
+            str,
+        )
     }
-    review_events: list[dict[str, Any]] = []
-    for offset, source_path in enumerate(source_paths):
-        review_id = f"V{next_review_number + offset:06d}"
-        review_event_core: dict[str, Any] = {
-            "review_id": review_id,
-            "epoch": discovery_epoch,
-            "stage": stage,
-            "mode": review_mode,
-            "reviewer": worker_id,
-            "source_paths": [source_path],
+    review_id = f"V{next_review_number:06d}"
+    review_event_core: dict[str, Any] = {
+        "review_id": review_id,
+        "epoch": discovery_epoch,
+        "stage": stage,
+        "mode": review_mode,
+        "reviewer": worker_id,
+        "source_paths": list(source_paths),
+    }
+    path_changes: list[dict[str, Any]] = []
+    for source_path in source_paths:
+        path_core = {
+            "source_path": source_path,
             "source_unit_ids": [
                 row["source_unit_id"]
                 for row in bundle_reading
@@ -1758,32 +1768,70 @@ def prepare_merge(
                 if review_mode == "REOPEN"
                 else None
             ),
-            "trigger_search_kind": None,
-            "trigger_hit_ids": [],
-            "candidate_changes": candidate_changes_by_path[source_path],
         }
         try:
-            review_event = close_review_event(
-                review_event_core,
-                unit_by_id,
-                result_reading_by_id,
-                result_asset_by_id,
-                prior_event_sha256,
-                search["rounds"],
+            path_changes.append(
+                close_path_change(
+                    review_event_core,
+                    path_core,
+                    unit_by_id,
+                    result_reading_by_id,
+                    result_asset_by_id,
+                )
             )
         except KeyError as exc:
             raise MergeError(
-                f"cannot bind review event {review_id} to its exact "
-                f"projection: {exc}"
+                f"cannot bind review event {review_id} path "
+                f"{source_path} to its exact projection: {exc}"
             ) from exc
-        review_event = {
-            field: review_event[field] for field in REVIEW_HISTORY_FIELDS
+    route_changes = [
+        close_route_change("CREATE", route)
+        for route in mapped_routes
+    ]
+    route_changes.sort(key=lambda change: int(change["route_id"][1:]))
+    prior_search_result_sha256 = next(
+        (
+            event["search_change"]["after_search_sha256"]
+            for event in reversed(review_history)
+            if isinstance(event, dict)
+            and isinstance(event.get("search_change"), dict)
+            and isinstance(
+                event["search_change"].get("after_search_sha256"),
+                str,
+            )
+        ),
+        None,
+    )
+    search_change = (
+        close_search_change(
+            search,
+            proposed_search,
+            prior_search_result_sha256,
+        )
+        if proposed_search != search
+        else None
+    )
+    review_event_core.update(
+        {
+            "path_changes": path_changes,
+            "candidate_changes": candidate_changes,
+            "route_changes": route_changes,
+            "search_change": search_change,
         }
-        review_events.append(review_event)
-        prior_event_sha256 = review_event["event_sha256"]
-        latest_path_result_sha256[source_path] = review_event[
-            "result_projection_sha256"
-        ]
+    )
+    try:
+        review_event = close_review_event(
+                review_event_core,
+                prior_event_sha256,
+        )
+    except KeyError as exc:
+        raise MergeError(
+            f"cannot close atomic review event {review_id}: {exc}"
+        ) from exc
+    review_event = {
+        field: review_event[field] for field in REVIEW_HISTORY_FIELDS
+    }
+    review_events = [review_event]
     proposed_review_history = review_history + review_events
 
     validation_errors = validate_audit.validate_objects(
@@ -1858,16 +1906,16 @@ def prepare_merge(
     )
 
 
-def prepare_search_enrichment(
+def prepare_search_append(
     proposal_path: Path,
     *,
     goal_dir: Path = GOAL_DIR,
-) -> SearchEnrichmentPlan:
-    """Validate one prepared search-enrichment proposal without writing it."""
+) -> SearchAppendPlan:
+    """Validate one atomic SEARCH_APPEND proposal without writing it."""
 
     proposal_path = proposal_path.resolve()
     goal_dir = goal_dir.resolve()
-    proposal_bytes, proposal = _load_enrichment_proposal(proposal_path)
+    proposal_bytes, proposal = _load_search_append_proposal(proposal_path)
     original_bytes, original_modes = _snapshot(goal_dir)
 
     declared_base = proposal["base_artifact_sha256"]
@@ -1877,7 +1925,7 @@ def prepare_search_enrichment(
     }
     if declared_base != expected_base:
         raise MergeError(
-            "enrichment proposal base artifact digests are stale or incomplete"
+            "SEARCH_APPEND base artifact digests are stale or incomplete"
         )
 
     try:
@@ -1928,7 +1976,7 @@ def prepare_search_enrichment(
     )
     if current_errors:
         raise MergeError(
-            "search enrichment requires a valid current audit state:\n- "
+            "SEARCH_APPEND requires a valid current audit state:\n- "
             + "\n- ".join(current_errors)
         )
 
@@ -1936,16 +1984,16 @@ def prepare_search_enrichment(
     active_epoch = _active_review_epoch(review_history)
     if epoch != active_epoch:
         raise MergeError(
-            f"search enrichment epoch {epoch} differs from active epoch "
+            f"SEARCH_APPEND epoch {epoch} differs from active epoch "
             f"{active_epoch}"
         )
     source_paths = tuple(
-        _canonical_audit_paths(manifest, proposal["source_paths"])
-    )
-    if len(source_paths) != 1:
-        raise MergeError(
-            "search enrichment must target exactly one source path"
+        _canonical_audit_paths(
+            manifest,
+            proposal["source_paths"],
+            allow_empty=True,
         )
+    )
     source_path_set = set(source_paths)
     reading_by_id = {row["source_unit_id"]: row for row in reading}
     asset_by_id = {row["asset_id"]: row for row in assets}
@@ -1956,7 +2004,7 @@ def prepare_search_enrichment(
     for path in source_paths:
         if not _path_is_complete(path, reading, assets):
             raise MergeError(
-                f"search enrichment path is not already fully reviewed: {path}"
+                f"SEARCH_APPEND path is not already fully reviewed: {path}"
             )
 
     proposed_search = proposal["proposed_search"]
@@ -2034,22 +2082,8 @@ def prepare_search_enrichment(
         candidate_ids_by_path.setdefault(path, set()).update(candidate_links)
         route_ids_by_path.setdefault(path, set()).update(route_links)
 
-    hits_for_declared_paths = {
-        hit_id: hit
-        for hit_id, hit in authorizing_hits.items()
-        if hit_paths[hit_id] in source_path_set
-    }
-    if any(
-        not any(hit_paths[hit_id] == path for hit_id in hits_for_declared_paths)
-        for path in source_paths
-    ):
-        raise MergeError(
-            "every enrichment source path must have a new trigger hit"
-        )
-
     reading_updates = proposal["reading_updates"]
     reading_update_by_id: dict[str, dict[str, str]] = {}
-    changed_paths: set[str] = set()
     snapshot_changed_paths: set[str] = set()
     for update in reading_updates:
         unit_id = update["source_unit_id"]
@@ -2068,7 +2102,7 @@ def prepare_search_enrichment(
         if unit_id not in candidate_ids_by_unit and unit_id not in route_ids_by_unit:
             if not any(
                 hit.get("source_unit_id") == unit_id
-                for hit in hits_for_declared_paths.values()
+                for hit in authorizing_hits.values()
             ):
                 raise MergeError(
                     f"reading {unit_id} changed without a new search hit"
@@ -2098,7 +2132,6 @@ def prepare_search_enrichment(
                     f"reading {unit_id} adds route links absent from its hit"
                 )
         reading_update_by_id[unit_id] = update
-        changed_paths.add(path)
         snapshot_changed_paths.add(path)
     proposed_reading = [
         reading_update_by_id.get(row["source_unit_id"], row)
@@ -2142,7 +2175,6 @@ def prepare_search_enrichment(
                     f"asset {asset_id} adds {field} absent from path hits"
                 )
         asset_update_by_id[asset_id] = update
-        changed_paths.add(path)
         snapshot_changed_paths.add(path)
     proposed_assets = [
         asset_update_by_id.get(row["asset_id"], row) for row in assets
@@ -2178,12 +2210,12 @@ def prepare_search_enrichment(
         _validate_enrichment_candidate_update(
             old,
             update,
-            trigger_hits=hits_for_declared_paths,
+            trigger_hits=authorizing_hits,
             round_evidence_groups=round_evidence_groups,
         )
         if candidate_id not in {
             value
-            for hit in hits_for_declared_paths.values()
+            for hit in authorizing_hits.values()
             for value in hit.get("candidate_ids", [])
         }:
             raise MergeError(
@@ -2194,9 +2226,6 @@ def prepare_search_enrichment(
         )
         new_evidence = update["source_evidence"][prior_evidence_count:]
         appended_evidence.extend(new_evidence)
-        for evidence in new_evidence:
-            anchor = evidence["discovery_anchor"]
-            changed_paths.add(hit_paths[anchor["id"]])
         candidate_update_by_id[candidate_id] = update
         if old is None:
             appended_candidates.append(update)
@@ -2280,7 +2309,7 @@ def prepare_search_enrichment(
         appended_route_ids.append(route_id)
         if (
             route.get("discovery_kind") != "SEARCH_HIT"
-            or route.get("discovery_id") not in hits_for_declared_paths
+            or route.get("discovery_id") not in authorizing_hits
             or route_id
             not in route_ids_by_path.get(
                 hit_paths.get(route.get("discovery_id"), ""),
@@ -2290,7 +2319,6 @@ def prepare_search_enrichment(
             raise MergeError(
                 f"appended route {route_id} is not tied to a new trigger hit"
             )
-        changed_paths.add(hit_paths[route["discovery_id"]])
     _sequence(
         [route["route_id"] for route in routes] + appended_route_ids,
         "R",
@@ -2307,85 +2335,106 @@ def prepare_search_enrichment(
         raise MergeError(
             "appended candidates differ from the search-round candidate delta"
         )
-    if not (
-        reading_updates
-        or asset_updates
-        or candidate_updates
-        or route_appends
-    ):
-        raise MergeError("search enrichment has no semantic ledger delta")
-    if changed_paths != source_path_set:
-        raise MergeError(
-            "enrichment source_paths differ from paths with semantic deltas"
-        )
     if snapshot_changed_paths != source_path_set:
         raise MergeError(
-            "every enrichment path must change a triggered reading/asset snapshot"
+            "SEARCH_APPEND source_paths must equal changed row/asset snapshots"
         )
 
     next_review_number = _review_sequence(review_history) + 1
-    prior_event_sha256 = review_history[-1]["event_sha256"]
+    prior_event_sha256 = (
+        review_history[-1]["event_sha256"] if review_history else None
+    )
     latest_path_result_sha256 = {
-        event["source_paths"][0]: event["result_projection_sha256"]
+        path_change["source_path"]: path_change[
+            "result_projection_sha256"
+        ]
         for event in review_history
         if isinstance(event, dict)
-        and isinstance(event.get("source_paths"), list)
-        and len(event["source_paths"]) == 1
-        and isinstance(event.get("result_projection_sha256"), str)
+        for path_change in event.get("path_changes", [])
+        if isinstance(path_change, dict)
+        and isinstance(path_change.get("source_path"), str)
+        and isinstance(
+            path_change.get("result_projection_sha256"),
+            str,
+        )
     }
     proposed_reading_by_id = {
         row["source_unit_id"]: row for row in proposed_reading
     }
     proposed_asset_by_id = {row["asset_id"]: row for row in proposed_assets}
     coordinator_id = proposal["coordinator_id"]
-    review_events: list[dict[str, Any]] = []
-    for offset, path in enumerate(source_paths):
+    review_id = f"V{next_review_number:06d}"
+    event_core: dict[str, Any] = {
+        "review_id": review_id,
+        "epoch": epoch,
+        "stage": new_round["owning_stage"],
+        "mode": "SEARCH_APPEND",
+        "reviewer": coordinator_id,
+        "source_paths": list(source_paths),
+    }
+    path_changes: list[dict[str, Any]] = []
+    for path in source_paths:
         previous_path_digest = latest_path_result_sha256.get(path)
         if previous_path_digest is None:
             raise MergeError(
-                f"search enrichment path lacks prior result history: {path}"
+                f"SEARCH_APPEND path lacks prior result history: {path}"
             )
-        path_hit_ids = [
-            hit_id
-            for hit_id in hits_for_declared_paths
-            if hit_paths[hit_id] == path
-        ]
-        event_core = {
-            "review_id": f"V{next_review_number + offset:06d}",
-            "epoch": epoch,
-            "stage": validate_audit.stage_for_document(
-                document_by_path[path]
-            ),
-            "mode": "SEARCH_ENRICHMENT",
-            "reviewer": coordinator_id,
-            "source_paths": [path],
-            "source_unit_ids": [
-                unit["id"] for unit in units if unit["path"] == path
-            ],
-            "asset_ids": [
-                asset["asset_id"]
-                for asset in assets
-                if asset["assignment_path"] == path
-            ],
-            "previous_path_result_sha256": previous_path_digest,
-            "trigger_search_kind": new_round["kind"],
-            "trigger_hit_ids": path_hit_ids,
-            "candidate_changes": candidate_changes,
-        }
-        event = close_review_event(
-            event_core,
-            unit_by_id,
-            proposed_reading_by_id,
-            proposed_asset_by_id,
-            prior_event_sha256,
-            proposed_search["rounds"],
+        path_changes.append(
+            close_path_change(
+                event_core,
+                {
+                    "source_path": path,
+                    "source_unit_ids": [
+                        unit["id"]
+                        for unit in units
+                        if unit["path"] == path
+                    ],
+                    "asset_ids": [
+                        asset["asset_id"]
+                        for asset in assets
+                        if asset["assignment_path"] == path
+                    ],
+                    "previous_path_result_sha256": (
+                        previous_path_digest
+                    ),
+                },
+                unit_by_id,
+                proposed_reading_by_id,
+                proposed_asset_by_id,
+            )
         )
-        event = {field: event[field] for field in REVIEW_HISTORY_FIELDS}
-        review_events.append(event)
-        prior_event_sha256 = event["event_sha256"]
-        latest_path_result_sha256[path] = event[
-            "result_projection_sha256"
-        ]
+    route_changes = [
+        close_route_change("CREATE", route) for route in route_appends
+    ]
+    route_changes.sort(key=lambda change: int(change["route_id"][1:]))
+    previous_search_result_sha256 = next(
+        (
+            event["search_change"]["after_search_sha256"]
+            for event in reversed(review_history)
+            if isinstance(event, dict)
+            and isinstance(event.get("search_change"), dict)
+            and isinstance(
+                event["search_change"].get("after_search_sha256"),
+                str,
+            )
+        ),
+        None,
+    )
+    event_core.update(
+        {
+            "path_changes": path_changes,
+            "candidate_changes": candidate_changes,
+            "route_changes": route_changes,
+            "search_change": close_search_change(
+                search,
+                proposed_search,
+                previous_search_result_sha256,
+            ),
+        }
+    )
+    event = close_review_event(event_core, prior_event_sha256)
+    event = {field: event[field] for field in REVIEW_HISTORY_FIELDS}
+    review_events = [event]
     proposed_review_history = review_history + review_events
 
     validation_errors = validate_audit.validate_objects(
@@ -2400,7 +2449,7 @@ def prepare_search_enrichment(
     )
     if validation_errors:
         raise MergeError(
-            "proposed search enrichment failed full validation:\n- "
+            "proposed SEARCH_APPEND failed full validation:\n- "
             + "\n- ".join(validation_errors)
         )
 
@@ -2428,7 +2477,7 @@ def prepare_search_enrichment(
         ),
     }
     if proposal_path.read_bytes() != proposal_bytes:
-        raise MergeError("enrichment proposal changed during validation")
+        raise MergeError("SEARCH_APPEND proposal changed during validation")
     for name, expected in original_bytes.items():
         path = goal_dir / name
         if (
@@ -2438,17 +2487,17 @@ def prepare_search_enrichment(
             or (path.stat().st_mode & 0o777) != original_modes[name]
         ):
             raise MergeError(
-                f"global audit state changed during enrichment planning: {name}"
+                f"global audit state changed during SEARCH_APPEND planning: {name}"
             )
 
-    return SearchEnrichmentPlan(
+    return SearchAppendPlan(
         proposal=proposal_path,
         goal_dir=goal_dir,
         coordinator_id=coordinator_id,
         epoch=epoch,
         source_paths=source_paths,
         search_round_id=search_round_id,
-        trigger_hit_ids=tuple(hits_for_declared_paths),
+        trigger_hit_ids=tuple(authorizing_hits),
         review_ids=tuple(event["review_id"] for event in review_events),
         reading_update_count=len(reading_updates),
         asset_update_count=len(asset_updates),
@@ -2464,7 +2513,7 @@ def prepare_search_enrichment(
 
 
 def _assert_snapshot_unchanged(
-    plan: MergePlan | SearchEnrichmentPlan,
+    plan: MergePlan | SearchAppendPlan,
 ) -> None:
     for name, expected in plan.original_bytes.items():
         path = plan.goal_dir / name
@@ -2472,89 +2521,28 @@ def _assert_snapshot_unchanged(
             raise MergeError(f"global audit state changed concurrently: {name}")
 
 
-def apply_merge(plan: MergePlan | SearchEnrichmentPlan) -> None:
-    """Commit a validated plan from same-filesystem staging files."""
+def apply_merge(plan: MergePlan | SearchAppendPlan) -> None:
+    """Commit a validated plan through the shared durable transaction."""
 
     _assert_snapshot_unchanged(plan)
-    stage = Path(
-        tempfile.mkdtemp(
-            prefix=".merge-worker-output-",
-            dir=plan.goal_dir,
-        )
-    )
-    new_root = stage / "new"
-    old_root = stage / "old"
-    attempted: list[str] = []
-    cleanup_stage = True
     try:
-        new_root.mkdir()
-        old_root.mkdir()
-        for name in WRITE_NAMES:
-            new_path = new_root / name
-            old_path = old_root / name
-            new_path.write_bytes(plan.proposed_bytes[name])
-            old_path.write_bytes(plan.original_bytes[name])
-            mode = plan.original_modes[name]
-            new_path.chmod(mode)
-            old_path.chmod(mode)
-
-        _assert_snapshot_unchanged(plan)
-        for name in WRITE_NAMES:
-            if (plan.goal_dir / name).read_bytes() != plan.original_bytes[name]:
-                raise MergeError(f"global audit state changed concurrently: {name}")
-            # Record the target before replacement.  If os.replace commits and
-            # then an asynchronous exception is delivered before it returns,
-            # the rollback must conservatively restore this target too.
-            attempted.append(name)
-            os.replace(new_root / name, plan.goal_dir / name)
-
-        for name in SNAPSHOT_NAMES:
-            path = plan.goal_dir / name
-            expected = (
-                plan.proposed_bytes[name]
-                if name in plan.proposed_bytes
-                else plan.original_bytes[name]
-            )
-            if (
-                not path.is_file()
-                or path.is_symlink()
-                or path.read_bytes() != expected
-            ):
-                if name in plan.proposed_bytes:
-                    raise MergeError(
-                        f"applied ledger differs from staged bytes: {name}"
-                    )
-                raise MergeError(
-                    f"global audit state changed concurrently: {name}"
-                )
-            if (path.stat().st_mode & 0o777) != plan.original_modes[name]:
-                if name in plan.proposed_bytes:
-                    raise MergeError(
-                        f"applied ledger mode differs from staged mode: {name}"
-                    )
-                raise MergeError(
-                    f"global audit state mode changed concurrently: {name}"
-                )
-    except BaseException as exc:
-        rollback_errors: list[str] = []
-        for name in reversed(attempted):
-            try:
-                os.replace(old_root / name, plan.goal_dir / name)
-            except BaseException as rollback_exc:
-                rollback_errors.append(
-                    f"{name}: {type(rollback_exc).__name__}: {rollback_exc}"
-                )
-        if rollback_errors:
-            cleanup_stage = False
-            raise MergeError(
-                f"merge failed ({exc}); rollback also failed: "
-                + "; ".join(rollback_errors)
-                + f"; staged recovery files remain at {stage}"
-            ) from exc
-        raise
-    finally:
-        if cleanup_stage:
-            shutil.rmtree(stage, ignore_errors=True)
+        audit_transaction.apply_transaction(
+            plan.goal_dir,
+            {
+                name: plan.original_bytes[name]
+                for name in audit_transaction.ARTIFACT_NAMES
+            },
+            {
+                name: plan.proposed_bytes[name]
+                for name in audit_transaction.ARTIFACT_NAMES
+            },
+            {
+                name: plan.original_modes[name]
+                for name in audit_transaction.ARTIFACT_NAMES
+            },
+        )
+    except audit_transaction.TransactionError as exc:
+        raise MergeError(str(exc)) from exc
 
 
 def main() -> int:
