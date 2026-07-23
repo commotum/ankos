@@ -179,6 +179,73 @@ class SearchAppendPlan:
         }
 
 
+@dataclass(frozen=True)
+class RouteResolutionPlan:
+    proposal: Path
+    goal_dir: Path
+    coordinator_id: str
+    epoch: int
+    stage: int
+    source_paths: tuple[str, ...]
+    review_ids: tuple[str, ...]
+    route_update_count: int
+    original_bytes: dict[str, bytes]
+    original_modes: dict[str, int]
+    proposed_bytes: dict[str, bytes]
+
+    def preview(self) -> dict[str, Any]:
+        return {
+            "proposal_kind": "ROUTE_RESOLUTION",
+            "proposal": str(self.proposal),
+            "goal_dir": str(self.goal_dir),
+            "coordinator_id": self.coordinator_id,
+            "epoch": self.epoch,
+            "stage": self.stage,
+            "source_paths": list(self.source_paths),
+            "review_ids": list(self.review_ids),
+            "changes": {
+                "route_updates": self.route_update_count,
+                "review_event_appends": 1,
+            },
+        }
+
+
+@dataclass(frozen=True)
+class CandidateRevisionPlan:
+    proposal: Path
+    goal_dir: Path
+    coordinator_id: str
+    epoch: int
+    source_paths: tuple[str, ...]
+    review_ids: tuple[str, ...]
+    candidate_update_count: int
+    candidate_append_count: int
+    reading_update_count: int
+    asset_update_count: int
+    original_bytes: dict[str, bytes]
+    original_modes: dict[str, int]
+    proposed_bytes: dict[str, bytes]
+
+    def preview(self) -> dict[str, Any]:
+        return {
+            "proposal_kind": "CANDIDATE_REVISION",
+            "proposal": str(self.proposal),
+            "goal_dir": str(self.goal_dir),
+            "coordinator_id": self.coordinator_id,
+            "epoch": self.epoch,
+            "stage": 18,
+            "source_paths": list(self.source_paths),
+            "review_ids": list(self.review_ids),
+            "changes": {
+                "candidate_updates": self.candidate_update_count,
+                "candidate_appends": self.candidate_append_count,
+                "reading_updates": self.reading_update_count,
+                "asset_updates": self.asset_update_count,
+                "review_event_appends": 1,
+            },
+        }
+
+
 SEARCH_APPEND_PROPOSAL_FIELDS = (
     "schema_version",
     "proposal_kind",
@@ -191,6 +258,24 @@ SEARCH_APPEND_PROPOSAL_FIELDS = (
     "candidate_updates",
     "route_appends",
     "proposed_search",
+)
+ROUTE_RESOLUTION_PROPOSAL_FIELDS = (
+    "schema_version",
+    "proposal_kind",
+    "coordinator_id",
+    "epoch",
+    "base_artifact_sha256",
+    "route_updates",
+)
+CANDIDATE_REVISION_PROPOSAL_FIELDS = (
+    "schema_version",
+    "proposal_kind",
+    "coordinator_id",
+    "epoch",
+    "base_artifact_sha256",
+    "candidate_updates",
+    "reading_updates",
+    "asset_updates",
 )
 READING_ENRICHMENT_SCALARS = {
     "review_disposition",
@@ -286,6 +371,100 @@ def _search_append_proposal_schema() -> dict[str, Any]:
             },
             "proposed_search": {"type": "object"},
         },
+        "additionalProperties": False,
+    }
+
+
+def _coordinator_base_properties(kind: str) -> dict[str, Any]:
+    return {
+        "schema_version": {"const": 1},
+        "proposal_kind": {"const": kind},
+        "coordinator_id": {"type": "string", "minLength": 1},
+        "epoch": {"type": "integer", "minimum": 1},
+        "base_artifact_sha256": {
+            "type": "object",
+            "required": list(WRITE_NAMES),
+            "properties": {
+                name: {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                }
+                for name in WRITE_NAMES
+            },
+            "additionalProperties": False,
+        },
+    }
+
+
+def _route_resolution_proposal_schema() -> dict[str, Any]:
+    properties = _coordinator_base_properties("ROUTE_RESOLUTION")
+    properties["route_updates"] = {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+            "type": "object",
+            "required": CROSS_REFERENCE_HEADER,
+            "properties": {
+                field: {"type": "string"}
+                for field in CROSS_REFERENCE_HEADER
+            },
+            "additionalProperties": False,
+        },
+    }
+    return {
+        "type": "object",
+        "required": list(ROUTE_RESOLUTION_PROPOSAL_FIELDS),
+        "properties": properties,
+        "additionalProperties": False,
+    }
+
+
+def _candidate_revision_proposal_schema() -> dict[str, Any]:
+    properties = _coordinator_base_properties("CANDIDATE_REVISION")
+    properties.update(
+        {
+            "candidate_updates": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "object",
+                    "required": CANDIDATE_FIELDS,
+                    "properties": {
+                        field: {} for field in CANDIDATE_FIELDS
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "reading_updates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": READING_HEADER,
+                    "properties": {
+                        field: {"type": "string"}
+                        for field in READING_HEADER
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "asset_updates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": ASSET_HEADER,
+                    "properties": {
+                        field: {"type": "string"}
+                        for field in ASSET_HEADER
+                    },
+                    "additionalProperties": False,
+                },
+            },
+        }
+    )
+    return {
+        "type": "object",
+        "required": list(CANDIDATE_REVISION_PROPOSAL_FIELDS),
+        "properties": properties,
         "additionalProperties": False,
     }
 
@@ -699,6 +878,33 @@ def _candidate_anchor_path(
     )
 
 
+def _provenance_anchor_path(
+    anchor: object,
+    *,
+    unit_by_id: dict[str, dict[str, Any]],
+    asset_by_physical_path: dict[str, dict[str, str]],
+    search_hit_paths: dict[str, str],
+) -> str | None:
+    if not isinstance(anchor, dict):
+        return None
+    anchor_id = anchor.get("id")
+    if not isinstance(anchor_id, str):
+        return None
+    if anchor.get("kind") == "SOURCE_UNIT":
+        unit = unit_by_id.get(anchor_id)
+        return unit.get("path") if isinstance(unit, dict) else None
+    if anchor.get("kind") == "IMAGE":
+        asset = asset_by_physical_path.get(anchor_id)
+        return (
+            asset.get("assignment_path")
+            if isinstance(asset, dict)
+            else None
+        )
+    if anchor.get("kind") == "SEARCH_HIT":
+        return search_hit_paths.get(anchor_id)
+    return None
+
+
 def _replace_rows(
     rows: list[dict[str, str]],
     updates: list[dict[str, str]],
@@ -851,6 +1057,34 @@ def _load_search_append_proposal(
     if schema_errors:
         raise MergeError(
             "SEARCH_APPEND proposal schema failed:\n- "
+            + "\n- ".join(schema_errors)
+        )
+    return payload, proposal
+
+
+def _load_coordinator_proposal(
+    path: Path,
+    *,
+    kind: str,
+    schema: dict[str, Any],
+) -> tuple[bytes, dict[str, Any]]:
+    if not path.is_file() or path.is_symlink():
+        raise MergeError(f"{kind} proposal is missing or unsafe: {path}")
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise MergeError(f"cannot read {kind} proposal: {exc}") from exc
+    proposal = _load_json_object_bytes(payload, f"{kind} proposal")
+    if payload != build_worker_bundle.canonical_json_bytes(proposal):
+        raise MergeError(f"{kind} proposal is not canonically serialized")
+    schema_errors = build_worker_bundle.json_schema_errors(
+        proposal,
+        schema,
+        f"{kind.lower().replace('_', '-')}-proposal",
+    )
+    if schema_errors:
+        raise MergeError(
+            f"{kind} proposal schema failed:\n- "
             + "\n- ".join(schema_errors)
         )
     return payload, proposal
@@ -1166,6 +1400,112 @@ def _snapshot(goal_dir: Path) -> tuple[dict[str, bytes], dict[str, int]]:
     return payloads, modes
 
 
+def _require_base_artifact_digests(
+    proposal: dict[str, Any],
+    original_bytes: dict[str, bytes],
+    kind: str,
+) -> None:
+    expected = {
+        name: hashlib.sha256(original_bytes[name]).hexdigest()
+        for name in WRITE_NAMES
+    }
+    if proposal.get("base_artifact_sha256") != expected:
+        raise MergeError(
+            f"{kind} base artifact digests are stale or incomplete"
+        )
+
+
+def _load_audit_state(
+    original_bytes: dict[str, bytes],
+) -> tuple[
+    dict[str, Any],
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    list[dict[str, str]],
+    dict[str, Any],
+    list[dict[str, Any]],
+]:
+    return (
+        _load_json_object_bytes(
+            original_bytes[MANIFEST_NAME],
+            MANIFEST_NAME,
+        ),
+        _read_jsonl_bytes(original_bytes[UNITS_NAME], UNITS_NAME),
+        _read_csv_bytes(
+            original_bytes[READING_NAME],
+            READING_NAME,
+            READING_HEADER,
+        ),
+        _read_jsonl_bytes(
+            original_bytes[CANDIDATE_NAME],
+            CANDIDATE_NAME,
+        ),
+        _read_csv_bytes(
+            original_bytes[ROUTE_NAME],
+            ROUTE_NAME,
+            CROSS_REFERENCE_HEADER,
+        ),
+        _read_csv_bytes(
+            original_bytes[ASSET_NAME],
+            ASSET_NAME,
+            ASSET_HEADER,
+        ),
+        _load_json_object_bytes(
+            original_bytes[SEARCH_NAME],
+            SEARCH_NAME,
+        ),
+        _read_jsonl_bytes(
+            original_bytes[REVIEW_HISTORY_NAME],
+            REVIEW_HISTORY_NAME,
+        ),
+    )
+
+
+def _latest_path_result_digests(
+    review_history: list[dict[str, Any]],
+) -> dict[str, str]:
+    return {
+        change["source_path"]: change["result_projection_sha256"]
+        for event in review_history
+        for change in event.get("path_changes", [])
+        if isinstance(change, dict)
+        and isinstance(change.get("source_path"), str)
+        and isinstance(change.get("result_projection_sha256"), str)
+    }
+
+
+def _latest_version_digests(
+    review_history: list[dict[str, Any]],
+    *,
+    changes_field: str,
+    id_field: str,
+    digest_field: str,
+) -> dict[str, str]:
+    return {
+        change[id_field]: change[digest_field]
+        for event in review_history
+        for change in event.get(changes_field, [])
+        if isinstance(change, dict)
+        and isinstance(change.get(id_field), str)
+        and isinstance(change.get(digest_field), str)
+    }
+
+
+def _canonical_candidate_record(
+    raw: dict[str, Any],
+) -> dict[str, Any]:
+    candidate = {field: raw[field] for field in CANDIDATE_FIELDS}
+    if isinstance(candidate.get("fingerprint"), dict):
+        candidate["fingerprint"] = {
+            field: candidate["fingerprint"][field]
+            for field in FINGERPRINT_FIELDS
+            if field in candidate["fingerprint"]
+        }
+    return candidate
+
+
 def _validate_stage_prerequisites(
     *,
     stage: int,
@@ -1386,6 +1726,19 @@ def _validate_reopen_prerequisites(
 
 
 def prepare_merge(
+    bundle: Path,
+    *,
+    goal_dir: Path = GOAL_DIR,
+) -> MergePlan:
+    """Plan one worker merge from a cooperative atomic ledger snapshot."""
+    try:
+        with audit_transaction.read_guard(goal_dir):
+            return _prepare_merge_locked(bundle, goal_dir=goal_dir)
+    except audit_transaction.TransactionError as exc:
+        raise MergeError(str(exc)) from exc
+
+
+def _prepare_merge_locked(
     bundle: Path,
     *,
     goal_dir: Path = GOAL_DIR,
@@ -1907,6 +2260,22 @@ def prepare_merge(
 
 
 def prepare_search_append(
+    proposal_path: Path,
+    *,
+    goal_dir: Path = GOAL_DIR,
+) -> SearchAppendPlan:
+    """Plan SEARCH_APPEND from a cooperative atomic ledger snapshot."""
+    try:
+        with audit_transaction.read_guard(goal_dir):
+            return _prepare_search_append_locked(
+                proposal_path,
+                goal_dir=goal_dir,
+            )
+    except audit_transaction.TransactionError as exc:
+        raise MergeError(str(exc)) from exc
+
+
+def _prepare_search_append_locked(
     proposal_path: Path,
     *,
     goal_dir: Path = GOAL_DIR,
@@ -2506,6 +2875,298 @@ def prepare_search_append(
         ),
         candidate_append_count=len(appended_candidates),
         route_append_count=len(route_appends),
+        original_bytes=original_bytes,
+        original_modes=original_modes,
+        proposed_bytes=proposed_bytes,
+    )
+
+
+def prepare_route_resolution(
+    proposal_path: Path,
+    *,
+    goal_dir: Path = GOAL_DIR,
+) -> RouteResolutionPlan:
+    """Plan one governed route-closure transaction."""
+    try:
+        with audit_transaction.read_guard(goal_dir):
+            return _prepare_route_resolution_locked(
+                proposal_path,
+                goal_dir=goal_dir,
+            )
+    except audit_transaction.TransactionError as exc:
+        raise MergeError(str(exc)) from exc
+
+
+def _prepare_route_resolution_locked(
+    proposal_path: Path,
+    *,
+    goal_dir: Path,
+) -> RouteResolutionPlan:
+    proposal_path = proposal_path.resolve()
+    goal_dir = goal_dir.resolve()
+    proposal_bytes, proposal = _load_coordinator_proposal(
+        proposal_path,
+        kind="ROUTE_RESOLUTION",
+        schema=_route_resolution_proposal_schema(),
+    )
+    original_bytes, original_modes = _snapshot(goal_dir)
+    _require_base_artifact_digests(
+        proposal,
+        original_bytes,
+        "ROUTE_RESOLUTION",
+    )
+    try:
+        (
+            manifest,
+            units,
+            reading,
+            candidates,
+            routes,
+            assets,
+            search,
+            review_history,
+        ) = _load_audit_state(original_bytes)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise MergeError(f"cannot load current audit state: {exc}") from exc
+    current_errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        review_history,
+    )
+    if current_errors:
+        raise MergeError(
+            "ROUTE_RESOLUTION requires a valid current audit state:\n- "
+            + "\n- ".join(current_errors)
+        )
+    epoch = proposal["epoch"]
+    if epoch != _active_review_epoch(review_history):
+        raise MergeError("ROUTE_RESOLUTION must use the active review epoch")
+
+    unit_by_id = {unit["id"]: unit for unit in units}
+    asset_by_id = {asset["asset_id"]: asset for asset in assets}
+    route_by_id = {route["route_id"]: route for route in routes}
+    document_by_path = {
+        document["path"]: document for document in manifest["documents"]
+    }
+    latest_route_digests = _latest_version_digests(
+        review_history,
+        changes_field="route_changes",
+        id_field="route_id",
+        digest_field="after_route_sha256",
+    )
+    route_updates = proposal["route_updates"]
+    update_by_id: dict[str, dict[str, str]] = {}
+    route_changes: list[dict[str, Any]] = []
+    resolution_paths: set[str] = set()
+    operating_stage = 4
+    immutable_fields = set(CROSS_REFERENCE_HEADER) - {
+        "status",
+        "target_unit_ids",
+        "target_asset_ids",
+        "attempts",
+        "vocabulary_terms",
+        "defect_boundary",
+    }
+    for update in route_updates:
+        route_id = update["route_id"]
+        if route_id in update_by_id:
+            raise MergeError(f"duplicate route resolution update: {route_id}")
+        before = route_by_id.get(route_id)
+        if before is None:
+            raise MergeError(f"route resolution is unknown: {route_id}")
+        if before["status"] != "PENDING":
+            raise MergeError(
+                f"route resolution requires an existing PENDING row: {route_id}"
+            )
+        if update["status"] not in {"RESOLVED", "MISSING_TARGET_FINAL"}:
+            raise MergeError(
+                f"route {route_id} does not close to a terminal status"
+            )
+        if any(update[field] != before[field] for field in immutable_fields):
+            raise MergeError(
+                f"route {route_id} changes immutable discovery/source fields"
+            )
+        if update == before:
+            raise MergeError(f"route resolution is unchanged: {route_id}")
+        for field in (
+            "target_unit_ids",
+            "target_asset_ids",
+            "attempts",
+            "vocabulary_terms",
+        ):
+            prior_values = _json_array(
+                before[field],
+                f"route {route_id} prior {field}",
+            )
+            new_values = _json_array(
+                update[field],
+                f"route {route_id} proposed {field}",
+            )
+            if not _is_exact_prefix(prior_values, new_values):
+                raise MergeError(
+                    f"route {route_id}.{field} rewrites prior entries"
+                )
+        if update["status"] == "MISSING_TARGET_FINAL":
+            operating_stage = 18
+            source_unit = unit_by_id.get(update["source_unit_id"])
+            source_asset = asset_by_id.get(update["source_asset_id"])
+            if source_unit is not None:
+                resolution_paths.add(source_unit["path"])
+            elif source_asset is not None:
+                resolution_paths.add(source_asset["assignment_path"])
+            else:
+                raise MergeError(
+                    f"route {route_id} has no resolvable source anchor"
+                )
+        else:
+            target_paths: set[str] = set()
+            for unit_id in _json_array(
+                update["target_unit_ids"],
+                f"route {route_id}.target_unit_ids",
+            ):
+                unit = unit_by_id.get(unit_id)
+                if unit is None:
+                    raise MergeError(
+                        f"route {route_id} targets unknown unit {unit_id}"
+                    )
+                target_paths.add(unit["path"])
+            for asset_id in _json_array(
+                update["target_asset_ids"],
+                f"route {route_id}.target_asset_ids",
+            ):
+                asset = asset_by_id.get(asset_id)
+                if asset is None:
+                    raise MergeError(
+                        f"route {route_id} targets unknown asset {asset_id}"
+                    )
+                target_paths.add(asset["assignment_path"])
+            if not target_paths:
+                raise MergeError(
+                    f"RESOLVED route {route_id} has no governed target"
+                )
+            resolution_paths.update(target_paths)
+            if operating_stage != 18:
+                operating_stage = max(
+                    operating_stage,
+                    *(
+                        validate_audit.stage_for_document(
+                            document_by_path[path]
+                        )
+                        for path in target_paths
+                    ),
+                )
+        previous_digest = latest_route_digests.get(route_id)
+        if previous_digest is None:
+            raise MergeError(f"route {route_id} lacks a prior version digest")
+        route_changes.append(
+            close_route_change(
+                "UPDATE",
+                update,
+                before_route=before,
+                previous_route_result_sha256=previous_digest,
+            )
+        )
+        update_by_id[route_id] = update
+    route_changes.sort(key=lambda change: int(change["route_id"][1:]))
+    source_paths = tuple(
+        _canonical_audit_paths(manifest, list(resolution_paths))
+    )
+    proposed_routes = [
+        update_by_id.get(route["route_id"], route) for route in routes
+    ]
+    latest_path_digests = _latest_path_result_digests(review_history)
+    event_core: dict[str, Any] = {
+        "review_id": f"V{_review_sequence(review_history) + 1:06d}",
+        "epoch": epoch,
+        "stage": operating_stage,
+        "mode": "ROUTE_RESOLUTION",
+        "reviewer": proposal["coordinator_id"],
+        "source_paths": list(source_paths),
+    }
+    reading_by_id = {row["source_unit_id"]: row for row in reading}
+    asset_result_by_id = {row["asset_id"]: row for row in assets}
+    path_changes: list[dict[str, Any]] = []
+    for path in source_paths:
+        previous_digest = latest_path_digests.get(path)
+        if previous_digest is None:
+            raise MergeError(
+                f"route-resolution path lacks prior result history: {path}"
+            )
+        path_changes.append(
+            close_path_change(
+                event_core,
+                {
+                    "source_path": path,
+                    "source_unit_ids": [
+                        unit["id"] for unit in units if unit["path"] == path
+                    ],
+                    "asset_ids": [
+                        asset["asset_id"]
+                        for asset in assets
+                        if asset["assignment_path"] == path
+                    ],
+                    "previous_path_result_sha256": previous_digest,
+                },
+                unit_by_id,
+                reading_by_id,
+                asset_result_by_id,
+            )
+        )
+    event_core.update(
+        {
+            "path_changes": path_changes,
+            "candidate_changes": [],
+            "route_changes": route_changes,
+            "search_change": None,
+        }
+    )
+    prior_event = (
+        review_history[-1]["event_sha256"] if review_history else None
+    )
+    event = close_review_event(event_core, prior_event)
+    proposed_history = review_history + [event]
+    validation_errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        proposed_routes,
+        assets,
+        search,
+        proposed_history,
+    )
+    if validation_errors:
+        raise MergeError(
+            "proposed ROUTE_RESOLUTION failed full validation:\n- "
+            + "\n- ".join(validation_errors)
+        )
+    proposed_bytes = {
+        name: original_bytes[name] for name in WRITE_NAMES
+    }
+    proposed_bytes[ROUTE_NAME] = build_worker_bundle.csv_bytes(
+        CROSS_REFERENCE_HEADER,
+        proposed_routes,
+    )
+    proposed_bytes[REVIEW_HISTORY_NAME] = _append_jsonl(
+        original_bytes[REVIEW_HISTORY_NAME],
+        [event],
+    )
+    if proposal_path.read_bytes() != proposal_bytes:
+        raise MergeError("ROUTE_RESOLUTION proposal changed during validation")
+    return RouteResolutionPlan(
+        proposal=proposal_path,
+        goal_dir=goal_dir,
+        coordinator_id=proposal["coordinator_id"],
+        epoch=epoch,
+        stage=operating_stage,
+        source_paths=source_paths,
+        review_ids=(event["review_id"],),
+        route_update_count=len(route_updates),
         original_bytes=original_bytes,
         original_modes=original_modes,
         proposed_bytes=proposed_bytes,

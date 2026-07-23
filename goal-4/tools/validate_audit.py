@@ -76,6 +76,7 @@ SCHEMA_DIR = GOAL_DIR / "schemas"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 B_ID = re.compile(r"^B[0-9]{4}$")
 E_ID = re.compile(r"^E[0-9]{6}$")
+R_ID = re.compile(r"^R[0-9]{6}$")
 G_ID = re.compile(r"^G[0-9]{6}$")
 Q_ID = re.compile(r"^Q[0-9]{4}$")
 H_ID = re.compile(r"^H[0-9]{6}$")
@@ -948,7 +949,15 @@ def _validate_history_snapshot(
         errors.append(f"{prefix} has malformed full result snapshot")
         return None
     source_paths = event.get("source_paths")
-    source_path = source_paths[0] if isinstance(source_paths, list) and len(source_paths) == 1 else None
+    source_path = (
+        event.get("source_path")
+        if isinstance(event.get("source_path"), str)
+        else (
+            source_paths[0]
+            if isinstance(source_paths, list) and len(source_paths) == 1
+            else None
+        )
+    )
     if snapshot.get("schema_version") != 1 or snapshot.get("source_path") != source_path:
         errors.append(f"{prefix} result snapshot identity is inconsistent")
     reading_results = snapshot.get("reading_results")
@@ -4967,7 +4976,14 @@ def mutation_checks(
             },
             {item["asset_id"]: item for item in asset_state},
         )
-        event_core["path_changes"] = [path_change]
+        include_path = not (
+            normalized_mode == "SEARCH_APPEND"
+            and prior_path_change is not None
+            and path_change["result_snapshot"]
+            == prior_path_change["result_snapshot"]
+        )
+        event_core["source_paths"] = [source_path] if include_path else []
+        event_core["path_changes"] = [path_change] if include_path else []
         event = close_review_event(
             event_core,
             result[-1]["event_sha256"] if result else None,
@@ -5125,6 +5141,9 @@ def mutation_checks(
         [],
         candidate_changes=[
             close_candidate_change("CREATE", copy.deepcopy(candidate))
+        ],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(route))
         ],
     )
     defect_reading_errors = validate_objects(
@@ -5338,6 +5357,9 @@ def mutation_checks(
         "REOPEN",
         "fixture-reviewer",
         reopened_search["rounds"],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(reopened_route))
+        ],
     )
     reopened_errors = validate_objects(
         manifest,
@@ -5615,37 +5637,48 @@ def mutation_checks(
         skipped_history,
     )
 
-    multipath_history = [
-        close_review_event(
+    malformed_multipath_core = {
+        "review_id": "V000001",
+        "epoch": 1,
+        "stage": stage,
+        "mode": "INITIAL",
+        "reviewer": "fixture-reviewer",
+        "source_paths": [path, next_path],
+        "candidate_changes": [
+            close_candidate_change("CREATE", copy.deepcopy(candidate))
+        ],
+        "route_changes": [
+            close_route_change("CREATE", copy.deepcopy(route))
+        ],
+        "search_change": None,
+    }
+    malformed_multipath_core["path_changes"] = [
+        close_path_change(
+            malformed_multipath_core,
             {
-                "review_id": "V000001",
-                "epoch": 1,
-                "stage": stage,
-                "mode": "INITIAL",
-                "reviewer": "fixture-reviewer",
-                "source_paths": [path, next_path],
+                "source_path": path,
                 "source_unit_ids": [
-                    item["id"]
-                    for item in units
-                    if item["path"] in {path, next_path}
+                    item["id"] for item in units if item["path"] == path
                 ],
                 "asset_ids": [
                     item["asset_id"]
                     for item in forward_assets
-                    if item["assignment_path"] in {path, next_path}
+                    if item["assignment_path"] == path
                 ],
+                "previous_path_result_sha256": None,
             },
             unit_by_fixture_id,
             {
                 item["source_unit_id"]: item for item in forward_reading
             },
             {item["asset_id"]: item for item in forward_assets},
-            None,
-            [],
         )
     ]
+    multipath_history = [
+        close_review_event(malformed_multipath_core, None)
+    ]
     expect_history_failure(
-        "one event covers multiple or noncontiguous paths",
+        "source paths differ from atomic path changes",
         forward_reading,
         base_candidates,
         base_routes,
@@ -5689,6 +5722,9 @@ def mutation_checks(
             close_candidate_change(
                 "CREATE", copy.deepcopy(allocation_candidate)
             )
+        ],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(route))
         ],
     )
     allocation_errors = validate_objects(
@@ -5783,6 +5819,9 @@ def mutation_checks(
             close_candidate_change(
                 "CREATE", copy.deepcopy(tail_candidate_two)
             ),
+        ],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(route))
         ],
     )
     tail_errors = validate_objects(
@@ -5916,6 +5955,9 @@ def mutation_checks(
             close_candidate_change(
                 "CREATE", copy.deepcopy(lineage_candidates[1])
             ),
+        ],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(route))
         ],
     )
     lineage_history = append_history_event(
@@ -6482,6 +6524,18 @@ def mutation_checks(
         "fixture-reviewer",
         search_fixture["rounds"][:1],
     )
+    pre_active_search_history = copy.deepcopy(search_history)
+    search_history = append_history_event(
+        search_history,
+        search_reading,
+        search_assets,
+        path,
+        2,
+        "SEARCH_ENRICHMENT",
+        "fixture-searcher",
+        search_fixture["rounds"],
+        full_search_state=search_fixture,
+    )
     search_errors = validate_objects(
         manifest,
         units,
@@ -6602,7 +6656,7 @@ def mutation_checks(
             "fixture construction."
         )
         local_enrichment_history = append_history_event(
-            search_history,
+            pre_active_search_history,
             local_enriched_reading,
             search_assets,
             path,
@@ -6612,6 +6666,7 @@ def mutation_checks(
             search_fixture["rounds"],
             "LOCAL",
             [governed_hit["hit_id"]],
+            full_search_state=search_fixture,
         )
         local_enrichment_errors = validate_objects(
             manifest,
@@ -6709,9 +6764,11 @@ def mutation_checks(
                 exclusion_history,
             )
 
-        previous_snapshot = search_history[-1]["result_snapshot"]
+        previous_snapshot = pre_active_search_history[-1]["path_changes"][0][
+            "result_snapshot"
+        ]
         unrelated_snapshot = copy.deepcopy(
-            local_enrichment_history[-1]["result_snapshot"]
+            local_enrichment_history[-1]["path_changes"][0]["result_snapshot"]
         )
         unrelated_snapshot["reading_results"][0][
             "candidate_ids"
@@ -6733,7 +6790,7 @@ def mutation_checks(
                 "unrelated candidate-link enrichment mutation unexpectedly passed"
             )
         unrelated_route_snapshot = copy.deepcopy(
-            local_enrichment_history[-1]["result_snapshot"]
+            local_enrichment_history[-1]["path_changes"][0]["result_snapshot"]
         )
         unrelated_route_snapshot["reading_results"][0][
             "route_ids"
@@ -6757,7 +6814,9 @@ def mutation_checks(
                 "unrelated route-link enrichment mutation unexpectedly passed"
             )
 
-        asset_snapshot = defect_asset_history[-1]["result_snapshot"]
+        asset_snapshot = defect_asset_history[-1]["path_changes"][0][
+            "result_snapshot"
+        ]
         illegal_asset_snapshot = copy.deepcopy(asset_snapshot)
         illegal_asset_snapshot["asset_results"][0]["visual_role"] = "CONTROL"
         illegal_asset_errors: list[str] = []
