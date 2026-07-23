@@ -1319,6 +1319,99 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     ] == ASSIGNMENT_PATH
 
 
+def test_route_resolution_default_dry_run_then_transactional_apply(
+    tmp_path: Path,
+) -> None:
+    goal = _goal_after_initial_merge(tmp_path)
+    routes = merge._read_csv(
+        goal / merge.ROUTE_NAME,
+        merge.CROSS_REFERENCE_HEADER,
+    )
+    assert len(routes) == 1
+    update = dict(routes[0])
+    target_unit_id = next(
+        unit["id"]
+        for unit in merge._read_jsonl(goal / merge.UNITS_NAME)
+        if unit["path"] == ASSIGNMENT_PATH
+    )
+    update.update(
+        {
+            "status": "RESOLVED",
+            "target_unit_ids": json.dumps(
+                [target_unit_id],
+                separators=(",", ":"),
+            ),
+            "attempts": '["Resolved against the reviewed Preface units."]',
+        }
+    )
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "ROUTE_RESOLUTION",
+        "coordinator_id": "route-resolution-coordinator",
+        "epoch": 1,
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "route_updates": [update],
+    }
+    proposal_path = tmp_path / "route-resolution-proposal.json"
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+    before = _transaction_state(goal)
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(TOOLS_DIR / "merge_worker_output.py"),
+            "--route-resolution",
+            str(proposal_path),
+            "--goal-dir",
+            str(goal),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    preview = json.loads(completed.stdout)
+    assert preview == {
+        "changes": {
+            "review_event_appends": 1,
+            "route_updates": 1,
+        },
+        "coordinator_id": "route-resolution-coordinator",
+        "epoch": 1,
+        "goal_dir": str(goal.resolve()),
+        "mode": "dry-run",
+        "proposal": str(proposal_path.resolve()),
+        "proposal_kind": "ROUTE_RESOLUTION",
+        "review_ids": ["V000002"],
+        "source_paths": [ASSIGNMENT_PATH],
+        "stage": 4,
+    }
+    assert _transaction_state(goal) == before
+
+    plan = merge.prepare_route_resolution(proposal_path, goal_dir=goal)
+    merge.apply_merge(plan)
+    resolved = merge._read_csv(
+        goal / merge.ROUTE_NAME,
+        merge.CROSS_REFERENCE_HEADER,
+    )
+    assert resolved == [update]
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    assert [event["mode"] for event in history] == [
+        "INITIAL",
+        "ROUTE_RESOLUTION",
+    ]
+    event = history[-1]
+    assert event["source_paths"] == [ASSIGNMENT_PATH]
+    assert event["candidate_changes"] == []
+    assert event["search_change"] is None
+    assert event["route_changes"][0]["action"] == "UPDATE"
+    assert event["route_changes"][0]["before_route"] == routes[0]
+    assert event["route_changes"][0]["after_route"] == update
+
+
 def test_search_enrichment_rejects_unauthorized_and_immutable_deltas(
     tmp_path: Path,
 ) -> None:

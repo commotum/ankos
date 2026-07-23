@@ -198,6 +198,27 @@ def main() -> int:
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
+    if args.check_initial:
+        try:
+            with audit_transaction.read_guard(GOAL_DIR):
+                artifacts = expected_artifacts()
+                stale = [
+                    str(path.relative_to(GOAL_DIR))
+                    for path, expected in artifacts.items()
+                    if not path.exists() or path.read_bytes() != expected
+                ]
+        except audit_transaction.TransactionError as exc:
+            print(
+                "refusing initial-state comparison while transaction "
+                f"is pending or busy: {exc}"
+            )
+            return 1
+        if stale:
+            print("initial audit artifacts differ: " + ", ".join(stale))
+            return 1
+        print("initial audit artifacts reproduce exactly")
+        return 0
+
     try:
         audit_transaction.require_clean(GOAL_DIR)
     except audit_transaction.TransactionError as exc:
@@ -205,18 +226,6 @@ def main() -> int:
         return 1
 
     artifacts = expected_artifacts()
-    if args.check_initial:
-        stale = [
-            str(path.relative_to(GOAL_DIR))
-            for path, expected in artifacts.items()
-            if not path.exists() or path.read_bytes() != expected
-        ]
-        if stale:
-            print("initial audit artifacts differ: " + ", ".join(stale))
-            return 1
-        print("initial audit artifacts reproduce exactly")
-        return 0
-
     existing_ledgers = [
         path
         for path in (

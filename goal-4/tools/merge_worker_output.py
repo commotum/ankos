@@ -3744,8 +3744,10 @@ def main() -> int:
                 goal_dir=args.goal_dir,
             )
         else:
-            assert args.bundle is not None
-            plan = prepare_merge(args.bundle, goal_dir=args.goal_dir)
+            bundle = args.bundle
+            if bundle is None:
+                raise MergeError("worker bundle input is missing")
+            plan = prepare_merge(bundle, goal_dir=args.goal_dir)
         if args.apply:
             apply_merge(plan)
         summary = plan.preview()

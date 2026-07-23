@@ -1109,8 +1109,10 @@ def _validate_search_enrichment_diff(
     trigger_unit_ids: set[str],
     trigger_candidate_ids_by_unit: dict[str, set[str]],
     trigger_route_ids_by_unit: dict[str, set[str]],
-    trigger_candidate_ids: set[str],
-    trigger_route_ids: set[str],
+    trigger_candidate_ids_by_path: dict[str, set[str]],
+    trigger_route_ids_by_path: dict[str, set[str]],
+    asset_assignment_by_id: dict[str, str],
+    event_path: str,
     errors: list[str],
     prefix: str,
     allow_no_row_delta: bool = False,
@@ -1225,6 +1227,18 @@ def _validate_search_enrichment_diff(
         if not changed_fields:
             continue
         changed = True
+        assignment_path = asset_assignment_by_id.get(asset_id)
+        if assignment_path != event_path:
+            errors.append(
+                f"{prefix} asset {asset_id} is outside its canonical "
+                "assignment path"
+            )
+        allowed_candidate_ids = trigger_candidate_ids_by_path.get(
+            assignment_path or "", set()
+        )
+        allowed_route_ids = trigger_route_ids_by_path.get(
+            assignment_path or "", set()
+        )
         illegal = changed_fields - ASSET_ENRICHMENT_ADDITIVE_FIELDS
         if illegal:
             errors.append(
@@ -1248,17 +1262,17 @@ def _validate_search_enrichment_diff(
                 )
             added = new_values - old_values
             if field == "candidate_ids" and not added.issubset(
-                trigger_candidate_ids
+                allowed_candidate_ids
             ):
                 errors.append(
                     f"{prefix} adds unrelated candidate links to asset {asset_id}"
                 )
-            if field == "route_ids" and not added.issubset(trigger_route_ids):
+            if field == "route_ids" and not added.issubset(allowed_route_ids):
                 errors.append(
                     f"{prefix} adds unrelated route links to asset {asset_id}"
                 )
     if not changed and not allow_no_row_delta:
-        errors.append(f"{prefix} SEARCH_ENRICHMENT has no semantic delta")
+        errors.append(f"{prefix} SEARCH_APPEND has no semantic delta")
 
 
 def _validate_candidate_enrichment_update(
@@ -1673,6 +1687,8 @@ def validate_review_history(
         trigger_route_ids: set[str] = set()
         trigger_candidate_ids_by_unit: dict[str, set[str]] = {}
         trigger_route_ids_by_unit: dict[str, set[str]] = {}
+        trigger_candidate_ids_by_path: dict[str, set[str]] = {}
+        trigger_route_ids_by_path: dict[str, set[str]] = {}
         trigger_hit_paths: dict[str, str] = {}
         all_hit_paths: dict[str, str] = {}
         for round_record in search_state.get("rounds", []):
@@ -1811,6 +1827,12 @@ def validate_review_history(
                 ).update(hit_candidates)
                 trigger_route_ids_by_unit.setdefault(
                     unit_id, set()
+                ).update(hit_routes)
+                trigger_candidate_ids_by_path.setdefault(
+                    unit["path"], set()
+                ).update(hit_candidates)
+                trigger_route_ids_by_path.setdefault(
+                    unit["path"], set()
                 ).update(hit_routes)
 
         if mode in {"INITIAL", "REOPEN"} and not source_paths:
@@ -1990,8 +2012,13 @@ def validate_review_history(
                         trigger_unit_ids,
                         trigger_candidate_ids_by_unit,
                         trigger_route_ids_by_unit,
-                        trigger_candidate_ids,
-                        trigger_route_ids,
+                        trigger_candidate_ids_by_path,
+                        trigger_route_ids_by_path,
+                        {
+                            asset_id: asset.get("assignment_path", "")
+                            for asset_id, asset in asset_by_id.items()
+                        },
+                        path,
                         errors,
                         change_prefix,
                     )
@@ -6781,8 +6808,13 @@ def mutation_checks(
             {unit_id},
             {unit_id: {"B0001"}},
             {unit_id: set()},
-            {"B0001"},
-            set(),
+            {path: {"B0001"}},
+            {path: set()},
+            {
+                row["asset_id"]: row["assignment_path"]
+                for row in search_assets
+            },
+            path,
             unrelated_errors,
             "unrelated-link fixture",
         )
@@ -6803,8 +6835,13 @@ def mutation_checks(
             {unit_id},
             {unit_id: {"B0001"}},
             {unit_id: set()},
-            {"B0001"},
-            set(),
+            {path: {"B0001"}},
+            {path: set()},
+            {
+                row["asset_id"]: row["assignment_path"]
+                for row in search_assets
+            },
+            path,
             unrelated_route_errors,
             "unrelated-route fixture",
         )
@@ -6827,8 +6864,13 @@ def mutation_checks(
             set(),
             {},
             {},
-            set(),
-            set(),
+            {},
+            {},
+            {
+                row["asset_id"]: row["assignment_path"]
+                for row in defect_asset
+            },
+            defect_asset_path,
             illegal_asset_errors,
             "illegal-asset fixture",
         )
