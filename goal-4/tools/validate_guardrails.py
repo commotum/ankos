@@ -376,11 +376,20 @@ def validate(data: dict[str, Any]) -> list[str]:
     }:
         errors.append("lifecycle_relation_contract fields are invalid")
     else:
-        if set(lifecycle["proof_kinds"]) != EXPECTED_LIFECYCLE_PROOF_KINDS:
-            errors.append("lifecycle proof kinds do not match the frozen contract")
+        proof_kinds = lifecycle["proof_kinds"]
         if (
-            set(lifecycle["merge_identity_proof_kinds"])
-            != EXPECTED_MERGE_IDENTITY_PROOFS
+            not isinstance(proof_kinds, list)
+            or not all(isinstance(item, str) for item in proof_kinds)
+            or set(proof_kinds) != EXPECTED_LIFECYCLE_PROOF_KINDS
+            or _duplicates(proof_kinds)
+        ):
+            errors.append("lifecycle proof kinds do not match the frozen contract")
+        merge_proofs = lifecycle["merge_identity_proof_kinds"]
+        if (
+            not isinstance(merge_proofs, list)
+            or not all(isinstance(item, str) for item in merge_proofs)
+            or set(merge_proofs) != EXPECTED_MERGE_IDENTITY_PROOFS
+            or _duplicates(merge_proofs)
         ):
             errors.append(
                 "merge identity proof kinds do not match the frozen contract"
