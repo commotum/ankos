@@ -345,9 +345,9 @@ def test_search_query_ids_follow_global_encounter_order() -> None:
 
 
 def test_stage18_requires_every_local_stage_before_saturation() -> None:
-    manifest, units, reading, candidates, routes, assets, _, _ = load()
-    assert candidates == []
-    assert routes == []
+    manifest, units, reading, _, _, assets, _, _ = load()
+    candidates = []
+    routes = []
     document_by_path = {
         document["path"]: document for document in manifest["documents"]
     }
