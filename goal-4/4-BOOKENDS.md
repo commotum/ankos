@@ -220,6 +220,13 @@ python3 goal-4/tools/validate_audit.py --goal-dir goal-4 --require-stage 4
 python3 -O goal-4/tools/validate_audit.py --goal-dir goal-4 --require-stage 4
   validated: units=14311 reviewed=157 candidates=2 routes=4
   assets=1607 screened=2 rounds=2
+
+python3 goal-4/tools/validate_audit.py --self-test
+python3 -O goal-4/tools/validate_audit.py --self-test
+  validated the progressed live state and destructive mutation fixtures
+
+uv run --with pytest pytest -q <all seven Goal 4 test modules>
+  93 passed (36 coordinator tests plus 57 remaining tests)
 ```
 
 The interleaved-evidence regression proves that candidate-grouped storage can
@@ -227,6 +234,13 @@ carry globally source-ordered evidence (`B0001`: `E000001`,`E000003`;
 `B0002`: `E000002`,`E000004`) through worker verification, preview, apply,
 history replay, and global validation. Gap, duplicate, group-order, and
 out-of-traversal mutations remain rejected.
+
+Independent search QA recomputed all 144 ordered query/unit pairs, confirmed
+the exact 42-unit disposition partition (3 governed, 21 control, 18
+exclusion), verified candidate links and vocabulary replay, and signed off on
+the terminal zero-delta round. The complete regression suite was made
+independent of whether the live ledgers are empty or progressed; no production
+validation was relaxed.
 
 All Stage 4 completion requirements are met. Exact next stage:
 `5-CH01-FOUNDATIONS`, beginning with its paired main-text/Notes paths in

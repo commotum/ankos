@@ -208,6 +208,14 @@ order, and orders WG groups by their first WE. The coordinator uses that same
 numeric order for global `E/G` allocation. Stage 4 exercises the case
 `B0001={E000001,E000003}` and `B0002={E000002,E000004}`.
 
+Bundle construction and verification accept an explicit authoritative
+`--goal-dir`; coordinator merge passes its target goal directory through to
+verification. Tests therefore reconstruct the exact initialized mutable
+artifacts instead of assuming that the live audit is still empty. Mutation
+self-tests likewise synthesize their clean fixture state while preserving
+immutable corpus/assignment columns, so both initial and genuinely progressed
+checkpoints exercise the same contract.
+
 Prepared merge plans are immutable mappings with a validation token covering
 all original bytes/modes and all proposed ledger bytes. Apply recomputes that
 token before entering the transaction. The initializer has no reset or
@@ -311,7 +319,7 @@ python3 -m py_compile goal-4/tools/*.py
   passed silently
 
 uv run --with pytest pytest -q goal-4/tools/test_audit.py
-  15 passed
+  16 passed
 
 uv run --with pytest pytest -q goal-4/tools/test_merge_worker_output.py
   36 passed
@@ -324,6 +332,16 @@ uv run --with pytest pytest -q goal-4/tools/test_audit_transaction.py
 
 uv run --with pytest pytest -q goal-4/tools/test_initialize_audit.py
   4 passed
+
+uv run --with pytest pytest -q \
+  goal-4/tools/test_guardrails.py \
+  goal-4/tools/test_corpus.py \
+  goal-4/tools/test_audit.py \
+  goal-4/tools/test_merge_worker_output.py \
+  goal-4/tools/test_audit_transaction.py \
+  goal-4/tools/test_initialize_audit.py \
+  goal-4/tools/test_prepare_review_output.py
+  93 passed
 
 git diff --check -- goal-4
   passed silently
