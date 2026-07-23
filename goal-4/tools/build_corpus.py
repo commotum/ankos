@@ -29,6 +29,9 @@ MARKDOWN_LINK_RE = re.compile(
     r"(?:\s+[\"'][^)]*[\"'])?\)"
 )
 FENCE_RE = re.compile(rb"^[ \t]{0,3}(`{3,}|~{3,})")
+STRUCTURAL_BOUNDARY_RE = re.compile(
+    rb"^(?:#{1,6}(?:\s|$)|[-+*]\s|\d+[.)]\s)"
+)
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -82,6 +85,13 @@ def source_unit_line_ranges(data: bytes) -> list[tuple[int, int]]:
 
     while index < len(lines):
         stripped = lines[index].rstrip(b"\r\n")
+        if (
+            fence_marker is None
+            and index > start
+            and STRUCTURAL_BOUNDARY_RE.match(stripped)
+        ):
+            ranges.append((start, index))
+            start = index
         fence = FENCE_RE.match(stripped)
         if fence:
             marker = fence.group(1)

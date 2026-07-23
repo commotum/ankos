@@ -162,45 +162,49 @@ These are current cutover facts to reverify and hash-pin in Stage 2:
 - The 29 documents cover publication information and printed contents, Preface, Chapters 1–12, General Notes, Notes for Chapters 1–12, Index, and Colophon.
 - The canonical source tree contains 1,607 JPEGs colocated with their owning document groups.
 - The source documents and their image references were validated before canonical cutover; Stage 2 must independently reverify counts, hashes, ordering, and link resolution rather than inherit that verdict.
+- Stage 2 is complete in `2-CORPUS-MAP.md`. Independent parsing found 38,168
+  physical Markdown lines partitioned into 14,311 deterministic source units.
+  The inherited 22,498-line table used a different historical concatenation
+  convention and is replaced below.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
 
 ## Canonical Corpus Map
 
-Stage 2 must rederive this map rather than trust it blindly:
+Stage 2 independently derived this map from the canonical files:
 
-| Material | Canonical logical lines |
-|---|---:|
-| Cover, copyright, printed contents | 1–85 |
-| Preface | 86–167 |
-| Chapter 1 | 168–399 |
-| Chapter 2 | 400–681 |
-| Chapter 3 | 682–1369 |
-| Chapter 4 | 1370–2143 |
-| Chapter 5 | 2144–2701 |
-| Chapter 6 | 2702–3421 |
-| Chapter 7 | 3422–4337 |
-| Chapter 8 | 4338–5165 |
-| Chapter 9 | 5166–6587 |
-| Chapter 10 | 6588–7693 |
-| Chapter 11 | 7694–8609 |
-| Chapter 12 | 8610–10622 |
-| General Notes | 10623–10817 |
-| Chapter 1 Notes | 10818–10894 |
-| Chapter 2 Notes | 10895–11630 |
-| Chapter 3 Notes | 11631–12498 |
-| Chapter 4 Notes | 12499–13459 |
-| Chapter 5 Notes | 13460–14198 |
-| Chapter 6 Notes | 14199–14847 |
-| Chapter 7 Notes | 14848–15582 |
-| Chapter 8 Notes | 15583–16011 |
-| Chapter 9 Notes | 16012–17086 |
-| Chapter 10 Notes | 17087–18194 |
-| Chapter 11 Notes | 18195–19027 |
-| Chapter 12 Notes | 19028–20825 |
-| Actual Index | 20826–22457 |
-| Actual Colophon | 22458–22498 |
+| Material | Canonical path | Physical/logical lines |
+|---|---|---:|
+| Publication and printed contents | `FRONT-MATTER/00-Publication-and-Contents.md` | 1–94 |
+| Preface | `FRONT-MATTER/01-Preface.md` | 95–167 |
+| Chapter 1 | `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md` | 168–375 |
+| Chapter 2 | `CHAPTERS/02-The-Crucial-Experiment.md` | 376–639 |
+| Chapter 3 | `CHAPTERS/03-The-World-of-Simple-Programs.md` | 640–1309 |
+| Chapter 4 | `CHAPTERS/04-Systems-Based-on-Numbers.md` | 1310–2045 |
+| Chapter 5 | `CHAPTERS/05-Two-Dimensions-and-Beyond.md` | 2046–2601 |
+| Chapter 6 | `CHAPTERS/06-Starting-from-Randomness.md` | 2602–3311 |
+| Chapter 7 | `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` | 3312–4183 |
+| Chapter 8 | `CHAPTERS/08-Implications-for-Everyday-Systems.md` | 4184–4953 |
+| Chapter 9 | `CHAPTERS/09-Fundamental-Physics.md` | 4954–6327 |
+| Chapter 10 | `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` | 6328–7341 |
+| Chapter 11 | `CHAPTERS/11-The-Notion-of-Computation.md` | 7342–8215 |
+| Chapter 12 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` | 8216–9901 |
+| General Notes | `BACK-MATTER/NOTES/00-General-Notes.md` | 9902–10092 |
+| Chapter 1 Notes | `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md` | 10093–10167 |
+| Chapter 2 Notes | `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md` | 10168–11082 |
+| Chapter 3 Notes | `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md` | 11083–11949 |
+| Chapter 4 Notes | `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md` | 11950–12989 |
+| Chapter 5 Notes | `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md` | 12990–13746 |
+| Chapter 6 Notes | `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md` | 13747–14412 |
+| Chapter 7 Notes | `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 14413–15104 |
+| Chapter 8 Notes | `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 15105–15462 |
+| Chapter 9 Notes | `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md` | 15463–16462 |
+| Chapter 10 Notes | `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md` | 16463–17560 |
+| Chapter 11 Notes | `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md` | 17561–18546 |
+| Chapter 12 Notes | `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md` | 18547–20389 |
+| Index | `BACK-MATTER/Index.md` | 20390–38129 |
+| Colophon | `BACK-MATTER/Colophon.md` | 38130–38168 |
 
 ## Assumptions To Challenge
 
@@ -293,6 +297,8 @@ Fix the audit's inclusion threshold, evidence model, candidate identity, disposi
 - The stage records commands, facts, and any changes folded back into this plan.
 
 ### 2-CORPUS-MAP
+
+Status: **COMPLETE** in `goal-4/2-CORPUS-MAP.md`.
 
 #### Big Picture Objective
 

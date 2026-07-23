@@ -333,8 +333,8 @@
   "worker_isolation": {
     "context_mode": "Use a sealed, hash-bound scratch bundle and an OS/filesystem sandbox when delegating blind discovery. Prompt-only restrictions in the shared repository are not evidence of input isolation.",
     "allowed_inputs": [
-      "principles.md",
-      "goal-4/guardrails.json",
+      "a sanitized statement of Principle 0 and source-fidelity rules, without current architecture vocabulary",
+      "a sanitized discovery-only projection of goal-4/guardrails.json",
       "a sanitized blind-worker brief that excludes current counts, candidate hypotheses, reconciliation vocabulary, API framing, and prohibited paths",
       "the assigned canonical Markdown document or deterministic source-unit slice",
       "only images owned by that assigned slice",

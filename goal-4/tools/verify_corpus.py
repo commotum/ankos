@@ -27,6 +27,9 @@ LINK_PATTERN = re.compile(
     r"(?:\s+[\"'][^)]*[\"'])?\)"
 )
 FENCE_PATTERN = re.compile(rb"^[ \t]{0,3}(`{3,}|~{3,})")
+STRUCTURAL_BOUNDARY_PATTERN = re.compile(
+    rb"^(?:#{1,6}(?:\s|$)|[-+*]\s|\d+[.)]\s)"
+)
 
 
 def digest(data: bytes) -> str:
@@ -63,6 +66,15 @@ def expected_unit_ranges(data: bytes) -> list[tuple[int, int, int, int]]:
     fence_char: bytes | None = None
     while cursor < len(lines):
         raw = lines[cursor].rstrip(b"\r\n")
+        if (
+            fence_char is None
+            and cursor > block_start
+            and STRUCTURAL_BOUNDARY_PATTERN.match(raw)
+        ):
+            result.append(
+                (offsets[block_start], offsets[cursor], block_start + 1, cursor)
+            )
+            block_start = cursor
         marker_match = FENCE_PATTERN.match(raw)
         if marker_match:
             marker = marker_match.group(1)
@@ -146,6 +158,14 @@ def independent_links(source_root: Path) -> list[tuple[Any, ...]]:
     return records
 
 
+def independent_tree_digest(source_root: Path) -> str:
+    value = hashlib.sha256()
+    for path in sorted(item for item in source_root.rglob("*") if item.is_file()):
+        relative = "./" + path.relative_to(source_root).as_posix()
+        value.update(f"{digest(path.read_bytes())}  {relative}\n".encode())
+    return value.hexdigest()
+
+
 def verify_loaded(
     manifest: dict[str, Any],
     units: list[dict[str, Any]],
@@ -192,6 +212,8 @@ def verify_loaded(
     for key, value in actual_independent.items():
         if counts.get(key) != value:
             errors.append(f"manifest count {key} is stale")
+    if manifest.get("source_tree_sha256") != independent_tree_digest(source_root):
+        errors.append("manifest source-tree digest mismatch")
 
     contents_targets = parse_contents_independently(source_root / "Contents.md")
     if len(contents_targets) != 29 or len(set(contents_targets)) != 29:
@@ -225,6 +247,9 @@ def verify_loaded(
     }
     if kind_counts != expected_kind_counts:
         errors.append(f"document kind counts are invalid: {dict(kind_counts)}")
+    concatenated = b"".join((source_root / path).read_bytes() for path in contents_targets)
+    if manifest.get("book_text_concatenated_sha256") != digest(concatenated):
+        errors.append("manifest concatenated book-text digest mismatch")
 
     units_by_path: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for index, unit in enumerate(units, start=1):
@@ -358,9 +383,85 @@ def verify_loaded(
         errors.append("manifest links differ from independent Markdown parse")
     if any(not row.get("exists") for row in manifest_links):
         errors.append("manifest contains a broken local or declared-existing link")
+    if [row.get("id") for row in manifest_links] != [
+        f"L{index:06d}" for index in range(1, len(manifest_links) + 1)
+    ]:
+        errors.append("manifest link IDs are not total canonical sequence")
+    valid_units = {unit.get("id"): unit for unit in units}
+    for row in manifest_links:
+        source_path = row.get("source_path")
+        source_unit_id = row.get("source_unit_id")
+        if source_path in {"README.md", "Contents.md"}:
+            if source_unit_id is not None:
+                errors.append("navigation link must not claim a book source unit")
+            continue
+        if source_unit_id not in valid_units:
+            errors.append(f"book link lacks valid source unit: {row.get('id')}")
+            continue
+        unit = valid_units[source_unit_id]
+        if unit.get("path") != source_path:
+            errors.append(f"book link source-unit path mismatch: {row.get('id')}")
+            continue
+        data = (source_root / source_path).read_bytes()
+        block = data[unit["byte_start"] : unit["byte_end"]].decode("utf-8")
+        if row.get("raw_target") not in block:
+            errors.append(f"book link target is not inside claimed unit: {row.get('id')}")
     image_link_count = sum(1 for row in manifest_links if row.get("kind") == "image")
     if counts.get("image_references") != image_link_count:
         errors.append("manifest image-reference count mismatch")
+
+    links_by_id = {row.get("id"): row for row in manifest_links}
+    expected_references: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in manifest_links:
+        if row.get("kind") == "image" and isinstance(row.get("resolved_path"), str):
+            expected_references[row["resolved_path"]].append(
+                {
+                    "link_id": row.get("id"),
+                    "source_path": row.get("source_path"),
+                    "source_unit_id": row.get("source_unit_id"),
+                }
+            )
+    for row in image_rows:
+        expected = expected_references.get(row.get("path"), [])
+        if row.get("referenced_by") != expected:
+            errors.append(f"image reverse-reference mismatch: {row.get('path')}")
+        if row.get("reference_count") != len(expected):
+            errors.append(f"image reference count mismatch: {row.get('path')}")
+        expected_status = "REFERENCED" if expected else "UNREFERENCED_PHYSICAL"
+        if row.get("inventory_status") != expected_status:
+            errors.append(f"image inventory status mismatch: {row.get('path')}")
+        for reference in row.get("referenced_by", []):
+            if reference.get("link_id") not in links_by_id:
+                errors.append(f"image references unknown link: {row.get('path')}")
+
+    doc_by_path = {doc.get("path"): doc for doc in documents}
+    for relative, document in doc_by_path.items():
+        expected_link_ids = [
+            row.get("id")
+            for row in manifest_links
+            if row.get("source_path") == relative
+        ]
+        if document.get("link_ids") != expected_link_ids:
+            errors.append(f"document link join mismatch: {relative}")
+        expected_images = [
+            row.get("resolved_path")
+            for row in manifest_links
+            if row.get("source_path") == relative and row.get("kind") == "image"
+        ]
+        if document.get("image_references") != expected_images:
+            errors.append(f"document image-reference join mismatch: {relative}")
+
+    navigation = manifest.get("navigation_documents")
+    if not isinstance(navigation, list) or len(navigation) != 2:
+        errors.append("navigation manifest must contain two documents")
+    else:
+        if {row.get("path") for row in navigation} != {"README.md", "Contents.md"}:
+            errors.append("navigation manifest paths are invalid")
+        for row in navigation:
+            path = source_root / row["path"]
+            data = path.read_bytes()
+            if row.get("sha256") != digest(data) or row.get("bytes") != len(data):
+                errors.append(f"navigation file record mismatch: {row.get('path')}")
 
     pairs = manifest.get("chapter_notes_pairs")
     if not isinstance(pairs, list) or len(pairs) != 12:
@@ -393,6 +494,10 @@ def mutation_checks(
     corrupt_unit = copy.deepcopy(units)
     corrupt_unit[0]["byte_end"] += 1
     mutations.append(("corrupt source-unit range", manifest, corrupt_unit, units_bytes))
+
+    missing_unit = copy.deepcopy(units)
+    missing_unit.pop(0)
+    mutations.append(("missing source-unit row", manifest, missing_unit, units_bytes))
 
     missing_image = copy.deepcopy(manifest)
     missing_image["images"].pop()
