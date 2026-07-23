@@ -232,6 +232,38 @@ def test_search_append_asset_links_require_same_path_hit_authority() -> None:
     assert any("unrelated route links" in error for error in errors)
 
 
+def test_atomic_prefix_rejects_search_over_unreviewed_future_sources() -> None:
+    search = {
+        "rounds": [
+            {
+                "queries": [{"scope_paths": ["future.md"]}],
+                "hits": [
+                    {
+                        "source_unit_id": "U999999",
+                        "candidate_ids": [],
+                        "route_ids": [],
+                    }
+                ],
+                "new_candidates": [],
+                "new_routes": [],
+                "new_evidence_groups": [],
+            }
+        ]
+    }
+    errors = []
+    MODULE._validate_atomic_prefix_state(
+        {},
+        {},
+        {},
+        search,
+        {},
+        errors,
+        "future-search regression",
+    )
+    assert any("query scopes an unreviewed future path" in error for error in errors)
+    assert any("hit targets an unreviewed future unit" in error for error in errors)
+
+
 def test_search_query_ids_follow_global_encounter_order() -> None:
     def query(query_id: str):
         return {

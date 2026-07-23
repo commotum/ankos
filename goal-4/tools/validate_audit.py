@@ -1727,9 +1727,21 @@ def _validate_atomic_prefix_state(
     for round_record in search_state.get("rounds", []):
         if not isinstance(round_record, dict):
             continue
+        for query in round_record.get("queries", []):
+            if not isinstance(query, dict):
+                continue
+            for scope_path in query.get("scope_paths", []):
+                if scope_path not in latest_path_change:
+                    errors.append(
+                        f"{prefix} search query scopes an unreviewed future path"
+                    )
         for hit in round_record.get("hits", []):
             if not isinstance(hit, dict):
                 continue
+            if hit.get("source_unit_id") not in reading_rows:
+                errors.append(
+                    f"{prefix} search hit targets an unreviewed future unit"
+                )
             if any(
                 candidate_id not in candidate_state
                 for candidate_id in hit.get("candidate_ids", [])
@@ -6186,9 +6198,17 @@ def mutation_checks(
             + "; ".join(tail_errors)
         )
 
-    lineage_candidates = [
+    lineage_initial_candidates = [
         lineage_candidate("B0001", 1, 1, 1),
         lineage_candidate("B0002", 2, 1, 2),
+    ]
+    lineage_initial_candidates[1]["source_evidence"][0][
+        "strength"
+    ] = "DIRECT_IDENTITY"
+    lineage_initial_candidates[1]["evidence_strength"] = ["DIRECT_IDENTITY"]
+    lineage_candidates = [
+        copy.deepcopy(lineage_initial_candidates[0]),
+        copy.deepcopy(lineage_initial_candidates[1]),
         lineage_candidate("B0003", 3, 2, 1),
         lineage_candidate("B0004", 4, 2, 2),
     ]
@@ -6242,10 +6262,6 @@ def mutation_checks(
             ],
         }
     )
-    lineage_candidates[1]["source_evidence"][0][
-        "strength"
-    ] = "DIRECT_IDENTITY"
-    lineage_candidates[1]["evidence_strength"] = ["DIRECT_IDENTITY"]
     lineage_candidates[1].update(
         {
             "record_status": "MERGED_REDIRECT",
@@ -6276,16 +6292,166 @@ def mutation_checks(
     lineage_candidates[3]["cross_reference_ids"] = []
     lineage_reading = copy.deepcopy(base_reading)
     lineage_assets = copy.deepcopy(base_assets)
-    for row in lineage_reading:
-        if row["path"] == path:
-            row["review_epoch"] = "2"
-    for row in lineage_assets:
-        if row["assignment_path"] == path:
-            row["review_epoch"] = "2"
     lineage_reading[0]["candidate_ids"] = '["B0003","B0004"]'
     lineage_initial_reading = copy.deepcopy(base_reading)
     lineage_initial_reading[0]["candidate_ids"] = '["B0001","B0002"]'
     lineage_initial_history = append_history_event(
+        [],
+        lineage_initial_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+        candidate_changes=[
+            close_candidate_change(
+                "CREATE", copy.deepcopy(lineage_initial_candidates[0])
+            ),
+            close_candidate_change(
+                "CREATE", copy.deepcopy(lineage_initial_candidates[1])
+            ),
+        ],
+        route_changes=[
+            close_route_change("CREATE", copy.deepcopy(route))
+        ],
+    )
+    lineage_initial_errors = validate_objects(
+        manifest,
+        units,
+        lineage_initial_reading,
+        lineage_initial_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+        lineage_initial_history,
+    )
+    if lineage_initial_errors:
+        failures.append(
+            "valid active lineage prefix failed: "
+            + "; ".join(lineage_initial_errors)
+        )
+
+    atomic_revision_changes = [
+        close_candidate_change(
+            "UPDATE",
+            copy.deepcopy(lineage_candidates[0]),
+            before_candidate=copy.deepcopy(lineage_initial_candidates[0]),
+            previous_candidate_result_sha256=canonical_sha256(
+                lineage_initial_candidates[0]
+            ),
+        ),
+        close_candidate_change(
+            "UPDATE",
+            copy.deepcopy(lineage_candidates[1]),
+            before_candidate=copy.deepcopy(lineage_initial_candidates[1]),
+            previous_candidate_result_sha256=canonical_sha256(
+                lineage_initial_candidates[1]
+            ),
+        ),
+        close_candidate_change(
+            "CREATE", copy.deepcopy(lineage_candidates[2])
+        ),
+        close_candidate_change(
+            "CREATE", copy.deepcopy(lineage_candidates[3])
+        ),
+    ]
+    lineage_revision_errors: list[str] = []
+    _validate_candidate_revision_update(
+        lineage_initial_candidates[0],
+        lineage_candidates[0],
+        lineage_revision_errors,
+        "atomic lineage revision B0001",
+    )
+    _validate_candidate_revision_update(
+        lineage_initial_candidates[1],
+        lineage_candidates[1],
+        lineage_revision_errors,
+        "atomic lineage revision B0002",
+    )
+    if [change["action"] for change in atomic_revision_changes] != [
+        "UPDATE",
+        "UPDATE",
+        "CREATE",
+        "CREATE",
+    ]:
+        lineage_revision_errors.append(
+            "atomic lineage revision has wrong change actions"
+        )
+    revision_core = {
+        "review_id": "V000002",
+        "epoch": 1,
+        "stage": 18,
+        "mode": "CANDIDATE_REVISION",
+        "reviewer": "fixture-reconciler",
+        "source_paths": [path],
+        "candidate_changes": atomic_revision_changes,
+        "route_changes": [],
+        "search_change": None,
+    }
+    revision_path_change = close_path_change(
+        revision_core,
+        {
+            "source_path": path,
+            "source_unit_ids": [
+                item["id"] for item in units if item["path"] == path
+            ],
+            "asset_ids": [
+                item["asset_id"]
+                for item in lineage_assets
+                if item["assignment_path"] == path
+            ],
+            "previous_path_result_sha256": lineage_initial_history[-1][
+                "path_changes"
+            ][0]["result_projection_sha256"],
+        },
+        unit_by_fixture_id,
+        {
+            item["source_unit_id"]: item for item in lineage_reading
+        },
+        {item["asset_id"]: item for item in lineage_assets},
+    )
+    _validate_atomic_prefix_state(
+        {candidate["id"]: candidate for candidate in lineage_candidates},
+        {route["route_id"]: route for route in base_routes},
+        {path: revision_path_change},
+        base_search,
+        {asset["asset_id"]: asset for asset in lineage_assets},
+        lineage_revision_errors,
+        "atomic Stage 18 lineage revision",
+    )
+    if lineage_revision_errors:
+        failures.append(
+            "valid atomic multi-layer lineage fixture failed: "
+            + "; ".join(lineage_revision_errors)
+        )
+
+    impossible_prefix_errors: list[str] = []
+    _validate_atomic_prefix_state(
+        {
+            candidate["id"]: candidate
+            for candidate in lineage_candidates[:2]
+        },
+        {route["route_id"]: route for route in base_routes},
+        {
+            path: lineage_initial_history[-1]["path_changes"][0],
+        },
+        base_search,
+        {asset["asset_id"]: asset for asset in lineage_assets},
+        impossible_prefix_errors,
+        "impossible pre-target lineage prefix",
+    )
+    if not any(
+        "targets future candidate" in error
+        for error in impossible_prefix_errors
+    ) or not any(
+        "links terminal candidate" in error
+        for error in impossible_prefix_errors
+    ):
+        failures.append(
+            "impossible terminal-before-target lineage prefix passed"
+        )
+    impossible_create_history = append_history_event(
         [],
         lineage_initial_reading,
         base_assets,
@@ -6306,39 +6472,15 @@ def mutation_checks(
             close_route_change("CREATE", copy.deepcopy(route))
         ],
     )
-    lineage_history = append_history_event(
-        lineage_initial_history,
-        lineage_reading,
-        lineage_assets,
-        path,
-        2,
-        "REOPEN",
-        "fixture-reviewer",
-        reopened_search["rounds"],
-        candidate_changes=[
-            close_candidate_change(
-                "CREATE", copy.deepcopy(lineage_candidates[2])
-            ),
-            close_candidate_change(
-                "CREATE", copy.deepcopy(lineage_candidates[3])
-            ),
-        ],
-    )
-    lineage_errors = validate_objects(
-        manifest,
-        units,
-        lineage_reading,
-        lineage_candidates,
+    expect_history_failure(
+        "INITIAL creates terminal candidates before lineage targets",
+        lineage_initial_reading,
+        lineage_candidates[:2],
         base_routes,
-        lineage_assets,
-        reopened_search,
-        lineage_history,
+        base_assets,
+        base_search,
+        impossible_create_history,
     )
-    if lineage_errors:
-        failures.append(
-            "valid multi-layer lineage fixture failed: "
-            + "; ".join(lineage_errors)
-        )
     broken_lineage = copy.deepcopy(lineage_candidates)
     broken_lineage[1]["evidence_reassignments"][0]["targets"][0][
         "evidence_id"
