@@ -353,6 +353,7 @@ def remove_spec(name: str) -> None:
 
 amend_spec(
     "Gray-code ordering generator",
+    uids=["U005647", "U005648", "U005649"],
     facts={
         "rule_relation_constraint_function_or_probability_law": FF(
             "GrayCode[m_] := Nest[Join[#, Length[#] + Reverse[#]] &, {0}, m]; "
@@ -1250,166 +1251,705 @@ def array_text(items: list[str]) -> str:
     return json.dumps(items, ensure_ascii=False, separators=(",", ":"))
 
 
+OBJECT_KIND = {
+    "ITERATION": "discrete iterated map or recurrence",
+    "CA": "cellular-automaton transition system",
+    "SUBSTITUTION": "substitution or replacement system",
+    "SOLVER": "constructive or numerical solver",
+    "FUNCTION": "immutable function or indexed sequence",
+    "QUERY": "predicate, decision query, or accepted-result condition",
+    "RELATION": "declarative relation or denoted mathematical object",
+    "REPRESENTATION": "encoder, decoder, or representation relation",
+    "GENERATOR": "finite or infinite sequence generator",
+    "OBSERVER": "observer or analyzer",
+    "CALCULUS": "function-construction calculus",
+    "PDE": "partial differential relation",
+    "ODE": "ordinary differential relation",
+    "PRESET": "initial, boundary, or numerical preset",
+    "PARTIAL_SYSTEM": "delimited construction with identity-bearing mechanics missing",
+    "EVALUATION_POLICY": "expression-evaluation policy",
+}
+
+LAW_KIND = {
+    "ITERATION": "one-step map or recurrence",
+    "CA": "local cellular transition rule",
+    "SUBSTITUTION": "replacement rule",
+    "SOLVER": "constructive or numerical update method",
+    "FUNCTION": "function definition",
+    "QUERY": "predicate or quantified accepted-result condition",
+    "RELATION": "declarative relation or constraint",
+    "REPRESENTATION": "encoding, decoding, or representation relation",
+    "GENERATOR": "generation law",
+    "OBSERVER": "observer or analyzer function",
+    "CALCULUS": "function-building operators and evaluation clauses",
+    "PDE": "partial differential constraint",
+    "ODE": "ordinary differential constraint",
+    "PRESET": "initial/boundary data assignment",
+    "PARTIAL_SYSTEM": "partially recovered transition law",
+    "EVALUATION_POLICY": "expression-reduction order",
+}
+
+STEPWISE_KINDS = {
+    "ITERATION", "CA", "SUBSTITUTION", "SOLVER", "GENERATOR",
+    "PARTIAL_SYSTEM",
+}
+CONTINUOUS_RELATION_KINDS = {"PDE", "ODE"}
+STATIC_KINDS = {
+    "FUNCTION", "QUERY", "RELATION", "REPRESENTATION", "OBSERVER",
+    "CALCULUS", "PDE", "ODE", "PRESET",
+}
+
+# A nonempty entry says that the cited source deliberately leaves these
+# fingerprint dimensions unresolved.  Reusing the exact source-limited
+# sentence as the UNKNOWN reason guarantees that it also appears verbatim in
+# missing_mechanics.
+MISSING_FIELD_HINTS: dict[str, dict[str, str]] = {
+    "rotated page-117 digit substitution preset": {
+        field: "The replacement rule and seed are only at the routed target."
+        for field in (
+            "seed", "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit", "successor_cardinality",
+        )
+    },
+    "92-token substitution realization of run-length encoding": {
+        field: "Only one of the 92 token replacements is stated."
+        for field in (
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit", "successor_cardinality",
+        )
+    },
+    "page-128 linear recurrence family": {
+        field: "The individual coefficients, orders, and initial values are at the routed target."
+        for field in (
+            "seed", "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit", "successor_cardinality",
+        )
+    },
+    "digit-by-digit square-root solver": {
+        field: "The per-step update choosing the next digit is only in the routed main-text construction."
+        for field in (
+            "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit", "schedule",
+        )
+    },
+    "zero-spacing substitution realization": {
+        field: "The replacement rules are at the routed page-903 discussion."
+        for field in (
+            "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit", "successor_cardinality",
+        )
+    },
+    "finite-precision multiplication-by-3/2 simulation": {
+        field: "The rounding/fill convention and exact recurrence are not stated in this unit."
+        for field in (
+            "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "determinism_branching_or_measure",
+        )
+    },
+    "probabilistic cellular automaton family": {
+        field: "The rule pair, probabilities, random coupling, and examples are only at page 591."
+        for field in (
+            "seed", "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit", "successor_cardinality",
+        )
+    },
+    "finite-difference PDE discretization family": {
+        field: "This unit states the method family but not a particular stencil."
+        for field in (
+            "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+        )
+    },
+    "sum-of-three-squares representability constraint": {
+        field: "The actual necessary-and-sufficient condition is only in the routed main-text target."
+        for field in (
+            "rule_relation_constraint_function_or_probability_law",
+            "witness_semantics",
+        )
+    },
+    "two-Gaussian periodic-boundary PDE comparison preset": {
+        field: "Gaussian scale, separation, and numerical grid are not printed in the Notes unit."
+        for field in ("seed", "input", "boundary", "parameters_and_variants")
+    },
+    "dimensional wave-equation square-pulse preset": {
+        field: "The exact pulse dimensions, domain, and boundary data are not printed."
+        for field in ("seed", "input", "boundary", "parameters_and_variants")
+    },
+    "case-c one-bit-count stopping-time map obligation": {
+        field: "The case-(c) one-step update formula is clipped from A000443 and is not stated in the prose."
+        for field in (
+            "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "determinism_branching_or_measure", "successor_cardinality",
+        )
+    },
+}
+
+
+def decision(
+    status: str,
+    value: str | None,
+    anchors: tuple[str, ...] | list[str],
+    reason: str,
+) -> dict[str, Any]:
+    return {
+        "status": status,
+        "value": value,
+        "anchors": tuple(anchors),
+        "reason": reason,
+    }
+
+
+def supported(
+    spec: dict[str, Any],
+    field: str,
+    value: str,
+    *anchors: str,
+) -> dict[str, Any]:
+    return decision(
+        "SUPPORTED",
+        value,
+        anchors,
+        f"{spec['name']}: the cited anchor states or directly fixes {field.replace('_', ' ')} at this exact scope.",
+    )
+
+
+def not_applicable(
+    spec: dict[str, Any],
+    field: str,
+    anchor: str,
+    reason: str,
+) -> dict[str, Any]:
+    return decision(
+        "NOT_APPLICABLE",
+        None,
+        (anchor,),
+        f"{spec['name']}: {reason}",
+    )
+
+
+def unknown(spec: dict[str, Any], field: str, reason: str | None = None) -> dict[str, Any]:
+    return decision(
+        "UNKNOWN_FROM_SOURCE",
+        None,
+        (),
+        reason
+        or (
+            f"{spec['name']}: the sealed Notes evidence does not state "
+            f"{field.replace('_', ' ')}."
+        ),
+    )
+
+
+def choose_law_anchor(
+    spec: dict[str, Any],
+    block_kind_by_uid: dict[str, str],
+) -> str:
+    if spec["identity_image"]:
+        return spec["identity_image"]
+    if spec["image_direct"] and spec["images"]:
+        return spec["images"][0]
+    if spec["law_uid"] is not None:
+        return spec["law_uid"]
+    for uid in spec["uids"]:
+        if block_kind_by_uid[uid] == "fenced_code":
+            return uid
+    return spec["uids"][0]
+
+
+def field_decisions(
+    spec: dict[str, Any],
+    block_kind_by_uid: dict[str, str],
+) -> dict[str, dict[str, Any]]:
+    """Build a conservative, source-limited 28-field decision record."""
+
+    name = spec["name"]
+    kind = spec["kind"]
+    identity_anchor = spec["identity_image"] or spec["uids"][0]
+    law_anchor = choose_law_anchor(spec, block_kind_by_uid)
+    parameters = list(spec["params"])
+    variants = list(spec["variants"])
+    dynamic = kind in STEPWISE_KINDS
+    continuous_relation = kind in CONTINUOUS_RELATION_KINDS
+    hints = MISSING_FIELD_HINTS.get(name, {})
+
+    result_values = {
+        "ITERATION": "the next iterate and, when requested, its trajectory",
+        "CA": "a replacement cell value and the resulting configuration when a global schedule is fixed",
+        "SUBSTITUTION": "the replacement word/list or generated substitution sequence",
+        "SOLVER": "a constructed or numerical approximation/result",
+        "FUNCTION": "the value or indexed sequence defined by the formula",
+        "QUERY": "a Boolean or quantified mathematical judgment",
+        "RELATION": "the denoted relation, identity, or satisfying-value set",
+        "REPRESENTATION": "an encoded/decoded value or representation",
+        "GENERATOR": "the generated finite prefix, sequence, or family",
+        "OBSERVER": "an observed or analyzed value",
+        "CALCULUS": "a function expression or function produced by the constructors",
+        "PDE": "a set of functions satisfying the partial differential relation",
+        "ODE": "a set of functions satisfying the ordinary differential relation",
+        "PRESET": "data used to initialize or compare a separate system/solver",
+        "PARTIAL_SYSTEM": "a delimited construction whose full successor is not recoverable",
+        "EVALUATION_POLICY": "the next selected expression reduction or its failure",
+    }
+
+    d: dict[str, dict[str, Any]] = {
+        field: unknown(spec, field) for field in FIELDS
+    }
+    d["object_kind"] = supported(
+        spec, "object_kind", f"{OBJECT_KIND[kind]}: {name}", identity_anchor
+    )
+    d["law_kind"] = supported(spec, "law_kind", LAW_KIND[kind], law_anchor)
+    d["rule_relation_constraint_function_or_probability_law"] = supported(
+        spec,
+        "rule_relation_constraint_function_or_probability_law",
+        spec["law"],
+        law_anchor,
+    )
+    d["result_kind"] = supported(
+        spec, "result_kind", result_values[kind], law_anchor
+    )
+    d["read_dependencies_or_neighborhood"] = supported(
+        spec,
+        "read_dependencies_or_neighborhood",
+        (
+            "the current state and explicit arguments appearing in the exact "
+            f"law: {spec['law']}"
+            if dynamic
+            else f"the explicit arguments and subexpressions in: {spec['law']}"
+        ),
+        law_anchor,
+    )
+
+    if parameters:
+        d["input"] = supported(
+            spec, "input", "inputs/parameters: " + "; ".join(parameters), law_anchor
+        )
+    else:
+        d["input"] = not_applicable(
+            spec,
+            "input",
+            identity_anchor,
+            "the captured object is a fixed denotation or quantified statement, not a caller-parameterized procedure.",
+        )
+    if parameters or variants:
+        value_parts: list[str] = []
+        if parameters:
+            value_parts.append("parameters: " + "; ".join(parameters))
+        if variants:
+            value_parts.append("variants: " + "; ".join(variants))
+        d["parameters_and_variants"] = supported(
+            spec, "parameters_and_variants", " | ".join(value_parts), law_anchor
+        )
+    else:
+        d["parameters_and_variants"] = not_applicable(
+            spec,
+            "parameters_and_variants",
+            identity_anchor,
+            "no separate parameter or variant is part of this candidate's stated identity.",
+        )
+
+    if dynamic:
+        time_value = {
+            "ITERATION": "discrete applications of the map or recurrence",
+            "CA": "discrete cellular update steps",
+            "SUBSTITUTION": "discrete replacement generations",
+            "SOLVER": "discrete construction or approximation steps",
+            "GENERATOR": "discrete generation stages or indices",
+            "PARTIAL_SYSTEM": "discrete steps are described, but their one-step law is incomplete",
+        }[kind]
+        d["native_time"] = supported(spec, "native_time", time_value, law_anchor)
+        d["complete_state"] = supported(
+            spec,
+            "complete_state",
+            {
+                "CA": "the current complete cell configuration plus stated parameters",
+                "SUBSTITUTION": "the current word/list plus stated replacement data",
+                "SOLVER": "the current approximation variables named by the method",
+                "GENERATOR": "the current generated prefix/index and stated parameters",
+                "PARTIAL_SYSTEM": "the current integer input/state; the missing rule prevents a complete successor description",
+            }.get(kind, "the current iterate or recurrence state plus stated parameters"),
+            law_anchor,
+        )
+        d["frontier_or_activation"] = supported(
+            spec,
+            "frontier_or_activation",
+            (
+                "the source object/eligible occurrence selected by the one-step law"
+                if kind != "CA"
+                else "the cell positions to which the local rule is applied"
+            ),
+            law_anchor,
+        )
+        if kind == "CA":
+            d["schedule"] = unknown(
+                spec,
+                "schedule",
+                f"{name}: the sealed Notes evidence gives a local rule but does not state a global cell-update schedule.",
+            )
+            d["determinism_branching_or_measure"] = unknown(
+                spec,
+                "determinism_branching_or_measure",
+                f"{name}: the local expression is deterministic, but the sealed source does not fix a complete global schedule/measure.",
+            )
+            d["successor_cardinality"] = unknown(
+                spec,
+                "successor_cardinality",
+                f"{name}: a local output is fixed, but global successor cardinality depends on the unstated schedule/topology.",
+            )
+        else:
+            d["schedule"] = supported(
+                spec,
+                "schedule",
+                "one application/construction step follows the order written in the exact law",
+                law_anchor,
+            )
+            d["determinism_branching_or_measure"] = supported(
+                spec,
+                "determinism_branching_or_measure",
+                "the stated law selects one next result for complete defined inputs; no probability measure is introduced",
+                law_anchor,
+            )
+            d["successor_cardinality"] = supported(
+                spec,
+                "successor_cardinality",
+                "one next/generated result for each complete defined state and parameter choice",
+                law_anchor,
+            )
+        d["visible_history"] = unknown(
+            spec,
+            "visible_history",
+            f"{name}: the source does not say whether earlier states beyond the stated read dependencies are retained as part of the visible state.",
+        )
+        seed_text = " ".join(parameters).lower() + " " + spec["law"].lower()
+        seed_tokens = (
+            "initial", "start ", "f[0]", "f[1]", "from {0}", "from {1",
+            "seed",
+        )
+        if any(token in seed_text for token in seed_tokens):
+            d["seed"] = supported(
+                spec,
+                "seed",
+                "the initial value/configuration is supplied by the stated parameters or initial clauses",
+                law_anchor,
+            )
+        else:
+            d["seed"] = unknown(
+                spec,
+                "seed",
+                f"{name}: the one-step/generation law is stated, but no initial seed is fixed for this candidate.",
+            )
+        d["write_replacement_assembly_or_commit"] = supported(
+            spec,
+            "write_replacement_assembly_or_commit",
+            (
+                "the local rule computes a replacement cell value; global commit timing is represented separately by schedule"
+                if kind == "CA"
+                else "the exact law produces the next replacement, appended term, or approximation"
+            ),
+            law_anchor,
+        )
+    elif continuous_relation:
+        d["native_time"] = supported(
+            spec,
+            "native_time",
+            "continuous independent variable(s) occur in the relation; this is not an update schedule",
+            law_anchor,
+        )
+        d["carrier"] = supported(
+            spec,
+            "carrier",
+            "functions over the continuous coordinates named in the equation",
+            law_anchor,
+        )
+        for field in (
+            "complete_state", "visible_history", "control_state", "seed",
+            "frontier_or_activation", "schedule",
+            "write_replacement_assembly_or_commit",
+        ):
+            d[field] = not_applicable(
+                spec,
+                field,
+                law_anchor,
+                "this candidate is a declarative differential relation, not an intrinsic discrete evolution or solver.",
+            )
+        d["successor_cardinality"] = not_applicable(
+            spec,
+            "successor_cardinality",
+            law_anchor,
+            "the equation denotes a solution relation rather than a successor function.",
+        )
+        d["determinism_branching_or_measure"] = not_applicable(
+            spec,
+            "determinism_branching_or_measure",
+            law_anchor,
+            "the equation alone supplies neither a stochastic measure nor a solver-level branch policy.",
+        )
+        d["termination_completion_failure"] = not_applicable(
+            spec,
+            "termination_completion_failure",
+            law_anchor,
+            "termination is a solver property; this candidate is only the differential relation.",
+        )
+    elif kind == "EVALUATION_POLICY":
+        d["native_time"] = not_applicable(
+            spec, "native_time", identity_anchor, "evaluation order is not physical/native time."
+        )
+        d["complete_state"] = supported(
+            spec,
+            "complete_state",
+            "the current recursive expression and values already made explicit",
+            law_anchor,
+        )
+        d["control_state"] = supported(
+            spec,
+            "control_state",
+            "the leftmost innermost unresolved occurrence selected for reduction",
+            law_anchor,
+        )
+        d["frontier_or_activation"] = supported(
+            spec,
+            "frontier_or_activation",
+            "the leftmost innermost f[k] occurrence",
+            law_anchor,
+        )
+        d["schedule"] = supported(
+            spec,
+            "schedule",
+            "reduce the selected occurrence to an explicit value before the enclosing expression",
+            law_anchor,
+        )
+        d["write_replacement_assembly_or_commit"] = supported(
+            spec,
+            "write_replacement_assembly_or_commit",
+            "replace the selected occurrence by its explicit value",
+            law_anchor,
+        )
+        d["successor_cardinality"] = supported(
+            spec,
+            "successor_cardinality",
+            "one selected next reduction when the selected subvalue is defined",
+            law_anchor,
+        )
+        d["determinism_branching_or_measure"] = supported(
+            spec,
+            "determinism_branching_or_measure",
+            "deterministic leftmost-innermost selection",
+            law_anchor,
+        )
+        for field in ("visible_history", "seed"):
+            d[field] = not_applicable(
+                spec, field, identity_anchor, "this evaluation policy has no trajectory seed/history."
+            )
+    else:
+        for field in (
+            "native_time", "complete_state", "visible_history", "control_state",
+            "seed", "frontier_or_activation", "schedule",
+            "write_replacement_assembly_or_commit",
+        ):
+            d[field] = not_applicable(
+                spec,
+                field,
+                identity_anchor,
+                "the captured object is not an intrinsic state-transition process.",
+            )
+        if kind == "RELATION":
+            d["successor_cardinality"] = not_applicable(
+                spec,
+                "successor_cardinality",
+                law_anchor,
+                "the source states a relation/constraint, not a successor function.",
+            )
+            d["determinism_branching_or_measure"] = not_applicable(
+                spec,
+                "determinism_branching_or_measure",
+                law_anchor,
+                "no transition branching or probability measure is intrinsic to this relation.",
+            )
+            d["termination_completion_failure"] = not_applicable(
+                spec,
+                "termination_completion_failure",
+                law_anchor,
+                "the relation is denotational; no evaluation procedure is claimed.",
+            )
+        elif kind == "PRESET":
+            for field in (
+                "successor_cardinality", "determinism_branching_or_measure",
+                "termination_completion_failure",
+            ):
+                d[field] = not_applicable(
+                    spec,
+                    field,
+                    identity_anchor,
+                    "a preset supplies data to another system and has no autonomous successor/evaluation semantics.",
+                )
+        else:
+            d["successor_cardinality"] = supported(
+                spec,
+                "successor_cardinality",
+                "one denoted result/judgment for each complete defined input",
+                law_anchor,
+            )
+            d["determinism_branching_or_measure"] = supported(
+                spec,
+                "determinism_branching_or_measure",
+                "the exact definition is single-valued for complete defined inputs and introduces no probability measure",
+                law_anchor,
+            )
+
+    if kind == "QUERY" and d["witness_semantics"]["status"] == "UNKNOWN_FROM_SOURCE":
+        d["witness_semantics"] = supported(
+            spec,
+            "witness_semantics",
+            f"accepted exactly when the stated predicate/quantified condition holds: {spec['law']}",
+            law_anchor,
+        )
+    elif kind in {"RELATION", "PDE", "ODE"}:
+        d["witness_semantics"] = supported(
+            spec,
+            "witness_semantics",
+            "a witness is a value/function satisfying the exact stated relation",
+            law_anchor,
+        )
+    elif kind == "PRESET":
+        d["witness_semantics"] = supported(
+            spec,
+            "witness_semantics",
+            "the stated data instantiate a separate equation, solver, or comparison",
+            law_anchor,
+        )
+    else:
+        d["witness_semantics"] = supported(
+            spec,
+            "witness_semantics",
+            "the witness is the exact value, next state, generated object, or observation produced by the stated law",
+            law_anchor,
+        )
+
+    # Static object dimensions that genuinely do not apply.
+    if kind not in {"CA", "PDE", "ODE", "SOLVER", "PRESET"}:
+        d["topology"] = not_applicable(
+            spec, "topology", identity_anchor, "no spatial adjacency topology is intrinsic to this candidate."
+        )
+        d["boundary"] = not_applicable(
+            spec, "boundary", identity_anchor, "no spatial boundary condition is intrinsic to this candidate."
+        )
+    elif kind == "SOLVER" and "PDE" not in name and "wave" not in name:
+        d["topology"] = not_applicable(
+            spec, "topology", identity_anchor, "this nonspatial solver has no adjacency topology."
+        )
+        d["boundary"] = not_applicable(
+            spec, "boundary", identity_anchor, "this nonspatial solver has no boundary condition."
+        )
+    elif d["topology"]["status"] == "UNKNOWN_FROM_SOURCE":
+        d["topology"] = unknown(
+            spec,
+            "topology",
+            f"{name}: the sealed Notes evidence does not fix the spatial domain/topology.",
+        )
+    if d["boundary"]["status"] == "UNKNOWN_FROM_SOURCE":
+        d["boundary"] = unknown(
+            spec,
+            "boundary",
+            f"{name}: the sealed Notes evidence does not fix boundary/initial-boundary data.",
+        )
+
+    d["external_data"] = not_applicable(
+        spec,
+        "external_data",
+        identity_anchor,
+        "the candidate is defined from stated mathematical inputs, not an external dataset.",
+    )
+    d["excluded_observers_and_representations"] = supported(
+        spec,
+        "excluded_observers_and_representations",
+        (
+            f"Only {name}'s stated observer/representation law is captured; "
+            "the underlying observed system is not redefined here."
+            if kind in {"OBSERVER", "REPRESENTATION"}
+            else (
+                f"plots, renderings, observers, and implementation comparisons "
+                f"are excluded from {name}'s native identity unless separately captured."
+            )
+        ),
+        identity_anchor,
+    )
+    d["evidence_limit"] = supported(
+        spec,
+        "evidence_limit",
+        (
+            "Explicit source limit: " + " | ".join(spec["missing"])
+            if spec["missing"]
+            else "The record claims only facts attached to the cited sealed Notes anchors; every unstated dimension remains UNKNOWN_FROM_SOURCE."
+        ),
+        identity_anchor,
+    )
+
+    # Apply exact hostile-review missing boundaries before explicit facts.
+    for field, reason in hints.items():
+        d[field] = unknown(spec, field, reason)
+
+    # Candidate-specific facts are authoritative over the conservative base.
+    for field, fact in spec["facts"].items():
+        d[field] = decision(
+            fact["status"],
+            fact["value"],
+            fact["anchors"],
+            fact["reason"]
+            or (
+                f"{name}: the cited anchor directly states "
+                f"{field.replace('_', ' ')} at this scope."
+            ),
+        )
+
+    # The visible case-(b) rule is image-native but defect-limited because the
+    # same extraction cuts off case (c).  Case (a) remains independently fixed
+    # by U005689; A000443 is only a corroborating defect-limited witness there.
+    if name == "case-b binary-length stopping-time map":
+        d["rule_relation_constraint_function_or_probability_law"] = supported(
+            spec,
+            "rule_relation_constraint_function_or_probability_law",
+            "n -> If[EvenQ[n], n/2, (n + 1)/2]",
+            "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg",
+        )
+
+    for field, item in d.items():
+        if item["status"] == "UNKNOWN_FROM_SOURCE":
+            item["value"] = None
+            item["anchors"] = ()
+        elif not item["anchors"]:
+            raise RuntimeError(f"{name}.{field} has {item['status']} without evidence anchors")
+    return d
+
+
 def profile(
     spec: dict[str, Any],
+    decisions: dict[str, dict[str, Any]],
     field_evidence_ids: dict[str, list[str]],
 ) -> tuple[dict[str, str], dict[str, Any]]:
-    kind = spec["kind"]
-    dynamic = kind in {"ITERATION", "CA", "SUBSTITUTION", "SOLVER"}
-    declarative_time = kind in {"PDE", "ODE"}
-    values: dict[str, str | None] = {
-        "object_kind": {
-            "ITERATION": "discrete iterated map or recurrence",
-            "CA": "cellular-automaton transition system",
-            "SUBSTITUTION": "substitution or replacement generator",
-            "SOLVER": "numerical or constructive solver",
-            "FUNCTION": "immutable function or indexed sequence",
-            "QUERY": "decision query or accepted-result predicate",
-            "RELATION": "declarative relation or denoted object",
-            "REPRESENTATION": "encoder, decoder, or representation relation",
-            "GENERATOR": "finite or infinite sequence generator",
-            "OBSERVER": "observer or analyzer function",
-            "CALCULUS": "function-construction calculus",
-            "PDE": "partial differential relation",
-            "ODE": "ordinary differential relation",
-        }[kind],
-        "native_time": (
-            "discrete update steps"
-            if dynamic
-            else "continuous independent variable appears in the relation but is not an update schedule"
-            if declarative_time
-            else None
-        ),
-        "carrier": (
-            "indexed lattice of cell values"
-            if kind == "CA"
-            else "function over continuous coordinates"
-            if kind in {"PDE", "ODE"}
-            else "scalar, finite list, expression, or indexed sequence stated by the law"
-        ),
-        "support": "the domain explicitly stated by the formula or prose definition",
-        "topology": "one-dimensional periodic lattice" if kind == "CA" else None,
-        "structural_invariants": "the printed definition and stated restrictions are preserved",
-        "alphabet_or_value_schema": (
-            "cell-value schema stated by the candidate law"
-            if kind == "CA"
-            else "numeric, symbolic, Boolean, list, or function values as typed by the printed expression"
-        ),
-        "complete_state": (
-            "the entire current lattice configuration"
-            if kind == "CA"
-            else "the current iterate or generated list"
-            if dynamic
-            else "the complete input and denoted output/relation"
-        ),
-        "visible_history": "successive iterates may be retained as a trajectory" if dynamic else None,
-        "control_state": None,
-        "seed": "the stated or caller-supplied initial value/configuration" if dynamic else None,
-        "input": "the printed parameters and input object",
-        "boundary": None,
-        "external_data": None,
-        "frontier_or_activation": "all sites updated synchronously" if kind == "CA" else "the current object to which the law is applied" if dynamic else None,
-        "schedule": "one deterministic synchronous update per step" if dynamic else None,
-        "read_dependencies_or_neighborhood": (
-            "the current site and dependencies named in the printed transition"
-            if kind == "CA"
-            else "the preceding iterate(s) or source object named by the law"
-            if dynamic
-            else "the explicit arguments of the formula or constraint"
-        ),
-        "law_kind": {
-            "PDE": "partial differential constraint",
-            "ODE": "ordinary differential constraint",
-            "QUERY": "predicate or termination/completion query",
-            "RELATION": "declarative relation",
-            "REPRESENTATION": "encoding/decoding relation",
-            "OBSERVER": "observer/analyzer map",
-            "SOLVER": "constructive or numerical update method",
-            "CALCULUS": "function-building operators and evaluation clauses",
-        }.get(kind, "deterministic generation or transition law"),
-        "rule_relation_constraint_function_or_probability_law": spec["law"],
-        "write_replacement_assembly_or_commit": (
-            "simultaneously replace all selected cells"
-            if kind == "CA"
-            else "replace or append according to the printed law"
-            if dynamic
-            else "evaluate or denote without an intrinsic state commit"
-        ),
-        "result_kind": (
-            "trajectory and current state"
-            if dynamic
-            else "solution/model set"
-            if kind in {"PDE", "ODE", "RELATION"}
-            else "Boolean or witness judgment"
-            if kind == "QUERY"
-            else "value, sequence, encoding, or analysis result"
-        ),
-        "successor_cardinality": (
-            "one successor for each fully specified deterministic state"
-            if dynamic and kind != "SUBSTITUTION"
-            else "one generated replacement result"
-            if dynamic
-            else "possibly many satisfying functions"
-            if kind in {"PDE", "ODE"}
-            else "one denoted result for each complete input"
-        ),
-        "determinism_branching_or_measure": (
-            "deterministic where every printed parameter is supplied"
-            if "probabilistic" not in spec["name"]
-            else "probabilistic rule choice; measure is not stated in this range"
-        ),
-        "termination_completion_failure": (
-            "iterate for a requested count or until the stated predicate; divergence may be meaningful"
-            if dynamic or kind == "QUERY"
-            else "evaluation succeeds when the printed domain and relation are defined"
-        ),
-        "witness_semantics": (
-            "accepted when the printed predicate is true or its stated witness exists"
-            if kind == "QUERY"
-            else "the value, sequence, model, or trajectory produced by the printed law"
-        ),
-        "parameters_and_variants": (
-            "; ".join(spec["params"] + spec["variants"])
-            if spec["params"] or spec["variants"]
-            else "no additional parameter or variant is stated"
-        ),
-        "excluded_observers_and_representations": "plots, digit renderings, asymptotic comments, and historical applications are not part of the native law unless separately captured",
-        "evidence_limit": (
-            "; ".join(spec["missing"])
-            if spec["missing"]
-            else "the cited in-scope evidence fixes the stated candidate law at its printed scope"
-        ),
-    }
-    values.update(spec["overrides"])
-    not_applicable = set(N_A)
-    if dynamic:
-        not_applicable -= {"native_time", "visible_history", "seed", "frontier_or_activation", "schedule"}
-    if declarative_time:
-        not_applicable -= {"native_time"}
-    if kind == "CA":
-        not_applicable -= {"topology", "boundary"}
-    if kind == "SOLVER":
-        not_applicable -= {"boundary"}
-    if "boundary" in spec["overrides"]:
-        not_applicable.discard("boundary")
-
     support: dict[str, str] = {}
     fingerprint: dict[str, Any] = {}
     for field in FIELDS:
-        if field in not_applicable and values.get(field) is None:
-            status = "NOT_APPLICABLE"
-            value = None
-            reason = "This dimension is not intrinsic to the printed object."
-        else:
-            status = "SUPPORTED"
-            value = values.get(field) or "not separately parameterized by the printed law"
-            reason = "Supported by the cited canonical Notes evidence at the candidate's printed scope."
-        support[field] = status
+        item = decisions[field]
+        evidence_ids = field_evidence_ids[field]
+        if item["status"] == "UNKNOWN_FROM_SOURCE" and evidence_ids:
+            raise RuntimeError(f"{spec['name']}.{field} has evidence despite UNKNOWN status")
+        if item["status"] != "UNKNOWN_FROM_SOURCE" and not evidence_ids:
+            raise RuntimeError(f"{spec['name']}.{field} lacks its declared evidence")
+        support[field] = item["status"]
         fingerprint[field] = {
-            "status": status,
-            "value": value,
-            "evidence_ids": field_evidence_ids[field],
-            "reason": reason,
+            "status": item["status"],
+            "value": item["value"],
+            "evidence_ids": evidence_ids,
+            "reason": item["reason"],
         }
     return support, fingerprint
 

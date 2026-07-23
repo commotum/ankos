@@ -2671,6 +2671,58 @@ continuous_ca_family = source_candidate(
     strength="DIRECT_COMPLETE_MECHANICS",
     route_keys=["totalistic-prior-chapter"],
 )
+continuous_ca_family["evidence"][0]["fields"] = [
+    "object_kind",
+    "native_time",
+    "alphabet_or_value_schema",
+    "law_kind",
+    "parameters_and_variants",
+    "excluded_observers_and_representations",
+    *EVOLUTION_NA,
+]
+continuous_ca_family["evidence"][0]["strength"] = "DIRECT_IDENTITY"
+continuous_ca_family["evidence"][0]["claim"] = (
+    "The passage introduces continuous-gray cellular automata and says their "
+    "rules combine totalistic cellular automata with the preceding iterated maps."
+)
+context_evidence(
+    continuous_ca_family,
+    "continuous-ca-family-mechanics",
+    "U000866",
+    "The next paragraph states the three-cell average, fixed scalar mapping, parallel next-step interpretation, and single-black-cell example.",
+    fields=[
+        "carrier",
+        "support",
+        "topology",
+        "structural_invariants",
+        "complete_state",
+        "visible_history",
+        "seed",
+        "input",
+        "boundary",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "termination_completion_failure",
+        "witness_semantics",
+        "evidence_limit",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    continuous_ca_family,
+    "continuous-ca-family-native-panel",
+    "U000867",
+    "The original-resolution panel shows the stated one-black-cell history under the average-neighborhood rule.",
+    image_path="CHAPTERS/_page_171_Picture_5.jpeg",
+    fields=["visible_history", "seed", "result_kind"],
+    strength="CORROBORATING",
+)
 
 continuous_single_black = source_candidate(
     "continuous-ca-single-black-seed",
@@ -2716,6 +2768,15 @@ average_ca = source_candidate(
 )
 context_evidence(
     average_ca,
+    "continuous-average-native-panel",
+    "U000867",
+    "The original-resolution panel shows the average rule's trajectory from one black cell.",
+    image_path="CHAPTERS/_page_171_Picture_5.jpeg",
+    fields=["visible_history", "seed", "result_kind"],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    average_ca,
     "continuous-average-table",
     "U000868",
     "The table gives exact early rows and corroborates simultaneous three-cell averaging.",
@@ -2739,6 +2800,26 @@ fractional_three_half_ca = source_candidate(
     strength="DIRECT_COMPLETE_MECHANICS",
     route_keys=["iterated-map-a-page150"],
 )
+fractional_three_half_ca["evidence"][0]["fields"] = [
+    field
+    for field in fractional_three_half_ca["evidence"][0]["fields"]
+    if field
+    not in {
+        "object_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    }
+]
+fractional_three_half_ca["evidence"][0]["strength"] = "DIRECT_PARTIAL_MECHANICS"
+context_evidence(
+    fractional_three_half_ca,
+    "continuous-three-half-native-panel",
+    "U000871",
+    "The original-resolution panel shows the fractional three-halves rule's trajectory from one black cell.",
+    image_path="CHAPTERS/_page_172_Picture_1.jpeg",
+    fields=["visible_history", "seed", "result_kind"],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
 context_evidence(
     fractional_three_half_ca,
     "continuous-three-half-table",
@@ -2747,6 +2828,22 @@ context_evidence(
     fields=["visible_history"],
     strength="CORROBORATING",
     modality="TABLE",
+)
+context_evidence(
+    fractional_three_half_ca,
+    "continuous-three-half-caption",
+    "U000873",
+    "The caption states the exact rule FractionalPart[(3/2) average], the one-black-cell seed, and its relation to iterated map (a).",
+    fields=[
+        "object_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+        "seed",
+        "read_dependencies_or_neighborhood",
+        "result_kind",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CAPTION",
 )
 
 ADDITIVE_CONTINUOUS_CA = continuous_ca_rule_facts(
@@ -2763,6 +2860,69 @@ additive_ca_family = source_candidate(
     missing="The off-picture boundary condition and numerical precision convention are not stated.",
     claim="The passage directly defines adding a fixed constant to the local average and taking the fractional part.",
     strength="DIRECT_COMPLETE_MECHANICS",
+)
+additive_ca_family["evidence"][0]["fields"] = [
+    field
+    for field in additive_ca_family["evidence"][0]["fields"]
+    if field != "parameters_and_variants"
+]
+context_evidence(
+    additive_ca_family,
+    "additive-ca-quarter-formula",
+    "U000879",
+    "The displayed formula prints FractionalPart[x+1/4] for the scalar postprocessing map.",
+    fields=["rule_relation_constraint_function_or_probability_law"],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
+)
+context_evidence(
+    additive_ca_family,
+    "additive-ca-quarter-caption",
+    "U000880",
+    "The caption restates adding 1/4 to the three-cell average and taking the fractional part.",
+    fields=[
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CAPTION",
+)
+context_evidence(
+    additive_ca_family,
+    "additive-ca-family-variation",
+    "U000883",
+    "The caption identifies one shared rule family whose added constant varies across the displayed runs.",
+    fields=["parameters_and_variants"],
+    strength="DIRECT_IDENTITY",
+    modality="CAPTION",
+)
+context_evidence(
+    additive_ca_family,
+    "additive-ca-quarter-native-panel",
+    "U000878",
+    "The original-resolution panel shows the c=1/4 cellular-automaton trajectory.",
+    image_path="CHAPTERS/_page_173_Picture_4.jpeg",
+    fields=["visible_history"],
+    strength="CORROBORATING",
+)
+context_evidence(
+    additive_ca_family,
+    "additive-ca-survey-one-control",
+    "U000884",
+    "The first survey controls the additive constant while retaining the shared rule family.",
+    image_path="CHAPTERS/_page_174_Picture_2.jpeg",
+    fields=["parameters_and_variants"],
+    strength="CORROBORATING",
+)
+context_evidence(
+    additive_ca_family,
+    "additive-ca-survey-two-control",
+    "U000885",
+    "The second survey continues control of the additive constant and includes longer histories.",
+    image_path="CHAPTERS/_page_175_Figure_2.jpeg",
+    fields=["parameters_and_variants", "visible_history"],
+    strength="CORROBORATING",
 )
 
 SURVEY_ONE = "CHAPTERS/_page_174_Picture_2.jpeg"
@@ -2810,6 +2970,17 @@ for c in [*first_constants, *second_only_constants]:
     facts["parameters_and_variants"] = (
         f"The additive constant is fixed at c={c}; the displayed seed is one black cell."
     )
+    if c == "0":
+        facts["rule_relation_constraint_function_or_probability_law"] = (
+            "Let a=(left+self+right)/3; set the new value to "
+            "FractionalPart[a+0]. In particular, input a=1 maps to 0, unlike "
+            "the pure-average rule, which leaves 1 unchanged."
+        )
+        facts["evidence_limit"] = (
+            "The c=0 preset is the fractional-part map, not the pure-average "
+            "rule: their endpoint behavior differs at a=1. The off-picture "
+            "boundary and numerical precision convention are unstated."
+        )
     key = f"continuous-ca-add-{constant_key(c)}"
     if c == "0.25":
         spec = source_candidate(
@@ -2824,6 +2995,38 @@ for c in [*first_constants, *second_only_constants]:
         )
         context_evidence(
             spec,
+            f"{key}-formula",
+            "U000879",
+            "The displayed formula prints FractionalPart[x+1/4].",
+            fields=["rule_relation_constraint_function_or_probability_law"],
+            strength="DIRECT_COMPLETE_MECHANICS",
+            modality="FORMULA",
+        )
+        context_evidence(
+            spec,
+            f"{key}-caption",
+            "U000880",
+            "The caption identifies the cellular-automaton preset, c=1/4 mechanics, and complex trajectory.",
+            fields=[
+                "object_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+                "visible_history",
+            ],
+            strength="DIRECT_COMPLETE_MECHANICS",
+            modality="CAPTION",
+        )
+        context_evidence(
+            spec,
+            f"{key}-native-panel",
+            "U000878",
+            "The original-resolution native panel shows the c=1/4 trajectory.",
+            image_path="CHAPTERS/_page_173_Picture_4.jpeg",
+            fields=["visible_history", "parameters_and_variants"],
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+        context_evidence(
+            spec,
             f"{key}-survey-one",
             "U000884",
             "Original-resolution inspection confirms the c=0.25 trajectory in the family survey.",
@@ -2835,7 +3038,7 @@ for c in [*first_constants, *second_only_constants]:
         spec = candidate(
             key,
             f"additive continuous-CA preset c={c}",
-            "U000883",
+            "U000875",
             facts,
             not_applicable=EVOLUTION_NA,
             missing="The off-picture boundary condition and numerical precision convention are not stated.",
@@ -2843,12 +3046,29 @@ for c in [*first_constants, *second_only_constants]:
         evidence(
             spec,
             f"{key}-family-anchor",
-            "U000883",
+            "U000875",
             (
-                "The caption delimits the displayed different-constant runs "
-                "as presets of one shared additive-constant rule family."
+                "The c=1/4 example establishes the shared three-cell-average, "
+                "add-constant, fractional-part law later varied by preset."
             ),
-            [],
+            [
+                field
+                for field in [*facts, *EVOLUTION_NA]
+                if field
+                not in {
+                    "object_kind",
+                    "visible_history",
+                    "parameters_and_variants",
+                }
+            ],
+            strength="DIRECT_COMPLETE_MECHANICS",
+        )
+        context_evidence(
+            spec,
+            f"{key}-family-variation",
+            "U000883",
+            "The caption delimits the displayed runs as presets of one shared rule family with different constants.",
+            fields=["object_kind", "parameters_and_variants"],
             strength="DIRECT_IDENTITY",
             modality="CAPTION",
         )
@@ -2860,10 +3080,10 @@ for c in [*first_constants, *second_only_constants]:
             panel_unit,
             (
                 f"Original-resolution inspection identifies c={c} as one "
-                "preset of the captioned additive-constant family."
+                "control-labelled preset and shows its output history."
             ),
-            list(facts) + list(EVOLUTION_NA),
-            strength="DIRECT_COMPLETE_MECHANICS",
+            ["object_kind", "parameters_and_variants", "visible_history"],
+            strength="DIRECT_IDENTITY",
             modality="IMAGE",
             image_path=panel,
         )
@@ -2921,44 +3141,93 @@ context_evidence(
 # Partial differential equations, initial data, symbolic sampling, and solver.
 
 PDE_FAMILY = {
-    "object_kind": "A continuous space-time evolution relation specified by a partial differential equation.",
+    "object_kind": "A family of continuous space-time field relations specified by partial differential equations.",
     "native_time": "Continuous time.",
     "carrier": "A field u[t,x] with continuous time t and continuous position x.",
     "support": "A continuous one-dimensional spatial domain across continuous time.",
-    "topology": "Local spatial derivatives relate values in infinitesimally nearby positions.",
-    "structural_invariants": "The field domain and stated differential relation persist while a classical solution exists.",
+    "topology": "Spatial derivatives relate field values through infinitesimal positional change.",
+    "structural_invariants": "The stated differential formula is the relation to be satisfied throughout its intended domain.",
     "alphabet_or_value_schema": "Real-valued field values and their time/space derivatives.",
-    "complete_state": "Enough field data at one time to satisfy the equation's time order, together with boundary conditions.",
-    "visible_history": "A solution field u[t,x] over a time interval.",
-    "seed": "Initial field data, and initial time derivative for second-order equations.",
-    "input": "The current field and derivatives required by the equation.",
-    "boundary": "Spatial boundary/asymptotic conditions are required in general but not stated for the displayed computations.",
-    "frontier_or_activation": "Every space-time point in the solution domain is constrained by the differential relation.",
-    "schedule": "No discrete native schedule; the relation holds continuously in time.",
-    "read_dependencies_or_neighborhood": "The local field value and the spatial derivatives appearing in the equation.",
-    "law_kind": "A deterministic partial differential relation where a well-posed solution exists.",
+    "input": "A candidate field and the field values or derivatives named in a particular equation.",
+    "read_dependencies_or_neighborhood": "The local field value and spatial-change rates named by a particular equation.",
+    "law_kind": "A partial differential relation.",
     "rule_relation_constraint_function_or_probability_law": "Specify the rate of time change by a formula involving the field and its spatial change rates.",
-    "write_replacement_assembly_or_commit": "No discrete commit; a valid solution jointly satisfies the differential relation at every point.",
-    "result_kind": "A field u[t,x] satisfying the equation and supplied initial/boundary data.",
-    "successor_cardinality": "Intended to determine one future solution for well-posed data; the source notes many sampled equations become singular or cease determining future behavior.",
-    "determinism_branching_or_measure": "Deterministic as a relation when well posed; no probability is native.",
-    "termination_completion_failure": "Evolution fails when values become infinite or vary infinitely quickly so the equation no longer determines future behavior.",
-    "witness_semantics": "A valid field has the stated derivatives and satisfies the equation plus initial/boundary data.",
-    "parameters_and_variants": "The differential formula, derivative orders, coefficients, and initial/boundary data vary.",
+    "result_kind": "A field relation whose satisfying fields are possible solutions once suitable data and semantics are supplied.",
+    "termination_completion_failure": "For many randomly chosen PDEs, infinite values or infinitely rapid variation can make the original equation cease to determine future behavior.",
+    "witness_semantics": "A candidate solution must satisfy the stated differential relation.",
+    "parameters_and_variants": "The symbolic differential formula and its component choices vary.",
     "excluded_observers_and_representations": "Gray plots, mesh surfaces, and numerical approximations represent candidate solutions.",
-    "evidence_limit": "The main text does not state spatial boundary conditions or the numerical solver used for its figures.",
+    "evidence_limit": "The family discussion does not state a general solution class, boundary conditions, well-posedness criterion, or numerical solver.",
 }
-pde_family = source_candidate(
+PDE_RELATION_NA = {
+    "control_state": "No independent discrete control register is part of the stated field relation.",
+    "external_data": "No external stream is part of the stated field relation.",
+    "frontier_or_activation": "A continuous differential relation has no stated discrete firing frontier.",
+    "schedule": "A continuous differential relation has no stated discrete update schedule.",
+    "write_replacement_assembly_or_commit": "The source states a continuous relation, not a discrete write/commit operation.",
+}
+pde_family = candidate(
     "pde-family",
     "partial-differential-equation evolution relation",
     "U000891",
     PDE_FAMILY,
-    not_applicable={
-        "control_state": "No independent discrete control register is part of the continuous field relation.",
-        "external_data": "After equation and data are supplied, no external stream is part of the relation.",
-    },
+    not_applicable=PDE_RELATION_NA,
     missing="Spatial boundary conditions, solution regularity class, and numerical realization are not specified.",
-    claim="The passage defines PDE rules as continuous time-change rates depending on field values and spatial change rates.",
+    unknown_reasons={
+        "complete_state": "The family passage does not specify what data constitute a complete state for arbitrary PDE order.",
+        "visible_history": "Solution pictures occur later, but the family relation does not define a native history representation.",
+        "seed": "No general initial-data schema is stated for the family; the displayed Gaussian data are a separate candidate.",
+        "boundary": "Spatial boundary or asymptotic conditions are not stated.",
+        "successor_cardinality": "No general existence or uniqueness claim is supplied.",
+        "determinism_branching_or_measure": "No general well-posedness or uniqueness semantics are supplied.",
+    },
+)
+evidence(
+    pde_family,
+    "pde-family-definition",
+    "U000891",
+    "The passage defines PDE rules as formulas for continuous time-change rates depending on field values and spatial change rates.",
+    [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "topology",
+        "structural_invariants",
+        "alphabet_or_value_schema",
+        "input",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "witness_semantics",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+        *PDE_RELATION_NA,
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    pde_family,
+    "pde-derivative-notation",
+    "U000912",
+    "The caption defines the displayed time and space derivative notation and identifies u as gray level.",
+    fields=[
+        "carrier",
+        "support",
+        "topology",
+        "alphabet_or_value_schema",
+        "read_dependencies_or_neighborhood",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CAPTION",
+)
+context_evidence(
+    pde_family,
+    "pde-family-general-failure",
+    "U000915",
+    "The prose states only a family-level failure mode: many sampled PDEs cease determining future behavior after blow-up or infinitely rapid variation.",
+    fields=["termination_completion_failure", "evidence_limit"],
     strength="DIRECT_PARTIAL_MECHANICS",
 )
 
@@ -2972,34 +3241,55 @@ def pde_candidate(
     *,
     route_keys: list[str] | None = None,
 ) -> CandidateSpec:
-    facts = deepcopy(PDE_FAMILY)
-    facts["object_kind"] = name
-    facts["rule_relation_constraint_function_or_probability_law"] = equation
-    facts["complete_state"] = (
-        "The field u at one time plus its first time derivative."
-        if time_order == "second"
-        else "The field u at one time."
+    time_derivative = (
+        "second time derivative" if time_order == "second" else "first time derivative"
     )
-    facts["read_dependencies_or_neighborhood"] = (
-        "The local field u and its second spatial derivative u_xx."
-        + (" The second time derivative is constrained." if time_order == "second" else "")
-    )
-    facts["parameters_and_variants"] = f"The equation is fixed as {equation}"
-    return source_candidate(
+    facts = {
+        "object_kind": f"{name}, stated as a partial differential relation.",
+        "native_time": "Continuous time t as represented by the displayed time derivative.",
+        "carrier": "A scalar field u[t,x].",
+        "support": "Continuous time t and one spatial coordinate x.",
+        "topology": "The equation uses the second spatial derivative u_xx.",
+        "alphabet_or_value_schema": "Field values and their displayed derivatives.",
+        "input": f"A candidate field u[t,x] with the displayed {time_derivative} and spatial derivatives.",
+        "read_dependencies_or_neighborhood": "The field terms and derivatives explicitly printed in the equation.",
+        "law_kind": "A stated partial differential relation, not a numerical solver.",
+        "rule_relation_constraint_function_or_probability_law": equation,
+        "result_kind": "Fields satisfying the displayed equation once adequate data and solution semantics are supplied.",
+        "witness_semantics": "A candidate field witnesses the relation by satisfying the displayed derivative equality.",
+        "parameters_and_variants": f"This candidate records exactly the displayed equation {equation}",
+        "excluded_observers_and_representations": "The adjacent gray plot and mesh are representations of a computed solution, not the equation or solver.",
+        "evidence_limit": "The formula does not state boundary/asymptotic data, a solution class, existence or uniqueness, or a numerical method.",
+    }
+    spec = candidate(
         key,
         name,
         anchor,
         facts,
-        not_applicable={
-            "control_state": "No independent discrete control register is part of the continuous field relation.",
-            "external_data": "After equation and data are supplied, no external stream is part of the relation.",
-        },
+        not_applicable=PDE_RELATION_NA,
         missing="Spatial boundary/asymptotic conditions and the numerical solution method are not stated.",
-        claim=f"The source explicitly prints the equation {equation}",
-        strength="DIRECT_COMPLETE_MECHANICS",
-        modality="FORMULA",
         route_keys=route_keys,
+        unknown_reasons={
+            "structural_invariants": "The displayed formula does not state an invariant or solution regularity class.",
+            "complete_state": "The displayed formula alone does not state the complete initial/boundary data required for this equation.",
+            "visible_history": "The equation does not define a native visualization or stored history.",
+            "seed": "The formula does not itself state initial data; the displayed Gaussian data are a separate candidate.",
+            "boundary": "No spatial boundary or asymptotic conditions are stated.",
+            "successor_cardinality": "The source does not establish existence or uniqueness of solutions for the stated data.",
+            "determinism_branching_or_measure": "The source does not provide well-posedness or uniqueness semantics.",
+            "termination_completion_failure": "No equation-specific completion or failure semantics are stated; the later failure discussion applies only to the sampled PDE family in general.",
+        },
     )
+    evidence(
+        spec,
+        f"{key}-formula",
+        anchor,
+        f"The source explicitly prints the equation {equation}",
+        [*facts, *PDE_RELATION_NA],
+        strength="DIRECT_PARTIAL_MECHANICS",
+        modality="FORMULA",
+    )
+    return spec
 
 
 diffusion_pde = pde_candidate(
@@ -3064,19 +3354,19 @@ pde_sampler = source_candidate(
     "U000914",
     declarative_facts(
         kind="A scheme for sampling PDEs by representing formulas as symbolic expressions over discrete component sets.",
-        carrier="Symbolic expression trees.",
-        support="Finite formula positions.",
-        alphabet="A discrete selected set of expression components.",
-        state="One generated symbolic formula.",
-        input_value="A discrete component vocabulary and an unstated expression-generation scheme.",
-        law_kind="A discrete formula-generation/sampling procedure.",
-        law="Represent candidate PDE right-hand sides as symbolic expressions assembled from discrete sets of possible components.",
+        carrier="Symbolic mathematical expressions.",
+        support="The source does not delimit expression size or structure.",
+        alphabet="Discrete sets of possible expression components, whose vocabulary is not listed.",
+        state="The source does not define an operational sampler state.",
+        input_value="The source does not state a concrete component vocabulary or generation procedure.",
+        law_kind="A qualitative symbolic-formula sampling principle.",
+        law="Represent possible PDE formulas as symbolic expressions built from discrete sets of possible components.",
         result="A sampled candidate PDE formula.",
-        successor="Many possible formulas under an unspecified enumeration or measure.",
-        determinism="Enumeration/measure is not specified.",
-        termination="Finite expressions can be generated; no size bound or stopping distribution is supplied.",
-        witness="A generated expression uses only admitted discrete components.",
-        variants="Component vocabulary, expression size, and sampling distribution vary.",
+        successor="The source does not specify an enumeration or probability law over expressions.",
+        determinism="No enumeration or probability measure is specified.",
+        termination="No expression-size control or stopping law is supplied.",
+        witness="No formal grammar is supplied against which a sampled expression could be checked.",
+        variants="The component vocabulary, expression size, and sampling distribution are not stated.",
         excluded="Subsequent solution behavior is not part of formula sampling.",
         limit="The grammar, component set, size control, and sampling distribution are omitted.",
     ),
@@ -3086,6 +3376,19 @@ pde_sampler = source_candidate(
     strength="DIRECT_PARTIAL_MECHANICS",
     uncertainties=["The source gives only the sampling principle, not a reproducible sampler."],
 )
+mark_unknown(
+    pde_sampler,
+    {
+        "support": "The source does not delimit expression size or syntactic structure.",
+        "complete_state": "No operational sampler state is specified.",
+        "input": "No concrete component vocabulary or generator input schema is supplied.",
+        "successor_cardinality": "No enumeration or measure over possible expressions is specified.",
+        "determinism_branching_or_measure": "No enumeration order or probability measure is specified.",
+        "termination_completion_failure": "No size control, stopping law, completion condition, or failure behavior is supplied.",
+        "witness_semantics": "Without a formal grammar or component list, no exact membership witness is defined.",
+        "parameters_and_variants": "The grammar, vocabulary, size controls, and sampling parameters are all omitted.",
+    },
+)
 
 pde_numerical_scheme = source_candidate(
     "pde-numerical-scheme",
@@ -3093,26 +3396,13 @@ pde_numerical_scheme = source_candidate(
     "U000936",
     {
         "object_kind": "The numerical approximation procedure used to compute the displayed PDE solution.",
-        "native_time": "The source does not state whether numerical time is stepped discretely or handled otherwise.",
-        "carrier": "A numerical representation of the continuous field u[t,x].",
-        "support": "A spatial/time discretization that is not identified.",
-        "alphabet_or_value_schema": "Finite numerical approximations to field values.",
-        "complete_state": "The solver state is not specified.",
         "input": "One PDE and its initial data.",
         "law_kind": "An unnamed numerical approximation algorithm.",
         "result_kind": "The computed approximate field shown in the figures.",
-        "successor_cardinality": "Unknown because solver mechanics and stability choices are omitted.",
-        "determinism_branching_or_measure": "Unknown from source.",
-        "termination_completion_failure": "Unknown; the source only warns that details can depend on the scheme.",
-        "witness_semantics": "No convergence or error certificate is supplied.",
-        "parameters_and_variants": "Grid/stencil, spatial step, time step, integrator, precision, and boundary handling are all unstated.",
         "excluded_observers_and_representations": "The grayscale solution panel is the solver output representation.",
-        "evidence_limit": "Only the existence and consequence of a numerical approximation scheme are stated.",
+        "evidence_limit": "Only the existence and visible consequence of a numerical approximation scheme are stated; all mechanics and validation criteria are absent.",
     },
-    not_applicable={
-        "seed": "The PDE initial data are solver input, not a separately stated random or constructive solver seed.",
-        "external_data": "No external data stream is stated.",
-    },
+    not_applicable={},
     missing=(
         "The stencil, grid, space/time step sizes, integrator, precision, "
         "boundary treatment, stability condition, and convergence/error checks are all missing."
@@ -3120,6 +3410,31 @@ pde_numerical_scheme = source_candidate(
     claim="The caption explicitly identifies a numerical approximation scheme as affecting computed details, but supplies none of its mechanics.",
     strength="DIRECT_IDENTITY",
     uncertainties=["The unnamed solver is construction-bearing but cannot be reproduced from the assigned source."],
+    unknown_reasons={
+        field: (
+            "The source identifies an unspecified numerical approximation "
+            f"scheme but does not state {field.replace('_', ' ')}."
+        )
+        for field in FINGERPRINT_FIELDS
+        if field
+        not in {
+            "object_kind",
+            "input",
+            "law_kind",
+            "result_kind",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        }
+    },
+)
+context_evidence(
+    pde_numerical_scheme,
+    "pde-solver-sensitive-panel",
+    "U000934",
+    "The final original-resolution solution panel is the one whose details the caption says are sensitive to the numerical approximation scheme.",
+    image_path="CHAPTERS/_page_181_Picture_6.jpeg",
+    fields=["result_kind", "excluded_observers_and_representations", "evidence_limit"],
+    strength="CORROBORATING",
 )
 
 
