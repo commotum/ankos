@@ -52,7 +52,7 @@ EXPECTED_SPEC_COUNTS = {"incoming": 23, "within": 15}
 EXPECTED_UPDATE_COUNT = 38
 EXPECTED_UNTOUCHED_CROSS_RANGE_COUNT = 9
 EXPECTED_SPEC_SHA256 = (
-    "83e833b9794c576a5c793796d362787534ea1d8a6d903c279f981f8726cc075a"
+    "7283078243ce21bf6a7c34f763b6fddc2421c8cd2132b9b0d63c5fc189d241c9"
 )
 UNIT_ID = re.compile(r"^U[0-9]{6}$")
 ASSET_ID = re.compile(r"^A[0-9]{6}$")
@@ -228,7 +228,7 @@ ROUTE_SPECS = (
         "",
         "PAGE",
         "sequences based on numbers discussed on page 908",
-        "Ulam’s non-cellular one-dimensional number-sequence construction",
+        "Ulam's non-cellular one-dimensional number-sequence construction",
         "U005796 U005797 U005798 U005799",
         "A000461",
         (

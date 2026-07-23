@@ -355,14 +355,278 @@ amend_spec(
     "Gray-code ordering generator",
     uids=["U005647", "U005648", "U005649"],
     facts={
+        "complete_state": FF(
+            "the complete accumulated Gray-code ordering list",
+            "U005648",
+        ),
+        "visible_history": FF(
+            "each Nest state is the accumulated ordering list; the prior list "
+            "remains as the first half of the next list",
+            "U005648",
+        ),
+        "seed": FF("{0}", "U005648"),
+        "frontier_or_activation": FF(
+            "the complete current ordering list is reflected and extended",
+            "U005648",
+        ),
+        "schedule": FF(
+            "each of the m Nest generations reflects the current list, adds "
+            "its length to that reflection, and appends it",
+            "U005648",
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "the current complete list and its length",
+            "U005648",
+        ),
         "rule_relation_constraint_function_or_probability_law": FF(
             "GrayCode[m_] := Nest[Join[#, Length[#] + Reverse[#]] &, {0}, m]; "
             "the element at position i is BitXor[i, Floor[i/2]]",
             ("U005648", "U005649"),
         ),
+        "write_replacement_assembly_or_commit": FF(
+            "Join retains the current list and appends Length[list] + "
+            "Reverse[list] as the new half",
+            "U005648",
+        ),
         "termination_completion_failure": FF(
             "For a supplied nonnegative digit count m, the printed Nest performs exactly m generations.",
             "U005648",
+        ),
+    },
+)
+
+amend_spec(
+    "continued-fraction-derived substitution generator",
+    uids=["U005682", "U005683", "U005684", "U005685", "U005681"],
+    law=(
+        "rules = Map[({0 -> Join[#, {1}], "
+        "1 -> Join[#, {1, 0}]} &)[Table[0, {# - 1}]] &, "
+        "Reverse[Rest[ContinuedFraction[h, m]]]]; "
+        "Floor[h] + Fold[Flatten[#1 /. #2] &, {0}, rules]"
+    ),
+    facts={
+        "complete_state": FF(
+            "the current 0/1 word together with the remaining generated rule list",
+            ("U005682", "U005684"),
+        ),
+        "visible_history": FF(
+            None,
+            "U005684",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed Fold returns the final accumulated word; it does "
+                "not return the preceding replacement generations."
+            ),
+        ),
+        "seed": FF("{0}", "U005684"),
+        "frontier_or_activation": FF(
+            "at each Fold stage, every 0 or 1 occurrence in the current word "
+            "is eligible for the current generated replacement rule",
+            ("U005682", "U005684"),
+        ),
+        "schedule": FF(
+            "Fold applies the generated rule list sequentially in its listed order",
+            ("U005682", "U005684"),
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "ContinuedFraction[h,m] generates the ordered rule list; each "
+            "Fold stage reads the current word and the next rule",
+            ("U005682", "U005684"),
+        ),
+        "rule_relation_constraint_function_or_probability_law": FF(
+            "rules = Map[({0 -> Join[#, {1}], "
+            "1 -> Join[#, {1, 0}]} &)[Table[0, {# - 1}]] &, "
+            "Reverse[Rest[ContinuedFraction[h, m]]]]; "
+            "Floor[h] + Fold[Flatten[#1 /. #2] &, {0}, rules]",
+            ("U005682", "U005684"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "each stage computes Flatten[current /. rule]; after all rules, "
+            "Floor[h] is added to the assembled digit list",
+            ("U005682", "U005684"),
+        ),
+        "termination_completion_failure": FF(
+            "the finite generated rule list is exhausted by Fold; for "
+            "quadratic h the source also states that the rule repertoire is finite",
+            ("U005682", "U005684", "U005685"),
+        ),
+    },
+)
+
+amend_spec(
+    "parity-trace initial-condition reconstructor",
+    law=(
+        "IntegerDigits[First[Fold[{Mod[If[OddQ[#2], "
+        "2 First[#1] - 1, 2 First[#1] "
+        "PowerMod[5, -1, Last[#1]]], Last[#1]], "
+        "2 Last[#1]} &, {0, 2}, Reverse[list]]], 2, Length[list]]"
+    ),
+    law_uid="U005700",
+)
+
+amend_spec(
+    "page-131 sequence (d)",
+    law=(
+        "f[n_] := (n + g[IntegerDigits[n, 2]])/2; "
+        "g[{(1)..}] = 1; g[{1, (0)..}] = 0; "
+        "g[{1, s__}] := 1 + "
+        "g[IntegerDigits[FromDigits[{s}, 2] + 1, 2]]"
+    ),
+    facts={
+        "read_dependencies_or_neighborhood": FF(
+            "f reads n and the recursive helper g; g distinguishes an all-1 "
+            "list, a 1 followed only by 0s, and a remaining suffix s",
+            ("U005746", "U005747"),
+        ),
+        "rule_relation_constraint_function_or_probability_law": FF(
+            "f[n_] := (n + g[IntegerDigits[n, 2]])/2; "
+            "g[{(1)..}] = 1; g[{1, (0)..}] = 0; "
+            "g[{1, s__}] := 1 + "
+            "g[IntegerDigits[FromDigits[{s}, 2] + 1, 2]]",
+            ("U005746", "U005747"),
+        ),
+    },
+)
+
+amend_spec(
+    "page-131 sequence (c) hump generator",
+    law=(
+        "hump formulation: FoldList[Plus, 0, Flatten["
+        "Nest[Delete[NestList[Rest, #, Length[#] - 1], 2] &, "
+        "Append[Table[1, {m}], 0], m]] - 1/2]; "
+        "reordered-digit formulation: FoldList[Plus, 1, "
+        "Map[Last[Last[#]] &, Sort[Table["
+        "({Length[#], Apply[Plus, #], 1 - #} &)[IntegerDigits[i, 2]], "
+        "{i, 2^m}]]]]"
+    ),
+    facts={
+        "complete_state": FF(
+            "for each formulation, the current cumulative sum and the "
+            "remaining finite ordered increment list",
+            ("U005754", "U005756"),
+        ),
+        "visible_history": FF(
+            "each FoldList returns the complete accumulated list of partial "
+            "sums, including its initial 0 or 1",
+            ("U005754", "U005756"),
+        ),
+        "seed": FF(
+            "the hump FoldList starts from 0; the reordered-base-2 FoldList "
+            "starts from 1",
+            ("U005754", "U005756"),
+        ),
+        "frontier_or_activation": FF(
+            "the next increment in the selected formulation's finite ordered list",
+            ("U005754", "U005756"),
+        ),
+        "schedule": FF(
+            "FoldList consumes the selected finite increment list from left to right",
+            ("U005754", "U005756"),
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "the current cumulative sum and next increment produced either "
+            "by the nested hump list or by the sorted base-2 digit tuples",
+            ("U005754", "U005756"),
+        ),
+        "rule_relation_constraint_function_or_probability_law": FF(
+            "hump formulation: FoldList[Plus, 0, Flatten["
+            "Nest[Delete[NestList[Rest, #, Length[#] - 1], 2] &, "
+            "Append[Table[1, {m}], 0], m]] - 1/2]; "
+            "reordered-digit formulation: FoldList[Plus, 1, "
+            "Map[Last[Last[#]] &, Sort[Table["
+            "({Length[#], Apply[Plus, #], 1 - #} &)[IntegerDigits[i, 2]], "
+            "{i, 2^m}]]]]",
+            ("U005754", "U005756"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "each Plus update appends its new cumulative sum to the visible "
+            "list returned by FoldList",
+            ("U005754", "U005756"),
+        ),
+        "result_kind": FF(
+            "the accumulated visible hump list, or the alternative list of "
+            "the first 2^m sequence elements",
+            ("U005754", "U005756"),
+        ),
+        "termination_completion_failure": FF(
+            "both printed formulations consume finite lists determined by m; "
+            "the second returns the first 2^m elements",
+            ("U005754", "U005756"),
+        ),
+        "parameters_and_variants": FF(
+            "parameter m; variants: nested hump FoldList and reordered-base-2 "
+            "digit FoldList",
+            ("U005754", "U005756"),
+        ),
+    },
+)
+
+amend_spec(
+    "arithmetic-geometric-mean pi solver",
+    law=(
+        "(#[[2]]^2/#[[3]] &)[NestWhile["
+        "Apply[Function[{a, b, c, d}, "
+        "{(a + b)/2, Sqrt[a b], c - d (a - b)^2, 2 d}], #] &, "
+        "{1, 1/Sqrt[N[2, n]], 1/4, 1/4}, "
+        "#[[1]] != #[[2]] &]]"
+    ),
+    law_uid="U005846",
+    facts={
+        "complete_state": FF(
+            "the four-tuple {a,b,c,d}",
+            "U005846",
+        ),
+        "visible_history": FF(
+            None,
+            "U005846",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed NestWhile returns the terminal four-tuple; it "
+                "does not return the earlier tuples."
+            ),
+        ),
+        "control_state": FF(
+            "continue exactly while a != b, written #[[1]] != #[[2]] &",
+            "U005846",
+        ),
+        "seed": FF(
+            "{1, 1/Sqrt[N[2, n]], 1/4, 1/4}",
+            "U005846",
+        ),
+        "frontier_or_activation": FF(
+            "the complete current four-tuple {a,b,c,d}",
+            "U005846",
+        ),
+        "schedule": FF(
+            "update all four tuple components together, then retest a != b",
+            "U005846",
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "the current a,b,c,d tuple and requested precision n in the initial b",
+            "U005846",
+        ),
+        "rule_relation_constraint_function_or_probability_law": FF(
+            "(#[[2]]^2/#[[3]] &)[NestWhile["
+            "Apply[Function[{a, b, c, d}, "
+            "{(a + b)/2, Sqrt[a b], c - d (a - b)^2, 2 d}], #] &, "
+            "{1, 1/Sqrt[N[2, n]], 1/4, 1/4}, "
+            "#[[1]] != #[[2]] &]]",
+            "U005846",
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "atomically replace {a,b,c,d} by "
+            "{(a+b)/2,Sqrt[a b],c-d(a-b)^2,2d}",
+            "U005846",
+        ),
+        "result_kind": FF(
+            "the terminal pi approximation b^2/c, written #[[2]]^2/#[[3]]",
+            "U005846",
+        ),
+        "termination_completion_failure": FF(
+            "NestWhile continues while a != b (#[[1]] != #[[2]]) and the "
+            "source states that equality is reached after approximately "
+            "Log[2, n] steps",
+            ("U005846", "U005847"),
         ),
     },
 )
@@ -727,6 +991,235 @@ SPECS.append(
 )
 
 amend_spec(
+    "Ulam sequence",
+    facts={
+        "complete_state": FF(
+            "the complete finite sequence accumulated so far",
+            ("U005796", "U005797"),
+        ),
+        "visible_history": FF(
+            "the current sequence is the accumulated visible list of every "
+            "previously appended term",
+            ("U005796", "U005797"),
+        ),
+        "seed": FF("{1, 2}", ("U005796", "U005797")),
+        "frontier_or_activation": FF(
+            "integers larger than the current last term are tested in "
+            "increasing order until one has exactly one representation as a "
+            "sum of two distinct earlier terms",
+            ("U005796", "U005797", "U005798"),
+        ),
+        "schedule": FF(
+            "append exactly the least qualifying integer, then repeat the search",
+            ("U005796", "U005797"),
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "the complete accumulated sequence and pair sums of distinct earlier terms",
+            ("U005796", "U005797", "U005798"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "append the least uniquely representable sum to the accumulated list",
+            ("U005796", "U005797"),
+        ),
+        "termination_completion_failure": FF(
+            "the definition generates an unbounded sequence; no intrinsic "
+            "terminal predicate is stated",
+            ("U005796", "U005797"),
+        ),
+    },
+)
+
+amend_spec(
+    "successive-integer concatenation sequence",
+    uids=["U005867", "U005860"],
+    facts={
+        "native_time": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed Flatten[Table[...]] directly denotes a finite "
+                "digit list for n; it does not state an intrinsic time evolution."
+            ),
+        ),
+        "complete_state": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The finite Table/Flatten expression denotes its result "
+                "without an evolving native state."
+            ),
+        ),
+        "visible_history": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The returned digit list is the denoted result, not a retained "
+                "history of transition states."
+            ),
+        ),
+        "control_state": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason="No transition controller is part of the direct finite expression.",
+        ),
+        "seed": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason="The bound n and base k are inputs, not a trajectory seed.",
+        ),
+        "frontier_or_activation": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason="No active component is selected by the direct Table/Flatten denotation.",
+        ),
+        "schedule": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason="The expression directly indexes integers 1 through n; no one-step schedule is asserted.",
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            None,
+            "U005867",
+            status="NOT_APPLICABLE",
+            reason="Flatten assembles the denoted finite result; it is not a state commit.",
+        ),
+        "structural_invariants": FF(
+            "the base-10 infinite concatenation is Champernowne's normal, "
+            "transcendental number; the general base-k limit contains every "
+            "finite block with equal frequency",
+            ("U005860", "U005867"),
+        ),
+        "termination_completion_failure": FF(
+            "for finite n the nested Table and Flatten return a finite list",
+            "U005867",
+        ),
+    },
+)
+
+amend_spec(
+    "rational-pair continued-fraction term enumerator",
+    facts={
+        "native_time": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="The printed nested Table directly denotes a finite enumeration for n.",
+        ),
+        "complete_state": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="No evolving state is intrinsic to the finite Table/Flatten result.",
+        ),
+        "visible_history": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="The returned flattened terms are a denoted result, not a transition history.",
+        ),
+        "control_state": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="No transition controller is stated by the direct enumeration.",
+        ),
+        "seed": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="The bound n is an input to the finite enumeration, not a trajectory seed.",
+        ),
+        "frontier_or_activation": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="No active component is selected by the direct nested Table.",
+        ),
+        "schedule": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="The nested Table specifies an index domain, not a one-step evolution schedule.",
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            None,
+            "U005906",
+            status="NOT_APPLICABLE",
+            reason="Flatten assembles the finite enumeration without committing a successor state.",
+        ),
+        "termination_completion_failure": FF(
+            "for finite n the bounded a,b tables and Flatten return a finite list",
+            ("U005906", "U005907"),
+        ),
+    },
+)
+
+amend_spec(
+    "Farey-sequence generator",
+    facts={
+        "native_time": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="The printed Union[Flatten[Table[...]]] directly denotes the finite Farey set.",
+        ),
+        "complete_state": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="No evolving native state is intrinsic to the direct finite expression.",
+        ),
+        "visible_history": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="The returned ordered set is not a retained transition history.",
+        ),
+        "control_state": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="No transition controller is part of the direct set construction.",
+        ),
+        "seed": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="The order bound n is an input, not an initial trajectory state.",
+        ),
+        "frontier_or_activation": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="No active component is selected by the direct Table/Flatten/Union denotation.",
+        ),
+        "schedule": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="The bounded index domain is not a one-step update schedule.",
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            None,
+            "U005924",
+            status="NOT_APPLICABLE",
+            reason="Union and Flatten assemble the denoted finite set without a state commit.",
+        ),
+        "termination_completion_failure": FF(
+            "for finite n the bounded table, flattening, and union return the finite Farey sequence",
+            ("U005923", "U005924"),
+        ),
+    },
+)
+
+amend_spec(
     "continued-fraction digit extractor",
     facts={
         "termination_completion_failure": FF(
@@ -738,6 +1231,23 @@ amend_spec(
 amend_spec(
     "Gauss-map continued-fraction trajectory",
     facts={
+        "visible_history": FF(
+            "NestList returns the complete iterate history beginning with x",
+            "U005891",
+        ),
+        "seed": FF("x", "U005891"),
+        "frontier_or_activation": FF(
+            "the current scalar iterate",
+            "U005891",
+        ),
+        "schedule": FF(
+            "apply 1/Mod[current,1] once per requested iterate",
+            "U005891",
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "append each new reciprocal-fractional-part iterate to the list returned by NestList",
+            "U005891",
+        ),
         "termination_completion_failure": FF(
             "The map is undefined when Mod[x,1]==0; rational inputs therefore terminate after finitely many continued-fraction terms.",
             "U005891",
@@ -801,6 +1311,16 @@ amend_spec(
 amend_spec(
     "Gauss fractional-part reciprocal map",
     facts={
+        "seed": FF("x", "U005967"),
+        "visible_history": FF(
+            None,
+            "U005967",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The source states the one-step map itself; no returned "
+                "iterate-history object is part of this candidate."
+            ),
+        ),
         "termination_completion_failure": FF(
             "x -> FractionalPart[1/x] is undefined at x=0.",
             "U005967",
@@ -808,8 +1328,98 @@ amend_spec(
     },
 )
 amend_spec(
+    "exact multiplier-mod-one map",
+    uids=["U005968", "U005978"],
+    facts={
+        "seed": FF("x", "U005968"),
+        "visible_history": FF(
+            None,
+            "U005968",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The source gives the map and a closed form for its nth "
+                "iterate, not a returned history of all prior iterates."
+            ),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "one exact map step replaces x by FractionalPart[a x]; the nth "
+            "iterate is directly FractionalPart[a^n x]",
+            "U005968",
+        ),
+    },
+)
+amend_spec(
+    "exact tent-map family",
+    facts={
+        "seed": FF("x", "U005968"),
+        "visible_history": FF(
+            None,
+            "U005968",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The source gives the map and an a=2 nth-iterate formula, "
+                "not a returned history of all earlier values."
+            ),
+        ),
+    },
+)
+amend_spec(
     "fixed-binary-precision shift-map simulation",
     facts={
+        "native_time": FF(
+            "the discrete simulated-step index n in the printed direct representation",
+            "U005972",
+        ),
+        "complete_state": FF(
+            "the 53 stored base-2 digits obtained from initial condition x at indexed step n",
+            ("U005972", "U005975"),
+        ),
+        "visible_history": FF(
+            None,
+            "U005972",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed closed form returns the digit representation at "
+                "step n, not a history of preceding simulated states."
+            ),
+        ),
+        "seed": FF("x", "U005972"),
+        "frontier_or_activation": FF(
+            None,
+            "U005972",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed indexed closed form selects no active component "
+                "for a one-step rewrite."
+            ),
+        ),
+        "schedule": FF(
+            None,
+            "U005972",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed formula directly denotes the representation at "
+                "step n and does not state an incremental update schedule."
+            ),
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "initial condition x, indexed step n, and the fixed 53-bit storage width",
+            ("U005972", "U005975"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            None,
+            "U005972",
+            status="NOT_APPLICABLE",
+            reason=(
+                "IntegerDigits[Mod[2^n Floor[2^53 x],2^53],2,53] "
+                "directly denotes the step-n digit representation; it is not "
+                "a one-step append or commit law."
+            ),
+        ),
+        "result_kind": FF(
+            "the 53-bit digit representation of the finite-storage simulation at step n",
+            "U005972",
+        ),
         "termination_completion_failure": FF(
             "With 53 stored binary digits the finite-state simulation eventually loses sampled digits and reaches 0, unlike the exact map.",
             ("U005972", "U005974", "U005975", "U005978"),
@@ -819,6 +1429,59 @@ amend_spec(
 amend_spec(
     "fixed-decimal-precision shift-map simulation",
     facts={
+        "native_time": FF(
+            "the discrete simulated-step index n in the printed direct representation",
+            "U005973",
+        ),
+        "complete_state": FF(
+            "the binary-coded representation of 12 stored decimal digits derived from x at indexed step n",
+            ("U005973", "U005976", "U005977"),
+        ),
+        "visible_history": FF(
+            None,
+            "U005973",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed closed form returns the digit representation at "
+                "step n, not a history of preceding simulated states."
+            ),
+        ),
+        "seed": FF("x", "U005973"),
+        "frontier_or_activation": FF(
+            None,
+            "U005973",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed indexed closed form selects no active component "
+                "for a one-step rewrite."
+            ),
+        ),
+        "schedule": FF(
+            None,
+            "U005973",
+            status="NOT_APPLICABLE",
+            reason=(
+                "The printed formula directly denotes the representation at "
+                "step n and does not state an incremental update schedule."
+            ),
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "initial condition x, indexed step n, and the fixed 12-decimal-digit BCD storage",
+            ("U005973", "U005976", "U005977"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            None,
+            "U005973",
+            status="NOT_APPLICABLE",
+            reason=(
+                "the nested IntegerDigits expression directly denotes the "
+                "step-n BCD representation; it is not a one-step append or commit law."
+            ),
+        ),
+        "result_kind": FF(
+            "the binary-coded 12-decimal-digit finite-storage representation at step n",
+            "U005973",
+        ),
         "termination_completion_failure": FF(
             "The 12-decimal-digit BCD simulation eventually samples beyond stored digits and then follows a finite-precision artifact rather than the exact map.",
             ("U005973", "U005974", "U005976", "U005977", "U005978"),
@@ -947,8 +1610,93 @@ SPECS.append(
         variants=("the source states that two equations can suffice for non-fixed/non-repetitive behavior",),
     )
 )
-amend_spec("two-Gaussian periodic-boundary PDE comparison preset", kind="PRESET")
-amend_spec("dimensional wave-equation square-pulse preset", kind="PRESET")
+amend_spec(
+    "two-Gaussian periodic-boundary PDE comparison preset",
+    kind="PRESET",
+    missing=(
+        "Gaussian scale, separation, numerical grid, and exact spatial-domain "
+        "dimensions are not printed in the Notes unit.",
+    ),
+    facts={
+        "support": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason=(
+                "Gaussian scale, separation, and the numerical grid are not "
+                "printed in U006019."
+            ),
+        ),
+        "topology": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason=(
+                "U006019 states periodic boundary conditions but does not "
+                "state exact spatial-domain dimensions."
+            ),
+        ),
+        "seed": FF(
+            "initial conditions containing two Gaussians",
+            "U006019",
+        ),
+        "input": FF(
+            "two-Gaussian initial data supplied to each compared equation",
+            "U006019",
+        ),
+        "boundary": FF("periodic boundary conditions", "U006019"),
+        "parameters_and_variants": FF(
+            "compared equation variants: diffusion; wave; sine-Gordon; "
+            "page-165 equation",
+            "U006019",
+        ),
+    },
+)
+amend_spec(
+    "dimensional wave-equation square-pulse preset",
+    kind="PRESET",
+    missing=(
+        "The exact pulse dimensions, spatial-domain extent, and boundary data "
+        "are not printed.",
+    ),
+    facts={
+        "support": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="U006021 does not state the exact stationary square-pulse dimensions.",
+        ),
+        "topology": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="U006021-U006023 do not state the exact spatial-domain extent.",
+        ),
+        "seed": FF(
+            "stationary square-pulse initial data",
+            "U006021",
+        ),
+        "input": FF(
+            "stationary square-pulse initial data and dimension d",
+            ("U006021", "U006023"),
+        ),
+        "boundary": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="U006021-U006023 do not state boundary data for the compared solutions.",
+        ),
+        "parameters_and_variants": FF(
+            "dimension d; compared variants: 1D, 2D, and 3D wave-equation solutions",
+            ("U006021", "U006023"),
+        ),
+        "excluded_observers_and_representations": FF(
+            "the displayed observer is a one-dimensional slice multiplied by "
+            "r^(d-1); it is not the native multidimensional field state",
+            "U006023",
+        ),
+    },
+)
 amend_spec(
     "negative-diffusion PDE relation",
     facts={
@@ -991,13 +1739,59 @@ amend_spec(
 remove_spec("named PDE numerical-method family")
 amend_spec(
     "explicit second-order PDE finite-difference solver",
+    law=(
+        "PDEKernel[f_, {dx_, dt_}] := Compile[{a, b, c, d}, "
+        "Evaluate[(2 b - d) + ((a + c - 2 b)/dx^2 + f[b]) dt^2]]; "
+        "PDEEvolveList[ker_, {u0_, u1_}, n_] := "
+        "Map[First, NestList[PDEStep[ker, #] &, {u0, u1}, n]]; "
+        "PDEStep[ker_, {u1_, u2_}] := {u2, Apply[ker, "
+        "Transpose[{RotateLeft[u2], u2, RotateRight[u2], u1}], {1}]}"
+    ),
     facts={
         "boundary": FF("periodic boundary induced by RotateLeft/RotateRight", "U006063"),
         "topology": FF("one-dimensional periodic spatial list", "U006063"),
         "complete_state": FF("two consecutive full spatial slices {u1,u2}", ("U006061", "U006063")),
+        "visible_history": FF(
+            "PDEEvolveList returns Map[First, NestList[...]], the successive "
+            "spatial-slice history for the requested n steps",
+            "U006063",
+        ),
+        "seed": FF(
+            "the two initial spatial slices {u0,u1}",
+            "U006063",
+        ),
+        "frontier_or_activation": FF(
+            "every position of the periodic current spatial slice",
+            "U006063",
+        ),
+        "schedule": FF(
+            "PDEKernel supplies each local next value and PDEStep assembles "
+            "all periodic positions synchronously from the same two input slices",
+            ("U006061", "U006063"),
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "PDEKernel reads left/current/right values a,b,c and the previous "
+            "time-slice value d; PDEStep supplies them from RotateLeft[u2], "
+            "u2, RotateRight[u2], and u1",
+            ("U006061", "U006063"),
+        ),
+        "rule_relation_constraint_function_or_probability_law": FF(
+            "PDEKernel[f_, {dx_, dt_}] := Compile[{a, b, c, d}, "
+            "Evaluate[(2 b - d) + ((a + c - 2 b)/dx^2 + f[b]) dt^2]]; "
+            "PDEEvolveList[ker_, {u0_, u1_}, n_] := "
+            "Map[First, NestList[PDEStep[ker, #] &, {u0, u1}, n]]; "
+            "PDEStep[ker_, {u1_, u2_}] := {u2, Apply[ker, "
+            "Transpose[{RotateLeft[u2], u2, RotateRight[u2], u1}], {1}]}",
+            ("U006061", "U006063"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "PDEKernel computes each next value; PDEStep synchronously "
+            "assembles the next slice and commits {u2,next-slice}",
+            ("U006061", "U006063"),
+        ),
         "termination_completion_failure": FF(
             "The code performs the requested number of steps; convergence to the continuous PDE is a separate, not guaranteed judgment.",
-            ("U006060", "U006061"),
+            ("U006060", "U006061", "U006063"),
         ),
     },
 )
