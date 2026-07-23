@@ -1,13 +1,13 @@
 # 5-CH01-FOUNDATIONS
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE**.
 
 ## Current Facts
 
-- Stages 1–4 are complete.
-- The valid live state contains 157 reviewed source units, 2 screened images,
-  2 active blind candidates, 4 pending cross-range routes, and 2 closed Stage
-  4 LOCAL rounds.
+- Stages 1–5 are complete.
+- The valid live state contains 299 reviewed source units, 5 screened images,
+  5 active blind candidates, 11 pending cross-range routes, and 4 closed
+  LOCAL rounds.
 - Stage 5 owns exactly two canonical documents in manifest order:
   - `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md`;
   - `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
@@ -15,8 +15,8 @@ Status: **IN PROGRESS**.
   `U000070..U000173` and `U004924..U004961`.
 - They own 3 physical images, all referenced from the main chapter; the Notes
   path owns no physical image.
-- Stage 5 will be one epoch-1 `INITIAL` transaction followed by one or more
-  epoch-1 `LOCAL` search transactions and any applicable route transactions.
+- Stage 5 is recorded by epoch-1 transactions `V000004..V000006`: one
+  `INITIAL` transaction and two `SEARCH_APPEND` transactions.
 
 ## Updated Assumptions
 
@@ -63,12 +63,12 @@ Starting coverage:
 
 | Obligation | Assigned | Completed |
 |---|---:|---:|
-| Source units | 142 | 0 |
-| Physical images | 3 | 0 |
-| LOCAL search scopes | 2 paths | 0 |
-| Search hits | 0 | 0 |
+| Source units | 142 | 142 |
+| Physical images | 3 | 3 |
+| LOCAL search scopes | 2 paths | 2 |
+| Search hits | 304 | 304 |
 | Within-stage routes | 0 | 0 |
-| Cross-range routes opened | 0 | 0 |
+| Cross-range routes opened | 7 | 7 |
 
 Every unit and image requires an individual disposition, source/evidence
 status, concise evidence statement, epoch/stage/reviewer metadata, and exact
@@ -76,14 +76,34 @@ candidate/route links.
 
 ## Candidate Changes
 
-No Stage 5 candidate has been proposed. Any discovery receives the next
-worker-local `W####` identity in frozen traversal and a global `B####`
-identity only through coordinator preview/apply.
+The coordinator allocated three source-limited candidates:
+
+- `B0003`: the 1981 elementary-cellular-automaton experiment series, including
+  the random-initial-condition restriction and screened printout;
+- `B0004`: the 1964 forty-disk statistical-physics simulation preset;
+- `B0005`: the 1973 two-dimensional particle cellular automaton.
+
+These are blind coverage candidates, not final catalog or semantic-family
+decisions.
 
 ## Search And Evidence Log
 
-No Stage 5 query has run. LOCAL search begins only after all 142 units are
-reviewed and all 3 images are screened.
+- `S003` ran 11 frozen query families over exactly the two assigned paths,
+  produced 152 fully dispositioned hits, added 12 source-derived vocabulary
+  terms, added no candidate/evidence/route, and has result/rerun digest
+  `da2dcca36d955654ce21b1765470b3fda6908dbe100eff72c776fa86f6713ef3`.
+- `S004` repeated the same query families and 152-hit result with no new
+  vocabulary, candidate, evidence, route, or row change. Its result/rerun
+  digest is
+  `b8d90cd84aea3ca6c0b750d1fb1495c1a5749d2e6c5c2dfcb12caba594d926ca`.
+- The first search transaction corrected `U004946` from a representation
+  disposition to the already-backed `CROSS_REFERENCE` disposition for
+  `R000007`; this was the only search-triggered row delta.
+- `R000005..R000011` retain seven legitimate `CROSS_RANGE` obligations:
+  static equations versus action rules, logic-rule scope, Turing/register
+  machines, the middle-square seed generator, the randomness comparison, the
+  particle cellular automaton, and elementary cellular automata with random
+  initial conditions.
 
 ## Detailed Implementation Plan
 
@@ -128,5 +148,26 @@ reviewed and all 3 images are screened.
 
 ## Stage Results
 
-In progress. Exact transaction IDs, candidates, evidence, routes, searches,
-decisions, and verification results will be recorded after execution.
+The sealed sequential bundle was verified before preview and apply. Coordinator
+preview allocated `B0003..B0005`, `E000005..E000011`, `G000005..G000011`,
+and `R000005..R000011`; apply recorded `V000004`. The two typed LOCAL
+proposals were independently previewed before apply and recorded `V000005`
+and `V000006`.
+
+All 142 units were read in canonical order before search, and all 3 images
+were inspected at original resolution. The chapter numeral is decorative, the
+old statistical-physics cover is a historical control/representation, and the
+1981 printout is checked native visual evidence for `B0003`; no hidden lookup
+table or boundary was inferred from pixels.
+
+The Stage 5 gate passes in both ordinary and optimized Python:
+
+```text
+validated blind audit harness: units=14311 reviewed=299 candidates=5
+routes=11 assets=1607 screened=5 rounds=4
+```
+
+There are no Stage 5 `WITHIN_STAGE` routes, no undispositioned LOCAL hits, no
+new search discovery on the terminal rerun, and no blind-phase T-ID, catalog,
+family, API-fit, or implementation conclusion. Stage 6 may begin from this
+state.

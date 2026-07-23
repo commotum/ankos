@@ -1978,6 +1978,3769 @@
       "tool_assumptions": [
         "Python Unicode regular expressions over decoded UTF-8 canonical source-unit byte ranges, with MULTILINE semantics and query-major then canonical source-unit result order."
       ]
+    },
+    {
+      "epoch": 1,
+      "hits": [
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000145",
+          "query_id": "Q0019",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2011e89ebba6124b0a4b2cc6a8de25bd24663de3d32b9e1825e8ce726634840b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000146",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000140"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "730ad8fbdf4987b2a6178f8667d7dc11840659570cc750a2e0f0eaf3a151ecaf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000147",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000153"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d6a7b7f613a2f07598ae6061d45bfb47c1c0c826b92f23469874fc8a069dae7e",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000148",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000155"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "61b5fe074cb7a25023906e323a78edbf2715306db681bd75f04de08229924ac9",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000149",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000173"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000150",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000151",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd3216451966aa7bd8b0c798df89c3eaddf6ea1aff30a77225870d0d58659bc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000152",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004938"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0edc45e85e110ff26cdff0b3350ca30a17bfbc2dadd15940dd3a22a4b2d17a8d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000153",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004939"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000154",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000155",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ada9c0622de8040325c57d469252c6c20d318010f534ad3ddcc11db9f805c390",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000156",
+          "query_id": "Q0020",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004957"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000157",
+          "query_id": "Q0021",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f232456108f3baa46ce05227d2601f637f9301b060859a1bd00fbce835fee906",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000158",
+          "query_id": "Q0022",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000141"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000159",
+          "query_id": "Q0022",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000160",
+          "query_id": "Q0022",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "605bd763d986cff5cbe14ba829a048cfb2a44a5a8c7536fd597a7d570b166f4b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000161",
+          "query_id": "Q0022",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004955"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000162",
+          "query_id": "Q0023",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4f0ac65537c84e8c737cb1ed6a2264ed481738ce55dc34a3fcd7573e9de463a4",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000163",
+          "query_id": "Q0024",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000121"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000164",
+          "query_id": "Q0024",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000165",
+          "query_id": "Q0024",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e3f93e1c09a4f62f66c9094babe9acdf25462ea102a479865a8319398c29e0ac",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000166",
+          "query_id": "Q0025",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000106"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "126c3e3bf1f4b42c774624cec1f1457f0022a0f4b7e31a28bd2c8dc3deb508c8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000167",
+          "query_id": "Q0025",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000136"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000168",
+          "query_id": "Q0025",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000169",
+          "query_id": "Q0025",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000170",
+          "query_id": "Q0025",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000171",
+          "query_id": "Q0025",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6852dad03d2154913296d239fbfdefe3aa12237372d145b2a2bd9e9b7c9f345",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000172",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000073"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "946b30b9dc6f02534e0b66e0771b623b51da08a81a30d0ae7009d69769371fdb",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000173",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000083"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3884a1af487bdf59169d274983d667bc130dcc8f5d1fc76fcd6e5e955aefbd13",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000174",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000099"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "02fa7ee0bc559b7d4cf1ffdf48bd1c1cd49002797cdb08f029b58fe64f731ef0",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000175",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000105"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6f77b7fec7b6544f2002544ac8a8b1f74b52927eb2b9dea7e9d9975f7335321",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000176",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000110"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8be2af35fcd1f41eaf0d79d65219ced18ebe8a03c03fc5c0ae5c5ca375b2e0fa",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000177",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000125"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5e62b5eddcd155af86e6d44509d6db02ae72f227597d6206b0add0261528c4f",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000178",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000131"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0707489be6c08c175fa6292a15ff9ef0f014b2162de19046294f6da363db24a8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000179",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004927"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8244463aa20235f8470dadaf683dfef5f4d9a26a26985668eab0426a38238690",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000180",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004928"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000181",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000182",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000183",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2b5b1f87a7bb9adf7482b6c220cdb8c00cbcf89b06da48fc0514685df636dbfc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000184",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004937"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3884a1af487bdf59169d274983d667bc130dcc8f5d1fc76fcd6e5e955aefbd13",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000185",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004941"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "42198927099cad92ebb4cf9a892fa85ab53149999d980c7514229082fd5497c8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000186",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004942"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5badbaaf2fdbb487332ea7173e7a9217cd098d627c97d30230e7edec09d8d63",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000187",
+          "query_id": "Q0026",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [
+            "R000007"
+          ],
+          "source_unit_id": "U004946"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "058b16c6a4212543c754b0e40203e65316be12eb3ef8576569fc6cc97bb6b712",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000188",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000129"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "55be94289b241db420873fd5ea1c2bc58c2b8dc13b3ea075150e23647f7dc275",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000189",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000150"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000190",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000191",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5badbaaf2fdbb487332ea7173e7a9217cd098d627c97d30230e7edec09d8d63",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000192",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [
+            "R000007"
+          ],
+          "source_unit_id": "U004946"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000193",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000194",
+          "query_id": "Q0027",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6852dad03d2154913296d239fbfdefe3aa12237372d145b2a2bd9e9b7c9f345",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000195",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000073"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "848858c2a6ff1e56f8436e2ef6799873191cfb9bd3f51aa73c5421227fa4fb00",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000196",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000075"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "dbeaa2a9358804ce4299710973efcb164199b28cede6f8808634dc1e71227d53",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000197",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000076"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a9363c1cb1b8195e4d1367601aa288127a5732087af05cede123e603e0629980",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000198",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000077"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "600a3b0be9f0cc040d83ff1e8f7bf7f9c727b99f7263f00f9921d3f1c8d6ca6a",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000199",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000078"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bf4a2c5c2f2c3fed6a66414ed6992b67440b5bf9cf63e44668c7ddafd08e8eca",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000200",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000079"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "076e13ee0bd73ba654e1406a49df8c65db358bf16c8753aefbbb127dc4bd7ef7",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000201",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000081"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1ac32e3456e568e2738bff1dbbe197d9f4ec17ea548e043e41e2c69cea956b45",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000202",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000082"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "946b30b9dc6f02534e0b66e0771b623b51da08a81a30d0ae7009d69769371fdb",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000203",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000083"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "35de4875d9e8fa5502189ca1263eb8526e25d3b9c3773e706b8118fcda7e866d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000204",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000084"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3b130a3ed03221a673aeaee9d6ca900581cb0a28c2f79bf930738fea09d61970",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000205",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000085"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e34400671285ab192a2c421a4daaa5d6ea21b7ad55a4517815be9a9d975c056d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000206",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000086"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f18e425f65a30cab195cd7c154d0c6baa3d0ed3fbc2a95ab1567ad54a3ec041d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000207",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000087"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8da4d2d297b0fd8f7d2552ae761e097bab03e5aad8cf7eab0c5b9e3a49bca507",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000208",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000088"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "53bafd4cd4f1584341c904e657784d10b6f6e5ffb5d7daaab6e157fa6915abaf",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000209",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000089"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5edb14a61388bdc51809c7b2b83224adce38555327972e4158d119b3a1cb0d24",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000210",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000090"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0a973ce260c4ecac45409b2529ed5a080cc0f7d8d079f20ac5a07882b18d973c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000211",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000091"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "67e31191278ffc0d4808bb904fb1f2d1c07251451a3d2618e754a18b863bc46c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000212",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000092"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c4aa580c7e9ce1e239a795e4c7c5ac75433ee46572c1223812f01033f4648616",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000213",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000093"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b7d199dd4afe63fdb7258bb846c56b10edb4e69a2bfdeaa067f1e7991ca560ec",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000214",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000094"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4436f9e36b4eb224d3fca5e4146775dce31d2636f8c25f4b54caf9bea75bf10a",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000215",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000095"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3b39023687f3af4ace6a2456dac505beac582ef205b4813b21442940be1abcd7",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000216",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000096"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d3ee40b2a2ff78f9eaa5f249071ec46e5f43e37eb29d5b593d14727ba5f626f8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000217",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000097"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5d60e672ebce0267997386f438b0d77079cae23d14379d1a4892bd443cf45066",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000218",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000098"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "de3497ab2001ec566cf3da393b3c292d6030b49c7b3048b740ecaf97dc0f216d",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000219",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000100"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ada8529ae6617e5791a7d82fa2bc7cf406e0d42d74efb91e92a370568636f633",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000220",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000101"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "341e3d93b1fdce763c33c182d2f54441e3b32acf52ef3af9ef0eb8245a49de0e",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000221",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000104"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "02fa7ee0bc559b7d4cf1ffdf48bd1c1cd49002797cdb08f029b58fe64f731ef0",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000222",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000105"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e3f93e1c09a4f62f66c9094babe9acdf25462ea102a479865a8319398c29e0ac",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000223",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000106"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "85ac24e5841ef80152a62675e81f2826053e3b38627c8ae6a6898c6e5e0da8f5",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000224",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000107"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "cda81c56f2137a9213d2bf1230818954bcb1fed49b8e84364bba2f9a73433cba",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000225",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000109"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6f77b7fec7b6544f2002544ac8a8b1f74b52927eb2b9dea7e9d9975f7335321",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000226",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000110"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "066c51986ba4db032e31980aa94622c3deb111a4d9d1220751dd10a9930f4a39",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000227",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000111"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a35e4d149f3c94379d5d10d5a0937224c97a42f84b85b6cf737854d503dd8965",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000228",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000114"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e5e99afe98e56d84636ad21d4671b7cbd07f9b77eb9ab2afdb674b8a47df9d3f",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000229",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000115"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3ce2dabd6852b0bd66c252f785644f8097b8aef917e40cce46f20f1a030f5dcf",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000230",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000118"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "47b2c76a43e803bcade6bf0c0b551b6e7d8236e9ae605a0b97a5f9235f7bb589",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000231",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000119"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4f0ac65537c84e8c737cb1ed6a2264ed481738ce55dc34a3fcd7573e9de463a4",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000232",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000121"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d5a98c1a94ab9a6370072d43a4114d53ea6c96270836f322c60f10cc8cc4fd3b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000233",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000123"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "de6634ae81e02ba43f2b9398a9f16a94b4f174f83c71b5e5c1738cb0e1d4d175",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000234",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000124"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8be2af35fcd1f41eaf0d79d65219ced18ebe8a03c03fc5c0ae5c5ca375b2e0fa",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000235",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000125"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7a65fd788886ca648f7473cc8a399b41bf50ffd3949f447a2ea074221fcb311c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000236",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000126"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "65092d713649adb28b789be0ca3332fda63b4f98a1d46f4c0c14b7438d513291",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000237",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000127"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "510e877ebd7a1efdbd5bd2c9303ff4ae6ba488e247ca2a1a782950ce0521a518",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000238",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000128"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "058b16c6a4212543c754b0e40203e65316be12eb3ef8576569fc6cc97bb6b712",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000239",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000129"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "fd599464abeda1e6fddc276dba2413e5de09fd89805ff4f85b90fb457921c409",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000240",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000130"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5e62b5eddcd155af86e6d44509d6db02ae72f227597d6206b0add0261528c4f",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000241",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000131"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c5d31f061151918dc317e7b93227b82073ba665c62efd8a47bd2a9e4b136f840",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000242",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000133"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "dc5f97e0a0af7ff61becd26ad6538c583a6cc08366d7892eba1a8d0b80b29777",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000243",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000134"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "126c3e3bf1f4b42c774624cec1f1457f0022a0f4b7e31a28bd2c8dc3deb508c8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000244",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000136"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0d750009645337559a4343002be2ecf3bcfe84c5f66bf66b549dbb6e3380ec96",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000245",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000139"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2011e89ebba6124b0a4b2cc6a8de25bd24663de3d32b9e1825e8ce726634840b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000246",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000140"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "9746c983786289ab3c40fa20dd8be3b71a62cc0edbf065344f3b2d5abe7e4acb",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000247",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000144"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2c9cc6b9cccc3ba424f89b7b14247cd5c1ca4bbbd0eb375245c22e79be38c154",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000248",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000145"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f7c54e2cbfe447288579a1f660e7bd0a45c89ece78e2b1ce76db34aa290f4eb5",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000249",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000146"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "705cd4e8918566e7cff68e29fd7f2e029fb07bcf15fec9aab8b52ed3ed1ff6fd",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000250",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000147"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "17c72a194cf90cb03f0c468597dc45cc4a2318f6ce71c9bf58f85c4a10ada9bc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000251",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000148"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "d83750f2820ec306984d456adfa6d28446578f7337a6d8ca57956ccf63490769",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000252",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000149"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "55be94289b241db420873fd5ea1c2bc58c2b8dc13b3ea075150e23647f7dc275",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000253",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000150"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "730ad8fbdf4987b2a6178f8667d7dc11840659570cc750a2e0f0eaf3a151ecaf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000254",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000153"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d6a7b7f613a2f07598ae6061d45bfb47c1c0c826b92f23469874fc8a069dae7e",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000255",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000155"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3ac309d18e3fd6103d82c035ea0035388056924e4645370719def3eed95644fe",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000256",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000159"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "53cd4f994a0f9daf22659a67ce64bb13f5cb0ae1a616732aa4c6269a27759593",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000257",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000161"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "030d4454c57326a49f97aaaa41a703e18a1b5fb3098fcbb09a5cb9354b1212e2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000258",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000162"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4310f97d37f8b136372ad745d7f748bca71ccf82db5737c85a4dac6fed2f4789",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000259",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000163"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c4797ca4160cd236a4eaa29d382f360368753b4d0a4230316820c13d53078aa8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000260",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000164"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a2fb4b9ee211628e1ef2e68ba4aa45005ed89ae445c8262836475f18accb7fac",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000261",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000171"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0707489be6c08c175fa6292a15ff9ef0f014b2162de19046294f6da363db24a8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000262",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004927"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8244463aa20235f8470dadaf683dfef5f4d9a26a26985668eab0426a38238690",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000263",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004928"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5b83c546b067e74a9b8e1391b62c33c27daa8c14f248e21b4338f93eae7297b9",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000264",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004929"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000265",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000266",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f0c6bc7e4779892fd128a2fa7dc172ec719898bd357cc32ea8c84177c5b0d88c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000267",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004933"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "da73b6f0aabd92e86148fe4983b2db563a4f654a35623a7261d5bd035ed42e46",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000268",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004934"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0135b39b95f39cedc1ea39161c1ef8a0e76936e4238a0a62ad78a8027358536b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000269",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004935"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000270",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2b5b1f87a7bb9adf7482b6c220cdb8c00cbcf89b06da48fc0514685df636dbfc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000271",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004937"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd3216451966aa7bd8b0c798df89c3eaddf6ea1aff30a77225870d0d58659bc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000272",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004938"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0edc45e85e110ff26cdff0b3350ca30a17bfbc2dadd15940dd3a22a4b2d17a8d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000273",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004939"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "42198927099cad92ebb4cf9a892fa85ab53149999d980c7514229082fd5497c8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000274",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004942"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d3127aab60129c262565e8c69deef7a6b08c324c15f854059a2b25d3a8f234e2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000275",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004943"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e7f100448807b830975cbda8917b7ff926d2226d47d56c621c37148c79389c20",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000276",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004945"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5badbaaf2fdbb487332ea7173e7a9217cd098d627c97d30230e7edec09d8d63",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000277",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [
+            "R000007"
+          ],
+          "source_unit_id": "U004946"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "170859b7f09cadd02a51fe3e2f2e9f052c15ea3268911949fb7747de0722c8fa",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000278",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004949"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000279",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000280",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4cef7315ce302f2dd6dae4058712fe1bc61d4196796635c1aff8819cb2223fef",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000281",
+          "query_id": "Q0028",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004956"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "dbeaa2a9358804ce4299710973efcb164199b28cede6f8808634dc1e71227d53",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000282",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000076"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "85ac24e5841ef80152a62675e81f2826053e3b38627c8ae6a6898c6e5e0da8f5",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000283",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000107"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "cda81c56f2137a9213d2bf1230818954bcb1fed49b8e84364bba2f9a73433cba",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000284",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000109"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e5e99afe98e56d84636ad21d4671b7cbd07f9b77eb9ab2afdb674b8a47df9d3f",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000285",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000115"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3ce2dabd6852b0bd66c252f785644f8097b8aef917e40cce46f20f1a030f5dcf",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000286",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000118"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "47b2c76a43e803bcade6bf0c0b551b6e7d8236e9ae605a0b97a5f9235f7bb589",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000287",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000119"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "fd599464abeda1e6fddc276dba2413e5de09fd89805ff4f85b90fb457921c409",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000288",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000130"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6b0834de6ccc2aca3d77c9324daaf8acb61852457a84a47781b653d979bc4ca3",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000289",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000132"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "126c3e3bf1f4b42c774624cec1f1457f0022a0f4b7e31a28bd2c8dc3deb508c8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000290",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000136"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2c9cc6b9cccc3ba424f89b7b14247cd5c1ca4bbbd0eb375245c22e79be38c154",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000291",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000145"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f7c54e2cbfe447288579a1f660e7bd0a45c89ece78e2b1ce76db34aa290f4eb5",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000292",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000146"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000293",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000294",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000295",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000296",
+          "query_id": "Q0029",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        }
+      ],
+      "kind": "LOCAL",
+      "new_candidates": [],
+      "new_evidence_groups": [],
+      "new_routes": [],
+      "new_vocabulary": [
+        "elementary cellular automata",
+        "random initial conditions",
+        "middle-square",
+        "bouncing disks",
+        "collision",
+        "discrete particles",
+        "square grid",
+        "conservation laws",
+        "particle cellular automaton",
+        "register machine",
+        "logic",
+        "statistical physics"
+      ],
+      "owning_stage": 5,
+      "queries": [
+        {
+          "case_sensitive": false,
+          "family": "candidate subtype",
+          "mode": "LITERAL",
+          "pattern": "elementary cellular automata",
+          "query_id": "Q0019",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate family",
+          "mode": "REGEX",
+          "pattern": "\\bcellular automat(?:on|a)\\b",
+          "query_id": "Q0020",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate seed",
+          "mode": "LITERAL",
+          "pattern": "random initial conditions",
+          "query_id": "Q0021",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "particle/disk mechanics",
+          "mode": "REGEX",
+          "pattern": "\\b(?:disks?|particles?|collid(?:e|es|ed|ing|isions?)|square grid|conservation laws?)\\b",
+          "query_id": "Q0022",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "seed generator",
+          "mode": "LITERAL",
+          "pattern": "middle-square",
+          "query_id": "Q0023",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "native evolution mechanics",
+          "mode": "REGEX",
+          "pattern": "\\b(?:initial conditions?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
+          "query_id": "Q0024",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "stochasticity guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:random(?:ness)?|randomization|probabilistic|probability|stochastic|Bernoulli)\\b",
+          "query_id": "Q0025",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "declarative-function guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential|logic)\\b",
+          "query_id": "Q0026",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "input-generator-structure guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|register machines?|mobile automata|automaton)\\b",
+          "query_id": "Q0027",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "general construction nouns",
+          "mode": "REGEX",
+          "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
+          "query_id": "Q0028",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "representation-application boundary",
+          "mode": "REGEX",
+          "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
+          "query_id": "Q0029",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        }
+      ],
+      "rerun_digest": "da2dcca36d955654ce21b1765470b3fda6908dbe100eff72c776fa86f6713ef3",
+      "result_digest": "da2dcca36d955654ce21b1765470b3fda6908dbe100eff72c776fa86f6713ef3",
+      "result_ids": [
+        "H000145",
+        "H000146",
+        "H000147",
+        "H000148",
+        "H000149",
+        "H000150",
+        "H000151",
+        "H000152",
+        "H000153",
+        "H000154",
+        "H000155",
+        "H000156",
+        "H000157",
+        "H000158",
+        "H000159",
+        "H000160",
+        "H000161",
+        "H000162",
+        "H000163",
+        "H000164",
+        "H000165",
+        "H000166",
+        "H000167",
+        "H000168",
+        "H000169",
+        "H000170",
+        "H000171",
+        "H000172",
+        "H000173",
+        "H000174",
+        "H000175",
+        "H000176",
+        "H000177",
+        "H000178",
+        "H000179",
+        "H000180",
+        "H000181",
+        "H000182",
+        "H000183",
+        "H000184",
+        "H000185",
+        "H000186",
+        "H000187",
+        "H000188",
+        "H000189",
+        "H000190",
+        "H000191",
+        "H000192",
+        "H000193",
+        "H000194",
+        "H000195",
+        "H000196",
+        "H000197",
+        "H000198",
+        "H000199",
+        "H000200",
+        "H000201",
+        "H000202",
+        "H000203",
+        "H000204",
+        "H000205",
+        "H000206",
+        "H000207",
+        "H000208",
+        "H000209",
+        "H000210",
+        "H000211",
+        "H000212",
+        "H000213",
+        "H000214",
+        "H000215",
+        "H000216",
+        "H000217",
+        "H000218",
+        "H000219",
+        "H000220",
+        "H000221",
+        "H000222",
+        "H000223",
+        "H000224",
+        "H000225",
+        "H000226",
+        "H000227",
+        "H000228",
+        "H000229",
+        "H000230",
+        "H000231",
+        "H000232",
+        "H000233",
+        "H000234",
+        "H000235",
+        "H000236",
+        "H000237",
+        "H000238",
+        "H000239",
+        "H000240",
+        "H000241",
+        "H000242",
+        "H000243",
+        "H000244",
+        "H000245",
+        "H000246",
+        "H000247",
+        "H000248",
+        "H000249",
+        "H000250",
+        "H000251",
+        "H000252",
+        "H000253",
+        "H000254",
+        "H000255",
+        "H000256",
+        "H000257",
+        "H000258",
+        "H000259",
+        "H000260",
+        "H000261",
+        "H000262",
+        "H000263",
+        "H000264",
+        "H000265",
+        "H000266",
+        "H000267",
+        "H000268",
+        "H000269",
+        "H000270",
+        "H000271",
+        "H000272",
+        "H000273",
+        "H000274",
+        "H000275",
+        "H000276",
+        "H000277",
+        "H000278",
+        "H000279",
+        "H000280",
+        "H000281",
+        "H000282",
+        "H000283",
+        "H000284",
+        "H000285",
+        "H000286",
+        "H000287",
+        "H000288",
+        "H000289",
+        "H000290",
+        "H000291",
+        "H000292",
+        "H000293",
+        "H000294",
+        "H000295",
+        "H000296"
+      ],
+      "round_id": "S003",
+      "tool_assumptions": [
+        "Python Unicode regular expressions over decoded UTF-8 canonical source-unit byte ranges, with MULTILINE semantics and query-major then canonical source-unit result order."
+      ]
+    },
+    {
+      "epoch": 1,
+      "hits": [
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000297",
+          "query_id": "Q0030",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2011e89ebba6124b0a4b2cc6a8de25bd24663de3d32b9e1825e8ce726634840b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000298",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000140"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "730ad8fbdf4987b2a6178f8667d7dc11840659570cc750a2e0f0eaf3a151ecaf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000299",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000153"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d6a7b7f613a2f07598ae6061d45bfb47c1c0c826b92f23469874fc8a069dae7e",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000300",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000155"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "61b5fe074cb7a25023906e323a78edbf2715306db681bd75f04de08229924ac9",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000301",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000173"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000302",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000303",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd3216451966aa7bd8b0c798df89c3eaddf6ea1aff30a77225870d0d58659bc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000304",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004938"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0edc45e85e110ff26cdff0b3350ca30a17bfbc2dadd15940dd3a22a4b2d17a8d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000305",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004939"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000306",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000307",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ada9c0622de8040325c57d469252c6c20d318010f534ad3ddcc11db9f805c390",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000308",
+          "query_id": "Q0031",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004957"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000309",
+          "query_id": "Q0032",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f232456108f3baa46ce05227d2601f637f9301b060859a1bd00fbce835fee906",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000310",
+          "query_id": "Q0033",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000141"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000311",
+          "query_id": "Q0033",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000312",
+          "query_id": "Q0033",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "605bd763d986cff5cbe14ba829a048cfb2a44a5a8c7536fd597a7d570b166f4b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000313",
+          "query_id": "Q0033",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004955"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000314",
+          "query_id": "Q0034",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4f0ac65537c84e8c737cb1ed6a2264ed481738ce55dc34a3fcd7573e9de463a4",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000315",
+          "query_id": "Q0035",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000121"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000316",
+          "query_id": "Q0035",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000317",
+          "query_id": "Q0035",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e3f93e1c09a4f62f66c9094babe9acdf25462ea102a479865a8319398c29e0ac",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000318",
+          "query_id": "Q0036",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000106"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "126c3e3bf1f4b42c774624cec1f1457f0022a0f4b7e31a28bd2c8dc3deb508c8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000319",
+          "query_id": "Q0036",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000136"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000320",
+          "query_id": "Q0036",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000321",
+          "query_id": "Q0036",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000322",
+          "query_id": "Q0036",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000323",
+          "query_id": "Q0036",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6852dad03d2154913296d239fbfdefe3aa12237372d145b2a2bd9e9b7c9f345",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000324",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000073"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "946b30b9dc6f02534e0b66e0771b623b51da08a81a30d0ae7009d69769371fdb",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000325",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000083"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3884a1af487bdf59169d274983d667bc130dcc8f5d1fc76fcd6e5e955aefbd13",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000326",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000099"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "02fa7ee0bc559b7d4cf1ffdf48bd1c1cd49002797cdb08f029b58fe64f731ef0",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000327",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000105"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6f77b7fec7b6544f2002544ac8a8b1f74b52927eb2b9dea7e9d9975f7335321",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000328",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000110"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8be2af35fcd1f41eaf0d79d65219ced18ebe8a03c03fc5c0ae5c5ca375b2e0fa",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000329",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000125"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5e62b5eddcd155af86e6d44509d6db02ae72f227597d6206b0add0261528c4f",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000330",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000131"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0707489be6c08c175fa6292a15ff9ef0f014b2162de19046294f6da363db24a8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000331",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004927"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8244463aa20235f8470dadaf683dfef5f4d9a26a26985668eab0426a38238690",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000332",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004928"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000333",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000334",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000335",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2b5b1f87a7bb9adf7482b6c220cdb8c00cbcf89b06da48fc0514685df636dbfc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000336",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004937"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3884a1af487bdf59169d274983d667bc130dcc8f5d1fc76fcd6e5e955aefbd13",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000337",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004941"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "42198927099cad92ebb4cf9a892fa85ab53149999d980c7514229082fd5497c8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000338",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004942"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5badbaaf2fdbb487332ea7173e7a9217cd098d627c97d30230e7edec09d8d63",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000339",
+          "query_id": "Q0037",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [
+            "R000007"
+          ],
+          "source_unit_id": "U004946"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "058b16c6a4212543c754b0e40203e65316be12eb3ef8576569fc6cc97bb6b712",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000340",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000129"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "55be94289b241db420873fd5ea1c2bc58c2b8dc13b3ea075150e23647f7dc275",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000341",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000150"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000342",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000343",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5badbaaf2fdbb487332ea7173e7a9217cd098d627c97d30230e7edec09d8d63",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000344",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [
+            "R000007"
+          ],
+          "source_unit_id": "U004946"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000345",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000346",
+          "query_id": "Q0038",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6852dad03d2154913296d239fbfdefe3aa12237372d145b2a2bd9e9b7c9f345",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000347",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000073"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "848858c2a6ff1e56f8436e2ef6799873191cfb9bd3f51aa73c5421227fa4fb00",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000348",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000075"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "dbeaa2a9358804ce4299710973efcb164199b28cede6f8808634dc1e71227d53",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000349",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000076"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a9363c1cb1b8195e4d1367601aa288127a5732087af05cede123e603e0629980",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000350",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000077"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "600a3b0be9f0cc040d83ff1e8f7bf7f9c727b99f7263f00f9921d3f1c8d6ca6a",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000351",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000078"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bf4a2c5c2f2c3fed6a66414ed6992b67440b5bf9cf63e44668c7ddafd08e8eca",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000352",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000079"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "076e13ee0bd73ba654e1406a49df8c65db358bf16c8753aefbbb127dc4bd7ef7",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000353",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000081"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1ac32e3456e568e2738bff1dbbe197d9f4ec17ea548e043e41e2c69cea956b45",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000354",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000082"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "946b30b9dc6f02534e0b66e0771b623b51da08a81a30d0ae7009d69769371fdb",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000355",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000083"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "35de4875d9e8fa5502189ca1263eb8526e25d3b9c3773e706b8118fcda7e866d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000356",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000084"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3b130a3ed03221a673aeaee9d6ca900581cb0a28c2f79bf930738fea09d61970",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000357",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000085"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e34400671285ab192a2c421a4daaa5d6ea21b7ad55a4517815be9a9d975c056d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000358",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000086"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f18e425f65a30cab195cd7c154d0c6baa3d0ed3fbc2a95ab1567ad54a3ec041d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000359",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000087"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8da4d2d297b0fd8f7d2552ae761e097bab03e5aad8cf7eab0c5b9e3a49bca507",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000360",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000088"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "53bafd4cd4f1584341c904e657784d10b6f6e5ffb5d7daaab6e157fa6915abaf",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000361",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000089"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5edb14a61388bdc51809c7b2b83224adce38555327972e4158d119b3a1cb0d24",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000362",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000090"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0a973ce260c4ecac45409b2529ed5a080cc0f7d8d079f20ac5a07882b18d973c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000363",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000091"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "67e31191278ffc0d4808bb904fb1f2d1c07251451a3d2618e754a18b863bc46c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000364",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000092"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c4aa580c7e9ce1e239a795e4c7c5ac75433ee46572c1223812f01033f4648616",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000365",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000093"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b7d199dd4afe63fdb7258bb846c56b10edb4e69a2bfdeaa067f1e7991ca560ec",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000366",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000094"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4436f9e36b4eb224d3fca5e4146775dce31d2636f8c25f4b54caf9bea75bf10a",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000367",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000095"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3b39023687f3af4ace6a2456dac505beac582ef205b4813b21442940be1abcd7",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000368",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000096"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d3ee40b2a2ff78f9eaa5f249071ec46e5f43e37eb29d5b593d14727ba5f626f8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000369",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000097"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5d60e672ebce0267997386f438b0d77079cae23d14379d1a4892bd443cf45066",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000370",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000098"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "de3497ab2001ec566cf3da393b3c292d6030b49c7b3048b740ecaf97dc0f216d",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000371",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000100"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ada8529ae6617e5791a7d82fa2bc7cf406e0d42d74efb91e92a370568636f633",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000372",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000101"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "341e3d93b1fdce763c33c182d2f54441e3b32acf52ef3af9ef0eb8245a49de0e",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000373",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000104"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "02fa7ee0bc559b7d4cf1ffdf48bd1c1cd49002797cdb08f029b58fe64f731ef0",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000374",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000105"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e3f93e1c09a4f62f66c9094babe9acdf25462ea102a479865a8319398c29e0ac",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000375",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000106"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "85ac24e5841ef80152a62675e81f2826053e3b38627c8ae6a6898c6e5e0da8f5",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000376",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000107"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "cda81c56f2137a9213d2bf1230818954bcb1fed49b8e84364bba2f9a73433cba",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000377",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000109"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e6f77b7fec7b6544f2002544ac8a8b1f74b52927eb2b9dea7e9d9975f7335321",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000378",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000110"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "066c51986ba4db032e31980aa94622c3deb111a4d9d1220751dd10a9930f4a39",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000379",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000111"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a35e4d149f3c94379d5d10d5a0937224c97a42f84b85b6cf737854d503dd8965",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000380",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000114"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e5e99afe98e56d84636ad21d4671b7cbd07f9b77eb9ab2afdb674b8a47df9d3f",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000381",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000115"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3ce2dabd6852b0bd66c252f785644f8097b8aef917e40cce46f20f1a030f5dcf",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000382",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000118"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "47b2c76a43e803bcade6bf0c0b551b6e7d8236e9ae605a0b97a5f9235f7bb589",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000383",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000119"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4f0ac65537c84e8c737cb1ed6a2264ed481738ce55dc34a3fcd7573e9de463a4",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000384",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000121"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d5a98c1a94ab9a6370072d43a4114d53ea6c96270836f322c60f10cc8cc4fd3b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000385",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000123"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "de6634ae81e02ba43f2b9398a9f16a94b4f174f83c71b5e5c1738cb0e1d4d175",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000386",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000124"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8be2af35fcd1f41eaf0d79d65219ced18ebe8a03c03fc5c0ae5c5ca375b2e0fa",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000387",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000125"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7a65fd788886ca648f7473cc8a399b41bf50ffd3949f447a2ea074221fcb311c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000388",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000126"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "65092d713649adb28b789be0ca3332fda63b4f98a1d46f4c0c14b7438d513291",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000389",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000127"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "510e877ebd7a1efdbd5bd2c9303ff4ae6ba488e247ca2a1a782950ce0521a518",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000390",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000128"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "058b16c6a4212543c754b0e40203e65316be12eb3ef8576569fc6cc97bb6b712",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000391",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000129"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "fd599464abeda1e6fddc276dba2413e5de09fd89805ff4f85b90fb457921c409",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000392",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000130"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5e62b5eddcd155af86e6d44509d6db02ae72f227597d6206b0add0261528c4f",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000393",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000131"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c5d31f061151918dc317e7b93227b82073ba665c62efd8a47bd2a9e4b136f840",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000394",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000133"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "dc5f97e0a0af7ff61becd26ad6538c583a6cc08366d7892eba1a8d0b80b29777",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000395",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000134"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "126c3e3bf1f4b42c774624cec1f1457f0022a0f4b7e31a28bd2c8dc3deb508c8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000396",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000136"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0d750009645337559a4343002be2ecf3bcfe84c5f66bf66b549dbb6e3380ec96",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000397",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000139"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2011e89ebba6124b0a4b2cc6a8de25bd24663de3d32b9e1825e8ce726634840b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000398",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000140"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "9746c983786289ab3c40fa20dd8be3b71a62cc0edbf065344f3b2d5abe7e4acb",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000399",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000144"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2c9cc6b9cccc3ba424f89b7b14247cd5c1ca4bbbd0eb375245c22e79be38c154",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000400",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000145"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f7c54e2cbfe447288579a1f660e7bd0a45c89ece78e2b1ce76db34aa290f4eb5",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000401",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000146"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "705cd4e8918566e7cff68e29fd7f2e029fb07bcf15fec9aab8b52ed3ed1ff6fd",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000402",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000147"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "17c72a194cf90cb03f0c468597dc45cc4a2318f6ce71c9bf58f85c4a10ada9bc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000403",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000148"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "d83750f2820ec306984d456adfa6d28446578f7337a6d8ca57956ccf63490769",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000404",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000149"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "55be94289b241db420873fd5ea1c2bc58c2b8dc13b3ea075150e23647f7dc275",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000405",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000150"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "730ad8fbdf4987b2a6178f8667d7dc11840659570cc750a2e0f0eaf3a151ecaf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000406",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U000153"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d6a7b7f613a2f07598ae6061d45bfb47c1c0c826b92f23469874fc8a069dae7e",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000407",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000155"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3ac309d18e3fd6103d82c035ea0035388056924e4645370719def3eed95644fe",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000408",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000159"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "53cd4f994a0f9daf22659a67ce64bb13f5cb0ae1a616732aa4c6269a27759593",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000409",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000161"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "030d4454c57326a49f97aaaa41a703e18a1b5fb3098fcbb09a5cb9354b1212e2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000410",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000162"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4310f97d37f8b136372ad745d7f748bca71ccf82db5737c85a4dac6fed2f4789",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000411",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000163"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c4797ca4160cd236a4eaa29d382f360368753b4d0a4230316820c13d53078aa8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000412",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000164"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a2fb4b9ee211628e1ef2e68ba4aa45005ed89ae445c8262836475f18accb7fac",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000413",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000171"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0707489be6c08c175fa6292a15ff9ef0f014b2162de19046294f6da363db24a8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000414",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004927"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8244463aa20235f8470dadaf683dfef5f4d9a26a26985668eab0426a38238690",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000415",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004928"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5b83c546b067e74a9b8e1391b62c33c27daa8c14f248e21b4338f93eae7297b9",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000416",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004929"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000417",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000418",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f0c6bc7e4779892fd128a2fa7dc172ec719898bd357cc32ea8c84177c5b0d88c",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000419",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004933"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "da73b6f0aabd92e86148fe4983b2db563a4f654a35623a7261d5bd035ed42e46",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000420",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004934"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0135b39b95f39cedc1ea39161c1ef8a0e76936e4238a0a62ad78a8027358536b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000421",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004935"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000422",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2b5b1f87a7bb9adf7482b6c220cdb8c00cbcf89b06da48fc0514685df636dbfc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000423",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004937"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd3216451966aa7bd8b0c798df89c3eaddf6ea1aff30a77225870d0d58659bc",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000424",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004938"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0edc45e85e110ff26cdff0b3350ca30a17bfbc2dadd15940dd3a22a4b2d17a8d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000425",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004939"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "42198927099cad92ebb4cf9a892fa85ab53149999d980c7514229082fd5497c8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000426",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004942"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d3127aab60129c262565e8c69deef7a6b08c324c15f854059a2b25d3a8f234e2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000427",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004943"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e7f100448807b830975cbda8917b7ff926d2226d47d56c621c37148c79389c20",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000428",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004945"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a5badbaaf2fdbb487332ea7173e7a9217cd098d627c97d30230e7edec09d8d63",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000429",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [
+            "R000007"
+          ],
+          "source_unit_id": "U004946"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "170859b7f09cadd02a51fe3e2f2e9f052c15ea3268911949fb7747de0722c8fa",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000430",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004949"
+        },
+        {
+          "candidate_ids": [
+            "B0005"
+          ],
+          "context_sha256": "f10dd2d5665b309bd331cad07a3045cdb10eb4dc58bc96ecfbf70e55be873714",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000431",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004952"
+        },
+        {
+          "candidate_ids": [
+            "B0003"
+          ],
+          "context_sha256": "f600f52661089ee4ba67212633acb666b231c976ccc3c063a8c9692be8b50837",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000432",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004953"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4cef7315ce302f2dd6dae4058712fe1bc61d4196796635c1aff8819cb2223fef",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000433",
+          "query_id": "Q0039",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004956"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "dbeaa2a9358804ce4299710973efcb164199b28cede6f8808634dc1e71227d53",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000434",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000076"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "85ac24e5841ef80152a62675e81f2826053e3b38627c8ae6a6898c6e5e0da8f5",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000435",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000107"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "cda81c56f2137a9213d2bf1230818954bcb1fed49b8e84364bba2f9a73433cba",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000436",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000109"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e5e99afe98e56d84636ad21d4671b7cbd07f9b77eb9ab2afdb674b8a47df9d3f",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000437",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U000115"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3ce2dabd6852b0bd66c252f785644f8097b8aef917e40cce46f20f1a030f5dcf",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000438",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000118"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "47b2c76a43e803bcade6bf0c0b551b6e7d8236e9ae605a0b97a5f9235f7bb589",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000439",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000119"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "fd599464abeda1e6fddc276dba2413e5de09fd89805ff4f85b90fb457921c409",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000440",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000130"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6b0834de6ccc2aca3d77c9324daaf8acb61852457a84a47781b653d979bc4ca3",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000441",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000132"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "126c3e3bf1f4b42c774624cec1f1457f0022a0f4b7e31a28bd2c8dc3deb508c8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000442",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000136"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "2c9cc6b9cccc3ba424f89b7b14247cd5c1ca4bbbd0eb375245c22e79be38c154",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000443",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000145"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f7c54e2cbfe447288579a1f660e7bd0a45c89ece78e2b1ce76db34aa290f4eb5",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000444",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000146"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7504d8418b8b7341891ae4443b5403378a9b865d3817974c8b311e12b09c4d83",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000445",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004930"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6a19884d026ebab27f737d4677cf1d900a6d1a9d139a0bfacfb7c55584e6f5a8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000446",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review identifies this hit as application, representation, comparison, or an already-routed locator, not a new native construction.",
+          "route_ids": [],
+          "source_unit_id": "U004932"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3f40bbb8a1ed9492ebbbcd5e4aec0198bfb35c109d230154b5cb65df86865dd2",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000447",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review finds framing, history, behavior, or incidental terminology without both an identity and native semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004936"
+        },
+        {
+          "candidate_ids": [
+            "B0004"
+          ],
+          "context_sha256": "ec1fad2243f91bfec607282432d66c3f49c603bc2849638cdd35512b520bbe2a",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000448",
+          "query_id": "Q0040",
+          "rationale": "Sequential context review already captured this hit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004951"
+        }
+      ],
+      "kind": "LOCAL",
+      "new_candidates": [],
+      "new_evidence_groups": [],
+      "new_routes": [],
+      "new_vocabulary": [],
+      "owning_stage": 5,
+      "queries": [
+        {
+          "case_sensitive": false,
+          "family": "candidate subtype",
+          "mode": "LITERAL",
+          "pattern": "elementary cellular automata",
+          "query_id": "Q0030",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate family",
+          "mode": "REGEX",
+          "pattern": "\\bcellular automat(?:on|a)\\b",
+          "query_id": "Q0031",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate seed",
+          "mode": "LITERAL",
+          "pattern": "random initial conditions",
+          "query_id": "Q0032",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "particle/disk mechanics",
+          "mode": "REGEX",
+          "pattern": "\\b(?:disks?|particles?|collid(?:e|es|ed|ing|isions?)|square grid|conservation laws?)\\b",
+          "query_id": "Q0033",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "seed generator",
+          "mode": "LITERAL",
+          "pattern": "middle-square",
+          "query_id": "Q0034",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "native evolution mechanics",
+          "mode": "REGEX",
+          "pattern": "\\b(?:initial conditions?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
+          "query_id": "Q0035",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "stochasticity guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:random(?:ness)?|randomization|probabilistic|probability|stochastic|Bernoulli)\\b",
+          "query_id": "Q0036",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "declarative-function guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential|logic)\\b",
+          "query_id": "Q0037",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "input-generator-structure guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|register machines?|mobile automata|automaton)\\b",
+          "query_id": "Q0038",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "general construction nouns",
+          "mode": "REGEX",
+          "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
+          "query_id": "Q0039",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "representation-application boundary",
+          "mode": "REGEX",
+          "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
+          "query_id": "Q0040",
+          "scope_paths": [
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+          ],
+          "whole_word": false
+        }
+      ],
+      "rerun_digest": "b8d90cd84aea3ca6c0b750d1fb1495c1a5749d2e6c5c2dfcb12caba594d926ca",
+      "result_digest": "b8d90cd84aea3ca6c0b750d1fb1495c1a5749d2e6c5c2dfcb12caba594d926ca",
+      "result_ids": [
+        "H000297",
+        "H000298",
+        "H000299",
+        "H000300",
+        "H000301",
+        "H000302",
+        "H000303",
+        "H000304",
+        "H000305",
+        "H000306",
+        "H000307",
+        "H000308",
+        "H000309",
+        "H000310",
+        "H000311",
+        "H000312",
+        "H000313",
+        "H000314",
+        "H000315",
+        "H000316",
+        "H000317",
+        "H000318",
+        "H000319",
+        "H000320",
+        "H000321",
+        "H000322",
+        "H000323",
+        "H000324",
+        "H000325",
+        "H000326",
+        "H000327",
+        "H000328",
+        "H000329",
+        "H000330",
+        "H000331",
+        "H000332",
+        "H000333",
+        "H000334",
+        "H000335",
+        "H000336",
+        "H000337",
+        "H000338",
+        "H000339",
+        "H000340",
+        "H000341",
+        "H000342",
+        "H000343",
+        "H000344",
+        "H000345",
+        "H000346",
+        "H000347",
+        "H000348",
+        "H000349",
+        "H000350",
+        "H000351",
+        "H000352",
+        "H000353",
+        "H000354",
+        "H000355",
+        "H000356",
+        "H000357",
+        "H000358",
+        "H000359",
+        "H000360",
+        "H000361",
+        "H000362",
+        "H000363",
+        "H000364",
+        "H000365",
+        "H000366",
+        "H000367",
+        "H000368",
+        "H000369",
+        "H000370",
+        "H000371",
+        "H000372",
+        "H000373",
+        "H000374",
+        "H000375",
+        "H000376",
+        "H000377",
+        "H000378",
+        "H000379",
+        "H000380",
+        "H000381",
+        "H000382",
+        "H000383",
+        "H000384",
+        "H000385",
+        "H000386",
+        "H000387",
+        "H000388",
+        "H000389",
+        "H000390",
+        "H000391",
+        "H000392",
+        "H000393",
+        "H000394",
+        "H000395",
+        "H000396",
+        "H000397",
+        "H000398",
+        "H000399",
+        "H000400",
+        "H000401",
+        "H000402",
+        "H000403",
+        "H000404",
+        "H000405",
+        "H000406",
+        "H000407",
+        "H000408",
+        "H000409",
+        "H000410",
+        "H000411",
+        "H000412",
+        "H000413",
+        "H000414",
+        "H000415",
+        "H000416",
+        "H000417",
+        "H000418",
+        "H000419",
+        "H000420",
+        "H000421",
+        "H000422",
+        "H000423",
+        "H000424",
+        "H000425",
+        "H000426",
+        "H000427",
+        "H000428",
+        "H000429",
+        "H000430",
+        "H000431",
+        "H000432",
+        "H000433",
+        "H000434",
+        "H000435",
+        "H000436",
+        "H000437",
+        "H000438",
+        "H000439",
+        "H000440",
+        "H000441",
+        "H000442",
+        "H000443",
+        "H000444",
+        "H000445",
+        "H000446",
+        "H000447",
+        "H000448"
+      ],
+      "round_id": "S004",
+      "tool_assumptions": [
+        "Python Unicode regular expressions over decoded UTF-8 canonical source-unit byte ranges, with MULTILINE semantics and query-major then canonical source-unit result order."
+      ]
     }
   ],
   "schema_version": 1,
@@ -2026,6 +5789,18 @@
     "implementation",
     "representation",
     "display",
-    "render"
+    "render",
+    "elementary cellular automata",
+    "random initial conditions",
+    "middle-square",
+    "bouncing disks",
+    "collision",
+    "discrete particles",
+    "square grid",
+    "conservation laws",
+    "particle cellular automaton",
+    "register machine",
+    "logic",
+    "statistical physics"
   ]
 }

@@ -183,7 +183,14 @@ These are current facts after completion of Stages 1–3:
   images are reviewed, `B0001`/`B0002` record the Rule 30 and Rule 110
   bookend constructions, 4 cross-range routes are queued, and 2 exact-scope
   LOCAL rounds record 144 fully dispositioned hits with a zero-delta rerun.
-  The live state is valid and resumable at Stage 5.
+  The resulting state was the verified Stage 5 input.
+- Stage 5 is complete in `5-CH01-FOUNDATIONS.md`: all 142 paired Chapter 1
+  units and 3 images are reviewed; `B0003..B0005` provisionally capture the
+  1981 elementary-cellular-automaton experiment series, the forty-disk
+  statistical-physics preset, and the 1973 two-dimensional particle cellular
+  automaton; `R000005..R000011` preserve 7 cross-range obligations; and
+  `S003`/`S004` record 304 fully dispositioned hits with a zero-delta rerun.
+  The live state is valid and resumable at Stage 6.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -393,6 +400,8 @@ Blindly screen cover/contents, Preface, General Notes, and Colophon for construc
 - The stage contains no T-ID mapping or API-fit conclusion.
 
 ### 5-CH01-FOUNDATIONS
+
+Status: **COMPLETE** in `goal-4/5-CH01-FOUNDATIONS.md`.
 
 #### Big Picture Objective
 
