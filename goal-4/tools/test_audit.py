@@ -75,9 +75,7 @@ def append_history_event(
         ),
         None,
     )
-    normalized_mode = (
-        "SEARCH_APPEND" if mode == "SEARCH_ENRICHMENT" else mode
-    )
+    normalized_mode = mode
     core = {
         "review_id": f"V{len(history) + 1:06d}",
         "epoch": epoch,
@@ -526,7 +524,7 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         assets,
         units[0]["path"],
         1,
-        "SEARCH_ENRICHMENT",
+        "SEARCH_APPEND",
         "saturation-enricher",
         saturation_enrichment_search["rounds"],
         "SATURATION",

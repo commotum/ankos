@@ -4888,9 +4888,7 @@ def mutation_checks(
                     prior_search_change["after_search"]
                 )
 
-        normalized_mode = (
-            "SEARCH_APPEND" if mode == "SEARCH_ENRICHMENT" else mode
-        )
+        normalized_mode = mode
         missing_rounds = prior_rounds[
             len(current_search.get("rounds", [])) :
         ]
@@ -6559,7 +6557,7 @@ def mutation_checks(
         search_assets,
         path,
         2,
-        "SEARCH_ENRICHMENT",
+        "SEARCH_APPEND",
         "fixture-searcher",
         search_fixture["rounds"],
         full_search_state=search_fixture,
@@ -6689,7 +6687,7 @@ def mutation_checks(
             search_assets,
             path,
             2,
-            "SEARCH_ENRICHMENT",
+            "SEARCH_APPEND",
             "fixture-search-enricher",
             search_fixture["rounds"],
             "LOCAL",
@@ -6738,7 +6736,7 @@ def mutation_checks(
             search_assets,
             path,
             2,
-            "SEARCH_ENRICHMENT",
+            "SEARCH_APPEND",
             "fixture-search-enricher",
             search_fixture["rounds"],
         )
@@ -6776,7 +6774,7 @@ def mutation_checks(
                 search_assets,
                 path,
                 2,
-                "SEARCH_ENRICHMENT",
+                "SEARCH_APPEND",
                 "fixture-search-enricher",
                 search_fixture["rounds"],
                 "LOCAL",
