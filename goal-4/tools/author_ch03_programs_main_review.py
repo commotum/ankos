@@ -138,6 +138,8 @@ def source_candidate(
     image_path: str | None = None,
     source_status: list[str] | None = None,
     uncertainties: list[str] | None = None,
+    parameters: list[tuple[str, str, list[str]]] | None = None,
+    variants: list[tuple[str, str, list[str]]] | None = None,
     route_keys: list[str] | None = None,
 ) -> CandidateSpec:
     spec = candidate(
@@ -150,6 +152,8 @@ def source_candidate(
         missing=missing,
         source_status=source_status,
         uncertainties=uncertainties,
+        parameters=parameters,
+        variants=variants,
         route_keys=route_keys,
     )
     fields = list(facts) + list((not_applicable or {}).keys())
@@ -323,6 +327,19 @@ context_evidence(
     "U000333",
     "The survey caption fixes the single-black-cell runs and 88 symmetry classes.",
 )
+for _label, _unit, _path in [
+    ("eca-catalog-page69", "U000329", "CHAPTERS/_page_69_Rules_100_139.jpeg"),
+    ("eca-catalog-page70", "U000331", "CHAPTERS/_page_70_Picture_2.jpeg"),
+    ("eca-catalog-page71", "U000332", "CHAPTERS/_page_71_Picture_2.jpeg"),
+]:
+    context_evidence(
+        eca_family,
+        _label,
+        _unit,
+        "Original-resolution inspection confirms that this is one part of the complete 256-rule catalog.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
 
 
 codec_facts = {
@@ -384,6 +401,49 @@ context_evidence(
     "U000324",
     "Original-resolution inspection confirms the ordered eight-case visual table.",
     image_path="CHAPTERS/_page_68_Figure_7.jpeg",
+    strength="CORROBORATING",
+)
+
+eca_quotient_facts = {
+    "object_kind": "A deterministic equivalence quotient on elementary cellular-automaton rules.",
+    "native_time": "No native time; this is a fixed equivalence-class query.",
+    "carrier": "The 256 elementary binary nearest-neighbor rule tables.",
+    "support": "Ordered eight-case elementary rule tables and their 0--255 codes.",
+    "alphabet_or_value_schema": "Binary rule outputs, acted on by left/right reflection and black/white exchange.",
+    "complete_state": "One complete elementary rule table or its code.",
+    "input": "One elementary rule.",
+    "law_kind": "A finite symmetry-generated equivalence relation.",
+    "rule_relation_constraint_function_or_probability_law": (
+        "Treat rules as equivalent when one is obtained from another by "
+        "interchanging left and right or by interchanging black and white, "
+        "including compositions of those operations."
+    ),
+    "result_kind": "The rule's equivalence class, one of 88 fundamentally inequivalent classes.",
+    "successor_cardinality": "Exactly one equivalence class contains each elementary rule.",
+    "determinism_branching_or_measure": "Deterministic and non-probabilistic.",
+    "witness_semantics": "Two rules witness equivalence when a stated interchange maps one complete table to the other.",
+    "parameters_and_variants": "The source permits left/right and black/white interchange.",
+    "excluded_observers_and_representations": "Catalog layout and observed behavior do not alter equivalence.",
+    "evidence_limit": "The source does not select a canonical representative for each class.",
+}
+eca_quotient = source_candidate(
+    "eca-symmetry-quotient",
+    "elementary cellular-automaton reflection/color equivalence quotient",
+    "U000333",
+    eca_quotient_facts,
+    aliases=["88 fundamentally inequivalent elementary rules"],
+    not_applicable=codec_na,
+    missing="No canonical representative-selection convention is stated.",
+    claim=(
+        "The caption explicitly defines equivalence under left/right or "
+        "black/white interchange and states that the 256 rules form 88 classes."
+    ),
+)
+context_evidence(
+    eca_quotient,
+    "eca-symmetry-rule110",
+    "U000348",
+    "The rule-110 discussion corroborates the quotient by identifying four equivalent cases under the same interchanges.",
     strength="CORROBORATING",
 )
 
@@ -521,6 +581,22 @@ eca_rules[150] = eca_preset(
     "A nested pattern with the captioned fractal dimension.",
     image_path="CHAPTERS/_page_73_Figure_1.jpeg",
 )
+for _rule in [105, 129]:
+    eca_rules[_rule] = eca_preset(
+        _rule,
+        "U000338",
+        "A displayed nested elementary-rule evolution.",
+        image_path="CHAPTERS/_page_73_Figure_1.jpeg",
+    )
+for _rule in [22, 60, 225]:
+    context_evidence(
+        eca_rules[_rule],
+        f"eca-rule-{_rule}-nested-figure",
+        "U000338",
+        f"The curated nested-rule figure visibly identifies and displays rule {_rule}.",
+        image_path="CHAPTERS/_page_73_Figure_1.jpeg",
+        strength="CORROBORATING",
+    )
 eca_rules[45] = eca_preset(
     45,
     "U000344",
