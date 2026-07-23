@@ -197,8 +197,8 @@ def rule_30_candidate() -> dict[str, Any]:
         fields=e1_fields,
     )
     e4 = evidence(
-        "WE000004",
-        "WG000004",
+        "WE000003",
+        "WG000003",
         anchor_kind="SOURCE_UNIT",
         anchor_id="U004873",
         source_unit_id="U004873",
@@ -218,7 +218,7 @@ def rule_30_candidate() -> dict[str, Any]:
         ),
         "native_time": (
             "Discrete generations represented by successive rows.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
         "carrier": (
             "A row of cell positions represented by people holding cards.",
@@ -227,7 +227,7 @@ def rule_30_candidate() -> dict[str, Any]:
         "support": (
             "A one-dimensional row whose successive generations form a "
             "two-dimensional history display.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
         "topology": (
             "Linear left/self/right adjacency is used for predecessor reads.",
@@ -243,7 +243,7 @@ def rule_30_candidate() -> dict[str, Any]:
         ),
         "seed": (
             "One black cell with all other displayed cells white.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
         "frontier_or_activation": (
             "Every position in the next successive row determines a value.",
@@ -265,7 +265,7 @@ def rule_30_candidate() -> dict[str, Any]:
         "result_kind": (
             "A unique successive-row evolution, displayed as a space-time "
             "pattern.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
         "successor_cardinality": (
             "Each next-row cell is determined once the referenced rule is "
@@ -279,18 +279,18 @@ def rule_30_candidate() -> dict[str, Any]:
         "parameters_and_variants": (
             "Rule number 30, a single-black-cell seed, and finite stadium or "
             "endpaper display windows.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
         "excluded_observers_and_representations": (
             "People/cards, the stadium photograph, endpaper cropping, and "
             "retained prior rows are representations rather than extra native "
             "state or mechanics.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
         "evidence_limit": (
             "These bookends omit the Rule 30 lookup table and boundary "
             "convention; page 27/page 29 routes must supply them.",
-            ["WE000001", "WE000004"],
+            ["WE000001", "WE000003"],
         ),
     }
     missing = (
@@ -321,7 +321,7 @@ def rule_30_candidate() -> dict[str, Any]:
                 "source_description": (
                     "The endpapers show the first and next roughly 500 steps."
                 ),
-                "evidence_ids": ["WE000004"],
+                "evidence_ids": ["WE000003"],
             },
         ],
         variants=[
@@ -330,7 +330,7 @@ def rule_30_candidate() -> dict[str, Any]:
                 "source_description": (
                     "One black cell is used with all other cells white."
                 ),
-                "evidence_ids": ["WE000001", "WE000004"],
+                "evidence_ids": ["WE000001", "WE000003"],
             }
         ],
         missing=missing,
@@ -378,8 +378,8 @@ def rule_110_candidate() -> dict[str, Any]:
         fields=e2_fields,
     )
     e3 = evidence(
-        "WE000003",
-        "WG000003",
+        "WE000004",
+        "WG000004",
         anchor_kind="IMAGE",
         anchor_id=RULE_110_IMAGE,
         source_unit_id="U004872",
@@ -409,7 +409,7 @@ def rule_110_candidate() -> dict[str, Any]:
         "support": (
             "A one-dimensional cellular row whose evolution is displayed as "
             "a long space-time diagram.",
-            ["WE000002", "WE000003"],
+            ["WE000002", "WE000004"],
         ),
         "alphabet_or_value_schema": (
             "Two values represented by empty and filled square symbols.",
@@ -418,7 +418,7 @@ def rule_110_candidate() -> dict[str, Any]:
         "visible_history": (
             "The illustration retains 3000 generations as a space-time "
             "history; this does not establish that the rule reads history.",
-            ["WE000003"],
+            ["WE000004"],
         ),
         "seed": (
             "An interface between repeats of □□□■■■■■ and repeats of "
@@ -432,7 +432,7 @@ def rule_110_candidate() -> dict[str, Any]:
         "result_kind": (
             "A unique long evolution pattern with measured growth and "
             "persistent structures.",
-            ["WE000002", "WE000003"],
+            ["WE000002", "WE000004"],
         ),
         "determinism_branching_or_measure": (
             "The source presents one deterministic evolution; no branching "
@@ -448,12 +448,12 @@ def rule_110_candidate() -> dict[str, Any]:
             "Cover cropping, growth rates, edge-period measurements, and "
             "persistent-structure counts describe or observe the evolution "
             "rather than alter its native rule.",
-            ["WE000002", "WE000003"],
+            ["WE000002", "WE000004"],
         ),
         "evidence_limit": (
             "The transition lookup and boundary convention are absent; page "
             "32 and page 292 routes must supply rule and structure details.",
-            ["WE000002", "WE000003"],
+            ["WE000002", "WE000004"],
         ),
     }
     missing = (
@@ -494,7 +494,7 @@ def rule_110_candidate() -> dict[str, Any]:
                     "The note distinguishes a 3000-step illustration from the "
                     "roughly 440-step cropped cover image."
                 ),
-                "evidence_ids": ["WE000002", "WE000003"],
+                "evidence_ids": ["WE000002", "WE000004"],
             },
         ],
         variants=[],
