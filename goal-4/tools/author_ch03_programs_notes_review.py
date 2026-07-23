@@ -1182,6 +1182,10 @@ for key, name, state_count, steps, black_cells, group_name in [
     witness["evidence"][0]["fields"].remove(
         "rule_relation_constraint_function_or_probability_law"
     )
+    witness["evidence"][0]["claim"] = (
+        f"The source directly delimits the {state_count}-state witness and "
+        f"states its {steps}-step, {black_cells}-black-cell result."
+    )
     add_support(
         witness,
         label=f"{key}-rule-table",
@@ -1233,6 +1237,10 @@ busy5 = preset(
 )
 busy5["evidence"][0]["fields"].remove(
     "rule_relation_constraint_function_or_probability_law"
+)
+busy5["evidence"][0]["claim"] = (
+    "The source directly delimits the five-state lower-bound witness and "
+    "states its halting-time and black-cell result without claiming optimality."
 )
 add_support(
     busy5,
@@ -2276,6 +2284,17 @@ symbolic["facts"]["structural_invariants"] = (
 )
 add_support(
     symbolic,
+    label="symbolic-iteration-interface",
+    unit="U005589",
+    claim=(
+        "The NestList definition supplies the concrete rewrite rule, initial "
+        "expression argument, and requested step count."
+    ),
+    fields=["parameters_and_variants"],
+    modality="CODE",
+)
+add_support(
+    symbolic,
     label="symbolic-nonlocal-representations",
     unit="U005593",
     claim=(
@@ -2306,7 +2325,7 @@ add_support(
         "The source states the depth-zero fixed-point condition and an explicit "
         "upper bound on the number of steps."
     ),
-    fields=["termination_completion_failure", "parameters_and_variants"],
+    fields=["termination_completion_failure"],
     modality="FORMULA",
 )
 add_support(
@@ -2364,6 +2383,7 @@ symbolic_codecs = direct_object(
     modality="PROSE",
 )
 for field in [
+    "carrier",
     "input",
     "rule_relation_constraint_function_or_probability_law",
     "result_kind",
@@ -2392,7 +2412,7 @@ add_support(
     label="polish-encoder-introduction",
     unit="U005593",
     claim="The source identifies the Polish encoder and its expression input.",
-    fields=["input", "parameters_and_variants"],
+    fields=["carrier", "input", "parameters_and_variants"],
 )
 add_support(
     symbolic_codecs,
@@ -2411,7 +2431,7 @@ add_support(
     label="polish-decoder-introduction",
     unit="U005595",
     claim="The source identifies recovery of the original expression.",
-    fields=["input", "result_kind", "parameters_and_variants"],
+    fields=["carrier", "input", "result_kind", "parameters_and_variants"],
 )
 add_support(
     symbolic_codecs,
@@ -2488,6 +2508,9 @@ expression_enum = direct_object(
     ),
     result="The complete list of expressions with LeafCount n.",
     parameters="Symbol set s and leaf count n.",
+)
+expression_enum["evidence"][0]["fields"].remove(
+    "rule_relation_constraint_function_or_probability_law"
 )
 add_support(
     expression_enum,
