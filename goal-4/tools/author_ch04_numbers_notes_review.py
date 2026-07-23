@@ -1,0 +1,803 @@
+#!/usr/bin/env python3
+"""Author the sealed Stage-8 Chapter-4 Notes blind-review worksheet.
+
+This helper is intentionally data-driven and bundle-local.  It does not search
+the repository or consult any taxonomy, API, runtime, or implementation plan.
+It can be rerun against a freshly rebuilt copy of the same worker bundle.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import tempfile
+from collections import defaultdict
+from pathlib import Path
+from typing import Any
+
+
+WORKER = "ch04-notes-reader-e1"
+STAGE = 8
+EPOCH = 1
+
+FIELDS = [
+    "object_kind",
+    "native_time",
+    "carrier",
+    "support",
+    "topology",
+    "structural_invariants",
+    "alphabet_or_value_schema",
+    "complete_state",
+    "visible_history",
+    "control_state",
+    "seed",
+    "input",
+    "boundary",
+    "external_data",
+    "frontier_or_activation",
+    "schedule",
+    "read_dependencies_or_neighborhood",
+    "law_kind",
+    "rule_relation_constraint_function_or_probability_law",
+    "write_replacement_assembly_or_commit",
+    "result_kind",
+    "successor_cardinality",
+    "determinism_branching_or_measure",
+    "termination_completion_failure",
+    "witness_semantics",
+    "parameters_and_variants",
+    "excluded_observers_and_representations",
+    "evidence_limit",
+]
+
+N_A = {
+    "native_time",
+    "topology",
+    "visible_history",
+    "control_state",
+    "seed",
+    "boundary",
+    "external_data",
+    "frontier_or_activation",
+    "schedule",
+}
+
+
+def S(
+    name: str,
+    uids: list[str],
+    kind: str,
+    law: str,
+    *,
+    params: tuple[str, ...] = (),
+    variants: tuple[str, ...] = (),
+    missing: tuple[str, ...] = (),
+    routes: tuple[str, ...] = (),
+    images: tuple[str, ...] = (),
+    image_direct: bool = False,
+    overrides: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    return {
+        "name": name,
+        "uids": uids,
+        "kind": kind,
+        "law": law,
+        "params": params,
+        "variants": variants,
+        "missing": missing,
+        "route_keys": routes,
+        "images": images,
+        "image_direct": image_direct,
+        "overrides": overrides or {},
+    }
+
+
+BITWISE_IMAGE = (
+    "BACK-MATTER/NOTES/"
+    "_page_921_iterated_bitwise_operations_six_panel_row.jpeg"
+)
+OTHER_PDE_IMAGE = "BACK-MATTER/NOTES/_page_940_Picture_4.jpeg"
+
+
+# Canonical first-occurrence order.  Alternatives are kept separate whenever
+# the Book gives a distinct law, relation, query, solver, or observer.
+SPECS = [
+    S("whole-number positional digit encoder", ["U005639", "U005640"], "REPRESENTATION", "Reverse[Mod[NestWhileList[Floor[#/k] &, n, # >= k &], k]]", params=("n", "k")),
+    S("positional digit decoder", ["U005641", "U005642"], "REPRESENTATION", "Fold[k #1 + #2 &, 0, list]", params=("list", "k")),
+    S("fractional positional digit generator", ["U005643", "U005644"], "REPRESENTATION", "Floor[k NestList[Mod[k #, 1] &, x, m - 1]]", params=("x", "k", "m")),
+    S("fractional positional digit reconstruction", ["U005645", "U005646"], "REPRESENTATION", "Fold[#1/k + #2 &, 0, Reverse[list]]/k", params=("list", "k")),
+    S("Gray-code ordering generator", ["U005647", "U005648"], "GENERATOR", "GrayCode[m_] := Nest[Join[#, Length[#] + Reverse[#]] &, {0}, m]", params=("m",)),
+    S("base-2 one-digit count function", ["U005658", "U005659", "U005660"], "FUNCTION", "DigitCount[n, 2, 1], with stated integer/noninteger-base and correlation generalizations", params=("n", "base", "digit"), variants=("integer and noninteger bases", "digit correlations")),
+    S("negative-base positional representation", ["U005662"], "REPRESENTATION", "FromDigits[list, -k] with digits 0 through k-1", params=("list", "k")),
+    S("non-power place-value representation", ["U005664"], "REPRESENTATION", "Sum[a[n] f[n], {n, 0, Infinity}] with constrained growth of f", params=("a", "f")),
+    S("multiplicative prime-exponent representation", ["U005665"], "REPRESENTATION", "integer represented by the exponent sequence in its prime factorization", params=("integer",)),
+    S("powers-of-three base-2 digit sequence", ["U005667"], "FUNCTION", "n maps to IntegerDigits[3^n, 2]", params=("n",)),
+    S("truncated powers-of-three congruential generator", ["U005669", "U005670"], "ITERATION", "Mod[3^n, 2^s], equivalently a linear congruential generator on the rightmost s bits", params=("n", "s")),
+    S("base-6 cellular automaton for powers of three", ["U005671"], "CA", "strictly local base-6 cellular automaton whose detailed rule is at page 614", routes=("powers3_ca",), missing=("The local transition table is outside the sealed Notes range.",)),
+    S("fractional-parts power sequence", ["U005673"], "FUNCTION", "n maps to Mod[(3/2)^n, 1]", params=("n",), variants=("general Mod[h^n,1] family",)),
+    S("base-6 cellular automaton for powers of 3/2", ["U005674", "U005675", "U005676"], "CA", "{a,b,c} -> 3 Mod[a + Quotient[b,2],2] + Quotient[3 Mod[b,2] + Quotient[c,2],2]", params=("initial base-6 digits of u",), variants=("invertible rule",)),
+    S("general fractional-parts power family", ["U005677"], "FUNCTION", "n maps to Mod[h^n, 1]", params=("h", "n")),
+    S("irrational-rotation multiple sequence", ["U005678", "U005680"], "FUNCTION", "n maps to Mod[h n, 1]", params=("h", "n")),
+    S("Beatty-difference digit sequence", ["U005681"], "FUNCTION", "Floor[(n + 1) h] - Floor[n h]", params=("h", "n")),
+    S("continued-fraction-derived substitution generator", ["U005682", "U005683", "U005684", "U005685"], "SUBSTITUTION", "derive a rule list from ContinuedFraction[h,m], then Fold replacement from {0}", params=("h", "m"), variants=("periodic rule set for quadratic h",)),
+    S("rotated page-117 digit substitution preset", ["U005657"], "SUBSTITUTION", "pattern described as a rotated first substitution-system example from page 83", routes=("page117_sub",), missing=("The replacement rule and seed are only at the routed target.",)),
+    S("page-122 parity integer map", ["U005687", "U005688"], "ITERATION", "If[EvenQ[n], 3 n/2, 3 (n + 1)/2]", params=("initial n", "t")),
+    S("standard 3n+1 map", ["U005689"], "ITERATION", "If[EvenQ[n], n/2, (3 n + 1)/2]", params=("initial n",)),
+    S("3n+1 eventual-one decision query", ["U005690"], "QUERY", "FixedPoint[(3 #/2^IntegerExponent[#, 2] + 1)/2 &, n] == 2", params=("n",)),
+    S("main-text 5n/2 parity map", ["U005691"], "ITERATION", "If[EvenQ[n], 5 n/2, (n + 1)/2]", params=("initial n",)),
+    S("base-6 cellular automaton for the 3n+1 map", ["U005696", "U005697", "U005698"], "CA", "{a,b,c} -> If[b==6, If[EvenQ[a],6,4], 3 Mod[a,2]+Quotient[b,2] /. 0->6 /; a==6]", params=("base-6 digit state",)),
+    S("parity-trace initial-condition reconstructor", ["U005699", "U005700"], "FUNCTION", "Fold backward through a supplied even/odd trace using modular inverse of 5, then return fixed-width base-2 digits", params=("parity list",)),
+    S("reversible rounded integer map", ["U005701", "U005702", "U005703", "U005704"], "ITERATION", "forward If[EvenQ[n],3n/2,Round[3n/4]] and inverse If[Mod[n,3]==0,2n/3,Round[4n/3]]", params=("n",), variants=("forward", "inverse")),
+    S("binary reversal-addition map", ["U005707", "U005708", "U005709", "U005711"], "ITERATION", "n -> n + FromDigits[Reverse[IntegerDigits[n,2]],2]", params=("n",), variants=("fixed-width with dropped carry", "ever-growing width")),
+    S("fixed-width digit-reversal permutation", ["U005713", "U005714"], "FUNCTION", "Table[FromDigits[Reverse[IntegerDigits[n,k,m]],k], {n,0,k^m-1}]", params=("k", "m")),
+    S("iterated run-length encoder", ["U005717", "U005718"], "ITERATION", "list -> Flatten[Map[{Length[#], First[#]} &, Split[list]]]", params=("initial list",)),
+    S("92-token substitution realization of run-length encoding", ["U005719", "U005720"], "SUBSTITUTION", "neighbor-independent replacement on 92 subsequences; one complete example replacement is printed", missing=("Only one of the 92 token replacements is stated.",)),
+    S("digit-count sequence append system", ["U005721", "U005722", "U005723"], "ITERATION", "list -> Join[list, IntegerDigits[Apply[Plus,list],2]]", params=("initial list",)),
+    S("BitXor[2 n,n] digit function", ["U005725"], "FUNCTION", "n maps to BitXor[2 n,n]", images=(BITWISE_IMAGE,), image_direct=True, params=("n",)),
+    S("BitXor[3+2 n,n] digit function", ["U005725"], "FUNCTION", "n maps to BitXor[3 + 2 n,n]", images=(BITWISE_IMAGE,), image_direct=True, params=("n",)),
+    S("BitXor[3 n,n] digit function", ["U005725"], "FUNCTION", "n maps to BitXor[3 n,n]", images=(BITWISE_IMAGE,), image_direct=True, params=("n",)),
+    S("BitXor[6 n,n] digit function", ["U005725"], "FUNCTION", "n maps to BitXor[6 n,n]", images=(BITWISE_IMAGE,), image_direct=True, params=("n",)),
+    S("BitOr[2 n,n] digit function", ["U005725"], "FUNCTION", "n maps to BitOr[2 n,n]", images=(BITWISE_IMAGE,), image_direct=True, params=("n",)),
+    S("BitOr[6 n,n] digit function", ["U005725"], "FUNCTION", "n maps to BitOr[6 n,n]", images=(BITWISE_IMAGE,), image_direct=True, params=("n",)),
+    S("page-128 linear recurrence family", ["U005728"], "ITERATION", "linear recurrence relations for the page-128 sequences", routes=("linear_recurrences",), missing=("The individual coefficients, orders, and initial values are at the routed target.",)),
+    S("factorial recurrence", ["U005729", "U005730"], "ITERATION", "f[1]=1; f[n]:=n f[n-1]", params=("n",)),
+    S("quadratic logistic recurrence", ["U005732", "U005733", "U005734"], "ITERATION", "f[0]=x; f[n]:=a f[n-1] (1-f[n-1])", params=("x", "a", "n")),
+    S("convenient two-argument Ackermann function", ["U005735", "U005736"], "FUNCTION", "f[1,n]=n; f[m,1]=f[m-1,2]; f[m,n]=f[m-1,f[m,n-1]+1]", params=("m", "n")),
+    S("original three-argument Ackermann function", ["U005737", "U005738", "U005739", "U005740", "U005741"], "FUNCTION", "f[1,x,y]=x+y; f[m,x,y]=Nest[f[m-1,x,#]&,x,y-1]", params=("m", "x", "y"), variants=("nested functional form",)),
+    S("memoized self-indexed recurrence", ["U005742", "U005743", "U005744"], "ITERATION", "f[n]=f[n-f[n-1]]+f[n-f[n-2]], with f[1]=f[2]=1 and memoized evaluation", params=("n",), variants=("evaluation-order-sensitive semantics",)),
+    S("page-131 sequence (d)", ["U005745", "U005746", "U005747", "U005748", "U005749", "U005750", "U005751", "U005752"], "FUNCTION", "f[n]=(n+g[IntegerDigits[n,2]])/2 with the printed recursive clauses for g", params=("n",), variants=("element multiplicity enumeration", "difference substitution form", "largest-preimage query")),
+    S("page-131 sequence (c) hump generator", ["U005753", "U005754", "U005755", "U005756"], "GENERATOR", "printed FoldList hump formula and reordered-base-2 alternative generate the first 2^m elements", params=("m",), variants=("hump formula", "reordered digit generator")),
+    S("binary-dependency recursive-sequence schema", ["U005758", "U005760"], "RELATION", "f[n] has form f[p[n]]+f[q[n]], giving a binary dependency tree", params=("p", "q", "n")),
+    S("primitive-recursive construction calculus", ["U005762", "U005763", "U005764", "U005769"], "CALCULUS", "zero, successor, projections, composition, and primitive recursion; recursion unwinds as Fold", variants=("recursive clauses", "Fold unrolling")),
+    S("primitive-recursive plus", ["U005765", "U005766"], "FUNCTION", "plus[0,y]=y; plus[x,y]:=s[plus[x-1,y]]", params=("x", "y")),
+    S("primitive-recursive times", ["U005765", "U005766"], "FUNCTION", "times[0,y]=0; times[x,y]:=plus[times[x-1,y],y]", params=("x", "y")),
+    S("unbounded mu-search operator", ["U005770", "U005771", "U005772"], "QUERY", "mu[f] searches n=0,1,... until f[n,args]==0, and may not terminate", params=("f", "arguments")),
+    S("symbolic composition/recursion enumerator", ["U005773", "U005774", "U005775", "U005776", "U005777"], "CALCULUS", "c[g,h...] composes functions and r[g,h] performs primitive recursion, with recursive and Fold forms", variants=("composition", "primitive recursion", "unwound recursion")),
+    S("triangular-number primitive-recursive function", ["U005780"], "FUNCTION", "r[z,r[s,s]] = #(# + 1)/2", params=("integer",)),
+    S("exponential primitive-recursive function", ["U005781"], "FUNCTION", "r[z,r[s,c[s,s]]] = 2^(# + 1) - # - 2", params=("integer",)),
+    S("nested-power-ceiling primitive-recursive function", ["U005782"], "FUNCTION", "r[z,r[s,p[2]]] = 2^Ceiling[Log[2,# + 2]] - # - 2", params=("integer",)),
+    S("parity primitive-recursive function", ["U005783"], "FUNCTION", "r[z,r[c[s,z],z]] = Mod[#,2]", params=("integer",)),
+    S("double-exponential primitive-recursive fold", ["U005784"], "FUNCTION", "r[z,r[s,r[s,s]]] = Fold[#1(#1+1)/2 + #2 &,0,Range[#]]", params=("integer",)),
+    S("complex primitive-recursive function", ["U005785", "U005786", "U005787", "U005789"], "FUNCTION", "the printed nested Fold/Ceiling/Log expression", params=("integer",)),
+    S("Ackermann-related nested recursion family", ["U005791"], "FUNCTION", "Nest[r[c[s,z],#]&,c[s,s],n] = f[n+1,2,# + 1]-1", params=("n", "integer")),
+    S("diagonalized non-primitive-recursive function", ["U005793"], "FUNCTION", "given enumeration w[m], diagonalization yields x -> w[x][x], with a modulo-2 variant", params=("x",), variants=("unbounded value", "modulo 2")),
+    S("Ulam sequence", ["U005796", "U005797", "U005798"], "GENERATOR", "start {1,2}; append the smallest number expressible as a sum of two earlier terms in exactly one way", params=("initial sequence",)),
+    S("Fermat-little-theorem primality predicate", ["U005802"], "QUERY", "for prime p, Mod[a^(p-1),p]==1; used as a primality-testing condition", params=("a", "p"), missing=("The note does not give a complete false-positive-resistant primality algorithm.",)),
+    S("decimation system", ["U005803"], "ITERATION", "start with a line of cells and remove every kth cell that remains at each step", params=("k", "line")),
+    S("decimation survival-time query", ["U005804", "U005805"], "QUERY", "the printed Module/While recurrence returns how many steps cell n survives", params=("n", "k")),
+    S("Josephus last-cell function", ["U005807"], "FUNCTION", "Fold[Mod[#1+k,#2,1]&,1,Range[2,n]]", params=("n", "k")),
+    S("Moebius sign function", ["U005815"], "FUNCTION", "0 for a repeated prime factor; otherwise (-1)^Length[FactorInteger[n]]", params=("n",)),
+    S("Mertens cumulative-sum observer", ["U005815"], "OBSERVER", "FoldList[Plus,0,Table[MoebiusMu[i],{i,n}]]", params=("n",)),
+    S("divisor-count function", ["U005817"], "FUNCTION", "DivisorSigma[0,n] = Length[Divisors[n]]", params=("n",)),
+    S("aliquot-balance function", ["U005818", "U005819"], "FUNCTION", "DivisorSigma[1,n]-2n, with the printed Ramanujan trigonometric expansion", params=("n",)),
+    S("sum-of-two-squares representation count", ["U005820"], "FUNCTION", "4 Apply[Plus, Im[I^Divisors[n]]]", params=("n",)),
+    S("sum-of-d-squares cumulative relation", ["U005821"], "RELATION", "count below n equals lattice-point count inside a radius-Sqrt[n] d-sphere", params=("n", "d")),
+    S("sum-of-four-squares representation count", ["U005822"], "FUNCTION", "8 Apply[Plus, Select[Divisors[n], Mod[#,4] != 0 &]]", params=("n",)),
+    S("Goldbach two-prime representation count", ["U005823"], "FUNCTION", "Length[Select[n-Table[Prime[i],{i,PrimePi[n]}],PrimeQ]]", params=("n",)),
+    S("Hardy-Littlewood Goldbach-count estimate", ["U005823", "U005824"], "FUNCTION", "2 n Product[(p-1)/(p-2)]/Log[n]^2 over distinct nonfirst prime factors", params=("n",)),
+    S("trapezoidal-number representability relation", ["U005826"], "RELATION", "n is representable by successive rows a,a-1,... except exactly when n is a power of 2", params=("n", "a", "b")),
+    S("perfect-number constraint", ["U005830", "U005832"], "QUERY", "Apply[Plus,Divisors[n]] == 2 n", params=("n",), variants=("pluperfect", "quasiperfect")),
+    S("Lucas-Lehmer Mersenne-prime test", ["U005830"], "QUERY", "Nest[Mod[#^2-2,2^n-1]&,4,n-2] == 0", params=("n",)),
+    S("iterated aliquot-sum map", ["U005833", "U005835", "U005836"], "ITERATION", "n -> Apply[Plus,Divisors[n]]-n = DivisorSigma[1,n]-n", params=("initial n",)),
+    S("unbounded aliquot-growth query", ["U005837"], "QUERY", "whether an iterated aliquot trajectory can increase forever", params=("initial n",), missing=("The Book states that the decision remains unresolved.",)),
+    S("Leibniz pi approximation", ["U005841", "U005842"], "FUNCTION", "4 Sum[(-1)^k/(2k+1), {k,0,m}]", params=("m",)),
+    S("nested-radical product pi approximation", ["U005843", "U005844"], "FUNCTION", "2 Apply[Times, 2/Rest[NestList[Sqrt[2+#]&,0,m]]]", params=("m",)),
+    S("arithmetic-geometric-mean pi solver", ["U005845", "U005846", "U005847"], "SOLVER", "iterate arithmetic mean, geometric mean, correction, and doubled weight until a==b; return b^2/c", params=("precision n",)),
+    S("direct nth-binary-digit extractor", ["U005848", "U005849", "U005850"], "FUNCTION", "printed modular-power finite sum plus controlled tail, rounded after FractionalPart", params=("n", "tail d")),
+    S("Bailey-Borwein-Plouffe pi relation", ["U005851", "U005852"], "RELATION", "Sum[16^-k (4/(8k+1)-2/(8k+4)-1/(8k+5)-1/(8k+6)), {k,0,Infinity}]", params=("k",)),
+    S("rational digit repeat-period function", ["U005854", "U005855", "U005856", "U005857"], "FUNCTION", "MultiplicativeOrder[b, FixedPoint[#/GCD[#,b]&,n]]", params=("n", "b")),
+    S("normal-number constraint", ["U005860"], "QUERY", "every digit and every finite digit block has equal limiting frequency in the selected base", params=("number", "base"), variants=("Champernowne concatenation witness", "Stoneham family")),
+    S("Newton square-root iteration", ["U005861"], "ITERATION", "x -> (x+n/x)/2", params=("n", "initial x")),
+    S("recurrence-ratio square-root solver", ["U005862"], "SOLVER", "f[i]=2f[i-1]+f[i-2], f[1]=f[2]=1; successive ratios tend to 1+Sqrt[2]", params=("steps",)),
+    S("digit-by-digit square-root solver", ["U005863"], "SOLVER", "maintain s^2+4r==4^t n while minimizing r", params=("n", "t"), routes=("digit_sqrt",), missing=("The per-step update choosing the next digit is only in the routed main-text construction.",)),
+    S("Thue-Morse substitution digit constant", ["U005864"], "RELATION", "base-2 digits generated by {1->{1,0},0->{0,1}}, approximately 0.587545966 in base 10"),
+    S("Fibonacci-substitution digit number", ["U005865"], "RELATION", "digits from {1->{1,0},0->{1}} equal Sum[2^(-Floor[n GoldenRatio]),{n,Infinity}]", params=("n",)),
+    S("successive-integer concatenation sequence", ["U005867"], "GENERATOR", "Flatten[Table[IntegerDigits[i,k],{i,n}]]", params=("k", "n"), variants=("polynomial-value concatenation", "Gray-code digit concatenation")),
+    S("concatenation-sequence cumulative walk", ["U005869"], "OBSERVER", "FoldList[Plus,0,2 list-1]", params=("concatenation list",)),
+    S("leading-digit-dropped concatenation walk", ["U005871", "U005873", "U005874"], "OBSERVER", "FoldList cumulative sum over 2 Rest[IntegerDigits[i,2]]-1", params=("n",)),
+    S("direct concatenation-position query", ["U005875", "U005876", "U005877", "U005878"], "FUNCTION", "printed ProductLog/NestWhile block locator and indexed binary-digit expression", params=("position n",)),
+    S("large-block concatenation digit formula", ["U005879", "U005880"], "FUNCTION", "printed finite sum obtains about k^(n+1) concatenation digits efficiently", params=("k", "n")),
+    S("sparse-position transcendental digit families", ["U005883"], "RELATION", "binary digit 1 positions n!, 2^n, or Fibonacci[n] delimit transcendental numbers", params=("position sequence",)),
+    S("run-length digit decoder", ["U005884", "U005885"], "REPRESENTATION", "Fold[Join[#1,Table[1-Last[#1],{#2}]]&,{0},list]", params=("run-length list",)),
+    S("successive-integer-run digit function", ["U005886"], "FUNCTION", "n maps to Mod[Floor[1/2+Sqrt[2n]],2]", params=("n",)),
+    S("Benford leading-digit measure", ["U005887"], "RELATION", "leading digit s in base b has frequency Log[b,(s+1)/s] when FractionalPart[Log[b,a[n]]] is uniform", params=("s", "b", "sequence a")),
+    S("continued-fraction digit extractor", ["U005887", "U005888"], "FUNCTION", "Floor[NestList[1/Mod[#,1]&,x,n-1]]", params=("x", "n")),
+    S("continued-fraction reconstruction", ["U005889", "U005890"], "REPRESENTATION", "Fold[1/#1+#2&,Last[list],Rest[Reverse[list]]]", params=("continued-fraction list",)),
+    S("Gauss-map continued-fraction trajectory", ["U005891"], "ITERATION", "NestList[1/Mod[#,1]&,x,n]", params=("x", "n")),
+    S("continued-fraction term-size measure", ["U005893"], "RELATION", "P(term=s)=Log[2,(1+1/s)/(1+1/(s+1))]", params=("s",)),
+    S("regular continued-fraction approximation to pi", ["U005895", "U005896", "U005897"], "FUNCTION", "4/(Fold[#2/#1+2&,2,Reverse[Range[1,n,2]^2]]-1)", params=("n",)),
+    S("linear-polynomial continued-fraction relation", ["U005898"], "RELATION", "continued fractions with nth term a n+b equal a stated ratio of BesselI functions", params=("a", "b")),
+    S("Shallit nested continued-fraction substitution", ["U005899", "U005900"], "SUBSTITUTION", "printed ten-symbol replacement lookup and output-value list generate continued fractions for Sum[1/k^(2^i)]", params=("k", "n")),
+    S("rational-pair continued-fraction term enumerator", ["U005905", "U005906", "U005907"], "GENERATOR", "Flatten[Table[Rest[ContinuedFraction[a/b]],{b,2,n},{a,b-1}]]", params=("n",)),
+    S("continued-fraction approximation-quality observer", ["U005908", "U005909", "U005910"], "OBSERVER", "with nth convergent r, return -Log[Denominator[r],Abs[x-r]]", params=("x", "n")),
+    S("subtractive Euclidean algorithm", ["U005912"], "ITERATION", "{a,b} -> If[a>b,{a-b,b},{a,b-a}] until {GCD[a,b],0}", params=("a", "b")),
+    S("Euclidean rational-termination query", ["U005914"], "QUERY", "starting from {x,1}, termination holds exactly when x is rational", params=("x",)),
+    S("Egyptian-fraction relation", ["U005917"], "RELATION", "represent a number as Sum[1/a[n],{n,Infinity}] using distinct integers a[n]", params=("a",)),
+    S("nested-radical representation", ["U005917"], "REPRESENTATION", "Fold[Sqrt[#1+#2]&,0,Reverse[list]]", params=("digit list",), variants=("constant digit", "repeating digit block")),
+    S("nested-radical digit encoder", ["U005918", "U005919", "U005920"], "FUNCTION", "Ceiling[NestList[(2-Mod[-#,1])^2&,x^2,n-1]-2]", params=("x", "n")),
+    S("digital-slope representation", ["U005921"], "REPRESENTATION", "digit n is Floor[n h]-Floor[(n-1)h], uniquely representing slope h", params=("h", "n")),
+    S("digital-slope reconstruction", ["U005921", "U005922"], "FUNCTION", "Max[MapIndexed[#1/First[#2]&,FoldList[Plus,First[list],Rest[list]]]]", params=("digit list",)),
+    S("Farey-sequence generator", ["U005923", "U005924"], "GENERATOR", "Union[Flatten[Table[a/b,{b,n},{a,0,b}]]]", params=("n",)),
+    S("operator-tree integer representation family", ["U005927", "U005928"], "REPRESENTATION", "build integers from 1 by expression trees using stated binary operators; measure minimum applications", params=("target integer", "operator set"), variants=("addition", "2a+b-1", "k a+b-k+1", "BitXor", "BitOr", "addition and multiplication")),
+    S("Lissajous curve map", ["U005935"], "FUNCTION", "t maps to a tuple of sine functions on separate coordinate axes", params=("frequencies", "t")),
+    S("two-sine function and zero relation", ["U005937"], "RELATION", "Sin[a x]+Sin[b x]=2 Sin[(a+b)x/2] Cos[(a-b)x/2], with two printed zero families", params=("a", "b", "x")),
+    S("ODE denotation of an incommensurate sine sum", ["U005937"], "ODE", "y''[x]+2y[x]-Sin[x]==0, y[0]==0, y'[0]==2 denotes Sin[x]+Sin[Sqrt[2]x]", params=("x",)),
+    S("three-sine function and zero set", ["U005937", "U005938", "U005941"], "RELATION", "Sin[a x]+Sin[b x]+Sin[c x], with stated periodicity for rational coefficients", params=("a", "b", "c", "x")),
+    S("cosine-difference zero-spacing sequence", ["U005943", "U005944"], "FUNCTION", "(Floor[(n+1) q]-Floor[n q]) with q=(b-a)/(a+b)", params=("a", "b", "n")),
+    S("zero-spacing substitution realization", ["U005945"], "SUBSTITUTION", "substitution rules generate the cosine-difference spacing sequence; sine-sum variant inserts -1/2", routes=("zero_substitution",), variants=("cosine difference", "sine sum"), missing=("The replacement rules are at the routed page-903 discussion.",)),
+    S("harmonic sine Fourier partial sums", ["U005946"], "FUNCTION", "Sum[Sin[n x]/n,{n,k}]", params=("x", "k")),
+    S("square-frequency Fourier sum", ["U005948", "U005949", "U005950"], "FUNCTION", "Sum[Sin[n^2 x]/n^2,{n,k}], with printed finite rational-angle relation", params=("x", "k")),
+    S("lacunary power-of-two cosine sum", ["U005952"], "FUNCTION", "Sum[Cos[2^n x],{n,k}]", params=("x", "k")),
+    S("weighted Weierstrass cosine series", ["U005954"], "FUNCTION", "Sum[Cos[2^n x]/2^(a n),{n,Infinity}]", params=("x", "a")),
+    S("Riemann zeta denotation", ["U005956"], "RELATION", "Zeta[s]=Sum[1/n^s,{n,Infinity}]=Product[1/(1-Prime[n]^-s),{n,Infinity}]", params=("s",)),
+    S("Riemann-hypothesis constraint", ["U005956"], "QUERY", "every complex zero r satisfies Re[r]==1/2", params=("zeta zero",)),
+    S("Riemann-Siegel Z function", ["U005957"], "FUNCTION", "Zeta[1/2+I t] Exp[I RiemannSiegelTheta[t]]", params=("t",)),
+    S("Riemann-Siegel theta function", ["U005958", "U005959", "U005960"], "FUNCTION", "Arg[Gamma[1/4+I t/2]]-t Log[Pi]/2", params=("t",)),
+    S("Voronin zeta universality relation", ["U005964"], "RELATION", "some translate Zeta[z+(3/4+I t)] approximates any zero-free analytic function on Abs[z]<1/4", params=("target function", "precision")),
+    S("Gauss fractional-part reciprocal map", ["U005967"], "ITERATION", "x -> FractionalPart[1/x]", params=("x",)),
+    S("exact multiplier-mod-one map", ["U005968"], "ITERATION", "x -> FractionalPart[a x], with nth iterate FractionalPart[a^n x]", params=("a", "x", "n")),
+    S("exact tent-map family", ["U005968"], "ITERATION", "If[x<1/2,a x,a(1-x)]; at a=2 the nth iterate is ArcCos[Cos[2^n Pi x]]/Pi", params=("a", "x", "n")),
+    S("fixed-binary-precision shift-map simulation", ["U005972", "U005974", "U005975", "U005978"], "ITERATION", "IntegerDigits[Mod[2^n Floor[2^53 x],2^53],2,53]", params=("x", "n"), variants=("53-bit storage",)),
+    S("fixed-decimal-precision shift-map simulation", ["U005973", "U005974", "U005976", "U005977", "U005978"], "ITERATION", "Flatten[IntegerDigits[IntegerDigits[Mod[2^n Floor[10^12 x],10^12],10,12],2,4]]", params=("x", "n"), variants=("12-digit BCD storage",)),
+    S("finite-precision multiplication-by-3/2 simulation", ["U005981"], "ITERATION", "fixed-precision repeated multiplication by 3/2 as shown in the associated simulation", missing=("The rounding/fill convention and exact recurrence are not stated in this unit.",)),
+    S("smooth logistic map", ["U005990", "U005991"], "ITERATION", "x -> a x(1-x)", params=("a", "initial x")),
+    S("logistic-map leftmost-digit substitution observer", ["U005991"], "OBSERVER", "eventual leftmost digit follows a step-j trace of {1->{1,0},0->{1,1}} in period-2^j regimes", params=("a", "initial digit")),
+    S("Anosov torus map", ["U005993"], "ITERATION", "{x,y} -> Mod[m.{x,y},1]", params=("matrix m", "initial vector"), variants=("example matrix {{2,1},{1,1}}",)),
+    S("Lyapunov-exponent observer", ["U005995"], "OBSERVER", "after t steps a small difference is multiplied by approximately 2^(lambda t)", params=("trajectory", "t")),
+    S("continuous cellular-automaton family", ["U005997", "U005998", "U005999", "U006000"], "CA", "average left,self,right then apply f; f is FractionalPart[3#/2]& or FractionalPart[#+1/4]&", params=("f", "initial list", "steps"), variants=("page-157 multiplier", "page-158 additive offset", "exact rational", "approximate numeric"), overrides={"boundary": "periodic boundary induced by RotateLeft/RotateRight"}),
+    S("continuous-CA background trajectory", ["U006003"], "FUNCTION", "background at step t is FractionalPart[a t]", params=("a", "t")),
+    S("continuous-CA center-cell color observer", ["U006003"], "OBSERVER", "reads successive center-cell values while separately tracking background values", params=("parameter a", "trajectory")),
+    S("additive continuous cellular automaton", ["U006006", "U006007", "U006008"], "CA", "list -> Mod[RotateLeft[list]+RotateRight[list],1]", params=("initial list",), variants=("single 1/k seed",), overrides={"boundary": "periodic boundary induced by rotations"}),
+    S("probabilistic cellular automaton family", ["U006010"], "CA", "at each discrete-valued cell choose probabilistically between two cellular-automaton rules", routes=("probabilistic_ca",), missing=("The rule pair, probabilities, random coupling, and examples are only at page 591.",)),
+    S("autonomous ODE system relation", ["U006012"], "ODE", "a'[t]=f[a[t],b[t],...], with coupled equations for finitely many continuous variables", params=("functions", "initial/boundary data", "t")),
+    S("Klein-Gordon PDE relation", ["U006015"], "PDE", "partial_tt u[t,x] = partial_xx u[t,x] - u[t,x]", params=("u", "t", "x")),
+    S("Klein-Gordon exact pulse solution", ["U006015", "U006016"], "RELATION", "u[t,x]=If[x^2>t^2,0,BesselJ[0,Sqrt[t^2-x^2]]]", params=("t", "x")),
+    S("negative-diffusion PDE relation", ["U006024", "U006025", "U006026"], "PDE", "partial_t u[t,x] = -partial_xx u[t,x]", params=("u", "t", "x")),
+    S("scalar-field PDE family", ["U006029", "U006030", "U006031"], "PDE", "partial_tt u[t,x] = partial_xx u[t,x] + f[u[t,x]]", params=("f", "u", "t", "x")),
+    S("scalar-field potential relation", ["U006032"], "RELATION", "v[u] = -Integrate[f[u],u]", params=("f", "u")),
+    S("scalar-field Lagrangian density", ["U006033", "U006034"], "RELATION", "((partial_t u)^2-(partial_x u)^2)/2-v[u]", params=("u", "v")),
+    S("scalar-field Hamiltonian functional", ["U006035", "U006036", "U006037"], "RELATION", "Integrate[((partial_t u)^2+(partial_x u)^2)/2+v[u],{x,-Infinity,Infinity}]", params=("u", "v")),
+    S("page-165 spatially uniform background ODE", ["U006038", "U006039", "U006040"], "ODE", "u''[t]==(1-u[t]^2)(1+a u[t]), with u[0]==u'[0]==0", params=("a", "t")),
+    S("a=0 Jacobi background solution", ["U006041", "U006042"], "RELATION", "Sqrt[3] JacobiSN[t/3^(1/4),1/2]^2/(1+JacobiCN[t/3^(1/4),1/2]^2)", params=("t",)),
+    S("general Jacobi background solution", ["U006043", "U006044", "U006045", "U006046", "U006047", "U006048", "U006049", "U006050", "U006051"], "RELATION", "b d JacobiSN[r t,s]^2/(b-d JacobiCN[r t,s]^2), with printed r,s and cubic root relation", params=("a", "b", "c", "d", "t")),
+    S("finite-difference PDE discretization family", ["U006052"], "SOLVER", "replace continuous space and time by discrete cells and refine cell sizes toward the target PDE", params=("space step", "time step", "PDE"), missing=("This unit states the method family but not a particular stencil.",)),
+    S("Courant stability constraint", ["U006053"], "QUERY", "for the described diffusion discretization require dt/dx < 1/2", params=("dt", "dx")),
+    S("explicit second-order PDE finite-difference solver", ["U006058", "U006059", "U006060", "U006061", "U006062", "U006063"], "SOLVER", "PDEKernel applies (2b-d)+((a+c-2b)/dx^2+f[b])dt^2; PDEStep updates all periodic cells synchronously", params=("f", "dx", "dt", "two initial slices", "steps"), overrides={"boundary": "periodic boundary induced by RotateLeft/RotateRight"}),
+    S("page-165 Gaussian numerical preset", ["U006064", "U006065"], "GENERATOR", "PDEEvolveList with f=(1-u^2)(1+u), dx=.1, dt=.05, paired Gaussian initial slices, 400 steps", params=("fixed preset",)),
+    S("PDE convergence observer", ["U006066"], "OBSERVER", "compare numerical patterns as dx decreases and check approximate energy conservation", params=("solutions at multiple dx",)),
+    S("different-power scalar-field PDE family", ["U006068", "U006069", "U006070"], "PDE", "partial_tt u = partial_xx u + (1-u^n)(1+a u), for n=4,6,8,...", params=("n", "a", "u", "t", "x")),
+    S("Burgers-equation relation", ["U006071", "U006072"], "PDE", "partial_t u[t,x] = partial_xx u[t,x] - u[t,x] partial_x u[t,x]", images=(OTHER_PDE_IMAGE,), image_direct=True, params=("u", "t", "x")),
+    S("nonlinear Schrodinger equation relation", ["U006071", "U006072"], "PDE", "i partial_t u[t,x] = -partial_xx u[t,x] + 4 Abs[u[t,x]]^2 u[t,x]", images=(OTHER_PDE_IMAGE,), image_direct=True, params=("u", "t", "x")),
+    S("Kuramoto-Sivashinsky equation relation", ["U006071", "U006072"], "PDE", "partial_t u[t,x] = -partial_xx u[t,x] - (1/2) partial_xxxx u[t,x] + (partial_x u[t,x])^2", images=(OTHER_PDE_IMAGE,), image_direct=True, params=("u", "t", "x")),
+    S("deterministic Kardar-Parisi-Zhang equation", ["U006072"], "PDE", "partial_t u[t,x] = a partial_xx u[t,x] + (b/2)(partial_x u[t,x])^2", params=("a", "b", "u", "t", "x")),
+]
+
+
+ROUTES = [
+    ("page117_sub", "U005657", "page 83", "replacement rule and seed for the rotated page-117 substitution preset", ["substitution system", "page 117"]),
+    ("powers3_ca", "U005671", "page 614", "strictly local base-6 cellular-automaton rule for powers of three", ["powers of three", "base 6 cellular automaton"]),
+    ("linear_recurrences", "U005728", "page 128", "coefficients, orders, and initial values of the page-128 linear recurrences", ["linear recurrence", "page 128"]),
+    ("digit_sqrt", "U005863", "page 141", "per-step update law for the digit-by-digit square-root construction", ["square root", "digit by digit"]),
+    ("integer_representations", "U005927", "page 560", "integer-representation construction referenced without mechanics", ["integer representation"]),
+    ("zero_substitution", "U005945", "page 903", "substitution rules for cosine/sine zero-spacing sequences", ["zero spacing", "substitution"]),
+    ("probabilistic_ca", "U006010", "page 591", "rule choices, probabilities, and seeds for probabilistic cellular automata", ["probabilistic cellular automaton"]),
+]
+
+
+HISTORICAL_UNITS = {
+    "U005653", "U005654", "U005655", "U005712", "U005761", "U005801",
+    "U005813", "U005814", "U005916", "U005966", "U006001", "U006002",
+    "U006074", "U006075",
+}
+
+OBSERVER_UNITS = {
+    "U005649", "U005672", "U005679", "U005686", "U005692", "U005693",
+    "U005694", "U005705", "U005710", "U005715", "U005724", "U005757",
+    "U005759", "U005779", "U005788", "U005790", "U005794", "U005799",
+    "U005810", "U005811", "U005812", "U005828", "U005829", "U005831",
+    "U005834", "U005853", "U005858", "U005859", "U005866", "U005868",
+    "U005870", "U005872", "U005881", "U005882", "U005892", "U005894",
+    "U005901", "U005902", "U005903", "U005904", "U005911", "U005913",
+    "U005915", "U005920", "U005926", "U005929", "U005934", "U005936",
+    "U005939", "U005940", "U005942", "U005947", "U005951", "U005953",
+    "U005955", "U005959", "U005960", "U005961", "U005962", "U005963",
+    "U005969", "U005970", "U005971", "U005979", "U005980", "U005982",
+    "U005983", "U005984", "U005985", "U005986", "U005987", "U005988",
+    "U005989", "U005992", "U005994", "U006004", "U006005", "U006009",
+    "U006013", "U006014", "U006017", "U006018", "U006019", "U006020",
+    "U006021", "U006022", "U006023", "U006027", "U006028", "U006054",
+    "U006055", "U006056", "U006057", "U006067",
+}
+
+
+def ordered_unique(items: list[str]) -> list[str]:
+    return list(dict.fromkeys(items))
+
+
+def array_text(items: list[str]) -> str:
+    return json.dumps(items, ensure_ascii=False, separators=(",", ":"))
+
+
+def profile(spec: dict[str, Any], mechanics_ids: list[str]) -> tuple[dict[str, str], dict[str, Any]]:
+    kind = spec["kind"]
+    dynamic = kind in {"ITERATION", "CA", "SUBSTITUTION", "SOLVER"}
+    declarative_time = kind in {"PDE", "ODE"}
+    values: dict[str, str | None] = {
+        "object_kind": {
+            "ITERATION": "discrete iterated map or recurrence",
+            "CA": "cellular-automaton transition system",
+            "SUBSTITUTION": "substitution or replacement generator",
+            "SOLVER": "numerical or constructive solver",
+            "FUNCTION": "immutable function or indexed sequence",
+            "QUERY": "decision query or accepted-result predicate",
+            "RELATION": "declarative relation or denoted object",
+            "REPRESENTATION": "encoder, decoder, or representation relation",
+            "GENERATOR": "finite or infinite sequence generator",
+            "OBSERVER": "observer or analyzer function",
+            "CALCULUS": "function-construction calculus",
+            "PDE": "partial differential relation",
+            "ODE": "ordinary differential relation",
+        }[kind],
+        "native_time": (
+            "discrete update steps"
+            if dynamic
+            else "continuous independent variable appears in the relation but is not an update schedule"
+            if declarative_time
+            else None
+        ),
+        "carrier": (
+            "indexed lattice of cell values"
+            if kind == "CA"
+            else "function over continuous coordinates"
+            if kind in {"PDE", "ODE"}
+            else "scalar, finite list, expression, or indexed sequence stated by the law"
+        ),
+        "support": "the domain explicitly stated by the formula or prose definition",
+        "topology": "one-dimensional periodic lattice" if kind == "CA" else None,
+        "structural_invariants": "the printed definition and stated restrictions are preserved",
+        "alphabet_or_value_schema": (
+            "cell-value schema stated by the candidate law"
+            if kind == "CA"
+            else "numeric, symbolic, Boolean, list, or function values as typed by the printed expression"
+        ),
+        "complete_state": (
+            "the entire current lattice configuration"
+            if kind == "CA"
+            else "the current iterate or generated list"
+            if dynamic
+            else "the complete input and denoted output/relation"
+        ),
+        "visible_history": "successive iterates may be retained as a trajectory" if dynamic else None,
+        "control_state": None,
+        "seed": "the stated or caller-supplied initial value/configuration" if dynamic else None,
+        "input": "the printed parameters and input object",
+        "boundary": None,
+        "external_data": None,
+        "frontier_or_activation": "all sites updated synchronously" if kind == "CA" else "the current object to which the law is applied" if dynamic else None,
+        "schedule": "one deterministic synchronous update per step" if dynamic else None,
+        "read_dependencies_or_neighborhood": (
+            "the current site and dependencies named in the printed transition"
+            if kind == "CA"
+            else "the preceding iterate(s) or source object named by the law"
+            if dynamic
+            else "the explicit arguments of the formula or constraint"
+        ),
+        "law_kind": {
+            "PDE": "partial differential constraint",
+            "ODE": "ordinary differential constraint",
+            "QUERY": "predicate or termination/completion query",
+            "RELATION": "declarative relation",
+            "REPRESENTATION": "encoding/decoding relation",
+            "OBSERVER": "observer/analyzer map",
+            "SOLVER": "constructive or numerical update method",
+            "CALCULUS": "function-building operators and evaluation clauses",
+        }.get(kind, "deterministic generation or transition law"),
+        "rule_relation_constraint_function_or_probability_law": spec["law"],
+        "write_replacement_assembly_or_commit": (
+            "simultaneously replace all selected cells"
+            if kind == "CA"
+            else "replace or append according to the printed law"
+            if dynamic
+            else "evaluate or denote without an intrinsic state commit"
+        ),
+        "result_kind": (
+            "trajectory and current state"
+            if dynamic
+            else "solution/model set"
+            if kind in {"PDE", "ODE", "RELATION"}
+            else "Boolean or witness judgment"
+            if kind == "QUERY"
+            else "value, sequence, encoding, or analysis result"
+        ),
+        "successor_cardinality": (
+            "one successor for each fully specified deterministic state"
+            if dynamic and kind != "SUBSTITUTION"
+            else "one generated replacement result"
+            if dynamic
+            else "possibly many satisfying functions"
+            if kind in {"PDE", "ODE"}
+            else "one denoted result for each complete input"
+        ),
+        "determinism_branching_or_measure": (
+            "deterministic where every printed parameter is supplied"
+            if "probabilistic" not in spec["name"]
+            else "probabilistic rule choice; measure is not stated in this range"
+        ),
+        "termination_completion_failure": (
+            "iterate for a requested count or until the stated predicate; divergence may be meaningful"
+            if dynamic or kind == "QUERY"
+            else "evaluation succeeds when the printed domain and relation are defined"
+        ),
+        "witness_semantics": (
+            "accepted when the printed predicate is true or its stated witness exists"
+            if kind == "QUERY"
+            else "the value, sequence, model, or trajectory produced by the printed law"
+        ),
+        "parameters_and_variants": (
+            "; ".join(spec["params"] + spec["variants"])
+            if spec["params"] or spec["variants"]
+            else "no additional parameter or variant is stated"
+        ),
+        "excluded_observers_and_representations": "plots, digit renderings, asymptotic comments, and historical applications are not part of the native law unless separately captured",
+        "evidence_limit": (
+            "; ".join(spec["missing"])
+            if spec["missing"]
+            else "the cited in-scope evidence fixes the stated candidate law at its printed scope"
+        ),
+    }
+    values.update(spec["overrides"])
+    not_applicable = set(N_A)
+    if dynamic:
+        not_applicable -= {"native_time", "visible_history", "seed", "frontier_or_activation", "schedule"}
+    if declarative_time:
+        not_applicable -= {"native_time"}
+    if kind == "CA":
+        not_applicable -= {"topology", "boundary"}
+    if kind == "SOLVER":
+        not_applicable -= {"boundary"}
+    if "boundary" in spec["overrides"]:
+        not_applicable.discard("boundary")
+
+    support: dict[str, str] = {}
+    fingerprint: dict[str, Any] = {}
+    for field in FIELDS:
+        if field in not_applicable and values.get(field) is None:
+            status = "NOT_APPLICABLE"
+            value = None
+            reason = "This dimension is not intrinsic to the printed object."
+        else:
+            status = "SUPPORTED"
+            value = values.get(field) or "not separately parameterized by the printed law"
+            reason = "Supported by the cited canonical Notes evidence at the candidate's printed scope."
+        support[field] = status
+        fingerprint[field] = {
+            "status": status,
+            "value": value,
+            "evidence_ids": mechanics_ids,
+            "reason": reason,
+        }
+    return support, fingerprint
+
+
+def atomic_json(path: Path, value: Any) -> None:
+    payload = (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+
+
+def author(bundle: Path) -> dict[str, Any]:
+    manifest = json.loads((bundle / "allowed-manifest.json").read_text())
+    output_path = bundle / "output" / "output.json"
+    output = json.loads(output_path.read_text())
+    if manifest["worker_id"] != WORKER or manifest["stage"] != STAGE or manifest["discovery_epoch"] != EPOCH:
+        raise SystemExit("bundle identity does not match this authoring helper")
+
+    reading = output["reading_updates"]
+    assets = output["asset_updates"]
+    unit_order = {row["source_unit_id"]: index for index, row in enumerate(reading, 1)}
+    asset_by_path = {row["physical_path"]: row for row in assets}
+    image_order = {
+        row["physical_path"]: len(reading) + index
+        for index, row in enumerate(assets, 1)
+    }
+    anchor_order = {**unit_order, **image_order}
+
+    # Candidate IDs and candidate-anchor ordinals.
+    candidate_anchor_counts: dict[str, int] = defaultdict(int)
+    for index, spec in enumerate(SPECS, 1):
+        spec["id"] = f"W{index:04d}"
+        anchor = spec["uids"][0]
+        candidate_anchor_counts[anchor] += 1
+        spec["candidate_anchor"] = {
+            "epoch": EPOCH,
+            "kind": "SOURCE_UNIT",
+            "id": anchor,
+            "ordinal": candidate_anchor_counts[anchor],
+        }
+
+    # Build evidence requests, then allocate immutable IDs in frozen traversal
+    # order.  Each candidate has distinct identity and mechanics evidence.
+    requests: list[dict[str, Any]] = []
+    serial = 0
+    for spec in SPECS:
+        for uid_index, uid in enumerate(spec["uids"]):
+            serial += 1
+            requests.append({
+                "sort": (anchor_order[uid], 0, serial),
+                "candidate": spec,
+                "anchor_kind": "SOURCE_UNIT",
+                "anchor_id": uid,
+                "source_unit_id": uid,
+                "image_path": None,
+                "strength": "DIRECT_IDENTITY" if uid_index == 0 else "CORROBORATING",
+                "modality": "PROSE",
+                "claim": f"Identifies {spec['name']} and its stated scope." if uid_index == 0 else f"Supplies context, restriction, or an alternative expression for {spec['name']}.",
+                "fields": ["object_kind"] if uid_index == 0 else ["parameters_and_variants", "evidence_limit"],
+                "mechanics": False,
+            })
+            if uid_index == 0:
+                serial += 1
+                requests.append({
+                    "sort": (anchor_order[uid], 1, serial),
+                    "candidate": spec,
+                    "anchor_kind": "SOURCE_UNIT",
+                    "anchor_id": uid,
+                    "source_unit_id": uid,
+                    "image_path": None,
+                    "strength": (
+                        "DIRECT_PARTIAL_MECHANICS"
+                        if spec["missing"] or (spec["images"] and spec["image_direct"])
+                        else "DIRECT_COMPLETE_MECHANICS"
+                    ),
+                    "modality": "FORMULA" if spec["kind"] in {"FUNCTION", "QUERY", "RELATION", "PDE", "ODE"} else "PROSE",
+                    "claim": f"States the native law: {spec['law']}",
+                    "fields": FIELDS,
+                    "mechanics": True,
+                })
+        for image_path in spec["images"]:
+            serial += 1
+            requests.append({
+                "sort": (anchor_order[image_path], 0, serial),
+                "candidate": spec,
+                "anchor_kind": "IMAGE",
+                "anchor_id": image_path,
+                "source_unit_id": None,
+                "image_path": image_path,
+                "strength": "DIRECT_COMPLETE_MECHANICS" if spec["image_direct"] else "CONTEXTUAL",
+                "modality": "IMAGE",
+                "claim": (
+                    f"Original-resolution checked transcription states: {spec['law']}"
+                    if spec["image_direct"]
+                    else f"Original-resolution image is a contextual witness for {spec['name']}."
+                ),
+                "fields": FIELDS if spec["image_direct"] else [],
+                "mechanics": spec["image_direct"],
+            })
+
+    requests.sort(key=lambda item: item["sort"])
+    evidence_anchor_counts: dict[tuple[str, str], int] = defaultdict(int)
+    for index, request in enumerate(requests, 1):
+        key = (request["anchor_kind"], request["anchor_id"])
+        evidence_anchor_counts[key] += 1
+        request["evidence_id"] = f"WE{index:06d}"
+        request["group_id"] = f"WG{index:06d}"
+        request["anchor"] = {
+            "epoch": EPOCH,
+            "kind": request["anchor_kind"],
+            "id": request["anchor_id"],
+            "ordinal": evidence_anchor_counts[key],
+        }
+
+    requests_by_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for request in requests:
+        requests_by_candidate[request["candidate"]["id"]].append(request)
+
+    route_by_key: dict[str, dict[str, Any]] = {}
+    route_anchor_counts: dict[str, int] = defaultdict(int)
+    for index, (key, uid, literal, expected, terms) in enumerate(ROUTES, 1):
+        route_anchor_counts[uid] += 1
+        route_id = f"WR{index:04d}"
+        route_by_key[key] = {
+            "route_id": route_id,
+            "source_unit_id": uid,
+            "source_asset_id": "",
+            "discovery_epoch": str(EPOCH),
+            "discovery_kind": "SOURCE_UNIT",
+            "discovery_id": uid,
+            "discovery_ordinal": str(route_anchor_counts[uid]),
+            "literal_target": literal,
+            "route_kind": "PAGE",
+            "expected_topic": expected,
+            "owning_stage": str(STAGE),
+            "closure_scope": "CROSS_RANGE",
+            "status": "PENDING",
+            "target_unit_ids": "[]",
+            "target_asset_ids": "[]",
+            "attempts": "[]",
+            "vocabulary_terms": array_text(terms),
+            "defect_boundary": "",
+        }
+
+    candidates: list[dict[str, Any]] = []
+    unit_candidates: dict[str, list[str]] = defaultdict(list)
+    asset_candidates: dict[str, list[str]] = defaultdict(list)
+    unit_anchor_candidates: dict[str, list[str]] = defaultdict(list)
+    for spec in SPECS:
+        candidate_id = spec["id"]
+        reqs = requests_by_candidate[candidate_id]
+        mechanics_ids = [r["evidence_id"] for r in reqs if r["mechanics"]]
+        support, fingerprint = profile(spec, mechanics_ids)
+        evidence_rows = [{
+            "evidence_id": r["evidence_id"],
+            "evidence_group_id": r["group_id"],
+            "discovery_anchor": r["anchor"],
+            "source_unit_id": r["source_unit_id"],
+            "image_path": r["image_path"],
+            "strength": r["strength"],
+            "modality": r["modality"],
+            "claim": r["claim"],
+            "fingerprint_fields": r["fields"],
+        } for r in reqs]
+        route_ids = [route_by_key[key]["route_id"] for key in spec["route_keys"]]
+        candidates.append({
+            "id": candidate_id,
+            "record_status": "ACTIVE",
+            "provisional_name": spec["name"],
+            "aliases": [],
+            "discovery_stage": STAGE,
+            "discovery_anchor": spec["candidate_anchor"],
+            "source_unit_ids": ordered_unique(spec["uids"]),
+            "source_evidence": evidence_rows,
+            "source_status": ["CLEAR"],
+            "image_witnesses": list(spec["images"]),
+            "evidence_strength": ordered_unique([r["strength"] for r in reqs]),
+            "field_support": support,
+            "fingerprint": fingerprint,
+            "parameters": [
+                {"name": name, "source_description": f"Printed parameter or input: {name}.", "evidence_ids": mechanics_ids}
+                for name in spec["params"]
+            ],
+            "variants": [
+                {"name": name, "source_description": f"Separately stated variant: {name}.", "evidence_ids": mechanics_ids}
+                for name in spec["variants"]
+            ],
+            "missing_mechanics": list(spec["missing"]),
+            "uncertainties": list(spec["missing"]),
+            "related_candidate_ids": [],
+            "cross_reference_ids": route_ids,
+            "evidence_reassignments": [],
+        })
+        for uid in ordered_unique(spec["uids"]):
+            unit_candidates[uid].append(candidate_id)
+        unit_anchor_candidates[spec["uids"][0]].append(candidate_id)
+        for image_path in spec["images"]:
+            asset_candidates[image_path].append(candidate_id)
+
+    unit_routes: dict[str, list[str]] = defaultdict(list)
+    for route in route_by_key.values():
+        unit_routes[route["source_unit_id"]].append(route["route_id"])
+
+    kind_by_candidate = {spec["id"]: spec["kind"] for spec in SPECS}
+    for row in reading:
+        uid = row["source_unit_id"]
+        candidate_ids = unit_candidates[uid]
+        route_ids = unit_routes[uid]
+        row.update({
+            "review_status": "REVIEWED",
+            "review_epoch": str(EPOCH),
+            "source_status": "CLEAR",
+            "uncertainty": "",
+            "candidate_ids": array_text(candidate_ids),
+            "route_ids": array_text(route_ids),
+            "review_stage": str(STAGE),
+            "reviewer": WORKER,
+        })
+        roles: list[str] = []
+        if candidate_ids:
+            kinds = {kind_by_candidate[cid] for cid in candidate_ids}
+            if kinds & {"REPRESENTATION", "GENERATOR"}:
+                roles.append("REPRESENTATION")
+            if kinds & {"OBSERVER", "QUERY"}:
+                roles.append("OBSERVER_OR_ANALYZER")
+            if kinds & {"SOLVER"}:
+                roles.append("IMPLEMENTATION_DETAIL")
+            row["review_disposition"] = "CANDIDATE" if uid in unit_anchor_candidates else "SUPPORTS_CANDIDATE"
+            names = [SPECS[int(cid[1:]) - 1]["name"] for cid in candidate_ids]
+            row["evidence_statement"] = "Canonical source supplies identity, mechanics, restriction, or direct support for: " + "; ".join(names) + "."
+        elif route_ids:
+            row["review_disposition"] = "CROSS_REFERENCE"
+            row["evidence_statement"] = "Construction-relevant mechanics are located only by the explicit routed target."
+            roles.append("EXTERNAL_ONLY")
+        elif row["block_kind"] == "image":
+            row["review_disposition"] = "REPRESENTATION_OR_OBSERVER"
+            row["evidence_statement"] = "Markdown image unit is a rendering/observer pointer; the assigned physical asset was screened separately."
+            roles.append("REPRESENTATION")
+        elif uid in HISTORICAL_UNITS:
+            row["review_disposition"] = "HISTORICAL_ONLY"
+            row["evidence_statement"] = "The unit supplies provenance, chronology, or terminology but no independently specified native law."
+            roles.append("HISTORICAL_MENTION")
+        elif uid in OBSERVER_UNITS:
+            row["review_disposition"] = "REPRESENTATION_OR_OBSERVER"
+            row["evidence_statement"] = "The unit states behavior, measurement, rendering, restriction, or comparison without an additional native law."
+            roles.append("BEHAVIOR_OR_OUTCOME")
+        else:
+            row["review_disposition"] = "NO_CONSTRUCTION"
+            row["evidence_statement"] = "Sequential in-context review found no additional independently anchored construction in this unit."
+        row["secondary_roles"] = array_text(ordered_unique(roles))
+
+    for row in assets:
+        image_path = row["physical_path"]
+        candidate_ids = asset_candidates[image_path]
+        orphan = row["reference_status"] == "UNREFERENCED_PHYSICAL"
+        native = image_path in {BITWISE_IMAGE, OTHER_PDE_IMAGE}
+        row.update({
+            "inspection_status": "SCREENED",
+            "review_epoch": str(EPOCH),
+            "visual_role": "SOURCE_DEFECT" if orphan else "NATIVE_EVIDENCE" if native else "OBSERVER",
+            "source_status": "AMBIGUOUS" if orphan else "CLEAR",
+            "risk_flags": array_text(
+                ["TEXT_BEARING", "AMBIGUOUS"] if orphan
+                else ["CONSTRUCTION_BEARING", "TEXT_BEARING"] if native
+                else ["TEXT_BEARING"]
+            ),
+            "original_resolution_status": "REVIEWED",
+            "transcription_status": "CHECKED",
+            "candidate_ids": array_text(candidate_ids),
+            "route_ids": "[]",
+            "evidence_statement": (
+                "Original-resolution orphan fragment/alternate panel was checked; a clean referenced composite exists, so it is retained only as source-defect evidence and contributes no hidden mechanics."
+                if orphan
+                else "Original-resolution formula labels were independently checked and transcribed as direct image evidence."
+                if native
+                else "Original-resolution rendering was checked; it is an observer/control image and contributes no hidden native mechanics."
+            ),
+            "review_stage": str(STAGE),
+            "reviewer": WORKER,
+            "uncertainty": (
+                "The physical image lacks a live source-unit anchor; its relationship to the clean referenced composite cannot be promoted to mechanics evidence."
+                if orphan else ""
+            ),
+        })
+
+    output["candidate_proposals"] = candidates
+    output["route_proposals"] = list(route_by_key.values())
+    output["uncertainties"] = [
+        "Thirty unreferenced physical assets were original-resolution checked but remain defect-only because their source-unit relationship is unanchored.",
+        "Several explicitly named partial constructions retain PENDING routes rather than inferred mechanics from outside the sealed range.",
+    ]
+    output["prohibited_input_nonuse"] = False
+    atomic_json(output_path, output)
+    return {
+        "readings": len(reading),
+        "assets": len(assets),
+        "candidates": len(candidates),
+        "routes": len(route_by_key),
+        "evidence": len(requests),
+        "orphans": sum(row["reference_status"] == "UNREFERENCED_PHYSICAL" for row in assets),
+        "output_sha256": hashlib.sha256(output_path.read_bytes()).hexdigest(),
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("bundle", type=Path)
+    args = parser.parse_args()
+    result = author(args.bundle.resolve())
+    print(json.dumps(result, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

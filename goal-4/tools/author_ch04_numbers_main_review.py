@@ -1661,3 +1661,1044 @@ symbolic_representation = source_candidate(
     strength="DIRECT_PARTIAL_MECHANICS",
     uncertainties=["The representation class is deliberately open-ended in this source."],
 )
+
+
+# ---------------------------------------------------------------------------
+# Immutable functions and function-derived encodings.
+
+SINE_SUM_FACTS = declarative_facts(
+    kind="A finite sum of sine functions.",
+    carrier="A real argument x and finitely many sine terms.",
+    support="The real line.",
+    alphabet="Real-valued inputs, frequencies, and outputs.",
+    state="The input x and fixed frequency coefficients.",
+    input_value="A real number x.",
+    law_kind="A deterministic real-valued function.",
+    law="Evaluate and add the stated sine terms at x.",
+    result="One real function value.",
+    successor="Exactly one real output per x.",
+    determinism="Deterministic.",
+    termination="A finite number of sine evaluations and additions completes each value.",
+    witness="Substituting x into every displayed term and summing reproduces the output.",
+    variants="The number of terms and their frequency multipliers vary.",
+    excluded="The plotted curve, waveform interpretation, and musical label are representations/applications.",
+    limit="The source assumes the standard sine function without restating its independent definition.",
+)
+sine_sum_family = source_candidate(
+    "sine-sum-family",
+    "finite sine-sum function family",
+    "U000816",
+    SINE_SUM_FACTS,
+    not_applicable=DECLARATIVE_NA,
+    missing="The underlying standard sine function is assumed rather than defined in this section.",
+    claim="The passage delimits combinations formed by adding standard sine functions.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
+sine_formulas = [
+    ("sine-sum-3over2", "sine sum Sin[x]+Sin[(3/2)x]", "Sin[x]+Sin[(3/2)x]"),
+    ("sine-sum-10over7", "sine sum Sin[x]+Sin[(10/7)x]", "Sin[x]+Sin[(10/7)x]"),
+    ("sine-sum-sqrt2", "sine sum Sin[x]+Sin[sqrt(2)x]", "Sin[x]+Sin[sqrt(2)x]"),
+    (
+        "sine-sum-sqrt2-sqrt3",
+        "three-term sine sum Sin[x]+Sin[sqrt(2)x]+Sin[sqrt(3)x]",
+        "Sin[x]+Sin[sqrt(2)x]+Sin[sqrt(3)x]",
+    ),
+]
+sine_specs: dict[str, CandidateSpec] = {}
+for key, name, formula in sine_formulas:
+    facts = deepcopy(SINE_SUM_FACTS)
+    facts["object_kind"] = name
+    facts["rule_relation_constraint_function_or_probability_law"] = f"Evaluate {formula}."
+    facts["parameters_and_variants"] = f"The formula is fixed at {formula}."
+    sine_specs[key] = source_candidate(
+        key,
+        name,
+        "U000817",
+        facts,
+        not_applicable=DECLARATIVE_NA,
+        missing="The underlying standard sine function is assumed rather than defined in this section.",
+        claim=f"Original-resolution inspection directly transcribes {formula}.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        image_path="CHAPTERS/_page_161_Figure_1.jpeg",
+    )
+
+axis_crossing_encoder = source_candidate(
+    "trig-axis-crossing-substitution-encoder",
+    "two-frequency trigonometric axis-crossing substitution encoding",
+    "U000819",
+    declarative_facts(
+        kind="An encoding of two-frequency sine/cosine axis crossings by a generalized substitution system.",
+        carrier="A two-term trigonometric function, its real-axis intervals, a continued fraction, and a binary substitution pattern.",
+        support="Successive real intervals and successive substitution stages.",
+        alphabet="Black/white interval markers and continued-fraction coefficients.",
+        state="The fixed frequency ratio alpha, current substitution word, and current continued-fraction term.",
+        input_value="A function Sin[x]+Sin[alpha x] or the stated two-term sine/cosine variants.",
+        law_kind="A deterministic representation coupling a continued fraction to generalized substitutions.",
+        law=(
+            "Compute the continued fraction of (alpha-1)/(alpha+1); use each "
+            "successive coefficient to select the pictured generalized substitution rule. "
+            "A black output element denotes an interval containing an axis crossing."
+        ),
+        result="A black/white interval sequence reproducing the function's axis-crossing pattern.",
+        successor="Exactly one encoded stage for each supplied continued-fraction term under the pictured rule convention.",
+        determinism="Deterministic once generalized-substitution mechanics and interval alignment are fixed.",
+        termination="Finite prefixes generate finite encoded prefixes; the construction continues with the continued fraction.",
+        witness="An interval is marked black exactly when the plotted function crosses the axis within it.",
+        variants="The source states analogous encodings for sums/differences of exactly two sine or cosine functions.",
+        excluded="The plotted waveform and vertical interval lines display the relation.",
+        limit="The base generalized-substitution semantics and precise interval-origin convention are routed outside this assigned path.",
+    ),
+    not_applicable=DECLARATIVE_NA,
+    missing="The base generalized-substitution semantics and exact interval-origin convention require the routed prior construction.",
+    claim="The prose states the continued-fraction control sequence and black-interval crossing semantics.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+    route_keys=["generalized-substitution-term"],
+)
+context_evidence(
+    axis_crossing_encoder,
+    "axis-crossing-encoder-panel",
+    "U000821",
+    "Original-resolution inspection confirms the rule icons, continued-fraction term schedule, black interval encoding, and four worked functions.",
+    image_path="CHAPTERS/_page_162_Figure_1.jpeg",
+    fields=[
+        "visible_history",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
+COS_DIFFERENCE_FACTS = declarative_facts(
+    kind="A two-frequency cosine-difference function.",
+    carrier="A real argument x and fixed frequency multiplier alpha.",
+    support="The real line.",
+    alphabet="Real-valued inputs and outputs.",
+    state="The input x.",
+    input_value="A real number x.",
+    law_kind="A deterministic real-valued function.",
+    law="Evaluate Cos[x]-Cos[alpha x].",
+    result="One real function value.",
+    successor="Exactly one value per x.",
+    determinism="Deterministic.",
+    termination="Two cosine evaluations and one subtraction complete each value.",
+    witness="Direct substitution into the displayed formula reproduces the output.",
+    variants="The multiplier alpha varies across the four displayed cases.",
+    excluded="The axis-crossing grid and generalized substitution word are representations/observers.",
+    limit="The standard cosine function is assumed rather than independently defined here.",
+)
+cos_cases = [
+    ("cosdiff-1-sqrt2", "Cos[x]-Cos[(1+sqrt(2))x]", "1+sqrt(2)"),
+    ("cosdiff-2-sqrt5", "Cos[x]-Cos[(2+sqrt(5))x]", "2+sqrt(5)"),
+    ("cosdiff-2-cuberoot5", "Cos[x]-Cos[(2+cuberoot(5))x]", "2+cuberoot(5)"),
+    ("cosdiff-1-sqrte", "Cos[x]-Cos[(1+sqrt(e))x]", "1+sqrt(e)"),
+]
+cos_specs: dict[str, CandidateSpec] = {}
+for key, formula, alpha in cos_cases:
+    facts = deepcopy(COS_DIFFERENCE_FACTS)
+    facts["object_kind"] = f"The function {formula}."
+    facts["rule_relation_constraint_function_or_probability_law"] = f"Evaluate {formula}."
+    facts["parameters_and_variants"] = f"alpha is fixed at {alpha}."
+    cos_specs[key] = source_candidate(
+        key,
+        formula,
+        "U000821",
+        facts,
+        not_applicable=DECLARATIVE_NA,
+        missing="The standard cosine function is assumed rather than independently defined here.",
+        claim=f"Original-resolution inspection directly transcribes {formula}.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        image_path="CHAPTERS/_page_162_Figure_1.jpeg",
+    )
+cos_specs["cosdiff-2-sqrt5"]["route_keys"].append("fibonacci-substitution-page83")
+
+zeta_function = source_candidate(
+    "riemann-zeta-function",
+    "Riemann zeta function",
+    "U000826",
+    declarative_facts(
+        kind="The function Zeta[s] defined by an infinite reciprocal-power sum.",
+        carrier="A scalar argument s and positive integer summation index k.",
+        support="Positive integers k in the displayed infinite sum.",
+        alphabet="Real or complex values.",
+        state="The input s.",
+        input_value="A value s in a domain where the displayed sum is used.",
+        law_kind="An infinite-series-defined function.",
+        law="Zeta[s] = Sum[1/k^s,{k,infinity}].",
+        result="The value of the reciprocal-power series.",
+        successor="One series value where the displayed series converges.",
+        determinism="Deterministic.",
+        termination="The denotation is an infinite sum; finite numerical evaluation requires an approximation not stated here.",
+        witness="Partial sums converge to the stated value in the admitted domain.",
+        variants="The source relates the function to prime distribution.",
+        excluded="The plotted Riemann-Siegel curve is a related function, not Zeta's native representation.",
+        limit="Analytic continuation and the complete complex domain are not specified.",
+    ),
+    not_applicable=DECLARATIVE_NA,
+    missing="Analytic continuation, convergence domain, and evaluation method are not supplied.",
+    claim="The caption explicitly defines Zeta[s] by Sum[1/k^s,{k,infinity}].",
+    strength="DIRECT_PARTIAL_MECHANICS",
+    modality="FORMULA",
+)
+
+riemann_siegel = source_candidate(
+    "riemann-siegel-z",
+    "Riemann-Siegel Z function",
+    "U000826",
+    declarative_facts(
+        kind="The Riemann-Siegel Z function related to Zeta[1/2+i t].",
+        carrier="A real argument t and a related complex zeta value.",
+        support="The real t axis.",
+        alphabet="Real input and the plotted real output.",
+        state="The input t.",
+        input_value="A real number t.",
+        law_kind="A named real-valued transformation of the critical-line zeta function.",
+        law="The source says the function is essentially Zeta[1/2+i t] but does not give the exact phase/normalization.",
+        result="The plotted Riemann-Siegel Z value.",
+        successor="The source treats it as single-valued.",
+        determinism="Deterministic once the omitted exact definition is supplied.",
+        termination="Evaluation mechanics are not supplied.",
+        witness="The plotted curve is identified as this function.",
+        variants="No variants are stated.",
+        excluded="The plotted polyline is a representation.",
+        limit="The word 'essentially' leaves the exact transformation, phase, and normalization unspecified.",
+    ),
+    not_applicable=DECLARATIVE_NA,
+    missing="The exact Riemann-Siegel phase/normalization and evaluation law are missing.",
+    claim="The caption identifies the plotted function and its critical-line zeta relation but qualifies it as only 'essentially' that expression.",
+    strength="DIRECT_IDENTITY",
+    uncertainties=["The exact Riemann-Siegel Z definition is underdetermined by 'essentially'."],
+)
+
+riemann_hypothesis = yes_no_query(
+    "riemann-hypothesis-query",
+    "Riemann-Hypothesis peak-sign query as stated",
+    "U000826",
+    "Determine whether all peaks after the first in the displayed Riemann-Siegel Z curve lie above the axis.",
+    "NO requires a violating peak; YES requires a proof covering every peak in the stated scope.",
+    "The source reports that the claim has not been established.",
+)
+
+
+# ---------------------------------------------------------------------------
+# Iterated maps and their initial conditions/observers.
+
+ITERATED_MAP_FAMILY = number_map_facts(
+    "An iterated self-map of the unit interval.",
+    "real numbers between 0 and 1",
+    "Apply a fixed function F:[0,1]->[0,1], updating x to F(x).",
+    "An explicitly supplied initial x in [0,1].",
+    "The map F and initial x vary.",
+)
+iterated_map_family = source_candidate(
+    "iterated-map-family",
+    "unit-interval iterated-map family",
+    "U000828",
+    ITERATED_MAP_FAMILY,
+    not_applicable=EVOLUTION_NA,
+    missing="A particular map and initial value must be supplied.",
+    claim="The passage defines an iterated map as repeatedly applying a fixed self-map of [0,1].",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+
+map_cases = [
+    ("iterated-map-a", "iterated map (a) FractionalPart[(3/2)x]", "FractionalPart[(3/2)x]"),
+    ("iterated-map-b", "iterated map (b) tent map of height 3/4", "If[x<1/2,(3/2)x,(3/2)(1-x)]"),
+    ("iterated-map-c", "iterated map (c) FractionalPart[(3/4)x]", "FractionalPart[(3/4)x]"),
+    ("iterated-map-d", "iterated map (d) binary shift map", "FractionalPart[2x]"),
+]
+map_specs: dict[str, CandidateSpec] = {}
+for key, name, formula in map_cases:
+    facts = deepcopy(ITERATED_MAP_FAMILY)
+    facts["object_kind"] = name
+    facts["rule_relation_constraint_function_or_probability_law"] = f"Update x to {formula}."
+    facts["parameters_and_variants"] = f"The map is fixed at x -> {formula}; seeds 1/2 and pi/4 are displayed."
+    map_specs[key] = source_candidate(
+        key,
+        name,
+        "U000835",
+        facts,
+        not_applicable=EVOLUTION_NA,
+        missing="Exact real arithmetic is assumed; finite-precision conventions are not stated.",
+        claim=f"Original-resolution inspection directly transcribes x -> {formula}.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        image_path="CHAPTERS/_page_165_Figure_1.jpeg",
+    )
+context_evidence(
+    map_specs["iterated-map-d"],
+    "shift-map-digit-semantics",
+    "U000833",
+    "The prose states that this map shifts every base-2 digit one position left at each step.",
+    fields=["rule_relation_constraint_function_or_probability_law"],
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+
+half_seed = source_candidate(
+    "iterated-map-half-seed",
+    "iterated-map initial value 1/2",
+    "U000831",
+    seed_facts(
+        "The scalar initial-value preset x=1/2.",
+        "One unit-interval scalar.",
+        "A single scalar position.",
+        "x=1/2",
+        "Applied to all four displayed iterated maps.",
+    ),
+    not_applicable=SEED_NA,
+    missing="No mechanics are missing for the scalar value itself.",
+    claim="The passage explicitly fixes 1/2 as the first page's initial condition.",
+    strength="DIRECT_IDENTITY",
+)
+pi_quarter_seed = source_candidate(
+    "iterated-map-pi-quarter-seed",
+    "iterated-map initial value pi/4",
+    "U000831",
+    seed_facts(
+        "The scalar initial-value preset x=pi/4.",
+        "One unit-interval scalar.",
+        "A single scalar position.",
+        "x=pi/4",
+        "Applied to all four displayed iterated maps.",
+    ),
+    not_applicable=SEED_NA,
+    missing="No mechanics are missing for the symbolic scalar value itself.",
+    claim="The passage explicitly fixes pi/4 as the second page's initial condition.",
+    strength="DIRECT_IDENTITY",
+)
+
+nearby_pair_seed = source_candidate(
+    "shift-map-nearby-seed-pair",
+    "nearby initial-condition pair for the shift map",
+    "U000843",
+    {
+        **seed_facts(
+            "A pair of scalar initial values differing by about one part in a billion billion.",
+            "Two unit-interval scalar registers compared under the same map.",
+            "A paired two-run experiment.",
+            "The displayed decimals are 0.785398163397448310 and 0.785398163397448311.",
+            "The pair is used with the binary shift map.",
+        ),
+        "successor_cardinality": "Exactly one ordered pair of initial values in the displayed preset.",
+    },
+    not_applicable=SEED_NA,
+    missing="The prose gives the relative scale informally; the figure supplies the two decimal labels.",
+    claim="The passage defines the close-pair experiment and the original-resolution panels supply both decimal values.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    nearby_pair_seed,
+    "nearby-seed-first",
+    "U000845",
+    "Original-resolution inspection confirms initial condition 0.785398163397448310.",
+    image_path="CHAPTERS/_page_168_Picture_1.jpeg",
+    fields=["complete_state", "seed"],
+    strength="DIRECT_IDENTITY",
+)
+context_evidence(
+    nearby_pair_seed,
+    "nearby-seed-second",
+    "U000846",
+    "Original-resolution inspection confirms initial condition 0.785398163397448311.",
+    image_path="CHAPTERS/_page_168_Picture_2.jpeg",
+    fields=["complete_state", "seed"],
+    strength="DIRECT_IDENTITY",
+)
+
+trajectory_difference = source_candidate(
+    "iterated-map-digit-difference",
+    "iterated-map digit-sequence difference observer",
+    "U000859",
+    declarative_facts(
+        kind="An observer showing differences between paired iterated-map digit sequences.",
+        carrier="Two aligned base-2 digit histories.",
+        support="Corresponding step and digit positions.",
+        alphabet="Matching/differing status at each aligned position.",
+        state="Two complete aligned digit histories.",
+        input_value="Two trajectories produced by the same map from nearby seeds.",
+        law_kind="A pointwise comparison observer.",
+        law="Compare corresponding base-2 digit positions and display where the sequences differ.",
+        result="A space-time pattern of digit differences.",
+        successor="Exactly one comparison status per aligned position.",
+        determinism="Deterministic once digit alignment and rendering are fixed.",
+        termination="A finite displayed window compares finitely many positions.",
+        witness="A marked position contains unequal source digits.",
+        variants="Applied separately to maps (a), (b), (c), and (d).",
+        excluded="Color/gray rendering of difference is not native map state.",
+        limit="The exact visual code for equal versus unequal pixels is not stated in prose.",
+    ),
+    not_applicable=DECLARATIVE_NA,
+    missing="The exact visual code and finite alignment/cropping convention are not stated.",
+    claim="The caption explicitly identifies the panels as differences in digit sequences from a small initial change.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+    image_path="CHAPTERS/_page_170_Picture_2.jpeg",
+)
+
+random_interval_seed = source_candidate(
+    "random-interval-seed-ensemble",
+    "random unit-interval initial-condition ensemble",
+    "U000853",
+    {
+        "object_kind": "A random seed generator constrained to a numeric size interval.",
+        "native_time": "No native evolution time; one sample produces one initial scalar.",
+        "carrier": "Real numbers in a stated interval.",
+        "support": "A scalar unit-interval state.",
+        "topology": "No spatial topology.",
+        "structural_invariants": "Every sample lies in the stated size range.",
+        "alphabet_or_value_schema": "Real-valued samples.",
+        "complete_state": "One sampled scalar x.",
+        "seed": "A random number subject only to a size-range constraint.",
+        "input": "The allowed numeric interval.",
+        "law_kind": "A measure-valued sampling rule.",
+        "rule_relation_constraint_function_or_probability_law": "Pick a number at random subject to lying in the specified range.",
+        "result_kind": "A sampled initial scalar, overwhelmingly likely under the intended idealization to have an apparently random digit sequence.",
+        "successor_cardinality": "Many possible samples with a measure that is not formally specified.",
+        "determinism_branching_or_measure": "Random/measure-valued.",
+        "termination_completion_failure": "One sample completes a generator call.",
+        "witness_semantics": "A valid sample lies inside the selected range.",
+        "parameters_and_variants": "The interval and unstated measure are parameters.",
+        "excluded_observers_and_representations": "The subsequent shift-map trajectory is not part of the seed generator.",
+        "evidence_limit": "The probability measure, endpoint convention, and finite/infinite precision are not specified.",
+    },
+    not_applicable={
+        "visible_history": "A one-shot seed ensemble has no trajectory.",
+        "control_state": "No control register is defined.",
+        "boundary": "No evolution boundary is part of the sampler.",
+        "external_data": "No external stream is stated.",
+        "frontier_or_activation": "A one-shot sampler has no update frontier.",
+        "schedule": "A one-shot sampler has no iterative schedule.",
+        "read_dependencies_or_neighborhood": "No local neighborhood is read.",
+        "write_replacement_assembly_or_commit": "The sampled scalar is the result, not a committed trajectory update.",
+    },
+    missing="The probability measure, endpoint convention, and precision model are not specified.",
+    claim="The passage explicitly describes random selection subject only to a size-range constraint.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+    uncertainties=["The intended probability measure is not formalized."],
+)
+
+
+# ---------------------------------------------------------------------------
+# Continuous cellular automata.
+
+CONTINUOUS_CA_FAMILY = iterative_facts(
+    kind="A one-dimensional continuous-valued nearest-neighbor cellular automaton.",
+    carrier="Cell positions carrying gray levels.",
+    support="A one-dimensional line of discrete cells.",
+    topology="Every cell has an immediate left and right neighbor.",
+    invariants="The line support, three-cell neighborhood, and gray-level interval persist.",
+    alphabet="A continuous gray level between white 0 and black 1.",
+    state="The current gray level at every cell.",
+    seed="An explicitly supplied gray-level configuration; the displayed runs start from one black cell on white.",
+    input_value="The complete old gray-level field.",
+    frontier="Every cell is active at every step.",
+    schedule="All cells update in parallel from the preceding complete field.",
+    read="Read the old gray levels of left neighbor, self, and right neighbor and form their average.",
+    law_kind="A deterministic local average followed by a fixed scalar map.",
+    law="For each cell compute the average of left, self, and right, then apply a fixed map F:[0,1]->[0,1].",
+    write="Commit all mapped values simultaneously as the next gray-level field.",
+    result="A successor gray-level field and, under iteration, a continuous-cellular-automaton trajectory.",
+    variants="The scalar map F varies; averaging, fractional multiplication, and additive-constant maps are displayed.",
+    excluded="Grayscale shading, difference pictures, and stacked histories represent or observe the state.",
+    limit="The off-picture boundary condition and exact-arithmetic implementation are not stated.",
+)
+continuous_ca_family = source_candidate(
+    "continuous-ca-family",
+    "continuous-valued nearest-neighbor cellular-automaton family",
+    "U000865",
+    CONTINUOUS_CA_FAMILY,
+    not_applicable=EVOLUTION_NA,
+    missing="The off-picture boundary condition and numerical precision convention are not stated.",
+    claim="The passage defines continuous gray-valued cells and the average-neighborhood-then-map update.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+    route_keys=["totalistic-prior-chapter"],
+)
+
+continuous_single_black = source_candidate(
+    "continuous-ca-single-black-seed",
+    "single-black-cell continuous-CA seed",
+    "U000866",
+    seed_facts(
+        "One cell at gray level 1 on an otherwise level-0 line.",
+        "Continuous-valued cell positions.",
+        "A one-dimensional cell line.",
+        "One black/1 cell and white/0 elsewhere.",
+        "Used by the displayed continuous-cellular-automaton rules.",
+    ),
+    not_applicable=SEED_NA,
+    missing="The origin coordinate and finite-display boundary convention are not stated.",
+    claim="The passage explicitly states that the run starts from a single black cell.",
+    strength="DIRECT_IDENTITY",
+)
+
+
+def continuous_ca_rule_facts(name: str, map_law: str, variants: str) -> dict[str, str]:
+    facts = deepcopy(CONTINUOUS_CA_FAMILY)
+    facts["object_kind"] = name
+    facts["rule_relation_constraint_function_or_probability_law"] = (
+        "Let a=(left+self+right)/3; " + map_law
+    )
+    facts["parameters_and_variants"] = variants
+    return facts
+
+
+average_ca = source_candidate(
+    "continuous-ca-average",
+    "continuous CA with pure neighborhood averaging",
+    "U000866",
+    continuous_ca_rule_facts(
+        "The continuous cellular automaton whose next value is the local average.",
+        "set the new cell value to a.",
+        "The scalar map is F(a)=a; the displayed seed is one black cell.",
+    ),
+    not_applicable=EVOLUTION_NA,
+    missing="The off-picture boundary condition and numerical precision convention are not stated.",
+    claim="The prose directly defines each next gray level as the average of self and immediate neighbors.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    average_ca,
+    "continuous-average-table",
+    "U000868",
+    "The table gives exact early rows and corroborates simultaneous three-cell averaging.",
+    fields=["visible_history", "rule_relation_constraint_function_or_probability_law"],
+    strength="CORROBORATING",
+    modality="TABLE",
+)
+
+fractional_three_half_ca = source_candidate(
+    "continuous-ca-frac-three-halves",
+    "continuous CA with fractional 3/2-scaled local average",
+    "U000870",
+    continuous_ca_rule_facts(
+        "The continuous cellular automaton using FractionalPart[(3/2)a].",
+        "set the new cell value to FractionalPart[(3/2)a].",
+        "The multiplier is fixed at 3/2; the displayed seed is one black cell.",
+    ),
+    not_applicable=EVOLUTION_NA,
+    missing="The off-picture boundary condition and numerical precision convention are not stated.",
+    claim="The passage directly says to multiply the local average by 3/2 and retain only its fractional part.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+    route_keys=["iterated-map-a-page150"],
+)
+context_evidence(
+    fractional_three_half_ca,
+    "continuous-three-half-table",
+    "U000872",
+    "The table gives the first six rows under the stated rule.",
+    fields=["visible_history"],
+    strength="CORROBORATING",
+    modality="TABLE",
+)
+
+ADDITIVE_CONTINUOUS_CA = continuous_ca_rule_facts(
+    "The additive-constant continuous cellular-automaton family.",
+    "for a fixed c, set the new cell value to FractionalPart[a+c].",
+    "The additive constant c varies; the surveys display 24 unique values.",
+)
+additive_ca_family = source_candidate(
+    "continuous-ca-additive-family",
+    "additive-constant continuous-CA family",
+    "U000875",
+    ADDITIVE_CONTINUOUS_CA,
+    not_applicable=EVOLUTION_NA,
+    missing="The off-picture boundary condition and numerical precision convention are not stated.",
+    claim="The passage directly defines adding a fixed constant to the local average and taking the fractional part.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+
+SURVEY_ONE = "CHAPTERS/_page_174_Picture_2.jpeg"
+SURVEY_TWO = "CHAPTERS/_page_175_Figure_2.jpeg"
+first_constants = [
+    "0",
+    "0.025",
+    "0.05",
+    "0.075",
+    "0.1",
+    "0.125",
+    "0.15",
+    "0.175",
+    "0.2",
+    "0.225",
+    "0.25",
+    "0.275",
+    "0.3",
+    "0.325",
+    "0.35",
+    "0.375",
+    "0.4",
+    "0.425",
+    "0.45",
+    "0.475",
+    "0.5",
+]
+second_only_constants = ["0.3299", "0.495", "0.9"]
+second_repeat_constants = {"0.1", "0.3", "0.325", "0.35", "0.475"}
+
+
+def constant_key(value: str) -> str:
+    return value.replace(".", "p")
+
+
+additive_presets: dict[str, CandidateSpec] = {}
+for c in [*first_constants, *second_only_constants]:
+    facts = deepcopy(ADDITIVE_CONTINUOUS_CA)
+    facts["object_kind"] = (
+        f"The c={c} preset of the additive-constant continuous cellular-automaton family."
+    )
+    facts["rule_relation_constraint_function_or_probability_law"] = (
+        f"Let a=(left+self+right)/3; set the new value to FractionalPart[a+{c}]."
+    )
+    facts["parameters_and_variants"] = (
+        f"The additive constant is fixed at c={c}; the displayed seed is one black cell."
+    )
+    key = f"continuous-ca-add-{constant_key(c)}"
+    if c == "0.25":
+        spec = source_candidate(
+            key,
+            "additive continuous-CA preset c=0.25",
+            "U000875",
+            facts,
+            not_applicable=EVOLUTION_NA,
+            missing="The off-picture boundary condition and numerical precision convention are not stated.",
+            claim="The prose directly fixes c=1/4 in the additive fractional-part rule.",
+            strength="DIRECT_COMPLETE_MECHANICS",
+        )
+        context_evidence(
+            spec,
+            f"{key}-survey-one",
+            "U000884",
+            "Original-resolution inspection confirms the c=0.25 trajectory in the family survey.",
+            image_path=SURVEY_ONE,
+            fields=["parameters_and_variants", "visible_history"],
+            strength="DIRECT_IDENTITY",
+        )
+    else:
+        spec = candidate(
+            key,
+            f"additive continuous-CA preset c={c}",
+            "U000883",
+            facts,
+            not_applicable=EVOLUTION_NA,
+            missing="The off-picture boundary condition and numerical precision convention are not stated.",
+        )
+        panel = SURVEY_ONE if c in first_constants else SURVEY_TWO
+        panel_unit = "U000884" if c in first_constants else "U000885"
+        evidence(
+            spec,
+            f"{key}-panel",
+            panel_unit,
+            (
+                f"Original-resolution inspection identifies c={c} as one "
+                "preset of the captioned additive-constant family."
+            ),
+            list(facts) + list(EVOLUTION_NA),
+            strength="DIRECT_COMPLETE_MECHANICS",
+            modality="IMAGE",
+            image_path=panel,
+        )
+    if c in second_repeat_constants:
+        context_evidence(
+            spec,
+            f"{key}-survey-two",
+            "U000885",
+            f"The longer original-resolution survey independently identifies the c={c} preset.",
+            image_path=SURVEY_TWO,
+            fields=["parameters_and_variants", "visible_history"],
+            strength="CORROBORATING",
+        )
+    additive_presets[c] = spec
+
+neighbor_difference = source_candidate(
+    "continuous-ca-neighbor-difference",
+    "continuous-CA adjacent-cell difference observer",
+    "U000886",
+    declarative_facts(
+        kind="An observer that replaces each displayed cell by its gray-level difference from an immediate neighbor.",
+        carrier="A one-dimensional gray-level field.",
+        support="Adjacent cell pairs.",
+        alphabet="Real-valued gray-level differences.",
+        state="A complete gray-level configuration.",
+        input_value="The gray level at each cell and one immediate neighbor.",
+        law_kind="A deterministic nearest-neighbor difference observer.",
+        law="For each cell, compute the difference between its gray level and that of its immediate neighbor.",
+        result="A one-dimensional field of adjacent differences.",
+        successor="Exactly one difference per chosen adjacent pair.",
+        determinism="Deterministic once left-versus-right orientation and display scaling are fixed.",
+        termination="A finite displayed row is transformed in one pass.",
+        witness="Adding the neighbor value to an oriented difference recovers the source value.",
+        variants="The middle c=0.3299 panel is shown through this observer.",
+        excluded="Gray rescaling of positive/negative differences is a rendering convention.",
+        limit="The caption does not specify left-versus-right orientation or value-to-gray scaling.",
+    ),
+    not_applicable=DECLARATIVE_NA,
+    missing="Left-versus-right orientation and gray rendering of signed differences are not specified.",
+    claim="The caption explicitly says the middle picture shows the difference between each cell and its immediate neighbor.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    neighbor_difference,
+    "continuous-difference-panel",
+    "U000885",
+    "Original-resolution inspection confirms the panel labelled 0.3299 (differences).",
+    image_path=SURVEY_TWO,
+    fields=["parameters_and_variants"],
+    strength="DIRECT_IDENTITY",
+)
+
+
+# ---------------------------------------------------------------------------
+# Partial differential equations, initial data, symbolic sampling, and solver.
+
+PDE_FAMILY = {
+    "object_kind": "A continuous space-time evolution relation specified by a partial differential equation.",
+    "native_time": "Continuous time.",
+    "carrier": "A field u[t,x] with continuous time t and continuous position x.",
+    "support": "A continuous one-dimensional spatial domain across continuous time.",
+    "topology": "Local spatial derivatives relate values in infinitesimally nearby positions.",
+    "structural_invariants": "The field domain and stated differential relation persist while a classical solution exists.",
+    "alphabet_or_value_schema": "Real-valued field values and their time/space derivatives.",
+    "complete_state": "Enough field data at one time to satisfy the equation's time order, together with boundary conditions.",
+    "visible_history": "A solution field u[t,x] over a time interval.",
+    "seed": "Initial field data, and initial time derivative for second-order equations.",
+    "input": "The current field and derivatives required by the equation.",
+    "boundary": "Spatial boundary/asymptotic conditions are required in general but not stated for the displayed computations.",
+    "frontier_or_activation": "Every space-time point in the solution domain is constrained by the differential relation.",
+    "schedule": "No discrete native schedule; the relation holds continuously in time.",
+    "read_dependencies_or_neighborhood": "The local field value and the spatial derivatives appearing in the equation.",
+    "law_kind": "A deterministic partial differential relation where a well-posed solution exists.",
+    "rule_relation_constraint_function_or_probability_law": "Specify the rate of time change by a formula involving the field and its spatial change rates.",
+    "write_replacement_assembly_or_commit": "No discrete commit; a valid solution jointly satisfies the differential relation at every point.",
+    "result_kind": "A field u[t,x] satisfying the equation and supplied initial/boundary data.",
+    "successor_cardinality": "Intended to determine one future solution for well-posed data; the source notes many sampled equations become singular or cease determining future behavior.",
+    "determinism_branching_or_measure": "Deterministic as a relation when well posed; no probability is native.",
+    "termination_completion_failure": "Evolution fails when values become infinite or vary infinitely quickly so the equation no longer determines future behavior.",
+    "witness_semantics": "A valid field has the stated derivatives and satisfies the equation plus initial/boundary data.",
+    "parameters_and_variants": "The differential formula, derivative orders, coefficients, and initial/boundary data vary.",
+    "excluded_observers_and_representations": "Gray plots, mesh surfaces, and numerical approximations represent candidate solutions.",
+    "evidence_limit": "The main text does not state spatial boundary conditions or the numerical solver used for its figures.",
+}
+pde_family = source_candidate(
+    "pde-family",
+    "partial-differential-equation evolution relation",
+    "U000891",
+    PDE_FAMILY,
+    not_applicable={
+        "control_state": "No independent discrete control register is part of the continuous field relation.",
+        "external_data": "After equation and data are supplied, no external stream is part of the relation.",
+    },
+    missing="Spatial boundary conditions, solution regularity class, and numerical realization are not specified.",
+    claim="The passage defines PDE rules as continuous time-change rates depending on field values and spatial change rates.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
+
+def pde_candidate(
+    key: str,
+    name: str,
+    anchor: str,
+    equation: str,
+    time_order: str,
+    *,
+    route_keys: list[str] | None = None,
+) -> CandidateSpec:
+    facts = deepcopy(PDE_FAMILY)
+    facts["object_kind"] = name
+    facts["rule_relation_constraint_function_or_probability_law"] = equation
+    facts["complete_state"] = (
+        "The field u at one time plus its first time derivative."
+        if time_order == "second"
+        else "The field u at one time."
+    )
+    facts["read_dependencies_or_neighborhood"] = (
+        "The local field u and its second spatial derivative u_xx."
+        + (" The second time derivative is constrained." if time_order == "second" else "")
+    )
+    facts["parameters_and_variants"] = f"The equation is fixed as {equation}"
+    return source_candidate(
+        key,
+        name,
+        anchor,
+        facts,
+        not_applicable={
+            "control_state": "No independent discrete control register is part of the continuous field relation.",
+            "external_data": "After equation and data are supplied, no external stream is part of the relation.",
+        },
+        missing="Spatial boundary/asymptotic conditions and the numerical solution method are not stated.",
+        claim=f"The source explicitly prints the equation {equation}",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        modality="FORMULA",
+        route_keys=route_keys,
+    )
+
+
+diffusion_pde = pde_candidate(
+    "diffusion-pde",
+    "diffusion equation",
+    "U000905",
+    "partial_t u[t,x] = (1/4) partial_xx u[t,x].",
+    "first",
+    route_keys=["continuous-average-page156"],
+)
+wave_pde = pde_candidate(
+    "wave-pde",
+    "wave equation",
+    "U000908",
+    "partial_tt u[t,x] = partial_xx u[t,x].",
+    "second",
+)
+sine_gordon_pde = pde_candidate(
+    "sine-gordon-pde",
+    "sine-Gordon soliton equation",
+    "U000911",
+    "partial_tt u[t,x] = partial_xx u[t,x] + Sin[u[t,x]].",
+    "second",
+)
+nonlinear_pdes: dict[int, CandidateSpec] = {}
+for coefficient, anchor in [(1, "U000922"), (2, "U000925"), (4, "U000928")]:
+    nonlinear_pdes[coefficient] = pde_candidate(
+        f"nonlinear-pde-{coefficient}",
+        f"nonlinear wave PDE with coefficient {coefficient}",
+        anchor,
+        (
+            "partial_tt u[t,x] = partial_xx u[t,x] + "
+            f"(1-u[t,x]^2)(1+{'' if coefficient == 1 else str(coefficient)}u[t,x])."
+        ),
+        "second",
+    )
+
+gaussian_pde_seed = source_candidate(
+    "gaussian-pde-initial-data",
+    "Gaussian stationary initial data for the PDE figures",
+    "U000912",
+    seed_facts(
+        "Initial data u[0,x]=e^(-x^2) and partial_t u[0,x]=0.",
+        "A continuous scalar field and its initial time derivative.",
+        "A continuous one-dimensional spatial domain.",
+        "u=e^(-x^2), partial_t u=0 at the initial time.",
+        "Used for the PDE figures on this and following pages.",
+    ),
+    not_applicable={
+        **SEED_NA,
+        "boundary": "Spatial boundary/asymptotic conditions belong to the PDE problem and are not included in the stated initial data.",
+    },
+    missing="The spatial domain and boundary/asymptotic conditions are not stated.",
+    claim="The caption explicitly states u=e^(-x^2), partial_t u=0 as the initial conditions.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="FORMULA",
+)
+
+pde_sampler = source_candidate(
+    "symbolic-pde-sampler",
+    "symbolic-expression sampler for PDE formulas",
+    "U000914",
+    declarative_facts(
+        kind="A scheme for sampling PDEs by representing formulas as symbolic expressions over discrete component sets.",
+        carrier="Symbolic expression trees.",
+        support="Finite formula positions.",
+        alphabet="A discrete selected set of expression components.",
+        state="One generated symbolic formula.",
+        input_value="A discrete component vocabulary and an unstated expression-generation scheme.",
+        law_kind="A discrete formula-generation/sampling procedure.",
+        law="Represent candidate PDE right-hand sides as symbolic expressions assembled from discrete sets of possible components.",
+        result="A sampled candidate PDE formula.",
+        successor="Many possible formulas under an unspecified enumeration or measure.",
+        determinism="Enumeration/measure is not specified.",
+        termination="Finite expressions can be generated; no size bound or stopping distribution is supplied.",
+        witness="A generated expression uses only admitted discrete components.",
+        variants="Component vocabulary, expression size, and sampling distribution vary.",
+        excluded="Subsequent solution behavior is not part of formula sampling.",
+        limit="The grammar, component set, size control, and sampling distribution are omitted.",
+    ),
+    not_applicable=DECLARATIVE_NA,
+    missing="The expression grammar, component vocabulary, size bound, and sampling/enumeration law are not stated.",
+    claim="The passage explicitly proposes symbolic expressions with discrete possible components as a PDE sampling scheme.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+    uncertainties=["The source gives only the sampling principle, not a reproducible sampler."],
+)
+
+pde_numerical_scheme = source_candidate(
+    "pde-numerical-scheme",
+    "unspecified numerical approximation scheme for the PDE figures",
+    "U000936",
+    {
+        "object_kind": "The numerical approximation procedure used to compute the displayed PDE solution.",
+        "native_time": "The source does not state whether numerical time is stepped discretely or handled otherwise.",
+        "carrier": "A numerical representation of the continuous field u[t,x].",
+        "support": "A spatial/time discretization that is not identified.",
+        "alphabet_or_value_schema": "Finite numerical approximations to field values.",
+        "complete_state": "The solver state is not specified.",
+        "input": "One PDE and its initial data.",
+        "law_kind": "An unnamed numerical approximation algorithm.",
+        "result_kind": "The computed approximate field shown in the figures.",
+        "successor_cardinality": "Unknown because solver mechanics and stability choices are omitted.",
+        "determinism_branching_or_measure": "Unknown from source.",
+        "termination_completion_failure": "Unknown; the source only warns that details can depend on the scheme.",
+        "witness_semantics": "No convergence or error certificate is supplied.",
+        "parameters_and_variants": "Grid/stencil, spatial step, time step, integrator, precision, and boundary handling are all unstated.",
+        "excluded_observers_and_representations": "The grayscale solution panel is the solver output representation.",
+        "evidence_limit": "Only the existence and consequence of a numerical approximation scheme are stated.",
+    },
+    not_applicable={
+        "seed": "The PDE initial data are solver input, not a separately stated random or constructive solver seed.",
+        "external_data": "No external data stream is stated.",
+    },
+    missing=(
+        "The stencil, grid, space/time step sizes, integrator, precision, "
+        "boundary treatment, stability condition, and convergence/error checks are all missing."
+    ),
+    claim="The caption explicitly identifies a numerical approximation scheme as affecting computed details, but supplies none of its mechanics.",
+    strength="DIRECT_IDENTITY",
+    uncertainties=["The unnamed solver is construction-bearing but cannot be reproduced from the assigned source."],
+)
+
+
+# Literal construction-bearing routes discovered during the sequential pass.
+add_route(
+    "register-page100",
+    "U000693",
+    "the register machine shown on page 100",
+    "register-machine realization and state encoding for the printed arithmetic map",
+    ["register machine", "page 100", "3n/2", "(3n+1)/2"],
+)
+add_route(
+    "substitution-page83",
+    "U000792",
+    "the substitution systems on page 83",
+    "substitution-system construction of nested digit sequences",
+    ["substitution systems", "page 83", "nested digit sequence"],
+)
+add_route(
+    "generalized-substitution-term",
+    "U000819",
+    "a generalized substitution system",
+    "base mechanics of generalized substitution systems used by the axis-crossing encoding",
+    ["generalized substitution system", "continued fraction", "axis crossing"],
+    kind="TERM",
+)
+add_route(
+    "fibonacci-substitution-page83",
+    "U000822",
+    "the Fibonacci substitution system on page 83",
+    "Fibonacci substitution-system mechanics and the analogous axis-crossing preset",
+    ["Fibonacci substitution system", "page 83", "quadratic irrational"],
+)
+add_route(
+    "shift-map-prev-pages",
+    "U000833",
+    "the so-called shift map used in case (d) on the previous two pages",
+    "iterated-map case (d) formula and trajectories",
+    ["shift map", "case (d)", "previous two pages"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "shift-map-pages150-151",
+    "U000850",
+    "the shift map—shown as case (d) on pages 150 and 151",
+    "shift-map formula and simple/random initial-condition runs",
+    ["shift map", "case (d)", "pages 150 and 151"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "intrinsic-maps-pages150-151",
+    "U000857",
+    "systems like (a) and (b) on pages 150 and 151",
+    "iterated-map cases (a) and (b) from simple initial conditions",
+    ["systems (a) and (b)", "pages 150 and 151", "simple initial conditions"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "totalistic-prior-chapter",
+    "U000865",
+    "the totalistic cellular automaton rules that we discussed at the beginning of the last chapter",
+    "discrete totalistic cellular-automaton base mechanics",
+    ["totalistic cellular automaton", "last chapter", "average"],
+    kind="SECTION",
+)
+add_route(
+    "iterated-map-a-page150",
+    "U000873",
+    "exactly iterated map (a) from page 150",
+    "unit-interval iterated map x -> FractionalPart[(3/2)x]",
+    ["iterated map (a)", "page 150", "FractionalPart", "3/2"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "continuous-average-page156",
+    "U000897",
+    "the continuous cellular automaton on page 156",
+    "pure-average continuous cellular automaton and its diffusion limit",
+    ["continuous cellular automaton", "page 156", "diffusion"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "continuous-rules-previous-page",
+    "U000886",
+    "the same kind of rules as on the previous page",
+    "additive-constant continuous-CA family and parameter presets",
+    ["same kind of rules", "previous page", "continuous cellular automata"],
+    scope="WITHIN_STAGE",
+    kind="SECTION",
+)
+add_route(
+    "nonlinear-pdes-previous-page",
+    "U000936",
+    "the same equations as on the previous page",
+    "three nonlinear PDE formulas and their shorter-time solutions",
+    ["same equations", "previous page", "partial differential equations"],
+    scope="WITHIN_STAGE",
+)
+
+# Candidate-to-family and candidate-to-route provenance.
+for _spec in additive_presets.values():
+    _spec["related_keys"] = ["continuous-ca-additive-family"]
+for _spec in radix_presets.values():
+    _spec["related_keys"] = ["radix-family"]
+for _spec in addition_presets.values():
+    _spec["related_keys"] = ["constant-addition-family"]
+for _spec in [times_two, times_three, times_three_halves]:
+    _spec["related_keys"] = ["constant-multiplication-family"]
+for _spec in fixed_specs.values():
+    _spec["related_keys"] = ["recursive-sequence-schema"]
+for _spec in variable_specs.values():
+    _spec["related_keys"] = ["recursive-sequence-schema"]
+for _spec in map_specs.values():
+    _spec["related_keys"] = ["iterated-map-family"]
+for _spec in [average_ca, fractional_three_half_ca, additive_ca_family]:
+    _spec["related_keys"] = ["continuous-ca-family"]
+for _spec in [diffusion_pde, wave_pde, sine_gordon_pde, *nonlinear_pdes.values()]:
+    _spec["related_keys"] = ["pde-family"]
+for _spec in cos_specs.values():
+    _spec["related_keys"] = ["trig-axis-crossing-substitution-encoder"]
+
+map_specs["iterated-map-d"]["route_keys"].extend(
+    ["shift-map-prev-pages", "shift-map-pages150-151"]
+)
+map_specs["iterated-map-a"]["route_keys"].append("intrinsic-maps-pages150-151")
+map_specs["iterated-map-b"]["route_keys"].append("intrinsic-maps-pages150-151")
+additive_ca_family["route_keys"].append("continuous-rules-previous-page")
+for _spec in nonlinear_pdes.values():
+    _spec["route_keys"].append("nonlinear-pdes-previous-page")
+
+for _spec, _label, _unit in [
+    (register_arithmetic_map, "register-page100-route", "U000693"),
+    (axis_crossing_encoder, "generalized-substitution-route", "U000819"),
+    (cos_specs["cosdiff-2-sqrt5"], "fibonacci-substitution-route", "U000822"),
+    (map_specs["iterated-map-d"], "shift-map-route-a", "U000833"),
+    (map_specs["iterated-map-d"], "shift-map-route-b", "U000850"),
+    (map_specs["iterated-map-a"], "intrinsic-map-a-route", "U000857"),
+    (map_specs["iterated-map-b"], "intrinsic-map-b-route", "U000857"),
+    (continuous_ca_family, "totalistic-prior-route", "U000865"),
+    (fractional_three_half_ca, "iterated-map-a-route", "U000873"),
+    (diffusion_pde, "continuous-average-route", "U000897"),
+    (additive_ca_family, "continuous-rules-route", "U000886"),
+    (nonlinear_pdes[1], "nonlinear-pde-route-1", "U000936"),
+    (nonlinear_pdes[2], "nonlinear-pde-route-2", "U000936"),
+    (nonlinear_pdes[4], "nonlinear-pde-route-4", "U000936"),
+]:
+    context_evidence(
+        _spec,
+        _label,
+        _unit,
+        "This unit supplies the literal construction-bearing route attached to the candidate.",
+        strength="LEAD_ONLY",
+        modality="CROSS_REFERENCE",
+    )
