@@ -93,6 +93,8 @@ REVIEW_HISTORY_FIELDS = [
     "source_paths",
     "source_unit_ids",
     "asset_ids",
+    "prior_search_round_count",
+    "prior_search_rounds_sha256",
     "input_projection_sha256",
     "result_projection_sha256",
     "previous_event_sha256",
@@ -791,6 +793,14 @@ def schema_documents() -> dict[str, dict[str, Any]]:
                 },
                 "uniqueItems": True,
             },
+            "prior_search_round_count": {
+                "type": "integer",
+                "minimum": 0,
+            },
+            "prior_search_rounds_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
             "input_projection_sha256": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{64}$",
@@ -1099,6 +1109,10 @@ def review_input_projection(
         "mode": event["mode"],
         "reviewer": event["reviewer"],
         "source_paths": event["source_paths"],
+        "prior_search_round_count": event["prior_search_round_count"],
+        "prior_search_rounds_sha256": event[
+            "prior_search_rounds_sha256"
+        ],
         "source_units": [
             {
                 "source_unit_id": unit_id,
@@ -1159,3 +1173,38 @@ def review_event_sha256(event: dict[str, Any]) -> str:
             if field != "event_sha256"
         }
     )
+
+
+def close_review_event(
+    core: dict[str, Any],
+    unit_by_id: dict[str, dict[str, Any]],
+    reading_by_id: dict[str, dict[str, Any]],
+    asset_by_id: dict[str, dict[str, Any]],
+    previous_event_sha256: str | None,
+    prior_search_rounds: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Close a new append-only review event with canonical projections/hashes."""
+    event = {
+        "review_id": core["review_id"],
+        "epoch": core["epoch"],
+        "stage": core["stage"],
+        "mode": core["mode"],
+        "reviewer": core["reviewer"],
+        "source_paths": list(core["source_paths"]),
+        "source_unit_ids": list(core["source_unit_ids"]),
+        "asset_ids": list(core["asset_ids"]),
+        "prior_search_round_count": len(prior_search_rounds),
+        "prior_search_rounds_sha256": canonical_sha256(prior_search_rounds),
+        "input_projection_sha256": "",
+        "result_projection_sha256": "",
+        "previous_event_sha256": previous_event_sha256,
+        "event_sha256": "",
+    }
+    event["input_projection_sha256"] = canonical_sha256(
+        review_input_projection(event, unit_by_id, asset_by_id)
+    )
+    event["result_projection_sha256"] = canonical_sha256(
+        review_result_projection(event, reading_by_id, asset_by_id)
+    )
+    event["event_sha256"] = review_event_sha256(event)
+    return event

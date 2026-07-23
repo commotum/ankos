@@ -235,14 +235,6 @@ def sanitized_guardrails(guardrails: dict[str, Any]) -> dict[str, Any]:
 
 def brief(worker_id: str, stage: int, epoch: int, paths: list[str]) -> str:
     listed = "\n".join(f"- `{path}`" for path in paths)
-    reopen_instruction = (
-        "\nThis is a formally reopened pass. In every reading/asset update, "
-        "retain the input row's existing global B/R links exactly and in "
-        "their existing order; add any new worker-local W/WR links without "
-        "removing or inventing global links.\n"
-        if epoch > 1
-        else ""
-    )
     return f"""# Blind Source Review
 
 Worker: `{worker_id}`
@@ -254,7 +246,11 @@ Do not run search in this worker bundle; the coordinator performs and records
 typed local-search rounds after merging the sequential review. Do not use
 outside knowledge to fill missing mechanics, and do not decide implementation,
 equivalence, reuse, or final taxonomy.
-{reopen_instruction}
+
+The coordinator infers initial-versus-reopened mode from the complete input
+projection. In every reading/asset update, retain the input row's existing
+global B/R links exactly and in their existing order; add any new worker-local
+W/WR links without removing or inventing global links.
 
 Assigned canonical documents:
 
@@ -577,6 +573,41 @@ def reopened_local_links(
     return local_links
 
 
+def projection_review_mode(
+    reading_rows: list[dict[str, str]],
+    asset_rows: list[dict[str, str]],
+) -> str:
+    """Infer one assignment's mode from its complete authoritative projection."""
+
+    modes: set[str] = set()
+    for row in reading_rows:
+        status = row.get("review_status")
+        if status == "PENDING":
+            modes.add("INITIAL")
+        elif status == "REVIEWED":
+            modes.add("REOPEN")
+        else:
+            raise ValueError(
+                f"reading projection has invalid review_status {status!r}"
+            )
+    for row in asset_rows:
+        status = row.get("inspection_status")
+        if status == "PENDING":
+            modes.add("INITIAL")
+        elif status == "SCREENED":
+            modes.add("REOPEN")
+        else:
+            raise ValueError(
+                f"asset projection has invalid inspection_status {status!r}"
+            )
+    if modes != {"INITIAL"} and modes != {"REOPEN"}:
+        raise ValueError(
+            "assignment projection must be uniformly PENDING or uniformly "
+            "REVIEWED/SCREENED"
+        )
+    return next(iter(modes))
+
+
 def discovery_anchor_orders(
     assigned_units: dict[str, dict[str, str]],
     assigned_assets: dict[str, dict[str, str]],
@@ -670,6 +701,7 @@ def build_bundle(
         for row in read_csv(GOAL_DIR / "asset-ledger.csv")
         if row["assignment_path"] in paths
     ]
+    projection_review_mode(reading, assets)
 
     prompt_bytes = brief(worker_id, stage, epoch, paths).encode("utf-8")
     reject_blind_text(
@@ -1823,6 +1855,10 @@ def verify_bundle(
         errors,
         "asset input",
     )
+    try:
+        projection_review_mode(reading_rows, asset_rows)
+    except ValueError as exc:
+        errors.append(str(exc))
     asset_ids = [row.get("asset_id") for row in asset_rows]
     if len(asset_ids) != len(set(asset_ids)):
         errors.append("bundle asset IDs are not unique")

@@ -27,6 +27,9 @@ from audit_contract import (  # noqa: E402
 
 ASSIGNMENT_PATH = "FRONT-MATTER/01-Preface.md"
 STAGE_5_PATH = "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
+STAGE_5_NOTES_PATH = (
+    "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+)
 
 
 class InjectedTransactionInterrupt(BaseException):
@@ -251,16 +254,23 @@ def _completed_no_construction_bundle(
     root: Path,
     *,
     stage: int,
-    assignment_path: str,
+    assignment_path: str | None = None,
+    assignment_paths: list[str] | None = None,
+    epoch: int = 1,
+    worker_id: str | None = None,
 ) -> Path:
     bundle = root / "bundle"
-    worker_id = f"stage-{stage}-order-test"
+    if assignment_paths is None:
+        assert assignment_path is not None
+        assignment_paths = [assignment_path]
+    assert assignment_path is None or assignment_paths == [assignment_path]
+    worker_id = worker_id or f"stage-{stage}-order-test"
     build_worker_bundle.build_bundle(
         bundle,
         worker_id,
         stage,
-        [assignment_path],
-        epoch=1,
+        assignment_paths,
+        epoch=epoch,
     )
     reading_updates: list[dict[str, str]] = []
     for original in _read_csv(bundle / "input" / "reading-input.csv"):
@@ -268,12 +278,12 @@ def _completed_no_construction_bundle(
         row.update(
             {
                 "review_status": "REVIEWED",
-                "review_epoch": "1",
+                "review_epoch": str(epoch),
                 "review_disposition": "NO_CONSTRUCTION",
                 "source_status": "CLEAR",
                 "secondary_roles": "[]",
-                "candidate_ids": "[]",
-                "route_ids": "[]",
+                "candidate_ids": original["candidate_ids"],
+                "route_ids": original["route_ids"],
                 "evidence_statement": "Assigned source unit reviewed.",
                 "review_stage": str(stage),
                 "reviewer": worker_id,
@@ -286,14 +296,14 @@ def _completed_no_construction_bundle(
         row.update(
             {
                 "inspection_status": "SCREENED",
-                "review_epoch": "1",
+                "review_epoch": str(epoch),
                 "visual_role": "DECORATIVE",
                 "source_status": "CLEAR",
                 "risk_flags": "[]",
                 "original_resolution_status": "NOT_REQUIRED",
                 "transcription_status": "NOT_REQUIRED",
-                "candidate_ids": "[]",
-                "route_ids": "[]",
+                "candidate_ids": original["candidate_ids"],
+                "route_ids": original["route_ids"],
                 "evidence_statement": "Assigned image screened.",
                 "review_stage": str(stage),
                 "reviewer": worker_id,
@@ -360,21 +370,53 @@ def _goal_after_initial_merge(root: Path) -> Path:
     return goal
 
 
-def _permit_test_stage18_closure(
-    monkeypatch: pytest.MonkeyPatch,
+def _add_local_closure(
+    goal: Path,
+    *,
+    epoch: int,
+    stage: int,
+    source_paths: list[str],
 ) -> None:
-    real_validate = merge.validate_audit.validate_objects
-
-    def validate_with_closed_checkpoint(*args: Any, **kwargs: Any) -> list[str]:
-        if kwargs.get("require_stages") == set(range(4, 19)):
-            return []
-        return real_validate(*args, **kwargs)
-
-    monkeypatch.setattr(
-        merge.validate_audit,
-        "validate_objects",
-        validate_with_closed_checkpoint,
+    search_path = goal / merge.SEARCH_NAME
+    search = json.loads(search_path.read_text(encoding="utf-8"))
+    query_number = (
+        sum(
+            len(round_record["queries"])
+            for round_record in search["rounds"]
+        )
+        + 1
     )
+    round_record: dict[str, Any] = {
+        "round_id": f"S{len(search['rounds']) + 1:03d}",
+        "epoch": epoch,
+        "kind": "LOCAL",
+        "owning_stage": stage,
+        "queries": [
+            {
+                "query_id": f"Q{query_number:04d}",
+                "family": "deterministic merge-history closure fixture",
+                "pattern": "__MERGE_HISTORY_IMPOSSIBLE_MATCH_71A9C2__",
+                "mode": "LITERAL",
+                "case_sensitive": True,
+                "whole_word": False,
+                "scope_paths": source_paths,
+            }
+        ],
+        "tool_assumptions": ["Deterministic zero-result fixture."],
+        "result_ids": [],
+        "result_digest": "",
+        "hits": [],
+        "new_vocabulary": [],
+        "new_candidates": [],
+        "new_evidence_groups": [],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    digest = merge.validate_audit.search_result_digest(round_record)
+    round_record["result_digest"] = digest
+    round_record["rerun_digest"] = digest
+    search["rounds"].append(round_record)
+    search_path.write_bytes(canonical_json_bytes(search))
 
 
 def test_default_cli_is_dry_run_and_rewrites_all_id_families(
@@ -400,6 +442,8 @@ def test_default_cli_is_dry_run_and_rewrites_all_id_families(
     assert completed.returncode == 0, completed.stderr
     preview = json.loads(completed.stdout)
     assert preview["mode"] == "dry-run"
+    assert preview["review_ids"] == ["V000001"]
+    assert preview["review_mode"] == "INITIAL"
     assert preview["mappings"] == {
         "candidates": {"W0001": "B0001"},
         "routes": {"WR0001": "R000001"},
@@ -427,6 +471,10 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
     merge.apply_merge(plan)
 
     assert (goal / merge.SEARCH_NAME).read_bytes() == search_before
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    assert [event["review_id"] for event in history] == ["V000001"]
+    assert history[0]["source_paths"] == [ASSIGNMENT_PATH]
+    assert history[0]["previous_event_sha256"] is None
     candidates = merge._read_jsonl(goal / merge.CANDIDATE_NAME)
     routes = merge._read_csv(
         goal / merge.ROUTE_NAME,
@@ -652,11 +700,34 @@ def test_later_initial_stage_requires_all_prior_stage_gates(
         merge.prepare_merge(bundle, goal_dir=goal)
 
 
+def test_stage_five_notes_cannot_merge_before_main_chapter(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_no_construction_bundle(
+        tmp_path,
+        stage=5,
+        assignment_path=STAGE_5_NOTES_PATH,
+    )
+    goal = _copy_global_state(tmp_path)
+
+    with pytest.raises(
+        merge.MergeError,
+        match="earlier canonical document .* remains pending",
+    ):
+        merge.prepare_merge(bundle, goal_dir=goal)
+
+
 def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     goal = _goal_after_initial_merge(tmp_path)
+    _add_local_closure(
+        goal,
+        epoch=1,
+        stage=4,
+        source_paths=[ASSIGNMENT_PATH],
+    )
     monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
     bundle = _completed_bundle(
         tmp_path / "reopened",
@@ -666,15 +737,12 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     search_before = json.loads(
         (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
     )
-    search_before["fixed_point"] = {"test_checkpoint": "closed"}
-    (goal / merge.SEARCH_NAME).write_bytes(
-        canonical_json_bytes(search_before)
-    )
-    _permit_test_stage18_closure(monkeypatch)
 
     plan = merge.prepare_merge(bundle, goal_dir=goal)
     preview = plan.preview()
     assert preview["discovery_epoch"] == 2
+    assert preview["review_ids"] == ["V000002"]
+    assert preview["review_mode"] == "REOPEN"
     assert preview["search_ledger_preserved"] is False
     assert preview["search_fixed_point_cleared"] is True
     assert plan.candidate_ids == {"W0001": "B0002"}
@@ -714,9 +782,16 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     assert search_after["fixed_point"] is None
     assert search_after["rounds"] == search_before["rounds"]
     assert search_after["vocabulary"] == search_before["vocabulary"]
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    assert [event["review_id"] for event in history] == [
+        "V000001",
+        "V000002",
+    ]
+    assert [event["epoch"] for event in history] == [1, 2]
+    assert history[1]["previous_event_sha256"] == history[0]["event_sha256"]
 
 
-def test_epoch_two_reopen_requires_closed_stage18_checkpoint(
+def test_epoch_two_reopen_requires_current_epoch_local_search_closure(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -730,7 +805,7 @@ def test_epoch_two_reopen_requires_closed_stage18_checkpoint(
 
     with pytest.raises(
         merge.MergeError,
-        match="requires a fully closed Stage 18 fixed point",
+        match="LOCAL search scopes are not closed",
     ):
         merge.prepare_merge(bundle, goal_dir=goal)
 
@@ -749,7 +824,7 @@ def test_reopen_epoch_must_be_next_global_epoch(
 
     with pytest.raises(
         merge.MergeError,
-        match="epoch 3 is not the next global epoch 2",
+        match="epoch 3 is not the next review epoch 2",
     ):
         merge.prepare_merge(bundle, goal_dir=goal)
 
@@ -766,7 +841,7 @@ def test_epoch_two_reopen_requires_completed_live_projection(
 
     with pytest.raises(
         merge.MergeError,
-        match="is not REVIEWED for discovery epoch 2",
+        match="differs from the active review epoch 1",
     ):
         merge.prepare_merge(bundle, goal_dir=goal)
 

@@ -26,6 +26,11 @@ from audit_contract import (
     FINGERPRINT_FIELDS,
     GOAL_DIR,
     READING_HEADER,
+    REVIEW_HISTORY_FIELDS,
+    canonical_sha256,
+    review_event_sha256,
+    review_input_projection,
+    review_result_projection,
 )
 
 
@@ -34,6 +39,7 @@ CANDIDATE_NAME = "candidate-ledger.jsonl"
 ROUTE_NAME = "cross-reference-ledger.csv"
 ASSET_NAME = "asset-ledger.csv"
 SEARCH_NAME = "search-rounds.json"
+REVIEW_HISTORY_NAME = "review-history.jsonl"
 MANIFEST_NAME = "corpus-manifest.json"
 UNITS_NAME = "source-units.jsonl"
 GUARDRAILS_NAME = "guardrails.json"
@@ -44,6 +50,7 @@ WRITE_NAMES = (
     READING_NAME,
     ASSET_NAME,
     SEARCH_NAME,
+    REVIEW_HISTORY_NAME,
 )
 SNAPSHOT_NAMES = (
     MANIFEST_NAME,
@@ -53,6 +60,7 @@ SNAPSHOT_NAMES = (
     ROUTE_NAME,
     ASSET_NAME,
     SEARCH_NAME,
+    REVIEW_HISTORY_NAME,
     GUARDRAILS_NAME,
 )
 
@@ -68,6 +76,8 @@ class MergePlan:
     worker_id: str
     stage: int
     discovery_epoch: int
+    review_ids: tuple[str, ...]
+    review_mode: str
     source_paths: tuple[str, ...]
     candidate_ids: dict[str, str]
     route_ids: dict[str, str]
@@ -87,6 +97,8 @@ class MergePlan:
             "goal_dir": str(self.goal_dir),
             "stage": self.stage,
             "discovery_epoch": self.discovery_epoch,
+            "review_ids": list(self.review_ids),
+            "review_mode": self.review_mode,
             "source_paths": list(self.source_paths),
             "mappings": {
                 "candidates": self.candidate_ids,
@@ -99,6 +111,7 @@ class MergePlan:
                 "asset_updates": self.asset_update_count,
                 "candidate_appends": len(self.candidate_ids),
                 "route_appends": len(self.route_ids),
+                "review_event_appends": len(self.review_ids),
             },
             "worker_uncertainties": list(self.worker_uncertainties),
             "search_ledger_preserved": (
@@ -108,7 +121,7 @@ class MergePlan:
             "search_rounds_preserved": True,
             "search_vocabulary_preserved": True,
             "search_fixed_point_cleared": (
-                self.discovery_epoch > 1
+                self.review_mode == "REOPEN"
             ),
             "search_ledger_sha256": hashlib.sha256(
                 self.proposed_bytes[SEARCH_NAME]
@@ -592,6 +605,7 @@ def _validate_stage_prerequisites(
     routes: list[dict[str, str]],
     assets: list[dict[str, str]],
     search: dict[str, Any],
+    review_history: list[dict[str, Any]],
 ) -> None:
     prerequisite_stages = set(range(4, stage))
     if not prerequisite_stages:
@@ -604,6 +618,7 @@ def _validate_stage_prerequisites(
         routes,
         assets,
         search,
+        review_history=review_history,
         require_stages=prerequisite_stages,
     )
     if errors:
@@ -611,6 +626,145 @@ def _validate_stage_prerequisites(
             f"stage {stage} merge prerequisites failed:\n- "
             + "\n- ".join(errors)
         )
+
+
+def _review_sequence(history: list[dict[str, Any]]) -> int:
+    identifiers: list[str] = []
+    for index, event in enumerate(history):
+        if not isinstance(event, dict) or set(event) != set(
+            REVIEW_HISTORY_FIELDS
+        ):
+            raise MergeError(
+                f"review-history event {index} differs from the frozen schema"
+            )
+        review_id = event.get("review_id")
+        if not isinstance(review_id, str):
+            raise MergeError(f"review-history event {index} lacks a review_id")
+        identifiers.append(review_id)
+    return _sequence(
+        identifiers,
+        "V",
+        6,
+        "review-history",
+    )
+
+
+def _active_review_epoch(history: list[dict[str, Any]]) -> int:
+    _review_sequence(history)
+    if not history:
+        return 1
+    return max(
+        _positive_epoch(event.get("epoch"), f"review {event.get('review_id')}")
+        for event in history
+    )
+
+
+def _validate_current_epoch_local_search_closed(
+    *,
+    history: list[dict[str, Any]],
+    search: dict[str, Any],
+    epoch: int,
+) -> None:
+    expected: dict[int, set[str]] = {}
+    for event in history:
+        if event.get("epoch") != epoch:
+            continue
+        stage = event.get("stage")
+        paths = event.get("source_paths")
+        if (
+            not isinstance(stage, int)
+            or isinstance(stage, bool)
+            or not isinstance(paths, list)
+            or not all(isinstance(path, str) for path in paths)
+        ):
+            raise MergeError(
+                f"review {event.get('review_id')} has malformed search scope"
+            )
+        expected.setdefault(stage, set()).update(paths)
+    if not expected:
+        raise MergeError(
+            f"cannot advance beyond epoch {epoch} without a review-history scope"
+        )
+
+    actual: dict[int, set[str]] = {}
+    rounds = search.get("rounds")
+    if not isinstance(rounds, list):
+        raise MergeError("search rounds are not an array")
+    for round_record in rounds:
+        if (
+            not isinstance(round_record, dict)
+            or round_record.get("kind") != "LOCAL"
+            or round_record.get("epoch") != epoch
+        ):
+            continue
+        stage = round_record.get("owning_stage")
+        queries = round_record.get("queries")
+        if not isinstance(stage, int) or not isinstance(queries, list):
+            raise MergeError("current-epoch LOCAL search round is malformed")
+        for query in queries:
+            if not isinstance(query, dict) or not isinstance(
+                query.get("scope_paths"),
+                list,
+            ):
+                raise MergeError("current-epoch LOCAL query scope is malformed")
+            scope_paths = query["scope_paths"]
+            if not all(isinstance(path, str) for path in scope_paths):
+                raise MergeError("current-epoch LOCAL query scope is malformed")
+            actual.setdefault(stage, set()).update(scope_paths)
+
+    for stage in sorted(set(expected) | set(actual)):
+        expected_paths = expected.get(stage, set())
+        actual_paths = actual.get(stage, set())
+        if actual_paths != expected_paths:
+            raise MergeError(
+                f"cannot advance beyond epoch {epoch}: Stage {stage} LOCAL "
+                "search scopes are not closed "
+                f"(expected={sorted(expected_paths)}, actual={sorted(actual_paths)})"
+            )
+
+
+def _path_is_complete(
+    path: str,
+    reading: list[dict[str, str]],
+    assets: list[dict[str, str]],
+) -> bool:
+    path_reading = [row for row in reading if row.get("path") == path]
+    path_assets = [
+        row for row in assets if row.get("assignment_path") == path
+    ]
+    return bool(path_reading) and all(
+        row.get("review_status") == "REVIEWED" for row in path_reading
+    ) and all(
+        row.get("inspection_status") == "SCREENED" for row in path_assets
+    )
+
+
+def _validate_stage_path_prefix(
+    *,
+    stage: int,
+    source_paths: tuple[str, ...],
+    manifest: dict[str, Any],
+    reading: list[dict[str, str]],
+    assets: list[dict[str, str]],
+) -> None:
+    canonical_paths = build_worker_bundle.ordered_stage_paths(manifest, stage)
+    if list(source_paths) != [
+        path for path in canonical_paths if path in set(source_paths)
+    ]:
+        raise MergeError("bundle source paths are not in canonical manifest order")
+    selected = set(source_paths)
+    for path in source_paths:
+        position = canonical_paths.index(path)
+        for earlier in canonical_paths[:position]:
+            if earlier not in selected and not _path_is_complete(
+                earlier,
+                reading,
+                assets,
+            ):
+                raise MergeError(
+                    f"cannot merge {path} while earlier canonical document "
+                    f"{earlier} remains pending"
+                )
 
 
 def _positive_epoch(value: object, label: str) -> int:
@@ -701,6 +855,8 @@ def _validate_reopen_prerequisites(
     routes: list[dict[str, str]],
     assets: list[dict[str, str]],
     search: dict[str, Any],
+    review_history: list[dict[str, Any]],
+    active_epoch: int,
 ) -> None:
     errors = validate_audit.validate_objects(
         manifest,
@@ -710,13 +866,18 @@ def _validate_reopen_prerequisites(
         routes,
         assets,
         search,
-        require_stages=set(range(4, 19)),
+        review_history=review_history,
     )
     if errors:
         raise MergeError(
-            "reopened merge requires a fully closed Stage 18 fixed point:\n- "
+            "reopened merge requires a valid current blind-audit state:\n- "
             + "\n- ".join(errors)
         )
+    _validate_current_epoch_local_search_closed(
+        history=review_history,
+        search=search,
+        epoch=active_epoch,
+    )
 
 
 def prepare_merge(
@@ -761,6 +922,7 @@ def prepare_merge(
         routes = _read_csv(goal_dir / ROUTE_NAME, CROSS_REFERENCE_HEADER)
         assets = _read_csv(goal_dir / ASSET_NAME, ASSET_HEADER)
         search = json.loads(original_bytes[SEARCH_NAME])
+        review_history = _read_jsonl(goal_dir / REVIEW_HISTORY_NAME)
         bundle_manifest = json.loads(bundle_bytes["manifest"])
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         raise MergeError(f"cannot load merge state: {exc}") from exc
@@ -782,8 +944,6 @@ def prepare_merge(
         or discovery_epoch < 1
     ):
         raise MergeError("bundle manifest has an invalid discovery_epoch")
-    reopened = discovery_epoch > 1
-
     source_paths_value = bundle_manifest.get("source_paths")
     if not isinstance(source_paths_value, list) or not all(
         isinstance(item, str) for item in source_paths_value
@@ -813,33 +973,32 @@ def prepare_merge(
     if bundle_assets != current_asset_projection:
         raise MergeError("stale asset-input projection differs from global rows")
 
-    expected_reading_status = "REVIEWED" if reopened else "PENDING"
-    expected_asset_status = "SCREENED" if reopened else "PENDING"
-    for row in bundle_reading:
-        if row.get("review_status") != expected_reading_status:
-            raise MergeError(
-                f"reading merge collision: {row.get('source_unit_id')} is not "
-                f"{expected_reading_status} for discovery epoch {discovery_epoch}"
-            )
-    for row in bundle_assets:
-        if row.get("inspection_status") != expected_asset_status:
-            raise MergeError(
-                f"asset merge collision: {row.get('asset_id')} is not "
-                f"{expected_asset_status} for discovery epoch {discovery_epoch}"
-            )
-    if reopened:
-        global_max_epoch = _global_max_epoch(
-            reading,
-            candidates,
-            routes,
-            assets,
-            search,
+    try:
+        review_mode = build_worker_bundle.projection_review_mode(
+            bundle_reading,
+            bundle_assets,
         )
-        expected_epoch = global_max_epoch + 1
+    except ValueError as exc:
+        raise MergeError(f"merge mode is ambiguous: {exc}") from exc
+    reopened = review_mode == "REOPEN"
+    active_epoch = _active_review_epoch(review_history)
+    _validate_stage_path_prefix(
+        stage=stage,
+        source_paths=source_paths,
+        manifest=manifest,
+        reading=reading,
+        assets=assets,
+    )
+    if reopened:
+        if not review_history:
+            raise MergeError(
+                "reopened merge has no authoritative prior review-history event"
+            )
+        expected_epoch = active_epoch + 1
         if discovery_epoch != expected_epoch:
             raise MergeError(
                 f"reopened discovery epoch {discovery_epoch} is not the next "
-                f"global epoch {expected_epoch}"
+                f"review epoch {expected_epoch}"
             )
         _validate_reopen_prerequisites(
             manifest=manifest,
@@ -849,8 +1008,15 @@ def prepare_merge(
             routes=routes,
             assets=assets,
             search=search,
+            review_history=review_history,
+            active_epoch=active_epoch,
         )
     else:
+        if discovery_epoch != active_epoch:
+            raise MergeError(
+                f"initial forward discovery epoch {discovery_epoch} differs "
+                f"from the active review epoch {active_epoch}"
+            )
         _validate_stage_prerequisites(
             stage=stage,
             manifest=manifest,
@@ -860,6 +1026,7 @@ def prepare_merge(
             routes=routes,
             assets=assets,
             search=search,
+            review_history=review_history,
         )
 
     output = _load_output(bundle_bytes["output"])
@@ -1018,6 +1185,70 @@ def prepare_merge(
     if reopened:
         proposed_search["fixed_point"] = None
 
+    worker_id = str(bundle_manifest.get("worker_id"))
+    unit_by_id = {unit["id"]: unit for unit in units}
+    input_asset_by_id = {row["asset_id"]: row for row in assets}
+    result_reading_by_id = {
+        row["source_unit_id"]: row for row in proposed_reading
+    }
+    result_asset_by_id = {row["asset_id"]: row for row in proposed_assets}
+    next_review_number = _review_sequence(review_history) + 1
+    prior_event_sha256 = (
+        review_history[-1]["event_sha256"] if review_history else None
+    )
+    review_events: list[dict[str, Any]] = []
+    for offset, source_path in enumerate(source_paths):
+        review_id = f"V{next_review_number + offset:06d}"
+        review_event: dict[str, Any] = {
+            "review_id": review_id,
+            "epoch": discovery_epoch,
+            "stage": stage,
+            "mode": review_mode,
+            "reviewer": worker_id,
+            "source_paths": [source_path],
+            "source_unit_ids": [
+                row["source_unit_id"]
+                for row in bundle_reading
+                if row["path"] == source_path
+            ],
+            "asset_ids": [
+                row["asset_id"]
+                for row in bundle_assets
+                if row["assignment_path"] == source_path
+            ],
+            "input_projection_sha256": "",
+            "result_projection_sha256": "",
+            "previous_event_sha256": prior_event_sha256,
+            "event_sha256": "",
+        }
+        try:
+            review_event["input_projection_sha256"] = canonical_sha256(
+                review_input_projection(
+                    review_event,
+                    unit_by_id,
+                    input_asset_by_id,
+                )
+            )
+            review_event["result_projection_sha256"] = canonical_sha256(
+                review_result_projection(
+                    review_event,
+                    result_reading_by_id,
+                    result_asset_by_id,
+                )
+            )
+        except KeyError as exc:
+            raise MergeError(
+                f"cannot bind review event {review_id} to its exact "
+                f"projection: {exc}"
+            ) from exc
+        review_event["event_sha256"] = review_event_sha256(review_event)
+        review_event = {
+            field: review_event[field] for field in REVIEW_HISTORY_FIELDS
+        }
+        review_events.append(review_event)
+        prior_event_sha256 = review_event["event_sha256"]
+    proposed_review_history = review_history + review_events
+
     validation_errors = validate_audit.validate_objects(
         manifest,
         units,
@@ -1026,6 +1257,7 @@ def prepare_merge(
         proposed_routes,
         proposed_assets,
         proposed_search,
+        review_history=proposed_review_history,
     )
     if validation_errors:
         raise MergeError(
@@ -1056,6 +1288,10 @@ def prepare_merge(
             if not reopened
             else build_worker_bundle.canonical_json_bytes(proposed_search)
         ),
+        REVIEW_HISTORY_NAME: _append_jsonl(
+            original_bytes[REVIEW_HISTORY_NAME],
+            review_events,
+        ),
     }
     if original_bytes[SEARCH_NAME] != (goal_dir / SEARCH_NAME).read_bytes():
         raise MergeError("search ledger changed while preparing the merge")
@@ -1066,9 +1302,11 @@ def prepare_merge(
     return MergePlan(
         bundle=bundle,
         goal_dir=goal_dir,
-        worker_id=str(bundle_manifest.get("worker_id")),
+        worker_id=worker_id,
         stage=stage,
         discovery_epoch=discovery_epoch,
+        review_ids=tuple(event["review_id"] for event in review_events),
+        review_mode=review_mode,
         source_paths=source_paths,
         candidate_ids=candidate_mapping,
         route_ids=route_mapping,
