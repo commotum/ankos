@@ -746,6 +746,39 @@ add_evidence(
     modality="FORMULA",
     strength="CORROBORATING",
 )
+add_evidence(
+    rule90,
+    label="rule90-main-self-similar-outcome",
+    unit="U000201",
+    claim=(
+        "The main-text caption identifies the displayed Rule 90 outcome as "
+        "nested/fractal/self-similar; this supports the result description "
+        "without turning the emergent property into native transition state."
+    ),
+    fields=[
+        "result_kind",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+    modality="CAPTION",
+)
+add_evidence(
+    rule90,
+    label="rule90-decimation-property",
+    unit="U005119",
+    claim=(
+        "The note gives an exact row/column decimation self-similarity and "
+        "Sierpiński identification as behavior/property evidence."
+    ),
+    fields=[
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+)
 
 rule30 = ca_preset(
     key="rule30",
@@ -797,6 +830,65 @@ add_evidence(
         "evidence_limit",
     ],
     modality="FORMULA",
+)
+add_evidence(
+    rule30,
+    label="rule30-built-in-single-seed-run",
+    unit="U005038",
+    claim=(
+        "The built-in example states a three-step Rule 30 run from one value-1 "
+        "cell surrounded by zeros."
+    ),
+    fields=[
+        "native_time",
+        "alphabet_or_value_schema",
+        "seed",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+)
+add_evidence(
+    rule30,
+    label="rule30-built-in-single-seed-output",
+    unit="U005039",
+    claim=(
+        "The exact call and four returned rows corroborate the named rule, "
+        "seed profile, requested steps, and deterministic result."
+    ),
+    fields=[
+        "object_kind",
+        "native_time",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "seed",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="CODE",
+    strength="CORROBORATING",
+)
+add_evidence(
+    rule30,
+    label="rule30-prng-cryptosystem-application",
+    unit="U005291",
+    claim=(
+        "The historical note records Rule 30 being proposed as a practical "
+        "random-sequence generator and cryptosystem; these are applications, "
+        "not additional native Rule 30 mechanics."
+    ),
+    fields=[
+        "object_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
 )
 
 rule110 = ca_preset(
@@ -2135,8 +2227,6 @@ def explicit_ca_example(
     # evidence claims exact rather than making the prose inherit the call.
     spec["evidence"][0]["fields"] = [
         "object_kind",
-        "native_time",
-        "alphabet_or_value_schema",
         "law_kind",
         "rule_relation_constraint_function_or_probability_law",
         "parameters_and_variants",
@@ -2352,6 +2442,322 @@ def declarative_pattern(
     )
 
 
+def direct_query_candidate(
+    *,
+    key: str,
+    name: str,
+    anchor: str,
+    object_kind: str,
+    input_text: str,
+    law: str,
+    result: str,
+    parameters_text: str,
+    aliases: list[str] | None = None,
+    route_keys: list[str] | None = None,
+) -> CandidateSpec:
+    missing = (
+        "The assigned passage does not state invalid-input behavior or an "
+        "independent witness/certificate convention."
+    )
+    return source_candidate(
+        key=key,
+        name=name,
+        anchor=anchor,
+        aliases=aliases or [],
+        facts={
+            "object_kind": object_kind,
+            "complete_state": (
+                "The complete supplied input together with the requested query selector."
+            ),
+            "input": input_text,
+            "law_kind": "A direct deterministic query/projection.",
+            "rule_relation_constraint_function_or_probability_law": law,
+            "result_kind": result,
+            "successor_cardinality": "Exactly one query result for each valid input.",
+            "determinism_branching_or_measure": "Deterministic.",
+            "parameters_and_variants": parameters_text,
+            "excluded_observers_and_representations": (
+                "Formatting, rasterization, and later interpretation of the "
+                "query result are representations or observations."
+            ),
+            "evidence_limit": missing,
+        },
+        claim=f"The source directly defines {name}: {law}",
+        missing=missing,
+        modality="FORMULA",
+        parameters=[
+            (
+                "query selector",
+                parameters_text,
+                [f"{key}-source"],
+            )
+        ],
+        route_keys=route_keys,
+    )
+
+
+time_slice_query = direct_query_candidate(
+    key="ca-time-slice-query",
+    name="cellular-automaton evolution time-slice selector",
+    anchor="U005024",
+    object_kind="A direct projection over a requested cellular-automaton evolution.",
+    input_text="A cellular-automaton evolution through step t and a time-offset selector.",
+    law=(
+        "Select all steps 0..t, steps 0..u, only the last step, one named step, "
+        "an inclusive step range, or a stepped range according to the exact "
+        "All/u/-1/{u}/{u1,u2}/{u1,u2,du} selector forms."
+    ),
+    result="The uniquely selected row or ordered list of evolution rows.",
+    parameters_text="The selector form and its step bounds/stride.",
+    aliases=["CellularAutomaton time offset off_t"],
+)
+add_evidence(
+    time_slice_query,
+    label="ca-time-slice-history-length",
+    unit="U005025",
+    claim=(
+        "The source states that an unprojected t-step evolution contains t+1 "
+        "rows, including the initial condition."
+    ),
+    fields=[
+        "complete_state",
+        "input",
+        "result_kind",
+        "parameters_and_variants",
+        "evidence_limit",
+    ],
+)
+add_evidence(
+    time_slice_query,
+    label="ca-time-slice-last-example",
+    unit="U005054",
+    claim="The example explicitly requests only the last row after ten steps.",
+    fields=[
+        "input",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+)
+add_evidence(
+    time_slice_query,
+    label="ca-time-slice-stride-example",
+    unit="U005058",
+    claim=(
+        "The example describes selecting every other step as part of a joint "
+        "space/time projection."
+    ),
+    fields=[
+        "input",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+)
+
+space_slice_query = direct_query_candidate(
+    key="ca-space-slice-query",
+    name="cellular-automaton evolution spatial-slice selector",
+    anchor="U005028",
+    object_kind="A direct spatial projection over a cellular-automaton evolution.",
+    input_text="A cellular-automaton evolution and a space-offset selector.",
+    law=(
+        "Select the affected support, the region differing from background, "
+        "the origin-aligned cell, a one-sided extent, one offset, an inclusive "
+        "offset range, or a stepped range according to the exact documented forms."
+    ),
+    result="The uniquely selected fixed-width spatial slice at every retained step.",
+    parameters_text="The selector mode, spatial bounds, and optional stride.",
+    aliases=["CellularAutomaton space offset off_x"],
+)
+for label, unit, claim, fields in [
+    (
+        "ca-space-slice-origin",
+        "U005026",
+        "The source fixes offset 0 as the initial-condition alignment origin.",
+        ["input", "rule_relation_constraint_function_or_probability_law",
+         "parameters_and_variants", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-fixed-width",
+        "U005031",
+        "Every row returned by one evolution projection has the same size.",
+        ["result_kind", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-affected-width",
+        "U005032",
+        "The source gives the exact affected-support width w + 2 r t.",
+        ["input", "rule_relation_constraint_function_or_probability_law",
+         "result_kind", "parameters_and_variants", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-all-no-background",
+        "U005033",
+        "The source fixes how All and Automatic include the explicit seed when no background is supplied.",
+        ["rule_relation_constraint_function_or_probability_law",
+         "parameters_and_variants", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-all",
+        "U005034",
+        "All selects every cell that can be affected by the initial condition.",
+        ["rule_relation_constraint_function_or_probability_law",
+         "result_kind", "parameters_and_variants", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-automatic",
+        "U005035",
+        "Automatic trims background cells from the sides of the pattern.",
+        ["rule_relation_constraint_function_or_probability_law",
+         "result_kind", "parameters_and_variants",
+         "excluded_observers_and_representations", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-time-coupling",
+        "U005036",
+        "Automatic computes retained width using only the requested time steps.",
+        ["input", "rule_relation_constraint_function_or_probability_law",
+         "parameters_and_variants", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-all-example",
+        "U005048",
+        "The example distinguishes All as every possibly affected cell.",
+        ["rule_relation_constraint_function_or_probability_law",
+         "result_kind", "parameters_and_variants",
+         "excluded_observers_and_representations", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-center-example",
+        "U005056",
+        "The example requests the three center columns at every retained step.",
+        ["input", "rule_relation_constraint_function_or_probability_law",
+         "result_kind", "parameters_and_variants",
+         "excluded_observers_and_representations", "evidence_limit"],
+    ),
+    (
+        "ca-space-slice-stride-example",
+        "U005058",
+        "The example selects every other cell across an explicit spatial range.",
+        ["input", "rule_relation_constraint_function_or_probability_law",
+         "result_kind", "parameters_and_variants",
+         "excluded_observers_and_representations", "evidence_limit"],
+    ),
+]:
+    add_evidence(
+        space_slice_query,
+        label=label,
+        unit=unit,
+        claim=claim,
+        fields=fields,
+        modality="FORMULA" if unit in {"U005032"} else "PROSE",
+    )
+
+
+symbolic_ca_formula = source_candidate(
+    key="symbolic-ca-formula-generator",
+    name="symbolic cellular-automaton cell-formula generator",
+    anchor="U005107",
+    aliases=["symbolic CA evolution formula"],
+    facts={
+        "object_kind": (
+            "A symbolic analyzer that derives formulas for cellular-automaton "
+            "cell values from a stated rule and symbolic initial values."
+        ),
+        "carrier": "Symbolic cell variables indexed by time and position.",
+        "support": "The dependency cone of the requested cellular-automaton cell.",
+        "complete_state": (
+            "The algebraic or logical rule, symbolic initial assignments, and "
+            "the target cell/time whose value is requested."
+        ),
+        "input": (
+            "An algebraic or logical cellular-automaton rule plus symbolic and "
+            "fixed initial-cell assignments."
+        ),
+        "law_kind": "Symbolic composition of a cellular-automaton transition law.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Substitute the symbolic initial assignments through the stated "
+            "cellular-automaton rule to derive a formula for a requested cell value."
+        ),
+        "result_kind": "A symbolic formula valid for all values of the declared variables.",
+        "parameters_and_variants": (
+            "Rule form, symbolic initial variables, fixed background values, "
+            "and requested cell/time."
+        ),
+        "excluded_observers_and_representations": (
+            "Formula simplification, printed syntax, and complexity growth are "
+            "analyzer/representation concerns rather than a second CA law."
+        ),
+        "evidence_limit": (
+            "The passage establishes the construction in principle but gives "
+            "no canonical simplifier, exact target-selection interface, "
+            "invalid-input behavior, or complexity bound."
+        ),
+    },
+    claim=(
+        "The source explicitly states that algebraic or logical CA rules can "
+        "be composed to generate symbolic formulas for evolution results."
+    ),
+    missing=(
+        "The passage establishes the construction in principle but gives no "
+        "canonical simplifier, exact target-selection interface, invalid-input "
+        "behavior, or complexity bound."
+    ),
+    route_keys=["symbolic-ca-formula-page618"],
+    parameters=[
+        (
+            "symbolic initial assignment",
+            "The worked profile names three symbolic center cells and fixes all "
+            "other initial cells to zero.",
+            ["symbolic-ca-formula-initial-values"],
+        )
+    ],
+)
+add_evidence(
+    symbolic_ca_formula,
+    label="symbolic-ca-formula-initial-values",
+    unit="U005108",
+    claim=(
+        "The code assigns p, q, and r to the three center cells and zero to all "
+        "other positions at time zero."
+    ),
+    fields=[
+        "carrier",
+        "support",
+        "complete_state",
+        "input",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="CODE",
+)
+add_evidence(
+    symbolic_ca_formula,
+    label="symbolic-ca-formula-result",
+    unit="U005109",
+    claim=(
+        "The source states that the construction yields a cell-value formula "
+        "valid for every choice of the three symbolic center values."
+    ),
+    fields=[
+        "object_kind",
+        "input",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+)
+
+
 pascal_mod2 = declarative_pattern(
     key="pascal-mod2",
     name="Pascal-triangle modulo-two pattern",
@@ -2377,6 +2783,83 @@ add_evidence(
     fields=list(pascal_mod2["facts"]),
     modality="FORMULA",
 )
+pascal_mod2["facts"]["structural_invariants"] = (
+    "The odd-coefficient array has a nested self-similar Sierpiński structure."
+)
+add_evidence(
+    pascal_mod2,
+    label="pascal-mod2-sierpinski-structure",
+    unit="U005119",
+    claim=(
+        "The source identifies the Rule 90/Pascal parity pattern as a "
+        "self-similar Sierpiński pattern and gives its exact decimation relation."
+    ),
+    fields=[
+        "structural_invariants",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
+)
+add_evidence(
+    pascal_mod2,
+    label="pascal-mod2-history-nesting",
+    unit="U005129",
+    claim=(
+        "The historical note explicitly states that odd binomial coefficients "
+        "form a nested geometrical pattern and preserves that as property evidence."
+    ),
+    fields=[
+        "structural_invariants",
+        "result_kind",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+)
+
+rule90_row_count = direct_query_candidate(
+    key="rule90-row-black-count",
+    name="Rule 90 row black-cell count function",
+    anchor="U005114",
+    object_kind="A direct integer-valued query on the canonical Rule 90 single-seed pattern.",
+    input_text="A nonnegative Rule 90 row index t.",
+    law="Return 2^DigitCount[t,2,1].",
+    result="The number of black cells on row t.",
+    parameters_text="The row index t; Rule 90 and base 2 are fixed.",
+    aliases=["Rule 90 row population"],
+    route_keys=["rule90-count-page902"],
+)
+
+rule90_black_positions = direct_query_candidate(
+    key="rule90-row-black-positions",
+    name="Rule 90 row black-cell position generator",
+    anchor="U005114",
+    object_kind="A direct list-valued query on the canonical Rule 90 single-seed pattern.",
+    input_text="A nonnegative Rule 90 row index t.",
+    law=(
+        "Compute the 1-bit positions of t, then fold from 0 by replacing each "
+        "current position x with x-2^j and x+2^j for every such digit position j."
+    ),
+    result="The complete list of black-cell positions on row t.",
+    parameters_text="The row index t; Rule 90 and base 2 are fixed.",
+    aliases=["Rule 90 black positions"],
+    route_keys=["rule90-position-page117"],
+)
+add_evidence(
+    rule90_black_positions,
+    label="rule90-row-black-positions-code",
+    unit="U005115",
+    claim=(
+        "The exact Fold and DigitPositions definitions construct all black-cell "
+        "positions from the 1-bit positions of t."
+    ),
+    fields=list(rule90_black_positions["facts"]),
+    modality="FORMULA",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
 
 rule60_pattern = declarative_pattern(
     key="rule60-pattern",
@@ -2391,6 +2874,32 @@ rule60_pattern = declarative_pattern(
     result="A uniquely determined distorted nested binary pattern.",
     aliases=["Rule 60 binomial pattern"],
     route_keys=["rule60-bit-page583"],
+)
+add_evidence(
+    rule60_pattern,
+    label="rule60-pattern-bit-test",
+    unit="U005118",
+    claim=(
+        "The exact digitwise formula returns 1 precisely when no aligned binary "
+        "digit of n exceeds the corresponding digit of t."
+    ),
+    fields=[
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "input",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="FORMULA",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 rule60_ca = source_candidate(
@@ -2448,9 +2957,6 @@ rule90_background = source_candidate(
         "carrier": "A one-dimensional Rule 90 cell row.",
         "support": "One finite foreground cell embedded in a repeating background.",
         "alphabet_or_value_schema": "Black/white cell values.",
-        "complete_state": (
-            "One black cell together with the repeated striped background block."
-        ),
         "input": (
             "A single black foreground cell and the pictured repeating striped "
             "background block."
@@ -2502,6 +3008,14 @@ rule90_background = source_candidate(
         )
     ],
 )
+rule90_background["source_status"] = ["AMBIGUOUS"]
+rule90_background["uncertainties"] = [
+    (
+        "The inline striped background symbol is construction-bearing but its "
+        "individual binary cells and exact repeated value sequence cannot be "
+        "recovered unambiguously at source resolution."
+    )
+]
 add_candidate_image(
     rule90_background,
     label="rule90-background-black-cell",
@@ -2513,7 +3027,6 @@ add_candidate_image(
     ),
     fields=[
         "alphabet_or_value_schema",
-        "complete_state",
         "seed",
         "parameters_and_variants",
         "evidence_limit",
@@ -2532,7 +3045,6 @@ add_candidate_image(
     ),
     fields=[
         "support",
-        "complete_state",
         "seed",
         "boundary",
         "parameters_and_variants",
@@ -2595,6 +3107,85 @@ add_evidence(
     ),
     fields=list(k_rule90["facts"]),
     modality="CODE",
+)
+add_evidence(
+    k_rule90,
+    label="k-color-rule90-count-relation",
+    unit="U005125",
+    claim=(
+        "The source gives a closed row-population formula and explains "
+        "non-prime patterns as superpositions of factor patterns; these are "
+        "properties/relations, not extra transition mechanics."
+    ),
+    fields=[
+        "object_kind",
+        "alphabet_or_value_schema",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
+    modality="FORMULA",
+)
+add_evidence(
+    k_rule90,
+    label="k-color-rule90-nesting",
+    unit="U005127",
+    claim=(
+        "The source states that all k-color patterns are nested and gives "
+        "prime-k counts and dimensions as behavior/property evidence."
+    ),
+    fields=[
+        "object_kind",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+)
+
+k_rule90_row_count = direct_query_candidate(
+    key="k-color-rule90-row-count",
+    name="k-color Rule 90 row nonwhite-cell count function",
+    anchor="U005125",
+    object_kind=(
+        "A direct integer-valued query on the canonical k-color additive "
+        "Rule 90 single-seed pattern."
+    ),
+    input_text="A nonnegative row index t and color modulus k.",
+    law="Return Apply[Times, 1 + IntegerDigits[t,k]].",
+    result="The number of nonwhite cells on row t.",
+    parameters_text="The row index t and color modulus k.",
+    aliases=["k-color additive row population"],
+)
+
+binomial_mod_k = declarative_pattern(
+    key="binomial-mod-k-prime",
+    name="prime-k Binomial modulo-k array",
+    anchor="U005125",
+    definition=(
+        "For prime k, evaluate Mod[Binomial[t,n],k] by multiplying the "
+        "digitwise binomial coefficients of the base-k digits of t and n, "
+        "then reducing the product modulo k."
+    ),
+    support="Nonnegative integer row and position coordinates (t,n).",
+    values="Residues modulo a prime k.",
+    result="A uniquely determined k-valued binomial-coefficient array.",
+    aliases=["Lucas digit formula for Binomial modulo k"],
+)
+add_evidence(
+    binomial_mod_k,
+    label="binomial-mod-k-code",
+    unit="U005126",
+    claim=(
+        "The exact formula pads the base-k digits, applies Binomial to each "
+        "digit pair, multiplies the results, and reduces modulo k."
+    ),
+    fields=list(binomial_mod_k["facts"]),
+    modality="FORMULA",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 additive = source_candidate(
@@ -2714,7 +3305,7 @@ def pictured_integer_pattern(
     return spec
 
 
-pictured_integer_pattern(
+binomial_mod2_array = pictured_integer_pattern(
     key="binomial-mod2-array",
     name="Binomial modulo-two array",
     unit="U005130",
@@ -2722,7 +3313,7 @@ pictured_integer_pattern(
     definition="Reduce Binomial's integer values modulo 2 over its argument lattice.",
     support="A two-dimensional integer-coordinate array.",
 )
-pictured_integer_pattern(
+multinomial_mod2_array = pictured_integer_pattern(
     key="multinomial-mod2-array",
     name="Multinomial modulo-two array family",
     unit="U005131",
@@ -2732,7 +3323,7 @@ pictured_integer_pattern(
     ),
     support="A d-dimensional integer-coordinate array.",
 )
-pictured_integer_pattern(
+stirling1_mod2_array = pictured_integer_pattern(
     key="stirling1-mod2-array",
     name="StirlingS1 modulo-two array",
     unit="U005132",
@@ -2740,13 +3331,32 @@ pictured_integer_pattern(
     definition="Reduce StirlingS1's integer values modulo 2 over its argument lattice.",
     support="A two-dimensional integer-coordinate array.",
 )
-pictured_integer_pattern(
+stirling2_mod2_array = pictured_integer_pattern(
     key="stirling2-mod2-array",
     name="StirlingS2 modulo-two array",
     unit="U005133",
     path="BACK-MATTER/NOTES/_page_885_Picture_26.jpeg",
     definition="Reduce StirlingS2's integer values modulo 2 over its argument lattice.",
     support="A two-dimensional integer-coordinate array.",
+)
+multinomial_mod2_array["facts"]["structural_invariants"] = (
+    "With d arguments the modulo-two Multinomial array is nested in d dimensions."
+)
+add_evidence(
+    multinomial_mod2_array,
+    label="multinomial-mod2-dimensional-nesting",
+    unit="U005134",
+    claim=(
+        "The source explicitly states that d-argument Multinomial yields a "
+        "nested pattern in d dimensions."
+    ),
+    fields=[
+        "support",
+        "structural_invariants",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
 )
 
 gcd_pattern = declarative_pattern(
@@ -2896,6 +3506,28 @@ def unary_bitwise_curve(key: str, operation: str) -> CandidateSpec:
         values=f"Integer values of {operation}.",
         result="A deterministic nested curve.",
         aliases=[f"{operation} n and 2n curve"],
+    )
+    spec["facts"]["structural_invariants"] = (
+        "The curve has the source-stated nested structure induced by comparing "
+        "the digits of n with the one-position-left shift 2n."
+    )
+    add_evidence(
+        spec,
+        label=f"{key}-nesting",
+        unit="U005139",
+        claim=(
+            "The source explicitly states that these curves are nested and "
+            "relates the structure to the one-digit shift from n to 2n."
+        ),
+        fields=[
+            "support",
+            "structural_invariants",
+            "input",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
     )
     add_candidate_image(
         spec,
@@ -3062,27 +3694,10 @@ def procedure_candidate(
             "carrier": carrier,
             "support": support,
             "complete_state": state,
-            "frontier_or_activation": (
-                "The next designated geometric or assembly component is added "
-                "or transformed."
-            ),
-            "schedule": "The stated construction operations are performed in order.",
-            "read_dependencies_or_neighborhood": (
-                "Each operation uses the previously constructed geometry or assembly."
-            ),
-            "law_kind": "A deterministic drawing, deformation, or assembly procedure.",
+            "law_kind": "A drawing, deformation, or assembly procedure.",
             "rule_relation_constraint_function_or_probability_law": description,
             "write_replacement_assembly_or_commit": description,
             "result_kind": result,
-            "successor_cardinality": (
-                "One next construction stage when every stated choice is fixed."
-            ),
-            "determinism_branching_or_measure": (
-                "Deterministic to the level specified by the source."
-            ),
-            "termination_completion_failure": (
-                "The depicted or stated finite operation sequence ends in the ornament."
-            ),
             "parameters_and_variants": description,
             "excluded_observers_and_representations": (
                 "Historical provenance, material, page layout, and visual "
@@ -3111,20 +3726,16 @@ def attach_procedure_images(
             unit=unit,
             path=path,
             claim=(
-                "Original-resolution inspection confirms this source-ordered "
-                "construction stage; the image is used only for visibly "
-                "unambiguous geometry."
+                "Original-resolution inspection confirms this source-associated "
+                "construction figure; only visibly unambiguous geometry, "
+                "grouping, or result structure is used, with no hidden temporal "
+                "order inferred from image proximity."
             ),
             fields=[
                 "carrier",
                 "support",
                 "complete_state",
-                "frontier_or_activation",
-                "schedule",
-                "read_dependencies_or_neighborhood",
-                "write_replacement_assembly_or_commit",
                 "result_kind",
-                "termination_completion_failure",
                 "parameters_and_variants",
                 "excluded_observers_and_representations",
                 "evidence_limit",
@@ -3139,8 +3750,8 @@ pylos = procedure_candidate(
     anchor="U005172",
     aliases=["classical seven-circuit labyrinth", "Troy maze"],
     description=(
-        "Apply the finite source-ordered drawing procedure shown in five stages "
-        "to produce the square or rounded labyrinth design."
+        "Apply the source-ordered four-stage square drawing procedure; the "
+        "source also shows a rounded-form output variant."
     ),
     carrier="Planar line segments, bends, and guide marks.",
     support="A bounded planar drawing region.",
@@ -3151,6 +3762,17 @@ pylos = procedure_candidate(
         "or behavior for malformed intermediate drawings."
     ),
 )
+pylos["uncertainties"] = [
+    (
+        "The source says the historical tablet pattern was “presumably made” "
+        "by the depicted procedure; the diagrams support the procedure, not "
+        "certainty about the artifact's actual production history."
+    )
+]
+pylos["evidence"][0]["claim"] = (
+    "The source presents a five-stage procedure for the Pylos labyrinth while "
+    "explicitly qualifying its attribution to the historical tablet as presumed."
+)
 attach_procedure_images(
     pylos,
     label_prefix="pylos-stage",
@@ -3159,8 +3781,32 @@ attach_procedure_images(
         ("U005174", "BACK-MATTER/NOTES/_page_888_Picture_6.jpeg"),
         ("U005175", "BACK-MATTER/NOTES/_page_888_Picture_7.jpeg"),
         ("U005176", "BACK-MATTER/NOTES/_page_888_Picture_8.jpeg"),
-        ("U005177", "BACK-MATTER/NOTES/_page_888_Picture_9.jpeg"),
     ],
+)
+add_candidate_image(
+    pylos,
+    label="pylos-rounded-variant",
+    unit="U005177",
+    path="BACK-MATTER/NOTES/_page_888_Picture_9.jpeg",
+    claim=(
+        "Original-resolution inspection confirms a rounded-form completed "
+        "labyrinth variant, not a fifth successor stage in the square sequence."
+    ),
+    fields=[
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+pylos["variants"].append(
+    (
+        "rounded completed form",
+        "The final separate image supplies a rounded-form output variant of "
+        "the labyrinth.",
+        ["pylos-rounded-variant"],
+    )
 )
 
 triangle_circles = procedure_candidate(
@@ -3229,6 +3875,17 @@ roman_rosette = procedure_candidate(
         "which semicircle side to retain, or degeneracy handling."
     ),
 )
+roman_rosette["uncertainties"] = [
+    (
+        "The source says the Roman mosaic was “presumably made” by the stated "
+        "construction; the procedure is retained without converting that "
+        "historical attribution into a fact."
+    )
+]
+roman_rosette["evidence"][0]["claim"] = (
+    "The source states the spoke, semicircle, and concentric-circle construction "
+    "while qualifying its attribution to the Roman mosaic as presumed."
+)
 attach_procedure_images(
     roman_rosette,
     label_prefix="roman-rosette-stage",
@@ -3259,11 +3916,22 @@ cosmati = procedure_candidate(
         "order, size ratios for every branch, or treatment of material gaps."
     ),
 )
+cosmati["uncertainties"] = [
+    (
+        "The source says the approximate nested structure was “presumably "
+        "created” as in the diagrams; the construction is retained while its "
+        "historical attribution remains conjectural."
+    )
+]
+cosmati["evidence"][0]["claim"] = (
+    "The source relates the approximate nested equilateral-triangle structure "
+    "to the following diagrams while explicitly marking that creation account "
+    "as presumed."
+)
 attach_procedure_images(
     cosmati,
     label_prefix="cosmati-stage",
     entries=[
-        ("U005194", "BACK-MATTER/NOTES/_page_889_Picture_3.jpeg"),
         ("U005195", "BACK-MATTER/NOTES/_page_889_Picture_4.jpeg"),
         ("U005196", "BACK-MATTER/NOTES/_page_889_Picture_5.jpeg"),
         ("U005197", "BACK-MATTER/NOTES/_page_889_Picture_6.jpeg"),
@@ -3324,7 +3992,7 @@ truchet = source_candidate(
     anchor="U005225",
     aliases=["Truchet tiles"],
     facts={
-        "object_kind": "A finite-alphabet planar tiling/pattern space.",
+        "object_kind": "A denotational finite-alphabet planar pattern space.",
         "carrier": "Square tile positions.",
         "support": "A two-dimensional square grid.",
         "topology": "Orthogonally adjacent square tile sites.",
@@ -3334,19 +4002,16 @@ truchet = source_candidate(
             "◣, ◥, ◤, or ◢."
         ),
         "complete_state": "One choice of the four tile values at every grid site.",
-        "frontier_or_activation": "A tile value is chosen for each site.",
-        "law_kind": "Free combination over a four-tile alphabet.",
+        "input": "A requested finite square-grid domain.",
+        "law_kind": "A model set/free-combination relation over a four-tile alphabet.",
         "rule_relation_constraint_function_or_probability_law": (
-            "Form two-dimensional patterns by combining the four stated tile types "
-            "in all or selected possible ways."
+            "The denoted set contains the square-grid assignments formed by "
+            "combining the four stated tile values at the sites."
         ),
-        "write_replacement_assembly_or_commit": "Place the chosen tile at each grid site.",
-        "result_kind": "A completed planar tile pattern.",
-        "successor_cardinality": (
-            "Four local choices per unconstrained site; the source does not impose a measure."
-        ),
-        "determinism_branching_or_measure": (
-            "Nondeterministic/enumerative unless a separate tile-selection rule is supplied."
+        "result_kind": "The set of completed planar tile assignments on the domain.",
+        "witness_semantics": (
+            "A witness is a completed square-grid assignment with exactly one "
+            "of the four stated tile values at every site."
         ),
         "parameters_and_variants": "Grid extent and tile choice at each position.",
         "excluded_observers_and_representations": (
@@ -3365,6 +4030,67 @@ truchet = source_candidate(
         "The passage does not specify a selection measure, adjacency constraint, "
         "enumeration order, or completion boundary."
     ),
+)
+
+random_ca_seed = source_candidate(
+    key="random-ca-initial-condition",
+    name="random cellular-automaton initial-condition ensemble",
+    anchor="U005288",
+    aliases=["random initial conditions"],
+    facts={
+        "object_kind": (
+            "A stochastic/ensemble-valued cellular-automaton initial-condition class."
+        ),
+        "complete_state": "One sampled complete cellular-automaton configuration.",
+        "input": (
+            "A cellular-automaton family together with an unstated random "
+            "initial-condition sampling specification."
+        ),
+        "seed": "A random initial configuration used to start a cellular automaton.",
+        "law_kind": (
+            "A probability/sampling law for initial configurations, with its "
+            "actual measure left unstated in this passage."
+        ),
+        "rule_relation_constraint_function_or_probability_law": (
+            "Sample an initial configuration at random, then use it as the "
+            "cellular automaton's initial state."
+        ),
+        "result_kind": "A sampled cellular-automaton initial configuration.",
+        "determinism_branching_or_measure": (
+            "Stochastic or ensemble-valued; the probability measure is not stated."
+        ),
+        "parameters_and_variants": (
+            "The cellular-automaton family, support/alphabet, and sampling "
+            "distribution are parameters whose values are not given here."
+        ),
+        "excluded_observers_and_representations": (
+            "The four behavior classes inferred from displayed runs are "
+            "observations, not part of the seed generator."
+        ),
+        "evidence_limit": (
+            "The historical passage explicitly says random initial conditions "
+            "but does not state their support, alphabet, independence structure, "
+            "probability measure, finite extent, or random source."
+        ),
+    },
+    claim=(
+        "The historical account explicitly distinguishes cellular automata "
+        "started from random initial conditions in the systematic survey."
+    ),
+    missing=(
+        "The historical passage explicitly says random initial conditions but "
+        "does not state their support, alphabet, independence structure, "
+        "probability measure, finite extent, or random source."
+    ),
+    strength="DIRECT_IDENTITY",
+    parameters=[
+        (
+            "sampling specification",
+            "The source establishes that initial conditions were random while "
+            "leaving the measure and support unspecified.",
+            ["random-ca-initial-condition-source"],
+        )
+    ],
 )
 
 
