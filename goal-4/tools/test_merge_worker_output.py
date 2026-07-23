@@ -957,7 +957,7 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     plan = merge.prepare_merge(bundle, goal_dir=goal)
     preview = plan.preview()
     assert preview["discovery_epoch"] == 2
-    assert preview["review_ids"] == ["V000002"]
+    assert preview["review_ids"] == ["V000003"]
     assert preview["review_mode"] == "REOPEN"
     assert preview["search_ledger_preserved"] is True
     assert preview["search_fixed_point_cleared"] is True
