@@ -148,7 +148,7 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current facts after completion of Stages 1–6:
+These are current facts after completion of Stages 1–7:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   that pre-execution state is retained only as historical provenance in
@@ -197,8 +197,16 @@ These are current facts after completion of Stages 1–6:
   candidates; all 6 within-stage, 3 incoming, and 1 backward route are
   resolved; 83 new cross-range obligations remain queued; and
   `S005`/`S006` record 1,154
-  fully dispositioned hits with a zero-delta rerun. The live state is valid
-  and resumable at Stage 7.
+  fully dispositioned hits with a zero-delta rerun. The resulting state was
+  the verified Stage 7 input.
+- Stage 7 is complete in `7-CH03-PROGRAMS.md`: all 653 paired Chapter 3 units
+  and 133 images are reviewed at the required depth; `B0092..B0320` preserve
+  229 deliberately uncollapsed blind coverage candidates; 11 incoming and all
+  16 within-stage routes are resolved; 61 new cross-range obligations remain
+  queued; and `S007`/`S008` record 2,496 total fully dispositioned hits—1,248
+  across 595 unique units in each round—with a zero-delta rerun. The valid live
+  state contains 1,441 reviewed units, 216 screened images, 320 candidates,
+  178 routes, and 8 LOCAL rounds and is resumable at Stage 8.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -452,6 +460,8 @@ Blindly audit Chapter 2 main text and Chapter 2 Notes.
 - Cross-range routes are recorded for later closure.
 
 ### 7-CH03-PROGRAMS
+
+Status: **COMPLETE** in `goal-4/7-CH03-PROGRAMS.md`.
 
 #### Big Picture Objective
 

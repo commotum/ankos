@@ -1,7 +1,8 @@
 # 3-AUDIT-HARNESS
 
 Status: **COMPLETE** after adversarial reclosure, independent system/history
-signoff, and the Stage 4 interleaved-evidence regression.
+signoff, the Stage 4 interleaved-evidence regression, and the Stage 7
+split-bundle regression.
 
 ## Current Facts
 
@@ -21,9 +22,9 @@ signoff, and the Stage 4 interleaved-evidence regression.
   state must reproduce all six mutable ledgers and the latest per-path
   snapshots exactly.
 - The generated empty state remains byte-reproducible as the Stage 4 baseline.
-  The live audit has since advanced validly through Stage 4: 157 reviewed
-  units, 2 screened assets, 2 active candidates, 4 pending cross-range routes,
-  2 LOCAL rounds, and 3 atomic review-history events.
+  The live audit has since advanced validly through Stage 7: 1,441 reviewed
+  units, 216 screened assets, 320 active candidates, 178 routes, 8 LOCAL
+  rounds, and 15 atomic review-history events.
 
 ## Updated Assumptions
 
@@ -170,6 +171,17 @@ Completed:
    recovery.
 9. Added focused tests for guardrails, corpus reconstruction, audit replay,
    coordinator operations, transactions, and initialization.
+10. Added `tools/combine_worker_outputs.py` for exact disjoint sub-bundle
+    partition validation, canonical union traversal, deterministic worker-ID
+    reallocation, and order-independent recombination.
+
+The Stage 7 split-bundle path accepts constituent outputs only when their
+source and asset assignments are disjoint and their union equals the sealed
+parent assignment. It allocates `W/WE/WG/WR` identities from canonical union
+traversal rather than bundle concatenation, including interleaved physical
+asset order. Reversing constituent order must produce identical completed
+output; overlap, omission, stale input, and optimized-mode mutations fail
+closed. Six focused combiner regressions cover those boundaries.
 
 The review-history transaction modes are:
 
@@ -389,6 +401,14 @@ signed off. History/replay QA passed its focused history subset, independently
 observed `28/29` rejection, `29/29` acceptance, and stale-epoch rejection, and
 signed off.
 
+Stage 7 expanded the ordinary full Goal 4 suite to 100 tests, all passing. An
+optimized aggregate run passed 99 tests and found one environment-specific
+relocation-fixture failure: `os.link` raised `EXDEV` across filesystems.
+`test_corpus.py` now falls back to `shutil.copy2` only for `errno.EXDEV` and
+continues to propagate every other link error. The corrected optimized
+relocation case passes; a full optimized aggregate rerun after the correction
+has not yet been recorded.
+
 Re-integration answers:
 
 1. No corpus-map defect was found.
@@ -404,5 +424,5 @@ Re-integration answers:
    visual risk, route closure, query replay, evidence groups, and lineage.
 9. The audit remains independent of the current taxonomy count and API.
 10. At original Stage 3 completion the exact next stage was `4-BOOKENDS`.
-    That stage is now complete; the harness remains closed and the live audit
-    resumes at `5-CH01-FOUNDATIONS`.
+    Stages 4–7 are now complete; the harness remains closed and the live audit
+    resumes at Stage 8.
