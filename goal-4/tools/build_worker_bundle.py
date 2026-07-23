@@ -276,11 +276,9 @@ For every source unit:
    `WR0001`, `WR0002`, ... sequence in discovery order; do not resolve them or
    declare a final missing target. The coordinator maps WR IDs to global R IDs
    and performs global routing.
-8. Allocate evidence as `WE000001`, `WE000002`, ... in frozen source/image
-   discovery traversal, independent of which candidate owns each record.
-   Allocate evidence groups as `WG000001`, `WG000002`, ... by the first
-   evidence ID in each group. The coordinator maps these worker-local IDs to
-   global E/G IDs.
+8. Allocate evidence as `WE000001`, `WE000002`, ... in first-occurrence order,
+   and evidence groups as `WG000001`, `WG000002`, ... in group first-occurrence
+   order. The coordinator maps these worker-local IDs to global E/G IDs.
 
 Write only `output/output.json` and preserve every required hash/declaration.
 Network use and access outside this bundle are prohibited. If the bundle lacks
