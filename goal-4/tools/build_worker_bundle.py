@@ -434,6 +434,16 @@ def parse_string_array(
     return parsed
 
 
+def is_complete_worker_sequence(
+    values: list[str],
+    prefix: str,
+    width: int,
+) -> bool:
+    return values == [
+        f"{prefix}{index:0{width}d}" for index in range(1, len(values) + 1)
+    ]
+
+
 def discovery_anchor_orders(
     assigned_units: dict[str, dict[str, str]],
     assigned_assets: dict[str, dict[str, str]],
@@ -820,10 +830,11 @@ def _validate_worker_output(
             for row in proposals
             if isinstance(row, dict) and isinstance(row.get("id"), str)
         ]
-        expected_ids = [
-            f"W{index:04d}" for index in range(1, len(proposal_ids) + 1)
-        ]
-        if proposal_ids != expected_ids or len(proposal_ids) != len(proposals):
+        if not is_complete_worker_sequence(
+            proposal_ids,
+            "W",
+            4,
+        ) or len(proposal_ids) != len(proposals):
             errors.append(
                 "worker candidate IDs must be a complete ordered W0001 sequence"
             )
@@ -838,6 +849,11 @@ def _validate_worker_output(
             proposal_by_id[candidate_id] = row
             if row.get("record_status") != "ACTIVE":
                 errors.append(f"worker candidate {candidate_id} must be ACTIVE")
+            if row.get("evidence_reassignments") != []:
+                errors.append(
+                    f"worker candidate {candidate_id} cannot reassign evidence; "
+                    "the coordinator owns split/merge allocation"
+                )
             if row.get("discovery_stage") != manifest.get("stage"):
                 errors.append(
                     f"candidate {candidate_id} discovery_stage differs from bundle"
@@ -1086,18 +1102,11 @@ def _validate_worker_output(
                         "worker discovery-anchor ordinals are not complete for "
                         f"anchor {anchor_key}"
                     )
-        expected_evidence_ids = [
-            f"WE{index:06d}"
-            for index in range(1, len(worker_evidence_ids) + 1)
-        ]
-        if worker_evidence_ids != expected_evidence_ids:
+        if not is_complete_worker_sequence(worker_evidence_ids, "WE", 6):
             errors.append(
                 "worker evidence IDs must be a complete ordered WE000001 sequence"
             )
-        expected_group_ids = [
-            f"WG{index:06d}" for index in range(1, len(worker_group_ids) + 1)
-        ]
-        if worker_group_ids != expected_group_ids:
+        if not is_complete_worker_sequence(worker_group_ids, "WG", 6):
             errors.append(
                 "worker evidence-group first occurrences must be a complete "
                 "ordered WG000001 sequence"
@@ -1112,12 +1121,8 @@ def _validate_worker_output(
             for row in routes
             if isinstance(row, dict) and isinstance(row.get("route_id"), str)
         ]
-        expected_route_ids = [
-            f"WR{index:04d}"
-            for index in range(1, len(proposed_route_ids) + 1)
-        ]
         if (
-            proposed_route_ids != expected_route_ids
+            not is_complete_worker_sequence(proposed_route_ids, "WR", 4)
             or len(proposed_route_ids) != len(routes)
         ):
             errors.append(

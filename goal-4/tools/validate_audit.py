@@ -285,6 +285,74 @@ def search_result_digest(round_record: dict[str, Any]) -> str:
     return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
 
 
+def execute_frozen_queries(
+    queries: list[dict[str, Any]],
+    units: list[dict[str, Any]],
+    source_root: Path,
+) -> tuple[list[tuple[str, str]], list[str]]:
+    """Execute the frozen, tool-independent search language over source units."""
+    errors: list[str] = []
+    bytes_by_path: dict[str, bytes] = {}
+    results: list[tuple[str, str]] = []
+    for query in queries:
+        if not isinstance(query, dict):
+            continue
+        query_id = query.get("query_id")
+        pattern = query.get("pattern")
+        mode = query.get("mode")
+        case_sensitive = query.get("case_sensitive")
+        whole_word = query.get("whole_word")
+        scope_paths = query.get("scope_paths")
+        if (
+            not isinstance(query_id, str)
+            or not isinstance(pattern, str)
+            or not pattern
+            or mode not in {"LITERAL", "REGEX"}
+            or not isinstance(case_sensitive, bool)
+            or not isinstance(whole_word, bool)
+            or not isinstance(scope_paths, list)
+        ):
+            continue
+        expression = re.escape(pattern) if mode == "LITERAL" else pattern
+        if whole_word:
+            expression = rf"(?<!\w)(?:{expression})(?!\w)"
+        flags = re.MULTILINE
+        if not case_sensitive:
+            flags |= re.IGNORECASE
+        try:
+            compiled = re.compile(expression, flags)
+        except re.error as exc:
+            errors.append(f"search query {query_id} has invalid regex: {exc}")
+            continue
+        scope = set(scope_paths)
+        for unit in units:
+            if unit["path"] not in scope:
+                continue
+            if unit["path"] not in bytes_by_path:
+                try:
+                    bytes_by_path[unit["path"]] = (
+                        source_root / unit["path"]
+                    ).read_bytes()
+                except OSError as exc:
+                    errors.append(
+                        f"cannot execute search in {unit['path']}: {exc}"
+                    )
+                    bytes_by_path[unit["path"]] = b""
+            block = bytes_by_path[unit["path"]][
+                unit["byte_start"] : unit["byte_end"]
+            ]
+            try:
+                text = block.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                errors.append(
+                    f"cannot decode source unit {unit['id']} for search: {exc}"
+                )
+                continue
+            if compiled.search(text):
+                results.append((query_id, unit["id"]))
+    return results, errors
+
+
 def validate_candidate(
     row: dict[str, Any],
     candidate_ids: set[str],
@@ -747,9 +815,11 @@ def validate_objects(
     search: dict[str, Any],
     require_stages: set[int] | None = None,
     require_all_reviewed: bool = False,
+    repo_root: Path | None = None,
 ) -> list[str]:
     errors: list[str] = []
     require_stages = require_stages or set()
+    source_root = (repo_root or REPO_ROOT) / "ref" / "A-New-Kind-of-Science"
     unit_by_id = {unit["id"]: unit for unit in units}
     unit_ids = set(unit_by_id)
     document_by_path = {doc["path"]: doc for doc in manifest["documents"]}
@@ -1594,7 +1664,9 @@ def validate_objects(
                 "query_id",
                 "family",
                 "pattern",
-                "flags",
+                "mode",
+                "case_sensitive",
+                "whole_word",
                 "scope_paths",
             }
             if not isinstance(query, dict) or set(query) != expected_query_fields:
@@ -1613,9 +1685,16 @@ def validate_objects(
                 errors.append(f"search query {query_id} lacks family")
             if not isinstance(query["pattern"], str) or not query["pattern"]:
                 errors.append(f"search query {query_id} lacks pattern")
-            exact_string_list(
-                query["flags"], f"search query {query_id}.flags", errors
-            )
+            if query["mode"] not in {"LITERAL", "REGEX"}:
+                errors.append(f"search query {query_id} has invalid mode")
+            if not isinstance(query["case_sensitive"], bool):
+                errors.append(
+                    f"search query {query_id} case_sensitive is not boolean"
+                )
+            if not isinstance(query["whole_word"], bool):
+                errors.append(
+                    f"search query {query_id} whole_word is not boolean"
+                )
             scope_paths = exact_string_list(
                 query["scope_paths"],
                 f"search query {query_id}.scope_paths",
@@ -1670,6 +1749,7 @@ def validate_objects(
 
         hit_ids: list[str] = []
         result_pairs: set[tuple[str, str]] = set()
+        ordered_result_pairs: list[tuple[str, str]] = []
         hits = round_record["hits"]
         if not isinstance(hits, list):
             errors.append(f"search round {round_index}.hits must be an array")
@@ -1712,6 +1792,7 @@ def validate_objects(
             if pair in result_pairs:
                 errors.append(f"search hit {hit_id} duplicates query/unit result")
             result_pairs.add(pair)
+            ordered_result_pairs.append(pair)
             source_unit = unit_by_id.get(hit["source_unit_id"])
             if source_unit is None:
                 errors.append(f"search hit {hit_id} has unknown source unit")
@@ -1768,6 +1849,16 @@ def validate_objects(
                 "rationale"
             ].strip():
                 errors.append(f"search hit {hit_id} lacks rationale")
+
+        rerun_pairs, rerun_errors = execute_frozen_queries(
+            queries, units, source_root
+        )
+        errors.extend(rerun_errors)
+        if ordered_result_pairs != rerun_pairs:
+            errors.append(
+                f"search round {round_index} recorded results differ from "
+                "independent query execution"
+            )
 
         result_ids = exact_string_list(
             round_record["result_ids"],
@@ -2408,6 +2499,123 @@ def mutation_checks(
     if base_errors:
         return ["valid candidate/route mutation fixture failed: " + "; ".join(base_errors)]
 
+    def lineage_candidate(
+        candidate_id: str,
+        evidence_number: int,
+        epoch: int,
+        ordinal: int,
+    ) -> dict[str, Any]:
+        result = copy.deepcopy(candidate)
+        evidence_id = f"E{evidence_number:06d}"
+        group_id = f"G{evidence_number:06d}"
+        result["id"] = candidate_id
+        result["provisional_name"] = f"lineage fixture {candidate_id}"
+        result["discovery_anchor"] = {
+            "epoch": epoch,
+            "kind": "SOURCE_UNIT",
+            "id": unit_id,
+            "ordinal": ordinal,
+        }
+        result["source_evidence"][0]["evidence_id"] = evidence_id
+        result["source_evidence"][0]["evidence_group_id"] = group_id
+        result["source_evidence"][0]["discovery_anchor"] = {
+            "epoch": epoch,
+            "kind": "SOURCE_UNIT",
+            "id": unit_id,
+            "ordinal": ordinal,
+        }
+        for field in FINGERPRINT_FIELDS:
+            result["fingerprint"][field]["evidence_ids"] = [evidence_id]
+        result["related_candidate_ids"] = []
+        result["evidence_reassignments"] = []
+        return result
+
+    lineage_candidates = [
+        lineage_candidate("B0001", 1, 1, 1),
+        lineage_candidate("B0002", 2, 1, 2),
+        lineage_candidate("B0003", 3, 2, 1),
+        lineage_candidate("B0004", 4, 2, 2),
+    ]
+    lineage_candidates[0].update(
+        {
+            "record_status": "SPLIT_SUPERSEDED",
+            "related_candidate_ids": [
+                {
+                    "candidate_id": "B0003",
+                    "relation": "SPLIT_INTO",
+                    "evidence_ids": ["E000001"],
+                    "uncertainty": "",
+                },
+                {
+                    "candidate_id": "B0004",
+                    "relation": "SPLIT_INTO",
+                    "evidence_ids": ["E000001"],
+                    "uncertainty": "",
+                },
+            ],
+            "evidence_reassignments": [
+                {
+                    "from_evidence_id": "E000001",
+                    "targets": [
+                        {
+                            "candidate_id": "B0003",
+                            "evidence_id": "E000003",
+                        },
+                        {
+                            "candidate_id": "B0004",
+                            "evidence_id": "E000004",
+                        },
+                    ],
+                }
+            ],
+        }
+    )
+    lineage_candidates[1].update(
+        {
+            "record_status": "MERGED_REDIRECT",
+            "related_candidate_ids": [
+                {
+                    "candidate_id": "B0001",
+                    "relation": "MERGED_INTO",
+                    "evidence_ids": ["E000002"],
+                    "uncertainty": "",
+                }
+            ],
+            "evidence_reassignments": [
+                {
+                    "from_evidence_id": "E000002",
+                    "targets": [
+                        {
+                            "candidate_id": "B0001",
+                            "evidence_id": "E000001",
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+    lineage_candidates[3]["cross_reference_ids"] = []
+    lineage_reading = copy.deepcopy(base_reading)
+    lineage_reading[0]["candidate_ids"] = '["B0003","B0004"]'
+    lineage_errors = validate_objects(
+        manifest,
+        units,
+        lineage_reading,
+        lineage_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+    )
+    if lineage_errors:
+        failures.append(
+            "valid multi-layer lineage fixture failed: "
+            + "; ".join(lineage_errors)
+        )
+    broken_lineage = copy.deepcopy(lineage_candidates)
+    broken_lineage[1]["evidence_reassignments"][0]["targets"][0][
+        "evidence_id"
+    ] = "E999999"
+
     mutations: list[
         tuple[
             str,
@@ -2418,6 +2626,16 @@ def mutation_checks(
             dict[str, Any],
         ]
     ] = []
+    mutations.append(
+        (
+            "broken multi-layer evidence reassignment",
+            lineage_reading,
+            broken_lineage,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
 
     missing_reading = copy.deepcopy(base_reading)
     missing_reading.pop()
@@ -2609,6 +2827,12 @@ def mutation_checks(
                 "reviewer": "fixture-reviewer",
             }
         )
+    source_bytes = (
+        REPO_ROOT / "ref" / "A-New-Kind-of-Science" / path
+    ).read_bytes()
+    fixture_pattern = source_bytes[
+        unit["byte_start"] : unit["byte_end"]
+    ].decode("utf-8")
     search_fixture = {
         "schema_version": 1,
         "phase": "blind_discovery",
@@ -2624,26 +2848,17 @@ def mutation_checks(
                     {
                         "query_id": "Q0001",
                         "family": "fixture noun",
-                        "pattern": "fixture",
-                        "flags": ["--fixed-strings"],
+                        "pattern": fixture_pattern,
+                        "mode": "LITERAL",
+                        "case_sensitive": True,
+                        "whole_word": False,
                         "scope_paths": [path],
                     }
                 ],
                 "tool_assumptions": ["Literal UTF-8 line search."],
-                "result_ids": ["H000001"],
+                "result_ids": [],
                 "result_digest": "",
-                "hits": [
-                    {
-                        "hit_id": "H000001",
-                        "query_id": "Q0001",
-                        "source_unit_id": unit_id,
-                        "context_sha256": unit["sha256"],
-                        "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
-                        "candidate_ids": ["B0001"],
-                        "route_ids": [],
-                        "rationale": "Already governed by the fixture candidate.",
-                    }
-                ],
+                "hits": [],
                 "new_vocabulary": [],
                 "new_candidates": [],
                 "new_evidence_groups": [],
@@ -2653,6 +2868,39 @@ def mutation_checks(
         ],
         "fixed_point": None,
     }
+    fixture_pairs, fixture_query_errors = execute_frozen_queries(
+        search_fixture["rounds"][0]["queries"],
+        units,
+        REPO_ROOT / "ref" / "A-New-Kind-of-Science",
+    )
+    failures.extend(fixture_query_errors)
+    unit_by_fixture_id = {item["id"]: item for item in units}
+    for hit_index, (query_id, hit_unit_id) in enumerate(
+        fixture_pairs, start=1
+    ):
+        hit_id = f"H{hit_index:06d}"
+        governed = hit_unit_id == unit_id
+        search_fixture["rounds"][0]["result_ids"].append(hit_id)
+        search_fixture["rounds"][0]["hits"].append(
+            {
+                "hit_id": hit_id,
+                "query_id": query_id,
+                "source_unit_id": hit_unit_id,
+                "context_sha256": unit_by_fixture_id[hit_unit_id]["sha256"],
+                "disposition": (
+                    "GOVERNED_CANDIDATE_OR_SUPPORT"
+                    if governed
+                    else "EXCLUSION"
+                ),
+                "candidate_ids": ["B0001"] if governed else [],
+                "route_ids": [],
+                "rationale": (
+                    "Already governed by the fixture candidate."
+                    if governed
+                    else "Duplicate literal outside the fixture anchor."
+                ),
+            }
+        )
     digest = search_result_digest(search_fixture["rounds"][0])
     search_fixture["rounds"][0]["result_digest"] = digest
     search_fixture["rounds"][0]["rerun_digest"] = digest
@@ -2826,6 +3074,7 @@ def main() -> int:
             search,
             set(args.require_stage),
             args.require_all_reviewed,
+            repo_root,
         )
     )
     if (goal_dir / "classification-ledger.csv").exists() or (

@@ -153,15 +153,18 @@
             "items": {
               "additionalProperties": false,
               "properties": {
+                "case_sensitive": {
+                  "type": "boolean"
+                },
                 "family": {
                   "type": "string"
                 },
-                "flags": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array",
-                  "uniqueItems": true
+                "mode": {
+                  "enum": [
+                    "LITERAL",
+                    "REGEX"
+                  ],
+                  "type": "string"
                 },
                 "pattern": {
                   "type": "string"
@@ -176,13 +179,18 @@
                   },
                   "type": "array",
                   "uniqueItems": true
+                },
+                "whole_word": {
+                  "type": "boolean"
                 }
               },
               "required": [
                 "query_id",
                 "family",
                 "pattern",
-                "flags",
+                "mode",
+                "case_sensitive",
+                "whole_word",
                 "scope_paths"
               ],
               "type": "object"

@@ -1604,6 +1604,7 @@
             "type": "string"
           },
           "evidence_id": {
+            "pattern": "^E[0-9]{6}$",
             "type": "string"
           },
           "fingerprint_fields": {

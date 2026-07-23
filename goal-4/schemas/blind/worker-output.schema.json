@@ -1752,10 +1752,11 @@
                   "type": "object"
                 },
                 "evidence_group_id": {
-                  "pattern": "^G[0-9]{6}$",
+                  "pattern": "^WG[0-9]{6}$",
                   "type": "string"
                 },
                 "evidence_id": {
+                  "pattern": "^WE[0-9]{6}$",
                   "type": "string"
                 },
                 "fingerprint_fields": {
