@@ -1335,35 +1335,30 @@ def canonical_sha256(value: Any) -> str:
 
 
 def review_input_projection(
-    event: dict[str, Any],
+    event_core: dict[str, Any],
+    path_change: dict[str, Any],
     unit_by_id: dict[str, dict[str, Any]],
     asset_by_id: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """Return the immutable corpus/input projection bound by a review event."""
+    """Return the immutable corpus/input projection bound for one event path."""
     return {
         "schema_version": 1,
-        "review_id": event["review_id"],
-        "epoch": event["epoch"],
-        "stage": event["stage"],
-        "mode": event["mode"],
-        "reviewer": event["reviewer"],
-        "source_paths": event["source_paths"],
-        "prior_search_round_count": event["prior_search_round_count"],
-        "prior_search_rounds_sha256": event[
-            "prior_search_rounds_sha256"
-        ],
-        "previous_path_result_sha256": event[
+        "review_id": event_core["review_id"],
+        "epoch": event_core["epoch"],
+        "stage": event_core["stage"],
+        "mode": event_core["mode"],
+        "reviewer": event_core["reviewer"],
+        "source_path": path_change["source_path"],
+        "previous_path_result_sha256": path_change[
             "previous_path_result_sha256"
         ],
-        "trigger_search_kind": event["trigger_search_kind"],
-        "trigger_hit_ids": event["trigger_hit_ids"],
         "source_units": [
             {
                 "source_unit_id": unit_id,
                 "path": unit_by_id[unit_id]["path"],
                 "sha256": unit_by_id[unit_id]["sha256"],
             }
-            for unit_id in event["source_unit_ids"]
+            for unit_id in path_change["source_unit_ids"]
         ],
         "assets": [
             {
@@ -1372,33 +1367,33 @@ def review_input_projection(
                 "assignment_path": asset_by_id[asset_id]["assignment_path"],
                 "sha256": asset_by_id[asset_id]["sha256"],
             }
-            for asset_id in event["asset_ids"]
+            for asset_id in path_change["asset_ids"]
         ],
     }
 
 
 def review_result_projection(
-    event: dict[str, Any],
+    path_change: dict[str, Any],
     reading_by_id: dict[str, dict[str, Any]],
     asset_by_id: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """Return the exact current result projection for a review event."""
+    """Return the exact current result projection for one event path."""
     return {
         "schema_version": 1,
-        "source_path": event["source_paths"][0],
+        "source_path": path_change["source_path"],
         "reading_results": [
             {
                 field: reading_by_id[unit_id][field]
                 for field in READING_REVIEW_RESULT_FIELDS
             }
-            for unit_id in event["source_unit_ids"]
+            for unit_id in path_change["source_unit_ids"]
         ],
         "asset_results": [
             {
                 field: asset_by_id[asset_id][field]
                 for field in ASSET_REVIEW_RESULT_FIELDS
             }
-            for asset_id in event["asset_ids"]
+            for asset_id in path_change["asset_ids"]
         ],
     }
 
@@ -1438,15 +1433,89 @@ def close_candidate_change(
     }
 
 
-def close_review_event(
-    core: dict[str, Any],
+def close_route_change(
+    action: str,
+    after_route: dict[str, Any],
+    before_route: dict[str, Any] | None = None,
+    previous_route_result_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Close one route CREATE/UPDATE version record."""
+    return {
+        "action": action,
+        "route_id": after_route["route_id"],
+        "previous_route_result_sha256": previous_route_result_sha256,
+        "before_route": before_route,
+        "before_route_sha256": (
+            canonical_sha256(before_route) if before_route is not None else None
+        ),
+        "after_route": after_route,
+        "after_route_sha256": canonical_sha256(after_route),
+    }
+
+
+def close_search_change(
+    before_search: dict[str, Any],
+    after_search: dict[str, Any],
+    previous_search_result_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Close one full before/after search-ledger version record."""
+    before_sha256 = canonical_sha256(before_search)
+    return {
+        "previous_search_result_sha256": (
+            before_sha256
+            if previous_search_result_sha256 is None
+            else previous_search_result_sha256
+        ),
+        "before_search": before_search,
+        "before_search_sha256": before_sha256,
+        "after_search": after_search,
+        "after_search_sha256": canonical_sha256(after_search),
+    }
+
+
+def close_path_change(
+    event_core: dict[str, Any],
+    path_core: dict[str, Any],
     unit_by_id: dict[str, dict[str, Any]],
     reading_by_id: dict[str, dict[str, Any]],
     asset_by_id: dict[str, dict[str, Any]],
-    previous_event_sha256: str | None,
-    prior_search_rounds: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Close a new append-only review event with canonical projections/hashes."""
+    """Close one per-path full row/asset snapshot inside an atomic event."""
+    path_change = {
+        "source_path": path_core["source_path"],
+        "source_unit_ids": list(path_core["source_unit_ids"]),
+        "asset_ids": list(path_core["asset_ids"]),
+        "previous_path_result_sha256": path_core.get(
+            "previous_path_result_sha256"
+        ),
+        "input_projection_sha256": "",
+        "result_snapshot": {},
+        "result_projection_sha256": "",
+    }
+    path_change["input_projection_sha256"] = canonical_sha256(
+        review_input_projection(
+            event_core,
+            path_change,
+            unit_by_id,
+            asset_by_id,
+        )
+    )
+    path_change["result_snapshot"] = review_result_projection(
+        path_change,
+        reading_by_id,
+        asset_by_id,
+    )
+    path_change["result_projection_sha256"] = canonical_sha256(
+        path_change["result_snapshot"]
+    )
+    return path_change
+
+
+def close_review_event(
+    core: dict[str, Any],
+    previous_event_sha256: str | None,
+) -> dict[str, Any]:
+    """Close one atomic append-only coordinator transaction."""
     event = {
         "review_id": core["review_id"],
         "epoch": core["epoch"],
@@ -1454,30 +1523,12 @@ def close_review_event(
         "mode": core["mode"],
         "reviewer": core["reviewer"],
         "source_paths": list(core["source_paths"]),
-        "source_unit_ids": list(core["source_unit_ids"]),
-        "asset_ids": list(core["asset_ids"]),
-        "prior_search_round_count": len(prior_search_rounds),
-        "prior_search_rounds_sha256": canonical_sha256(prior_search_rounds),
-        "previous_path_result_sha256": core.get(
-            "previous_path_result_sha256"
-        ),
-        "trigger_search_kind": core.get("trigger_search_kind"),
-        "trigger_hit_ids": list(core.get("trigger_hit_ids", [])),
+        "path_changes": list(core.get("path_changes", [])),
         "candidate_changes": list(core.get("candidate_changes", [])),
-        "input_projection_sha256": "",
-        "result_snapshot": {},
-        "result_projection_sha256": "",
+        "route_changes": list(core.get("route_changes", [])),
+        "search_change": core.get("search_change"),
         "previous_event_sha256": previous_event_sha256,
         "event_sha256": "",
     }
-    event["input_projection_sha256"] = canonical_sha256(
-        review_input_projection(event, unit_by_id, asset_by_id)
-    )
-    event["result_snapshot"] = review_result_projection(
-        event, reading_by_id, asset_by_id
-    )
-    event["result_projection_sha256"] = canonical_sha256(
-        event["result_snapshot"]
-    )
     event["event_sha256"] = review_event_sha256(event)
     return event

@@ -32,14 +32,18 @@ from audit_contract import (
     READING_DISPOSITIONS,
     READING_HEADER,
     READING_REVIEW_RESULT_FIELDS,
+    PATH_CHANGE_FIELDS,
     REVIEW_HISTORY_FIELDS,
     REVIEW_MODES,
     REPO_ROOT,
     ROUTE_CLOSURE_SCOPES,
+    ROUTE_CHANGE_ACTIONS,
+    ROUTE_CHANGE_FIELDS,
     ROUTE_KINDS,
     ROUTE_STATUSES,
+    SEARCH_CHANGE_FIELDS,
     SEARCH_HIT_DISPOSITIONS,
-    SEARCH_ENRICHMENT_TRIGGER_KINDS,
+    SEARCH_APPEND_TRIGGER_KINDS,
     SECONDARY_ROLES,
     SOURCE_STATUSES,
     VISUAL_RISK_FLAGS,
@@ -49,6 +53,9 @@ from audit_contract import (
     canonical_json_bytes,
     close_review_event,
     close_candidate_change,
+    close_path_change,
+    close_route_change,
+    close_search_change,
     review_event_sha256,
     review_input_projection,
     review_result_projection,
@@ -1276,7 +1283,9 @@ def _validate_candidate_enrichment_update(
     for field in (
         "aliases",
         "source_unit_ids",
+        "source_status",
         "image_witnesses",
+        "evidence_strength",
         "cross_reference_ids",
     ):
         old_values = before.get(field)
@@ -1419,7 +1428,7 @@ def _validate_candidate_enrichment_update(
         )
 
 
-def validate_review_history(
+def _validate_review_history_per_path_legacy(
     manifest: dict[str, Any],
     units: list[dict[str, Any]],
     reading: list[dict[str, str]],
@@ -2130,6 +2139,190 @@ def validate_review_history(
         asset_path_history_epochs,
         expected_local_scopes,
     )
+
+
+def _validate_candidate_revision_update(
+    before: dict[str, Any],
+    after: dict[str, Any],
+    errors: list[str],
+    prefix: str,
+) -> None:
+    """Enforce append-only provenance and one-way lifecycle revision."""
+    for field in ("id", "provisional_name", "discovery_stage", "discovery_anchor"):
+        if before.get(field) != after.get(field):
+            errors.append(f"{prefix} changes immutable candidate {field}")
+    before_status = before.get("record_status")
+    after_status = after.get("record_status")
+    if before_status != "ACTIVE" and after_status != before_status:
+        errors.append(f"{prefix} resurrects or rewrites a terminal candidate")
+    if before_status == "ACTIVE" and after_status not in {
+        "ACTIVE",
+        "MERGED_REDIRECT",
+        "SPLIT_SUPERSEDED",
+    }:
+        errors.append(f"{prefix} has an invalid candidate lifecycle transition")
+    for field in (
+        "aliases",
+        "source_unit_ids",
+        "source_evidence",
+        "source_status",
+        "image_witnesses",
+        "evidence_strength",
+        "parameters",
+        "variants",
+        "missing_mechanics",
+        "uncertainties",
+        "related_candidate_ids",
+        "cross_reference_ids",
+        "evidence_reassignments",
+    ):
+        old_values = before.get(field)
+        new_values = after.get(field)
+        if not isinstance(old_values, list) or not isinstance(new_values, list):
+            errors.append(f"{prefix} has malformed candidate {field}")
+            continue
+        if new_values[: len(old_values)] != old_values:
+            errors.append(
+                f"{prefix} reorders or rewrites prior candidate {field}"
+            )
+
+
+def _validate_route_resolution_update(
+    before: dict[str, str],
+    after: dict[str, str],
+    stage: int,
+    errors: list[str],
+    prefix: str,
+) -> None:
+    """Enforce the only governed route lifecycle transition."""
+    mutable = {
+        "status",
+        "target_unit_ids",
+        "target_asset_ids",
+        "attempts",
+        "defect_boundary",
+    }
+    for field in CROSS_REFERENCE_HEADER:
+        if field not in mutable and before.get(field) != after.get(field):
+            errors.append(f"{prefix} changes immutable route {field}")
+    if before.get("status") != "PENDING" or after.get("status") not in {
+        "RESOLVED",
+        "MISSING_TARGET_FINAL",
+    }:
+        errors.append(f"{prefix} has an invalid route lifecycle transition")
+    if after.get("status") == "MISSING_TARGET_FINAL" and stage != 18:
+        errors.append(f"{prefix} finalizes a missing route before Stage 18")
+    for field in ("target_unit_ids", "target_asset_ids", "attempts"):
+        parsed_string_list(
+            after.get(field, ""),
+            f"{prefix}.{field}",
+            errors,
+        )
+
+
+def _terminal_active_descendants(
+    candidate_id: str,
+    candidates: dict[str, dict[str, Any]],
+) -> set[str]:
+    """Return active leaves reached through merge/split supersession edges."""
+    pending = [candidate_id]
+    seen: set[str] = set()
+    leaves: set[str] = set()
+    while pending:
+        current_id = pending.pop()
+        if current_id in seen:
+            continue
+        seen.add(current_id)
+        current = candidates.get(current_id)
+        if current is None:
+            continue
+        if current.get("record_status") == "ACTIVE":
+            leaves.add(current_id)
+            continue
+        targets = [
+            relation.get("candidate_id")
+            for relation in current.get("related_candidate_ids", [])
+            if isinstance(relation, dict)
+            and relation.get("relation") in {"MERGED_INTO", "SPLIT_INTO"}
+            and isinstance(relation.get("candidate_id"), str)
+        ]
+        pending.extend(targets)
+    return leaves
+
+
+def _validate_candidate_revision_path_diff(
+    previous_snapshot: dict[str, Any],
+    snapshot: dict[str, Any],
+    candidate_state: dict[str, dict[str, Any]],
+    errors: list[str],
+    prefix: str,
+) -> bool:
+    """Allow only terminal-descendant rewrites of candidate link arrays."""
+    changed = False
+    for result_key, id_field in (
+        ("reading_results", "source_unit_id"),
+        ("asset_results", "asset_id"),
+    ):
+        before_by_id = {
+            row[id_field]: row
+            for row in previous_snapshot.get(result_key, [])
+            if isinstance(row, dict) and id_field in row
+        }
+        for row in snapshot.get(result_key, []):
+            if not isinstance(row, dict) or id_field not in row:
+                continue
+            row_id = row[id_field]
+            before = before_by_id.get(row_id)
+            if before is None:
+                errors.append(f"{prefix} adds an unknown snapshot row")
+                continue
+            changed_fields = {
+                field
+                for field in row
+                if row.get(field) != before.get(field)
+            }
+            if not changed_fields:
+                continue
+            changed = True
+            if changed_fields != {"candidate_ids"}:
+                errors.append(
+                    f"{prefix} candidate revision changes non-link fields "
+                    f"for {row_id}: {sorted(changed_fields)}"
+                )
+                continue
+            old_ids = set(
+                parsed_string_list(
+                    before["candidate_ids"],
+                    f"{prefix}.previous.{row_id}.candidate_ids",
+                    errors,
+                )
+            )
+            new_ids = set(
+                parsed_string_list(
+                    row["candidate_ids"],
+                    f"{prefix}.current.{row_id}.candidate_ids",
+                    errors,
+                )
+            )
+            removed = old_ids - new_ids
+            added = new_ids - old_ids
+            allowed: set[str] = set()
+            for candidate_id in removed:
+                candidate = candidate_state.get(candidate_id)
+                if candidate is None or candidate.get("record_status") == "ACTIVE":
+                    errors.append(
+                        f"{prefix} removes non-terminal candidate {candidate_id}"
+                    )
+                    continue
+                allowed.update(
+                    _terminal_active_descendants(candidate_id, candidate_state)
+                )
+            if not added or not added.issubset(allowed):
+                errors.append(
+                    f"{prefix} does not rewrite candidate links to exact "
+                    "terminal active descendants"
+                )
+    return changed
 
 
 def validate_objects(
