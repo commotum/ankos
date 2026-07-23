@@ -1262,6 +1262,173 @@ seed_or_query_candidate(
     ),
     result="A d-dimensional initial cellular configuration.",
 )
+
+explicit_cyclic_seed = source_candidate(
+    key="explicit-cyclic-seed",
+    name="{1,0,0,1,0} cyclic cellular-automaton seed preset",
+    anchor="U005043",
+    aliases=["five-cell cyclic rule 30 seed"],
+    facts={
+        "object_kind": "A concrete finite cyclic initial-condition preset.",
+        "carrier": "Five ordered cells.",
+        "support": "A five-site cyclic array.",
+        "topology": "The endpoints are adjacent under cyclic continuation.",
+        "alphabet_or_value_schema": "Binary values 0 and 1.",
+        "complete_state": "The explicit list {1,0,0,1,0}.",
+        "seed": "The explicit five-cell binary list {1,0,0,1,0}.",
+        "boundary": "The explicit list continues cyclically.",
+        "law_kind": "Use the list as the initial state for rule 30.",
+        "result_kind": "A finite cyclic Rule 30 evolution.",
+        "parameters_and_variants": "Five cells, rule 30, and a three-step example run.",
+        "excluded_observers_and_representations": (
+            "The printed four-row output is a finite witness of the preset."
+        ),
+        "evidence_limit": (
+            "The example does not define behavior for malformed lists or a "
+            "native stopping condition beyond the requested run length."
+        ),
+    },
+    claim=(
+        "The source states that an explicitly supplied finite initial list is "
+        "continued cyclically and introduces the five-cell rule 30 example."
+    ),
+    missing=(
+        "The example does not define behavior for malformed lists or a native "
+        "stopping condition beyond the requested run length."
+    ),
+)
+add_evidence(
+    explicit_cyclic_seed,
+    label="explicit-cyclic-seed-run",
+    unit="U005044",
+    claim=(
+        "The exact function call and output fix the five-cell list, rule 30, "
+        "three steps, and cyclic finite result."
+    ),
+    fields=list(explicit_cyclic_seed["facts"]),
+    modality="CODE",
+)
+
+periodic_patch_seed = source_candidate(
+    key="periodic-patch-seed",
+    name="{1,1} patch on repeating {1,0,1,1} CA background",
+    anchor="U005045",
+    aliases=["periodic-background rule 30 seed"],
+    facts={
+        "object_kind": "A concrete finite-foreground/repeating-background seed preset.",
+        "carrier": "A one-dimensional cellular row.",
+        "support": "An unbounded repetition background with a finite foreground patch.",
+        "topology": "Linear positions on a repeating background.",
+        "alphabet_or_value_schema": "Binary values 0 and 1.",
+        "complete_state": (
+            "Foreground {1,1} superimposed on repetitions of {1,0,1,1}."
+        ),
+        "seed": "Patch {1,1} on a repeating {1,0,1,1} background.",
+        "boundary": "The four-value background repeats beyond the foreground.",
+        "law_kind": "Use the composed state as the initial condition for rule 30.",
+        "result_kind": (
+            "A rule 30 evolution, by default projected to the region affected "
+            "by the foreground patch."
+        ),
+        "parameters_and_variants": (
+            "Foreground block, repeating background block, rule, run length, "
+            "and output window."
+        ),
+        "excluded_observers_and_representations": (
+            "The affected-region crop is an output projection, not a boundary "
+            "or transition change."
+        ),
+        "evidence_limit": (
+            "The example does not state invalid-input, native completion, "
+            "failure, or witness semantics."
+        ),
+    },
+    claim=(
+        "The source explicitly specifies the {1,1} foreground, repeating "
+        "{1,0,1,1} background, and default affected-region projection."
+    ),
+    missing=(
+        "The example does not state invalid-input, native completion, failure, "
+        "or witness semantics."
+    ),
+)
+add_evidence(
+    periodic_patch_seed,
+    label="periodic-patch-seed-call",
+    unit="U005046",
+    claim=(
+        "The function call fixes rule 30, the foreground/background pair, and "
+        "the 50-step run."
+    ),
+    fields=list(periodic_patch_seed["facts"]),
+    modality="CODE",
+)
+add_evidence(
+    periodic_patch_seed,
+    label="periodic-patch-all-window",
+    unit="U005048",
+    claim=(
+        "The adjacent example distinguishes the native seed from an observer "
+        "request for all possibly affected cells."
+    ),
+    fields=[
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+)
+
+positioned_patch_seed = source_candidate(
+    key="positioned-patch-preset",
+    name="two positioned Rule 30 foreground blocks preset",
+    anchor="U005051",
+    aliases=["offset -10 and 20 initial blocks"],
+    facts={
+        "object_kind": "A concrete multi-patch cellular initial-condition preset.",
+        "carrier": "A one-dimensional binary cellular row.",
+        "support": "An unbounded zero background with positioned finite blocks.",
+        "topology": "Integer-indexed linear cell positions.",
+        "alphabet_or_value_schema": "Binary values 0 and 1.",
+        "complete_state": (
+            "One {1} block at offset -10 and one {1,1} block at offset 20 on "
+            "a zero background."
+        ),
+        "seed": "The two explicitly positioned foreground blocks on background 0.",
+        "boundary": "The value-0 background extends outside the finite blocks.",
+        "law_kind": "Use the composed state as the initial condition for rule 30.",
+        "result_kind": "A unique 50-step Rule 30 evolution.",
+        "parameters_and_variants": (
+            "Foreground values, offsets -10 and 20, zero background, rule 30, "
+            "and 50 steps."
+        ),
+        "excluded_observers_and_representations": "The raster is an output representation.",
+        "evidence_limit": (
+            "The example does not state collision/overlap precedence for "
+            "arbitrary positioned blocks or invalid-input behavior."
+        ),
+    },
+    claim=(
+        "The source explicitly introduces blocks placed at offsets -10 and 20."
+    ),
+    missing=(
+        "The example does not state collision/overlap precedence for arbitrary "
+        "positioned blocks or invalid-input behavior."
+    ),
+)
+add_evidence(
+    positioned_patch_seed,
+    label="positioned-patch-call",
+    unit="U005052",
+    claim=(
+        "The code fixes the two block values and offsets, zero background, "
+        "rule 30, and 50-step request."
+    ),
+    fields=list(positioned_patch_seed["facts"]),
+    modality="CODE",
+)
+
 # Explicit generalized-rule presets.
 
 def explicit_ca_example(
@@ -1751,38 +1918,219 @@ additive = source_candidate(
     route_keys=["additive-page952"],
 )
 
-integer_patterns = declarative_pattern(
-    key="integer-function-patterns",
-    name="integer-function modulo-two lattice-pattern family",
-    anchor="U005134",
+def pictured_integer_pattern(
+    *,
+    key: str,
+    name: str,
+    unit: str,
+    path: str,
+    definition: str,
+    support: str,
+) -> CandidateSpec:
+    missing = (
+        "The image and caption identify the function and modulo-two display, "
+        "but do not state the function's full arithmetic definition, domain "
+        "clipping, invalid arguments, or witness semantics."
+    )
+    facts = {
+        "object_kind": "A declarative integer-function modulo-two pattern.",
+        "carrier": "Integer coordinate tuples.",
+        "support": support,
+        "alphabet_or_value_schema": "Binary residues modulo 2.",
+        "input": "The integer arguments of the named function.",
+        "law_kind": "Direct integer-function evaluation followed by reduction modulo 2.",
+        "rule_relation_constraint_function_or_probability_law": definition,
+        "result_kind": "A static binary lattice pattern.",
+        "successor_cardinality": "One residue for each valid coordinate tuple.",
+        "determinism_branching_or_measure": "Deterministic.",
+        "parameters_and_variants": "The named integer function and its arity.",
+        "excluded_observers_and_representations": (
+            "Black/white pixels and page layout represent the modular values."
+        ),
+        "evidence_limit": missing,
+    }
+    spec = add_candidate(
+        ALL_CANDIDATE_SPECS,
+        key=key,
+        name=name,
+        anchor=path,
+        aliases=[],
+        facts=facts,
+        missing=missing,
+    )
+    add_evidence(
+        spec,
+        label=f"{key}-context",
+        unit="U005134",
+        claim=(
+            "The caption states that the preceding pictures are made by "
+            "reducing their named integer functions modulo 2."
+        ),
+        fields=[
+            "object_kind",
+            "carrier",
+            "support",
+            "alphabet_or_value_schema",
+            "input",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        modality="CAPTION",
+    )
+    add_candidate_image(
+        spec,
+        label=f"{key}-image",
+        unit=unit,
+        path=path,
+        claim=(
+            f"Original-resolution inspection confirms the source label and "
+            f"binary lattice rendering for {name}; pixels are not used to "
+            "invent the arithmetic definition."
+        ),
+        fields=list(facts),
+    )
+    return spec
+
+
+pictured_integer_pattern(
+    key="binomial-mod2-array",
+    name="Binomial modulo-two array",
+    unit="U005130",
+    path="BACK-MATTER/NOTES/_page_885_Picture_23.jpeg",
+    definition="Reduce Binomial's integer values modulo 2 over its argument lattice.",
+    support="A two-dimensional integer-coordinate array.",
+)
+pictured_integer_pattern(
+    key="multinomial-mod2-array",
+    name="Multinomial modulo-two array family",
+    unit="U005131",
+    path="BACK-MATTER/NOTES/_page_885_Picture_24.jpeg",
     definition=(
-        "Evaluate a selected integer function over its integer argument lattice "
-        "and reduce the values modulo 2; d-argument Multinomial yields a "
-        "d-dimensional instance."
+        "Reduce a d-argument Multinomial value modulo 2 at each integer tuple."
     ),
-    support="A one- or d-dimensional integer-coordinate lattice.",
-    values="Function values reduced modulo 2.",
-    result="A static modular-value pattern.",
-    aliases=["other integer functions"],
-    route_keys=[
-        "gcd-page613",
-        "jacobi-page1081",
-        "function-combinations-page747",
-    ],
+    support="A d-dimensional integer-coordinate array.",
+)
+pictured_integer_pattern(
+    key="stirling1-mod2-array",
+    name="StirlingS1 modulo-two array",
+    unit="U005132",
+    path="BACK-MATTER/NOTES/_page_885_Picture_25.jpeg",
+    definition="Reduce StirlingS1's integer values modulo 2 over its argument lattice.",
+    support="A two-dimensional integer-coordinate array.",
+)
+pictured_integer_pattern(
+    key="stirling2-mod2-array",
+    name="StirlingS2 modulo-two array",
+    unit="U005133",
+    path="BACK-MATTER/NOTES/_page_885_Picture_26.jpeg",
+    definition="Reduce StirlingS2's integer values modulo 2 over its argument lattice.",
+    support="A two-dimensional integer-coordinate array.",
 )
 
-bitwise_patterns = declarative_pattern(
-    key="bitwise-patterns",
-    name="bitwise-function lattice-pattern family",
-    anchor="U005135",
+gcd_pattern = declarative_pattern(
+    key="gcd-pattern",
+    name="GCD modulo-two lattice pattern",
+    anchor="U005134",
+    definition="Evaluate GCD[m,n] over integer pairs and reduce the values modulo 2.",
+    support="A two-dimensional integer-coordinate lattice.",
+    values="Binary residues modulo 2.",
+    result="A static binary pattern.",
+    route_keys=["gcd-page613"],
+)
+jacobi_pattern = declarative_pattern(
+    key="jacobi-pattern",
+    name="JacobiSymbol modulo-two lattice pattern",
+    anchor="U005134",
     definition=(
-        "Evaluate a selected bitwise function on integer coordinates and display "
-        "its values or a declared equality relation."
+        "Evaluate JacobiSymbol[m,2n-1] over integer pairs and reduce/display "
+        "the resulting values."
     ),
-    support="An integer-coordinate lattice.",
-    values="Integer or Boolean values produced by bitwise operations.",
-    result="A static or parameter-indexed nested pattern.",
-    aliases=["bitwise functions"],
+    support="A two-dimensional integer-coordinate lattice.",
+    values="Values derived from the JacobiSymbol integer function.",
+    result="A static lattice pattern.",
+    route_keys=["jacobi-page1081"],
+)
+
+
+def bitwise_function_candidate(
+    key: str,
+    display_name: str,
+    relation: str,
+) -> CandidateSpec:
+    missing = (
+        "The source names and relates the bitwise function but does not give a "
+        "complete bit-by-bit definition, signed-integer convention, domain "
+        "boundary, or witness semantics."
+    )
+    spec = source_candidate(
+        key=key,
+        name=f"{display_name} integer function",
+        anchor="U005135",
+        aliases=[display_name],
+        facts={
+            "object_kind": "A deterministic binary integer function.",
+            "carrier": "Pairs of integers represented by digit sequences.",
+            "input": "Two integer arguments x and y.",
+            "law_kind": "A direct bitwise function.",
+            "rule_relation_constraint_function_or_probability_law": relation,
+            "result_kind": "One integer result.",
+            "successor_cardinality": "Exactly one result per valid input pair.",
+            "determinism_branching_or_measure": "Deterministic.",
+            "parameters_and_variants": "Choice of bitwise operation.",
+            "excluded_observers_and_representations": (
+                "Nested black/white plots are representations of function values."
+            ),
+            "evidence_limit": missing,
+        },
+        claim=(
+            f"The source names {display_name} as a bitwise integer function and "
+            f"states the exact cross-function relation {relation}."
+        ),
+        missing=missing,
+        modality="FORMULA",
+    )
+    add_candidate_image(
+        spec,
+        label=f"{key}-plot",
+        unit="U005136",
+        path="BACK-MATTER/NOTES/_page_886_Picture_4.jpeg",
+        claim=(
+            f"Original-resolution inspection confirms the labelled nested "
+            f"function plot including {display_name}; it is a representation."
+        ),
+        fields=[
+            "object_kind",
+            "carrier",
+            "input",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+    )
+    return spec
+
+
+bitwise_function_candidate(
+    "bitand-function",
+    "BitAnd",
+    "BitOr[x,y] + BitAnd[x,y] == x+y.",
+)
+bitwise_function_candidate(
+    "bitor-function",
+    "BitOr",
+    "BitOr[x,y] - BitAnd[x,y] == BitXor[x,y].",
+)
+bitwise_function_candidate(
+    "bitxor-function",
+    "BitXor",
+    "BitOr[x,y] - BitAnd[x,y] == BitXor[x,y].",
 )
 
 munching = declarative_pattern(
@@ -1799,20 +2147,66 @@ munching = declarative_pattern(
     aliases=["munching squares", "munching foos"],
     route_keys=["munching-page871"],
 )
-
-bitwise_curves = declarative_pattern(
-    key="bitwise-curves",
-    name="successive-n bitwise curve construction",
-    anchor="U005139",
-    definition=(
-        "Generate curves from values obtained by applying selected bitwise "
-        "functions to n and the left-shifted value 2n for successive n."
+add_candidate_image(
+    munching,
+    label="munching-squares-image",
+    unit="U005138",
+    path="BACK-MATTER/NOTES/_page_886_Picture_6.jpeg",
+    claim=(
+        "Original-resolution inspection confirms the successive labelled "
+        "BitXor equality patterns; the source formula supplies the relation."
     ),
-    support="Successive integer indices mapped into a plotted curve.",
-    values="Integer values of a selected bitwise function.",
-    result="A deterministic nested curve.",
-    aliases=["bitwise n and 2n curves"],
+    fields=[
+        "support",
+        "alphabet_or_value_schema",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
 )
+
+
+def unary_bitwise_curve(key: str, operation: str) -> CandidateSpec:
+    spec = declarative_pattern(
+        key=key,
+        name=f"{operation}[n,2n] successive-index curve",
+        anchor="U005139",
+        definition=(
+            f"For successive n, evaluate {operation}[n,2n] and use the values "
+            "to form the displayed curve."
+        ),
+        support="Successive integer indices mapped into a plotted curve.",
+        values=f"Integer values of {operation}.",
+        result="A deterministic nested curve.",
+        aliases=[f"{operation} n and 2n curve"],
+    )
+    add_candidate_image(
+        spec,
+        label=f"{key}-image",
+        unit="U005140",
+        path="BACK-MATTER/NOTES/_page_886_Picture_8.jpeg",
+        claim=(
+            f"Original-resolution inspection confirms the labelled "
+            f"{operation}[n,2n] curve among the successive-index plots."
+        ),
+        fields=[
+            "object_kind",
+            "support",
+            "alphabet_or_value_schema",
+            "input",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+    )
+    return spec
+
+
+unary_bitwise_curve("bitand-curve", "BitAnd")
+unary_bitwise_curve("bitor-curve", "BitOr")
+unary_bitwise_curve("bitxor-curve", "BitXor")
 
 center_column = source_candidate(
     key="rule30-center-column",
@@ -1865,4 +2259,337 @@ add_evidence(
     ),
     fields=list(center_column["facts"]),
     modality="CODE",
+)
+
+
+# ---------------------------------------------------------------------------
+# Explicit ornamental and assembly procedures.
+
+def procedure_candidate(
+    *,
+    key: str,
+    name: str,
+    anchor: str,
+    description: str,
+    carrier: str,
+    support: str,
+    state: str,
+    result: str,
+    missing: str,
+    aliases: list[str] | None = None,
+) -> CandidateSpec:
+    return source_candidate(
+        key=key,
+        name=name,
+        anchor=anchor,
+        aliases=aliases or [],
+        facts={
+            "object_kind": "A finite geometric or physical construction procedure.",
+            "native_time": "Discrete construction stages or assembly operations.",
+            "carrier": carrier,
+            "support": support,
+            "complete_state": state,
+            "frontier_or_activation": (
+                "The next designated geometric or assembly component is added "
+                "or transformed."
+            ),
+            "schedule": "The stated construction operations are performed in order.",
+            "read_dependencies_or_neighborhood": (
+                "Each operation uses the previously constructed geometry or assembly."
+            ),
+            "law_kind": "A deterministic drawing, deformation, or assembly procedure.",
+            "rule_relation_constraint_function_or_probability_law": description,
+            "write_replacement_assembly_or_commit": description,
+            "result_kind": result,
+            "successor_cardinality": (
+                "One next construction stage when every stated choice is fixed."
+            ),
+            "determinism_branching_or_measure": (
+                "Deterministic to the level specified by the source."
+            ),
+            "termination_completion_failure": (
+                "The depicted or stated finite operation sequence ends in the ornament."
+            ),
+            "parameters_and_variants": description,
+            "excluded_observers_and_representations": (
+                "Historical provenance, material, page layout, and visual "
+                "similarity to cellular automata are contextual."
+            ),
+            "evidence_limit": missing,
+        },
+        claim=f"The source delimits {name} and states or diagrams its procedure: {description}",
+        missing=missing,
+        parameters=[
+            ("construction profile", description, [f"{key}-source"]),
+        ],
+    )
+
+
+def attach_procedure_images(
+    candidate: CandidateSpec,
+    *,
+    label_prefix: str,
+    entries: list[tuple[str, str]],
+) -> None:
+    for index, (unit, path) in enumerate(entries, 1):
+        add_candidate_image(
+            candidate,
+            label=f"{label_prefix}-{index}",
+            unit=unit,
+            path=path,
+            claim=(
+                "Original-resolution inspection confirms this source-ordered "
+                "construction stage; the image is used only for visibly "
+                "unambiguous geometry."
+            ),
+            fields=[
+                "carrier",
+                "support",
+                "complete_state",
+                "frontier_or_activation",
+                "schedule",
+                "read_dependencies_or_neighborhood",
+                "write_replacement_assembly_or_commit",
+                "result_kind",
+                "termination_completion_failure",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+
+
+pylos = procedure_candidate(
+    key="pylos-labyrinth",
+    name="Pylos labyrinth drawing procedure",
+    anchor="U005172",
+    aliases=["classical seven-circuit labyrinth", "Troy maze"],
+    description=(
+        "Apply the finite source-ordered drawing procedure shown in five stages "
+        "to produce the square or rounded labyrinth design."
+    ),
+    carrier="Planar line segments, bends, and guide marks.",
+    support="A bounded planar drawing region.",
+    state="The partial line drawing after each depicted stage.",
+    result="A completed classical labyrinth drawing.",
+    missing=(
+        "The prose does not verbalize every stroke, orientation, scaling rule, "
+        "or behavior for malformed intermediate drawings."
+    ),
+)
+attach_procedure_images(
+    pylos,
+    label_prefix="pylos-stage",
+    entries=[
+        ("U005173", "BACK-MATTER/NOTES/_page_888_Picture_5.jpeg"),
+        ("U005174", "BACK-MATTER/NOTES/_page_888_Picture_6.jpeg"),
+        ("U005175", "BACK-MATTER/NOTES/_page_888_Picture_7.jpeg"),
+        ("U005176", "BACK-MATTER/NOTES/_page_888_Picture_8.jpeg"),
+        ("U005177", "BACK-MATTER/NOTES/_page_888_Picture_9.jpeg"),
+    ],
+)
+
+triangle_circles = procedure_candidate(
+    key="triangular-circle-array",
+    name="triangular-array centered-circle ornament",
+    anchor="U005178",
+    aliases=["Phoenician triangular circle pattern"],
+    description=(
+        "Arrange holes in a triangular array and draw a circle centered at each hole."
+    ),
+    carrier="Circle centers and circular arcs.",
+    support="A planar triangular lattice of holes.",
+    state="The fixed center array together with circles already drawn.",
+    result="A repeated overlapping-circle ornament.",
+    missing=(
+        "The passage omits array extent, circle radius, edge clipping, and a "
+        "formal completion convention."
+    ),
+)
+
+celtic_circles = procedure_candidate(
+    key="celtic-touching-circles",
+    name="Desborough tangent-circle ornament construction",
+    anchor="U005179",
+    aliases=["Desborough Mirror circle construction"],
+    description=(
+        "Assemble the engraved pattern from portions of circles arranged to "
+        "touch one another as shown in the staged diagrams."
+    ),
+    carrier="Circular arcs and tangency points.",
+    support="A bounded planar ornament region.",
+    state="The partial collection of touching circular arcs.",
+    result="The Desborough-style tangent-circle pattern.",
+    missing=(
+        "The source does not give exact centers, radii, arc-selection rules, "
+        "scale, or a textual step order."
+    ),
+)
+attach_procedure_images(
+    celtic_circles,
+    label_prefix="celtic-circle-stage",
+    entries=[
+        ("U005180", "BACK-MATTER/NOTES/_page_888_Picture_12.jpeg"),
+        ("U005181", "BACK-MATTER/NOTES/_page_888_Picture_13.jpeg"),
+        ("U005182", "BACK-MATTER/NOTES/_page_888_Picture_14.jpeg"),
+        ("U005183", "BACK-MATTER/NOTES/_page_888_Picture_15.jpeg"),
+    ],
+)
+
+roman_rosette = procedure_candidate(
+    key="roman-rosette",
+    name="48-spoke Roman rosette construction",
+    anchor="U005184",
+    aliases=["Roman mosaic rosette procedure"],
+    description=(
+        "Construct 48 regularly spaced spokes by repeated angle bisection, draw "
+        "semicircles centered at the spoke ends, then add concentric circles "
+        "through the intersection points."
+    ),
+    carrier="Spokes, semicircles, intersections, and concentric circles.",
+    support="A planar circular construction region.",
+    state="The accumulated straight and circular construction lines.",
+    result="A completed 48-fold rosette pattern.",
+    missing=(
+        "The passage does not specify the initial radius, compass orientation, "
+        "which semicircle side to retain, or degeneracy handling."
+    ),
+)
+attach_procedure_images(
+    roman_rosette,
+    label_prefix="roman-rosette-stage",
+    entries=[
+        ("U005185", "BACK-MATTER/NOTES/_page_888_Picture_17.jpeg"),
+        ("U005186", "BACK-MATTER/NOTES/_page_888_Picture_18.jpeg"),
+        ("U005187", "BACK-MATTER/NOTES/_page_888_Picture_19.jpeg"),
+        ("U005188", "BACK-MATTER/NOTES/_page_888_Picture_20.jpeg"),
+    ],
+)
+
+cosmati = procedure_candidate(
+    key="cosmati-triangles",
+    name="Cosmati nested-equilateral-triangle construction",
+    anchor="U005193",
+    aliases=["Cosmati triangle nesting"],
+    description=(
+        "Recursively place the same equilateral-triangle structure at smaller "
+        "scales inside the available triangular regions, as shown in the "
+        "construction diagrams."
+    ),
+    carrier="Equilateral triangular tiles or regions.",
+    support="A bounded equilateral-triangle region.",
+    state="The collection of triangles present at each nesting level.",
+    result="A finite approximately nested Cosmati mosaic pattern.",
+    missing=(
+        "The source does not provide an exact recursion depth, triangle-choice "
+        "order, size ratios for every branch, or treatment of material gaps."
+    ),
+)
+attach_procedure_images(
+    cosmati,
+    label_prefix="cosmati-stage",
+    entries=[
+        ("U005194", "BACK-MATTER/NOTES/_page_889_Picture_3.jpeg"),
+        ("U005195", "BACK-MATTER/NOTES/_page_889_Picture_4.jpeg"),
+        ("U005196", "BACK-MATTER/NOTES/_page_889_Picture_5.jpeg"),
+        ("U005197", "BACK-MATTER/NOTES/_page_889_Picture_6.jpeg"),
+        ("U005198", "BACK-MATTER/NOTES/_page_889_Picture_7.jpeg"),
+    ],
+)
+
+triangle_push = procedure_candidate(
+    key="triangle-grid-push",
+    name="triangle-grid push-in/push-out ornament construction",
+    anchor="U005203",
+    aliases=["Alcázar triangular-grid pattern"],
+    description=(
+        "Start from a grid of triangles and consistently push each triangle "
+        "side inward or outward."
+    ),
+    carrier="Triangular grid edges.",
+    support="A two-dimensional triangular tiling.",
+    state="The current placement/deformation of every triangle side.",
+    result="A repeated interlocking tiled ornament.",
+    missing=(
+        "The source does not state the exact push assignment, displacement "
+        "magnitude, boundary handling, or consistency rule at shared sides."
+    ),
+)
+
+rope = procedure_candidate(
+    key="nested-rope",
+    name="nested twisted-strand rope assembly",
+    anchor="U005209",
+    aliases=["7 x 7 x 7 wire-rope preset"],
+    description=(
+        "Twist strands together, with each strand itself formed by twisting "
+        "smaller strands; one explicit wire-rope preset uses 7 x 7 x 7 units."
+    ),
+    carrier="Strands recursively grouped into larger strands or rope.",
+    support="A finite hierarchical cross-section and longitudinal twist.",
+    state="The nested grouping and twist orientation of all component strands.",
+    result="A multilevel rope or wire-rope assembly.",
+    missing=(
+        "The source does not state handedness, pitch, exact geometric placement, "
+        "material constraints, or failure/completion tolerances."
+    ),
+)
+attach_procedure_images(
+    rope,
+    label_prefix="rope-stage",
+    entries=[
+        ("U005210", "BACK-MATTER/NOTES/_page_889_Picture_19.jpeg"),
+        ("U005211", "BACK-MATTER/NOTES/_page_889_Picture_20.jpeg"),
+        ("U005212", "BACK-MATTER/NOTES/_page_889_Picture_21.jpeg"),
+    ],
+)
+
+truchet = source_candidate(
+    key="truchet-pattern-space",
+    name="Truchet four-tile planar pattern space",
+    anchor="U005225",
+    aliases=["Truchet tiles"],
+    facts={
+        "object_kind": "A finite-alphabet planar tiling/pattern space.",
+        "carrier": "Square tile positions.",
+        "support": "A two-dimensional square grid.",
+        "topology": "Orthogonally adjacent square tile sites.",
+        "structural_invariants": "Every site is occupied by one congruent square tile.",
+        "alphabet_or_value_schema": (
+            "Four square tiles distinguished by which triangular half is filled: "
+            "◣, ◥, ◤, or ◢."
+        ),
+        "complete_state": "One choice of the four tile values at every grid site.",
+        "frontier_or_activation": "A tile value is chosen for each site.",
+        "law_kind": "Free combination over a four-tile alphabet.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Form two-dimensional patterns by combining the four stated tile types "
+            "in all or selected possible ways."
+        ),
+        "write_replacement_assembly_or_commit": "Place the chosen tile at each grid site.",
+        "result_kind": "A completed planar tile pattern.",
+        "successor_cardinality": (
+            "Four local choices per unconstrained site; the source does not impose a measure."
+        ),
+        "determinism_branching_or_measure": (
+            "Nondeterministic/enumerative unless a separate tile-selection rule is supplied."
+        ),
+        "parameters_and_variants": "Grid extent and tile choice at each position.",
+        "excluded_observers_and_representations": (
+            "Leonardo/Truchet history and artistic use are contextual."
+        ),
+        "evidence_limit": (
+            "The passage does not specify a selection measure, adjacency "
+            "constraint, enumeration order, or completion boundary."
+        ),
+    },
+    claim=(
+        "The source explicitly gives the four-tile alphabet and describes "
+        "forming 2D patterns by combining those tiles."
+    ),
+    missing=(
+        "The passage does not specify a selection measure, adjacency constraint, "
+        "enumeration order, or completion boundary."
+    ),
 )
