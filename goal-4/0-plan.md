@@ -166,6 +166,17 @@ These are current cutover facts to reverify and hash-pin in Stage 2:
   physical Markdown lines partitioned into 14,311 deterministic source units.
   The inherited 22,498-line table used a different historical concatenation
   convention and is replaced below.
+- Stage 3 is complete in `3-AUDIT-HARNESS.md`. The initial six mutable ledgers
+  reproduce byte-for-byte, every later mutation is one atomic hash-chained
+  `V######` transaction, and replay validates every historical prefix as well
+  as the terminal state. Coordinator apply is protected by immutable prepared
+  plans, a cooperative read/write lock, a durable recovery journal, and
+  deterministic six-ledger rollback/finalization.
+- Independent Stage 3 reclosure proved that 28/29-document saturation cannot
+  authorize a final missing target, 29/29 remains reachable, and a saturation
+  round from an earlier epoch is stale after reopen. The valid Stage 4 starting
+  state remains empty: 0 reviewed units, 0 screened images, 0 candidates,
+  0 routes, and 0 search rounds.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -322,6 +333,8 @@ Create a trustworthy, hash-pinned map of the complete canonical Book corpus.
 
 ### 3-AUDIT-HARNESS
 
+Status: **COMPLETE** in `goal-4/3-AUDIT-HARNESS.md`.
+
 #### Big Picture Objective
 
 Build the ledgers and validators that make sequential reading, candidate capture, cross-reference closure, asset inspection, and final classification auditable.
@@ -340,6 +353,14 @@ Build the ledgers and validators that make sequential reading, candidate capture
 - The source-unit ledger partitions the canonical corpus without gaps or overlaps.
 - The harness runs from root and a relocated copy and fails closed under declared modes.
 - Stage 4 can begin with empty, valid, resumable ledgers.
+
+The completed harness additionally requires every event prefix to have exact
+candidate/evidence/route reverse joins, contiguous global evidence allocation,
+available discovery anchors, and a complete provenance-preserving lifecycle.
+Final-missing routes require complete review/screening, all applicable LOCAL
+closures, and exact full-corpus Stage 18 saturation in the current epoch. A
+fixed point additionally requires zero pending routes and exact ordered
+vocabulary replay.
 
 ### 4-BOOKENDS
 

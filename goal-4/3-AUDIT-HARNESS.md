@@ -1,6 +1,7 @@
 # 3-AUDIT-HARNESS
 
-Status: **IN PROGRESS** pending adversarial reclosure.
+Status: **COMPLETE** after adversarial reclosure and independent system/history
+signoff.
 
 ## Current Facts
 
@@ -15,6 +16,13 @@ Status: **IN PROGRESS** pending adversarial reclosure.
 - The initial candidate and search ledgers are empty, and the cross-reference
   ledger contains only its exact header.
 - No reconciliation data file exists during blind discovery.
+- Every later blind mutation is represented by one atomic, hash-chained
+  `V######` transaction. Replaying those transactions from the empty initial
+  state must reproduce all six mutable ledgers and the latest per-path
+  snapshots exactly.
+- The live Stage 4 starting state remains byte-for-byte equal to the generated
+  initial state: 0 reviewed units, 0 screened assets, 0 candidates, 0 routes,
+  and 0 search rounds.
 
 ## Updated Assumptions
 
@@ -33,6 +41,17 @@ Status: **IN PROGRESS** pending adversarial reclosure.
   terminal active candidates.
 - Search reproducibility requires an executable query language, not merely a
   stored prose query or result count.
+- Final-state validity is not enough for append-only history. Every event
+  prefix must independently satisfy candidate, evidence, lifecycle, route,
+  search, provenance, and reverse-join invariants; a later transaction cannot
+  legitimize an invalid earlier state.
+- A final missing-target decision requires complete sequential review, complete
+  asset screening, exact LOCAL search closure for every applicable
+  stage/epoch, and a current-epoch Stage 18 SATURATION round whose query scopes
+  cover exactly all 29 canonical documents.
+- A search fixed point additionally requires zero pending routes, a final
+  zero-delta full-corpus saturation rerun, and exact ordered replay of the
+  top-level vocabulary from each round's declared `new_vocabulary`.
 - Worker bundles can reduce accidental information leakage, but filesystem
   sealing is not an operating-system security boundary. Actual blind
   delegation requires a separately enforced runtime sandbox; otherwise reading
@@ -127,13 +146,14 @@ Completed:
 
 1. Added `tools/audit_contract.py` as the shared allowlist-only contract.
 2. Added `tools/initialize_audit.py` and generated exact initial ledgers.
-3. Generated six blind schemas:
+3. Generated seven blind schemas:
    - reading row;
    - asset row;
    - cross-reference row;
    - candidate record;
    - search rounds;
-   - worker output.
+   - worker output;
+   - atomic review-history event.
 4. Generated two reconciliation-only schemas:
    - classification row;
    - coverage row.
@@ -144,7 +164,27 @@ Completed:
 7. Added `tools/merge_worker_output.py` for dry-run-first coordinator merges,
    stale-projection detection, worker-ID remapping, full proposed-state
    validation, and same-filesystem staged writes.
-8. Added `tools/test_audit.py` and `tools/test_merge_worker_output.py`.
+8. Added `tools/audit_transaction.py` for cooperative locking, durable
+   journaling, atomic six-ledger replacement, and deterministic crash
+   recovery.
+9. Added focused tests for guardrails, corpus reconstruction, audit replay,
+   coordinator operations, transactions, and initialization.
+
+The review-history transaction modes are:
+
+- `INITIAL`: atomically completes the next canonical unread path or path set;
+- `REOPEN`: atomically replaces a previously reviewed path projection in a
+  new epoch and clears a prior fixed point when applicable;
+- `SEARCH_APPEND`: appends exactly one LOCAL or SATURATION round and atomically
+  carries its row, asset, candidate, route, and evidence changes;
+- `ROUTE_RESOLUTION`: performs the only governed pending-route transition;
+- `CANDIDATE_REVISION`: performs Stage 18 append-only candidate enrichment,
+  merge, or split changes with exact affected-path rewrites.
+
+One `V######` identifies the whole coordinator transaction, including
+multi-path review. Candidate, route, search, and path changes carry full
+before/after snapshots and hash chains. Replay validates each closed prefix,
+not just the terminal ledgers.
 
 The worker namespace is deliberately separate:
 
@@ -157,6 +197,26 @@ The coordinator deterministically maps those append-only identities into the
 global `B/R/E/G` namespaces and rewrites all nested joins. Worker output cannot
 resolve routes, perform coordinator search, assign reconciliation fields, or
 reassign tombstone evidence.
+
+Prepared merge plans are immutable mappings with a validation token covering
+all original bytes/modes and all proposed ledger bytes. Apply recomputes that
+token before entering the transaction. The initializer has no reset or
+`--force` path and refuses to overwrite any existing mutable ledger.
+
+The transaction layer uses a persistent advisory lock for cooperating tools,
+fsynced `PREPARED`/`COMMITTED` journal states, complete base/proposed staging,
+and deterministic recovery:
+
+- all base files present: discard an uncommitted journal;
+- all proposed files present: finalize a committed journal;
+- mixed base/proposed state: restore the complete base state;
+- any unknown target state: retain the journal and fail closed.
+
+Unique mode-`0600` scratch files prevent read-only final modes from blocking a
+crash retry; final modes are applied only at the atomic install boundary.
+Consistent multi-ledger readers use the same read guard. This is a cooperative
+durability contract, not a claim that arbitrary lock-free readers see six
+POSIX renames as one filesystem operation.
 
 ## No-Cheating Checks
 
@@ -173,12 +233,23 @@ reassign tombstone evidence.
   and images.
 - Candidate/evidence discovery anchors must follow the frozen epoch traversal
   and contiguous global allocation.
+- Every event prefix has contiguous `E######`/`G######` allocation, exact
+  candidate/evidence joins, available discovery anchors, matching
+  search-hit/source witnesses, and a complete provenance-preserving lifecycle
+  graph.
 - Merge/split graphs must be acyclic, provenance-covering, and terminate in
   active descendants; evidence reassignment preserves canonical witnesses.
 - Cross-reference routes have typed sources/targets, exact backlinks, and
   stage-sensitive closure gates.
 - Search rounds are replayed against canonical source bytes; stale result or
   context digests fail.
+- Search vocabulary is the exact ordered concatenation of per-round declared
+  additions; undeclared top-level terms fail.
+- `MISSING_TARGET_FINAL` cannot be reached from partial review, missing LOCAL
+  closure, a partial-corpus saturation round, or a saturation round from a
+  stale pre-reopen epoch.
+- A fixed point cannot coexist with a pending route or precede complete
+  reading, screening, and LOCAL closure.
 - Reconciliation files are forbidden before Stage 19, while their future
   schemas are already closed and enum-typed.
 - Sealed bundles reject symlinks, hardlinks, special files, writable inputs,
@@ -186,6 +257,8 @@ reassign tombstone evidence.
   invalid worker-local identity sequences.
 - Merge defaults to a non-mutating preview and validates the entire proposed
   global state before any explicit apply.
+- The six-ledger apply path rejects stale or mutated prepared plans and
+  recovers every tested crash boundary, including read-only target modes.
 - The full harness runs from a byte-for-byte relocated corpus copy.
 - Validation passes under ordinary and optimized Python; correctness does not
   depend on `assert`.
@@ -199,7 +272,7 @@ reassign tombstone evidence.
 | Govern cross-reference and search queues | Typed routes, stage gates, executable search replay, and hit-disposition mutations |
 | Govern every physical image | 1,607 exact initial rows, independent owner recomputation, and risk-sensitive inspection rules |
 | Keep blind discovery free of reconciliation/API conclusions | Recursive forbidden-key/text scan and absence of reconciliation data files |
-| Support safe resumable work | Reproducible initializer, stage gates, sealed range bundles, and transactional coordinator |
+| Support safe resumable work | Non-overwriting initializer, stage gates, sealed range bundles, hash-chained event replay, immutable prepared plans, and journaled six-ledger coordinator |
 | Fail under meaningful corruption | Source, link, asset, provenance, lifecycle, search, bundle, merge, and schema mutation cases |
 | Run from root and a relocated copy | Focused test suite, including independent copied source tree |
 | Leave a valid Stage 4 starting state | Initial artifacts reproduce byte-for-byte and global validator reports zero reviewed work with no unresolved invalid row |
@@ -227,12 +300,17 @@ python3 goal-4/tools/validate_audit.py --self-test
 python3 -m py_compile goal-4/tools/*.py
   passed silently
 
-uv run --with pytest pytest -q \
-  goal-4/tools/test_guardrails.py \
-  goal-4/tools/test_corpus.py \
-  goal-4/tools/test_audit.py \
-  goal-4/tools/test_merge_worker_output.py
-  20 passed
+uv run --with pytest pytest -q goal-4/tools/test_audit.py
+  15 passed
+
+uv run --with pytest pytest -q goal-4/tools/test_merge_worker_output.py
+  34 passed
+
+uv run --with pytest pytest -q goal-4/tools/test_audit_transaction.py
+  22 passed
+
+uv run --with pytest pytest -q goal-4/tools/test_initialize_audit.py
+  4 passed
 
 git diff --check -- goal-4
   passed silently
@@ -251,11 +329,31 @@ The audit-validator mutation suite rejects, among other cases:
 - invalid evidence groups;
 - an open within-stage route;
 - broken multi-level merge/split evidence reassignment.
+- an invalid candidate or route at any historical `V` prefix even when a later
+  transaction repairs the final ledger;
+- evidence anchored to a future or mismatched search hit;
+- noncontiguous prefix evidence/evidence-group allocation;
+- undeclared top-level search vocabulary;
+- premature fixed points and premature final-missing routes.
 
 The coordinator tests additionally reject invalid completed bundles, stale
 input projections, and global ID collisions, and prove that preview is
 non-mutating, explicit apply uses validated staging, all four worker ID
-families are rewritten, and search state is preserved.
+families are rewritten, and search state is preserved. They also prove that:
+
+- final-missing route resolution remains reachable after full review, LOCAL
+  closure, and a non-fixed current-epoch full-corpus saturation round;
+- a 28/29-document saturation scope is rejected;
+- a 29/29-document scope is accepted;
+- epoch-1 saturation is stale after an epoch-2 reopen;
+- a fixed point is rejected with missing LOCAL closure, a pending route, or
+  undeclared vocabulary.
+
+Independent final QA reproduced those same boundary cases through normal
+coordinator operations. System QA passed 34 targeted regression checks and
+signed off. History/replay QA passed its focused history subset, independently
+observed `28/29` rejection, `29/29` acceptance, and stale-epoch rejection, and
+signed off.
 
 Re-integration answers:
 

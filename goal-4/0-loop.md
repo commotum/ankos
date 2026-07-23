@@ -37,6 +37,12 @@ This loop governs every stage in `goal-4/0-plan.md`. The plan is authoritative b
 9. Fold results back into `goal-4/0-plan.md` and the shared Goal 4 ledgers; update assumptions and reopen contradicted stages.
 10. Continue toward the original objective. If stopping for the session, leave the goal resumable with exact ledger state, open queues, next source unit/stage, failed checks, unblock actions, and assumptions to challenge.
 
+All blind-phase ledger mutations go through the Stage 3 coordinator as one
+atomic `V######` transaction. Use a non-mutating preview before explicit
+`--apply`; do not hand-edit the six live mutable ledgers. The governed event
+modes are `INITIAL`, `REOPEN`, `SEARCH_APPEND`, `ROUTE_RESOLUTION`, and
+Stage-18-only `CANDIDATE_REVISION`.
+
 ## Global Invariants
 
 - Do not narrow the user's objective without saying so.
@@ -115,6 +121,12 @@ Short excerpts may be retained when necessary to pin exact mechanics, but do not
 - If a target is missing or OCR-corrupt, record searches attempted and the evidence boundary.
 - A route that discovers new vocabulary must seed the next saturation round.
 - Stage 18 cannot complete until the queue is empty or every missing target has a final explicit defect record.
+- `MISSING_TARGET_FINAL` is available only after complete sequential
+  source/asset review, exact LOCAL closure for every applicable stage/epoch,
+  and a current-epoch Stage 18 SATURATION round whose query-scope union is
+  exactly the full 29-document corpus. It does not require the terminal fixed
+  point, so routes can be drained between a full-corpus saturation pass and its
+  final zero-delta rerun.
 
 ## Asset Protocol
 
@@ -140,6 +152,12 @@ Short excerpts may be retained when necessary to pin exact mechanics, but do not
 5. Add newly discovered aliases, operations, examples, and parameters to the next round.
 6. Repeat until a full round adds no vocabulary, candidate, evidence, or unresolved route.
 7. Mutation-test removal of a hit disposition so the verifier proves there is no silent remainder.
+
+The top-level vocabulary must be the exact ordered replay of every round's
+`new_vocabulary`; it is not a free-form superset. Establishing the Stage 18
+fixed point additionally requires complete review/screening, exact LOCAL
+closure, a current-epoch full-corpus saturation round, zero pending routes, a
+zero-delta final round, and an identical rerun digest.
 
 ## Orthogonal Reconciliation Fields
 
