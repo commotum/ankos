@@ -839,13 +839,17 @@ def _validate_worker_output(
     errors: list[str],
     require_completed_output: bool,
     text_patterns: tuple[re.Pattern[str], ...],
+    worker_output_override: dict[str, Any] | None = None,
 ) -> None:
-    output_path = bundle / "output" / "output.json"
-    try:
-        output = json.loads(output_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        errors.append(f"cannot load worker output: {exc}")
-        return
+    if worker_output_override is None:
+        output_path = bundle / "output" / "output.json"
+        try:
+            output = json.loads(output_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"cannot load worker output: {exc}")
+            return
+    else:
+        output = deepcopy(worker_output_override)
     if not isinstance(output, dict):
         errors.append("worker output is not an object")
         return
@@ -1549,6 +1553,8 @@ def _validate_worker_output(
 def verify_bundle(
     bundle: Path,
     require_completed_output: bool = False,
+    *,
+    worker_output_override: dict[str, Any] | None = None,
 ) -> list[str]:
     """Verify against one cooperative atomic Goal-4 ledger snapshot."""
     try:
@@ -1556,6 +1562,7 @@ def verify_bundle(
             return _verify_bundle_locked(
                 bundle,
                 require_completed_output=require_completed_output,
+                worker_output_override=worker_output_override,
             )
     except audit_transaction.TransactionError as exc:
         return [str(exc)]
@@ -1564,6 +1571,8 @@ def verify_bundle(
 def _verify_bundle_locked(
     bundle: Path,
     require_completed_output: bool = False,
+    *,
+    worker_output_override: dict[str, Any] | None = None,
 ) -> list[str]:
     errors: list[str] = []
     try:
@@ -2020,6 +2029,7 @@ def _verify_bundle_locked(
         errors,
         require_completed_output,
         text_patterns,
+        worker_output_override,
     )
     return errors
 
