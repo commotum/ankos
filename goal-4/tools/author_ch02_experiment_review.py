@@ -489,6 +489,23 @@ add_evidence(
     ],
     modality="CAPTION",
 )
+add_evidence(
+    rule254,
+    label="rule254-formula",
+    unit="U005096",
+    claim=(
+        "The Notes give the exact binary algebraic expression "
+        "1 - (1 - p) (1 - q) (1 - r) for rule 254."
+    ),
+    fields=[
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "determinism_branching_or_measure",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="FORMULA",
+)
 
 rule250 = ca_preset(
     key="rule250",
@@ -517,6 +534,23 @@ add_evidence(
     fields=list(rule250["facts"]),
     modality="CAPTION",
 )
+add_evidence(
+    rule250,
+    label="rule250-formula",
+    unit="U005097",
+    claim=(
+        "The Notes give the exact binary algebraic expression p + r - p r "
+        "for rule 250."
+    ),
+    fields=[
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "determinism_branching_or_measure",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="FORMULA",
+)
 
 rule90 = ca_preset(
     key="rule90",
@@ -544,6 +578,24 @@ add_evidence(
     ),
     fields=list(rule90["facts"]),
     modality="CAPTION",
+)
+add_evidence(
+    rule90,
+    label="rule90-notes-formula",
+    unit="U005094",
+    claim=(
+        "The Notes independently give the exact modulo-two left-plus-right "
+        "formula for rule 90."
+    ),
+    fields=[
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "determinism_branching_or_measure",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="FORMULA",
+    strength="CORROBORATING",
 )
 
 rule30 = ca_preset(
@@ -2592,4 +2644,400 @@ truchet = source_candidate(
         "The passage does not specify a selection measure, adjacency constraint, "
         "enumeration order, or completion boundary."
     ),
+)
+
+
+# ---------------------------------------------------------------------------
+# Historically identified systems with enough identity-bearing mechanics to
+# survive blind discovery.  The routes deliberately retain the limits of these
+# passages instead of filling in omitted transition tables from outside the
+# assigned Chapter 2 pair.
+
+life = source_candidate(
+    key="game-of-life",
+    name="Conway's Game of Life cellular automaton preset",
+    anchor="U000301",
+    aliases=["Game of Life", "Life"],
+    facts={
+        "object_kind": "A specifically named two-dimensional cellular automaton preset.",
+        "native_time": "Discrete cellular-automaton evolution.",
+        "carrier": "Cells in a two-dimensional cellular array.",
+        "support": "A two-dimensional cellular space.",
+        "complete_state": "The value of every cell in the two-dimensional array.",
+        "law_kind": "A fixed two-dimensional cellular-automaton rule set.",
+        "result_kind": "An evolution that can contain repetitive and other structures.",
+        "parameters_and_variants": (
+            "The passage distinguishes the specific rules of Life from the "
+            "variety of 2D rules Conway tested."
+        ),
+        "excluded_observers_and_representations": (
+            "Recreational use, engineering interpretations of structures, "
+            "popularity, and observed complexity are context rather than native mechanics."
+        ),
+        "evidence_limit": (
+            "Neither Chapter 2 passage states the Life birth/survival table, "
+            "cell alphabet, neighborhood, boundary, seed, or commit convention."
+        ),
+    },
+    claim=(
+        "The main text identifies Game of Life as a specific two-dimensional "
+        "cellular automaton and distinguishes its structures and behavior from "
+        "the one-dimensional examples."
+    ),
+    missing=(
+        "Neither Chapter 2 passage states the Life birth/survival table, cell "
+        "alphabet, neighborhood, boundary, seed, or commit convention."
+    ),
+    strength="DIRECT_IDENTITY",
+    route_keys=["life-page249"],
+)
+add_evidence(
+    life,
+    label="game-of-life-history",
+    unit="U005233",
+    claim=(
+        "The Notes identify Conway's 1970 fixed Life rule set, distinguish it "
+        "from the other 2D rules tested, and route the omitted mechanics to page 249."
+    ),
+    fields=[
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "complete_state",
+        "law_kind",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="DIRECT_IDENTITY",
+)
+
+von_neumann_ca = source_candidate(
+    key="von-neumann-29color-ca",
+    name="von Neumann 29-color self-reproduction cellular automaton",
+    anchor="U005229",
+    aliases=["von Neumann self-reproducing automaton"],
+    facts={
+        "object_kind": (
+            "A particular two-dimensional cellular automaton designed to model "
+            "self-reproduction and computer/mechanical components."
+        ),
+        "native_time": "Discrete cellular-automaton evolution.",
+        "carrier": "Cells in a two-dimensional cellular array.",
+        "support": "A two-dimensional cellular space.",
+        "alphabet_or_value_schema": "Twenty-nine possible colors for each cell.",
+        "complete_state": "A color assignment to the two-dimensional cell array.",
+        "seed": (
+            "An outlined approximately 200,000-cell configuration intended to "
+            "reproduce itself."
+        ),
+        "law_kind": "A fixed, complicated local cellular-automaton rule.",
+        "result_kind": (
+            "A cellular evolution intended to emulate components and support "
+            "a self-reproducing configuration."
+        ),
+        "parameters_and_variants": (
+            "The source fixes two dimensions, 29 colors, and the historical "
+            "1952–3 construction."
+        ),
+        "excluded_observers_and_representations": (
+            "The earlier factory, differential-equation, robotics, and toy-set "
+            "ideas are historical antecedents, not state of this cellular automaton."
+        ),
+        "evidence_limit": (
+            "The local transition table, neighborhood, exact 200,000-cell seed, "
+            "boundary, and reproduction witness are not supplied in this range."
+        ),
+    },
+    claim=(
+        "The source delimits von Neumann's 1952–3 construction as a 2D "
+        "29-color cellular automaton and states its intended component and "
+        "self-reproduction roles."
+    ),
+    missing=(
+        "The local transition table, neighborhood, exact 200,000-cell seed, "
+        "boundary, and reproduction witness are not supplied in this range."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    route_keys=[
+        "von-neumann-self-reproduction-page1179",
+        "von-neumann-universality-page1115",
+    ],
+)
+add_evidence(
+    von_neumann_ca,
+    label="von-neumann-followup-routes",
+    unit="U005230",
+    claim=(
+        "The historical continuation routes later self-reproducing and "
+        "universal cellular-automaton constructions while supplying no missing "
+        "transition table for the 29-color preset."
+    ),
+    fields=[
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+    modality="CROSS_REFERENCE",
+)
+
+ulam_objects = source_candidate(
+    key="ulam-recursive-2d-ca",
+    name="Ulam recursively defined geometrical-object cellular automata",
+    anchor="U005232",
+    aliases=["recursively defined geometrical objects"],
+    facts={
+        "object_kind": (
+            "A small historical collection of generalized two-dimensional "
+            "cellular-automaton presets."
+        ),
+        "native_time": "Discrete evolution from an initial cellular configuration.",
+        "carrier": "Cells in a two-dimensional array.",
+        "support": "A two-dimensional cellular space.",
+        "alphabet_or_value_schema": (
+            "At least black and non-black cell values are distinguished."
+        ),
+        "complete_state": "The cellular values across the two-dimensional support.",
+        "seed": "A single black cell.",
+        "law_kind": "Generalized two-dimensional local cellular-automaton growth rules.",
+        "result_kind": "Recursively generated geometrical growth patterns.",
+        "parameters_and_variants": "A handful of different unspecified rules were simulated.",
+        "excluded_observers_and_representations": (
+            "Computer model, picture size, biological speculation, and observed "
+            "complexity are contextual."
+        ),
+        "evidence_limit": (
+            "The individual rule tables, alphabet, neighborhoods, boundary, and "
+            "exact correspondence among the historical examples are omitted."
+        ),
+    },
+    claim=(
+        "The passage explicitly identifies Ulam's objects as generalized 2D "
+        "cellular automata evolved from single black cells."
+    ),
+    missing=(
+        "The individual rule tables, alphabet, neighborhoods, boundary, and "
+        "exact correspondence among the historical examples are omitted."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    route_keys=["ulam-page928"],
+)
+
+fredkin_rule90 = source_candidate(
+    key="fredkin-2d-rule90",
+    name="Fredkin two-dimensional analog of Rule 90",
+    anchor="U005232",
+    aliases=["2D analog of rule 90"],
+    facts={
+        "object_kind": "A particular two-dimensional cellular-automaton preset.",
+        "native_time": "Discrete cellular-automaton evolution.",
+        "carrier": "Cells in a two-dimensional array.",
+        "support": "A two-dimensional cellular space.",
+        "law_kind": "A two-dimensional analog of the Rule 90 local law.",
+        "result_kind": "A cellular evolution with reported self-reproduction properties.",
+        "parameters_and_variants": (
+            "The source fixes the historical 1961 PDP-1 simulation and its "
+            "stated relationship to Rule 90."
+        ),
+        "excluded_observers_and_representations": (
+            "The PDP-1 implementation and reported self-reproduction are not "
+            "substitutes for the omitted native rule."
+        ),
+        "evidence_limit": (
+            "The meaning of '2D analog', neighborhood, alphabet, transition "
+            "table, seed, boundary, and reproduction witness are not stated."
+        ),
+    },
+    claim=(
+        "The same historical passage delimits Fredkin's 1961 simulation as a "
+        "two-dimensional analog of Rule 90 and records its intended property."
+    ),
+    missing=(
+        "The meaning of '2D analog', neighborhood, alphabet, transition table, "
+        "seed, boundary, and reproduction witness are not stated."
+    ),
+    strength="DIRECT_IDENTITY",
+    route_keys=["fredkin-page1179"],
+)
+
+code20 = source_candidate(
+    key="code20",
+    name="binary range-2 totalistic code 20 cellular automaton",
+    anchor="U005233",
+    aliases=["k=2 r=2 totalistic code 20", "Millen one-dimensional Life analog"],
+    facts={
+        "object_kind": "A named one-dimensional totalistic cellular-automaton preset.",
+        "native_time": "Discrete cellular-automaton evolution.",
+        "carrier": "Cells in a one-dimensional array.",
+        "support": "A one-dimensional cellular space.",
+        "topology": "A centered range-2 neighborhood of five cells.",
+        "alphabet_or_value_schema": "Two cell values.",
+        "complete_state": "The value at every one-dimensional cell position.",
+        "frontier_or_activation": "The totalistic rule applies across the cellular support.",
+        "read_dependencies_or_neighborhood": "Two neighbors on each side plus the cell itself.",
+        "law_kind": "A deterministic totalistic local cellular-automaton rule.",
+        "result_kind": "A uniquely determined next configuration once code 20 is decoded.",
+        "parameters_and_variants": "k = 2, r = 2, totalistic code 20.",
+        "excluded_observers_and_representations": (
+            "Its historical motivation as a one-dimensional analog of Life is contextual."
+        ),
+        "evidence_limit": (
+            "The passage names the code but does not expand its totalistic "
+            "lookup, seed, boundary, code-number convention, or completion semantics."
+        ),
+    },
+    claim=(
+        "The source identifies Millen's example exactly as the k=2, r=2 "
+        "totalistic code 20 preset and routes its omitted rule to page 283."
+    ),
+    missing=(
+        "The passage names the code but does not expand its totalistic lookup, "
+        "seed, boundary, code-number convention, or completion semantics."
+    ),
+    strength="DIRECT_IDENTITY",
+    route_keys=["code20-page283"],
+)
+
+lfsr = source_candidate(
+    key="linear-feedback-shift-register",
+    name="linear feedback shift-register construction class",
+    anchor="U005236",
+    aliases=["LFSR", "finite one-dimensional additive cellular automaton"],
+    facts={
+        "object_kind": (
+            "A finite shift-register sequence generator identified with "
+            "one-dimensional additive cellular automata."
+        ),
+        "native_time": "Discrete register shifts and feedback steps.",
+        "carrier": "A finite ordered register of digital cells.",
+        "support": "A finite one-dimensional register.",
+        "alphabet_or_value_schema": "Digital values such as binary digits.",
+        "complete_state": "The current value stored in every register cell.",
+        "visible_history": "Successive output digits form a generated sequence.",
+        "law_kind": "A linear feedback/shift law, equivalently an additive CA law.",
+        "result_kind": "A deterministic output sequence for a fixed register and seed.",
+        "determinism_branching_or_measure": (
+            "Deterministic; apparent complexity is generated without a stated probability law."
+        ),
+        "parameters_and_variants": (
+            "Register length, feedback relation, seed, and output convention vary."
+        ),
+        "excluded_observers_and_representations": (
+            "Communications use, cryptography, repetition-period analysis, and "
+            "hardware realization are applications or observations."
+        ),
+        "evidence_limit": (
+            "No particular tap set, shift direction, feedback polynomial, seed, "
+            "output cell, or finite-boundary correspondence is specified here."
+        ),
+    },
+    claim=(
+        "The history passage identifies linear feedback shift registers as "
+        "finite one-dimensional additive cellular automata and as deterministic "
+        "sequence generators."
+    ),
+    missing=(
+        "No particular tap set, shift direction, feedback polynomial, seed, "
+        "output cell, or finite-boundary correspondence is specified here."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    route_keys=["lfsr-page974", "lfsr-page259"],
+)
+
+shift_block_maps = source_candidate(
+    key="shift-commuting-block-map",
+    name="shift-commuting block-map cellular-automaton class",
+    anchor="U005237",
+    aliases=["symbolic-dynamics block map"],
+    facts={
+        "object_kind": (
+            "A mapping class on infinite binary sequences stated to be exactly "
+            "the class of one-dimensional cellular automata."
+        ),
+        "native_time": "One application of a sequence-to-sequence map.",
+        "carrier": "Positions in an infinite binary sequence.",
+        "support": "A one-dimensional infinite sequence.",
+        "topology": "The integer shift on sequence positions.",
+        "alphabet_or_value_schema": "Binary values 0 and 1.",
+        "complete_state": "An infinite sequence of 0s and 1s.",
+        "frontier_or_activation": "The block map determines an output at every position.",
+        "schedule": "The complete output sequence is determined from the input sequence.",
+        "read_dependencies_or_neighborhood": "A finite local block around each output position.",
+        "law_kind": "A shift-commuting finite-block map.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Apply the same finite-block mapping equivariantly at every sequence position."
+        ),
+        "result_kind": "One output binary sequence.",
+        "parameters_and_variants": "The finite block radius and local mapping vary.",
+        "excluded_observers_and_representations": (
+            "Symbolic-dynamics terminology, cryptographic use, and global theorem "
+            "statements are representations, applications, or analysis."
+        ),
+        "evidence_limit": (
+            "The passage states exact class identity but supplies no particular "
+            "block map, radius, boundary issue, or proof of the correspondence."
+        ),
+    },
+    claim=(
+        "The source states that shift-commuting block maps on binary sequences "
+        "are exactly one-dimensional cellular automata."
+    ),
+    missing=(
+        "The passage states exact class identity but supplies no particular "
+        "block map, radius, boundary issue, or proof of the correspondence."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    route_keys=["shift-maps-page960", "shift-maps-page961"],
+)
+
+code10 = source_candidate(
+    key="code10",
+    name="binary range-2 totalistic code 10 cellular automaton",
+    anchor="U005316",
+    aliases=["k=2 r=2 totalistic code 10"],
+    facts={
+        "object_kind": "A named one-dimensional totalistic cellular-automaton preset.",
+        "native_time": "Discrete cellular-automaton evolution.",
+        "carrier": "Cells in a one-dimensional array.",
+        "support": "A one-dimensional cellular space.",
+        "topology": "A centered range-2 neighborhood of five cells.",
+        "alphabet_or_value_schema": "Two values, black and white.",
+        "complete_state": "The black/white value at every cell position.",
+        "frontier_or_activation": "Every cell receives a next-step value.",
+        "schedule": "The five-cell totalistic rule is applied for each discrete step.",
+        "read_dependencies_or_neighborhood": "The cell and two neighbors on each side.",
+        "law_kind": "A deterministic totalistic local lookup rule.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "The next cell is black iff exactly 1 or 3 of its five neighborhood "
+            "cells are black; otherwise it is white."
+        ),
+        "write_replacement_assembly_or_commit": (
+            "One black or white replacement value is produced for every cell."
+        ),
+        "result_kind": "A uniquely determined next configuration and iterated evolution.",
+        "successor_cardinality": "Exactly one successor for each complete configuration.",
+        "determinism_branching_or_measure": "Deterministic.",
+        "parameters_and_variants": "k = 2, r = 2, totalistic code 10.",
+        "excluded_observers_and_representations": (
+            "The two displayed evolution images and randomness comparison are "
+            "observer evidence, not additional native state or law."
+        ),
+        "evidence_limit": (
+            "The passage does not state the seed used in the displayed images, "
+            "boundary, code-number convention, completion, or witness semantics."
+        ),
+    },
+    claim=(
+        "The source gives the complete five-cell totalistic transition law for "
+        "binary range-2 code 10."
+    ),
+    missing=(
+        "The passage does not state the seed used in the displayed images, "
+        "boundary, code-number convention, completion, or witness semantics."
+    ),
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
