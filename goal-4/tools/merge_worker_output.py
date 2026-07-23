@@ -1102,7 +1102,7 @@ def apply_merge(plan: MergePlan) -> None:
     )
     new_root = stage / "new"
     old_root = stage / "old"
-    replaced: list[str] = []
+    attempted: list[str] = []
     cleanup_stage = True
     try:
         new_root.mkdir()
@@ -1120,15 +1120,48 @@ def apply_merge(plan: MergePlan) -> None:
         for name in WRITE_NAMES:
             if (plan.goal_dir / name).read_bytes() != plan.original_bytes[name]:
                 raise MergeError(f"global audit state changed concurrently: {name}")
+            # Record the target before replacement.  If os.replace commits and
+            # then an asynchronous exception is delivered before it returns,
+            # the rollback must conservatively restore this target too.
+            attempted.append(name)
             os.replace(new_root / name, plan.goal_dir / name)
-            replaced.append(name)
+
+        for name in SNAPSHOT_NAMES:
+            path = plan.goal_dir / name
+            expected = (
+                plan.proposed_bytes[name]
+                if name in plan.proposed_bytes
+                else plan.original_bytes[name]
+            )
+            if (
+                not path.is_file()
+                or path.is_symlink()
+                or path.read_bytes() != expected
+            ):
+                if name in plan.proposed_bytes:
+                    raise MergeError(
+                        f"applied ledger differs from staged bytes: {name}"
+                    )
+                raise MergeError(
+                    f"global audit state changed concurrently: {name}"
+                )
+            if (path.stat().st_mode & 0o777) != plan.original_modes[name]:
+                if name in plan.proposed_bytes:
+                    raise MergeError(
+                        f"applied ledger mode differs from staged mode: {name}"
+                    )
+                raise MergeError(
+                    f"global audit state mode changed concurrently: {name}"
+                )
     except BaseException as exc:
         rollback_errors: list[str] = []
-        for name in reversed(replaced):
+        for name in reversed(attempted):
             try:
                 os.replace(old_root / name, plan.goal_dir / name)
-            except OSError as rollback_exc:
-                rollback_errors.append(f"{name}: {rollback_exc}")
+            except BaseException as rollback_exc:
+                rollback_errors.append(
+                    f"{name}: {type(rollback_exc).__name__}: {rollback_exc}"
+                )
         if rollback_errors:
             cleanup_stage = False
             raise MergeError(
@@ -1140,10 +1173,6 @@ def apply_merge(plan: MergePlan) -> None:
     finally:
         if cleanup_stage:
             shutil.rmtree(stage, ignore_errors=True)
-
-    for name in WRITE_NAMES:
-        if (plan.goal_dir / name).read_bytes() != plan.proposed_bytes[name]:
-            raise MergeError(f"applied ledger differs from staged bytes: {name}")
 
 
 def main() -> int:

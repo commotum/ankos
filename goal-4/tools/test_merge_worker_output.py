@@ -29,6 +29,10 @@ ASSIGNMENT_PATH = "FRONT-MATTER/01-Preface.md"
 STAGE_5_PATH = "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
 
 
+class InjectedTransactionInterrupt(BaseException):
+    """Deterministic stand-in for an interruption at a transaction boundary."""
+
+
 def _read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
@@ -333,6 +337,22 @@ def _bytes(goal: Path) -> dict[str, bytes]:
     }
 
 
+def _transaction_state(
+    goal: Path,
+) -> tuple[dict[str, bytes], dict[str, int]]:
+    return (
+        _bytes(goal),
+        {
+            name: (goal / name).stat().st_mode & 0o777
+            for name in merge.WRITE_NAMES
+        },
+    )
+
+
+def _merge_staging_dirs(goal: Path) -> list[Path]:
+    return sorted(goal.glob(".merge-worker-output-*"))
+
+
 def _goal_after_initial_merge(root: Path) -> Path:
     bundle = _completed_bundle(root / "initial")
     goal = _copy_global_state(root / "state")
@@ -433,6 +453,133 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
             if row["physical_path"] == candidates[0]["image_witnesses"][0]
         )
     ) == ["R000001"]
+
+
+@pytest.mark.parametrize("failure_call", [2, 3])
+def test_apply_pre_replace_failure_restores_bytes_modes_and_cleans_staging(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure_call: int,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    before = _transaction_state(goal)
+    real_replace = merge.os.replace
+    calls = 0
+    injected = OSError(f"failure before replace call {failure_call}")
+
+    def fail_before_replace(source: Path, target: Path) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == failure_call:
+            raise injected
+        real_replace(source, target)
+
+    monkeypatch.setattr(merge.os, "replace", fail_before_replace)
+    with pytest.raises(OSError) as caught:
+        merge.apply_merge(plan)
+
+    assert caught.value is injected
+    assert _transaction_state(goal) == before
+    assert _merge_staging_dirs(goal) == []
+
+
+def test_apply_replace_then_interrupt_restores_every_target_and_cleans_staging(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    before = _transaction_state(goal)
+    real_replace = merge.os.replace
+    calls = 0
+    injected = InjectedTransactionInterrupt(
+        "replacement committed before bookkeeping"
+    )
+
+    def replace_then_interrupt(source: Path, target: Path) -> None:
+        nonlocal calls
+        calls += 1
+        real_replace(source, target)
+        if calls == 2:
+            raise injected
+
+    monkeypatch.setattr(merge.os, "replace", replace_then_interrupt)
+    with pytest.raises(InjectedTransactionInterrupt) as caught:
+        merge.apply_merge(plan)
+
+    assert caught.value is injected
+    assert _transaction_state(goal) == before
+    assert _merge_staging_dirs(goal) == []
+
+
+def test_apply_final_verification_failure_rolls_back_bytes_and_modes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    before = _transaction_state(goal)
+    real_replace = merge.os.replace
+    calls = 0
+    corrupt_target = goal / merge.CANDIDATE_NAME
+
+    def corrupt_after_final_replace(source: Path, target: Path) -> None:
+        nonlocal calls
+        calls += 1
+        real_replace(source, target)
+        if calls == len(merge.WRITE_NAMES):
+            corrupt_target.write_bytes(b"concurrent mutation\n")
+            corrupt_target.chmod(0o600)
+
+    monkeypatch.setattr(merge.os, "replace", corrupt_after_final_replace)
+    with pytest.raises(
+        merge.MergeError,
+        match="applied ledger differs from staged bytes",
+    ):
+        merge.apply_merge(plan)
+
+    assert _transaction_state(goal) == before
+    assert _merge_staging_dirs(goal) == []
+
+
+def test_apply_rollback_failure_retains_recovery_staging(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    real_replace = merge.os.replace
+    calls = 0
+
+    def fail_commit_then_rollback(source: Path, target: Path) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("injected commit failure")
+        if calls == 4:
+            raise InjectedTransactionInterrupt("injected rollback failure")
+        real_replace(source, target)
+
+    monkeypatch.setattr(merge.os, "replace", fail_commit_then_rollback)
+    with pytest.raises(
+        merge.MergeError,
+        match="rollback also failed",
+    ) as caught:
+        merge.apply_merge(plan)
+
+    recovery_dirs = _merge_staging_dirs(goal)
+    assert len(recovery_dirs) == 1
+    assert str(recovery_dirs[0]) in str(caught.value)
+    recovery_copy = recovery_dirs[0] / "old" / merge.CANDIDATE_NAME
+    assert recovery_copy.read_bytes() == plan.original_bytes[merge.CANDIDATE_NAME]
+    assert (
+        recovery_copy.stat().st_mode & 0o777
+    ) == plan.original_modes[merge.CANDIDATE_NAME]
 
 
 def test_bad_completed_bundle_is_rejected(tmp_path: Path) -> None:
