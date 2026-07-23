@@ -1844,6 +1844,35 @@ sub_cantor = sub_preset(
     "CHAPTERS/_page_98_Figure_2.jpeg",
     "Subdivision case (d) yields a version of the Cantor set.",
 )
+sub_primary_survey = bounded_trajectory_survey(
+    "substitution-primary-four-case-survey",
+    "four-case neighbor-independent substitution preset survey",
+    "U000462",
+    SUB_BASE,
+    "CHAPTERS/_page_98_Figure_2.jpeg",
+    [
+        ("case (a)", "A complete neighbor-independent subdivision preset."),
+        ("case (b)", "The complete Thue-Morse/doubling subdivision preset."),
+        ("case (c)", "The complete Fibonacci-growth subdivision preset."),
+        ("case (d)", "The complete Cantor-set subdivision preset."),
+    ],
+    "Four complete replacement-rule and equal-width subdivision panels.",
+    not_applicable=NA_NO_CONTROL,
+    missing="The visual symbol tables are not independently transcribed into prose.",
+    claim="The original-resolution figure visibly delimits all four replacement tables and their subdivision trajectories.",
+)
+for _spec, _label in [
+    (sub_thue, "substitution-thue-morse-subdivision"),
+    (sub_fib, "substitution-fibonacci-subdivision"),
+]:
+    context_evidence(
+        _spec,
+        _label,
+        "U000462",
+        "The original-resolution subdivision figure is a co-referential view of this named preset.",
+        image_path="CHAPTERS/_page_98_Figure_2.jpeg",
+        strength="CORROBORATING",
+    )
 
 
 def representation_candidate(
@@ -1881,6 +1910,29 @@ subdivision_rep = representation_candidate(
     "A nested fixed-width subdivision picture.",
     image_path="CHAPTERS/_page_98_Figure_2.jpeg",
 )
+context_evidence(
+    subdivision_rep,
+    "substitution-subdivision-primary-figure",
+    "U000462",
+    "The original-resolution four-case figure instantiates the equal-width subdivision transform.",
+    image_path="CHAPTERS/_page_98_Figure_2.jpeg",
+    strength="CORROBORATING",
+)
+sub_additional_survey = bounded_trajectory_survey(
+    "substitution-additional-ten-case-survey",
+    "ten-case neighbor-independent substitution preset survey",
+    "U000467",
+    SUB_BASE,
+    "CHAPTERS/_page_99_Figure_1.jpeg",
+    [
+        (f"case ({letter})", "A complete neighbor-independent replacement table and subdivision trajectory.")
+        for letter in "abcdefghij"
+    ],
+    "Ten complete replacement-rule and regular nested subdivision panels.",
+    not_applicable=NA_NO_CONTROL,
+    missing="The visual symbol tables are not independently transcribed into prose.",
+    claim="The original-resolution figure visibly delimits all ten replacement tables and trajectories.",
+)
 tree_rep = representation_candidate(
     "substitution-tree-representation",
     "substitution-system branch-tree representation",
@@ -1890,6 +1942,14 @@ tree_rep = representation_candidate(
     "A rooted colored branch tree encoding the replacement genealogy.",
     image_path="CHAPTERS/_page_99_Picture_4.jpeg",
     route_keys=["trees-page400"],
+)
+context_evidence(
+    tree_rep,
+    "substitution-tree-four-case-figure",
+    "U000470",
+    "The original-resolution tree figure renders four co-referential substitution presets.",
+    image_path="CHAPTERS/_page_99_Picture_4.jpeg",
+    strength="CORROBORATING",
 )
 
 NEIGHBOR_SUB_BASE = deepcopy(SUB_BASE)
@@ -1980,6 +2040,22 @@ context_evidence(
     image_path="CHAPTERS/_page_102_Figure_4.jpeg",
     strength="DIRECT_PARTIAL_MECHANICS",
 )
+context_evidence(
+    multicolor_sub,
+    "substitution-multicolor-trajectories",
+    "U000485",
+    "The original-resolution trajectory panel supplies the six co-referential colored evolutions.",
+    image_path="CHAPTERS/_page_102_Figure_2.jpeg",
+    strength="CORROBORATING",
+)
+multicolor_sub["variants"] = [
+    (
+        f"case ({letter})",
+        "One of the six complete three/four-color slow-growth rules and trajectories.",
+        ["substitution-multicolor-trajectories", "substitution-multicolor-rules"],
+    )
+    for letter in "abcdef"
+]
 
 
 SEQ_BASE = trajectory_facts(
@@ -2047,6 +2123,14 @@ seq_two = seq_preset(
     "The initial string shown in the page-105 evolution.",
     "CHAPTERS/_page_105_Figure_4.jpeg",
 )
+context_evidence(
+    seq_two,
+    "sequential-two-rule-strip",
+    "U000501",
+    "The compact original-resolution rule strip is co-referential evidence for the ordered two-replacement preset.",
+    image_path="CHAPTERS/_page_105_Picture_2.jpeg",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
 seq_three = source_candidate(
     "sequential-three-rule-survey",
     "three-replacement sequential substitution survey family",
@@ -2064,6 +2148,22 @@ context_evidence(
     image_path="CHAPTERS/_page_106_Figure_4.jpeg",
     strength="DIRECT_PARTIAL_MECHANICS",
 )
+context_evidence(
+    seq_three,
+    "sequential-three-rule-trajectories",
+    "U000508",
+    "The original-resolution trajectory panel supplies the eight co-referential survey evolutions.",
+    image_path="CHAPTERS/_page_106_Figure_2.jpeg",
+    strength="CORROBORATING",
+)
+seq_three["variants"] = [
+    (
+        f"case ({letter})",
+        "One of the eight ordered three-replacement presets run from BAB.",
+        ["sequential-three-rule-trajectories", "sequential-three-rule-tables"],
+    )
+    for letter in "abcdefgh"
+]
 seq_random = source_candidate(
     "sequential-three-rule-g",
     "apparently-random sequential substitution case (g) preset",
@@ -2082,10 +2182,22 @@ context_evidence(
     image_path="CHAPTERS/_page_107_Picture_5.jpeg",
     strength="CORROBORATING",
 )
+for _label, _unit, _path in [
+    ("sequential-three-rule-g-history", "U000512", "CHAPTERS/_page_107_Picture_3.jpeg"),
+    ("sequential-three-rule-g-compressed", "U000513", "CHAPTERS/_page_107_Picture_4.jpeg"),
+]:
+    context_evidence(
+        seq_random,
+        _label,
+        _unit,
+        "The original-resolution panel is a co-referential ordinary or record-length view of survey case (g).",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
 record_length = source_candidate(
     "record-length-compression",
     "record-string-length compression observer",
-    "U000515",
+    "U000512",
     observer_facts(
         "record-string-length compression",
         "A variable-length sequential-substitution trajectory.",
@@ -2094,7 +2206,24 @@ record_length = source_candidate(
     ),
     not_applicable=observer_na,
     missing="The observer does not reconstruct omitted strings.",
-    claim="The caption explicitly defines the million-step compressed picture by new length records.",
+    claim="The original-resolution image delimits the record-length compressed history.",
+    image_path="CHAPTERS/_page_107_Picture_3.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    record_length,
+    "record-length-compression-history",
+    "U000513",
+    "The companion original-resolution panel supports the same record-length compression.",
+    image_path="CHAPTERS/_page_107_Picture_4.jpeg",
+    strength="CORROBORATING",
+)
+context_evidence(
+    record_length,
+    "record-length-compression-definition",
+    "U000515",
+    "The caption explicitly defines the million-step compressed picture by new length records.",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 
@@ -2137,6 +2266,55 @@ tag1 = source_candidate(
     claim="The passage materially restricts deletion to one and the captions state the cycle-by-cycle substitution correspondence.",
     route_keys=["tag1-page83-a", "tag1-page83-b"],
 )
+tag1_survey = source_candidate(
+    "tag-delete-one-four-case-survey",
+    "four-case one-deletion tag-system preset survey",
+    "U000520",
+    {
+        **TAG_BASE,
+        "object_kind": "A bounded survey of four one-deletion tag-system presets.",
+        "read_dependencies_or_neighborhood": "The single element removed from the beginning.",
+        "parameters_and_variants": "Exactly four complete pictured one-deletion append tables and trajectories.",
+        "result_kind": "Four tag trajectories corresponding cycle-by-cycle to the cited substitution examples.",
+    },
+    not_applicable=NA_NO_CONTROL,
+    missing="The visual append blocks are not independently transcribed into prose.",
+    claim="The first original-resolution panel delimits the first complete one-deletion tag preset.",
+    image_path="CHAPTERS/_page_108_Figure_5.jpeg",
+    variants=[
+        ("case 1", "The first complete one-deletion rule and trajectory.", ["tag-delete-one-four-case-survey-source"]),
+        ("case 2", "The second complete one-deletion rule and trajectory.", ["tag-delete-one-survey-case-2"]),
+        ("case 3", "The third complete one-deletion rule and trajectory.", ["tag-delete-one-survey-case-3"]),
+        ("case 4", "The fourth complete one-deletion rule and trajectory.", ["tag-delete-one-survey-case-4"]),
+    ],
+)
+for _index, _unit, _path in [
+    (2, "U000521", "CHAPTERS/_page_108_Figure_6.jpeg"),
+    (3, "U000522", "CHAPTERS/_page_108_Figure_7.jpeg"),
+    (4, "U000523", "CHAPTERS/_page_108_Figure_8.jpeg"),
+]:
+    context_evidence(
+        tag1_survey,
+        f"tag-delete-one-survey-case-{_index}",
+        _unit,
+        f"The original-resolution panel delimits complete one-deletion preset {_index}.",
+        image_path=_path,
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+for _index, _unit, _path in [
+    (1, "U000520", "CHAPTERS/_page_108_Figure_5.jpeg"),
+    (2, "U000521", "CHAPTERS/_page_108_Figure_6.jpeg"),
+    (3, "U000522", "CHAPTERS/_page_108_Figure_7.jpeg"),
+    (4, "U000523", "CHAPTERS/_page_108_Figure_8.jpeg"),
+]:
+    context_evidence(
+        tag1,
+        f"tag-delete-one-restriction-case-{_index}",
+        _unit,
+        "The complete visual preset instantiates the one-deletion restriction.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
 tag2 = source_candidate(
     "tag-delete-two",
     "two-deletion tag system restriction",
@@ -2153,6 +2331,37 @@ context_evidence(
     "Original-resolution inspection confirms the rule diagrams, trajectories, and length plots.",
     image_path="CHAPTERS/_page_109_Figure_2.jpeg",
     strength="DIRECT_PARTIAL_MECHANICS",
+)
+tag2["variants"] = [
+    (
+        f"case ({letter})",
+        "One of the six complete two-deletion append tables and trajectories.",
+        ["tag-delete-two-figure"],
+    )
+    for letter in "abcdef"
+]
+tag_length = source_candidate(
+    "tag-sequence-length-observer",
+    "tag-system sequence-length observer",
+    "U000527",
+    observer_facts(
+        "tag-system sequence length",
+        "A tag-system trajectory of finite element sequences.",
+        "Map each trajectory step to the total number of elements in its current sequence.",
+        "The integer-valued sequence-length series and its plot.",
+    ),
+    not_applicable=observer_na,
+    missing="The plot scale is a representation choice and does not affect the length values.",
+    claim="The original-resolution figure delimits a length plot beneath every two-deletion trajectory.",
+    image_path="CHAPTERS/_page_109_Figure_2.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    tag_length,
+    "tag-sequence-length-caption",
+    "U000528",
+    "The caption explicitly states that the plots show total sequence length in each case.",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 
@@ -2203,10 +2412,44 @@ context_evidence(
     image_path="CHAPTERS/_page_110_Picture_5.jpeg",
     strength="DIRECT_COMPLETE_MECHANICS",
 )
+context_evidence(
+    cyclic_example,
+    "cyclic-tag-two-block-summary",
+    "U000534",
+    "The compact original-resolution block list is a complete summary of the same worked cyclic rule.",
+    image_path="CHAPTERS/_page_110_Picture_7.jpeg",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+cyclic_survey = bounded_trajectory_survey(
+    "cyclic-tag-five-case-survey",
+    "five-case cyclic-tag preset survey",
+    "U000538",
+    CYCLIC_BASE,
+    "CHAPTERS/_page_111_Figure_1.jpeg",
+    [
+        ("case (a)", "A complete cyclic-tag rule with simple behavior."),
+        ("case (b)", "A complete cyclic-tag rule with simple behavior."),
+        ("case (c)", "A complete cyclic-tag rule with a nested-form subsequence."),
+        ("case (d)", "A complete cyclic-tag rule with irregular growth fluctuations."),
+        ("case (e)", "A complete cyclic-tag rule with irregular growth fluctuations."),
+    ],
+    "Five complete block-list rules and trajectories from a single-black-element start.",
+    not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
+    missing="The visual blocks are not independently transcribed into symbols.",
+    claim="The original-resolution figure visibly delimits all five cyclic-tag rule lists and trajectories.",
+)
+context_evidence(
+    cyclic,
+    "cyclic-tag-five-case-survey",
+    "U000538",
+    "The original-resolution five-case survey corroborates the cyclic conditional-append mechanics.",
+    image_path="CHAPTERS/_page_111_Figure_1.jpeg",
+    strength="CORROBORATING",
+)
 cyclic_seed = source_candidate(
     "cyclic-tag-single-black-seed",
     "single-black-element cyclic-tag seed",
-    "U000539",
+    "U000538",
     seed_facts(
         "one black element",
         "A finite binary sequence plus cyclic phase",
@@ -2215,8 +2458,17 @@ cyclic_seed = source_candidate(
     ),
     not_applicable=seed_na,
     missing="The initial cyclic phase is supplied by each pictured rule but not restated in prose.",
-    claim="The caption explicitly fixes a single black initial element for all five examples.",
+    claim="The original-resolution survey visibly delimits the common single-black-element start.",
+    image_path="CHAPTERS/_page_111_Figure_1.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
     route_keys=["cyclic-page83"],
+)
+context_evidence(
+    cyclic_seed,
+    "cyclic-tag-single-black-caption",
+    "U000539",
+    "The caption explicitly fixes a single black initial element for all five examples.",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 for _case in ["d", "e"]:
     source_candidate(
@@ -2229,6 +2481,41 @@ for _case in ["d", "e"]:
         claim=f"The original-resolution survey unambiguously delimits cyclic-tag case ({_case}) and its rule blocks.",
         image_path="CHAPTERS/_page_111_Figure_1.jpeg",
     )
+
+cyclic_detrended = source_candidate(
+    "cyclic-tag-detrended-growth-query",
+    "cyclic-tag detrended-growth fluctuation query",
+    "U000537",
+    observer_facts(
+        "cyclic-tag detrended growth",
+        "A cyclic-tag trajectory, especially survey cases (d) or (e).",
+        (
+            "Compute sequence length by step and remove the stated linear "
+            "average growth of one-half element per step, using the displayed "
+            "plot's origin convention."
+        ),
+        "The residual growth-fluctuation series and its plot.",
+    ),
+    not_applicable=observer_na,
+    missing="The prose states the slope but does not separately formalize the plot's additive intercept.",
+    claim="The passage explicitly isolates fluctuations about the average growth of cases (d) and (e).",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    cyclic_detrended,
+    "cyclic-tag-detrended-plot",
+    "U000540",
+    "The original-resolution plot supplies the detrended series for cases (d) and (e).",
+    image_path="CHAPTERS/_page_111_Figure_3.jpeg",
+    strength="CORROBORATING",
+)
+context_evidence(
+    cyclic_detrended,
+    "cyclic-tag-detrended-caption",
+    "U000541",
+    "The caption explicitly fixes the removed average growth rate at one-half element per step.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
 
 
 REGISTER_BASE = trajectory_facts(
@@ -2259,6 +2546,30 @@ register = source_candidate(
     not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
     missing="The behavior after falling off a program without an explicit jump is not separately formalized.",
     claim="The passage and following instruction definitions delimit two nonnegative registers, increment, and conditional decrement-jump execution.",
+)
+register_short_survey = bounded_trajectory_survey(
+    "register-short-three-case-survey",
+    "three-case short register-machine program survey",
+    "U000549",
+    REGISTER_BASE,
+    "CHAPTERS/_page_113_Figure_1.jpeg",
+    [
+        ("case 1", "A complete short program in which register 1 alternates and register 2 stays zero."),
+        ("case 2", "A complete short program in which register 1 alternates and register 2 grows."),
+        ("case 3", "A complete short program in which both registers grow."),
+    ],
+    "Three complete short instruction lists and their register trajectories.",
+    not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
+    missing="The programs have positional identities in the figure but no standalone names or machine codes.",
+    claim="The original-resolution figure visibly delimits all three short programs and their trajectories.",
+)
+context_evidence(
+    register,
+    "register-short-program-survey",
+    "U000549",
+    "The original-resolution three-program survey corroborates the two-register interpreter mechanics.",
+    image_path="CHAPTERS/_page_113_Figure_1.jpeg",
+    strength="CORROBORATING",
 )
 register_seed = source_candidate(
     "register-zero-seed",
@@ -2441,6 +2752,75 @@ bracket_rep = representation_candidate(
     "A binary square sequence/picture of expression bracket structure.",
     image_path="CHAPTERS/_page_118_Picture_3.jpeg",
 )
+for _index, _unit, _path in [
+    (1, "U000576", "CHAPTERS/_page_118_Picture_3.jpeg"),
+    (2, "U000577", "CHAPTERS/_page_118_Picture_4.jpeg"),
+    (3, "U000578", "CHAPTERS/_page_118_Picture_5.jpeg"),
+    (4, "U000579", "CHAPTERS/_page_118_Picture_6.jpeg"),
+]:
+    context_evidence(
+        symbolic_main,
+        f"symbolic-main-bracket-history-{_index}",
+        _unit,
+        "The original-resolution bracket history is a co-referential continuation of the worked symbolic preset.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
+    context_evidence(
+        bracket_rep,
+        f"symbolic-bracket-history-{_index}",
+        _unit,
+        "The original-resolution panel instantiates the opening/closing-bracket square encoding.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
+symbolic_fixed_point = source_candidate(
+    "symbolic-fixed-point-time-query",
+    "symbolic fixed-point and time-to-fixed-point query",
+    "U000576",
+    observer_facts(
+        "symbolic fixed point and time to fixed point",
+        "A symbolic-rewrite rule, initial expression, and resulting trajectory.",
+        (
+            "Test whether a state is unchanged by the next complete rewrite "
+            "scan; when such a state is reached, return the least number of "
+            "rewrite steps needed to reach it and the fixed expression."
+        ),
+        "A fixed-point status and, when reached, the least completion step and fixed expression.",
+    ),
+    not_applicable=observer_na,
+    missing="The source reports very large empirical/asymptotic times but does not provide a separate proof certificate.",
+    claim="The original-resolution continuation delimits trajectories ending in fixed bracket configurations.",
+    image_path="CHAPTERS/_page_118_Picture_3.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+for _index, _unit, _path in [
+    (2, "U000577", "CHAPTERS/_page_118_Picture_4.jpeg"),
+    (3, "U000578", "CHAPTERS/_page_118_Picture_5.jpeg"),
+    (4, "U000579", "CHAPTERS/_page_118_Picture_6.jpeg"),
+]:
+    context_evidence(
+        symbolic_fixed_point,
+        f"symbolic-fixed-point-history-{_index}",
+        _unit,
+        "The original-resolution panel supplies another trajectory/final-state witness for the query.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
+context_evidence(
+    symbolic_fixed_point,
+    "symbolic-fixed-point-caption",
+    "U000580",
+    "The caption reports fixed configurations and exact completion times of 264 and 65,555 steps for the displayed inputs.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    symbolic_fixed_point,
+    "symbolic-fixed-point-always",
+    "U000581",
+    "The prose states eventual stabilization for the particular worked rule.",
+    strength="CORROBORATING",
+)
 symbolic_survey = source_candidate(
     "symbolic-six-rule-survey",
     "six-rule symbolic-system survey",
@@ -2458,6 +2838,37 @@ context_evidence(
     image_path="CHAPTERS/_page_119_Figure_3.jpeg",
     strength="DIRECT_PARTIAL_MECHANICS",
 )
+symbolic_survey["variants"] = [
+    (
+        f"case ({letter})",
+        "One of the six complete symbolic rewrite rules run from the common expression.",
+        ["symbolic-six-rule-figure"],
+    )
+    for letter in "abcdef"
+]
+symbolic_size_difference = source_candidate(
+    "symbolic-expression-size-difference-observer",
+    "symbolic successive-expression size-difference observer",
+    "U000583",
+    observer_facts(
+        "successive symbolic-expression size difference",
+        "A symbolic-system expression trajectory.",
+        "Measure expression size at each step and subtract the preceding step's size.",
+        "The signed successive-size-difference series and its plot.",
+    ),
+    not_applicable=observer_na,
+    missing="The caption does not specify whether expression size counts symbols, brackets, or another equivalent displayed unit.",
+    claim="The original-resolution figure delimits a size-difference plot for each symbolic rule.",
+    image_path="CHAPTERS/_page_119_Figure_3.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    symbolic_size_difference,
+    "symbolic-size-difference-caption",
+    "U000584",
+    "The caption explicitly defines the plots as differences in expression size on successive steps.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
 
 
 K_TOTALISTIC = deepcopy(TOTALISTIC_BASE)
@@ -2473,13 +2884,22 @@ K_TOTALISTIC.update(
 k_totalistic = source_candidate(
     "k-color-totalistic-family",
     "k-color totalistic cellular automaton family",
-    "U000602",
+    "U000601",
     K_TOTALISTIC,
     aliases=["totalistic rules with varying numbers of colors"],
     not_applicable=NA_NO_CONTROL,
     missing="The source routes the base totalistic definition to page 60 and does not state every general-k code convention here.",
-    claim="The caption materially parameterizes totalistic cellular automata by color count and number of sum cases.",
+    claim="The original-resolution comparison visibly delimits totalistic examples with varying color counts.",
+    image_path="CHAPTERS/_page_122_Figure_2.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
     route_keys=["totalistic-page60"],
+)
+context_evidence(
+    k_totalistic,
+    "k-totalistic-caption",
+    "U000602",
+    "The caption materially parameterizes totalistic automata by color count, sum-case count, and finite rule-space size.",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 eca_symmetric = source_candidate(
@@ -2503,8 +2923,6 @@ random_seed = source_candidate(
         "alphabet_or_value_schema": "Black/white cell values.",
         "complete_state": "A sampled complete initial row.",
         "seed": "A random binary initial condition.",
-        "law_kind": "A probability law over initial configurations.",
-        "rule_relation_constraint_function_or_probability_law": "Sample the initial cell colors randomly; the exact distribution is not stated.",
         "result_kind": "A random initial cellular-automaton state.",
         "successor_cardinality": "Many possible seeds with an unspecified measure.",
         "determinism_branching_or_measure": "Measure-valued/random.",
@@ -2526,105 +2944,59 @@ random_seed = source_candidate(
         "termination_completion_failure": "One sample completes the generator call.",
         "witness_semantics": "No certificate beyond membership in the binary configuration space is defined.",
         "structural_invariants": "No trajectory invariants apply to a one-shot seed ensemble.",
-        "topology": "The source does not state dependence structure between sampled positions.",
     },
     missing="The probability distribution and finite/infinite support convention are not stated.",
     claim="The passage explicitly contrasts experiments from random initial conditions with simple seeds, but leaves the sampling law unspecified.",
     strength="DIRECT_PARTIAL_MECHANICS",
 )
 
-experiment_facts = {
-    "object_kind": "A reproducible computer-experiment search and inspection protocol.",
-    "native_time": "Experiments run each selected program for successive steps.",
-    "carrier": "A chosen rule/program space and the trajectories generated from its members.",
-    "support": "An enumerated or randomly sampled collection of precisely specified programs.",
-    "complete_state": "The exact rule, initial condition, and run prefix for each experiment.",
-    "input": "A simple program class, rule selection, exact initial conditions, and run length.",
-    "frontier_or_activation": "Each selected program is independently run and inspected.",
-    "schedule": "Prefer broad/mindless enumeration or sampling, execute, display raw behavior, inspect, then revise assumptions and repeat.",
-    "read_dependencies_or_neighborhood": "The protocol reads exact trajectories and their direct visual presentations.",
-    "law_kind": "An experimental enumeration/execution/inspection procedure.",
-    "rule_relation_constraint_function_or_probability_law": "Specify exact rules and seeds, run many simple cases, inspect actual behavior rather than a narrow summary, and iteratively remove search assumptions.",
-    "result_kind": "A reproducible collection of trajectories and discovered behavior classes/examples.",
-    "successor_cardinality": "Many experimental cases; each fixed deterministic program has one run.",
-    "determinism_branching_or_measure": "Deterministic per exact program/seed, with enumeration or random sampling at the experiment-selection level.",
-    "termination_completion_failure": "An experiment round ends at its selected case/run bounds and may be revised for a new round.",
-    "witness_semantics": "A claimed example is witnessed by its exact rule, initial condition, and directly inspectable run.",
-    "parameters_and_variants": "Program family, search order/distribution, seed, run length, display, and criteria vary.",
-    "excluded_observers_and_representations": "Automated criteria and pictures aid discovery but do not replace the native laws of tested systems.",
-    "evidence_limit": "The methodology is procedural guidance, not a single fixed exhaustive algorithm for every program space.",
-}
-experiment = source_candidate(
-    "computer-experiment-protocol",
-    "simple direct computer-experiment discovery protocol",
-    "U000607",
-    experiment_facts,
-    aliases=["methodology based on doing computer experiments"],
-    not_applicable={
-        "topology": "The experiment protocol has no single spatial topology.",
-        "structural_invariants": "Invariants belong to each tested program, not the protocol.",
-        "alphabet_or_value_schema": "The schema varies with the tested program family.",
-        "visible_history": "Histories are outputs consumed by the protocol, represented in result_kind.",
-        "control_state": "No mandatory controller state beyond experiment-round choices is defined.",
-        "seed": "Initial conditions are protocol inputs rather than a fixed protocol seed.",
-        "boundary": "Boundaries belong to the tested program.",
-        "external_data": "No external stream is intrinsic to the protocol.",
-        "write_replacement_assembly_or_commit": "The protocol observes program runs; it has no shared state commit.",
-    },
-    missing="No single stopping or saturation criterion for all searches is specified.",
-    claim="The methodology section defines precise repeatable program experiments and later specifies broad search, direct behavior inspection, visual analysis, and iterative assumption removal.",
-)
-context_evidence(
-    experiment,
-    "computer-experiment-precision",
-    "U000610",
-    "Rules and initial conditions can be specified perfectly precisely and rerun identically.",
-    strength="CORROBORATING",
-)
-context_evidence(
-    experiment,
-    "computer-experiment-broad-search",
-    "U000625",
-    "The passage prescribes a broad mindless search over a narrowly crafted one.",
-    strength="DIRECT_PARTIAL_MECHANICS",
-)
-context_evidence(
-    experiment,
-    "computer-experiment-direct-view",
-    "U000626",
-    "The passage prescribes inspection of actual behavior rather than lossy summaries.",
-    strength="DIRECT_PARTIAL_MECHANICS",
-)
-visual_observer = source_candidate(
-    "visual-raster-inspection-observer",
-    "direct visual trajectory-inspection observer",
-    "U000626",
-    observer_facts(
-        "direct visual trajectory inspection",
-        "Raw program trajectories or large arrays of states.",
-        "Render raw state data as pictures with minimal summarization and inspect the picture directly for unexpected structure.",
-        "A visual representation supporting rapid human recognition of behavior.",
-    ),
-    not_applicable=observer_na,
-    missing="The source intentionally does not reduce human visual recognition to a fixed automated classifier.",
-    claim="The passage distinguishes actual behavior from summaries; the following passage defines picture rendering as the practical analysis interface.",
-)
-context_evidence(
-    visual_observer,
-    "visual-raster-inspection-picture",
-    "U000627",
-    "The passage states that pictures make huge raw datasets rapidly analyzable by eye.",
-    strength="DIRECT_COMPLETE_MECHANICS",
-)
-
-
 # Literal construction-bearing routes.  Workers propose them but do not resolve.
+add_route(
+    "four-ca-previous-chapter",
+    "U000315",
+    "Four basic examples from the previous chapter of behavior produced by cellular automata with simple underlying rules.",
+    "the four prior cellular-automaton construction examples",
+    ["previous chapter", "four basic examples", "cellular automata"],
+    kind="SECTION",
+)
+add_route(
+    "ca-setup-previous-chapter",
+    "U000316",
+    "the array of black and white cells in the cellular automata of the previous chapter",
+    "the prior chapter's cellular-automaton setup",
+    ["previous chapter", "cellular automata", "black and white cells"],
+    kind="SECTION",
+)
 add_route(
     "rule90-page26",
     "U000339",
     "rule 90 from page 26",
     "rule 90 construction and comparison",
     ["rule 90", "page 26", "nested pattern"],
+)
+add_route(
+    "randomness-previous-chapter",
+    "U000340",
+    "as we saw in the previous chapter",
+    "prior cellular-automaton examples of apparent randomness",
+    ["previous chapter", "cellular automata", "apparent randomness"],
+    kind="SECTION",
+)
+add_route(
+    "rule110-previous-chapter",
+    "U000348",
+    "the last example in the previous chapter was rule 110",
+    "prior rule-110 construction and localized-structure behavior",
+    ["previous chapter", "rule 110", "regular and irregular parts"],
+    kind="SECTION",
+)
+add_route(
+    "ca-phenomena-previous-chapter",
+    "U000372",
+    "the fundamental phenomena that we discovered in the previous chapter",
+    "prior cellular-automaton phenomena used for the chapter-wide comparison",
+    ["previous chapter", "cellular automata", "fundamental phenomena"],
+    kind="SECTION",
 )
 add_route(
     "rule110-page32",
@@ -2634,6 +3006,14 @@ add_route(
     ["rule 110", "page 32", "identifiable structures"],
 )
 add_route(
+    "totalistic-last-two-page66",
+    "U000381",
+    "the last two cellular automata from page 66",
+    "code-1635 and code-2049 page-66 trajectories continued for 3000 steps",
+    ["page 66", "last two cellular automata", "3000 steps"],
+    scope="WITHIN_STAGE",
+)
+add_route(
     "trees-page400",
     "U000471",
     "On page 400 I will use similar systems to discuss the growth of actual trees and leaves.",
@@ -2641,11 +3021,53 @@ add_route(
     ["page 400", "actual trees", "leaves", "substitution"],
 )
 add_route(
+    "substitution-original-page82-a",
+    "U000481",
+    "our original pictures of substitution systems on page 82",
+    "the original fixed-size-element substitution-system pictures",
+    ["page 82", "original pictures", "substitution systems"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "substitution-original-page82-b",
+    "U000482",
+    "our original pictures of substitution systems on page 82",
+    "the original fixed-size-element substitution-system pictures",
+    ["page 82", "original pictures", "substitution systems"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "sequential-previous-substitution-section",
+    "U000493",
+    "The substitution systems that we discussed in the previous section",
+    "the preceding parallel substitution-system family and mechanics",
+    ["previous section", "substitution systems", "parallel"],
+    scope="WITHIN_STAGE",
+    kind="SECTION",
+)
+add_route(
     "tag1-page83-a",
     "U000524",
     "the first three ordinary neighbor-independent substitution systems shown on page 83",
     "tag/substitution cycle correspondence",
     ["page 83", "tag system", "neighbor-independent substitution"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    "cyclic-previous-tag-section",
+    "U000530",
+    "the tag systems that we discussed in the previous section",
+    "the preceding ordinary tag-system family and mechanics",
+    ["previous section", "tag systems", "cyclic tag"],
+    scope="WITHIN_STAGE",
+    kind="SECTION",
+)
+add_route(
+    "cyclic-case-c-page83",
+    "U000536",
+    "the third neighbor-independent substitution system shown on page 83",
+    "cyclic-tag case (c) nested-form correspondence",
+    ["page 83", "cyclic tag", "third substitution system"],
     scope="WITHIN_STAGE",
 )
 add_route(
@@ -2663,6 +3085,23 @@ add_route(
     "cyclic-tag case (c) nested-form correspondence",
     ["page 83", "cyclic tag", "third substitution system"],
     scope="WITHIN_STAGE",
+)
+add_route(
+    "conclusions-prior-mobile-substitution",
+    "U000589",
+    "our study of substitution systems earlier in this chapter ... studying mobile automata",
+    "the earlier substitution-system and mobile-automaton construction sections",
+    ["earlier in this chapter", "substitution systems", "mobile automata"],
+    scope="WITHIN_STAGE",
+    kind="SECTION",
+)
+add_route(
+    "behavior-themes-previous-chapter",
+    "U000598",
+    "the basic themes of repetition, nesting, randomness and localized structures that we already saw in specific cellular automata in the previous chapter",
+    "prior cellular-automaton examples of the four behavior themes",
+    ["previous chapter", "repetition", "nesting", "randomness", "localized structures"],
+    kind="SECTION",
 )
 add_route(
     "register-page122",
