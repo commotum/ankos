@@ -694,6 +694,15 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
     reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
     assets = merge._read_csv(goal / merge.ASSET_NAME, ASSET_HEADER)
     assert [row["id"] for row in candidates] == ["B0001"]
+    assert history[0]["candidate_changes"] == []
+    assert len(history[1]["candidate_changes"]) == 1
+    create = history[1]["candidate_changes"][0]
+    assert create["action"] == "CREATE"
+    assert create["candidate_id"] == "B0001"
+    assert create["previous_candidate_result_sha256"] is None
+    assert create["before_candidate"] is None
+    assert create["before_candidate_sha256"] is None
+    assert create["after_candidate"] == candidates[0]
     assert [row["route_id"] for row in routes] == ["R000001"]
     assert [
         item["evidence_id"] for item in candidates[0]["source_evidence"]
@@ -1335,6 +1344,11 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     ]
     enrichment = history[-1]
     assert enrichment["trigger_hit_ids"] == [governed_hit_id]
+    assert len(enrichment["candidate_changes"]) == 1
+    create = enrichment["candidate_changes"][0]
+    assert create["action"] == "CREATE"
+    assert create["candidate_id"] == "B0001"
+    assert create["after_candidate"] == candidates[0]
     assert enrichment["previous_path_result_sha256"] == history[1][
         "result_projection_sha256"
     ]
@@ -1417,6 +1431,22 @@ def test_search_enrichment_rejects_forbidden_coordinator_identity(
 
     with pytest.raises(merge.MergeError, match="prohibited"):
         merge.prepare_search_enrichment(forbidden, goal_dir=goal)
+
+
+def test_search_enrichment_rejects_multi_path_candidate_transaction(
+    tmp_path: Path,
+) -> None:
+    goal, proposal_path, _, _ = _search_enrichment_fixture(tmp_path)
+    proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
+    proposal["source_paths"] = INITIAL_STAGE_4_PREFIX
+    multi_path = tmp_path / "multi-path-enrichment.json"
+    multi_path.write_bytes(canonical_json_bytes(proposal))
+
+    with pytest.raises(
+        merge.MergeError,
+        match="must target exactly one source path",
+    ):
+        merge.prepare_search_enrichment(multi_path, goal_dir=goal)
 
 
 def test_search_enrichment_rollback_restores_history_and_all_ledgers(
@@ -1573,6 +1603,19 @@ def test_search_enrichment_appends_evidence_to_existing_active_candidate(
     proposal_path = tmp_path / "existing-candidate-enrichment.json"
     proposal_path.write_bytes(canonical_json_bytes(proposal))
 
+    inserted = copy.deepcopy(proposal)
+    inserted["candidate_updates"][0]["source_unit_ids"] = [
+        unit_id,
+        first_unit_id,
+    ]
+    inserted_path = tmp_path / "inserted-provenance-enrichment.json"
+    inserted_path.write_bytes(canonical_json_bytes(inserted))
+    with pytest.raises(
+        merge.MergeError,
+        match="deletes or rewrites prior provenance",
+    ):
+        merge.prepare_search_enrichment(inserted_path, goal_dir=goal)
+
     plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
     assert plan.candidate_update_count == 1
     assert plan.candidate_append_count == 0
@@ -1585,3 +1628,16 @@ def test_search_enrichment_appends_evidence_to_existing_active_candidate(
         ["E000001", "E000002"],
         ["G000001", "G000002"],
     )
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    prior_create = history[-2]["candidate_changes"][0]
+    update = history[-1]["candidate_changes"][0]
+    assert update["action"] == "UPDATE"
+    assert update["candidate_id"] == "B0001"
+    assert update["previous_candidate_result_sha256"] == prior_create[
+        "after_candidate_sha256"
+    ]
+    assert update["before_candidate"] == prior_create["after_candidate"]
+    assert update["before_candidate_sha256"] == prior_create[
+        "after_candidate_sha256"
+    ]
+    assert update["after_candidate"] == updated

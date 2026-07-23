@@ -27,6 +27,7 @@ from audit_contract import (
     GOAL_DIR,
     READING_HEADER,
     REVIEW_HISTORY_FIELDS,
+    close_candidate_change,
     close_review_event,
 )
 
@@ -228,6 +229,8 @@ def _enrichment_proposal_schema() -> dict[str, Any]:
             "source_paths": {
                 "type": "array",
                 "items": {"type": "string", "minLength": 1},
+                "minItems": 1,
+                "maxItems": 1,
                 "uniqueItems": True,
             },
             "base_artifact_sha256": {
@@ -665,6 +668,37 @@ def _rewrite_candidate(
     return {field: candidate[field] for field in CANDIDATE_FIELDS}
 
 
+def _candidate_anchor_path(
+    candidate: dict[str, Any],
+    unit_by_id: dict[str, dict[str, Any]],
+    asset_by_id: dict[str, dict[str, str]],
+) -> str:
+    """Resolve a blind-worker candidate's owning review path."""
+    candidate_id = candidate.get("id", "<unknown>")
+    anchor = candidate.get("discovery_anchor")
+    if not isinstance(anchor, dict):
+        raise MergeError(f"candidate {candidate_id} has no discovery anchor")
+    kind = anchor.get("kind")
+    anchor_id = anchor.get("id")
+    if kind == "SOURCE_UNIT" and isinstance(anchor_id, str):
+        source_unit = unit_by_id.get(anchor_id)
+        if source_unit is not None and isinstance(source_unit.get("path"), str):
+            return source_unit["path"]
+    elif kind == "IMAGE" and isinstance(anchor_id, str):
+        asset = asset_by_id.get(anchor_id)
+        if asset is not None and isinstance(asset.get("assignment_path"), str):
+            return asset["assignment_path"]
+    elif kind == "SEARCH_HIT":
+        raise MergeError(
+            f"blind worker candidate {candidate_id} cannot use a search-hit "
+            "discovery anchor"
+        )
+    raise MergeError(
+        f"candidate {candidate_id} discovery anchor does not resolve to "
+        "an assigned source path"
+    )
+
+
 def _replace_rows(
     rows: list[dict[str, str]],
     updates: list[dict[str, str]],
@@ -822,11 +856,6 @@ def _load_enrichment_proposal(path: Path) -> tuple[bytes, dict[str, Any]]:
 
 def _is_exact_prefix(old: list[Any], new: list[Any]) -> bool:
     return len(new) >= len(old) and new[: len(old)] == old
-
-
-def _is_ordered_subset(old: list[Any], new: list[Any]) -> bool:
-    iterator = iter(new)
-    return all(any(item == candidate for candidate in iterator) for item in old)
 
 
 def _validate_string_array_additions(
@@ -1020,7 +1049,7 @@ def _validate_enrichment_candidate_update(
         if (
             not isinstance(old_values, list)
             or not isinstance(new_values, list)
-            or not _is_ordered_subset(old_values, new_values)
+            or not _is_exact_prefix(old_values, new_values)
         ):
             raise MergeError(
                 f"candidate {candidate_id}.{field} deletes or rewrites "
@@ -1661,6 +1690,37 @@ def prepare_merge(
         row["source_unit_id"]: row for row in proposed_reading
     }
     result_asset_by_id = {row["asset_id"]: row for row in proposed_assets}
+    candidate_changes_by_path: dict[str, list[dict[str, Any]]] = {
+        source_path: [] for source_path in source_paths
+    }
+    for candidate in mapped_candidates:
+        anchor_path = _candidate_anchor_path(
+            candidate,
+            unit_by_id,
+            result_asset_by_id,
+        )
+        if anchor_path not in source_path_set:
+            raise MergeError(
+                f"candidate {candidate['id']} discovery anchor lies outside "
+                "the worker assignment"
+            )
+        candidate_changes_by_path[anchor_path].append(
+            close_candidate_change("CREATE", candidate)
+        )
+    for changes in candidate_changes_by_path.values():
+        changes.sort(key=lambda change: int(change["candidate_id"][1:]))
+    ordered_created_ids = [
+        change["candidate_id"]
+        for source_path in source_paths
+        for change in candidate_changes_by_path[source_path]
+    ]
+    if ordered_created_ids != [
+        candidate["id"] for candidate in mapped_candidates
+    ]:
+        raise MergeError(
+            "candidate proposal order differs from canonical discovery-anchor "
+            "path order"
+        )
     next_review_number = _review_sequence(review_history) + 1
     prior_event_sha256 = (
         review_history[-1]["event_sha256"] if review_history else None
@@ -1700,6 +1760,7 @@ def prepare_merge(
             ),
             "trigger_search_kind": None,
             "trigger_hit_ids": [],
+            "candidate_changes": candidate_changes_by_path[source_path],
         }
         try:
             review_event = close_review_event(
@@ -1881,6 +1942,10 @@ def prepare_search_enrichment(
     source_paths = tuple(
         _canonical_audit_paths(manifest, proposal["source_paths"])
     )
+    if len(source_paths) != 1:
+        raise MergeError(
+            "search enrichment must target exactly one source path"
+        )
     source_path_set = set(source_paths)
     reading_by_id = {row["source_unit_id"]: row for row in reading}
     asset_by_id = {row["asset_id"]: row for row in assets}
@@ -2085,7 +2150,14 @@ def prepare_search_enrichment(
 
     candidate_updates = proposal["candidate_updates"]
     candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
+    latest_candidate_result_sha256: dict[str, str] = {}
+    for event in review_history:
+        for change in event["candidate_changes"]:
+            latest_candidate_result_sha256[change["candidate_id"]] = change[
+                "after_candidate_sha256"
+            ]
     candidate_update_by_id: dict[str, dict[str, Any]] = {}
+    candidate_changes: list[dict[str, Any]] = []
     appended_candidates: list[dict[str, Any]] = []
     appended_evidence: list[dict[str, Any]] = []
     round_evidence_groups = set(new_round.get("new_evidence_groups", []))
@@ -2128,6 +2200,30 @@ def prepare_search_enrichment(
         candidate_update_by_id[candidate_id] = update
         if old is None:
             appended_candidates.append(update)
+            candidate_changes.append(
+                close_candidate_change("CREATE", update)
+            )
+        else:
+            previous_candidate_digest = (
+                latest_candidate_result_sha256.get(candidate_id)
+            )
+            if previous_candidate_digest is None:
+                raise MergeError(
+                    f"candidate {candidate_id} lacks a prior version digest"
+                )
+            candidate_changes.append(
+                close_candidate_change(
+                    "UPDATE",
+                    update,
+                    before_candidate=old,
+                    previous_candidate_result_sha256=(
+                        previous_candidate_digest
+                    ),
+                )
+            )
+    candidate_changes.sort(
+        key=lambda change: int(change["candidate_id"][1:])
+    )
 
     existing_candidate_ids = [candidate["id"] for candidate in candidates]
     appended_candidate_ids = [
@@ -2274,6 +2370,7 @@ def prepare_search_enrichment(
             "previous_path_result_sha256": previous_path_digest,
             "trigger_search_kind": new_round["kind"],
             "trigger_hit_ids": path_hit_ids,
+            "candidate_changes": candidate_changes,
         }
         event = close_review_event(
             event_core,

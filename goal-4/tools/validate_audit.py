@@ -48,6 +48,7 @@ from audit_contract import (
     canonical_sha256,
     canonical_json_bytes,
     close_review_event,
+    close_candidate_change,
     review_event_sha256,
     review_input_projection,
     review_result_projection,
@@ -1095,6 +1096,7 @@ def _validate_search_enrichment_diff(
     trigger_route_ids: set[str],
     errors: list[str],
     prefix: str,
+    allow_no_row_delta: bool = False,
 ) -> None:
     previous_reading = {
         row["source_unit_id"]: row
@@ -1238,8 +1240,183 @@ def _validate_search_enrichment_diff(
                 errors.append(
                     f"{prefix} adds unrelated route links to asset {asset_id}"
                 )
-    if not changed:
+    if not changed and not allow_no_row_delta:
         errors.append(f"{prefix} SEARCH_ENRICHMENT has no semantic delta")
+
+
+def _validate_candidate_enrichment_update(
+    before: dict[str, Any],
+    after: dict[str, Any],
+    event: dict[str, Any],
+    trigger_hit_ids: set[str],
+    trigger_unit_ids: set[str],
+    trigger_candidate_ids: set[str],
+    trigger_route_ids: set[str],
+    snapshot: dict[str, Any] | None,
+    errors: list[str],
+    prefix: str,
+) -> None:
+    immutable_fields = {
+        "id",
+        "record_status",
+        "provisional_name",
+        "discovery_stage",
+        "discovery_anchor",
+        "evidence_reassignments",
+    }
+    for field in immutable_fields:
+        if before.get(field) != after.get(field):
+            errors.append(
+                f"{prefix} changes unsupported candidate lifecycle/identity "
+                f"field {field}"
+            )
+    if before.get("record_status") != "ACTIVE":
+        errors.append(f"{prefix} updates a non-ACTIVE candidate")
+
+    for field in (
+        "aliases",
+        "source_unit_ids",
+        "image_witnesses",
+        "cross_reference_ids",
+    ):
+        old_values = before.get(field)
+        new_values = after.get(field)
+        if not isinstance(old_values, list) or not isinstance(new_values, list):
+            errors.append(f"{prefix} has malformed candidate {field}")
+            continue
+        if new_values[: len(old_values)] != old_values:
+            errors.append(
+                f"{prefix} reorders or rewrites prior candidate {field}"
+            )
+    added_units = set(after.get("source_unit_ids", [])) - set(
+        before.get("source_unit_ids", [])
+    )
+    if not added_units.issubset(trigger_unit_ids):
+        errors.append(f"{prefix} adds source units not authorized by trigger hits")
+    added_routes = set(after.get("cross_reference_ids", [])) - set(
+        before.get("cross_reference_ids", [])
+    )
+    if not added_routes.issubset(trigger_route_ids):
+        errors.append(f"{prefix} adds routes not authorized by trigger hits")
+    added_images = set(after.get("image_witnesses", [])) - set(
+        before.get("image_witnesses", [])
+    )
+    event_path = event.get("source_paths", [None])[0]
+    allowed_images = {
+        row.get("asset_id"): row
+        for row in (snapshot or {}).get("asset_results", [])
+        if isinstance(row, dict)
+    }
+    for image_path in added_images:
+        linked = False
+        for row in allowed_images.values():
+            candidate_ids: list[str] = []
+            try:
+                candidate_ids = json.loads(row.get("candidate_ids", "[]"))
+            except (TypeError, json.JSONDecodeError):
+                pass
+            asset_id = row.get("asset_id")
+            if (
+                isinstance(asset_id, str)
+                and after.get("id") in candidate_ids
+                and event_path is not None
+            ):
+                linked = True
+                break
+        if not linked:
+            errors.append(
+                f"{prefix} adds image provenance without a triggered asset link"
+            )
+
+    old_evidence = before.get("source_evidence")
+    new_evidence = after.get("source_evidence")
+    if not isinstance(old_evidence, list) or not isinstance(new_evidence, list):
+        errors.append(f"{prefix} has malformed source_evidence")
+        return
+    if new_evidence[: len(old_evidence)] != old_evidence:
+        errors.append(f"{prefix} rewrites prior candidate evidence")
+    appended_evidence = new_evidence[len(old_evidence) :]
+    if not appended_evidence:
+        errors.append(f"{prefix} candidate UPDATE appends no evidence")
+        return
+    appended_evidence_ids: set[str] = set()
+    for evidence in appended_evidence:
+        if not isinstance(evidence, dict):
+            errors.append(f"{prefix} appends malformed evidence")
+            continue
+        evidence_id = evidence.get("evidence_id")
+        if isinstance(evidence_id, str):
+            appended_evidence_ids.add(evidence_id)
+        anchor = evidence.get("discovery_anchor")
+        if (
+            not isinstance(anchor, dict)
+            or anchor.get("kind") != "SEARCH_HIT"
+            or anchor.get("id") not in trigger_hit_ids
+            or anchor.get("epoch") != event.get("epoch")
+        ):
+            errors.append(
+                f"{prefix} appends evidence without an exact event trigger"
+            )
+    before_relations = before.get("related_candidate_ids")
+    after_relations = after.get("related_candidate_ids")
+    if not isinstance(before_relations, list) or not isinstance(
+        after_relations, list
+    ):
+        errors.append(f"{prefix} has malformed related_candidate_ids")
+    else:
+        if after_relations[: len(before_relations)] != before_relations:
+            errors.append(f"{prefix} rewrites prior related_candidate_ids")
+        for relation in after_relations[len(before_relations) :]:
+            if (
+                not isinstance(relation, dict)
+                or relation.get("relation")
+                not in {
+                    "POSSIBLY_SAME_AS",
+                    "POSSIBLE_VARIANT_OF",
+                    "SOURCE_COMPARE",
+                }
+                or not appended_evidence_ids.intersection(
+                    relation.get("evidence_ids", [])
+                )
+            ):
+                errors.append(
+                    f"{prefix} appends an unsupported or unproved relation"
+                )
+    for field in FINGERPRINT_FIELDS:
+        before_value = before.get("fingerprint", {}).get(field)
+        after_value = after.get("fingerprint", {}).get(field)
+        before_support = before.get("field_support", {}).get(field)
+        after_support = after.get("field_support", {}).get(field)
+        if before_value == after_value and before_support == after_support:
+            continue
+        evidence_ids = (
+            after_value.get("evidence_ids", [])
+            if isinstance(after_value, dict)
+            else []
+        )
+        if not appended_evidence_ids.intersection(evidence_ids):
+            errors.append(
+                f"{prefix} changes fingerprint {field} without appended evidence"
+            )
+    for field in ("parameters", "variants"):
+        before_values = before.get(field)
+        after_values = after.get(field)
+        if not isinstance(before_values, list) or not isinstance(after_values, list):
+            errors.append(f"{prefix} has malformed {field}")
+            continue
+        if after_values[: len(before_values)] != before_values:
+            errors.append(f"{prefix} rewrites prior {field}")
+        for value in after_values[len(before_values) :]:
+            if not isinstance(value, dict) or not appended_evidence_ids.intersection(
+                value.get("evidence_ids", [])
+            ):
+                errors.append(
+                    f"{prefix} appends {field} without appended evidence"
+                )
+    if after.get("id") not in trigger_candidate_ids:
+        errors.append(
+            f"{prefix} candidate UPDATE is not named by an event trigger hit"
+        )
 
 
 def validate_review_history(
@@ -1328,6 +1505,8 @@ def validate_review_history(
     latest_review_unit_event: dict[str, dict[str, Any]] = {}
     latest_review_asset_event: dict[str, dict[str, Any]] = {}
     latest_path_event: dict[str, dict[str, Any]] = {}
+    candidate_state: dict[str, dict[str, Any]] = {}
+    candidate_result_hashes: dict[str, str] = {}
     seen_paths: set[str] = set()
     seen_review_path_epochs: set[tuple[int, str]] = set()
     next_initial_path_index = 0
@@ -1511,6 +1690,10 @@ def validate_review_history(
         trigger_route_ids_by_unit: dict[str, set[str]] = {}
         trigger_candidate_ids: set[str] = set()
         trigger_route_ids: set[str] = set()
+        candidate_changes = event.get("candidate_changes")
+        if not isinstance(candidate_changes, list):
+            errors.append(f"{prefix}.candidate_changes is not an array")
+            candidate_changes = []
         if is_review_event:
             if trigger_kind is not None or trigger_hit_ids:
                 errors.append(f"{prefix} review event carries search triggers")
@@ -1614,7 +1797,184 @@ def validate_review_history(
                         trigger_route_ids,
                         errors,
                         prefix,
+                        bool(candidate_changes),
                     )
+
+        change_ids: list[str] = []
+        for change_index, change in enumerate(candidate_changes, start=1):
+            change_prefix = f"{prefix} candidate change {change_index}"
+            if not isinstance(change, dict) or set(change) != set(
+                CANDIDATE_CHANGE_FIELDS
+            ):
+                errors.append(f"{change_prefix} fields differ from contract")
+                continue
+            action = change.get("action")
+            candidate_id = change.get("candidate_id")
+            before_candidate = change.get("before_candidate")
+            after_candidate = change.get("after_candidate")
+            if action not in CANDIDATE_CHANGE_ACTIONS:
+                errors.append(f"{change_prefix} has invalid action")
+            if not isinstance(candidate_id, str) or not B_ID.fullmatch(
+                candidate_id
+            ):
+                errors.append(f"{change_prefix} has invalid candidate ID")
+                continue
+            change_ids.append(candidate_id)
+            if (
+                not isinstance(after_candidate, dict)
+                or set(after_candidate) != set(CANDIDATE_FIELDS)
+                or after_candidate.get("id") != candidate_id
+            ):
+                errors.append(f"{change_prefix} has malformed after candidate")
+                continue
+            if forbidden_keys(after_candidate):
+                errors.append(f"{change_prefix} after candidate has forbidden field")
+            if change.get("after_candidate_sha256") != canonical_sha256(
+                after_candidate
+            ):
+                errors.append(f"{change_prefix} after-candidate hash is stale")
+
+            prior_candidate = candidate_state.get(candidate_id)
+            prior_candidate_hash = candidate_result_hashes.get(candidate_id)
+            if action == "CREATE":
+                if mode not in {"INITIAL", "REOPEN", "SEARCH_ENRICHMENT"}:
+                    errors.append(f"{change_prefix} CREATE has invalid event mode")
+                if prior_candidate is not None:
+                    errors.append(f"{change_prefix} recreates an existing candidate")
+                expected_candidate_id = f"B{len(candidate_state) + 1:04d}"
+                if candidate_id != expected_candidate_id:
+                    errors.append(
+                        f"{change_prefix} does not allocate the next B ID"
+                    )
+                if (
+                    change.get("previous_candidate_result_sha256") is not None
+                    or before_candidate is not None
+                    or change.get("before_candidate_sha256") is not None
+                ):
+                    errors.append(
+                        f"{change_prefix} CREATE carries a prior candidate version"
+                    )
+                anchor = after_candidate.get("discovery_anchor")
+                anchor_path = None
+                if isinstance(anchor, dict):
+                    anchor_kind = anchor.get("kind")
+                    anchor_id = anchor.get("id")
+                    if anchor.get("epoch") != epoch:
+                        errors.append(
+                            f"{change_prefix} discovery epoch differs from event"
+                        )
+                    if anchor_kind == "SOURCE_UNIT":
+                        anchor_path = unit_by_id.get(anchor_id, {}).get("path")
+                    elif anchor_kind == "IMAGE":
+                        anchor_asset = next(
+                            (
+                                row
+                                for row in assets
+                                if row.get("physical_path") == anchor_id
+                            ),
+                            None,
+                        )
+                        anchor_path = (
+                            anchor_asset.get("assignment_path")
+                            if anchor_asset is not None
+                            else None
+                        )
+                    elif anchor_kind == "SEARCH_HIT":
+                        meta = hit_meta.get(str(anchor_id))
+                        if meta is not None:
+                            anchor_unit = unit_by_id.get(meta[3])
+                            anchor_path = (
+                                anchor_unit["path"]
+                                if anchor_unit is not None
+                                else None
+                            )
+                        if mode != "SEARCH_ENRICHMENT" or anchor_id not in set(
+                            trigger_hit_ids
+                        ):
+                            errors.append(
+                                f"{change_prefix} search discovery is not triggered"
+                            )
+                if anchor_path != event_path:
+                    errors.append(
+                        f"{change_prefix} CREATE is attached to the wrong path event"
+                    )
+                if mode == "SEARCH_ENRICHMENT":
+                    for evidence in after_candidate.get("source_evidence", []):
+                        evidence_anchor = (
+                            evidence.get("discovery_anchor", {})
+                            if isinstance(evidence, dict)
+                            else {}
+                        )
+                        if (
+                            evidence_anchor.get("kind") != "SEARCH_HIT"
+                            or evidence_anchor.get("id")
+                            not in set(trigger_hit_ids)
+                            or evidence_anchor.get("epoch") != epoch
+                        ):
+                            errors.append(
+                                f"{change_prefix} CREATE evidence is not "
+                                "trigger-authorized"
+                            )
+                    if candidate_id not in trigger_candidate_ids:
+                        errors.append(
+                            f"{change_prefix} CREATE is not named by a trigger hit"
+                        )
+                candidate_state[candidate_id] = copy.deepcopy(after_candidate)
+                candidate_result_hashes[candidate_id] = change[
+                    "after_candidate_sha256"
+                ]
+            elif action == "UPDATE":
+                if mode != "SEARCH_ENRICHMENT":
+                    errors.append(
+                        f"{change_prefix} UPDATE is outside SEARCH_ENRICHMENT"
+                    )
+                if prior_candidate is None:
+                    errors.append(f"{change_prefix} updates an unknown candidate")
+                    continue
+                if (
+                    change.get("previous_candidate_result_sha256")
+                    != prior_candidate_hash
+                ):
+                    errors.append(
+                        f"{change_prefix} breaks candidate version hash chain"
+                    )
+                if before_candidate != prior_candidate:
+                    errors.append(
+                        f"{change_prefix} before candidate differs from replay state"
+                    )
+                if not isinstance(before_candidate, dict) or change.get(
+                    "before_candidate_sha256"
+                ) != canonical_sha256(before_candidate):
+                    errors.append(
+                        f"{change_prefix} before-candidate hash is stale"
+                    )
+                if change.get("before_candidate_sha256") != prior_candidate_hash:
+                    errors.append(
+                        f"{change_prefix} prior result and before hash differ"
+                    )
+                _validate_candidate_enrichment_update(
+                    prior_candidate,
+                    after_candidate,
+                    event,
+                    set(trigger_hit_ids),
+                    trigger_unit_ids,
+                    trigger_candidate_ids,
+                    trigger_route_ids,
+                    snapshot,
+                    errors,
+                    change_prefix,
+                )
+                candidate_state[candidate_id] = copy.deepcopy(after_candidate)
+                candidate_result_hashes[candidate_id] = change[
+                    "after_candidate_sha256"
+                ]
+        if change_ids != sorted(
+            change_ids,
+            key=lambda value: int(value[1:]) if B_ID.fullmatch(value) else 10**9,
+        ) or len(change_ids) != len(set(change_ids)):
+            errors.append(
+                f"{prefix} candidate changes are not unique increasing B order"
+            )
 
         if is_review_event and event_path is not None:
             event_position = document_position.get(event_path, 10**9)
@@ -1755,6 +2115,13 @@ def validate_review_history(
                 f"review-history latest snapshot for {path} differs from "
                 "current full row projection"
             )
+    replayed_candidates = [
+        candidate_state[candidate_id] for candidate_id in candidate_state
+    ]
+    if replayed_candidates != candidates:
+        errors.append(
+            "review-history candidate-version replay differs from candidate ledger"
+        )
 
     return (
         errors,
@@ -3779,6 +4146,7 @@ def mutation_checks(
         prior_rounds: list[dict[str, Any]],
         trigger_search_kind: str | None = None,
         trigger_hit_ids: list[str] | None = None,
+        candidate_changes: list[dict[str, Any]] | None = None,
     ) -> list[dict[str, Any]]:
         result = copy.deepcopy(prior)
         prior_path_event = next(
@@ -3818,6 +4186,7 @@ def mutation_checks(
                 ),
                 "trigger_search_kind": trigger_search_kind,
                 "trigger_hit_ids": trigger_hit_ids or [],
+                "candidate_changes": candidate_changes or [],
             },
             unit_by_fixture_id,
             {
@@ -3830,16 +4199,6 @@ def mutation_checks(
         result.append(event)
         return result
 
-    base_history = append_history_event(
-        [],
-        base_reading,
-        base_assets,
-        path,
-        1,
-        "INITIAL",
-        "fixture-reviewer",
-        [],
-    )
     evidence = {
         "evidence_id": "E000001",
         "evidence_group_id": "G000001",
@@ -3921,6 +4280,19 @@ def mutation_checks(
     )
     base_candidates = [candidate]
     base_routes = [route]
+    base_history = append_history_event(
+        [],
+        base_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+        candidate_changes=[
+            close_candidate_change("CREATE", copy.deepcopy(candidate))
+        ],
+    )
 
     base_errors = validate_objects(
         manifest,
@@ -3972,6 +4344,9 @@ def mutation_checks(
         "INITIAL",
         "fixture-reviewer",
         [],
+        candidate_changes=[
+            close_candidate_change("CREATE", copy.deepcopy(candidate))
+        ],
     )
     defect_reading_errors = validate_objects(
         manifest,
@@ -4522,6 +4897,21 @@ def mutation_checks(
         "DIRECT_COMPLETE_MECHANICS",
         "CORROBORATING",
     ]
+    allocation_history = append_history_event(
+        [],
+        base_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+        candidate_changes=[
+            close_candidate_change(
+                "CREATE", copy.deepcopy(allocation_candidate)
+            )
+        ],
+    )
     allocation_errors = validate_objects(
         manifest,
         units,
@@ -4530,7 +4920,7 @@ def mutation_checks(
         base_routes,
         base_assets,
         base_search,
-        base_history,
+        allocation_history,
     )
     if allocation_errors:
         failures.append(
@@ -4607,6 +4997,14 @@ def mutation_checks(
         "INITIAL",
         "fixture-reviewer",
         [],
+        candidate_changes=[
+            close_candidate_change(
+                "CREATE", copy.deepcopy(tail_candidate_one)
+            ),
+            close_candidate_change(
+                "CREATE", copy.deepcopy(tail_candidate_two)
+            ),
+        ],
     )
     tail_errors = validate_objects(
         manifest,
@@ -4721,8 +5119,28 @@ def mutation_checks(
         if row["assignment_path"] == path:
             row["review_epoch"] = "2"
     lineage_reading[0]["candidate_ids"] = '["B0003","B0004"]'
+    lineage_initial_reading = copy.deepcopy(base_reading)
+    lineage_initial_reading[0]["candidate_ids"] = '["B0001","B0002"]'
+    lineage_initial_history = append_history_event(
+        [],
+        lineage_initial_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+        candidate_changes=[
+            close_candidate_change(
+                "CREATE", copy.deepcopy(lineage_candidates[0])
+            ),
+            close_candidate_change(
+                "CREATE", copy.deepcopy(lineage_candidates[1])
+            ),
+        ],
+    )
     lineage_history = append_history_event(
-        base_history,
+        lineage_initial_history,
         lineage_reading,
         lineage_assets,
         path,
@@ -4730,6 +5148,14 @@ def mutation_checks(
         "REOPEN",
         "fixture-reviewer",
         reopened_search["rounds"],
+        candidate_changes=[
+            close_candidate_change(
+                "CREATE", copy.deepcopy(lineage_candidates[2])
+            ),
+            close_candidate_change(
+                "CREATE", copy.deepcopy(lineage_candidates[3])
+            ),
+        ],
     )
     lineage_errors = validate_objects(
         manifest,
