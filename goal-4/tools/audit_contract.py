@@ -334,7 +334,11 @@ def fingerprint_value_schema() -> dict[str, Any]:
     }
 
 
-def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
+def candidate_schema(
+    id_pattern: str = "^B[0-9]{4}$",
+    evidence_id_pattern: str = "^E[0-9]{6}$",
+    evidence_group_pattern: str = "^G[0-9]{6}$",
+) -> dict[str, Any]:
     evidence_schema = {
         "type": "object",
         "required": [
@@ -349,10 +353,13 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
             "fingerprint_fields",
         ],
         "properties": {
-            "evidence_id": {"type": "string"},
+            "evidence_id": {
+                "type": "string",
+                "pattern": evidence_id_pattern,
+            },
             "evidence_group_id": {
                 "type": "string",
-                "pattern": "^G[0-9]{6}$",
+                "pattern": evidence_group_pattern,
             },
             "discovery_anchor": {
                 "type": "object",
@@ -551,12 +558,22 @@ def schema_documents() -> dict[str, dict[str, Any]]:
     )
     query_schema = {
         "type": "object",
-        "required": ["query_id", "family", "pattern", "flags", "scope_paths"],
+        "required": [
+            "query_id",
+            "family",
+            "pattern",
+            "mode",
+            "case_sensitive",
+            "whole_word",
+            "scope_paths",
+        ],
         "properties": {
             "query_id": {"type": "string", "pattern": "^Q[0-9]{4}$"},
             "family": {"type": "string"},
             "pattern": {"type": "string"},
-            "flags": _string_array(),
+            "mode": {"type": "string", "enum": ["LITERAL", "REGEX"]},
+            "case_sensitive": {"type": "boolean"},
+            "whole_word": {"type": "boolean"},
             "scope_paths": _string_array(),
         },
         "additionalProperties": False,
@@ -662,6 +679,88 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         },
         "additionalProperties": False,
     }
+    family_relation_schema = {
+        "type": "object",
+        "required": [
+            "relation",
+            "target_kind",
+            "target_id",
+            "evidence_ids",
+            "rationale",
+        ],
+        "properties": {
+            "relation": {"type": "string", "enum": FAMILY_RELATIONS},
+            "target_kind": {
+                "type": "string",
+                "enum": ["CANDIDATE", "SEMANTIC_FAMILY"],
+            },
+            "target_id": {
+                "type": "string",
+                "pattern": "^(?:B[0-9]{4}|F[0-9]{4})$",
+            },
+            "evidence_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^E[0-9]{6}$",
+                },
+                "uniqueItems": True,
+                "minItems": 1,
+            },
+            "rationale": {"type": "string", "minLength": 1},
+        },
+        "additionalProperties": False,
+    }
+    proof_obligation_schema = {
+        "type": "object",
+        "required": ["obligation_id", "status", "evidence_ids", "argument"],
+        "properties": {
+            "obligation_id": {"type": "string", "minLength": 1},
+            "status": {
+                "type": "string",
+                "enum": ["PROVED", "NOT_APPLICABLE", "SOURCE_INSUFFICIENT"],
+            },
+            "evidence_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^E[0-9]{6}$",
+                },
+                "uniqueItems": True,
+            },
+            "argument": {"type": "string", "minLength": 1},
+        },
+        "additionalProperties": False,
+    }
+    proof_packet_schema = {
+        "type": "object",
+        "required": [
+            "proof_case",
+            "obligations",
+            "nearest_candidate_ids",
+            "non_preservation_witness",
+            "reopen_trigger",
+        ],
+        "properties": {
+            "proof_case": {"type": "string", "enum": PROOF_CASES},
+            "obligations": {
+                "type": "array",
+                "items": proof_obligation_schema,
+                "minItems": 1,
+            },
+            "nearest_candidate_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^B[0-9]{4}$",
+                },
+                "uniqueItems": True,
+            },
+            "non_preservation_witness": {"type": ["string", "null"]},
+            "reopen_trigger": {"type": ["string", "null"]},
+        },
+        "additionalProperties": False,
+    }
     classification_schema = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Stage 20 classification row",
@@ -675,17 +774,39 @@ def schema_documents() -> dict[str, dict[str, Any]]:
             "family_relations",
             "rationale",
             "evidence_ids",
+            "proof_packets",
             "hostile_review_required",
         ],
         "properties": {
             "candidate_id": {"type": "string", "pattern": "^B[0-9]{4}$"},
-            "catalog_action": {"type": "string"},
-            "semantic_role": {"type": "string"},
-            "semantic_subtype": {"type": ["string", "null"]},
-            "family_action": {"type": "string"},
-            "family_relations": {"type": "array"},
-            "rationale": {"type": "string"},
-            "evidence_ids": _string_array(),
+            "catalog_action": {"type": "string", "enum": CATALOG_ACTIONS},
+            "semantic_role": {"type": "string", "enum": SEMANTIC_ROLES},
+            "semantic_subtype": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "enum": SEMANTIC_SUBTYPES},
+                ]
+            },
+            "family_action": {"type": "string", "enum": FAMILY_ACTIONS},
+            "family_relations": {
+                "type": "array",
+                "items": family_relation_schema,
+            },
+            "rationale": {"type": "string", "minLength": 1},
+            "evidence_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^E[0-9]{6}$",
+                },
+                "uniqueItems": True,
+                "minItems": 1,
+            },
+            "proof_packets": {
+                "type": "array",
+                "items": proof_packet_schema,
+                "minItems": 1,
+            },
             "hostile_review_required": {"type": "boolean"},
         },
         "additionalProperties": False,
@@ -695,18 +816,63 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         "title": "Stage 19+ coverage join row",
         "type": "object",
         "required": [
-            "candidate_id",
+            "coverage_id",
+            "candidate_ids",
             "existing_t_ids",
-            "proposed_t_id",
+            "proposed_t_ids",
             "source_unit_ids",
+            "image_paths",
+            "evidence_ids",
             "reconciliation_result",
+            "rationale",
         ],
         "properties": {
-            "candidate_id": {"type": "string", "pattern": "^B[0-9]{4}$"},
-            "existing_t_ids": _string_array(),
-            "proposed_t_id": {"type": ["string", "null"]},
-            "source_unit_ids": _string_array(),
-            "reconciliation_result": {"type": "string"},
+            "coverage_id": {"type": "string", "pattern": "^C[0-9]{4}$"},
+            "candidate_ids": {
+                "type": "array",
+                "items": {"type": "string", "pattern": "^B[0-9]{4}$"},
+                "uniqueItems": True,
+            },
+            "existing_t_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^T(?:0[1-9]|[1-3][0-9]|4[0-5])$",
+                },
+                "uniqueItems": True,
+            },
+            "proposed_t_ids": {
+                "type": "array",
+                "items": {"type": "string", "pattern": "^T[0-9]{2,}$"},
+                "uniqueItems": True,
+            },
+            "source_unit_ids": {
+                "type": "array",
+                "items": {"type": "string", "pattern": "^U[0-9]{6}$"},
+                "uniqueItems": True,
+            },
+            "image_paths": _string_array(),
+            "evidence_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^E[0-9]{6}$",
+                },
+                "uniqueItems": True,
+            },
+            "reconciliation_result": {
+                "type": "string",
+                "enum": [
+                    "REDISCOVERED",
+                    "CORRECTION_REQUIRED",
+                    "PROPOSED_ADDITION",
+                    "NO_SEPARATE_ENTRY",
+                    "DUPLICATE_OR_ALIAS",
+                    "INSUFFICIENT_BOOK_EVIDENCE",
+                    "UNMATCHED_EXISTING_OBLIGATION",
+                ],
+            },
+            "rationale": {"type": "string", "minLength": 1},
         },
         "additionalProperties": False,
     }
@@ -751,7 +917,11 @@ def schema_documents() -> dict[str, dict[str, Any]]:
             "reading_updates": {"type": "array", "items": reading_schema},
             "candidate_proposals": {
                 "type": "array",
-                "items": candidate_schema("^W[0-9]{4}$"),
+                "items": candidate_schema(
+                    "^W[0-9]{4}$",
+                    "^WE[0-9]{6}$",
+                    "^WG[0-9]{6}$",
+                ),
             },
             "asset_updates": {"type": "array", "items": asset_schema},
             "route_proposals": {"type": "array", "items": cross_schema},

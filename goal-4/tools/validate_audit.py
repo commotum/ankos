@@ -1209,6 +1209,7 @@ def validate_objects(
                     )
 
     lineage_state: dict[str, int] = {}
+    lineage_terminals: dict[str, set[str]] = {}
 
     def terminal_descendants(candidate_id: str) -> set[str]:
         state = lineage_state.get(candidate_id, 0)
@@ -1216,9 +1217,7 @@ def validate_objects(
             errors.append(f"candidate lineage cycle reaches {candidate_id}")
             return set()
         if state == 2:
-            candidate = candidate_by_id[candidate_id]
-            if candidate["record_status"] == "ACTIVE":
-                return {candidate_id}
+            return lineage_terminals[candidate_id]
         lineage_state[candidate_id] = 1
         candidate = candidate_by_id[candidate_id]
         if candidate["record_status"] == "ACTIVE":
@@ -1233,6 +1232,7 @@ def validate_objects(
                     f"candidate {candidate_id} lineage has no active descendant"
                 )
         lineage_state[candidate_id] = 2
+        lineage_terminals[candidate_id] = terminals
         return terminals
 
     for candidate_id in candidate_ids:

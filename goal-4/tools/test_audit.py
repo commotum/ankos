@@ -104,6 +104,7 @@ def test_worker_bundle_detects_input_mutation(tmp_path: Path) -> None:
         text=True,
     )
     brief = bundle / "input" / "brief.md"
+    brief.chmod(0o644)
     brief.write_text(brief.read_text() + "\nmutation\n")
     verified = subprocess.run(
         [sys.executable, str(build), "--verify", str(bundle)],

@@ -182,8 +182,13 @@ For every source unit:
 6. Review every assigned image at least as a thumbnail; require original
    resolution for construction-bearing, text-bearing, ambiguous, or
    caption-incomplete images.
-7. Emit routes only as `PENDING` proposals; do not resolve them or declare a
-   final missing target. The coordinator performs global routing.
+7. Emit routes only as `PENDING` proposals with a complete worker-local
+   `WR0001`, `WR0002`, ... sequence in discovery order; do not resolve them or
+   declare a final missing target. The coordinator maps WR IDs to global R IDs
+   and performs global routing.
+8. Allocate evidence as `WE000001`, `WE000002`, ... in first-occurrence order,
+   and evidence groups as `WG000001`, `WG000002`, ... in group first-occurrence
+   order. The coordinator maps these worker-local IDs to global E/G IDs.
 
 Write only `output/output.json` and preserve every required hash/declaration.
 Network use and access outside this bundle are prohibited. If the bundle lacks
@@ -806,6 +811,9 @@ def _validate_worker_output(
     proposals = output.get("candidate_proposals", [])
     proposal_by_id: dict[str, dict[str, Any]] = {}
     proposal_anchor_keys: list[tuple[int, int, int]] = []
+    worker_evidence_ids: list[str] = []
+    worker_group_ids: list[str] = []
+    seen_worker_group_ids: set[str] = set()
     if isinstance(proposals, list):
         proposal_ids = [
             row.get("id")
@@ -963,6 +971,14 @@ def _validate_worker_output(
                         )
                         continue
                     evidence_by_id[evidence_id] = evidence
+                    worker_evidence_ids.append(evidence_id)
+                    evidence_group_id = evidence.get("evidence_group_id")
+                    if (
+                        isinstance(evidence_group_id, str)
+                        and evidence_group_id not in seen_worker_group_ids
+                    ):
+                        seen_worker_group_ids.add(evidence_group_id)
+                        worker_group_ids.append(evidence_group_id)
                     source_id = evidence.get("source_unit_id")
                     image_path = evidence.get("image_path")
                     if source_id is None and image_path is None:
@@ -1070,11 +1086,43 @@ def _validate_worker_output(
                         "worker discovery-anchor ordinals are not complete for "
                         f"anchor {anchor_key}"
                     )
+        expected_evidence_ids = [
+            f"WE{index:06d}"
+            for index in range(1, len(worker_evidence_ids) + 1)
+        ]
+        if worker_evidence_ids != expected_evidence_ids:
+            errors.append(
+                "worker evidence IDs must be a complete ordered WE000001 sequence"
+            )
+        expected_group_ids = [
+            f"WG{index:06d}" for index in range(1, len(worker_group_ids) + 1)
+        ]
+        if worker_group_ids != expected_group_ids:
+            errors.append(
+                "worker evidence-group first occurrences must be a complete "
+                "ordered WG000001 sequence"
+            )
 
     routes = output.get("route_proposals", [])
     route_ids: set[str] = set()
     route_anchor_keys: list[tuple[int, int, int]] = []
     if isinstance(routes, list):
+        proposed_route_ids = [
+            row.get("route_id")
+            for row in routes
+            if isinstance(row, dict) and isinstance(row.get("route_id"), str)
+        ]
+        expected_route_ids = [
+            f"WR{index:04d}"
+            for index in range(1, len(proposed_route_ids) + 1)
+        ]
+        if (
+            proposed_route_ids != expected_route_ids
+            or len(proposed_route_ids) != len(routes)
+        ):
+            errors.append(
+                "worker route IDs must be a complete ordered WR0001 sequence"
+            )
         for row in routes:
             if not isinstance(row, dict):
                 continue
