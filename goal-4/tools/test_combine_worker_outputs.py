@@ -28,6 +28,7 @@ from audit_contract import (  # noqa: E402
 
 FIRST_PATH = "FRONT-MATTER/00-Publication-and-Contents.md"
 SECOND_PATH = "FRONT-MATTER/01-Preface.md"
+GENERAL_NOTES_PATH = "BACK-MATTER/NOTES/00-General-Notes.md"
 
 
 def _fresh_goal(root: Path) -> Path:
@@ -438,20 +439,142 @@ def test_combines_completed_disjoint_outputs_and_rewrites_every_join(
     ) == []
 
 
-def test_rejects_noncanonical_partition_without_mutating_union(
+def test_sub_bundle_argument_order_does_not_change_anchor_allocation(
+    tmp_path: Path,
+) -> None:
+    canonical = _fixture(tmp_path / "canonical")
+    reversed_order = _fixture(tmp_path / "reversed")
+
+    combine.combine_worker_outputs(
+        [canonical["first"], canonical["second"]],
+        canonical["union"],
+        goal_dir=canonical["goal"],
+    )
+    combine.combine_worker_outputs(
+        [reversed_order["second"], reversed_order["first"]],
+        reversed_order["union"],
+        goal_dir=reversed_order["goal"],
+    )
+    canonical_output = (
+        canonical["union"] / "output" / "output.json"
+    ).read_bytes()
+    reversed_output = (
+        reversed_order["union"] / "output" / "output.json"
+    ).read_bytes()
+    assert reversed_output == canonical_output
+
+
+def test_rejects_overlapping_partition_without_mutating_union(
     tmp_path: Path,
 ) -> None:
     fixture = _fixture(tmp_path)
+    duplicate = tmp_path / "duplicate-first"
+    build_worker_bundle.build_bundle(
+        duplicate,
+        "duplicate-first-worker",
+        4,
+        [FIRST_PATH],
+        epoch=1,
+        goal_dir=fixture["goal"],
+    )
+    _scaffold(duplicate)
+    _complete_sub_bundle(
+        duplicate,
+        goal=fixture["goal"],
+        candidate_name="Duplicate first construction",
+    )
     output_path = fixture["union"] / "output" / "output.json"
     before = output_path.read_bytes()
 
-    with pytest.raises(combine.CombineError, match="exact ordered partition"):
+    with pytest.raises(combine.CombineError, match="assignments overlap"):
         combine.combine_worker_outputs(
-            [fixture["second"], fixture["first"]],
+            [fixture["first"], duplicate],
             fixture["union"],
             goal_dir=fixture["goal"],
         )
     assert output_path.read_bytes() == before
+
+
+def test_reconstructs_interleaved_assets_in_combined_canonical_order(
+    tmp_path: Path,
+) -> None:
+    goal = _fresh_goal(tmp_path / "state")
+    preface = tmp_path / "preface"
+    notes = tmp_path / "general-notes"
+    union = tmp_path / "union"
+    build_worker_bundle.build_bundle(
+        preface,
+        "preface-worker",
+        4,
+        [SECOND_PATH],
+        epoch=1,
+        goal_dir=goal,
+    )
+    build_worker_bundle.build_bundle(
+        notes,
+        "general-notes-worker",
+        4,
+        [GENERAL_NOTES_PATH],
+        epoch=1,
+        goal_dir=goal,
+    )
+    build_worker_bundle.build_bundle(
+        union,
+        "asset-union-worker",
+        4,
+        [SECOND_PATH, GENERAL_NOTES_PATH],
+        epoch=1,
+        goal_dir=goal,
+    )
+    for bundle in (preface, notes, union):
+        _scaffold(bundle)
+    _complete_sub_bundle(
+        preface,
+        goal=goal,
+        candidate_name="Preface construction",
+    )
+    _complete_sub_bundle(
+        notes,
+        goal=goal,
+        candidate_name="General-notes construction",
+    )
+
+    preface_assets = prepare.load_csv_exact(
+        preface / "input" / "asset-input.csv",
+        ASSET_HEADER,
+        "preface assets",
+    )
+    notes_assets = prepare.load_csv_exact(
+        notes / "input" / "asset-input.csv",
+        ASSET_HEADER,
+        "general-notes assets",
+    )
+    union_assets = prepare.load_csv_exact(
+        union / "input" / "asset-input.csv",
+        ASSET_HEADER,
+        "union assets",
+    )
+    concatenated_ids = [
+        row["asset_id"] for row in [*preface_assets, *notes_assets]
+    ]
+    union_ids = [row["asset_id"] for row in union_assets]
+    assert set(concatenated_ids) == set(union_ids)
+    assert concatenated_ids != union_ids
+
+    combine.combine_worker_outputs(
+        [preface, notes],
+        union,
+        goal_dir=goal,
+    )
+    output = _json(union / "output" / "output.json")
+    assert [row["asset_id"] for row in output["asset_updates"]] == union_ids
+    assert [
+        row["provisional_name"] for row in output["candidate_proposals"]
+    ] == ["Preface construction", "General-notes construction"]
+    assert [
+        row["cross_reference_ids"]
+        for row in output["candidate_proposals"]
+    ] == [["WR0001"], ["WR0002"]]
 
 
 def test_rejects_incomplete_input_and_nonpristine_union(
