@@ -1529,6 +1529,11 @@ def _validate_atomic_prefix_state(
             prefix_evidence_ids,
             errors,
         )
+    _validate_prefix_candidate_lifecycle(
+        candidate_state,
+        errors,
+        prefix,
+    )
 
     evidence_sequence = [
         evidence.get("evidence_id")
@@ -1952,6 +1957,190 @@ def _validate_atomic_prefix_state(
             for group_id in round_record.get("new_evidence_groups", [])
         ):
             errors.append(f"{prefix} search delta links future evidence")
+
+
+def _validate_prefix_candidate_lifecycle(
+    candidate_state: dict[str, dict[str, Any]],
+    errors: list[str],
+    prefix: str,
+) -> None:
+    """Require a complete, provenance-preserving lineage at one V prefix."""
+    split_parent: dict[str, str] = {}
+    supersession_targets: dict[str, list[str]] = {
+        candidate_id: [] for candidate_id in candidate_state
+    }
+    for candidate_id, candidate in candidate_state.items():
+        source_number = (
+            int(candidate_id[1:])
+            if B_ID.fullmatch(candidate_id)
+            else -1
+        )
+        for relation in candidate.get("related_candidate_ids", []):
+            if not isinstance(relation, dict):
+                continue
+            relation_kind = relation.get("relation")
+            if relation_kind not in {"MERGED_INTO", "SPLIT_INTO"}:
+                continue
+            target_id = relation.get("candidate_id")
+            target = candidate_state.get(str(target_id))
+            if target is None:
+                continue
+            supersession_targets[candidate_id].append(str(target_id))
+            target_number = (
+                int(target_id[1:])
+                if isinstance(target_id, str)
+                and B_ID.fullmatch(target_id)
+                else -1
+            )
+            if (
+                relation_kind == "MERGED_INTO"
+                and target_number >= source_number
+            ):
+                errors.append(
+                    f"{prefix} candidate {candidate_id} does not merge into "
+                    "an earlier ID"
+                )
+            if relation_kind == "SPLIT_INTO":
+                if target_number <= source_number:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} split child is "
+                        "not a new ID"
+                    )
+                prior_parent = split_parent.get(str(target_id))
+                if prior_parent is not None and prior_parent != candidate_id:
+                    errors.append(
+                        f"{prefix} candidate {target_id} has multiple split "
+                        "parents"
+                    )
+                split_parent[str(target_id)] = candidate_id
+
+        direct_targets = [
+            candidate_state[target_id]
+            for target_id in supersession_targets[candidate_id]
+            if target_id in candidate_state
+        ]
+        if candidate.get("record_status") == "MERGED_REDIRECT":
+            if direct_targets:
+                target = direct_targets[0]
+                for field in (
+                    "source_unit_ids",
+                    "image_witnesses",
+                    "cross_reference_ids",
+                ):
+                    if not set(candidate.get(field, [])).issubset(
+                        set(target.get(field, []))
+                    ):
+                        errors.append(
+                            f"{prefix} candidate {candidate_id} merge drops "
+                            f"{field}"
+                        )
+        elif candidate.get("record_status") == "SPLIT_SUPERSEDED":
+            if direct_targets:
+                for field in (
+                    "source_unit_ids",
+                    "image_witnesses",
+                    "cross_reference_ids",
+                ):
+                    target_union = set().union(
+                        *(
+                            set(target.get(field, []))
+                            for target in direct_targets
+                        )
+                    )
+                    if not set(candidate.get(field, [])).issubset(
+                        target_union
+                    ):
+                        errors.append(
+                            f"{prefix} candidate {candidate_id} split drops "
+                            f"{field}"
+                        )
+
+        source_evidence = {
+            item["evidence_id"]: item
+            for item in candidate.get("source_evidence", [])
+            if isinstance(item, dict)
+            and isinstance(item.get("evidence_id"), str)
+        }
+        direct_target_ids = set(supersession_targets[candidate_id])
+        for reassignment in candidate.get("evidence_reassignments", []):
+            if not isinstance(reassignment, dict):
+                continue
+            source_item = source_evidence.get(
+                reassignment.get("from_evidence_id")
+            )
+            for mapped in reassignment.get("targets", []):
+                if not isinstance(mapped, dict):
+                    continue
+                target_id = mapped.get("candidate_id")
+                if target_id not in direct_target_ids:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} reassigns "
+                        "evidence outside its direct supersession targets"
+                    )
+                    continue
+                target_candidate = candidate_state.get(str(target_id))
+                if target_candidate is None:
+                    continue
+                target_item = next(
+                    (
+                        item
+                        for item in target_candidate.get(
+                            "source_evidence", []
+                        )
+                        if isinstance(item, dict)
+                        and item.get("evidence_id")
+                        == mapped.get("evidence_id")
+                    ),
+                    None,
+                )
+                if target_item is None:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} maps to missing "
+                        "target evidence"
+                    )
+                elif source_item is not None and (
+                    source_item.get("source_unit_id")
+                    != target_item.get("source_unit_id")
+                    or source_item.get("image_path")
+                    != target_item.get("image_path")
+                ):
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} evidence "
+                        "reassignment changes its canonical witness"
+                    )
+
+    lineage_state: dict[str, int] = {}
+    lineage_terminals: dict[str, set[str]] = {}
+
+    def terminal_descendants(candidate_id: str) -> set[str]:
+        state = lineage_state.get(candidate_id, 0)
+        if state == 1:
+            errors.append(
+                f"{prefix} candidate lineage cycle reaches {candidate_id}"
+            )
+            return set()
+        if state == 2:
+            return lineage_terminals[candidate_id]
+        lineage_state[candidate_id] = 1
+        candidate = candidate_state[candidate_id]
+        if candidate.get("record_status") == "ACTIVE":
+            terminals = {candidate_id}
+        else:
+            terminals: set[str] = set()
+            for target_id in supersession_targets.get(candidate_id, []):
+                if target_id in candidate_state:
+                    terminals.update(terminal_descendants(target_id))
+            if not terminals:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} lineage has no "
+                    "active descendant"
+                )
+        lineage_state[candidate_id] = 2
+        lineage_terminals[candidate_id] = terminals
+        return terminals
+
+    for candidate_id in candidate_state:
+        terminal_descendants(candidate_id)
 
 
 def validate_review_history(
@@ -6478,6 +6667,134 @@ def mutation_checks(
                 + "; ".join(premature_fixed_errors)
             )
 
+    prior_epoch_saturation = zero_local_round(
+        2,
+        2,
+        1,
+        18,
+        saturation_scope_paths,
+    )
+    prior_epoch_saturation["kind"] = "SATURATION"
+    prior_epoch_saturation_digest = search_result_digest(
+        prior_epoch_saturation
+    )
+    prior_epoch_saturation[
+        "result_digest"
+    ] = prior_epoch_saturation_digest
+    prior_epoch_saturation[
+        "rerun_digest"
+    ] = prior_epoch_saturation_digest
+    prior_epoch_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": [
+            "Deterministic zero-result history fixture."
+        ],
+        "vocabulary": [],
+        "rounds": [epoch1_round, prior_epoch_saturation],
+        "fixed_point": None,
+    }
+    prior_epoch_history = append_history_event(
+        base_history,
+        base_reading,
+        base_assets,
+        path,
+        1,
+        "SEARCH_APPEND",
+        "fixture-searcher",
+        [epoch1_round],
+    )
+    prior_epoch_history = append_history_event(
+        prior_epoch_history,
+        base_reading,
+        base_assets,
+        path,
+        1,
+        "SEARCH_APPEND",
+        "fixture-searcher",
+        prior_epoch_search["rounds"],
+        full_search_state=prior_epoch_search,
+    )
+    prior_epoch_history = append_history_event(
+        prior_epoch_history,
+        reopened_reading,
+        reopened_assets,
+        path,
+        2,
+        "REOPEN",
+        "fixture-reviewer",
+        prior_epoch_search["rounds"],
+    )
+    prior_epoch_missing_core = {
+        "review_id": f"V{len(prior_epoch_history) + 1:06d}",
+        "epoch": 2,
+        "stage": 18,
+        "mode": "ROUTE_RESOLUTION",
+        "reviewer": "fixture-reviewer",
+        "source_paths": [path],
+        "candidate_changes": [],
+        "route_changes": [
+            close_route_change(
+                "UPDATE",
+                copy.deepcopy(missing_final_route),
+                before_route=copy.deepcopy(route),
+                previous_route_result_sha256=canonical_sha256(route),
+            )
+        ],
+        "search_change": None,
+    }
+    prior_epoch_missing_core["path_changes"] = [
+        close_path_change(
+            prior_epoch_missing_core,
+            {
+                "source_path": path,
+                "source_unit_ids": [
+                    item["id"] for item in units if item["path"] == path
+                ],
+                "asset_ids": [
+                    item["asset_id"]
+                    for item in reopened_assets
+                    if item["assignment_path"] == path
+                ],
+                "previous_path_result_sha256": prior_epoch_history[-1][
+                    "path_changes"
+                ][0]["result_projection_sha256"],
+            },
+            unit_by_fixture_id,
+            {
+                item["source_unit_id"]: item
+                for item in reopened_reading
+            },
+            {item["asset_id"]: item for item in reopened_assets},
+        )
+    ]
+    prior_epoch_missing_history = [
+        *prior_epoch_history,
+        close_review_event(
+            prior_epoch_missing_core,
+            prior_epoch_history[-1]["event_sha256"],
+        ),
+    ]
+    prior_epoch_missing_errors = validate_objects(
+        manifest,
+        units,
+        reopened_reading,
+        base_candidates,
+        [missing_final_route],
+        reopened_assets,
+        prior_epoch_search,
+        prior_epoch_missing_history,
+    )
+    if not any(
+        "before current-epoch Stage-18 SATURATION" in error
+        for error in prior_epoch_missing_errors
+    ):
+        failures.append(
+            "pre-REOPEN saturation incorrectly authorized later missing "
+            "finalization: "
+            + "; ".join(prior_epoch_missing_errors)
+        )
+
     expect_history_failure(
         "reviewed rows without history",
         base_reading,
@@ -7037,6 +7354,32 @@ def mutation_checks(
         failures.append(
             "valid atomic multi-layer lineage fixture failed: "
             + "; ".join(lineage_revision_errors)
+        )
+
+    broken_prefix_lineage = copy.deepcopy(lineage_candidates)
+    broken_prefix_lineage[0]["cross_reference_ids"] = []
+    broken_prefix_lineage_errors: list[str] = []
+    _validate_atomic_prefix_state(
+        {
+            candidate["id"]: candidate
+            for candidate in broken_prefix_lineage
+        },
+        {route["route_id"]: route for route in base_routes},
+        {path: revision_path_change},
+        base_search,
+        {asset["asset_id"]: asset for asset in lineage_assets},
+        {unit_id: {1, 2}},
+        {},
+        broken_prefix_lineage_errors,
+        "reachable V000002 broken-lineage regression",
+    )
+    if not any(
+        "candidate B0002 merge drops cross_reference_ids" in error
+        for error in broken_prefix_lineage_errors
+    ):
+        failures.append(
+            "reachable merge-provenance prefix escaped validation: "
+            + "; ".join(broken_prefix_lineage_errors)
         )
 
     impossible_prefix_errors: list[str] = []
