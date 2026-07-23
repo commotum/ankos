@@ -1458,6 +1458,8 @@ def _validate_atomic_prefix_state(
     latest_path_change: dict[str, dict[str, Any]],
     search_state: dict[str, Any],
     asset_by_id: dict[str, dict[str, str]],
+    unit_history_epochs: dict[str, set[int]],
+    asset_path_history_epochs: dict[str, set[int]],
     errors: list[str],
     prefix: str,
 ) -> None:
@@ -1479,6 +1481,16 @@ def _validate_atomic_prefix_state(
 
     evidence_by_id: dict[str, tuple[str, dict[str, Any]]] = {}
     evidence_group_ids: set[str] = set()
+    search_hit_by_id: dict[str, tuple[int, dict[str, Any]]] = {}
+    for round_record in search_state.get("rounds", []):
+        if not isinstance(round_record, dict):
+            continue
+        round_epoch = round_record.get("epoch")
+        if not isinstance(round_epoch, int):
+            continue
+        for hit in round_record.get("hits", []):
+            if isinstance(hit, dict) and isinstance(hit.get("hit_id"), str):
+                search_hit_by_id[hit["hit_id"]] = (round_epoch, hit)
     for candidate_id, candidate in candidate_state.items():
         for evidence in candidate.get("source_evidence", []):
             if not isinstance(evidence, dict):
@@ -1489,6 +1501,86 @@ def _validate_atomic_prefix_state(
                 evidence_by_id[evidence_id] = (candidate_id, evidence)
             if isinstance(group_id, str):
                 evidence_group_ids.add(group_id)
+
+    prefix_evidence_ids: set[str] = set()
+    reviewed_image_paths = {
+        asset_by_id[asset_id]["physical_path"]
+        for asset_id in asset_rows
+        if asset_id in asset_by_id
+        and isinstance(asset_by_id[asset_id].get("physical_path"), str)
+    }
+    for candidate in candidate_state.values():
+        validate_candidate(
+            candidate,
+            set(candidate_state),
+            set(reading_rows),
+            reviewed_image_paths,
+            set(route_state),
+            prefix_evidence_ids,
+            errors,
+        )
+
+    evidence_sequence = [
+        evidence.get("evidence_id")
+        for candidate in candidate_state.values()
+        for evidence in candidate.get("source_evidence", [])
+        if isinstance(evidence, dict)
+    ]
+    expected_evidence_ids = {
+        f"E{index:06d}" for index in range(1, len(evidence_sequence) + 1)
+    }
+    if (
+        len(evidence_sequence) != len(set(evidence_sequence))
+        or set(evidence_sequence) != expected_evidence_ids
+    ):
+        errors.append(
+            f"{prefix} evidence IDs are not a contiguous prefix allocation"
+        )
+    for candidate_id, candidate in candidate_state.items():
+        local_ids = [
+            evidence.get("evidence_id")
+            for evidence in candidate.get("source_evidence", [])
+            if isinstance(evidence, dict)
+        ]
+        if local_ids != sorted(
+            local_ids,
+            key=lambda value: (
+                int(value[1:])
+                if isinstance(value, str) and E_ID.fullmatch(value)
+                else 10**9
+            ),
+        ):
+            errors.append(
+                f"{prefix} candidate {candidate_id} evidence is not "
+                "append-ordered"
+            )
+    group_minimum_e: dict[str, int] = {}
+    for candidate in candidate_state.values():
+        for evidence in candidate.get("source_evidence", []):
+            if not isinstance(evidence, dict):
+                continue
+            group_id = evidence.get("evidence_group_id")
+            evidence_id = evidence.get("evidence_id")
+            if (
+                isinstance(group_id, str)
+                and isinstance(evidence_id, str)
+                and E_ID.fullmatch(evidence_id)
+            ):
+                group_minimum_e[group_id] = min(
+                    group_minimum_e.get(group_id, 10**9),
+                    int(evidence_id[1:]),
+                )
+    expected_group_ids = [
+        f"G{index:06d}" for index in range(1, len(group_minimum_e) + 1)
+    ]
+    if set(group_minimum_e) != set(expected_group_ids) or sorted(
+        group_minimum_e,
+        key=lambda group_id: group_minimum_e[group_id],
+    ) != expected_group_ids:
+        errors.append(
+            f"{prefix} evidence groups are not a contiguous minimum-E "
+            "prefix allocation"
+        )
 
     expected_reading_candidates = {
         unit_id: {
@@ -1607,6 +1699,58 @@ def _validate_atomic_prefix_state(
             )
 
     for candidate_id, candidate in candidate_state.items():
+        for evidence in candidate.get("source_evidence", []):
+            if not isinstance(evidence, dict):
+                continue
+            anchor = evidence.get("discovery_anchor")
+            if not isinstance(anchor, dict):
+                continue
+            anchor_kind = anchor.get("kind")
+            anchor_id = anchor.get("id")
+            anchor_epoch = anchor.get("epoch")
+            if anchor_kind == "SOURCE_UNIT":
+                if (
+                    not isinstance(anchor_id, str)
+                    or not isinstance(anchor_epoch, int)
+                    or anchor_epoch
+                    not in unit_history_epochs.get(anchor_id, set())
+                ):
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} evidence refers "
+                        "to a future source review anchor"
+                    )
+            elif anchor_kind == "IMAGE":
+                if (
+                    not isinstance(anchor_id, str)
+                    or not isinstance(anchor_epoch, int)
+                    or anchor_epoch
+                    not in asset_path_history_epochs.get(anchor_id, set())
+                ):
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} evidence refers "
+                        "to a future image review anchor"
+                    )
+            elif anchor_kind == "SEARCH_HIT":
+                hit_record = search_hit_by_id.get(str(anchor_id))
+                if hit_record is None:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} evidence refers "
+                        "to a future SEARCH_HIT"
+                    )
+                else:
+                    hit_epoch, hit = hit_record
+                    if anchor_epoch != hit_epoch:
+                        errors.append(
+                            f"{prefix} candidate {candidate_id} evidence "
+                            "SEARCH_HIT epoch is not yet available"
+                        )
+                    if evidence.get("source_unit_id") != hit.get(
+                        "source_unit_id"
+                    ):
+                        errors.append(
+                            f"{prefix} candidate {candidate_id} evidence "
+                            "source unit differs from its SEARCH_HIT"
+                        )
         for unit_id in candidate.get("source_unit_ids", []):
             if unit_id not in reading_rows:
                 errors.append(
@@ -1702,27 +1846,58 @@ def _validate_atomic_prefix_state(
                 f"{prefix} route {route_id} source asset lacks a reviewed "
                 "prefix snapshot"
             )
-        if route.get("status") == "RESOLVED":
-            for target_id in parsed_string_list(
-                route.get("target_unit_ids", ""),
-                f"{prefix}.route.{route_id}.target_unit_ids",
-                errors,
-            ):
+        target_unit_ids = parsed_string_list(
+            route.get("target_unit_ids", ""),
+            f"{prefix}.route.{route_id}.target_unit_ids",
+            errors,
+        )
+        target_asset_ids = parsed_string_list(
+            route.get("target_asset_ids", ""),
+            f"{prefix}.route.{route_id}.target_asset_ids",
+            errors,
+        )
+        attempts = parsed_string_list(
+            route.get("attempts", ""),
+            f"{prefix}.route.{route_id}.attempts",
+            errors,
+        )
+        defect_boundary = str(route.get("defect_boundary", "")).strip()
+        if route.get("status") == "PENDING":
+            if target_unit_ids or target_asset_ids or defect_boundary:
+                errors.append(
+                    f"{prefix} pending route {route_id} carries premature "
+                    "resolution fields"
+                )
+        elif route.get("status") == "RESOLVED":
+            if (
+                not target_unit_ids and not target_asset_ids
+            ) or defect_boundary:
+                errors.append(
+                    f"{prefix} resolved route {route_id} lacks exact targets"
+                )
+            for target_id in target_unit_ids:
                 if target_id not in reading_rows:
                     errors.append(
                         f"{prefix} resolved route {route_id} targets an "
                         "unreviewed future unit"
                     )
-            for target_id in parsed_string_list(
-                route.get("target_asset_ids", ""),
-                f"{prefix}.route.{route_id}.target_asset_ids",
-                errors,
-            ):
+            for target_id in target_asset_ids:
                 if target_id not in asset_rows:
                     errors.append(
                         f"{prefix} resolved route {route_id} targets an "
                         "unreviewed future asset"
                     )
+        elif route.get("status") == "MISSING_TARGET_FINAL":
+            if (
+                target_unit_ids
+                or target_asset_ids
+                or not attempts
+                or not defect_boundary
+            ):
+                errors.append(
+                    f"{prefix} final-missing route {route_id} has an "
+                    "incomplete final disposition"
+                )
 
     for round_record in search_state.get("rounds", []):
         if not isinstance(round_record, dict):
@@ -2873,6 +3048,8 @@ def validate_review_history(
             latest_path_change,
             search_state,
             asset_by_id,
+            unit_history_epochs,
+            asset_path_history_epochs,
             errors,
             prefix,
         )
@@ -6417,6 +6594,8 @@ def mutation_checks(
         {path: revision_path_change},
         base_search,
         {asset["asset_id"]: asset for asset in lineage_assets},
+        {unit_id: {1}},
+        {},
         lineage_revision_errors,
         "atomic Stage 18 lineage revision",
     )
@@ -6438,6 +6617,8 @@ def mutation_checks(
         },
         base_search,
         {asset["asset_id"]: asset for asset in lineage_assets},
+        {unit_id: {1}},
+        {},
         impossible_prefix_errors,
         "impossible pre-target lineage prefix",
     )

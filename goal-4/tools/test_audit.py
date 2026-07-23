@@ -257,6 +257,8 @@ def test_atomic_prefix_rejects_search_over_unreviewed_future_sources() -> None:
         {},
         search,
         {},
+        {},
+        {},
         errors,
         "future-search regression",
     )
