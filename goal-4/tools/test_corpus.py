@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import errno
 import importlib.util
 import os
 import shutil
@@ -13,6 +14,16 @@ SPEC = importlib.util.spec_from_file_location("verify_corpus", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+
+
+def link_or_copy(source: str, destination: str) -> str:
+    try:
+        os.link(source, destination)
+    except OSError as exc:
+        if exc.errno != errno.EXDEV:
+            raise
+        return shutil.copy2(source, destination)
+    return destination
 
 
 def load() -> tuple[dict, list[dict], bytes]:
@@ -41,7 +52,7 @@ def test_verifier_runs_from_relocated_copy(tmp_path: Path) -> None:
     shutil.copytree(
         MODULE.REPO_ROOT / "ref" / "A-New-Kind-of-Science",
         source_target,
-        copy_function=os.link,
+        copy_function=link_or_copy,
     )
     goal_target = relocated / "goal-4"
     tools_target = goal_target / "tools"
