@@ -276,6 +276,7 @@ experiment = source_candidate(
         "rule, sampling measure, or classification procedure."
     ),
 )
+experiment["route_keys"].append("ca-classes-page231")
 add_evidence(
     experiment,
     label="experiment-systematic",
@@ -294,6 +295,27 @@ add_evidence(
     ],
     strength="CONTEXTUAL",
 )
+add_evidence(
+    experiment,
+    label="experiment-early-ca-survey",
+    unit="U005286",
+    claim=(
+        "The historical account records the 1981 cellular-automaton experiments "
+        "and distinguishes random-initial-condition surveys from later attention "
+        "to the single-seed Rule 30 result."
+    ),
+    fields=[
+        "object_kind",
+        "carrier",
+        "input",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+)
+experiment["route_keys"].append("early-ca-experiment-page19")
 add_evidence(
     experiment,
     label="experiment-print-series",
@@ -1534,8 +1556,7 @@ centered_seed = source_candidate(
             "The CenterList function name and list syntax are implementation notation."
         ),
         "evidence_limit": (
-            "The passage does not define behavior for invalid n or constructor "
-            "failure; any evolution boundary is a downstream program choice."
+            "The passage does not define behavior for invalid n or constructor failure."
         ),
     },
     claim=(
@@ -1543,8 +1564,7 @@ centered_seed = source_candidate(
         "condition and its binary value encoding."
     ),
     missing=(
-        "The passage does not define behavior for invalid n or constructor "
-        "failure; any evolution boundary is a downstream program choice."
+        "The passage does not define behavior for invalid n or constructor failure."
     ),
 )
 add_evidence(
@@ -2608,6 +2628,7 @@ def declarative_pattern(
     definition: str,
     support: str,
     values: str,
+    input_text: str,
     result: str,
     aliases: list[str] | None = None,
     route_keys: list[str] | None = None,
@@ -2627,7 +2648,7 @@ def declarative_pattern(
             "support": support,
             "alphabet_or_value_schema": values,
             "complete_state": "The value assigned to every coordinate in the requested domain.",
-            "input": "Integer coordinates and any declared modulus or parameter.",
+            "input": input_text,
             "law_kind": "A direct function or relation, not an iterated transition.",
             "rule_relation_constraint_function_or_probability_law": definition,
             "result_kind": result,
@@ -3048,6 +3069,10 @@ pascal_mod2 = declarative_pattern(
     ),
     support="Integer row and position coordinates.",
     values="Binary parity values.",
+    input_text=(
+        "A nonnegative row t and a parity-compatible integer position n for "
+        "which (n+t)/2 indexes the stated binomial coefficient."
+    ),
     result="A static nested binary array.",
     aliases=["odd binomial-coefficient pattern"],
     route_keys=["pascal-page611", "pascal-polynomial-page1091"],
@@ -3154,6 +3179,7 @@ rule60_pattern = declarative_pattern(
     ),
     support="Nonnegative integer row and position coordinates.",
     values="Binary parity values.",
+    input_text="Nonnegative integers t and n in the Binomial[t,n] array.",
     result="A uniquely determined distorted binary pattern.",
     aliases=["Rule 60 binomial pattern"],
     route_keys=["rule60-bit-page583"],
@@ -3496,6 +3522,7 @@ binomial_mod_k = declarative_pattern(
     ),
     support="Nonnegative integer row and position coordinates (t,n).",
     values="Residues modulo a prime k.",
+    input_text="Nonnegative integer coordinates t and n together with a prime modulus k.",
     result="A uniquely determined k-valued binomial-coefficient array.",
     aliases=["Lucas digit formula for Binomial modulo k"],
 )
@@ -3694,6 +3721,7 @@ gcd_pattern = declarative_pattern(
     definition="Evaluate GCD[m,n] over integer pairs and reduce the values modulo 2.",
     support="A two-dimensional integer-coordinate lattice.",
     values="Binary residues modulo 2.",
+    input_text="An integer pair (m,n) in the requested lattice domain.",
     result="A static binary pattern.",
     route_keys=["gcd-page613"],
 )
@@ -3707,6 +3735,7 @@ jacobi_pattern = declarative_pattern(
     ),
     support="A two-dimensional integer-coordinate lattice.",
     values="Values derived from the JacobiSymbol integer function.",
+    input_text="An integer pair (m,n), evaluated as JacobiSymbol[m,2n-1].",
     result="A static lattice pattern.",
     route_keys=["jacobi-page1081"],
 )
@@ -3797,6 +3826,7 @@ munching = declarative_pattern(
     ),
     support="A two-dimensional integer-coordinate grid indexed by t.",
     values="Boolean membership in the equality relation.",
+    input_text="A successive integer index t and an integer-coordinate pair (x,y).",
     result="A sequence of relation-defined grid patterns.",
     aliases=["munching squares"],
     route_keys=[],
@@ -3832,6 +3862,7 @@ def unary_bitwise_curve(key: str, operation: str) -> CandidateSpec:
         ),
         support="Successive integer indices mapped into a plotted curve.",
         values=f"Integer values of {operation}.",
+        input_text="A requested finite run of successive integer indices n.",
         result="A deterministic nested curve.",
         aliases=[f"{operation} n and 2n curve"],
     )
@@ -3996,6 +4027,29 @@ rule102 = source_candidate(
         "boundary, or define completion and witness semantics."
     ),
     strength="DIRECT_PARTIAL_MECHANICS",
+)
+add_evidence(
+    rule110,
+    label="rule110-notes-followup-routes",
+    unit="U005149",
+    claim=(
+        "The Rule 110 note identifies later detailed treatments and localized-"
+        "structure examples, and distinguishes Rule 110 from Rule 102 in one "
+        "lookup case without replacing the earlier complete law evidence."
+    ),
+    fields=[
+        "object_kind",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
+)
+rule110["route_keys"].extend(
+    ["rule110-page229", "rule110-page675", "rule110-structures-page292"]
 )
 
 
@@ -4523,6 +4577,53 @@ branching_game = source_candidate(
     strength="DIRECT_PARTIAL_MECHANICS",
 )
 
+go_game = source_candidate(
+    key="go-stone-placement-game",
+    name="Go black/white grid-stone placement game",
+    anchor="U005221",
+    aliases=["Go"],
+    facts={
+        "object_kind": "A named rule-governed branching board game.",
+        "native_time": "Discrete successive plays.",
+        "carrier": "Black and white stones.",
+        "support": "A grid of board positions.",
+        "topology": "The source identifies a grid but does not state its extent or adjacency rules.",
+        "external_data": "A move choice supplied by skill or randomness.",
+        "law_kind": "A particularly simple but unstated game rule set.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Play proceeds by putting black and white stones on a grid under "
+            "Go's definite rules; those rules are not printed in this passage."
+        ),
+        "result_kind": "A branching sequence of grid-stone positions/patterns of play.",
+        "successor_cardinality": "Many possible choices can occur at a game step.",
+        "determinism_branching_or_measure": (
+            "Branching through player choices; no move policy or probability measure is stated."
+        ),
+        "parameters_and_variants": (
+            "Board extent, legal-move/capture rules, player schedule, and choice "
+            "policy are not supplied here."
+        ),
+        "excluded_observers_and_representations": (
+            "Visual similarity to a cellular automaton and historical origin are contextual."
+        ),
+        "evidence_limit": (
+            "The passage supplies the named grid/stone mechanic but omits the "
+            "complete position schema, legal moves, captures, ko, scoring, "
+            "termination, and winner semantics."
+        ),
+    },
+    claim=(
+        "The source identifies Go as a simple-rule game involving placement of "
+        "black and white stones on a grid."
+    ),
+    missing=(
+        "The passage supplies the named grid/stone mechanic but omits the "
+        "complete position schema, legal moves, captures, ko, scoring, "
+        "termination, and winner semantics."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
 constraint_puzzle = source_candidate(
     key="constraint-puzzle-solution-set",
     name="constraint-defined puzzle solution-set class",
@@ -4539,6 +4640,10 @@ constraint_puzzle = source_candidate(
             "Accept exactly the candidate assignments that satisfy the puzzle's constraints."
         ),
         "result_kind": "The set of assignments that satisfy all constraints.",
+        "successor_cardinality": (
+            "The denoted solution set can contain zero, one, or many satisfying "
+            "assignments, depending on the constraint instance."
+        ),
         "witness_semantics": (
             "A witness is a complete candidate assignment that satisfies every "
             "constraint in the puzzle instance."
@@ -4554,7 +4659,7 @@ constraint_puzzle = source_candidate(
         "evidence_limit": (
             "The passage establishes the constraint/solution-set semantics but "
             "does not supply a particular variable domain, constraint language, "
-            "solver, solution count, or sampling measure."
+            "or solution count."
         ),
     },
     claim=(
@@ -4563,8 +4668,8 @@ constraint_puzzle = source_candidate(
     ),
     missing=(
         "The passage establishes the constraint/solution-set semantics but does "
-        "not supply a particular variable domain, constraint language, solver, "
-        "solution count, or sampling measure."
+        "not supply a particular variable domain, constraint language, or "
+        "solution count."
     ),
     strength="DIRECT_PARTIAL_MECHANICS",
 )
@@ -4592,6 +4697,10 @@ truchet = source_candidate(
             "combining the four stated tile values at the sites."
         ),
         "result_kind": "The set of completed planar tile assignments on the domain.",
+        "successor_cardinality": (
+            "For a fixed finite domain of N sites, free combination of four tile "
+            "values denotes 4^N completed assignments."
+        ),
         "witness_semantics": (
             "A witness is a completed square-grid assignment with exactly one "
             "of the four stated tile values at every site."
@@ -4601,8 +4710,7 @@ truchet = source_candidate(
             "Leonardo/Truchet history and artistic use are contextual."
         ),
         "evidence_limit": (
-            "The passage does not specify a selection measure, adjacency "
-            "constraint, enumeration order, or finite grid domain/extent."
+            "The passage does not specify a finite grid domain or its extent."
         ),
     },
     claim=(
@@ -4610,8 +4718,7 @@ truchet = source_candidate(
         "forming 2D patterns by combining those tiles."
     ),
     missing=(
-        "The passage does not specify a selection measure, adjacency constraint, "
-        "enumeration order, or finite grid domain/extent."
+        "The passage does not specify a finite grid domain or its extent."
     ),
 )
 
@@ -4674,6 +4781,7 @@ random_ca_seed = source_candidate(
             ["random-ca-initial-condition-source"],
         )
     ],
+    route_keys=["random-initial-page112", "ca-classes-page231"],
 )
 add_evidence(
     random_ca_seed,
@@ -5027,6 +5135,85 @@ lfsr = source_candidate(
     ),
     strength="DIRECT_PARTIAL_MECHANICS",
     route_keys=["lfsr-page974", "lfsr-page259"],
+)
+
+nonlinear_fsr = source_candidate(
+    key="nonlinear-feedback-shift-register",
+    name="nonlinear feedback shift-register construction class",
+    anchor="U005236",
+    aliases=["nonlinear FSR", "nonlinear feedback register"],
+    facts={
+        "object_kind": (
+            "A finite digital shift-register sequence-generator class related "
+            "to general one-dimensional cellular automata."
+        ),
+        "native_time": "Discrete register shifts and nonlinear feedback steps.",
+        "carrier": "A finite ordered register of digital cells.",
+        "support": "A finite one-dimensional register.",
+        "alphabet_or_value_schema": "Digital cell values/digits.",
+        "complete_state": "The current value stored in every register cell.",
+        "visible_history": "Successive register outputs form a generated sequence.",
+        "law_kind": "A nonlinear feedback-and-shift law.",
+        "result_kind": "An output sequence generated by the nonlinear register.",
+        "parameters_and_variants": (
+            "Register length, nonlinear feedback function, shift direction, "
+            "seed, and output convention vary."
+        ),
+        "excluded_observers_and_representations": (
+            "Closeness to Rule 30, repetition-period studies, cryptographic/radio "
+            "applications, and special-purpose hardware are relations, analyses, "
+            "applications, or implementations."
+        ),
+        "evidence_limit": (
+            "No particular register length, nonlinear feedback function, taps, "
+            "shift direction, seed, output cell, or exact Rule 30 correspondence "
+            "is supplied in this range."
+        ),
+    },
+    claim=(
+        "The source explicitly identifies nonlinear feedback shift registers "
+        "as relatives of general 1D cellular automata and notes examples close "
+        "to Rule 30."
+    ),
+    missing=(
+        "No particular register length, nonlinear feedback function, taps, "
+        "shift direction, seed, output cell, or exact Rule 30 correspondence "
+        "is supplied in this range."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    route_keys=[
+        "nonlinear-feedback-page1088",
+        "close-nonlinear-feedback-page1088",
+    ],
+    parameters=[
+        (
+            "feedback class",
+            "The source distinguishes nonlinear from linear feedback and relates "
+            "the class to general 1D cellular automata.",
+            ["nonlinear-feedback-shift-register-source"],
+        )
+    ],
+)
+add_evidence(
+    nonlinear_fsr,
+    label="nonlinear-feedback-shift-register-timeline",
+    unit="U005268",
+    claim=(
+        "The timeline independently records Golomb's nonlinear feedback-shift-"
+        "register simulations, including rules close to Rule 30 and period-focused analysis."
+    ),
+    fields=[
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "law_kind",
+        "result_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CORROBORATING",
 )
 
 shift_block_maps = source_candidate(
