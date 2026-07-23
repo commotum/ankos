@@ -1475,7 +1475,7 @@
               "additionalProperties": false,
               "properties": {
                 "candidate_id": {
-                  "pattern": "^B[0-9]{4}$",
+                  "pattern": "^W[0-9]{4}$",
                   "type": "string"
                 },
                 "evidence_ids": {

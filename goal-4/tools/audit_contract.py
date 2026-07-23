@@ -285,7 +285,7 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         "type": "object",
         "required": ["candidate_id", "relation", "evidence_ids", "uncertainty"],
         "properties": {
-            "candidate_id": {"type": "string", "pattern": "^B[0-9]{4}$"},
+            "candidate_id": {"type": "string", "pattern": id_pattern},
             "relation": {
                 "type": "string",
                 "enum": [
