@@ -72,6 +72,7 @@ def candidate(
     parameters: list[tuple[str, str, list[str]]] | None = None,
     variants: list[tuple[str, str, list[str]]] | None = None,
     route_keys: list[str] | None = None,
+    unknown_reasons: dict[str, str] | None = None,
 ) -> CandidateSpec:
     if any(item["key"] == key for item in ALL_CANDIDATES):
         raise AuthoringError(f"duplicate candidate key {key}")
@@ -88,6 +89,7 @@ def candidate(
         "parameters": parameters or [],
         "variants": variants or [],
         "route_keys": route_keys or [],
+        "unknown_reasons": unknown_reasons or {},
         "evidence": [],
         "_insertion": len(ALL_CANDIDATES),
     }
@@ -142,6 +144,7 @@ def source_candidate(
     parameters: list[tuple[str, str, list[str]]] | None = None,
     variants: list[tuple[str, str, list[str]]] | None = None,
     route_keys: list[str] | None = None,
+    unknown_reasons: dict[str, str] | None = None,
 ) -> CandidateSpec:
     spec = candidate(
         key,
@@ -156,6 +159,7 @@ def source_candidate(
         parameters=parameters,
         variants=variants,
         route_keys=route_keys,
+        unknown_reasons=unknown_reasons,
     )
     evidence(
         spec,
@@ -191,6 +195,25 @@ def context_evidence(
         modality=("IMAGE" if image_path else modality),
         image_path=image_path,
     )
+
+
+def mark_unknown(spec: CandidateSpec, reasons: dict[str, str]) -> None:
+    """Move unsupported fingerprint claims to exact source-limited unknowns."""
+    for field, reason in reasons.items():
+        spec["facts"].pop(field, None)
+        spec["not_applicable"].pop(field, None)
+        for item in spec["evidence"]:
+            item["fields"] = [
+                present for present in item["fields"] if present != field
+            ]
+        spec["unknown_reasons"][field] = reason
+
+
+def spec_by_key(key: str) -> CandidateSpec:
+    try:
+        return next(item for item in ALL_CANDIDATES if item["key"] == key)
+    except StopIteration as exc:
+        raise AuthoringError(f"unknown candidate key {key}") from exc
 
 
 def add_route(
@@ -2753,6 +2776,8 @@ UNKNOWN_LABELS = {
 
 
 def unknown_reason(spec: CandidateSpec, field: str) -> str:
+    if field in spec["unknown_reasons"]:
+        return spec["unknown_reasons"][field]
     return (
         f"The assigned Chapter 4 main-text evidence for {spec['name']} does "
         f"not state {UNKNOWN_LABELS[field]} beyond the recorded facts and routes."

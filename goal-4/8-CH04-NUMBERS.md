@@ -288,3 +288,35 @@ The next safe action is to build and verify the two sealed Stage 8 worker
 bundles from the recorded all-pending assignment, then begin independent
 sequential review with `U000641` in the main bundle and `U005637` in the Notes
 bundle.
+
+## In-Progress Review Checkpoint
+
+This checkpoint supersedes the opening-only paragraph above while Stage 8
+remains **IN PROGRESS**:
+
+- Both sealed assignments have now been read in full: all 745 source units and
+  all 145 owned assets received an initial split-output review.
+- The first main and Notes outputs passed structural verification in ordinary
+  and optimized Python, but independent hostile semantic/provenance review
+  rejected both before merge. No ledger transaction has been applied.
+- The main hostile report is
+  `/tmp/ankos-goal4-stage8-main-hostile.md`; the Notes hostile report is
+  `/tmp/ankos-goal4-stage8-notes-hostile.md`.
+- The independent route comparison is
+  `/tmp/ankos-goal4-stage8-route-delta.md`. It identifies three route-identity
+  replacements, four Notes scope corrections, and required missing
+  within-stage pointers.
+- The rejected outputs are retained only as reproducible review evidence.
+  Both source authoring helpers are being repaired and will generate fresh
+  sealed bundles; finalized output JSON will not be patched.
+- One additional referenced Notes image defect was confirmed at original
+  resolution: `A000443` preserves two formulas but cuts off the third. It must
+  remain `SOURCE_DEFECT`/`DEFECTIVE`, and no missing formula may be guessed.
+- `validate_audit.py` now rejects an absence-only value masquerading as a
+  `SUPPORTED` fingerprint field while preserving legitimate supported values
+  that state a positive fact plus an unresolved subcase. Its ordinary and
+  optimized self-tests and Stage 7 gates pass.
+
+The next safe action is to complete both helper-level repairs, regenerate and
+hostile-review both fresh outputs, and keep the combined merge closed until
+all exact semantic, visual, provenance, and route checks pass.

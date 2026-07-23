@@ -299,15 +299,748 @@ SPECS = [
 ]
 
 
+def FF(
+    value: str | None,
+    anchors: str | tuple[str, ...],
+    *,
+    status: str = "SUPPORTED",
+    reason: str = "",
+) -> dict[str, Any]:
+    """Declare one source-limited fingerprint fact.
+
+    ``anchors`` contains exact source-unit IDs or physical image paths.  Empty
+    anchors are permitted only for UNKNOWN facts.
+    """
+
+    if isinstance(anchors, str):
+        anchors = (anchors,)
+    return {
+        "status": status,
+        "value": value,
+        "anchors": tuple(anchors),
+        "reason": reason,
+    }
+
+
+def spec_named(name: str) -> dict[str, Any]:
+    matches = [spec for spec in SPECS if spec["name"] == name]
+    if len(matches) != 1:
+        raise RuntimeError(f"expected exactly one spec named {name!r}")
+    return matches[0]
+
+
+def amend_spec(name: str, **changes: Any) -> None:
+    spec = spec_named(name)
+    if "facts" in changes:
+        merged = dict(spec.get("facts", {}))
+        merged.update(changes.pop("facts"))
+        spec["facts"] = merged
+    spec.update(changes)
+
+
+def remove_spec(name: str) -> None:
+    spec = spec_named(name)
+    SPECS.remove(spec)
+
+
+# ---------------------------------------------------------------------------
+# Hostile-review repairs.
+#
+# These edits deliberately live as data mutations rather than post-hoc output
+# patches.  A fresh bundle authored from this helper receives the repaired
+# identities, laws, field provenance, source boundaries, and routes.
+# ---------------------------------------------------------------------------
+
+amend_spec(
+    "Gray-code ordering generator",
+    facts={
+        "rule_relation_constraint_function_or_probability_law": FF(
+            "GrayCode[m_] := Nest[Join[#, Length[#] + Reverse[#]] &, {0}, m]; "
+            "the element at position i is BitXor[i, Floor[i/2]]",
+            ("U005648", "U005649"),
+        ),
+        "termination_completion_failure": FF(
+            "For a supplied nonnegative digit count m, the printed Nest performs exactly m generations.",
+            "U005648",
+        ),
+    },
+)
+SPECS.append(
+    S(
+        "related BitXor rule-60 integer iteration",
+        ["U005649"],
+        "ITERATION",
+        "i -> BitXor[i, 2 i]",
+        params=("initial i",),
+        variants=("digit sequences correspond to elementary cellular automaton rule 60",),
+        facts={
+            "termination_completion_failure": FF(
+                "The source states only repeated application; no terminal predicate is part of the law.",
+                "U005649",
+            ),
+        },
+    )
+)
+
+amend_spec(
+    "base-6 cellular automaton for powers of three",
+    law="{a_, b_, c_} -> 3 Mod[b, 2] + Floor[c/2]",
+    missing=(),
+    facts={
+        "alphabet_or_value_schema": FF("six base-6 digit colors", "U005671"),
+        "read_dependencies_or_neighborhood": FF(
+            "three-cell input {a,b,c}; the printed value depends on b and c",
+            "U005671",
+        ),
+        "topology": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="U005671 gives a local three-cell rule but does not state a periodic, finite, or infinite boundary topology.",
+        ),
+    },
+)
+
+amend_spec(
+    "3n+1 eventual-one decision query",
+    name="universal 3n+1 eventual-one query",
+    uids=["U005689", "U005690"],
+    law="for every initial positive integer n, FixedPoint[(3 #/2^IntegerExponent[#, 2] + 1)/2 &, n] == 2",
+    params=(),
+    missing=(),
+    facts={
+        "witness_semantics": FF(
+            "accepted only if the displayed per-seed equality holds for every positive-integer initial n; the Book says no general proof is known",
+            ("U005689", "U005690"),
+        ),
+        "termination_completion_failure": FF(
+            "The query is mathematically well specified, but its universal truth is unresolved in the source.",
+            "U005689",
+        ),
+    },
+)
+SPECS.append(
+    S(
+        "per-seed 3n+1 eventual-one predicate",
+        ["U005690"],
+        "QUERY",
+        "FixedPoint[(3 #/2^IntegerExponent[#, 2] + 1)/2 &, n] == 2",
+        params=("initial n",),
+        facts={
+            "witness_semantics": FF(
+                "accepted for a supplied n exactly when the displayed FixedPoint expression equals 2",
+                "U005690",
+            ),
+            "termination_completion_failure": FF(
+                "FixedPoint may fail to return if the accelerated orbit does not reach a fixed point; the source does not prove completion for every n.",
+                "U005690",
+            ),
+        },
+    )
+)
+SPECS.append(
+    S(
+        "case-b binary-length stopping-time map",
+        ["U005694"],
+        "ITERATION",
+        "n -> If[EvenQ[n], n/2, (n + 1)/2]",
+        params=("initial n",),
+        images=("BACK-MATTER/NOTES/_page_919_Figure_10.jpeg",),
+        facts={
+            "termination_completion_failure": FF(
+                "The source states that the number of steps to reach 1 equals the number of base-2 digits in n.",
+                "U005694",
+            ),
+        },
+        source_status=("CLEAR", "DEFECTIVE"),
+        source_uncertainties=(
+            "A000443 is bottom-clipped, but the complete case-(b) formula remains visible.",
+        ),
+    )
+)
+SPECS.append(
+    S(
+        "case-c one-bit-count stopping-time map obligation",
+        ["U005694"],
+        "PARTIAL_SYSTEM",
+        "The rule is not recoverable from the sealed extraction; the prose states only that its stopping time is determined by the number of 1 bits in n.",
+        params=("initial n",),
+        missing=(
+            "The case-(c) one-step update formula is clipped from A000443 and is not stated in the prose.",
+        ),
+        images=("BACK-MATTER/NOTES/_page_919_Figure_10.jpeg",),
+        facts={
+            "rule_relation_constraint_function_or_probability_law": FF(
+                None,
+                (),
+                status="UNKNOWN_FROM_SOURCE",
+                reason="The sealed prose delimits case (c), but the formula label is outside A000443's bottom crop.",
+            ),
+            "termination_completion_failure": FF(
+                "The source states only that the number of steps is determined by DigitCount[n,2,1].",
+                "U005694",
+            ),
+        },
+        source_status=("CLEAR", "DEFECTIVE"),
+        source_uncertainties=(
+            "The candidate is retained under E5 because A000443 cuts off the identity-bearing case-(c) update formula.",
+        ),
+    )
+)
+
+amend_spec(
+    "memoized self-indexed recurrence",
+    variants=(),
+    facts={
+        "termination_completion_failure": FF(
+            "Evaluation can request an undefined f[-1]; cancellation such as f[-1]-f[-1] does not prevent leftmost-innermost evaluation from attempting it.",
+            "U005744",
+        ),
+    },
+)
+SPECS.append(
+    S(
+        "leftmost-innermost recursive evaluation policy",
+        ["U005744"],
+        "EVALUATION_POLICY",
+        "evaluate the leftmost innermost f[k] occurrence to an explicit value before using the enclosing expression",
+        params=("recursive expression",),
+        variants=("memoized value reuse is a separate implementation policy",),
+        facts={
+            "termination_completion_failure": FF(
+                "The policy may demand an undefined subvalue even when the complete symbolic expression would cancel that subvalue.",
+                "U005744",
+            ),
+        },
+    )
+)
+
+amend_spec(
+    "primitive-recursive construction calculus",
+    uids=["U005762", "U005763", "U005764", "U005768", "U005769"],
+    law="zero z=0&, successor s=#+1&, projections p[i_]:=Slot[i]&, composition, and "
+        "f[0,y___Integer]:=g[y]; f[x_Integer,y___Integer]:=h[f[x-1,y],x-1,y], "
+        "which unwinds to Fold[h[#1,#2,y]&,g[y],Range[0,x-1]]",
+    facts={
+        "support": FF("non-negative integer inputs", ("U005762", "U005768")),
+        "termination_completion_failure": FF(
+            "Every primitive-recursive computation is total on its stated non-negative-integer domain and has a finitely bounded evaluation.",
+            ("U005768", "U005769"),
+        ),
+    },
+)
+amend_spec(
+    "unbounded mu-search operator",
+    facts={
+        "termination_completion_failure": FF(
+            "Search returns the first n with f[n,args]==0; it may never terminate when no such n is reached.",
+            ("U005770", "U005771", "U005772"),
+        ),
+        "witness_semantics": FF(
+            "a returned n is the least nonnegative witness satisfying f[n,args]==0",
+            "U005771",
+        ),
+    },
+)
+amend_spec(
+    "complex primitive-recursive function",
+    law="Fold[Fold[2^Ceiling[Log[2, Ceiling[(#1 + 2)/(#2 + 2)]]] "
+        "(#2 + 2) - 2 - #1 &, #2, Range[#1]] &, 0, Range[#]] &",
+    law_uid="U005786",
+)
+amend_spec(
+    "diagonalized non-primitive-recursive function",
+    params=("enumeration w", "x"),
+    facts={
+        "input": FF(
+            "a chosen enumeration w[m] of primitive-recursive functions and an index x",
+            "U005793",
+        ),
+        "support": FF(
+            "conditional on the chosen enumeration/order w; the source suggests LeafCount then Sort but does not print the enumeration",
+            "U005793",
+        ),
+    },
+)
+amend_spec(
+    "Fermat-little-theorem primality predicate",
+    name="Fermat little-theorem prime congruence",
+    kind="RELATION",
+    law="PrimeQ[p] implies Mod[a^(p - 1), p] == 1",
+    missing=(),
+    facts={
+        "witness_semantics": FF(
+            "congruence failure disproves the stated necessary prime condition; congruence truth is not asserted to prove primality",
+            "U005802",
+        ),
+        "termination_completion_failure": FF(
+            "The congruence is a stated necessary condition, not a complete false-positive-resistant primality algorithm.",
+            "U005802",
+        ),
+    },
+)
+amend_spec(
+    "decimation survival-time query",
+    name="decimation survival-time function",
+    kind="OBSERVER",
+    law="Module[{q = n + k - 1, s = 1}, While[Mod[q, k] != 0, "
+        "q = Ceiling[(k - 1) q/k]; s++]; s]",
+    law_uid="U005805",
+    facts={
+        "result_kind": FF(
+            "integer number of decimation steps survived by the cell at position n",
+            ("U005804", "U005805"),
+        ),
+        "witness_semantics": FF(
+            "the returned integer s is the survival time, not a Boolean acceptance judgment",
+            ("U005804", "U005805"),
+        ),
+    },
+)
+amend_spec(
+    "Josephus last-cell function",
+    law="Fold[Mod[#1 + k, #2, 1] &, 0, Range[n]]",
+)
+
+remove_spec("analytic prime-approximation family")
+SPECS.extend([
+    S(
+        "nth-prime asymptotic approximation",
+        ["U005810"],
+        "FUNCTION",
+        "Prime[n] is approximated by n Log[n] + n Log[Log[n]]",
+        params=("n",),
+    ),
+    S(
+        "prime-counting approximation family",
+        ["U005810", "U005956"],
+        "FUNCTION",
+        "PrimePi[n] is approximated by n/Log[n], by LogIntegral[n], and up to "
+        "order Sqrt[n] by LogIntegral[n] - Sum[LogIntegral[n^r[i]], "
+        "{i,-Infinity,Infinity}] using zeta zeros r[i]",
+        params=("n",),
+        variants=("n/Log[n]", "LogIntegral[n]", "zeta-zero correction"),
+    ),
+])
+
+remove_spec("perfect-number constraint")
+SPECS.extend([
+    S(
+        "perfect-number constraint",
+        ["U005830"],
+        "QUERY",
+        "Apply[Plus, Divisors[n]] == 2 n",
+        params=("n",),
+    ),
+    S(
+        "pluperfect-number constraint",
+        ["U005832"],
+        "QUERY",
+        "IntegerQ[DivisorSigma[1, n]/n]",
+        params=("n",),
+    ),
+    S(
+        "quasiperfect-number tolerance constraint",
+        ["U005832"],
+        "QUERY",
+        "Abs[DivisorSigma[1, n] - 2 n] < r",
+        params=("n", "r"),
+    ),
+])
+amend_spec(
+    "unbounded aliquot-growth query",
+    params=(),
+    missing=(),
+    facts={
+        "witness_semantics": FF(
+            "accepted if there exists an iterated aliquot trajectory whose values increase forever",
+            "U005837",
+        ),
+        "termination_completion_failure": FF(
+            "The accepted-result condition is complete, but the source states that its truth remains unresolved.",
+            "U005837",
+        ),
+    },
+)
+amend_spec(
+    "direct nth-binary-digit extractor",
+    name="direct nth base-2 digit extractor for Log[2]",
+    law="Round[FractionalPart[Sum[FractionalPart[PowerMod[2,n-k,k]/k],"
+        "{k,n}] + Sum[2^(n-k)/k,{k,n+1,n+d}]]]",
+    law_uid="U005849",
+    facts={
+        "result_kind": FF("the nth base-2 digit of Log[2]", ("U005848", "U005849")),
+        "termination_completion_failure": FF(
+            "Trying several tail lengths d checks stability, but finite-precision truncation retains an exponentially small probability of an incorrect digit.",
+            "U005850",
+        ),
+    },
+)
+amend_spec(
+    "normal-number constraint",
+    variants=(),
+    facts={
+        "witness_semantics": FF(
+            "accepted in the selected base only when every digit and every finite digit block has equal limiting frequency",
+            "U005860",
+        ),
+    },
+)
+SPECS.append(
+    S(
+        "Stoneham normal-number family",
+        ["U005860"],
+        "RELATION",
+        "Sum[1/(p^n b^(p^n)), {n, Infinity}] is normal in base b and "
+        "transcendental when p > 2 is prime and GCD[b,p] == 1",
+        params=("prime p", "base b"),
+        facts={
+            "support": FF("p > 2 prime and GCD[b,p] == 1", "U005860"),
+        },
+    )
+)
+
+amend_spec(
+    "continued-fraction digit extractor",
+    facts={
+        "termination_completion_failure": FF(
+            "For rational x the iteration reaches Mod[x,1]==0 and the next reciprocal is undefined; only the available finite terms are defined.",
+            ("U005887", "U005888"),
+        ),
+    },
+)
+amend_spec(
+    "Gauss-map continued-fraction trajectory",
+    facts={
+        "termination_completion_failure": FF(
+            "The map is undefined when Mod[x,1]==0; rational inputs therefore terminate after finitely many continued-fraction terms.",
+            "U005891",
+        ),
+    },
+)
+amend_spec(
+    "direct concatenation-position query",
+    law="((IntegerDigits[#3 + Quotient[#1,#2],2][[Mod[#1,#2]+1]] &)"
+        "[n-(#-2)2^(#-1)-2,#,2^(#-1)] &)"
+        "[NestWhile[# + 1 &,0,(#-1)2^# + 1 < n &]]",
+    law_uid="U005876",
+)
+amend_spec(
+    "large-block concatenation digit formula",
+    law="k/(k-1)^2 - (k-1) Sum[k^((k^s-1)(1+s-s k)/(k-1)) "
+        "(1/((k-1)(k^s-1)^2) - k/((k-1)(k^(s+1)-1)^2) + "
+        "1/(k^(s+1)-1)), {s,n}]",
+    law_uid="U005880",
+)
+amend_spec(
+    "linear-polynomial continued-fraction relation",
+    law="a continued fraction whose nth term is a n + b denotes "
+        "BesselI[b/a, 2/a]/BesselI[b/a + 1, 2/a]",
+)
+amend_spec(
+    "Shallit nested continued-fraction substitution",
+    law="{0,k-1,k+2,k,k,k-2,k,k+2,k-2,k}[["
+        "Nest[Flatten[{{1,2},{3,4},{5,6},{7,8},{5,6},{3,4},"
+        "{9,10},{7,8},{9,10},{3,4}}[[#]]]&,1,n]]]",
+    law_uid="U005900",
+)
+amend_spec(
+    "rational double-integral special-function identity",
+    law="Integrate[1/(1+x^2+y^2),{x,0,1},{y,0,1}] == "
+        "HypergeometricPFQ[{1/2,1,1},{3/2,3/2},1/9]/6 + "
+        "Pi ArcSinh[1]/2 - Catalan",
+    law_uid="U005931",
+)
+amend_spec(
+    "square-frequency Fourier sum",
+    law="Sum[Sin[n^2 x]/n^2,{n,k}]; at x=p Pi/q and k=Infinity it equals "
+        "(Pi/(2q))^2 Sum[Sin[n^2 p Pi/q]/Sin[n Pi/(2q)]^2,{n,q-1}]",
+)
+amend_spec(
+    "Riemann zeta denotation",
+    law="for real s, Zeta[s]=Sum[1/n^s,{n,Infinity}]="
+        "Product[1/(1-Prime[n]^-s),{n,Infinity}]; complex s uses analytic continuation",
+    facts={
+        "support": FF(
+            "the source states the sum/product for real s and separately names analytic continuation for complex s",
+            "U005956",
+        ),
+    },
+)
+amend_spec(
+    "Riemann-hypothesis constraint",
+    law="all indexed zeta zeros r[i] used in the source satisfy Re[r[i]] == 1/2",
+    params=("indexed zeta-zero family r",),
+)
+amend_spec(
+    "Gauss fractional-part reciprocal map",
+    facts={
+        "termination_completion_failure": FF(
+            "x -> FractionalPart[1/x] is undefined at x=0.",
+            "U005967",
+        ),
+    },
+)
+amend_spec(
+    "fixed-binary-precision shift-map simulation",
+    facts={
+        "termination_completion_failure": FF(
+            "With 53 stored binary digits the finite-state simulation eventually loses sampled digits and reaches 0, unlike the exact map.",
+            ("U005972", "U005974", "U005975", "U005978"),
+        ),
+    },
+)
+amend_spec(
+    "fixed-decimal-precision shift-map simulation",
+    facts={
+        "termination_completion_failure": FF(
+            "The 12-decimal-digit BCD simulation eventually samples beyond stored digits and then follows a finite-precision artifact rather than the exact map.",
+            ("U005973", "U005974", "U005976", "U005977", "U005978"),
+        ),
+    },
+)
+amend_spec(
+    "Anosov torus map",
+    source_status=("CONFLICTING",),
+    source_uncertainties=(
+        "U005993 says rational initial conditions yield repetition and then says rational entries in m yield complicated behavior even though its displayed m is already rational/integer.",
+    ),
+    facts={
+        "parameters_and_variants": FF(
+            "matrix m and initial vector; the behavior condition on rational entries of m is internally conflicting",
+            "U005993",
+            status="CONFLICTING_SOURCE",
+            reason="The two rationality statements in U005993 cannot both delimit the claimed behavior as written.",
+        ),
+    },
+)
+
+amend_spec(
+    "continuous cellular-automaton family",
+    name="continuous cellular-automaton averaging implementation",
+    law="CCAEvolveStep[f_,list_List] := Map[f,(RotateLeft[list]+list+"
+        "RotateRight[list])/3]; CCAEvolveList[f_,init_List,t_Integer] := "
+        "NestList[CCAEvolveStep[f,#]&,init,t]",
+    variants=("exact rational arithmetic", "approximate numeric arithmetic"),
+    facts={
+        "alphabet_or_value_schema": FF("cell values lie between 0 and 1", "U005997"),
+        "topology": FF("one-dimensional periodic list induced by RotateLeft/RotateRight", "U005998"),
+        "boundary": FF("periodic boundary induced by RotateLeft/RotateRight", "U005998"),
+        "frontier_or_activation": FF("Map applies f at every list position", "U005998"),
+        "schedule": FF("one synchronous whole-list update per CCAEvolveStep", "U005998"),
+        "read_dependencies_or_neighborhood": FF(
+            "left neighbor, self, and right neighbor averaged before applying f",
+            "U005998",
+        ),
+        "termination_completion_failure": FF(
+            "CCAEvolveList performs the requested t steps; approximate arithmetic can accumulate exponentially growing errors and produce qualitatively wrong patterns.",
+            ("U005999", "U006000"),
+        ),
+    },
+)
+SPECS.extend([
+    S(
+        "page-157 continuous-CA transfer-rule preset",
+        ["U005997", "U005998", "U005999", "U006000"],
+        "CA",
+        "average left,self,right, then apply FractionalPart[3 #/2] &",
+        params=("initial list", "steps"),
+        facts={
+            "alphabet_or_value_schema": FF("cell values lie between 0 and 1", "U005997"),
+            "topology": FF("one-dimensional periodic list induced by RotateLeft/RotateRight", "U005998"),
+            "boundary": FF("periodic boundary induced by RotateLeft/RotateRight", "U005998"),
+            "read_dependencies_or_neighborhood": FF("left, self, right arithmetic mean", "U005998"),
+            "termination_completion_failure": FF(
+                "Exact rational arithmetic is required for detailed calculations; 64-bit approximate values can make the lower pattern qualitatively wrong.",
+                ("U005999", "U006000"),
+            ),
+        },
+    ),
+    S(
+        "page-158 continuous-CA offset-rule preset",
+        ["U005997", "U005998", "U005999", "U006000"],
+        "CA",
+        "average left,self,right, then apply FractionalPart[# + 1/4] &",
+        params=("initial list", "steps"),
+        facts={
+            "alphabet_or_value_schema": FF("cell values lie between 0 and 1", "U005997"),
+            "topology": FF("one-dimensional periodic list induced by RotateLeft/RotateRight", "U005998"),
+            "boundary": FF("periodic boundary induced by RotateLeft/RotateRight", "U005998"),
+            "read_dependencies_or_neighborhood": FF("left, self, right arithmetic mean", "U005998"),
+            "termination_completion_failure": FF(
+                "Exact rational arithmetic is required for detailed calculations; approximate errors grow exponentially.",
+                ("U005999", "U006000"),
+            ),
+        },
+    ),
+])
+amend_spec(
+    "additive continuous cellular automaton",
+    facts={
+        "topology": FF("one-dimensional periodic list induced by rotations", "U006007"),
+        "boundary": FF("periodic boundary induced by RotateLeft/RotateRight", "U006007"),
+        "frontier_or_activation": FF("all list positions update together", "U006007"),
+        "schedule": FF("one synchronous whole-list update per step", "U006007"),
+        "read_dependencies_or_neighborhood": FF("left and right neighbor values", "U006007"),
+    },
+)
+amend_spec(
+    "probabilistic cellular automaton family",
+    facts={
+        "determinism_branching_or_measure": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="U006010 names probabilistic selection between two rules but defers the probabilities and coupling to page 591.",
+        ),
+        "schedule": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="The local Notes unit does not say how random rule choices are coupled or scheduled.",
+        ),
+        "topology": FF(
+            None,
+            (),
+            status="UNKNOWN_FROM_SOURCE",
+            reason="The local Notes unit does not state a boundary topology for the routed examples.",
+        ),
+    },
+)
+amend_spec(
+    "autonomous ODE system relation",
+    params=("dependent functions", "initial values", "t"),
+)
+SPECS.append(
+    S(
+        "non-autonomous ODE system relation",
+        ["U006012"],
+        "ODE",
+        "coupled ordinary differential equations whose right-hand-side function depends explicitly on time",
+        params=("dependent functions", "initial values", "t"),
+        variants=("the source states that two equations can suffice for non-fixed/non-repetitive behavior",),
+    )
+)
+amend_spec("two-Gaussian periodic-boundary PDE comparison preset", kind="PRESET")
+amend_spec("dimensional wave-equation square-pulse preset", kind="PRESET")
+amend_spec(
+    "negative-diffusion PDE relation",
+    facts={
+        "termination_completion_failure": FF(
+            "The source calls the behavior inconsistent: any spatial variation eventually becomes infinitely rapid.",
+            ("U006024", "U006025", "U006026"),
+        ),
+    },
+)
+amend_spec(
+    "PDE boundary-value constraint semantics",
+    kind="RELATION",
+    facts={
+        "result_kind": FF(
+            "a solution set over a region: too little boundary data may admit many solutions; too much may admit none",
+            "U006028",
+        ),
+        "successor_cardinality": FF(
+            "not a successor relation; boundary constraints can yield many, one, or zero satisfying functions",
+            "U006028",
+        ),
+        "termination_completion_failure": FF(
+            "nonuniqueness and nonexistence are explicit accepted outcomes of underspecified or inconsistent boundary data",
+            "U006028",
+        ),
+    },
+)
+amend_spec(
+    "general Jacobi background solution",
+    law="b d JacobiSN[r t,s]^2/(b-d JacobiCN[r t,s]^2), where "
+        "r=-Sqrt[(a c (b-d))/8], s=d(c-b)/(c(d-b)), and b,c,d satisfy "
+        "(x-b)(x-c)(x-d)==-(12+6 a x-4 x^2-3 a x^3)/(3 a)",
+    facts={
+        "termination_completion_failure": FF(
+            "The source states periodic, nonsingular behavior except for -8/3 < a < -1/Sqrt[6].",
+            "U006047",
+        ),
+    },
+)
+remove_spec("named PDE numerical-method family")
+amend_spec(
+    "explicit second-order PDE finite-difference solver",
+    facts={
+        "boundary": FF("periodic boundary induced by RotateLeft/RotateRight", "U006063"),
+        "topology": FF("one-dimensional periodic spatial list", "U006063"),
+        "complete_state": FF("two consecutive full spatial slices {u1,u2}", ("U006061", "U006063")),
+        "termination_completion_failure": FF(
+            "The code performs the requested number of steps; convergence to the continuous PDE is a separate, not guaranteed judgment.",
+            ("U006060", "U006061"),
+        ),
+    },
+)
+amend_spec("page-165 Gaussian numerical preset", kind="PRESET")
+amend_spec(
+    "PDE convergence observer",
+    facts={
+        "termination_completion_failure": FF(
+            "The top and middle examples converge rapidly as dx decreases; for the bottom example convergence is slow, correctness of details is unknown, and apparent shocks may be discretization artifacts.",
+            "U006066",
+        ),
+        "witness_semantics": FF(
+            "comparison across decreasing dx and approximate energy conservation are evidence, not a proof of convergence or correctness",
+            "U006066",
+        ),
+    },
+)
+for pde_name in (
+    "Burgers-equation relation",
+    "nonlinear Schrodinger equation relation",
+    "Kuramoto-Sivashinsky equation relation",
+):
+    amend_spec(
+        pde_name,
+        identity_image=OTHER_PDE_IMAGE,
+        facts={
+            "boundary": FF(
+                "periodic boundary for the pictured solutions; this is not intrinsic to the equation identity",
+                "U006072",
+            ),
+        },
+    )
+
+
+# Source-grounded relationship names are retained without allocating forbidden
+# global B IDs.  The blind schema only permits B IDs in related_candidate_ids;
+# the coordinator will map these named comparisons after W-ID allocation.
+RELATION_GROUPS = [
+    ("truncated powers-of-three congruential generator", "base-6 cellular automaton for powers of three"),
+    ("standard 3n+1 map", "universal 3n+1 eventual-one query", "per-seed 3n+1 eventual-one predicate", "base-6 cellular automaton for the 3n+1 map"),
+    ("iterated run-length encoder", "92-token substitution realization of run-length encoding"),
+    ("Moebius sign function", "Mertens cumulative-sum observer"),
+    ("iterated aliquot-sum map", "unbounded aliquot-growth query"),
+    ("successive-integer concatenation sequence", "concatenation-sequence cumulative walk", "leading-digit-dropped concatenation walk", "direct concatenation-position query", "large-block concatenation digit formula"),
+    ("continued-fraction digit extractor", "continued-fraction reconstruction", "Gauss-map continued-fraction trajectory", "continued-fraction approximation-quality observer"),
+    ("subtractive Euclidean algorithm", "Euclidean rational-termination query"),
+    ("smooth logistic map", "logistic-map leftmost-digit substitution observer", "Lyapunov-exponent observer"),
+    ("continuous cellular-automaton averaging implementation", "page-157 continuous-CA transfer-rule preset", "page-158 continuous-CA offset-rule preset", "continuous-CA background trajectory", "continuous-CA center-cell color observer"),
+    ("Klein-Gordon PDE relation", "Klein-Gordon exact pulse solution"),
+    ("finite-difference PDE discretization family", "Courant stability constraint", "explicit second-order PDE finite-difference solver", "PDE convergence observer"),
+]
+for group in RELATION_GROUPS:
+    for name in group:
+        spec = spec_named(name)
+        peers = tuple(peer for peer in group if peer != name)
+        spec["relation_names"] = tuple(dict.fromkeys(
+            list(spec.get("relation_names", ())) + list(peers)
+        ))
+
+
 ROUTES = [
-    ("page117_sub", "U005657", "page 83", "replacement rule and seed for the rotated page-117 substitution preset", ["substitution system", "page 117"]),
-    ("powers3_ca", "U005671", "page 614", "strictly local base-6 cellular-automaton rule for powers of three", ["powers of three", "base 6 cellular automaton"]),
-    ("linear_recurrences", "U005728", "page 128", "coefficients, orders, and initial values of the page-128 linear recurrences", ["linear recurrence", "page 128"]),
-    ("three_squares", "U005820", "page 135", "necessary-and-sufficient sum-of-three-squares representability condition", ["three squares", "representability"]),
-    ("digit_sqrt", "U005863", "page 141", "per-step update law for the digit-by-digit square-root construction", ["square root", "digit by digit"]),
-    ("integer_representations", "U005927", "page 560", "integer-representation construction referenced without mechanics", ["integer representation"]),
-    ("zero_substitution", "U005945", "page 903", "substitution rules for cosine/sine zero-spacing sequences", ["zero spacing", "substitution"]),
-    ("probabilistic_ca", "U006010", "page 591", "rule choices, probabilities, and seeds for probabilistic cellular automata", ["probabilistic cellular automaton"]),
+    ("page117_sub", "U005657", "page 83", "replacement rule and seed for the rotated page-117 substitution preset", ["substitution system", "page 117"], "CROSS_RANGE"),
+    ("powers3_ca", "U005671", "page 614", "complicated base-6 powers-of-three pattern used for the cellular-automaton correspondence", ["powers of three", "base 6 cellular automaton"], "CROSS_RANGE"),
+    ("linear_recurrences", "U005728", "page 128", "coefficients, orders, and initial values of the page-128 linear recurrences", ["linear recurrence", "page 128"], "WITHIN_STAGE"),
+    ("three_squares", "U005820", "page 135", "necessary-and-sufficient sum-of-three-squares representability condition", ["three squares", "representability"], "WITHIN_STAGE"),
+    ("digit_sqrt", "U005863", "page 141", "per-step update law for the digit-by-digit square-root construction", ["square root", "digit by digit"], "WITHIN_STAGE"),
+    ("integer_representations", "U005927", "page 560", "integer-representation construction referenced without mechanics", ["integer representation"], "CROSS_RANGE"),
+    ("zero_substitution", "U005945", "page 903", "substitution rules for cosine/sine zero-spacing sequences", ["zero spacing", "substitution"], "WITHIN_STAGE"),
+    ("probabilistic_ca", "U006010", "page 591", "rule choices, probabilities, and seeds for probabilistic cellular automata", ["probabilistic cellular automaton"], "CROSS_RANGE"),
 ]
 
 
@@ -334,6 +1067,178 @@ OBSERVER_UNITS = {
     "U006013", "U006014", "U006017", "U006018", "U006019", "U006020",
     "U006021", "U006022", "U006023", "U006027", "U006028", "U006054",
     "U006055", "U006056", "U006057", "U006067",
+}
+
+
+ASSET_ROLE_IDS: dict[str, set[str]] = {
+    "NATIVE_EVIDENCE": {
+        "A000441", "A000456", "A000482", "A000483", "A000489", "A000518",
+    },
+    "RELATION": {"A000491", "A000495"},
+    "CONTROL": {
+        "A000440", "A000450", "A000462", "A000469", "A000480",
+        "A000481", "A000484", "A000494", "A000498", "A000499",
+        "A000500", "A000501", "A000502", "A000503", "A000504",
+        "A000506", "A000507", "A000511", "A000512", "A000513",
+        "A000517",
+    },
+    "OBSERVER": {
+        "A000437", "A000438", "A000439", "A000442", "A000444",
+        "A000445", "A000446", "A000457", "A000458", "A000459",
+        "A000460", "A000461", "A000465", "A000466", "A000467",
+        "A000468", "A000470", "A000471", "A000472", "A000473",
+        "A000492", "A000497",
+    },
+    # A000443 is a referenced but bottom-clipped extraction.  The remaining
+    # SOURCE_DEFECT IDs are the 30 unreferenced fragments and are filled from
+    # the bundle's reference_status at authoring time.
+    "SOURCE_DEFECT": {"A000443"},
+}
+
+ASSET_RISKS: dict[str, tuple[str, ...]] = {
+    "A000440": ("TEXT_BEARING",),
+    "A000441": ("CONSTRUCTION_BEARING",),
+    "A000443": (
+        "CONSTRUCTION_BEARING", "TEXT_BEARING",
+        "AMBIGUOUS", "CAPTION_INCOMPLETE",
+    ),
+    "A000450": ("TEXT_BEARING",),
+    "A000456": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000462": ("TEXT_BEARING",),
+    "A000468": ("TEXT_BEARING",),
+    "A000469": ("TEXT_BEARING",),
+    "A000480": ("TEXT_BEARING",),
+    "A000481": ("TEXT_BEARING",),
+    "A000482": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000483": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000484": ("TEXT_BEARING",),
+    "A000489": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000491": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000492": ("TEXT_BEARING",),
+    "A000494": ("TEXT_BEARING",),
+    "A000495": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000497": ("TEXT_BEARING",),
+    "A000498": ("TEXT_BEARING",),
+    "A000499": ("TEXT_BEARING",),
+    "A000500": ("TEXT_BEARING",),
+    "A000501": ("TEXT_BEARING",),
+    "A000502": ("TEXT_BEARING",),
+    "A000503": ("TEXT_BEARING",),
+    "A000504": ("TEXT_BEARING",),
+    "A000506": ("TEXT_BEARING",),
+    "A000507": ("TEXT_BEARING",),
+    "A000511": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000512": ("TEXT_BEARING",),
+    "A000513": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+    "A000517": ("TEXT_BEARING",),
+    "A000518": ("CONSTRUCTION_BEARING", "TEXT_BEARING"),
+}
+
+ORPHAN_RISKS: dict[str, tuple[str, ...]] = {
+    **{
+        asset_id: ("TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE")
+        for asset_id in (
+            "A000447", "A000448", "A000449", "A000474", "A000475",
+            "A000476", "A000477", "A000478", "A000479", "A000485",
+            "A000486", "A000487", "A000488", "A000490", "A000493",
+            "A000496", "A000508", "A000509", "A000510", "A000514",
+            "A000515", "A000516",
+        )
+    },
+    **{
+        asset_id: (
+            "CONSTRUCTION_BEARING", "TEXT_BEARING",
+            "AMBIGUOUS", "CAPTION_INCOMPLETE",
+        )
+        for asset_id in (
+            "A000451", "A000452", "A000453", "A000454", "A000455",
+        )
+    },
+    **{
+        asset_id: ("AMBIGUOUS", "CAPTION_INCOMPLETE")
+        for asset_id in (
+            "A000463", "A000464", "A000505",
+        )
+    },
+}
+
+# Candidate/image joins include contextual observers and controls, not merely
+# images that carry native formulas.  Candidate image_witnesses and the asset
+# ledger are generated from this one symmetric mapping.
+ASSET_CANDIDATE_NAMES: dict[str, tuple[str, ...]] = {
+    "A000437": ("Gray-code ordering generator",),
+    "A000438": ("base-2 one-digit count function",),
+    "A000439": ("negative-base positional representation",),
+    "A000440": ("irrational-rotation multiple sequence", "uniformly-distributed fractional-part family"),
+    "A000441": ("multiplicative prime-exponent representation",),
+    "A000442": ("powers-of-three base-2 digit sequence",),
+    "A000443": (
+        "standard 3n+1 map",
+        "case-b binary-length stopping-time map",
+        "case-c one-bit-count stopping-time map obligation",
+    ),
+    "A000444": ("binary reversal-addition map",),
+    "A000445": ("iterated run-length encoder", "92-token substitution realization of run-length encoding"),
+    "A000446": ("reversible rounded integer map",),
+    "A000450": ("fixed-width digit-reversal permutation",),
+    "A000456": (
+        "BitXor[2 n,n] digit function", "BitXor[3+2 n,n] digit function",
+        "BitXor[3 n,n] digit function", "BitXor[6 n,n] digit function",
+        "BitOr[2 n,n] digit function", "BitOr[6 n,n] digit function",
+    ),
+    "A000457": ("binary-dependency recursive-sequence schema",),
+    "A000458": ("complex primitive-recursive function",),
+    "A000459": ("complex primitive-recursive function",),
+    "A000460": ("diagonalized non-primitive-recursive function",),
+    "A000461": ("Ulam sequence",),
+    "A000462": ("decimation system", "decimation survival-time function"),
+    "A000465": ("divisor-count function", "aliquot-balance function"),
+    "A000466": ("Lucas-Lehmer Mersenne-prime test",),
+    "A000467": ("iterated aliquot-sum map", "unbounded aliquot-growth query"),
+    "A000469": ("rational digit repeat-period function",),
+    "A000470": ("concatenation-sequence cumulative walk",),
+    "A000471": ("leading-digit-dropped concatenation walk",),
+    "A000472": ("successive-integer concatenation sequence",),
+    "A000473": ("successive-integer concatenation sequence",),
+    "A000480": ("continued-fraction digit extractor", "Gauss-map continued-fraction trajectory"),
+    "A000481": ("continued-fraction approximation-quality observer",),
+    "A000482": ("subtractive Euclidean algorithm",),
+    "A000483": ("subtractive Euclidean algorithm", "Euclidean rational-termination query"),
+    "A000484": ("continued-fraction term-size measure",),
+    "A000489": ("operator-tree integer representation family",),
+    "A000491": ("digital-slope representation", "digital-slope reconstruction"),
+    "A000492": ("two-sine function and zero relation", "ODE denotation of an incommensurate sine sum"),
+    "A000494": ("harmonic sine Fourier partial sums",),
+    "A000495": ("Lissajous curve map",),
+    "A000497": ("three-sine function and zero set",),
+    "A000498": ("cosine-difference zero-spacing sequence", "zero-spacing substitution realization"),
+    "A000499": ("square-frequency Fourier sum",),
+    "A000500": ("lacunary power-of-two cosine sum",),
+    "A000501": ("weighted Weierstrass cosine series",),
+    "A000502": ("fixed-binary-precision shift-map simulation", "fixed-decimal-precision shift-map simulation"),
+    "A000503": ("finite-precision multiplication-by-3/2 simulation",),
+    "A000504": ("smooth logistic map",),
+    "A000506": ("additive continuous cellular automaton",),
+    "A000507": ("continuous-CA background trajectory", "continuous-CA center-cell color observer"),
+    "A000511": ("two-Gaussian periodic-boundary PDE comparison preset",),
+    "A000512": ("dimensional wave-equation square-pulse preset",),
+    "A000513": ("Courant stability constraint",),
+    "A000517": ("PDE convergence observer",),
+    "A000518": (
+        "Burgers-equation relation", "nonlinear Schrodinger equation relation",
+        "Kuramoto-Sivashinsky equation relation",
+    ),
+}
+
+SOURCE_STATUS_BY_UID = {
+    "U005695": (
+        "DEFECTIVE",
+        "The referenced A000443 extraction is bottom-clipped before the case-(c) formula label.",
+    ),
+    "U005993": (
+        "CONFLICTING",
+        "The unit's two rationality conditions for repetitive versus complicated behavior conflict as written.",
+    ),
 }
 
 
