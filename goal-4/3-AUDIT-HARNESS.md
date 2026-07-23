@@ -401,13 +401,13 @@ signed off. History/replay QA passed its focused history subset, independently
 observed `28/29` rejection, `29/29` acceptance, and stale-epoch rejection, and
 signed off.
 
-Stage 7 expanded the ordinary full Goal 4 suite to 100 tests, all passing. An
-optimized aggregate run passed 99 tests and found one environment-specific
-relocation-fixture failure: `os.link` raised `EXDEV` across filesystems.
-`test_corpus.py` now falls back to `shutil.copy2` only for `errno.EXDEV` and
-continues to propagate every other link error. The corrected optimized
-relocation case passes; a full optimized aggregate rerun after the correction
-has not yet been recorded.
+Stage 7 expanded the full Goal 4 suite to 100 tests, all passing in ordinary
+and optimized Python. The first optimized aggregate run found one
+environment-specific relocation-fixture failure: `os.link` raised `EXDEV`
+across filesystems. `test_corpus.py` now falls back to `shutil.copy2` only for
+`errno.EXDEV` and continues to propagate every other link error. The corrected
+optimized aggregate rerun passes all 100 tests; pytest emits only its expected
+warning that test-module assertions are disabled under `-O`.
 
 Re-integration answers:
 

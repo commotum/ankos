@@ -263,16 +263,16 @@ python3 -O goal-4/tools/validate_audit.py --goal-dir goal-4 --require-stage 7
   routes=178 assets=1607 screened=216 rounds=8
 ```
 
-The ordinary full Goal 4 regression suite passes all 100 tests. The first
-optimized full-suite run passed 99 tests and exposed one relocation-fixture
+The full Goal 4 regression suite passes all 100 tests in ordinary and
+optimized Python. The first optimized run exposed one relocation-fixture
 failure: a hard link crossed filesystems and raised `EXDEV`. The fixture now
 falls back from `os.link` to `shutil.copy2` only for `errno.EXDEV`, preserving
-all other errors, and the corrected optimized relocation case passes. A full
-optimized aggregate rerun after that correction has not yet been recorded and
-is not claimed here.
+all other errors. The corrected optimized aggregate passes all 100 tests with
+only pytest's expected warning about disabled test-module assertions under
+`-O`.
 
 There are no pending Stage 7 `WITHIN_STAGE` routes, no undispositioned LOCAL
 hits, and no semantic discovery on the terminal rerun. The blind artifacts
 contain no T-ID, catalog, semantic-family, API-fit, or implementation
-conclusion. Subject to recording the final optimized aggregate rerun, Stage 8
-may begin from this verified ledger state without pre-reading its source.
+conclusion. Stage 8 may begin from this verified ledger state without
+pre-reading its source.
