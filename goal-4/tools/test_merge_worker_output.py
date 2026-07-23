@@ -444,6 +444,8 @@ def _search_candidate(
 
 def _search_enrichment_fixture(
     root: Path,
+    *,
+    second_candidate: bool = False,
 ) -> tuple[Path, Path, str, str]:
     initial_bundle = _completed_no_construction_bundle(
         root / "initial",
@@ -480,6 +482,9 @@ def _search_enrichment_fixture(
     governed_pair = next(pair for pair in pairs if pair[1] in target_ids)
     governed_unit_id = governed_pair[1]
     unit_by_id = {unit["id"]: unit for unit in units}
+    governed_candidate_ids = (
+        ["B0001", "B0002"] if second_candidate else ["B0001"]
+    )
     hits: list[dict[str, Any]] = []
     governed_hit_id = ""
     for index, (query_id, unit_id) in enumerate(pairs, start=1):
@@ -498,7 +503,7 @@ def _search_enrichment_fixture(
                     if governed
                     else "EXCLUSION"
                 ),
-                "candidate_ids": ["B0001"] if governed else [],
+                "candidate_ids": governed_candidate_ids if governed else [],
                 "route_ids": [],
                 "rationale": (
                     "The hit governs the newly discovered candidate."
@@ -519,8 +524,12 @@ def _search_enrichment_fixture(
         "result_digest": "",
         "hits": hits,
         "new_vocabulary": [],
-        "new_candidates": ["B0001"],
-        "new_evidence_groups": ["G000001"],
+        "new_candidates": governed_candidate_ids,
+        "new_evidence_groups": (
+            ["G000001", "G000002"]
+            if second_candidate
+            else ["G000001"]
+        ),
         "new_routes": [],
         "rerun_digest": "",
     }
@@ -547,10 +556,25 @@ def _search_enrichment_fixture(
     reading_update.update(
         {
             "review_disposition": "CANDIDATE",
-            "candidate_ids": '["B0001"]',
+            "candidate_ids": json.dumps(
+                governed_candidate_ids,
+                separators=(",", ":"),
+            ),
             "evidence_statement": "The appended LOCAL hit supplies a construction lead.",
         }
     )
+    candidate_updates = [
+        _search_candidate(governed_unit_id, governed_hit_id)
+    ]
+    if second_candidate:
+        second = copy.deepcopy(candidate_updates[0])
+        second["id"] = "B0002"
+        second["provisional_name"] = "Second search construction lead"
+        second["discovery_anchor"]["ordinal"] = 2
+        second["source_evidence"][0]["evidence_id"] = "E000002"
+        second["source_evidence"][0]["evidence_group_id"] = "G000002"
+        second["source_evidence"][0]["discovery_anchor"]["ordinal"] = 2
+        candidate_updates.append(second)
     proposal = {
         "schema_version": 1,
         "proposal_kind": "SEARCH_ENRICHMENT",
@@ -563,9 +587,7 @@ def _search_enrichment_fixture(
         },
         "reading_updates": [reading_update],
         "asset_updates": [],
-        "candidate_updates": [
-            _search_candidate(governed_unit_id, governed_hit_id)
-        ],
+        "candidate_updates": candidate_updates,
         "route_appends": [],
         "proposed_search": proposed_search,
     }

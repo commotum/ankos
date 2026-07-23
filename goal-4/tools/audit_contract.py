@@ -91,22 +91,30 @@ REVIEW_HISTORY_FIELDS = [
     "mode",
     "reviewer",
     "source_paths",
-    "source_unit_ids",
-    "asset_ids",
-    "prior_search_round_count",
-    "prior_search_rounds_sha256",
-    "previous_path_result_sha256",
-    "trigger_search_kind",
-    "trigger_hit_ids",
+    "path_changes",
     "candidate_changes",
-    "input_projection_sha256",
-    "result_snapshot",
-    "result_projection_sha256",
+    "route_changes",
+    "search_change",
     "previous_event_sha256",
     "event_sha256",
 ]
-REVIEW_MODES = ["INITIAL", "REOPEN", "SEARCH_ENRICHMENT"]
-SEARCH_ENRICHMENT_TRIGGER_KINDS = ["LOCAL", "SATURATION"]
+REVIEW_MODES = [
+    "INITIAL",
+    "REOPEN",
+    "SEARCH_APPEND",
+    "ROUTE_RESOLUTION",
+    "CANDIDATE_REVISION",
+]
+SEARCH_APPEND_TRIGGER_KINDS = ["LOCAL", "SATURATION"]
+PATH_CHANGE_FIELDS = [
+    "source_path",
+    "source_unit_ids",
+    "asset_ids",
+    "previous_path_result_sha256",
+    "input_projection_sha256",
+    "result_snapshot",
+    "result_projection_sha256",
+]
 CANDIDATE_CHANGE_FIELDS = [
     "action",
     "candidate_id",
@@ -117,6 +125,23 @@ CANDIDATE_CHANGE_FIELDS = [
     "after_candidate_sha256",
 ]
 CANDIDATE_CHANGE_ACTIONS = ["CREATE", "UPDATE"]
+ROUTE_CHANGE_FIELDS = [
+    "action",
+    "route_id",
+    "previous_route_result_sha256",
+    "before_route",
+    "before_route_sha256",
+    "after_route",
+    "after_route_sha256",
+]
+ROUTE_CHANGE_ACTIONS = ["CREATE", "UPDATE"]
+SEARCH_CHANGE_FIELDS = [
+    "previous_search_result_sha256",
+    "before_search",
+    "before_search_sha256",
+    "after_search",
+    "after_search_sha256",
+]
 READING_REVIEW_RESULT_FIELDS = [
     "source_unit_id",
     "review_status",
@@ -893,18 +918,72 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         },
         "additionalProperties": False,
     }
-    review_history_schema = {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "Append-only blind review-history event",
+    route_snapshot_schema = _csv_row_schema(
+        "Blind cross-reference row",
+        CROSS_REFERENCE_HEADER,
+        cross_properties,
+    )
+    route_change_schema = {
         "type": "object",
-        "required": REVIEW_HISTORY_FIELDS,
+        "required": ROUTE_CHANGE_FIELDS,
         "properties": {
-            "review_id": {"type": "string", "pattern": "^V[0-9]{6}$"},
-            "epoch": {"type": "integer", "minimum": 1},
-            "stage": {"type": "integer", "minimum": 4, "maximum": 17},
-            "mode": {"type": "string", "enum": REVIEW_MODES},
-            "reviewer": {"type": "string", "minLength": 1},
-            "source_paths": _string_array(),
+            "action": {
+                "type": "string",
+                "enum": ROUTE_CHANGE_ACTIONS,
+            },
+            "route_id": {
+                "type": "string",
+                "pattern": "^R[0-9]{6}$",
+            },
+            "previous_route_result_sha256": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                ]
+            },
+            "before_route": {
+                "oneOf": [{"type": "null"}, route_snapshot_schema]
+            },
+            "before_route_sha256": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                ]
+            },
+            "after_route": route_snapshot_schema,
+            "after_route_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+        },
+        "additionalProperties": False,
+    }
+    search_change_schema = {
+        "type": "object",
+        "required": SEARCH_CHANGE_FIELDS,
+        "properties": {
+            "previous_search_result_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+            "before_search": search_schema,
+            "before_search_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+            "after_search": search_schema,
+            "after_search_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+        },
+        "additionalProperties": False,
+    }
+    path_change_schema = {
+        "type": "object",
+        "required": PATH_CHANGE_FIELDS,
+        "properties": {
+            "source_path": {"type": "string", "minLength": 1},
             "source_unit_ids": {
                 "type": "array",
                 "items": {
@@ -921,40 +1000,11 @@ def schema_documents() -> dict[str, dict[str, Any]]:
                 },
                 "uniqueItems": True,
             },
-            "prior_search_round_count": {
-                "type": "integer",
-                "minimum": 0,
-            },
-            "prior_search_rounds_sha256": {
-                "type": "string",
-                "pattern": "^[0-9a-f]{64}$",
-            },
             "previous_path_result_sha256": {
                 "oneOf": [
                     {"type": "null"},
                     {"type": "string", "pattern": "^[0-9a-f]{64}$"},
                 ]
-            },
-            "trigger_search_kind": {
-                "oneOf": [
-                    {"type": "null"},
-                    {
-                        "type": "string",
-                        "enum": SEARCH_ENRICHMENT_TRIGGER_KINDS,
-                    },
-                ]
-            },
-            "trigger_hit_ids": {
-                "type": "array",
-                "items": {
-                    "type": "string",
-                    "pattern": "^H[0-9]{6}$",
-                },
-                "uniqueItems": True,
-            },
-            "candidate_changes": {
-                "type": "array",
-                "items": candidate_change_schema,
             },
             "input_projection_sha256": {
                 "type": "string",
@@ -964,6 +1014,39 @@ def schema_documents() -> dict[str, dict[str, Any]]:
             "result_projection_sha256": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{64}$",
+            },
+        },
+        "additionalProperties": False,
+    }
+    review_history_schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Append-only blind review-history event",
+        "type": "object",
+        "required": REVIEW_HISTORY_FIELDS,
+        "properties": {
+            "review_id": {"type": "string", "pattern": "^V[0-9]{6}$"},
+            "epoch": {"type": "integer", "minimum": 1},
+            "stage": {"type": "integer", "minimum": 4, "maximum": 18},
+            "mode": {"type": "string", "enum": REVIEW_MODES},
+            "reviewer": {"type": "string", "minLength": 1},
+            "source_paths": _string_array(),
+            "path_changes": {
+                "type": "array",
+                "items": path_change_schema,
+            },
+            "candidate_changes": {
+                "type": "array",
+                "items": candidate_change_schema,
+            },
+            "route_changes": {
+                "type": "array",
+                "items": route_change_schema,
+            },
+            "search_change": {
+                "oneOf": [
+                    {"type": "null"},
+                    search_change_schema,
+                ]
             },
             "previous_event_sha256": {
                 "oneOf": [
