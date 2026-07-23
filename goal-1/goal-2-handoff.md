@@ -8,6 +8,21 @@ Implement the evidence-grounded SimplePrograms architecture in `src/ca` without 
 
 This handoff is subordinate to the evidence and semantic boundaries in the 45 type-stage files, `architecture-audit.md`, `design-ledger.md`, and `47-SYNTHESIS.md`. If implementation pressure contradicts those records, stop and re-derive the affected Goal 1 decision; do not add a family switch, second semantic/execution compatibility path, callback, or lossy representation.
 
+## Canonical Book Source
+
+All source lookup for this handoff must use the repository's canonical
+*A New Kind of Science* Markdown corpus:
+
+- [Source overview](../ref/A-New-Kind-of-Science/README.md)
+- [Ordered contents and links to all 29 book documents](../ref/A-New-Kind-of-Science/Contents.md)
+
+Search and cite the linked front matter, chapters, Notes, Index, and Colophon
+documents directly. These files and their colocated figures are the only live
+book-source surface for Goal 2. Goal 1 stage files remain the design and
+conformance authorities, but any quotation, example, rule table, or fixture
+used by an implementation must be rebound to the canonical document that
+contains it.
+
 ## Target Architecture
 
 `src/ca` remains the package path and is revised **in place** as the SimplePrograms library. The path does not delimit the semantics to cellular automata. Do not build a second `simple_programs` package and route old calls through a legacy CA executor.
@@ -429,7 +444,7 @@ The following matrix is normative. `Cnn` is the leaf obligation for `Tnn`; `—`
 
 ## Exact 45-Row Coverage Matrix
 
-The `Coverage stage` column assigns each catalog row exactly once. Leaf obligation `Cnn` is definitionally the conformance obligation for catalog row `Tnn`; there is no independent remapping. The normative 45-row leaf-dependency matrix above maps every row exactly once and gives direct proof dependencies, while the stage DAG supplies the shared-substrate dependencies. Shared implementation is planned above and is not duplicated here. The named Goal 1 file is the authority for exact fixtures, source repairs, variants, and negative tests.
+The `Coverage stage` column assigns each catalog row exactly once. Leaf obligation `Cnn` is definitionally the conformance obligation for catalog row `Tnn`; there is no independent remapping. The normative 45-row leaf-dependency matrix above maps every row exactly once and gives direct proof dependencies, while the stage DAG supplies the shared-substrate dependencies. Shared implementation is planned above and is not duplicated here. The named Goal 1 file is the design authority for exact fixtures, variants, and negative tests; the linked canonical book corpus above is the source authority for text, figures, and rule material.
 
 | ID | Exact catalog name | Coverage stage | Goal 1 authority | Required conformance focus |
 |---|---|---|---|---|
