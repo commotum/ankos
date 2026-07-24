@@ -406,7 +406,7 @@ _ROUTES = (
         "numbered 171-pattern witness collection for local-template constraints",
         WITHIN,
         target_unit_ids=uids(1186, 1188), target_asset_ids=aids(913, 914),
-        candidate_ids=bids(699, 702),
+        candidate_ids=bids(699) + bids(702),
         vocabulary_terms=("constraint numbering", "local templates", "repetitive patterns"),
     ),
     route(
@@ -463,10 +463,7 @@ _ROUTES = (
         "nested witness produced by required-template constraint 18762389",
         WITHIN,
         target_unit_ids=uids(1208, 1210), target_asset_ids=aids(917, 918),
-        candidate_ids=bids(709),
-        recovered_candidate_names=(
-            "required-template constraint-family cardinality",
-        ),
+        candidate_ids=bids(708),
         vocabulary_terms=("nested witness", "required-template constraint", "previous page"),
     ),
     route(
@@ -660,6 +657,7 @@ _ROUTES = (
         "page-188 two-dimensional substitution presets (a) through (f)",
         WITHIN,
         target_unit_ids=uids(1038, 1041), target_asset_ids=aids(876),
+        candidate_ids=bids(767, 772),
         recovered_candidate_names=(
             "finite-automaton digit-array substitution-pattern generator",
         ),
@@ -681,6 +679,7 @@ _ROUTES = (
         "page-187 Sierpiński block-substitution pattern",
         WITHIN,
         target_unit_ids=uids(1034, 1037), target_asset_ids=aids(874, 875),
+        candidate_ids=bids(898),
         recovered_candidate_names=(
             "binomial-parity Sierpiński array generator",
             "bitwise-AND-complement Sierpiński array generator",
@@ -998,6 +997,9 @@ _ROUTES = (
         WITHIN,
         target_unit_ids=uids(1061, 1062),
         candidate_ids=bids(915),
+        recovered_candidate_names=(
+            "two-dimensional-grid total-order linearization scan",
+        ),
         vocabulary_terms=("grid scan", "page 192", "space-filling curves"),
     ),
     route(
@@ -1132,11 +1134,11 @@ _ROUTES = (
     route(
         "U006261", "H011715", 1,
         "as on page 206",
-        "page-206 string multiway system used by the group and semigroup interpretation",
+        "page-206 three-replacement multiway system exhibiting quadratic growth",
         WITHIN,
         target_unit_ids=uids(1140, 1143), target_asset_ids=aids(901, 902),
-        candidate_ids=bids(921) + bids(924, 925),
-        vocabulary_terms=("group", "multiway system", "page 206", "semigroup"),
+        candidate_ids=bids(691) + bids(922),
+        vocabulary_terms=("multiway system", "page 206", "quadratic growth"),
     ),
     route(
         "U006263", "H011716", 1,
@@ -1518,6 +1520,7 @@ _ROUTES = (
         "main-text one-dimensional constraint as a regular-language special case",
         WITHIN,
         target_unit_ids=uids(1162, 1165), target_asset_ids=aids(908),
+        candidate_ids=bids(940, 941),
         vocabulary_terms=("one-dimensional constraint", "regular language"),
     ),
     route(
@@ -2064,7 +2067,7 @@ def canonical_spec_digest() -> str:
 ROUTE_SPEC_DIGEST = route_spec_digest()
 CANONICAL_SPEC_DIGEST = canonical_spec_digest()
 EXPECTED_CANONICAL_SPEC_DIGEST = (
-    "5e575deef81eb316173de75edad0a2d1857e14b7327984f290a3a954c1bae27f"
+    "ea4c7b2e9af1a762c6448f3314d196baaa9e515ce6904f65a7bce7234f207682"
 )
 
 
