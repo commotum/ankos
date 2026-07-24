@@ -168,6 +168,13 @@ def candidate_definitions() -> list[dict[str, Any]]:
         source_status: str = "CLEAR",
         conflicting_fields: list[str] | None = None,
         na_fields: list[str] | None = None,
+        mechanics_units: list[str] | None = None,
+        field_units: dict[str, list[str]] | None = None,
+        evidence_overrides: dict[str, dict[str, Any]] | None = None,
+        route_units: list[str] | None = None,
+        related_names: list[str] | None = None,
+        variant_units: dict[str, list[str]] | None = None,
+        anchor_priority: int = 0,
     ) -> None:
         defs.append(
             {
@@ -184,28 +191,80 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "source_status": source_status,
                 "conflicting_fields": conflicting_fields or [],
                 "na_fields": na_fields or [],
+                "mechanics_units": mechanics_units or [semantic_units[0]],
+                "field_units": field_units or {},
+                "evidence_overrides": evidence_overrides or {},
+                "route_units": route_units or [],
+                "related_names": related_names or [],
+                "variant_units": variant_units or {},
+                "anchor_priority": anchor_priority,
             }
         )
 
     add(
-        "random black-or-white cellular-automaton initial-condition generator",
-        ["U001227", "U001416", "U001421"],
-        ["U001227", "U001416", "U001421"],
+        "random cellular-automaton initial-field generator family",
+        ["U001227", "U001316", "U001324", "U001331", "U001333", "U001416", "U001421"],
+        ["U001227", "U001316", "U001324", "U001331", "U001333", "U001416", "U001421"],
         seed_values(
-            "stochastic initial-condition generator",
-            carrier="the cells of a cellular-automaton initial row",
-            alphabet="black or white",
-            law="choose the color of every cell at random; later examples vary the black-cell density",
-            result="a complete black-or-white initial cell configuration",
-            determinism="stochastic; the source does not state independence or exact probabilities in this range",
+            "carrier- and alphabet-parameterized stochastic initial-field generator family",
+            carrier=(
+                "the target cellular automaton's field: a one-dimensional binary row, a one-dimensional "
+                "real-valued row, or a two-dimensional binary grid in the displayed variants"
+            ),
+            alphabet=(
+                "the target field's value domain: black/white for binary examples or gray levels in [0,1] "
+                "for continuous examples"
+            ),
+            law=(
+                "choose every field value at random in the target carrier and value domain; binary examples "
+                "also vary black-cell density"
+            ),
+            result="one complete initial field for the selected target carrier and value domain",
+            determinism="stochastic; exact measures and independence are not stated in this range",
         ),
         aliases=["completely random initial conditions", "random initial conditions"],
         role="SEED",
-        parameters=["black-cell density"],
-        variants=["typical random initial condition", "low-density random initial condition"],
-        uncertainties=[
-            "The main text does not state an exact probability, independence condition, support extent, or random-bit source."
+        parameters=["target carrier", "target value domain", "black-cell density for binary fields"],
+        variants=[
+            "one-dimensional black-or-white random row",
+            "one-dimensional random real-valued field in [0,1]",
+            "two-dimensional black-or-white random field",
+            "low-density one-dimensional binary field",
         ],
+        uncertainties=[
+            "The main text does not state exact probability measures, independence conditions, support extents, or random-bit sources for these variants."
+        ],
+        mechanics_units=["U001227"],
+        field_units={
+            "carrier": ["U001227", "U001316", "U001324", "U001331", "U001333"],
+            "alphabet_or_value_schema": ["U001227", "U001316", "U001331"],
+            "complete_state": ["U001227", "U001316", "U001324", "U001331", "U001333"],
+            "rule_relation_constraint_function_or_probability_law": [
+                "U001227",
+                "U001316",
+                "U001324",
+                "U001331",
+                "U001333",
+                "U001416",
+                "U001421",
+            ],
+            "result_kind": ["U001227", "U001316", "U001324", "U001331", "U001333"],
+            "parameters_and_variants": [
+                "U001227",
+                "U001316",
+                "U001324",
+                "U001331",
+                "U001333",
+                "U001416",
+                "U001421",
+            ],
+        },
+        variant_units={
+            "one-dimensional black-or-white random row": ["U001227"],
+            "one-dimensional random real-valued field in [0,1]": ["U001316"],
+            "two-dimensional black-or-white random field": ["U001324", "U001331", "U001333"],
+            "low-density one-dimensional binary field": ["U001421"],
+        },
     )
     add(
         "elementary cellular automaton rule 254",
@@ -882,25 +941,26 @@ def candidate_definitions() -> list[dict[str, Any]]:
     )
     add(
         "persistent-structure exhaustive search query",
-        ["U001519", "U001532", "U001533", "U001534", "U001535", "U001536", "U001537", "U001538", "U001539", "U001540"],
-        ["U001519", "U001533", "U001534", "U001536", "U001537", "U001538", "U001540"],
+        ["U001519", "U001532", "U001533", "U001534", "U001535", "U001536"],
+        ["U001519", "U001533", "U001534", "U001536"],
         relation_values(
-            "enumeration and constraint query",
+            "bounded brute-force enumeration query",
             carrier="finite cellular-automaton initial blocks and their evolutions",
-            input_value="a cellular-automaton rule, an enumeration bound or repetition period, and candidate finite blocks",
+            input_value="a cellular-automaton rule and an integer bound on consecutively encoded finite initial blocks",
             law=(
-                "enumerate initial-condition numbers and test whether evolution dies out or yields a fixed or moving "
-                "persistent structure; a separate systematic period-bounded method is only cross-referenced"
+                "enumerate initial-condition integers in order, decode each as a finite initial block, evolve it, "
+                "and record whether it dies out or yields a fixed or moving persistent structure"
             ),
-            result="persistent structures found within the stated enumeration or all structures for a stated small period",
+            result="persistent structures witnessed within the finite enumerated prefix; completeness beyond that prefix is not claimed",
         ),
         aliases=["persistent structure search"],
         role="OBSERVER",
-        uncertainties=["The complete systematic period-bounded procedure is not stated here and is routed to page 268."],
+        uncertainties=["The source does not state a universal stopping or equivalence-deduplication criterion for this brute-force search."],
+        mechanics_units=["U001519"],
     )
     add(
         "three-color nearest-neighbor cellular automaton code 357",
-        ["U001527", "U001528", "U001543", "U001544", "U001545", "U001546"],
+        ["U001527", "U001528", "U001542", "U001543", "U001544", "U001545", "U001546"],
         ["U001527", "U001528", "U001544", "U001546"],
         ca_values(
             "code 357",
@@ -911,7 +971,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
     )
     add(
         "three-color nearest-neighbor cellular automaton code 1329",
-        ["U001529", "U001530", "U001549", "U001550", "U001551", "U001552", "U001553", "U001554", "U001555", "U001556"],
+        ["U001529", "U001530", "U001548", "U001549", "U001550", "U001551", "U001552", "U001553", "U001554", "U001555", "U001556"],
         ["U001529", "U001530", "U001550", "U001553", "U001556"],
         ca_values(
             "code 1329",
@@ -919,6 +979,239 @@ def candidate_definitions() -> list[dict[str, Any]]:
             neighborhood="nearest neighbors",
         ),
         aliases=["code 1329 cellular automaton"],
+    )
+
+    add(
+        "neighbor-difference gray-field display transformation",
+        ["U001321", "U001323"],
+        ["U001323"],
+        {
+            **relation_values(
+                "deterministic observer transformation",
+                carrier="a one-dimensional real-valued cellular-automaton field",
+                input_value="the actual gray level of each cell and the gray level of its selected neighbor",
+                law="replace the displayed gray level by the difference between each cell's gray level and its neighbor's",
+                result="a derived gray-field display with uniform stripes removed",
+            ),
+            "read_dependencies_or_neighborhood": "each displayed cell reads its own actual value and one neighboring actual value",
+            "excluded_observers_and_representations": (
+                "the differenced gray levels are a display transformation and are not the continuous cellular automaton's native state"
+            ),
+        },
+        aliases=["neighbor-difference display", "stripe-removing gray display"],
+        role="OBSERVER",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        mechanics_units=["U001323"],
+    )
+    add(
+        "one-dimensional slice-through-time and temporal-fog observer",
+        ["U001325", "U001326", "U001327", "U001334", "U001335", "U001341"],
+        ["U001325", "U001335", "U001341"],
+        {
+            **relation_values(
+                "deterministic space-time slice and history-rendering observer",
+                carrier="a two-dimensional cellular-automaton history",
+                input_value="a two-dimensional evolution, a chosen one-dimensional slice, and successive observation steps",
+                law=(
+                    "extract the chosen one-dimensional slice through successive steps; optionally retain cells black "
+                    "on preceding steps in progressively lighter gray to form a temporal fog"
+                ),
+                result="a one-dimensional-through-time display, optionally augmented by receding gray history",
+            ),
+            "read_dependencies_or_neighborhood": "the selected spatial slice and its earlier time layers",
+            "parameters_and_variants": "slice position, history depth, fog shading, and displayed codes 4, 12, 24, 30, 38, 52 or Game of Life",
+            "excluded_observers_and_representations": (
+                "the slice and fog are observer outputs; they do not alter or define the two-dimensional native transition law"
+            ),
+        },
+        aliases=["one-dimensional slice observer", "temporal fog display"],
+        role="OBSERVER",
+        variants=[
+            "code 4 slice",
+            "code 12 slice",
+            "code 24 slice",
+            "code 30 slice",
+            "code 38 slice",
+            "code 52 slice",
+            "Game of Life slice with temporal fog",
+        ],
+        mechanics_units=["U001325", "U001335", "U001341"],
+        variant_units={
+            "code 4 slice": ["U001334", "U001335"],
+            "code 12 slice": ["U001334", "U001335"],
+            "code 24 slice": ["U001334", "U001335"],
+            "code 30 slice": ["U001334", "U001335"],
+            "code 38 slice": ["U001334", "U001335"],
+            "code 52 slice": ["U001334", "U001335"],
+            "Game of Life slice with temporal fog": ["U001341"],
+        },
+    )
+    add(
+        "finite-system repetition-period and maximum-period observer",
+        [
+            "U001385",
+            "U001386",
+            "U001387",
+            "U001388",
+            "U001389",
+            "U001390",
+            "U001391",
+            "U001392",
+            "U001393",
+        ],
+        ["U001385", "U001387", "U001388", "U001389", "U001391", "U001393"],
+        {
+            **relation_values(
+                "finite-orbit repetition-period query and curve observer",
+                carrier="finite deterministic systems, including cyclic binary cellular automata",
+                input_value="a transition rule, finite size n, and initial state",
+                law=(
+                    "iterate the finite deterministic system until a state recurs, measure its eventual repetition "
+                    "period, and compare it with the number of possible states"
+                ),
+                result="one eventual repetition period or a period-versus-size curve",
+            ),
+            "support": "n binary cells give 2^n complete states",
+            "structural_invariants": (
+                "every finite deterministic orbit eventually repeats; its period is at most the number of states, "
+                "hence at most 2^n for n binary cells"
+            ),
+            "parameters_and_variants": (
+                "system size n, initial state, and rules 90, 30, 45, and 110; the displayed peaks are "
+                "2^((n-1)/2)-1 for rule 90, about 2^(0.63n) for rule 30, close to 2^n for rule 45, "
+                "and roughly n^3 for rule 110"
+            ),
+            "excluded_observers_and_representations": (
+                "the evolution panels and period curves measure finite instances; they do not define the plotted rules' native transition laws"
+            ),
+        },
+        aliases=["finite repetition-period query", "period-versus-size observer"],
+        role="OBSERVER",
+        variants=["rule 90 period curve", "rule 30 period curve", "rule 45 period curve", "rule 110 period curve"],
+        mechanics_units=["U001385", "U001387", "U001393"],
+        variant_units={
+            "rule 90 period curve": ["U001392", "U001393"],
+            "rule 30 period curve": ["U001392", "U001393"],
+            "rule 45 period curve": ["U001388", "U001392", "U001393"],
+            "rule 110 period curve": ["U001392", "U001393"],
+        },
+    )
+    add(
+        "additive cellular-automaton superposition relation",
+        ["U001411", "U001412", "U001413", "U001414", "U001463", "U001464"],
+        ["U001412", "U001414", "U001463", "U001464"],
+        {
+            **relation_values(
+                "algebraic superposition and self-emulation relation",
+                carrier="binary cellular-automaton initial configurations and their complete evolution patterns",
+                input_value="an additive rule and one or more component initial configurations or evolution patterns",
+                law=(
+                    "the evolution from a superposed initial configuration is the corresponding superposition of "
+                    "component evolutions; every additive rule self-emulates and yields nested patterns"
+                ),
+                result="a superposed evolution equivalent to evolving the combined initial condition",
+            ),
+            "structural_invariants": (
+                "additivity is preserved through evolution and implies block self-emulation; rules 90 and 150 are "
+                "the only fundamentally different two-color nearest-neighbor examples stated here"
+            ),
+            "parameters_and_variants": "rule 90 and rule 150",
+        },
+        aliases=["cellular-automaton additivity", "pattern superposition"],
+        role="CONSTRAINT",
+        variants=["rule 90 additivity", "rule 150 additivity"],
+        mechanics_units=["U001414", "U001464"],
+        related_names=[
+            "elementary cellular automaton rule 90",
+            "elementary cellular automaton rule 150",
+            "rule-90 pair-block self-emulation",
+            "rule-150 block self-emulation",
+        ],
+        variant_units={
+            "rule 90 additivity": ["U001412", "U001413", "U001414", "U001463", "U001464"],
+            "rule 150 additivity": ["U001463", "U001464"],
+        },
+    )
+    add(
+        "elementary cellular automaton rule 255",
+        ["U001484", "U001485", "U001486"],
+        ["U001484", "U001486"],
+        ca_values("rule 255"),
+        aliases=["rule 255"],
+        strength="DIRECT_PARTIAL_MECHANICS",
+        mechanics_units=["U001486"],
+        anchor_priority=-1,
+        uncertainties=["The local rule table is image-borne or delegated to the rule-number scheme; this range directly identifies the preset and its outcome."],
+    )
+    add(
+        "localized finite-seed integer codec family",
+        ["U001533", "U001536", "U001544"],
+        ["U001533", "U001536", "U001544"],
+        {
+            "object_kind": "deterministic integer-to-localized-seed codec family",
+            "native_time": "one decoding operation",
+            "carrier": "a finite localized block of cells used as a cellular-automaton initial condition",
+            "alphabet_or_value_schema": "radix-matched cell values: two colors for base 2 or three colors for base 3",
+            "complete_state": "the finite cell block encoded by the integer's digit sequence",
+            "input": "a nonnegative integer and the selected radix/color correspondence",
+            "law_kind": "deterministic positional-radix decoding function",
+            "rule_relation_constraint_function_or_probability_law": (
+                "write the integer in base 2 or base 3 and map its digit sequence to the corresponding two-color "
+                "or three-color finite initial block"
+            ),
+            "result_kind": "one localized finite seed",
+            "successor_cardinality": "one seed for each integer and selected codec",
+            "determinism_branching_or_measure": "deterministic",
+            "termination_completion_failure": "decoding completes after the finite digit sequence is emitted",
+            "parameters_and_variants": "base 2 for binary code 20 examples; base 3 for three-color code 357 examples",
+            "excluded_observers_and_representations": (
+                "the integer labels encode initial conditions and are not cellular-automaton rule numbers or evolution laws"
+            ),
+            "evidence_limit": "Digit orientation, leading-zero convention, and the surrounding blank-background convention are not fully stated.",
+        },
+        aliases=["initial-condition integer codec"],
+        role="SEED",
+        variants=["base-2 binary finite-seed codec", "base-3 three-color finite-seed codec"],
+        uncertainties=["Digit orientation, leading-zero convention, and the surrounding blank-background convention are not fully stated."],
+        mechanics_units=["U001533", "U001544"],
+        variant_units={
+            "base-2 binary finite-seed codec": ["U001533", "U001536"],
+            "base-3 three-color finite-seed codec": ["U001544"],
+        },
+    )
+    add(
+        "systematic fixed-period persistent-structure constraint solver",
+        ["U001537", "U001538", "U001539", "U001540"],
+        ["U001537", "U001538", "U001540"],
+        {
+            **relation_values(
+                "complete fixed-period constraint-solving procedure",
+                carrier="finite fixed or moving cellular-automaton structures",
+                input_value="a cellular-automaton rule and requested repetition period",
+                law=(
+                    "apply a systematic constraint method to find all fixed or moving persistent structures having "
+                    "the requested period"
+                ),
+                result="the complete set of persistent structures for that bounded period",
+            ),
+            "parameters_and_variants": "displayed code-20 results for repetition periods through 15",
+            "evidence_limit": (
+                "The range states the completeness contract and results but does not give the constraint encoding or solving algorithm; WR0024 routes it to page 268."
+            ),
+        },
+        aliases=["complete fixed-period structure search"],
+        role="OBSERVER",
+        uncertainties=[
+            "The range states the completeness contract and results but does not give the constraint encoding or solving algorithm; WR0024 routes it to page 268."
+        ],
+        mechanics_units=["U001537", "U001540"],
+    )
+
+    defs.sort(
+        key=lambda candidate: (
+            int(candidate["units"][0][1:]),
+            candidate["anchor_priority"],
+        )
     )
     return defs
 
