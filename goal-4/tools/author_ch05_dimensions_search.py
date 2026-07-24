@@ -233,7 +233,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "outer-totalistic cellular automaton code 686",
-        ["U006102", "U006117"],
+        ["U006102", "U006117", "U006118"],
         "cellular-automaton rule preset",
         "two-dimensional binary cell array",
         "one complete cell configuration",
@@ -388,7 +388,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "base-(i-1) binary-digit point-set generator",
-        ["U006187", "U006188"],
+        ["U006187", "U006188", "U006189"],
         "uniterated geometric point-set generator",
         "complex plane",
         "digit length t",
@@ -398,7 +398,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "box-counting fractal-dimension observer",
-        ["U006193", "U006195"],
+        ["U006193", "U006194", "U006195"],
         "geometric scaling observer",
         "a planar pattern under successively finer grids",
         "pattern and grid edge scale a",
@@ -420,7 +420,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Julia-set zero-membership to Mandelbrot-boundary relation",
-        ["U006202", "U006203"],
+        ["U006202", "U006203", "U006204"],
         "parameter-space membership relation",
         "complex parameters c and their Julia sets",
         "a parameter c",
@@ -430,7 +430,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Julia-set nearest-distance field observer",
-        ["U006203"],
+        ["U006203", "U006204"],
         "parameter-space distance observer",
         "Julia set associated with each complex parameter c",
         "parameter c and fixed point z0",
@@ -504,7 +504,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "network dimensionality observer",
-        ["U006234"],
+        ["U006234", "U006235"],
         "graph-volume scaling observer",
         "a network at a selected evolution step",
         "network, reference node, and connection radius r",
@@ -869,6 +869,7 @@ RECOVERED_SPECS = [
         "integers a, x, and y",
         "accept exactly when x^2 = a y^2",
         "the integer solution set; nonzero solutions require square a as stated",
+        related=["B0962", "B0968"],
         limit=(
             "The source's “no solution” wording omits the universal trivial "
             "solution x=y=0; the square-a characterization is retained only "
@@ -1028,6 +1029,201 @@ for unit_id, name, expression, result_kind in SIERPINSKI_SPECS:
             ),
         )
     )
+
+RELINK_SPECS = [
+    {
+        "candidate_id": "B0032",
+        "units": {
+            "U000972": [
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            "U000977": [
+                "result_kind",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            "U000978": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            "U006112": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            "U006113": [
+                "result_kind",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+        },
+        "claim": (
+            "The Chapter 5 center-line and offset-slice examples specialize "
+            "the existing dimension-agnostic cellular-automaton spatial-slice "
+            "selector without defining a new selector law."
+        ),
+    },
+    {
+        "candidate_id": "B0094",
+        "units": {
+            "U006117": [
+                "object_kind",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+                "evidence_limit",
+            ]
+        },
+        "claim": (
+            "The source independently identifies rule 90 as the one-dimensional "
+            "component result while leaving the neighboring 2D attribution "
+            "conflicting."
+        ),
+    },
+    {
+        "candidate_id": "B0595",
+        "units": {
+            "U006182": [
+                "input",
+                "read_dependencies_or_neighborhood",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "witness_semantics",
+                "parameters_and_variants",
+                "evidence_limit",
+            ]
+        },
+        "claim": (
+            "The GoldenRatio lattice cut is a specific digital-slope "
+            "representation preset and supplies a Fibonacci-sequence witness."
+        ),
+    },
+    {
+        "candidate_id": "B0703",
+        "units": {
+            "U001212": [
+                "parameters_and_variants",
+                "evidence_limit",
+            ]
+        },
+        "claim": (
+            "The exact family cardinality bounds the required-template "
+            "constraint family but does not alter its acceptance law."
+        ),
+    },
+    {
+        "candidate_id": "B0912",
+        "units": {
+            "U006199": [
+                "result_kind",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ]
+        },
+        "claim": (
+            "The inspected Julia-set array corroborates outputs of the "
+            "inverse-square-root Julia generator without adding update mechanics."
+        ),
+    },
+    {
+        "candidate_id": "B0913",
+        "units": {
+            "U006201": [
+                "result_kind",
+                "witness_semantics",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ]
+        },
+        "claim": (
+            "The inspected Mandelbrot magnification sequence corroborates the "
+            "bounded-orbit relation and its parameter-space witness."
+        ),
+    },
+    {
+        "candidate_id": "B0919",
+        "units": {
+            "U006233": [
+                "result_kind",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ]
+        },
+        "claim": (
+            "The node-count plot corroborates the stated sequential-network "
+            "preset's behavior without supplying its native rule."
+        ),
+    },
+    {
+        "candidate_id": "B0921",
+        "units": {
+            "U006244": [
+                "carrier",
+                "alphabet_or_value_schema",
+                "law_kind",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+            ],
+            "U006245": [
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            "U006246": [
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "excluded_observers_and_representations",
+            ],
+        },
+        "claim": (
+            "The list-based alternative is an implementation of the existing "
+            "string multiway step, not a distinct multiway law."
+        ),
+    },
+    {
+        "candidate_id": "B0922",
+        "units": {
+            "U006255": [
+                "result_kind",
+                "witness_semantics",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006259": [
+                "result_kind",
+                "witness_semantics",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            "U006260": [
+                "seed",
+                "result_kind",
+                "termination_completion_failure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+        "claim": (
+            "The count, bounded-reachability image, and alternate-seed outcomes "
+            "supply result and parameter evidence for the existing page-206 "
+            "multiway preset."
+        ),
+    },
+]
 
 PROPOSED_VOCABULARY = list(dict.fromkeys([
     "two-dimensional cellular automaton",
@@ -1225,7 +1421,9 @@ QUERY_SPECS = [
             r"\b(?:rules?|systems?|algorithms?|generators?|solvers?|"
             r"relations?|functions?|transformations?|maps?|constraints?|"
             r"equations?|games?|initial conditions?|evolution|positions?|"
-            r"patterns?)\b|(?:^|\n)\s*(?:!\[[^\]]*\]\([^)]+\)|```)|"
+            r"patterns?|counts?|cardinalit(?:y|ies)|growth rates?|"
+            r"first appears?|number of)\b|"
+            r"(?:^|\n)\s*(?:!\[[^\]]*\]\([^)]+\)|```)|"
             r"`[^`\n]*(?:->|→|==|:=|:>|Nest|NestList|Map|Table|Replace|"
             r"Rule|Step|Evolve)[^`\n]*`|"
             r"`[^`\n]*\[[^`\n]*\][^`\n]*`"
