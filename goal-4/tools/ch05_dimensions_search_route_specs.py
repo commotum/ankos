@@ -2,7 +2,7 @@
 """Frozen Stage 9 Chapter 5 local-search route authoring specification.
 
 This module is data only.  It does not read or write any audit ledger.
-`ROUTE_SPECS` materializes the 138 new route rows in immutable final-F15
+`ROUTE_SPECS` materializes the 151 new route rows in immutable final-F15
 SEARCH_HIT order and within-hit locator order.  Existing-route uses and
 rejected/non-bearing locators are frozen separately so every one of the 144
 final F15 hit units has an explicit disposition.
@@ -479,6 +479,21 @@ _ROUTES = (
         vocabulary_terms=("56 templates", "forced complex pattern", "rule 30 correspondence"),
     ),
     route(
+        "U006078", "H011656", 1,
+        "Page 170 · 1D phenomena",
+        "dimension-specific phenomenon boundary for the main-text cellular-automaton setting",
+        WITHIN,
+        target_unit_ids=uids(960, 965), target_asset_ids=aids(845, 846),
+        vocabulary_terms=("dimensional boundary", "one-dimensional phenomena", "page 170"),
+    ),
+    route(
+        "U006078", "H011656", 2,
+        "see page 981",
+        "reversible-rule phase-transition comparison for dimensional phenomena",
+        CROSS,
+        vocabulary_terms=("phase transition", "reversible evolution", "one dimension"),
+    ),
+    route(
         "U006082", "H011657", 1,
         "the 5-neighbor rules introduced on page 170",
         "main-text five-site square-neighborhood cellular-automaton family",
@@ -543,12 +558,28 @@ _ROUTES = (
         vocabulary_terms=("9-neighbor rules", "growth rules"),
     ),
     route(
+        "U006121", "H011664", 1,
+        "discussed on page 979",
+        "fixed-interior and cycling-region behavior of cellular automaton code 746",
+        CROSS,
+        candidate_ids=bids(662),
+        vocabulary_terms=("approximate circle", "code 746", "cycling regions"),
+    ),
+    route(
         "U006126", "H011666", 1,
         "the Voronoi region (see page 987)",
         "Voronoi-cell derivation of nearest-neighbor lattice adjacency",
         CROSS,
         candidate_ids=bids(876),
         vocabulary_terms=("lattice adjacency", "nearest neighbors", "Voronoi region"),
+    ),
+    route(
+        "U006126", "H011666", 2,
+        "Compare pages 1029 and 986",
+        "crystallographic terminology and Voronoi-region shape comparison",
+        CROSS,
+        candidate_ids=bids(876),
+        vocabulary_terms=("crystallography", "lattice geometry", "Voronoi region"),
     ),
     route(
         "U006130", "H011667", 1,
@@ -747,6 +778,26 @@ _ROUTES = (
             "bivariate-series Sierpiński array generator",
         ),
         vocabulary_terms=("bivariate series", "Sierpiński array"),
+    ),
+    route(
+        "U006159", "H011683", 1,
+        "compare page 1073",
+        "alternate formula comparison for the block-join Sierpiński array generator",
+        CROSS,
+        recovered_candidate_names=(
+            "block-join substitution Sierpiński array generator",
+        ),
+        vocabulary_terms=("block join", "formula comparison", "Sierpiński array"),
+    ),
+    route(
+        "U006162", "H011684", 1,
+        "compare page 1005",
+        "alternate formula comparison for the complex-affine Sierpiński coordinate enumerator",
+        CROSS,
+        recovered_candidate_names=(
+            "complex-affine Sierpiński coordinate enumerator",
+        ),
+        vocabulary_terms=("complex affine", "coordinate enumeration", "formula comparison"),
     ),
     route(
         "U006163", "H011685", 1,
@@ -951,6 +1002,13 @@ _ROUTES = (
     ),
     route(
         "U006227", "H011705", 1,
+        "discussed on page 1121",
+        "combinator-system comparison for the binary-outdegree network representation",
+        CROSS,
+        vocabulary_terms=("binary-outdegree network", "combinator systems", "data structures"),
+    ),
+    route(
+        "U006227", "H011705", 2,
         "Page 202 · Properties",
         "page-202(c) network node-count sequence and binary-digit recurrence",
         WITHIN,
@@ -1157,6 +1215,31 @@ _ROUTES = (
         vocabulary_terms=("AxA or B", "context-free grammar", "formal language"),
     ),
     route(
+        "U006272", "H011721", 1,
+        "See also page 944",
+        "inspected page-944 comparison boundary for the formal-language discussion",
+        WITHIN,
+        target_unit_ids=uids(6114, 6125),
+        target_asset_ids=(
+            "A000527", "A000528", "A000541", "A000542",
+        ),
+        vocabulary_terms=("formal languages", "page 944", "comparison boundary"),
+        defect_boundary=(
+            "The source gives only a bare cross-reference. Inspected page "
+            "944 contains two-dimensional cellular-automaton history, rules, "
+            "behavior, and projections, but states no grammar identity or "
+            "equivalence."
+        ),
+        attempts=(
+            "Resolved literal target 'See also page 944' to inspected units "
+            "U006114-U006125 and referenced assets A000527, A000528, "
+            "A000541, and A000542. Those targets contain two-dimensional "
+            "cellular-automaton material; no explicit comparison predicate, "
+            "grammar identity, or grammar equivalence is asserted or "
+            "inferred.",
+        ),
+    ),
+    route(
         "U006275", "H011723", 1,
         "page 933",
         "fractal-dimension comparison for the numeric multiway evolution",
@@ -1167,6 +1250,14 @@ _ROUTES = (
     ),
     route(
         "U006275", "H011723", 2,
+        "discussed on page 907",
+        "recursive-sequence comparison for the numeric multiway system",
+        CROSS,
+        candidate_ids=bids(932),
+        vocabulary_terms=("numeric multiway system", "recursive sequences"),
+    ),
+    route(
+        "U006275", "H011723", 3,
         "page 937",
         "network representation of the numeric multiway evolution",
         WITHIN,
@@ -1176,6 +1267,13 @@ _ROUTES = (
     ),
     route(
         "U006276", "H011724", 1,
+        "But see page 766",
+        "computational-power exception boundary for nondeterministic systems",
+        CROSS,
+        vocabulary_terms=("computational power", "nondeterministic systems"),
+    ),
+    route(
+        "U006276", "H011724", 2,
         "page 871",
         "bitwise-XOR characterization used by the nim losing-position predicate",
         CROSS,
@@ -1363,6 +1461,14 @@ _ROUTES = (
         vocabulary_terms=("tiling existence", "undecidability"),
     ),
     route(
+        "U006310", "H011735", 2,
+        "see page 994",
+        "fivefold-symmetry comparison for the Penrose tiling",
+        CROSS,
+        candidate_ids=bids(951, 952),
+        vocabulary_terms=("fivefold symmetry", "Penrose tiling"),
+    ),
+    route(
         "U006312", "H011736", 1,
         "page 221",
         "main-text aperiodic tiling and nonrepetitive-pattern examples",
@@ -1370,6 +1476,14 @@ _ROUTES = (
         target_unit_ids=uids(1217, 1220), target_asset_ids=aids(921, 922),
         candidate_ids=bids(951, 952),
         vocabulary_terms=("aperiodic tiling", "nonrepetitive pattern", "page 221"),
+    ),
+    route(
+        "U006313", "H011737", 1,
+        "See also page 1139",
+        "undecidability evidence boundary for aperiodic tiling constraints",
+        CROSS,
+        candidate_ids=bids(951, 952),
+        vocabulary_terms=("aperiodic tiling", "tiling constraints", "undecidability"),
     ),
     route(
         "U006318", "H011738", 1,
@@ -1439,6 +1553,14 @@ _ROUTES = (
             "odd-binomial-coefficient parity relation",
         ),
         vocabulary_terms=("binomial coefficient", "odd parity", "Diophantine relation"),
+    ),
+    route(
+        "U006335", "H011744", 1,
+        "See pages 791 and 1164",
+        "sparse-solution and higher-power comparison for the Fermat relation",
+        CROSS,
+        candidate_ids=bids(978),
+        vocabulary_terms=("Fermat relation", "higher powers", "sparse solutions"),
     ),
     route(
         "U006336", "H011745", 1,
@@ -1762,21 +1884,6 @@ def non_bearing_locator(
 
 NON_BEARING_LOCATORS = (
     non_bearing_locator(
-        "U006078", "Page 170 · 1D phenomena",
-        (
-            "The page label introduces a behavior-only statement about "
-            "phenomena unavailable in one dimension; it does not identify "
-            "target construction mechanics."
-        ),
-    ),
-    non_bearing_locator(
-        "U006078", "page 981",
-        (
-            "The traditional phase-transition comparison is contextual and "
-            "does not supply mechanics for a Chapter 5 construction."
-        ),
-    ),
-    non_bearing_locator(
         "U006114", "pages 876–878",
         "The locator supports only a history-of-study statement.",
     ),
@@ -1812,34 +1919,6 @@ NON_BEARING_LOCATORS = (
         "The rug-and-design comparison is application context only.",
     ),
     non_bearing_locator(
-        "U006121", "page 979",
-        (
-            "The approximate-circle comment is a behavior detail and does "
-            "not identify additional code-746 construction mechanics."
-        ),
-    ),
-    non_bearing_locator(
-        "U006126", "Compare pages 1029 and 986",
-        (
-            "The comparison concerns crystallographic terminology and "
-            "Voronoi-region shapes, not a distinct executable construction."
-        ),
-    ),
-    non_bearing_locator(
-        "U006159", "compare page 1073",
-        (
-            "The formula-output analogy neither changes nor completes the "
-            "block-join Sierpiński construction."
-        ),
-    ),
-    non_bearing_locator(
-        "U006162", "compare page 1005",
-        (
-            "The formula-output analogy neither changes nor completes the "
-            "complex-affine Sierpiński construction."
-        ),
-    ),
-    non_bearing_locator(
         "U006197", "page 43",
         "The locator occurs only in the history of fractal art.",
     ),
@@ -1871,36 +1950,10 @@ NON_BEARING_LOCATORS = (
         ),
     ),
     non_bearing_locator(
-        "U006227", "page 1121",
-        "The combinator-system comparison is an application analogy only.",
-    ),
-    non_bearing_locator(
         "U006261", "page 1150",
         (
             "The mathematical-proof comparison belongs to historical and "
             "terminological context for multiway systems."
-        ),
-    ),
-    non_bearing_locator(
-        "U006272", "See also page 944",
-        (
-            "The bare connective supplies no target topic or mechanics in "
-            "this source unit."
-        ),
-    ),
-    non_bearing_locator(
-        "U006275", "page 907",
-        (
-            "The source calls the recursive-sequence systems only somewhat "
-            "related; it does not make them mechanics of the numeric "
-            "multiway preset."
-        ),
-    ),
-    non_bearing_locator(
-        "U006276", "page 766",
-        (
-            "The comparison concerns computational power of nondeterministic "
-            "systems, not mechanics of the delimited multiway construction."
         ),
     ),
     non_bearing_locator(
@@ -1910,26 +1963,312 @@ NON_BEARING_LOCATORS = (
             "principles and do not supply a new constraint construction."
         ),
     ),
-    non_bearing_locator(
-        "U006310", "page 994",
-        (
-            "The locator supports only a fivefold-symmetry observation about "
-            "the Penrose geometry."
-        ),
-    ),
-    non_bearing_locator(
-        "U006313", "See also page 1139",
-        (
-            "The bare connective supplies no additional target topic or "
-            "mechanics beyond the adjacent tiling discussion."
-        ),
-    ),
-    non_bearing_locator(
-        "U006335", "See pages 791 and 1164",
-        (
-            "The connective follows a mathematical fact about sparse "
-            "Diophantine solutions and supplies neither a route topic nor "
-            "construction mechanics."
-        ),
-    ),
 )
+
+
+ROUTE_SPECS = tuple(
+    {
+        **spec,
+        "route_id": f"R{route_number:06d}",
+    }
+    for route_number, spec in enumerate(_ROUTES, start=249)
+)
+
+LOCATOR_DISPOSITIONS = (
+    tuple(
+        {
+            "disposition": "NEW_ROUTE",
+            "source_unit_id": spec["source_unit_id"],
+            "discovery_id": spec["discovery_id"],
+            "literal_target": spec["literal_target"],
+            "route_id": spec["route_id"],
+        }
+        for spec in ROUTE_SPECS
+    )
+    + tuple(
+        {
+            "disposition": "EXISTING_ROUTE",
+            "source_unit_id": use["source_unit_id"],
+            "discovery_id": use["discovery_id"],
+            "literal_target": use["literal_target"],
+            "route_id": use["existing_route_id"],
+        }
+        for use in EXISTING_ROUTE_USES
+    )
+    + tuple(
+        {
+            "disposition": "NON_BEARING",
+            "source_unit_id": item["source_unit_id"],
+            "discovery_id": item["discovery_id"],
+            "literal_target": item["literal_target"],
+            "route_id": "",
+        }
+        for item in NON_BEARING_LOCATORS
+    )
+)
+
+EXPECTED_COUNTS = {
+    "f15_hit_units": 144,
+    "new_routes": 151,
+    "new_route_source_units": 117,
+    "within_stage_routes": 86,
+    "cross_range_routes": 65,
+    "stage_existing_routes": 46,
+    "f15_existing_route_uses": 45,
+    "f15_existing_route_source_units": 37,
+    "non_bearing_locators": 17,
+    "non_bearing_source_units": 6,
+    "locator_dispositions": 213,
+}
+
+
+def canonical_spec_payload() -> dict[str, Any]:
+    """Return the complete frozen data projection covered by the digest."""
+
+    return {
+        "route_specs": list(ROUTE_SPECS),
+        "stage_existing_route_ids": list(STAGE_EXISTING_ROUTE_IDS),
+        "existing_route_uses": list(EXISTING_ROUTE_USES),
+        "non_bearing_locators": list(NON_BEARING_LOCATORS),
+        "f15_hit_units": list(F15_HIT_UNITS),
+        "locator_dispositions": list(LOCATOR_DISPOSITIONS),
+        "expected_counts": EXPECTED_COUNTS,
+    }
+
+
+def _canonical_json_bytes(value: Any) -> bytes:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def route_spec_digest() -> str:
+    """Return the canonical digest of only the 151 authored route rows."""
+
+    return hashlib.sha256(_canonical_json_bytes(list(ROUTE_SPECS))).hexdigest()
+
+
+def canonical_spec_digest() -> str:
+    """Return the canonical digest of routes plus every audit inventory."""
+
+    return hashlib.sha256(
+        _canonical_json_bytes(canonical_spec_payload())
+    ).hexdigest()
+
+
+ROUTE_SPEC_DIGEST = route_spec_digest()
+CANONICAL_SPEC_DIGEST = canonical_spec_digest()
+EXPECTED_CANONICAL_SPEC_DIGEST = "__FILL_AFTER_VALIDATION__"
+
+
+def assert_frozen_spec() -> str:
+    """Fail closed if route order, scope, coverage, or frozen data drifts."""
+
+    if len(F15_HIT_UNITS) != EXPECTED_COUNTS["f15_hit_units"]:
+        raise AssertionError("final-F15 hit-unit count drifted")
+    if len(set(F15_HIT_UNITS)) != len(F15_HIT_UNITS):
+        raise AssertionError("final-F15 hit-unit order contains duplicates")
+    if f15_hit_id(F15_HIT_UNITS[0]) != "H011603":
+        raise AssertionError("first final-F15 hit ID drifted")
+    if f15_hit_id(F15_HIT_UNITS[-1]) != "H011746":
+        raise AssertionError("last final-F15 hit ID drifted")
+
+    if len(ROUTE_SPECS) != EXPECTED_COUNTS["new_routes"]:
+        raise AssertionError("new route count drifted")
+    expected_route_ids = tuple(
+        f"R{number:06d}" for number in range(249, 400)
+    )
+    route_ids = tuple(spec["route_id"] for spec in ROUTE_SPECS)
+    if route_ids != expected_route_ids:
+        raise AssertionError("new route-ID allocation drifted")
+
+    route_source_units = {
+        spec["source_unit_id"] for spec in ROUTE_SPECS
+    }
+    if (
+        len(route_source_units)
+        != EXPECTED_COUNTS["new_route_source_units"]
+    ):
+        raise AssertionError("new-route source-unit count drifted")
+
+    scope_counts = {
+        scope: sum(
+            spec["closure_scope"] == scope for spec in ROUTE_SPECS
+        )
+        for scope in (WITHIN, CROSS)
+    }
+    if scope_counts != {
+        WITHIN: EXPECTED_COUNTS["within_stage_routes"],
+        CROSS: EXPECTED_COUNTS["cross_range_routes"],
+    }:
+        raise AssertionError(f"route scope partition drifted: {scope_counts}")
+
+    route_discovery_keys: list[tuple[int, int]] = []
+    route_identities: set[tuple[str, str, str]] = set()
+    for spec in ROUTE_SPECS:
+        source_unit_id = spec["source_unit_id"]
+        if source_unit_id not in F15_HIT_UNITS:
+            raise AssertionError(
+                f"route source is outside final F15: {source_unit_id}"
+            )
+        expected_hit = f15_hit_id(source_unit_id)
+        if (
+            spec["discovery_kind"] != "SEARCH_HIT"
+            or spec["discovery_id"] != expected_hit
+            or spec["discovery_family_ordinal"] != 15
+        ):
+            raise AssertionError(
+                f"route discovery anchor drifted: {spec['route_id']}"
+            )
+        discovery_key = (
+            int(spec["discovery_id"][1:]),
+            spec["discovery_ordinal"],
+        )
+        route_discovery_keys.append(discovery_key)
+        identity = (
+            source_unit_id,
+            spec["literal_target"],
+            spec["expected_topic"],
+        )
+        if identity in route_identities:
+            raise AssertionError(f"duplicate route identity: {identity!r}")
+        route_identities.add(identity)
+        if not spec["attempts"] or not all(spec["attempts"]):
+            raise AssertionError(
+                f"route has no auditable attempt: {spec['route_id']}"
+            )
+        if not spec["literal_target"] or not spec["expected_topic"]:
+            raise AssertionError(
+                f"route has an empty governed claim: {spec['route_id']}"
+            )
+        if spec["route_kind"] not in {"PAGE", "SECTION", "OTHER"}:
+            raise AssertionError(
+                f"route kind drifted: {spec['route_id']}"
+            )
+        if spec["closure_scope"] == WITHIN:
+            if spec["status"] != "RESOLVED":
+                raise AssertionError(
+                    f"within-stage route is not resolved: {spec['route_id']}"
+                )
+            if not spec["target_unit_ids"] and not spec["target_asset_ids"]:
+                raise AssertionError(
+                    f"resolved route has no target: {spec['route_id']}"
+                )
+        elif spec["status"] != "PENDING":
+            raise AssertionError(
+                f"cross-range route is not pending: {spec['route_id']}"
+            )
+        if len(spec["candidate_ids"]) != len(set(spec["candidate_ids"])):
+            raise AssertionError(
+                f"route repeats a candidate ID: {spec['route_id']}"
+            )
+        if any(
+            len(candidate_id) != 5
+            or not candidate_id.startswith("B")
+            or not candidate_id[1:].isdigit()
+            for candidate_id in spec["candidate_ids"]
+        ):
+            raise AssertionError(
+                f"route has an invalid candidate ID: {spec['route_id']}"
+            )
+        if len(spec["recovered_candidate_names"]) != len(
+            set(spec["recovered_candidate_names"])
+        ):
+            raise AssertionError(
+                f"route repeats a recovered candidate: {spec['route_id']}"
+            )
+
+    if route_discovery_keys != sorted(route_discovery_keys):
+        raise AssertionError("new routes are not in final-F15 locator order")
+    grouped_ordinals: dict[str, list[int]] = {}
+    for spec in ROUTE_SPECS:
+        grouped_ordinals.setdefault(spec["discovery_id"], []).append(
+            spec["discovery_ordinal"]
+        )
+    for hit_id, ordinals in grouped_ordinals.items():
+        if ordinals != list(range(1, len(ordinals) + 1)):
+            raise AssertionError(
+                f"non-contiguous locator ordinals for {hit_id}: {ordinals}"
+            )
+
+    if (
+        len(STAGE_EXISTING_ROUTE_IDS)
+        != EXPECTED_COUNTS["stage_existing_routes"]
+    ):
+        raise AssertionError("Stage-9 existing route count drifted")
+    expected_existing_uses = (
+        set(STAGE_EXISTING_ROUTE_IDS) - {"R000225"}
+    )
+    actual_existing_uses = {
+        use["existing_route_id"] for use in EXISTING_ROUTE_USES
+    }
+    if actual_existing_uses != expected_existing_uses:
+        raise AssertionError("final-F15 existing-route inventory drifted")
+    if (
+        len(EXISTING_ROUTE_USES)
+        != EXPECTED_COUNTS["f15_existing_route_uses"]
+    ):
+        raise AssertionError("final-F15 existing-route use count drifted")
+    if (
+        len({use["source_unit_id"] for use in EXISTING_ROUTE_USES})
+        != EXPECTED_COUNTS["f15_existing_route_source_units"]
+    ):
+        raise AssertionError(
+            "final-F15 existing-route source-unit count drifted"
+        )
+
+    if (
+        len(NON_BEARING_LOCATORS)
+        != EXPECTED_COUNTS["non_bearing_locators"]
+    ):
+        raise AssertionError("non-bearing locator count drifted")
+    if (
+        len({item["source_unit_id"] for item in NON_BEARING_LOCATORS})
+        != EXPECTED_COUNTS["non_bearing_source_units"]
+    ):
+        raise AssertionError("non-bearing source-unit count drifted")
+
+    for item in (*EXISTING_ROUTE_USES, *NON_BEARING_LOCATORS):
+        if item["discovery_id"] != f15_hit_id(item["source_unit_id"]):
+            raise AssertionError(
+                "inventory discovery anchor drifted: "
+                f"{item['source_unit_id']} {item['literal_target']!r}"
+            )
+
+    disposition_keys = [
+        (
+            item["disposition"],
+            item["source_unit_id"],
+            item["literal_target"],
+            item["route_id"],
+        )
+        for item in LOCATOR_DISPOSITIONS
+    ]
+    if len(disposition_keys) != len(set(disposition_keys)):
+        raise AssertionError("locator disposition inventory has duplicates")
+    if (
+        len(LOCATOR_DISPOSITIONS)
+        != EXPECTED_COUNTS["locator_dispositions"]
+    ):
+        raise AssertionError("locator disposition count drifted")
+    covered_units = {
+        item["source_unit_id"] for item in LOCATOR_DISPOSITIONS
+    }
+    if covered_units != set(F15_HIT_UNITS):
+        missing = sorted(set(F15_HIT_UNITS) - covered_units)
+        extra = sorted(covered_units - set(F15_HIT_UNITS))
+        raise AssertionError(
+            f"final-F15 disposition coverage drifted; "
+            f"missing={missing}, extra={extra}"
+        )
+
+    digest = canonical_spec_digest()
+    if digest != EXPECTED_CANONICAL_SPEC_DIGEST:
+        raise AssertionError(
+            "canonical route-audit digest drifted: "
+            f"{digest} != {EXPECTED_CANONICAL_SPEC_DIGEST}"
+        )
+    return digest

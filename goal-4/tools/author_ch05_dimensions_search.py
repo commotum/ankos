@@ -374,6 +374,14 @@ RECOVERED_SPECS = [
             "Start cell, orientation, turn convention, extent, and tie "
             "breaking for the snaking and spiral scans are not specified."
         ],
+        cardinality=(
+            "one traversal only after the omitted start, orientation, turn, "
+            "extent, and tie-breaking choices are fully supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic traversal "
+            "from the two-dimensional grid alone"
+        ),
     ),
     _spec(
         "network evolution node-count observer",
@@ -554,6 +562,14 @@ RECOVERED_SPECS = [
             "The cut window, plane offset, lattice-intersection convention, "
             "and exact projection map are not specified."
         ],
+        cardinality=(
+            "one tiling only after the omitted cut window, plane offset, "
+            "intersection convention, and projection map are fully supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic tiling "
+            "without those omitted cut-and-project choices"
+        ),
     ),
     _spec(
         "quadratic-irrational hyperplane cut-and-project nested-pattern family",
@@ -567,6 +583,14 @@ RECOVERED_SPECS = [
             "The source does not specify the acceptance window, offsets, "
             "projection coordinates, or boundary convention for this family."
         ],
+        cardinality=(
+            "one pattern only after the omitted acceptance window, offsets, "
+            "projection coordinates, and boundary convention are fully supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic pattern "
+            "without those omitted cut-and-project choices"
+        ),
     ),
     _spec(
         "base-(i-1) binary-digit point-set generator",
@@ -1422,7 +1446,6 @@ RELINK_SPECS = [
             "U006117": [
                 "object_kind",
                 "law_kind",
-                "rule_relation_constraint_function_or_probability_law",
                 "parameters_and_variants",
                 "evidence_limit",
             ]
@@ -1437,10 +1460,8 @@ RELINK_SPECS = [
         "candidate_id": "B0595",
         "units": {
             "U006182": [
+                "object_kind",
                 "input",
-                "read_dependencies_or_neighborhood",
-                "law_kind",
-                "rule_relation_constraint_function_or_probability_law",
                 "result_kind",
                 "witness_semantics",
                 "parameters_and_variants",
