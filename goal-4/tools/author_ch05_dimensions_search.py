@@ -1177,7 +1177,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "multiway equivalence-class quotient representation",
-        ["U006262"],
+        ["U006261", "U006262"],
         "quotient representation",
         "all strings under a group or semigroup rewrite relation",
         "a bidirectional rule presentation",
@@ -1188,6 +1188,28 @@ RECOVERED_SPECS = [
             "specified bidirectional presentation"
         ),
         measure="deterministic declarative quotient formation",
+        evidence_scopes={
+            "U006261": [
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006262": [
+                "object_kind",
+                "carrier",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+        discovery_unit="U006262",
+        identity_unit="U006262",
     ),
     _spec(
         "group-or-semigroup Cayley-graph generator family",
@@ -1468,13 +1490,29 @@ RECOVERED_SPECS = [
         ["U006301", "U006302", "U006303", "U006304"],
         "two-dimensional substitution system",
         "arrays over sixteen substitution symbols/colors",
-        "the displayed 16-symbol replacement table and an initial symbol",
+        (
+            "a current finite array over the sixteen symbols and the displayed "
+            "16-symbol replacement table"
+        ),
         "replace every symbol by its displayed block at each step",
         "one successor nested-pattern array",
         related=["B0948"],
+        limit=(
+            "The complete 16-symbol replacement table is explicit, but the "
+            "source does not state the initial symbol or array used for the "
+            "displayed nested pattern."
+        ),
+        uncertainties=[
+            "The seed or initial condition for the displayed Ammann pattern "
+            "is not stated."
+        ],
+        missing_mechanics=[
+            "The initial symbol or finite seed array is unspecified."
+        ],
         evidence_scopes={
             "U006301": [
                 "object_kind",
+                "native_time",
                 "carrier",
                 "support",
                 "alphabet_or_value_schema",
@@ -2261,6 +2299,22 @@ RELINK_SPECS = [
         ),
     },
     {
+        "candidate_id": "B0916",
+        "units": {
+            "U006223": [
+                "native_time",
+                "schedule",
+                "write_replacement_assembly_or_commit",
+                "result_kind",
+            ]
+        },
+        "claim": (
+            "The prose immediately preceding NetEvolveList states that each "
+            "successive network applies the rules and then removes every node "
+            "not connected to node 1."
+        ),
+    },
+    {
         "candidate_id": "B0919",
         "units": {
             "U006233": [
@@ -2276,6 +2330,10 @@ RELINK_SPECS = [
     {
         "candidate_id": "B0921",
         "units": {
+            "U006242": [
+                "native_time",
+                "law_kind",
+            ],
             "U006244": [
                 "carrier",
                 "alphabet_or_value_schema",
@@ -2294,10 +2352,21 @@ RELINK_SPECS = [
                 "rule_relation_constraint_function_or_probability_law",
                 "excluded_observers_and_representations",
             ],
+            "U006251": [
+                "structural_invariants",
+                "write_replacement_assembly_or_commit",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "witness_semantics",
+                "evidence_limit",
+            ],
         },
         "claim": (
-            "The list-based alternative is an implementation of the existing "
-            "string multiway step, not a distinct multiway law."
+            "The lead-in, list-based alternative, and general-properties note "
+            "corroborate the existing string multiway system: step functions "
+            "enumerate replacements, while Union merges equal states and "
+            "therefore erases path multiplicity rather than defining a "
+            "distinct multiway law."
         ),
     },
     {
@@ -2605,7 +2674,7 @@ EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
 EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
 EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
-EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 213
+EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 214
 EXPECTED_NEW_ROUTE_COUNT = 151
 EXPECTED_READING_UPDATE_COUNT = 154
 EXPECTED_NEW_CANDIDATE_COUNT = 88
@@ -2644,10 +2713,10 @@ EXPECTED_NORMALIZED_RESULT_DIGEST = (
     "14af3dc4c5d59f050f1dd1c05fd691d7307f6d58a78ce592b0de40e1eb5e952f"
 )
 EXPECTED_ROUTE_SPEC_DIGEST = (
-    "1bc5019c7236aef8bf0186b179997a3e83e2f385444ea8aa9bbf94aab226c6f3"
+    "bd46f6219ec51c9f9077448cfee5ff2a263882cca3d63fbe4cdd8c4116938ea0"
 )
 EXPECTED_ROUTE_AUDIT_DIGEST = (
-    "5e575deef81eb316173de75edad0a2d1857e14b7327984f290a3a954c1bae27f"
+    "ea4c7b2e9af1a762c6448f3314d196baaa9e515ce6904f65a7bce7234f207682"
 )
 EXPECTED_TRIAGE_DIGEST = (
     "1d2d0c50a27a20dd283952077f73d6fc71057ffdfa3b062a9a082ceefb33c06f"
@@ -2663,7 +2732,7 @@ EXPECTED_ROUTE_COVERAGE_DIGEST = ""
 EXPECTED_OMISSION_CHALLENGE_COUNT = 0
 EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
 EXPECTED_NEW_VOCABULARY_DIGEST = (
-    "947cb8a7ec2ab54b4548b5e861467ec997b1ca7c9f6515bf70eafb43e8bd8960"
+    "f2bb0778817ace90ee9f3e4b0d9c3a9a246f704ef77859368a2888bdfb9a115a"
 )
 EXPECTED_DISPOSITION_COUNTS: dict[str, int] = {}
 EXPECTED_ROUND_DIGESTS: dict[str, str] = {}
@@ -3567,10 +3636,12 @@ DENOTATION_NA = {
     "visible_history",
     "control_state",
     "seed",
+    "external_data",
     "frontier_or_activation",
     "schedule",
     "read_dependencies_or_neighborhood",
     "write_replacement_assembly_or_commit",
+    "termination_completion_failure",
     "witness_semantics",
 }
 
@@ -5519,8 +5590,29 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             f"Stage 9 candidate coverage drifted: {coverage_digest}"
         )
 
-    route_coverage: list[tuple[str, list[str]]] = []
     result_set = set(result_unit_ids)
+    candidate_route_witnesses: dict[str, set[str]] = {}
+    for candidate_id in expected_stage_candidates:
+        candidate_route_ids = enriched_candidates_by_id[candidate_id][
+            "cross_reference_ids"
+        ]
+        if not candidate_route_ids:
+            continue
+        candidate_witnesses = {
+            unit_id
+            for unit_id in result_set & stage_unit_ids
+            if candidate_id
+            in parse_links(
+                proposed_reading_by_id[unit_id]["candidate_ids"],
+                f"{unit_id}.candidate_ids",
+            )
+        }
+        for route_id in candidate_route_ids:
+            candidate_route_witnesses.setdefault(route_id, set()).update(
+                candidate_witnesses
+            )
+
+    route_coverage: list[tuple[str, list[str]]] = []
     for route_id in sorted(proposed_active_route_ids):
         route = proposed_routes_by_id[route_id]
         witnesses: set[str] = set()
@@ -5535,6 +5627,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             )
             & stage_unit_ids
         )
+        witnesses.update(candidate_route_witnesses.get(route_id, set()))
         witnesses &= result_set
         if not witnesses:
             raise AuthoringError(
