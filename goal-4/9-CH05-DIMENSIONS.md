@@ -44,7 +44,7 @@ Status: **COMPLETE**.
   routes: 109 resolved `WITHIN_STAGE` routes and 91 pending `CROSS_RANGE`
   obligations. Its complete active relationship set has 217 routes: 125
   resolved and 92 pending, including 16 resolved incoming routes and the
-  now-reachable earlier pending route `R000102`.
+  candidate-linked earlier pending route `R000102`.
 - The six terminal mutable-ledger hashes are:
   - `reading-ledger.csv`:
     `bca2a50ad241f2cd99de3ea5fb7650591f9a1e50a7bcef1176ecc8ac6f37beb6`;
