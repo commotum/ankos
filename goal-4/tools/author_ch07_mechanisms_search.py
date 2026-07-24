@@ -275,7 +275,9 @@ QUERY_SPECS = [
             r"probabilit(?:y|ies)|noise|shot noise|Johnson noise|flicker|"
             r"entropy(?: pool)?|quantum|thermal|Monte Carlo|ensemble|"
             r"distribution|measure|Boltzmann|microcanonical|canonical|"
-            r"percolation|Ising|biased|unbiased|independent)\b"
+            r"percolation|Ising|biased|unbiased|independent|"
+            r"microscopic fluctuations?|breakdown|"
+            r"amplif(?:y|ies|ied|ication)|sparks?)\b"
         ),
         "REGEX",
     ),
@@ -286,7 +288,9 @@ QUERY_SPECS = [
             r"rolling|spinning|toss(?:ed|ing)?|friction|collisions?|elastic|"
             r"pegboard|three[- ]body|planet|moon|gravitational|scatter(?:ing)?|"
             r"knead(?:ing)?|stretch|cut|stack|doubling map|fractional part|"
-            r"maps?|iterat(?:e|es|ed|ing|ion)|finite[- ]state|"
+            r"left[- ]shift|shift(?:s|ed|ing)?[^.\n]{0,60}\b(?:left|right)\b|"
+            r"transcription|maps?|"
+            r"iterat(?:e|es|ed|ing|ion)|finite[- ]state|"
             r"periodic(?:ity)?|recurr(?:ence|ent)|closed curves?)\b"
         ),
         "REGEX",
@@ -428,7 +432,7 @@ QUERY_SPECS = [
         "REGEX",
     ),
     (
-        "typed cross-reference and locator obligations",
+        "typed cross-reference locator and route-anchor obligations",
         (
             r"\b(?:pages?|page|chapter)\s+"
             r"(?:\d+|[IVX]+)(?:[–-]\d+)?\b|"
@@ -436,7 +440,10 @@ QUERY_SPECS = [
             r"(?:facing|previous|next)(?:\s+(?:one|two|three))?"
             r"\s+pages?\b|"
             r"\b(?:previous section|next chapter|next few chapters|"
-            r"later in (?:this|the) book)\b"
+            r"later in (?:this|the) book|linear feedback shift registers?|"
+            r"ultimate forms of behavior|undecidable|"
+            r"non[- ]deterministic Turing machines?|tiling problems?|"
+            r"halting problems?)\b"
         ),
         "REGEX",
     ),
@@ -445,7 +452,7 @@ QUERY_SPECS = [
 
 # Source/query guards are filled after --calibrate-source and then immutable.
 EXPECTED_QUERY_SPEC_DIGEST = (
-    "dc4e71f0e243aef5c5057baa9fd037c68783f53da54b4915edd30adb3fb31dee"
+    "9a7790adeeb39626e5234f06596b731571e0f6729ab1b3e58eee4e03f5a4502c"
 )
 EXPECTED_STAGE_VOCABULARY_COUNT = len(PROPOSED_VOCABULARY)
 EXPECTED_STAGE_VOCABULARY_DIGEST = (
@@ -467,14 +474,14 @@ EXPECTED_SOURCE_SHA256 = {
         "fd8696100529789964578841267bbd841411691d05248840ede6e0b4b7bd69f3"
     ),
 }
-EXPECTED_RESULT_PAIR_COUNT = 2468
+EXPECTED_RESULT_PAIR_COUNT = 2478
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 704
 EXPECTED_HIT_COUNTS = [
     104,
-    278,
-    75,
+    282,
+    78,
     84,
-    86,
+    89,
     84,
     59,
     36,
@@ -484,18 +491,18 @@ EXPECTED_HIT_COUNTS = [
     160,
     83,
     209,
-    152,
+    155,
 ]
 EXPECTED_PATH_PAIR_COUNTS = {
-    STAGE_PATHS[0]: 1412,
-    STAGE_PATHS[1]: 1056,
+    STAGE_PATHS[0]: 1419,
+    STAGE_PATHS[1]: 1059,
 }
 EXPECTED_PATH_UNIQUE_UNIT_COUNTS = {
     STAGE_PATHS[0]: 432,
     STAGE_PATHS[1]: 272,
 }
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
-    "a749122199eed5b13935e73b1937305c0e8ec8e7ad7b4b629a0e79d49e69b59f"
+    "c604632660a66ca6c815be6ecb03e6a6d0c2505b95082ee010a8154429fcb69d"
 )
 EXPECTED_RESULT_UNIT_IDS_DIGEST = (
     "effa31eb78c02cfc76773c2b58fe7a26de2778aefb9facb12132c9a0089a8e8b"
@@ -505,37 +512,58 @@ EXPECTED_CLOSED_ROUND_COUNT = 16
 EXPECTED_CLOSED_ROUNDS_DIGEST = (
     "f9d4edba680a2f9c810db432bb6a79f892fbb6692f5f74f9acd93d41f0eaedbf"
 )
-EXPECTED_QUERY_START = {"S015": 209, "S017": 209, "S018": -1}
-EXPECTED_HIT_START = {"S015": 18631, "S017": 18631, "S018": -1}
+EXPECTED_QUERY_START = {"S015": 209, "S017": 209, "S018": 224}
+EXPECTED_HIT_START = {"S015": 18631, "S017": 18631, "S018": 21109}
 EXPECTED_GLOBAL_VOCABULARY_COUNT = {
     "S015": 716,
     "S017": 716,
-    "S018": -1,
+    "S018": 907,
 }
 EXPECTED_GLOBAL_VOCABULARY_DIGEST = {
     "S015": "c98559ab14e510f32f4f7e13852bed3d8ec016b1708dce7c94764d8120e693d6",
     "S017": "c98559ab14e510f32f4f7e13852bed3d8ec016b1708dce7c94764d8120e693d6",
-    "S018": "__FILL_S018_GLOBAL_VOCABULARY_DIGEST__",
+    "S018": "786ca2acc4b7aba9545363c7fbc6fec49b6c95eea267153de081f2af7cf337cd",
 }
 EXPECTED_GLOBAL_ASSUMPTIONS_COUNT = 2
 EXPECTED_GLOBAL_ASSUMPTIONS_DIGEST = (
     "671219eeacdded499c971a237e87b358ec687bfb6f085425d101d5d007a20afd"
 )
 EXPECTED_POST_MERGE_SEMANTICS: dict[str, Any] = {
-    "stage_reading_count": None,
-    "stage_reading_digest": None,
-    "stage_asset_count": None,
-    "stage_asset_digest": None,
-    "stage_candidate_count": None,
-    "stage_candidate_ids_digest": None,
-    "triage_digest": None,
-    "candidate_coverage_digest": None,
-    "omission_challenge_count": None,
-    "omission_challenge_digest": None,
-    "route_coverage_count": None,
-    "route_coverage_digest": None,
-    "disposition_counts": None,
-    "normalized_hit_projection_digest": None,
+    "stage_reading_count": 713,
+    "stage_reading_digest": (
+        "aefbfea99a0e698e1e30112cd703a1c732b368f474d818f03ce53218c055d4dd"
+    ),
+    "stage_asset_count": 194,
+    "stage_asset_digest": (
+        "b7b4e5ff2489d64701bb07b4d9b82688fca33d86bcbe42a80f56a633c584d864"
+    ),
+    "stage_candidate_count": 163,
+    "stage_candidate_ids_digest": (
+        "f7fdb657ab7bb6e59118c8a7367ec8d5da7a09caa6ad80ab169b66503e6a0890"
+    ),
+    "triage_digest": (
+        "3309da9bb6b23203230d95d954ebd35cd5e1fb3af1363841296df1a5a5a6ca50"
+    ),
+    "candidate_coverage_digest": (
+        "3496212836e9a84a6b01f393f7b8b65937f0f868d2cb594251e5e909811532b4"
+    ),
+    "omission_challenge_count": 489,
+    "omission_challenge_digest": (
+        "9ac5e8254b78d9303fc096775517b67fbe35375bebc45a0149dc7d4072a3c044"
+    ),
+    "route_coverage_count": 163,
+    "route_coverage_digest": (
+        "3f919f6a25195bb972da04af1675b7faff64bc17cfbb0bd026d51b5acff462ab"
+    ),
+    "disposition_counts": {
+        "CONTROL_OR_RELATIONSHIP": 45,
+        "CROSS_REFERENCE": 97,
+        "EXCLUSION": 644,
+        "GOVERNED_CANDIDATE_OR_SUPPORT": 1692,
+    },
+    "normalized_hit_projection_digest": (
+        "0aa120c8aa645bd7846f789a7126066a9fdff14465b84ee153fbe2cefdd67946"
+    ),
 }
 EXPECTED_ROUND_GUARDS: dict[str, dict[str, Any]] = {
     # S015 is a compatibility alias used only inside the validated Stage 10
@@ -564,7 +592,9 @@ EXPECTED_ROUND_GUARDS: dict[str, dict[str, Any]] = {
                 "f614cce2bff0e040fca38cd1a82036432d951c2082febfcb9cf0eb86c03ae94d"
             ),
         },
-        "result_digest": None,
+        "result_digest": (
+            "468f300c470f61dedbe0493a60d54e02f3eb74894ed08036570390b7749827db"
+        ),
     },
     "S017": {
         "prior_event_sha256": (
@@ -590,7 +620,9 @@ EXPECTED_ROUND_GUARDS: dict[str, dict[str, Any]] = {
                 "f614cce2bff0e040fca38cd1a82036432d951c2082febfcb9cf0eb86c03ae94d"
             ),
         },
-        "result_digest": None,
+        "result_digest": (
+            "468f300c470f61dedbe0493a60d54e02f3eb74894ed08036570390b7749827db"
+        ),
     },
     "S018": {
         "prior_event_sha256": None,
