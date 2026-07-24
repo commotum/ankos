@@ -768,6 +768,213 @@ def _search_enrichment_fixture(
     return goal, proposal_path, governed_unit_id, governed_hit_id
 
 
+def _interleaved_search_append_fixture(
+    root: Path,
+) -> tuple[Path, Path]:
+    """Build a SEARCH_APPEND whose global E order interleaves candidate owners."""
+
+    goal, first_proposal, first_unit_id, _ = _search_enrichment_fixture(
+        root / "first"
+    )
+    merge.apply_merge(
+        merge.prepare_search_append(first_proposal, goal_dir=goal)
+    )
+    units = merge._read_jsonl(goal / merge.UNITS_NAME)
+    query = {
+        "query_id": "Q0002",
+        "family": "interleaved search-evidence fixture",
+        "pattern": "the",
+        "mode": "LITERAL",
+        "case_sensitive": False,
+        "whole_word": True,
+        "scope_paths": [ASSIGNMENT_PATH],
+    }
+    pairs, errors = merge.validate_audit.execute_frozen_queries(
+        [query],
+        units,
+        merge.validate_audit.REPO_ROOT
+        / "ref"
+        / "A-New-Kind-of-Science",
+    )
+    assert errors == []
+    unit_by_id = {unit["id"]: unit for unit in units}
+    governed_units = [
+        unit_id
+        for _, unit_id in pairs
+        if (
+            unit_id != first_unit_id
+            and unit_by_id[unit_id]["path"] == ASSIGNMENT_PATH
+            and unit_by_id[unit_id]["block_kind"] == "paragraph"
+        )
+    ][:2]
+    assert len(governed_units) == 2
+    early_unit_id, late_unit_id = governed_units
+
+    search = json.loads(
+        (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    hit_start = (
+        sum(len(round_record["hits"]) for round_record in search["rounds"])
+        + 1
+    )
+    hits: list[dict[str, Any]] = []
+    hit_by_unit: dict[str, str] = {}
+    for offset, (query_id, unit_id) in enumerate(pairs):
+        hit_id = f"H{hit_start + offset:06d}"
+        if unit_id in governed_units:
+            hit_by_unit[unit_id] = hit_id
+            candidate_ids = (
+                ["B0002"]
+                if unit_id == early_unit_id
+                else ["B0001", "B0002"]
+            )
+            disposition = "GOVERNED_CANDIDATE_OR_SUPPORT"
+            rationale = "The hit supplies interleaved candidate evidence."
+        else:
+            candidate_ids = []
+            disposition = "EXCLUSION"
+            rationale = "The hit is retained as a deterministic control."
+        hits.append(
+            {
+                "hit_id": hit_id,
+                "query_id": query_id,
+                "source_unit_id": unit_id,
+                "context_sha256": unit_by_id[unit_id]["sha256"],
+                "disposition": disposition,
+                "candidate_ids": candidate_ids,
+                "route_ids": [],
+                "rationale": rationale,
+            }
+        )
+    assert set(hit_by_unit) == set(governed_units)
+
+    round_record = {
+        "round_id": "S002",
+        "epoch": 1,
+        "kind": "LOCAL",
+        "owning_stage": 4,
+        "queries": [query],
+        "tool_assumptions": ["Literal UTF-8 source-unit search."],
+        "result_ids": [hit["hit_id"] for hit in hits],
+        "result_digest": "",
+        "hits": hits,
+        "new_vocabulary": [],
+        "new_candidates": ["B0002"],
+        "new_evidence_groups": ["G000002", "G000003", "G000004"],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    digest = merge.validate_audit.search_result_digest(round_record)
+    round_record["result_digest"] = digest
+    round_record["rerun_digest"] = digest
+    proposed_search = copy.deepcopy(search)
+    proposed_search["rounds"].append(round_record)
+
+    reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
+    reading_by_id = {row["source_unit_id"]: row for row in reading}
+    reading_updates: list[dict[str, str]] = []
+    for unit_id, additions in (
+        (early_unit_id, ["B0002"]),
+        (late_unit_id, ["B0001", "B0002"]),
+    ):
+        row = dict(reading_by_id[unit_id])
+        prior = json.loads(row["candidate_ids"])
+        assert not set(prior) & set(additions)
+        row["candidate_ids"] = json.dumps(
+            [*prior, *additions],
+            separators=(",", ":"),
+        )
+        row["review_disposition"] = (
+            "CANDIDATE"
+            if unit_id == early_unit_id
+            else "SUPPORTS_CANDIDATE"
+        )
+        row["evidence_statement"] = (
+            "The second LOCAL round supplies interleaved candidate evidence."
+        )
+        reading_updates.append(row)
+
+    existing = copy.deepcopy(
+        next(
+            candidate
+            for candidate in merge._read_jsonl(
+                goal / merge.CANDIDATE_NAME
+            )
+            if candidate["id"] == "B0001"
+        )
+    )
+    existing["source_unit_ids"].append(late_unit_id)
+    existing["source_evidence"].append(
+        {
+            "evidence_id": "E000003",
+            "evidence_group_id": "G000003",
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": "SEARCH_HIT",
+                "id": hit_by_unit[late_unit_id],
+                "ordinal": 1,
+            },
+            "source_unit_id": late_unit_id,
+            "image_path": None,
+            "strength": "CORROBORATING",
+            "modality": "PROSE",
+            "claim": "The later hit corroborates the existing candidate.",
+            "fingerprint_fields": [],
+        }
+    )
+    existing["evidence_strength"].append("CORROBORATING")
+
+    appended = _search_candidate(
+        early_unit_id,
+        hit_by_unit[early_unit_id],
+    )
+    appended["id"] = "B0002"
+    appended["provisional_name"] = "Interleaved appended construction lead"
+    appended["source_evidence"][0]["evidence_id"] = "E000002"
+    appended["source_evidence"][0]["evidence_group_id"] = "G000002"
+    appended["source_unit_ids"].append(late_unit_id)
+    appended["source_evidence"].append(
+        {
+            "evidence_id": "E000004",
+            "evidence_group_id": "G000004",
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": "SEARCH_HIT",
+                "id": hit_by_unit[late_unit_id],
+                "ordinal": 2,
+            },
+            "source_unit_id": late_unit_id,
+            "image_path": None,
+            "strength": "CORROBORATING",
+            "modality": "PROSE",
+            "claim": "The later hit also corroborates the new candidate.",
+            "fingerprint_fields": [],
+        }
+    )
+    appended["evidence_strength"].append("CORROBORATING")
+
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "SEARCH_APPEND",
+        "coordinator_id": "interleaved-search-evidence-coordinator",
+        "epoch": 1,
+        "source_paths": [ASSIGNMENT_PATH],
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "reading_updates": reading_updates,
+        "asset_updates": [],
+        # Deliberately candidate-major: E3 precedes E2/E4 in this array.
+        "candidate_updates": [existing, appended],
+        "route_appends": [],
+        "proposed_search": proposed_search,
+    }
+    proposal_path = root / "interleaved-search-append.json"
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+    return goal, proposal_path
+
+
 def _add_local_closure(
     goal: Path,
     *,
@@ -2331,6 +2538,75 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     assert enrichment["path_changes"][0]["result_snapshot"][
         "source_path"
     ] == ASSIGNMENT_PATH
+
+
+def test_search_append_accepts_globally_interleaved_existing_and_new_evidence(
+    tmp_path: Path,
+) -> None:
+    goal, proposal_path = _interleaved_search_append_fixture(tmp_path)
+    commands = [
+        [
+            sys.executable,
+            str(TOOLS_DIR / "merge_worker_output.py"),
+            "--search-append",
+            str(proposal_path),
+            "--goal-dir",
+            str(goal),
+        ],
+        [
+            sys.executable,
+            "-O",
+            str(TOOLS_DIR / "merge_worker_output.py"),
+            "--search-append",
+            str(proposal_path),
+            "--goal-dir",
+            str(goal),
+        ],
+    ]
+    previews = [
+        subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        for command in commands
+    ]
+    assert all(completed.returncode == 0 for completed in previews), [
+        completed.stderr for completed in previews
+    ]
+    assert json.loads(previews[0].stdout) == json.loads(previews[1].stdout)
+
+    plan = merge.prepare_search_append(proposal_path, goal_dir=goal)
+    assert plan.candidate_update_count == 1
+    assert plan.candidate_append_count == 1
+    merge.apply_merge(plan)
+    candidates = {
+        candidate["id"]: candidate
+        for candidate in merge._read_jsonl(goal / merge.CANDIDATE_NAME)
+    }
+    assert [
+        item["evidence_id"]
+        for item in candidates["B0001"]["source_evidence"]
+    ] == ["E000001", "E000003"]
+    assert [
+        item["evidence_id"]
+        for item in candidates["B0002"]["source_evidence"]
+    ] == ["E000002", "E000004"]
+    assert merge._existing_evidence_sequences(
+        [candidates["B0001"], candidates["B0002"]]
+    ) == (
+        ["E000001", "E000002", "E000003", "E000004"],
+        ["G000001", "G000002", "G000003", "G000004"],
+    )
+    search = json.loads(
+        (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    assert search["rounds"][-1]["new_evidence_groups"] == [
+        "G000002",
+        "G000003",
+        "G000004",
+    ]
 
 
 def test_route_resolution_default_dry_run_then_transactional_apply(

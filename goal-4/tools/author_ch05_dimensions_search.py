@@ -368,7 +368,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "network evolution node-count observer",
-        ["U001112", "U001115"],
+        ["U001112", "U001114", "U001115"],
         "trajectory observer",
         "network-system evolution history",
         "the network at each retained step",
@@ -452,7 +452,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "multiway state-count and first-difference observer",
-        ["U001130", "U001134", "U001135", "U001139"],
+        ["U001130", "U001134", "U001135", "U001138", "U001139"],
         "trajectory observer",
         "multiway-system evolution history",
         "the distinct state collection at each retained step",
@@ -881,7 +881,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Ammann 16-symbol substitution system",
-        ["U006301", "U006302"],
+        ["U006301", "U006302", "U006303", "U006304"],
         "two-dimensional substitution system",
         "arrays over sixteen substitution symbols/colors",
         "the displayed 16-symbol replacement table and an initial symbol",
@@ -1777,9 +1777,9 @@ EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
 EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 414
 EXPECTED_STAGE_ROUTE_COUNT = 62
-EXPECTED_READING_UPDATE_COUNT = 146
+EXPECTED_READING_UPDATE_COUNT = 149
 EXPECTED_NEW_CANDIDATE_COUNT = 87
-EXPECTED_NEW_EVIDENCE_COUNT = 192
+EXPECTED_NEW_EVIDENCE_COUNT = 196
 EXPECTED_RESULT_PAIR_COUNT = 1552
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -2699,6 +2699,7 @@ def _build_enrichment(
 
 DIRECT_FUNCTION_NA = {
     "native_time",
+    "visible_history",
     "control_state",
     "seed",
     "external_data",
