@@ -112,7 +112,7 @@ CROSS = "CROSS_RANGE"
 
 _ROUTES = (
     route(
-        "U000971", "H011605", 1,
+        "U000971", "H011606", 1,
         "the two-dimensional patterns from the bottom of the previous page",
         "code-942 two-dimensional cellular-automaton patterns used as stacked-history slices",
         WITHIN,
@@ -123,7 +123,7 @@ _ROUTES = (
         vocabulary_terms=("code 942", "stacked history", "two-dimensional cellular automaton"),
     ),
     route(
-        "U000972", "H011606", 1,
+        "U000972", "H011607", 1,
         "The facing page and the one that follows",
         "two-dimensional cellular-automaton rule-pattern survey",
         WITHIN,
@@ -132,7 +132,7 @@ _ROUTES = (
         vocabulary_terms=("rule patterns", "two-dimensional cellular automata"),
     ),
     route(
-        "U000972", "H011606", 2,
+        "U000972", "H011607", 2,
         "the previous page",
         "one-dimensional center-slice views of the surveyed two-dimensional cellular automata",
         WITHIN,
@@ -141,7 +141,7 @@ _ROUTES = (
         vocabulary_terms=("center slices", "two-dimensional cellular automata"),
     ),
     route(
-        "U000976", "H011608", 1,
+        "U000976", "H011609", 1,
         "the previous page",
         "the same two-dimensional cellular-automaton presets shown after fewer steps",
         WITHIN,
@@ -150,7 +150,7 @@ _ROUTES = (
         vocabulary_terms=("continued evolution", "rule patterns", "two-dimensional cellular automata"),
     ),
     route(
-        "U000978", "H011609", 1,
+        "U000978", "H011610", 1,
         "the previous two pages",
         "two-dimensional cellular-automaton patterns used by the center-slice observer",
         WITHIN,
@@ -159,7 +159,7 @@ _ROUTES = (
         vocabulary_terms=("center slices", "rule patterns", "two-dimensional cellular automata"),
     ),
     route(
-        "U000980", "H011610", 1,
+        "U000980", "H011611", 1,
         "the picture on the facing page",
         "rough-surface eight-neighbor cellular automaton code 175850",
         WITHIN,
@@ -168,7 +168,7 @@ _ROUTES = (
         vocabulary_terms=("code 175850", "rough surface", "two-dimensional cellular automaton"),
     ),
     route(
-        "U000991", "H011615", 1,
+        "U000991", "H011616", 1,
         "the previous page",
         "related eight-neighbor retaining growth-rule family",
         WITHIN,
@@ -177,7 +177,7 @@ _ROUTES = (
         vocabulary_terms=("eight-neighbor rule", "retaining rule", "two-dimensional cellular automaton"),
     ),
     route(
-        "U000991", "H011615", 2,
+        "U000991", "H011616", 2,
         "the picture on the previous page",
         "row-of-seven black-cell initial condition",
         WITHIN,
@@ -186,7 +186,7 @@ _ROUTES = (
         vocabulary_terms=("initial condition", "row of seven black cells"),
     ),
     route(
-        "U000997", "H011617", 1,
+        "U000997", "H011618", 1,
         "the cellular automaton from the previous page",
         "eight-neighbor retaining cellular automaton whose successive patterns are stacked",
         WITHIN,
@@ -198,7 +198,7 @@ _ROUTES = (
         vocabulary_terms=("cellular automaton", "stacked history", "previous page"),
     ),
     route(
-        "U001002", "H011618", 1,
+        "U001002", "H011619", 1,
         "the cellular automaton from the facing page",
         "continued evolution of the eight-neighbor retaining cellular automaton",
         WITHIN,
@@ -207,7 +207,7 @@ _ROUTES = (
         vocabulary_terms=("cellular automaton", "continued evolution", "row of eleven black cells"),
     ),
     route(
-        "U001016", "H011620", 1,
+        "U001016", "H011621", 1,
         "The facing page",
         "five illustrated four-state two-dimensional Turing-machine presets",
         WITHIN,
@@ -216,7 +216,7 @@ _ROUTES = (
         vocabulary_terms=("four-state rules", "two-dimensional Turing machines"),
     ),
     route(
-        "U001031", "H011621", 1,
+        "U001031", "H011622", 1,
         "rule (e) from the previous page",
         "four-state two-dimensional Turing-machine rule (e)",
         WITHIN,
@@ -228,7 +228,7 @@ _ROUTES = (
         vocabulary_terms=("head path", "rule (e)", "two-dimensional Turing machine"),
     ),
     route(
-        "U001038", "H011623", 1,
+        "U001038", "H011624", 1,
         "The next page",
         "nine page-188 two-dimensional substitution presets",
         WITHIN,
@@ -237,7 +237,7 @@ _ROUTES = (
         vocabulary_terms=("page 188", "substitution presets", "two-dimensional substitution systems"),
     ),
     route(
-        "U001046", "H011624", 1,
+        "U001046", "H011625", 1,
         "the picture on the next page",
         "overlap-producing geometrical replacement preset",
         WITHIN,
@@ -246,7 +246,7 @@ _ROUTES = (
         vocabulary_terms=("geometrical replacement", "overlapping squares"),
     ),
     route(
-        "U001050", "H011625", 1,
+        "U001050", "H011626", 1,
         "the pictures on the facing page",
         "four geometrical fractal-replacement presets",
         WITHIN,
@@ -255,7 +255,7 @@ _ROUTES = (
         vocabulary_terms=("fractal patterns", "geometrical replacement"),
     ),
     route(
-        "U001053", "H011627", 1,
+        "U001053", "H011628", 1,
         "geometrical replacement rules of the kind shown on the facing page",
         "neighbor-independent geometrical fractal-replacement family",
         WITHIN,
@@ -264,7 +264,7 @@ _ROUTES = (
         vocabulary_terms=("fractal geometry", "geometrical replacement", "neighbor independent"),
     ),
     route(
-        "U001056", "H011628", 1,
+        "U001056", "H011629", 1,
         "the picture at the top of the next page",
         "two-dimensional neighbor-dependent substitution mechanism",
         WITHIN,
@@ -273,7 +273,7 @@ _ROUTES = (
         vocabulary_terms=("neighbor-dependent substitution", "two-dimensional substitution"),
     ),
     route(
-        "U001056", "H011628", 2,
+        "U001056", "H011629", 2,
         "the pictures on the next page",
         "eight neighbor-dependent substitution behavior presets",
         WITHIN,
@@ -282,7 +282,7 @@ _ROUTES = (
         vocabulary_terms=("neighbor-dependent substitution", "two-dimensional substitution"),
     ),
     route(
-        "U001075", "H011631", 1,
+        "U001075", "H011632", 1,
         "the pictures on the facing page",
         "binary-outdegree networks with recognizable array geometries",
         WITHIN,
@@ -291,7 +291,7 @@ _ROUTES = (
         vocabulary_terms=("array geometry", "binary-outdegree networks"),
     ),
     route(
-        "U001076", "H011632", 1,
+        "U001076", "H011633", 1,
         "the networks illustrated at the top of the facing page",
         "one-, two-, and three-dimensional array-network presets",
         WITHIN,
@@ -300,7 +300,7 @@ _ROUTES = (
         vocabulary_terms=("array networks", "effective dimension"),
     ),
     route(
-        "U001091", "H011633", 1,
+        "U001091", "H011634", 1,
         "the pictures at the top of the next page",
         "uniform linear binary-outdegree-network layout representation",
         WITHIN,
@@ -311,7 +311,7 @@ _ROUTES = (
         vocabulary_terms=("linear layout", "network representation"),
     ),
     route(
-        "U001095", "H011634", 1,
+        "U001095", "H011635", 1,
         "the pictures on the facing page",
         "four binary-outdegree network-rerouting presets",
         WITHIN,
@@ -320,7 +320,7 @@ _ROUTES = (
         vocabulary_terms=("network rerouting", "rule presets"),
     ),
     route(
-        "U001101", "H011635", 1,
+        "U001101", "H011636", 1,
         "the pictures on the next page",
         "two node-inserting network-rule presets",
         WITHIN,
@@ -329,7 +329,7 @@ _ROUTES = (
         vocabulary_terms=("network evolution", "node insertion"),
     ),
     route(
-        "U001108", "H011636", 1,
+        "U001108", "H011637", 1,
         "the pictures on the facing page",
         "one-hop same-target/different-target conditional network rules",
         WITHIN,
@@ -338,7 +338,7 @@ _ROUTES = (
         vocabulary_terms=("conditional network rules", "one-hop neighborhood"),
     ),
     route(
-        "U001111", "H011637", 1,
+        "U001111", "H011638", 1,
         "the pictures on the next two pages",
         "distance-two distinct-node-count network-rule family and presets",
         WITHIN,
@@ -347,7 +347,7 @@ _ROUTES = (
         vocabulary_terms=("distance two", "network rules", "node count"),
     ),
     route(
-        "U001144", "H011640", 1,
+        "U001144", "H011641", 1,
         "the facing page",
         "period-1071 slow-growth multiway preset",
         WITHIN,
@@ -356,7 +356,7 @@ _ROUTES = (
         vocabulary_terms=("multiway system", "period 1071", "slow growth"),
     ),
     route(
-        "U001148", "H011642", 1,
+        "U001148", "H011643", 1,
         "the next page",
         "multiway state-collection survey presets",
         WITHIN,
@@ -365,7 +365,7 @@ _ROUTES = (
         vocabulary_terms=("multiway survey", "state collections"),
     ),
     route(
-        "U001151", "H011644", 1,
+        "U001151", "H011645", 1,
         "previous pages",
         "repeated-state evidence underlying the multiway quotient representation",
         WITHIN,
@@ -374,7 +374,7 @@ _ROUTES = (
         vocabulary_terms=("multiway evolution", "repeated states", "state merging"),
     ),
     route(
-        "U001152", "H011645", 1,
+        "U001152", "H011646", 1,
         "the picture at the top of the facing page",
         "explicit-once multiway evolution representation",
         WITHIN,
@@ -383,7 +383,7 @@ _ROUTES = (
         vocabulary_terms=("multiway evolution", "sequence-transition network"),
     ),
     route(
-        "U001166", "H011646", 1,
+        "U001166", "H011647", 1,
         "the picture at the top of the facing page",
         "one-dimensional at-least-one-unlike-neighbor constraint witnesses",
         WITHIN,
@@ -392,7 +392,7 @@ _ROUTES = (
         vocabulary_terms=("one-dimensional constraint", "unlike neighbor"),
     ),
     route(
-        "U001178", "H011647", 1,
+        "U001178", "H011648", 1,
         "the pictures on the facing page",
         "two-dimensional fixed black/white-neighbor-count constraint census",
         WITHIN,
@@ -401,7 +401,7 @@ _ROUTES = (
         vocabulary_terms=("neighbor-count constraints", "satisfying patterns"),
     ),
     route(
-        "U001184", "H011648", 1,
+        "U001184", "H011649", 1,
         "the next two pages",
         "numbered 171-pattern witness collection for local-template constraints",
         WITHIN,
@@ -410,7 +410,7 @@ _ROUTES = (
         vocabulary_terms=("constraint numbering", "local templates", "repetitive patterns"),
     ),
     route(
-        "U001185", "H011649", 1,
+        "U001185", "H011650", 1,
         "the set of 171 repetitive patterns on the next two pages",
         "complete 171-pattern witness basis for local-template constraints",
         WITHIN,
@@ -422,7 +422,7 @@ _ROUTES = (
         vocabulary_terms=("171 repetitive patterns", "local-template constraints", "witness basis"),
     ),
     route(
-        "U001188", "H011650", 1,
+        "U001188", "H011651", 1,
         "constraints of the type shown on the previous page",
         "two-dimensional overlapping local-template constraint family",
         WITHIN,
@@ -431,7 +431,7 @@ _ROUTES = (
         vocabulary_terms=("171-pattern basis", "local templates", "previous-page constraints"),
     ),
     route(
-        "U001199", "H011651", 1,
+        "U001199", "H011652", 1,
         "the pictures on the next page",
         "iterative region-growth backtracking solver traces",
         WITHIN,
@@ -440,7 +440,7 @@ _ROUTES = (
         vocabulary_terms=("backtracking", "constraint solver", "region growth"),
     ),
     route(
-        "U001201", "H011652", 1,
+        "U001201", "H011653", 1,
         "the third picture on the next page",
         "finite-region witness for globally unsatisfiable constraint 387520105",
         WITHIN,
@@ -449,7 +449,7 @@ _ROUTES = (
         vocabulary_terms=("constraint 387520105", "finite-region witness", "unsatisfiable constraint"),
     ),
     route(
-        "U001206", "H011653", 1,
+        "U001206", "H011654", 1,
         "the system shown on the facing page",
         "first forced-nonrepetitive overlapping-template constraint",
         WITHIN,
@@ -458,7 +458,7 @@ _ROUTES = (
         vocabulary_terms=("constraint 18762389", "forced nonrepetition", "nested pattern"),
     ),
     route(
-        "U001212", "H011654", 1,
+        "U001212", "H011655", 1,
         "the kind of nested behavior seen on the previous page",
         "nested witness produced by required-template constraint 18762389",
         WITHIN,
@@ -470,7 +470,7 @@ _ROUTES = (
         vocabulary_terms=("nested witness", "required-template constraint", "previous page"),
     ),
     route(
-        "U001217", "H011655", 1,
+        "U001217", "H011656", 1,
         "the example shown at the top of the facing page",
         "56-template rule-30-correspondence constraint and forced pattern",
         WITHIN,
@@ -479,40 +479,40 @@ _ROUTES = (
         vocabulary_terms=("56 templates", "forced complex pattern", "rule 30 correspondence"),
     ),
     route(
-        "U006078", "H011656", 1,
+        "U006078", "H011657", 1,
         "Page 170 · 1D phenomena",
         "dimension-specific phenomenon boundary for the main-text cellular-automaton setting",
         WITHIN,
-        target_unit_ids=uids(960, 965), target_asset_ids=aids(845, 846),
+        target_unit_ids=uids(960, 962), target_asset_ids=aids(845),
         vocabulary_terms=("dimensional boundary", "one-dimensional phenomena", "page 170"),
     ),
     route(
-        "U006078", "H011656", 2,
+        "U006078", "H011657", 2,
         "see page 981",
         "reversible-rule phase-transition comparison for dimensional phenomena",
         CROSS,
         vocabulary_terms=("phase transition", "reversible evolution", "one dimension"),
     ),
     route(
-        "U006082", "H011657", 1,
+        "U006082", "H011658", 1,
         "the 5-neighbor rules introduced on page 170",
         "main-text five-site square-neighborhood cellular-automaton family",
         WITHIN,
-        target_unit_ids=uids(960, 965), target_asset_ids=aids(845, 846),
+        target_unit_ids=uids(960, 962), target_asset_ids=aids(845),
         candidate_ids=bids(853),
         vocabulary_terms=("5-neighbor rules", "cellular automaton", "page 170"),
     ),
     route(
-        "U006085", "H011658", 1,
+        "U006085", "H011659", 1,
         "the 9-neighbor rules introduced on page 177",
         "main-text nine-site square-neighborhood cellular-automaton family",
         WITHIN,
-        target_unit_ids=uids(980, 989), target_asset_ids=aids(852, 853),
+        target_unit_ids=uids(986, 989), target_asset_ids=aids(852, 853),
         candidate_ids=bids(854),
         vocabulary_terms=("9-neighbor rules", "cellular automaton", "page 177"),
     ),
     route(
-        "U006098", "H011659", 1,
+        "U006098", "H011660", 1,
         "page 53 for elementary rules",
         "elementary cellular-automaton neighborhood-configuration ordering",
         CROSS,
@@ -523,7 +523,7 @@ _ROUTES = (
         vocabulary_terms=("elementary rules", "neighborhood configurations", "rule numbering"),
     ),
     route(
-        "U006098", "H011659", 2,
+        "U006098", "H011660", 2,
         "page 941 for 5-neighbor rules",
         "five-cell neighborhood-configuration ordering",
         WITHIN,
@@ -535,7 +535,7 @@ _ROUTES = (
         vocabulary_terms=("5-neighbor rules", "neighborhood configurations", "rule numbering"),
     ),
     route(
-        "U006106", "H011660", 1,
+        "U006106", "H011661", 1,
         "page 941",
         "the 32 five-cell neighborhoods used by the symmetric-class converter",
         WITHIN,
@@ -547,7 +547,7 @@ _ROUTES = (
         vocabulary_terms=("32 neighborhoods", "5-neighbor rules", "symmetry classes"),
     ),
     route(
-        "U006110", "H011661", 1,
+        "U006110", "H011662", 1,
         "the 9-neighbor examples on page 373",
         "nine-neighbor growth-rule examples",
         CROSS,
@@ -558,7 +558,7 @@ _ROUTES = (
         vocabulary_terms=("9-neighbor rules", "growth rules"),
     ),
     route(
-        "U006121", "H011664", 1,
+        "U006121", "H011665", 1,
         "discussed on page 979",
         "fixed-interior and cycling-region behavior of cellular automaton code 746",
         CROSS,
@@ -566,7 +566,7 @@ _ROUTES = (
         vocabulary_terms=("approximate circle", "code 746", "cycling regions"),
     ),
     route(
-        "U006126", "H011666", 1,
+        "U006126", "H011667", 1,
         "the Voronoi region (see page 987)",
         "Voronoi-cell derivation of nearest-neighbor lattice adjacency",
         CROSS,
@@ -574,7 +574,7 @@ _ROUTES = (
         vocabulary_terms=("lattice adjacency", "nearest neighbors", "Voronoi region"),
     ),
     route(
-        "U006126", "H011666", 2,
+        "U006126", "H011667", 2,
         "Compare pages 1029 and 986",
         "crystallographic terminology and Voronoi-region shape comparison",
         CROSS,
@@ -582,7 +582,7 @@ _ROUTES = (
         vocabulary_terms=("crystallography", "lattice geometry", "Voronoi region"),
     ),
     route(
-        "U006130", "H011667", 1,
+        "U006130", "H011668", 1,
         "a nested Penrose tiling (see page 932)",
         "nested Penrose substitution tiling used as a cellular-automaton carrier",
         WITHIN,
@@ -591,7 +591,7 @@ _ROUTES = (
         vocabulary_terms=("cellular automaton", "nested Penrose tiling", "page 932"),
     ),
     route(
-        "U006130", "H011667", 2,
+        "U006130", "H011668", 2,
         "See also page 1027",
         "cellular automata on nonperiodic or nested tilings",
         CROSS,
@@ -599,24 +599,24 @@ _ROUTES = (
         vocabulary_terms=("cellular automaton", "nested tiling", "Penrose tiling"),
     ),
     route(
-        "U006132", "H011668", 1,
+        "U006132", "H011669", 1,
         "See page 936",
         "binary-outdegree network mechanics underlying cellular automata on homogeneous networks",
         WITHIN,
-        target_unit_ids=uids(6210, 6226),
+        target_unit_ids=uids(6236, 6237),
         candidate_ids=bids(891),
         vocabulary_terms=("cellular automata on networks", "homogeneous networks", "network mechanics"),
     ),
     route(
-        "U006132", "H011668", 2,
-        "the constraints of the kind discussed on page 483",
+        "U006132", "H011669", 2,
+        "constraints of the kind discussed on page 483",
         "longer-range network homogeneity constraints",
         CROSS,
         candidate_ids=bids(891),
         vocabulary_terms=("homogeneous networks", "longer-range rules", "network constraints"),
     ),
     route(
-        "U006143", "H011670", 1,
+        "U006143", "H011671", 1,
         "the discussion of paths in substitution systems on page 892",
         "turn-relative path semantics in substitution systems",
         CROSS,
@@ -624,7 +624,7 @@ _ROUTES = (
         vocabulary_terms=("paths", "substitution systems", "turning rules"),
     ),
     route(
-        "U006145", "H011671", 1,
+        "U006145", "H011672", 1,
         "the rule on page 187",
         "page-187 two-dimensional block-substitution rule and seed",
         WITHIN,
@@ -633,7 +633,7 @@ _ROUTES = (
         vocabulary_terms=("block substitution", "page 187", "two-dimensional substitution"),
     ),
     route(
-        "U006147", "H011672", 1,
+        "U006147", "H011673", 1,
         "the 1D case discussed on page 891",
         "one-dimensional digit-transducer substitution construction",
         CROSS,
@@ -643,7 +643,7 @@ _ROUTES = (
         vocabulary_terms=("digit sequences", "finite automaton", "substitution systems"),
     ),
     route(
-        "U006149", "H011673", 1,
+        "U006149", "H011674", 1,
         "the pattern on page 187",
         "page-187 Sierpiński block-substitution preset",
         WITHIN,
@@ -655,7 +655,7 @@ _ROUTES = (
         vocabulary_terms=("page 187", "Sierpiński pattern", "substitution system"),
     ),
     route(
-        "U006149", "H011673", 2,
+        "U006149", "H011674", 2,
         "patterns (a) through (f) on page 188",
         "page-188 two-dimensional substitution presets (a) through (f)",
         WITHIN,
@@ -666,7 +666,7 @@ _ROUTES = (
         vocabulary_terms=("page 188", "substitution presets"),
     ),
     route(
-        "U006149", "H011673", 3,
+        "U006149", "H011674", 3,
         "See pages 608 and 1091",
         "digit-pair exclusion correspondences for the substitution generator",
         CROSS,
@@ -676,7 +676,7 @@ _ROUTES = (
         vocabulary_terms=("digit pairs", "substitution systems"),
     ),
     route(
-        "U006150", "H011674", 1,
+        "U006150", "H011675", 1,
         "Page 187 · Sierpiński pattern",
         "page-187 Sierpiński block-substitution pattern",
         WITHIN,
@@ -700,7 +700,7 @@ _ROUTES = (
         vocabulary_terms=("page 187", "Sierpiński pattern"),
     ),
     route(
-        "U006151", "H011675", 1,
+        "U006151", "H011676", 1,
         "see pages 611 and 870",
         "binomial-parity Sierpiński-array correspondences",
         CROSS,
@@ -710,7 +710,7 @@ _ROUTES = (
         vocabulary_terms=("binomial parity", "Sierpiński array"),
     ),
     route(
-        "U006152", "H011676", 1,
+        "U006152", "H011677", 1,
         "see pages 608 and 871",
         "bitwise-AND Sierpiński-array correspondences",
         CROSS,
@@ -720,7 +720,7 @@ _ROUTES = (
         vocabulary_terms=("bitwise AND", "Sierpiński array"),
     ),
     route(
-        "U006153", "H011677", 1,
+        "U006153", "H011678", 1,
         "see page 870",
         "rotate-add modulo-two Sierpiński evolution correspondence",
         CROSS,
@@ -730,7 +730,7 @@ _ROUTES = (
         vocabulary_terms=("modulo 2", "rotate add", "Sierpiński evolution"),
     ),
     route(
-        "U006154", "H011678", 1,
+        "U006154", "H011679", 1,
         "see page 870",
         "convolution modulo-two Sierpiński evolution correspondence",
         CROSS,
@@ -740,7 +740,7 @@ _ROUTES = (
         vocabulary_terms=("convolution", "modulo 2", "Sierpiński evolution"),
     ),
     route(
-        "U006155", "H011679", 1,
+        "U006155", "H011680", 1,
         "see page 906",
         "bit-XOR Sierpiński recurrence correspondence",
         CROSS,
@@ -750,7 +750,7 @@ _ROUTES = (
         vocabulary_terms=("bit XOR", "recurrence", "Sierpiński array"),
     ),
     route(
-        "U006156", "H011680", 1,
+        "U006156", "H011681", 1,
         "see page 1034",
         "cumulative-sum modulo-two Sierpiński correspondence",
         CROSS,
@@ -760,7 +760,7 @@ _ROUTES = (
         vocabulary_terms=("cumulative sum", "modulo 2", "Sierpiński evolution"),
     ),
     route(
-        "U006157", "H011681", 1,
+        "U006157", "H011682", 1,
         "see pages 870 and 951",
         "binomial-coefficient Sierpiński-array correspondences",
         CROSS,
@@ -770,7 +770,7 @@ _ROUTES = (
         vocabulary_terms=("binomial coefficients", "Sierpiński array"),
     ),
     route(
-        "U006158", "H011682", 1,
+        "U006158", "H011683", 1,
         "see page 1091",
         "bivariate-series Sierpiński-array correspondence",
         CROSS,
@@ -780,7 +780,7 @@ _ROUTES = (
         vocabulary_terms=("bivariate series", "Sierpiński array"),
     ),
     route(
-        "U006159", "H011683", 1,
+        "U006159", "H011684", 1,
         "compare page 1073",
         "alternate formula comparison for the block-join Sierpiński array generator",
         CROSS,
@@ -790,7 +790,7 @@ _ROUTES = (
         vocabulary_terms=("block join", "formula comparison", "Sierpiński array"),
     ),
     route(
-        "U006162", "H011684", 1,
+        "U006162", "H011685", 1,
         "compare page 1005",
         "alternate formula comparison for the complex-affine Sierpiński coordinate enumerator",
         CROSS,
@@ -800,7 +800,7 @@ _ROUTES = (
         vocabulary_terms=("complex affine", "coordinate enumeration", "formula comparison"),
     ),
     route(
-        "U006163", "H011685", 1,
+        "U006163", "H011686", 1,
         "see page 358",
         "odd-multiplicity coordinate-enumerator correspondence",
         CROSS,
@@ -810,7 +810,7 @@ _ROUTES = (
         vocabulary_terms=("coordinate enumeration", "odd multiplicity", "Sierpiński pattern"),
     ),
     route(
-        "U006164", "H011686", 1,
+        "U006164", "H011687", 1,
         "see page 870",
         "binary-position-fold coordinate-enumerator correspondence",
         CROSS,
@@ -820,7 +820,7 @@ _ROUTES = (
         vocabulary_terms=("binary positions", "coordinate enumeration", "Sierpiński pattern"),
     ),
     route(
-        "U006165", "H011687", 1,
+        "U006165", "H011688", 1,
         "see page 509",
         "nested-tree-path coordinate-enumerator correspondence",
         CROSS,
@@ -830,7 +830,7 @@ _ROUTES = (
         vocabulary_terms=("coordinate enumeration", "nested tree", "Sierpiński pattern"),
     ),
     route(
-        "U006172", "H011689", 1,
+        "U006172", "H011690", 1,
         "the 2D rule on page 187",
         "two-dimensional antecedent of the three-dimensional substitution preset",
         WITHIN,
@@ -839,7 +839,7 @@ _ROUTES = (
         vocabulary_terms=("page 187", "three-dimensional substitution", "two-dimensional analog"),
     ),
     route(
-        "U006175", "H011690", 1,
+        "U006175", "H011691", 1,
         "The systems on pages 187 and 188",
         "square-subdivision substitution systems contrasted with other-shape systems",
         WITHIN,
@@ -848,7 +848,7 @@ _ROUTES = (
         vocabulary_terms=("other shapes", "square subdivision", "substitution systems"),
     ),
     route(
-        "U006178", "H011691", 1,
+        "U006178", "H011692", 1,
         "see page 943",
         "Penrose aperiodic-tiling identity and substitution provenance",
         WITHIN,
@@ -857,7 +857,7 @@ _ROUTES = (
         vocabulary_terms=("Penrose tiling", "substitution tiling"),
     ),
     route(
-        "U006182", "H011692", 1,
+        "U006182", "H011693", 1,
         "page 83",
         "one-dimensional Fibonacci substitution-system antecedent",
         CROSS,
@@ -867,7 +867,7 @@ _ROUTES = (
         vocabulary_terms=("Fibonacci substitution", "Penrose pattern"),
     ),
     route(
-        "U006182", "H011692", 2,
+        "U006182", "H011693", 2,
         "page 903",
         "GoldenRatio line-cut construction for the Fibonacci sequence",
         CROSS,
@@ -877,7 +877,7 @@ _ROUTES = (
         vocabulary_terms=("cut and project", "Fibonacci sequence", "GoldenRatio"),
     ),
     route(
-        "U006182", "H011692", 3,
+        "U006182", "H011693", 3,
         "See also page 943",
         "Penrose aperiodic-tiling identity and substitution provenance",
         WITHIN,
@@ -888,7 +888,7 @@ _ROUTES = (
         vocabulary_terms=("Penrose tiling", "substitution tiling"),
     ),
     route(
-        "U006184", "H011693", 1,
+        "U006184", "H011694", 1,
         "Page 189 · Dragon curve",
         "page-189 dragon-curve geometrical substitution preset",
         WITHIN,
@@ -897,7 +897,7 @@ _ROUTES = (
         vocabulary_terms=("dragon curve", "geometrical substitution", "page 189"),
     ),
     route(
-        "U006184", "H011693", 2,
+        "U006184", "H011694", 2,
         "page 892",
         "paperfolding path construction corresponding to the dragon curve",
         CROSS,
@@ -905,7 +905,7 @@ _ROUTES = (
         vocabulary_terms=("dragon curve", "paperfolding", "substitution paths"),
     ),
     route(
-        "U006185", "H011694", 1,
+        "U006185", "H011695", 1,
         "the rule on page 189",
         "page-189 dragon-curve geometrical substitution rule",
         WITHIN,
@@ -914,7 +914,7 @@ _ROUTES = (
         vocabulary_terms=("dragon curve", "geometrical substitution", "page 189"),
     ),
     route(
-        "U006185", "H011694", 2,
+        "U006185", "H011695", 2,
         "the rule on page 190",
         "page-190 overlap-producing geometrical substitution rule",
         WITHIN,
@@ -923,7 +923,7 @@ _ROUTES = (
         vocabulary_terms=("geometrical substitution", "page 190"),
     ),
     route(
-        "U006185", "H011694", 3,
+        "U006185", "H011695", 3,
         "rules (a), (b) and (c) (Koch curve) on page 191",
         "three page-191 geometrical substitution rules",
         WITHIN,
@@ -932,7 +932,7 @@ _ROUTES = (
         vocabulary_terms=("geometrical substitution", "Koch curve", "page 191"),
     ),
     route(
-        "U006187", "H011695", 1,
+        "U006187", "H011696", 1,
         "the patterns on page 189",
         "page-189 geometrical-substitution pattern",
         WITHIN,
@@ -943,7 +943,7 @@ _ROUTES = (
         vocabulary_terms=("base i-1", "geometrical substitution", "page 189"),
     ),
     route(
-        "U006189", "H011696", 1,
+        "U006189", "H011697", 1,
         "Compare page 1094",
         "complex-base representability and completeness conditions",
         CROSS,
@@ -953,7 +953,7 @@ _ROUTES = (
         vocabulary_terms=("complex base", "representability", "digit point set"),
     ),
     route(
-        "U006195", "H011698", 1,
+        "U006195", "H011699", 1,
         "the discussion of page 1138",
         "noncomputability limit for dimension observers",
         CROSS,
@@ -963,7 +963,7 @@ _ROUTES = (
         vocabulary_terms=("fractal dimension", "noncomputability"),
     ),
     route(
-        "U006196", "H011699", 1,
+        "U006196", "H011700", 1,
         "Compare page 959",
         "distribution-moment generalizations of fractal dimension",
         CROSS,
@@ -973,7 +973,7 @@ _ROUTES = (
         vocabulary_terms=("distribution moments", "fractal dimension"),
     ),
     route(
-        "U006202", "H011701", 1,
+        "U006202", "H011702", 1,
         "pages 407 and 1006",
         "parameter-space sets analogous to the Mandelbrot set",
         CROSS,
@@ -983,7 +983,7 @@ _ROUTES = (
         vocabulary_terms=("Mandelbrot set", "parameter space"),
     ),
     route(
-        "U006205", "H011702", 1,
+        "U006205", "H011703", 1,
         "Page 192 · Neighbor-dependent substitution systems",
         "main-text neighbor-dependent two-dimensional substitution system",
         WITHIN,
@@ -992,34 +992,34 @@ _ROUTES = (
         vocabulary_terms=("neighbor-dependent substitution", "page 192"),
     ),
     route(
-        "U006208", "H011703", 1,
+        "U006208", "H011704", 1,
         "Page 192 · Space-filling curves",
         "main-text two-dimensional grid-scanning problem and scan order",
         WITHIN,
-        target_unit_ids=uids(1056, 1062), target_asset_ids=aids(882),
+        target_unit_ids=uids(1061, 1062),
         candidate_ids=bids(915),
         vocabulary_terms=("grid scan", "page 192", "space-filling curves"),
     ),
     route(
-        "U006227", "H011705", 1,
+        "U006227", "H011706", 1,
         "discussed on page 1121",
         "combinator-system comparison for the binary-outdegree network representation",
         CROSS,
         vocabulary_terms=("binary-outdegree network", "combinator systems", "data structures"),
     ),
     route(
-        "U006227", "H011705", 2,
+        "U006227", "H011706", 2,
         "Page 202 · Properties",
         "page-202(c) network node-count sequence and binary-digit recurrence",
         WITHIN,
-        target_unit_ids=uids(1111, 1115), target_asset_ids=aids(892),
+        target_unit_ids=uids(1114, 1115), target_asset_ids=aids(892),
         recovered_candidate_names=(
             "page-202(c) network node-count sequence generator",
         ),
         vocabulary_terms=("binary-digit recurrence", "network node count", "page 202"),
     ),
     route(
-        "U006234", "H011706", 1,
+        "U006234", "H011707", 1,
         "page 479",
         "network dimension defined by radius-r reachable-volume growth",
         CROSS,
@@ -1029,18 +1029,18 @@ _ROUTES = (
         vocabulary_terms=("dimension", "network radius", "reachable volume"),
     ),
     route(
-        "U006234", "H011706", 2,
+        "U006234", "H011707", 2,
         "the systems on pages 202 and 203",
         "network-rule systems used by the dimensionality observer",
         WITHIN,
-        target_unit_ids=uids(1111, 1121), target_asset_ids=aids(892, 893),
+        target_unit_ids=uids(1114, 1121), target_asset_ids=aids(892, 893),
         recovered_candidate_names=(
             "network dimensionality observer",
         ),
         vocabulary_terms=("dimension", "network rules", "pages 202 and 203"),
     ),
     route(
-        "U006236", "H011707", 1,
+        "U006236", "H011708", 1,
         "page 259",
         "finite-size cellular-automaton comparison for homogeneous-network automata",
         CROSS,
@@ -1048,7 +1048,7 @@ _ROUTES = (
         vocabulary_terms=("cellular automata", "finite size", "homogeneous networks"),
     ),
     route(
-        "U006238", "H011708", 1,
+        "U006238", "H011709", 1,
         "Chapter 6",
         "behavior classes of random Boolean networks",
         CROSS,
@@ -1057,7 +1057,7 @@ _ROUTES = (
         vocabulary_terms=("behavior classes", "random Boolean networks"),
     ),
     route(
-        "U006238", "H011708", 2,
+        "U006238", "H011709", 2,
         "page 963",
         "random-mapping comparison for random Boolean networks",
         CROSS,
@@ -1065,7 +1065,7 @@ _ROUTES = (
         vocabulary_terms=("random Boolean networks", "random mappings"),
     ),
     route(
-        "U006248", "H011709", 1,
+        "U006248", "H011710", 1,
         "The case shown on page 206",
         "page-206 three-rule slow-growth multiway preset",
         WITHIN,
@@ -1074,11 +1074,11 @@ _ROUTES = (
         vocabulary_terms=("multiway preset", "page 206", "three rules"),
     ),
     route(
-        "U006252", "H011710", 1,
+        "U006252", "H011711", 1,
         "pictures like those on page 208",
         "page-208 multiway state collections used to illustrate polynomial growth",
         WITHIN,
-        target_unit_ids=uids(1148, 1150), target_asset_ids=aids(904),
+        target_unit_ids=uids(1149, 1150), target_asset_ids=aids(904),
         recovered_candidate_names=(
             "polynomial-growth string-multiway preset",
             "polynomial-growth multiway state-count asymptotic profile",
@@ -1086,7 +1086,7 @@ _ROUTES = (
         vocabulary_terms=("multiway state count", "page 208", "polynomial growth"),
     ),
     route(
-        "U006255", "H011711", 1,
+        "U006255", "H011712", 1,
         "Page 206 · Properties",
         "page-206 multiway preset properties and state-count diagnostics",
         WITHIN,
@@ -1098,18 +1098,18 @@ _ROUTES = (
         vocabulary_terms=("first differences", "multiway state count", "page 206"),
     ),
     route(
-        "U006256", "H011712", 1,
+        "U006256", "H011713", 1,
         "as on page 208",
         "page-208 layered display of complete multiway state collections",
         WITHIN,
-        target_unit_ids=uids(1148, 1150), target_asset_ids=aids(904),
+        target_unit_ids=uids(1149, 1150), target_asset_ids=aids(904),
         recovered_candidate_names=(
             "stacked multiway-state evolution representation",
         ),
         vocabulary_terms=("layered history", "multiway states", "page 208"),
     ),
     route(
-        "U006258", "H011713", 1,
+        "U006258", "H011714", 1,
         "In analogy with page 796",
         "bounded-length reachability display for a string multiway system",
         CROSS,
@@ -1130,7 +1130,7 @@ _ROUTES = (
         ),
     ),
     route(
-        "U006261", "H011714", 1,
+        "U006261", "H011715", 1,
         "as on page 206",
         "page-206 string multiway system used by the group and semigroup interpretation",
         WITHIN,
@@ -1139,7 +1139,7 @@ _ROUTES = (
         vocabulary_terms=("group", "multiway system", "page 206", "semigroup"),
     ),
     route(
-        "U006263", "H011715", 1,
+        "U006263", "H011716", 1,
         "the ones shown on page 196",
         "tree-network exemplars for the free-semigroup Cayley graph",
         WITHIN,
@@ -1151,22 +1151,22 @@ _ROUTES = (
         vocabulary_terms=("Cayley graph", "free semigroup", "tree network"),
     ),
     route(
-        "U006264", "H011716", 1,
+        "U006264", "H011717", 1,
         "Compare page 945",
-        "homogeneous-network context for the A5 Cayley-graph presentation",
+        "finite-group and finite-semigroup count context for the A5 presentation",
         WITHIN,
-        target_unit_ids=uids(6132),
+        target_unit_ids=uids(6336, 6337), target_asset_ids=aids(585),
         recovered_candidate_names=(
             "A5 icosahedral-group presentation",
         ),
-        vocabulary_terms=("A5", "Cayley graph", "homogeneous network"),
+        vocabulary_terms=("A5", "finite group", "group order"),
     ),
     route(
-        "U006265", "H011717", 1,
+        "U006265", "H011718", 1,
         "See also pages 945 and 1032",
         "Monster Group finite-group denotation and referenced omitted presentation",
         CROSS,
-        target_unit_ids=uids(6132),
+        target_unit_ids=uids(6336, 6337), target_asset_ids=aids(585),
         recovered_candidate_names=(
             "Monster Group finite-group denotation with source-omitted presentation",
         ),
@@ -1178,14 +1178,15 @@ _ROUTES = (
         ),
         attempts=(
             "Resolved the page-945 half of literal target 'See also pages "
-            "945 and 1032' only to U006132, which states the homogeneous "
-            "Cayley-graph carrier context. Page 1032 lies outside the "
-            "assigned Chapter 5 range and was not opened; no generators, "
-            "relations, rule list, or quotient mechanics were inferred.",
+            "945 and 1032' to U006336-U006337/A000585, which supplies the "
+            "finite-group and finite-semigroup count/classification context. "
+            "Page 1032 lies outside the assigned Chapter 5 range and was "
+            "not opened; no generators, relations, rule list, or quotient "
+            "mechanics were inferred.",
         ),
     ),
     route(
-        "U006267", "H011718", 1,
+        "U006267", "H011719", 1,
         "page 1104",
         "Chomsky hierarchy classification of the displayed grammar families",
         CROSS,
@@ -1193,7 +1194,7 @@ _ROUTES = (
         vocabulary_terms=("Chomsky hierarchy", "generative grammars", "formal languages"),
     ),
     route(
-        "U006268", "H011719", 1,
+        "U006268", "H011720", 1,
         "page 957",
         "finite-automaton recognition of the no-adjacent-B regular language",
         CROSS,
@@ -1204,7 +1205,7 @@ _ROUTES = (
         vocabulary_terms=("finite automaton", "no adjacent B", "regular language"),
     ),
     route(
-        "U006269", "H011720", 1,
+        "U006269", "H011721", 1,
         "pages 1091 and 1103",
         "context-free-language properties of the AxA-or-B grammar",
         CROSS,
@@ -1215,41 +1216,35 @@ _ROUTES = (
         vocabulary_terms=("AxA or B", "context-free grammar", "formal language"),
     ),
     route(
-        "U006272", "H011721", 1,
+        "U006272", "H011722", 1,
         "See also page 944",
-        "inspected page-944 comparison boundary for the formal-language discussion",
+        "formal languages used to define one-dimensional sequence constraints",
         WITHIN,
-        target_unit_ids=uids(6114, 6125),
-        target_asset_ids=(
-            "A000527", "A000528", "A000541", "A000542",
-        ),
-        vocabulary_terms=("formal languages", "page 944", "comparison boundary"),
+        target_unit_ids=uids(6323),
+        vocabulary_terms=("formal languages", "one-dimensional constraints", "page 944"),
         defect_boundary=(
-            "The source gives only a bare cross-reference. Inspected page "
-            "944 contains two-dimensional cellular-automaton history, rules, "
-            "behavior, and projections, but states no grammar identity or "
-            "equivalence."
+            "The source gives only a bare cross-reference. The target states "
+            "that formal languages can define one-dimensional constraints "
+            "but does not assert grammar-family identity or equivalence."
         ),
         attempts=(
-            "Resolved literal target 'See also page 944' to inspected units "
-            "U006114-U006125 and referenced assets A000527, A000528, "
-            "A000541, and A000542. Those targets contain two-dimensional "
-            "cellular-automaton material; no explicit comparison predicate, "
-            "grammar identity, or grammar equivalence is asserted or "
-            "inferred.",
+            "Resolved literal target 'See also page 944' to U006323, the "
+            "direct formal-language paragraph on that printed page. It "
+            "states use in defining one-dimensional constraints; no "
+            "grammar-family identity or equivalence is inferred.",
         ),
     ),
     route(
-        "U006275", "H011723", 1,
+        "U006275", "H011724", 1,
         "page 933",
-        "fractal-dimension comparison for the numeric multiway evolution",
+        "geometrical-substitution comparison for complex-valued numeric multiway evolution",
         WITHIN,
-        target_unit_ids=uids(6184, 6196), target_asset_ids=aids(551, 552),
+        target_unit_ids=uids(6184, 6192), target_asset_ids=aids(552),
         candidate_ids=bids(932),
-        vocabulary_terms=("fractal dimension", "multiway system", "numeric evolution"),
+        vocabulary_terms=("geometrical substitution", "multiway system", "numeric evolution"),
     ),
     route(
-        "U006275", "H011723", 2,
+        "U006275", "H011724", 2,
         "discussed on page 907",
         "recursive-sequence comparison for the numeric multiway system",
         CROSS,
@@ -1257,7 +1252,7 @@ _ROUTES = (
         vocabulary_terms=("numeric multiway system", "recursive sequences"),
     ),
     route(
-        "U006275", "H011723", 3,
+        "U006275", "H011724", 3,
         "page 937",
         "network representation of the numeric multiway evolution",
         WITHIN,
@@ -1266,14 +1261,14 @@ _ROUTES = (
         vocabulary_terms=("multiway network", "numeric evolution", "page 937"),
     ),
     route(
-        "U006276", "H011724", 1,
+        "U006276", "H011725", 1,
         "But see page 766",
         "computational-power exception boundary for nondeterministic systems",
         CROSS,
         vocabulary_terms=("computational power", "nondeterministic systems"),
     ),
     route(
-        "U006276", "H011724", 2,
+        "U006276", "H011725", 2,
         "page 871",
         "bitwise-XOR characterization used by the nim losing-position predicate",
         CROSS,
@@ -1284,7 +1279,7 @@ _ROUTES = (
         vocabulary_terms=("bitwise XOR", "losing position", "nim"),
     ),
     route(
-        "U006279", "H011725", 1,
+        "U006279", "H011726", 1,
         "page 923",
         "initial-value and boundary-value formulation of partial differential equations",
         CROSS,
@@ -1292,16 +1287,16 @@ _ROUTES = (
         vocabulary_terms=("boundary value", "initial value", "partial differential equation"),
     ),
     route(
-        "U006282", "H011726", 1,
+        "U006282", "H011727", 1,
         "Page 211 · 1D constraints",
         "main-text one-dimensional allowed-block constraints",
         WITHIN,
-        target_unit_ids=uids(1162, 1171), target_asset_ids=aids(908, 909),
+        target_unit_ids=uids(1167, 1171), target_asset_ids=aids(909),
         candidate_ids=bids(940, 941),
         vocabulary_terms=("allowed blocks", "one-dimensional constraints", "page 211"),
     ),
     route(
-        "U006284", "H011727", 1,
+        "U006284", "H011728", 1,
         "The constraint on page 210",
         "period-four witness for the main-text one-dimensional constraint",
         WITHIN,
@@ -1310,7 +1305,7 @@ _ROUTES = (
         vocabulary_terms=("allowed blocks", "period four", "one-dimensional constraint"),
     ),
     route(
-        "U006284", "H011727", 2,
+        "U006284", "H011728", 2,
         "See also page 266",
         "one-dimensional constraint periodicity comparison",
         CROSS,
@@ -1318,7 +1313,7 @@ _ROUTES = (
         vocabulary_terms=("constraint periodicity", "one-dimensional constraint"),
     ),
     route(
-        "U006285", "H011728", 1,
+        "U006285", "H011729", 1,
         "page 225",
         "cellular-automaton convergence to invariant configurations",
         CROSS,
@@ -1326,7 +1321,7 @@ _ROUTES = (
         vocabulary_terms=("cellular automaton", "invariant configurations"),
     ),
     route(
-        "U006285", "H011728", 2,
+        "U006285", "H011729", 2,
         "See page 954",
         "cellular-automaton invariant-configuration correspondence",
         CROSS,
@@ -1334,7 +1329,7 @@ _ROUTES = (
         vocabulary_terms=("cellular automaton", "fixed point", "invariant configuration"),
     ),
     route(
-        "U006285", "H011728", 3,
+        "U006285", "H011729", 3,
         "See page 958",
         "finite-complement-language and subshift-of-finite-type terminology",
         CROSS,
@@ -1342,16 +1337,16 @@ _ROUTES = (
         vocabulary_terms=("finite complement language", "subshift of finite type"),
     ),
     route(
-        "U006285", "H011728", 4,
+        "U006285", "H011729", 4,
         "Page 215 · 2D constraints",
         "main-text minimal two-dimensional local-template constraints",
         WITHIN,
-        target_unit_ids=uids(1186, 1188), target_asset_ids=aids(913, 914),
+        target_unit_ids=uids(1187, 1188), target_asset_ids=aids(914),
         candidate_ids=bids(943),
         vocabulary_terms=("local templates", "minimal constraints", "two-dimensional constraints"),
     ),
     route(
-        "U006286", "H011729", 1,
+        "U006286", "H011730", 1,
         "See also page 927",
         "canonical binary rule-number ordering used by the constraint-number decoder",
         WITHIN,
@@ -1363,7 +1358,7 @@ _ROUTES = (
         vocabulary_terms=("binary code", "constraint numbering", "template ordering"),
     ),
     route(
-        "U006290", "H011730", 1,
+        "U006290", "H011731", 1,
         "page 213",
         "main-text periodic tessellation encoded by overlapping corners",
         WITHIN,
@@ -1374,7 +1369,7 @@ _ROUTES = (
         vocabulary_terms=("Fill", "overlapping corners", "periodic tessellation"),
     ),
     route(
-        "U006295", "H011731", 1,
+        "U006295", "H011732", 1,
         "page 1139",
         "undecidability of infinite-pattern constraint satisfaction",
         CROSS,
@@ -1382,7 +1377,7 @@ _ROUTES = (
         vocabulary_terms=("constraint satisfaction", "infinite pattern", "undecidability"),
     ),
     route(
-        "U006295", "H011731", 2,
+        "U006295", "H011732", 2,
         "page 1145",
         "NP-completeness of finite-region constraint satisfaction",
         CROSS,
@@ -1390,7 +1385,7 @@ _ROUTES = (
         vocabulary_terms=("finite region", "NP-complete", "satisfaction"),
     ),
     route(
-        "U006295", "H011731", 3,
+        "U006295", "H011732", 3,
         "Compare page 959",
         "enumeration and solver comparison for two-dimensional constraints",
         CROSS,
@@ -1398,7 +1393,7 @@ _ROUTES = (
         vocabulary_terms=("constraint solver", "enumeration", "two-dimensional constraints"),
     ),
     route(
-        "U006295", "H011731", 4,
+        "U006295", "H011732", 4,
         "Page 219 · Non-periodic pattern",
         "main-text forced-nonperiodic constraint witness",
         WITHIN,
@@ -1407,7 +1402,7 @@ _ROUTES = (
         vocabulary_terms=("forced nonperiodicity", "non-periodic pattern", "page 219"),
     ),
     route(
-        "U006297", "H011732", 1,
+        "U006297", "H011733", 1,
         "page 117",
         "nested-pattern comparison for the exhaustive constraint search",
         CROSS,
@@ -1415,7 +1410,7 @@ _ROUTES = (
         vocabulary_terms=("constraint search", "nested pattern"),
     ),
     route(
-        "U006301", "H011733", 1,
+        "U006301", "H011734", 1,
         "page 188",
         "main-text two-dimensional substitution patterns used by the Ammann-derived constraint",
         WITHIN,
@@ -1428,7 +1423,7 @@ _ROUTES = (
         vocabulary_terms=("Ammann", "local template", "substitution system"),
     ),
     route(
-        "U006305", "H011734", 1,
+        "U006305", "H011735", 1,
         "pages 941 and 954",
         "constraint-number decoding and cellular-automaton correspondence",
         CROSS,
@@ -1444,16 +1439,16 @@ _ROUTES = (
         ),
     ),
     route(
-        "U006305", "H011734", 2,
+        "U006305", "H011735", 2,
         "page 170",
         "main-text five-site cellular-automaton family used in the constraint correspondence",
         WITHIN,
-        target_unit_ids=uids(960, 965), target_asset_ids=aids(845, 846),
+        target_unit_ids=uids(960, 962), target_asset_ids=aids(845),
         candidate_ids=bids(949),
         vocabulary_terms=("cellular automaton", "constraint correspondence", "page 170"),
     ),
     route(
-        "U006310", "H011735", 1,
+        "U006310", "H011736", 1,
         "page 1139",
         "undecidability boundary for determining whether a tiling exists",
         CROSS,
@@ -1461,7 +1456,7 @@ _ROUTES = (
         vocabulary_terms=("tiling existence", "undecidability"),
     ),
     route(
-        "U006310", "H011735", 2,
+        "U006310", "H011736", 2,
         "see page 994",
         "fivefold-symmetry comparison for the Penrose tiling",
         CROSS,
@@ -1469,16 +1464,16 @@ _ROUTES = (
         vocabulary_terms=("fivefold symmetry", "Penrose tiling"),
     ),
     route(
-        "U006312", "H011736", 1,
+        "U006312", "H011737", 1,
         "page 221",
         "main-text aperiodic tiling and nonrepetitive-pattern examples",
         WITHIN,
-        target_unit_ids=uids(1217, 1220), target_asset_ids=aids(921, 922),
+        target_unit_ids=uids(1218, 1220), target_asset_ids=aids(921, 922),
         candidate_ids=bids(951, 952),
         vocabulary_terms=("aperiodic tiling", "nonrepetitive pattern", "page 221"),
     ),
     route(
-        "U006313", "H011737", 1,
+        "U006313", "H011738", 1,
         "See also page 1139",
         "undecidability evidence boundary for aperiodic tiling constraints",
         CROSS,
@@ -1486,7 +1481,7 @@ _ROUTES = (
         vocabulary_terms=("aperiodic tiling", "tiling constraints", "undecidability"),
     ),
     route(
-        "U006318", "H011738", 1,
+        "U006318", "H011739", 1,
         "page 1141",
         "enumeration complexity for square-free sequences",
         CROSS,
@@ -1494,7 +1489,7 @@ _ROUTES = (
         vocabulary_terms=("enumeration", "square-free sequence"),
     ),
     route(
-        "U006321", "H011739", 1,
+        "U006321", "H011740", 1,
         "page 83",
         "Thue-Morse nested-sequence antecedent for cube-free blocks",
         CROSS,
@@ -1502,7 +1497,7 @@ _ROUTES = (
         vocabulary_terms=("cube-free", "nested sequence", "Thue-Morse"),
     ),
     route(
-        "U006322", "H011740", 1,
+        "U006322", "H011741", 1,
         "page 1068",
         "unavoidable-block-pattern bounds",
         CROSS,
@@ -1510,7 +1505,7 @@ _ROUTES = (
         vocabulary_terms=("avoidable pattern", "block pattern", "unavoidable pattern"),
     ),
     route(
-        "U006323", "H011741", 1,
+        "U006323", "H011742", 1,
         "page 938",
         "formal-language grammar families used to express one-dimensional constraints",
         WITHIN,
@@ -1518,7 +1513,7 @@ _ROUTES = (
         vocabulary_terms=("formal language", "generative grammar", "one-dimensional constraint"),
     ),
     route(
-        "U006323", "H011741", 2,
+        "U006323", "H011742", 2,
         "page 210",
         "main-text one-dimensional constraint as a regular-language special case",
         WITHIN,
@@ -1526,15 +1521,22 @@ _ROUTES = (
         vocabulary_terms=("one-dimensional constraint", "regular language"),
     ),
     route(
-        "U006323", "H011741", 3,
+        "U006323", "H011742", 3,
         "page 940",
-        "finite-complement and subshift terminology for regular-language constraints",
+        "equations, PDE, and linear-system discussion at printed page 940",
         WITHIN,
-        target_unit_ids=uids(6285),
-        vocabulary_terms=("finite complement language", "regular language", "subshift of finite type"),
+        target_unit_ids=uids(6277, 6281),
+        vocabulary_terms=("equations", "linear systems", "partial differential equations"),
+        defect_boundary=(
+            "The literal printed-page-940 target resolves within Stage 9 to "
+            "U006277-U006281, whose inspected equations/PDE/linear-system "
+            "discussion does not state finite-complement-language or "
+            "subshift-of-finite-type terminology; no such terminology or "
+            "candidate mechanics are inferred from the pointer."
+        ),
     ),
     route(
-        "U006330", "H011742", 1,
+        "U006330", "H011743", 1,
         "page 1078",
         "primitive Pythagorean-triple parameterization",
         CROSS,
@@ -1545,7 +1547,7 @@ _ROUTES = (
         vocabulary_terms=("primitive triples", "Pythagorean triples", "parameterization"),
     ),
     route(
-        "U006332", "H011743", 1,
+        "U006332", "H011744", 1,
         "page 1160",
         "odd-binomial-coefficient parity relation",
         CROSS,
@@ -1555,7 +1557,7 @@ _ROUTES = (
         vocabulary_terms=("binomial coefficient", "odd parity", "Diophantine relation"),
     ),
     route(
-        "U006335", "H011744", 1,
+        "U006335", "H011745", 1,
         "See pages 791 and 1164",
         "sparse-solution and higher-power comparison for the Fermat relation",
         CROSS,
@@ -1563,7 +1565,7 @@ _ROUTES = (
         vocabulary_terms=("Fermat relation", "higher powers", "sparse solutions"),
     ),
     route(
-        "U006336", "H011745", 1,
+        "U006336", "H011746", 1,
         "See also page 805",
         "matrix-power pattern constraints",
         CROSS,
@@ -1571,7 +1573,7 @@ _ROUTES = (
         vocabulary_terms=("matrix powers", "pattern constraints"),
     ),
     route(
-        "U006336", "H011745", 2,
+        "U006336", "H011746", 2,
         "page 938",
         "simple finite-group classification context",
         WITHIN,
@@ -1582,7 +1584,7 @@ _ROUTES = (
         vocabulary_terms=("finite groups", "simple groups", "classification"),
     ),
     route(
-        "U006336", "H011745", 3,
+        "U006336", "H011746", 3,
         "See also pages 938 and 1032",
         "finite-group classification and enumeration boundary",
         CROSS,
@@ -1603,8 +1605,8 @@ _ROUTES = (
 )
 
 
-# Final family-15 hit order.  H011603 corresponds to the first unit and the
-# IDs then increase by one through H011746.
+# Final family-15 hit order.  H011604 corresponds to the first unit and the
+# IDs then increase by one through H011747.
 F15_HIT_UNITS = (
     "U000965", "U000968", "U000971", "U000972", "U000974", "U000976",
     "U000978", "U000980", "U000981", "U000982", "U000983", "U000984",
@@ -1636,7 +1638,7 @@ F15_HIT_UNITS = (
 def f15_hit_id(source_unit_id: str) -> str:
     """Return the frozen final-F15 hit ID for one hit unit."""
 
-    return f"H{11603 + F15_HIT_UNITS.index(source_unit_id):06d}"
+    return f"H{11604 + F15_HIT_UNITS.index(source_unit_id):06d}"
 
 
 def existing_route_use(
@@ -2073,9 +2075,9 @@ def assert_frozen_spec() -> str:
         raise AssertionError("final-F15 hit-unit count drifted")
     if len(set(F15_HIT_UNITS)) != len(F15_HIT_UNITS):
         raise AssertionError("final-F15 hit-unit order contains duplicates")
-    if f15_hit_id(F15_HIT_UNITS[0]) != "H011603":
+    if f15_hit_id(F15_HIT_UNITS[0]) != "H011604":
         raise AssertionError("first final-F15 hit ID drifted")
-    if f15_hit_id(F15_HIT_UNITS[-1]) != "H011746":
+    if f15_hit_id(F15_HIT_UNITS[-1]) != "H011747":
         raise AssertionError("last final-F15 hit ID drifted")
 
     if len(ROUTE_SPECS) != EXPECTED_COUNTS["new_routes"]:
