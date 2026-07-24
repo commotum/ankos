@@ -2113,7 +2113,7 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006373", "page 260", "printed maximum-period discussion", "PAGE", ["primitive spatial-period state-count function"]),
         ("U006377", "page 963", "finite cellular-automaton state-count context", "PAGE", ["primitive spatial-period state-count function"]),
         ("U006385", "page 260", "rule-90 repetition-period figure assumptions", "PAGE", ["finite cyclic rule-90 repetition-period bound function"]),
-        ("U006386", "page 962", "finite-size period exceptions", "PAGE", ["finite cyclic rule-60 polynomial cellular automaton"]),
+        ("U006386", "page 962", "finite-size period exceptions", "PAGE", ["finite cyclic rule-60 polynomial cellular automaton", "finite cyclic rule-60 repetition-period bound function", "finite-ring cellular-automaton repetition-period comparison survey"]),
         ("U006388", "page 865", "bitwise cellular-automaton representation", "PAGE", ["finite cellular-automaton boundary implementation codec"]),
         ("U006390", "page 263", "printed rule-22 and rule-225 discussion", "PAGE", ["elementary cellular automaton rule 22", "elementary cellular automaton rule 225"]),
         ("U006390", "page 58", "single-cell rule-225 nested pattern", "PAGE", ["elementary cellular automaton rule 225"]),
@@ -2227,7 +2227,7 @@ def main() -> None:
     specs = candidate_specs()
     for index, item in enumerate(specs, 1):
         item["id"] = f"W{index:04d}"
-    assert len(specs) == 86
+    assert len(specs) == 111
     by_name = {item["name"]: item for item in specs}
     assert len(by_name) == len(specs)
 
@@ -2495,7 +2495,16 @@ def main() -> None:
                 "missing_mechanics": missing_mechanics,
                 "uncertainties": item["uncertainties"],
                 "related_candidate_ids": [
-                    by_name[name]["id"] for name in item["related"]
+                    {
+                        "candidate_id": by_name[name]["id"],
+                        "relation": "SOURCE_COMPARE",
+                        "proof_kind": "PROVISIONAL_COMPARISON",
+                        "evidence_ids": [first_evidence_id],
+                        "before_rationale": "",
+                        "after_rationale": "",
+                        "uncertainty": "The records are source-linked for comparison but preserve distinct mechanics and result kinds.",
+                    }
+                    for name in item["related"]
                 ],
                 "cross_reference_ids": route_ids_by_candidate[item["id"]],
                 "evidence_reassignments": [],
@@ -2709,6 +2718,9 @@ def main() -> None:
         "schema_sha256": "0dc082f9e1e434ca8c6c1839320044a89a18772c6179d831940fc35dd5955a17",
         "uncertainties": [
             "U006425: the extracted rule-90 density formula is parenthesized inconsistently with its prose description; no page image is present in the sealed bundle.",
+            "U006514: the printed set-entropy expression lacks a logarithm; for full support it is k^n/n and diverges instead of yielding the finite set/topological entropy named in U006515.",
+            "U006516–U006517: the printed q-entropy denominator q-1 evaluates to -1 for the stated uniform distribution, contradicting the following prose's asserted maximum +1.",
+            "U006429: the no-even-black-block restriction is stated semantically, but the source does not formalize the block-boundary convention or a sampler.",
             "All 30 unreferenced physical images are uncaptained crops duplicated from referenced page composites; they were inspected at original resolution but cannot be assigned a canonical source unit.",
             "Several Life structure records have direct identity and behavior anchors but lack coordinate-level seed transcriptions in the source.",
         ],
