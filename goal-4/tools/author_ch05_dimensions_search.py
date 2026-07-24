@@ -990,25 +990,49 @@ QUERY_SPECS = [
 EXPECTED_STAGE_UNIT_COUNT = 539
 EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
-EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 342
+EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 386
 EXPECTED_STAGE_ROUTE_COUNT = 62
-EXPECTED_READING_UPDATE_COUNT = 22
-EXPECTED_NEW_CANDIDATE_COUNT = 18
-EXPECTED_NEW_EVIDENCE_COUNT = 20
-EXPECTED_RESULT_PAIR_COUNT = 0
+EXPECTED_READING_UPDATE_COUNT = 96
+EXPECTED_NEW_CANDIDATE_COUNT = 62
+EXPECTED_NEW_EVIDENCE_COUNT = 122
+EXPECTED_RESULT_PAIR_COUNT = 1522
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 0
 EXPECTED_PATH_PAIR_COUNTS: dict[str, int] = {}
 EXPECTED_PATH_UNIQUE_UNIT_COUNTS: dict[str, int] = {}
-EXPECTED_HIT_COUNTS: list[int] = []
-EXPECTED_QUERY_SPEC_DIGEST = ""
-EXPECTED_NORMALIZED_RESULT_DIGEST = ""
+EXPECTED_HIT_COUNTS = [
+    66,
+    17,
+    69,
+    74,
+    37,
+    78,
+    5,
+    14,
+    9,
+    475,
+    160,
+    202,
+    65,
+    133,
+    118,
+]
+EXPECTED_QUERY_SPEC_DIGEST = (
+    "253d03a56244bd2baf76216229e03b4a5a485f2c4f91f90e74634f88e29958c6"
+)
+EXPECTED_NORMALIZED_RESULT_DIGEST = (
+    "2055489225361387e4babfb9eab33eb9d58eceb340665e5f8289c08139aa712a"
+)
 EXPECTED_TRIAGE_DIGEST = ""
-EXPECTED_ACTIVE_SEMANTIC_DIGEST = ""
+EXPECTED_ACTIVE_SEMANTIC_DIGEST = (
+    "d80973df9e95c8fac4b32183fac377c039eb1dab3ab69af86f9f35b5151bac90"
+)
 EXPECTED_CANDIDATE_COVERAGE_DIGEST = ""
 EXPECTED_ROUTE_COVERAGE_DIGEST = ""
 EXPECTED_OMISSION_CHALLENGE_COUNT = 0
 EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
-EXPECTED_NEW_VOCABULARY_DIGEST = ""
+EXPECTED_NEW_VOCABULARY_DIGEST = (
+    "f189780314f2aad8a2618357d7e7a22ec2aedd008c91d096638c29e9dd7f2bef"
+)
 EXPECTED_DISPOSITION_COUNTS: dict[str, int] = {}
 EXPECTED_ROUND_DIGESTS: dict[str, str] = {}
 
@@ -2247,23 +2271,50 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     )
     history = read_jsonl(goal_dir / merge_worker_output.REVIEW_HISTORY_NAME)
 
-    if (
-        not history
-        or history[-1].get("review_id") != "V000024"
-        or history[-1].get("stage") != 9
-        or history[-1].get("mode") != "ROUTE_RESOLUTION"
-        or history[-1].get("epoch") != 2
-    ):
-        raise AuthoringError("expected exact Stage 9 V000024 route terminal")
     rounds = search.get("rounds")
-    if not isinstance(rounds, list) or len(rounds) != 12:
-        raise AuthoringError("expected exactly twelve prior LOCAL rounds")
+    if not isinstance(rounds, list):
+        raise AuthoringError("search rounds are not an array")
+    prior_stage_rounds = [
+        record
+        for record in rounds
+        if record.get("owning_stage") == 9 and record.get("epoch") == 2
+    ]
+    if len(prior_stage_rounds) not in {0, 1}:
+        raise AuthoringError("expected zero or one prior Stage 9 LOCAL round")
+    first_pass = not prior_stage_rounds
+    expected_round_count = 12 if first_pass else 13
+    if len(rounds) != expected_round_count:
+        raise AuthoringError(
+            f"expected exactly {expected_round_count} prior LOCAL rounds"
+        )
+    terminal = history[-1] if history else {}
+    if first_pass:
+        terminal_ok = (
+            terminal.get("review_id") == "V000024"
+            and terminal.get("stage") == 9
+            and terminal.get("mode") == "ROUTE_RESOLUTION"
+            and terminal.get("epoch") == 2
+        )
+    else:
+        terminal_ok = (
+            terminal.get("review_id") == "V000025"
+            and terminal.get("stage") == 9
+            and terminal.get("mode") == "SEARCH_APPEND"
+            and terminal.get("epoch") == 2
+            and terminal.get("reviewer")
+            == "ch05-dimensions-local-search-e2"
+            and prior_stage_rounds[0].get("round_id") == "S013"
+        )
+    if not terminal_ok:
+        raise AuthoringError(
+            "Stage 9 search authoring terminal state is not recognized"
+        )
     if any(
         record.get("kind") != "LOCAL"
         for record in rounds
     ) or [
         (record.get("owning_stage"), record.get("epoch"))
-        for record in rounds
+        for record in rounds[:12]
     ] != [
         (4, 1),
         (4, 1),
@@ -2334,9 +2385,14 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             f"{row['source_unit_id']}.candidate_ids",
         )
     }
-    if len(initial_stage_candidates) != EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT:
+    expected_current_candidate_count = (
+        EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT
+        if first_pass
+        else EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT
+    )
+    if len(initial_stage_candidates) != expected_current_candidate_count:
         raise AuthoringError(
-            "initial Stage 9 candidate relationship count drifted: "
+            "current Stage 9 candidate relationship count drifted: "
             f"{len(initial_stage_candidates)}"
         )
     if any(
@@ -2344,6 +2400,27 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         for candidate_id in initial_stage_candidates
     ):
         raise AuthoringError("Stage 9 reaches an unknown or inactive candidate")
+    recovered_candidate_ids = {
+        f"B{number:04d}"
+        for number in range(
+            981,
+            981 + EXPECTED_NEW_CANDIDATE_COUNT,
+        )
+    }
+    base_stage_candidates = (
+        initial_stage_candidates - recovered_candidate_ids
+    )
+    if len(base_stage_candidates) != EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT:
+        raise AuthoringError("pre-search Stage 9 candidate set drifted")
+    if not first_pass and not (
+        recovered_candidate_ids <= initial_stage_candidates
+        and prior_stage_rounds[0].get("new_candidates")
+        == sorted(
+            recovered_candidate_ids,
+            key=lambda candidate_id: int(candidate_id[1:]),
+        )
+    ):
+        raise AuthoringError("applied S013 recovered-candidate suffix differs")
 
     active_route_ids = {
         route_id
@@ -2421,7 +2498,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
                     "cross_reference_ids"
                 ],
             }
-            for candidate_id in sorted(initial_stage_candidates)
+            for candidate_id in sorted(base_stage_candidates)
         ],
         "routes": [
             {
@@ -2528,10 +2605,19 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         (ordinal, unit_id): f"H{hit_start + offset:06d}"
         for offset, (ordinal, unit_id) in enumerate(normalized_pairs)
     }
-    reading_updates, candidate_updates = _build_enrichment(
-        reading_by_id=reading_by_id,
-        hit_by_pair=hit_by_pair,
-    )
+    if first_pass:
+        (
+            reading_updates,
+            candidate_updates,
+            new_evidence_group_ids,
+        ) = _build_final_enrichment(
+            reading_by_id=reading_by_id,
+            hit_by_pair=hit_by_pair,
+        )
+    else:
+        reading_updates = []
+        candidate_updates = []
+        new_evidence_group_ids = []
     update_by_id = {
         row["source_unit_id"]: row for row in reading_updates
     }
@@ -2543,9 +2629,10 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         **candidates_by_id,
         **{candidate["id"]: candidate for candidate in candidate_updates},
     }
-    expected_stage_candidates = initial_stage_candidates | {
-        candidate["id"] for candidate in candidate_updates
-    }
+    expected_stage_candidates = (
+        initial_stage_candidates
+        | {candidate["id"] for candidate in candidate_updates}
+    )
     if len(expected_stage_candidates) != EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT:
         raise AuthoringError("enriched Stage 9 candidate count drifted")
 
@@ -2781,20 +2868,32 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         existing_vocabulary
     ) != len(set(existing_vocabulary)):
         raise AuthoringError("global search vocabulary is malformed")
-    new_vocabulary = [
+    mechanically_deduplicated = [
         value
         for value in PROPOSED_VOCABULARY
         if value not in existing_vocabulary
     ]
-    if new_vocabulary != PROPOSED_VOCABULARY:
-        raise AuthoringError(
-            "Stage 9 vocabulary is not a fully new frozen suffix"
-        )
+    if first_pass:
+        if mechanically_deduplicated != PROPOSED_VOCABULARY:
+            raise AuthoringError(
+                "Stage 9 vocabulary is not a fully new frozen suffix"
+            )
+        new_vocabulary = mechanically_deduplicated
+    else:
+        if mechanically_deduplicated:
+            raise AuthoringError(
+                "applied S013 vocabulary is not fully present"
+            )
+        if existing_vocabulary[-len(PROPOSED_VOCABULARY) :] != (
+            PROPOSED_VOCABULARY
+        ):
+            raise AuthoringError("applied S013 vocabulary suffix differs")
+        new_vocabulary = []
     if ASSUMPTION not in search.get("tool_assumptions", []):
         raise AuthoringError("prior search assumption is absent")
 
     round_record: dict[str, Any] = {
-        "round_id": "S013",
+        "round_id": f"S{len(rounds) + 1:03d}",
         "epoch": 2,
         "kind": "LOCAL",
         "owning_stage": 9,
@@ -2807,17 +2906,23 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         "new_candidates": [
             candidate["id"] for candidate in candidate_updates
         ],
-        "new_evidence_groups": [
-            f"G{number:06d}" for number in range(4049, 4069)
-        ],
+        "new_evidence_groups": new_evidence_group_ids,
         "new_routes": [],
         "rerun_digest": "",
     }
     digest = validate_audit.search_result_digest(round_record)
     round_record["result_digest"] = digest
     round_record["rerun_digest"] = digest
-    if digest != EXPECTED_ROUND_DIGESTS.get("S013"):
-        raise AuthoringError(f"S013 result digest drifted: {digest}")
+    if digest != EXPECTED_ROUND_DIGESTS.get(round_record["round_id"]):
+        raise AuthoringError(
+            f"{round_record['round_id']} result digest drifted: {digest}"
+        )
+    if prior_stage_rounds and _normalized_hit_projection(
+        prior_stage_rounds[0]
+    ) != _normalized_hit_projection(round_record):
+        raise AuthoringError(
+            "Stage 9 zero-delta rerun differs from the S013 hit projection"
+        )
 
     proposed_search = deepcopy(search)
     proposed_search["vocabulary"].extend(new_vocabulary)
@@ -2827,7 +2932,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         "proposal_kind": "SEARCH_APPEND",
         "coordinator_id": "ch05-dimensions-local-search-e2",
         "epoch": 2,
-        "source_paths": [NOTES_PATH],
+        "source_paths": STAGE_PATHS if first_pass else [],
         "base_artifact_sha256": {
             name: hashlib.sha256((goal_dir / name).read_bytes()).hexdigest()
             for name in merge_worker_output.WRITE_NAMES
