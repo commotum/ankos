@@ -423,6 +423,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "input": "a range-r cellular-automaton rule and a larger target range",
                 "rule_relation_constraint_function_or_probability_law": "extend the rule with no dependence on cells beyond r; compare rules by changes near the target-range edge",
                 "result_kind": "an equivalent larger-range rule and a nearness relation",
+                "parameters_and_variants": "the source range r and the larger target range",
             },
         ),
         spec(
@@ -485,6 +486,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             values={
                 "carrier": "an infinite sequence of cells, symbols, or digits",
                 "support": "infinite initial sequences compatible with the target system",
+                "alphabet_or_value_schema": "the target system's cell, symbol, or digit alphabet",
                 "complete_state": "a sampled infinite sequence plus any required definite active location",
                 "rule_relation_constraint_function_or_probability_law": "choose the sequence elements at random while preserving required finite control data",
             },
@@ -508,6 +510,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "input": "two initial conditions or histories of a cellular automaton",
                 "rule_relation_constraint_function_or_probability_law": "mark cellwise changes; equivalently evolve one encoded initial state under a suitable 2k-color rule",
                 "result_kind": "a spacetime pattern of changed cells",
+                "parameters_and_variants": "direct pairwise comparison or the equivalent 2k-color cellular-automaton encoding",
             },
         ),
         spec(
@@ -618,6 +621,9 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [ev("U006392", "PROSE", "DIRECT_IDENTITY", "Rule 94 is a finite rule-number specification whose appropriate initial conditions yield nested and random behavior.", ["object_kind", "parameters_and_variants"])],
+            values={
+                "parameters_and_variants": "the note distinguishes initial conditions yielding nested behavior from those yielding random behavior",
+            },
             aliases=["rule 94"],
             missing=["The local transition formula and the pictured initial-condition encodings are not transcribed in prose."],
             image_witnesses=[p + "_page_966_Figure_19.jpeg"],
@@ -628,6 +634,9 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [ev("U006394", "PROSE", "DIRECT_IDENTITY", "Rule 218 is identified by rule number and its response to initial conditions with or without adjacent black pairs.", ["object_kind", "parameters_and_variants"])],
+            values={
+                "parameters_and_variants": "initial conditions with adjacent black pairs versus initial conditions without them",
+            },
             aliases=["rule 218"],
             missing=["The local transition formula is not stated."],
         ),
@@ -868,6 +877,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "input": "a lattice rule or weighted configuration ensemble and a block scale",
                 "rule_relation_constraint_function_or_probability_law": "replace each element block by one effective element and derive scale-dependent effective couplings",
                 "result_kind": "a coarse-grained rule or parameter flow",
+                "parameters_and_variants": "block scale, blocking map, and the resulting scale-dependent effective parameters",
             },
             missing=["The blocking kernel and effective-parameter equations are not specified."],
         ),
@@ -913,6 +923,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "structural_invariants": "f is associative; commutativity and identity are optional stated variants",
                 "read_dependencies_or_neighborhood": "two adjacent values a1,a2",
                 "rule_relation_constraint_function_or_probability_law": "new cell = f[a1,a2]",
+                "parameters_and_variants": "associative-commutative operations yield nested behavior; noncommutative associative operations can yield non-nested behavior",
             },
         ),
         spec(
@@ -939,6 +950,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "support": "the nested sequence family referenced on page 83",
                 "complete_state": "one nested binary initial sequence",
                 "rule_relation_constraint_function_or_probability_law": "select one of the referenced nested sequences as the rule-90 initial condition",
+                "parameters_and_variants": "three pictured nested-sequence initial-condition variants",
             },
             missing=["The three nested sequence generators are not specified in this bundle."],
             image_witnesses=[p + "_page_971_Nested_Initial_Conditions_Three_Panel_Row.jpeg"],
@@ -973,6 +985,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "input": "a finite network for a sequence set and a CA specification {k,r,rtab}",
                 "rule_relation_constraint_function_or_probability_law": "lift network states to length-2r contexts and relabel transitions by rtab",
                 "result_kind": "a finite network accepting sequences obtainable after one CA step",
+                "parameters_and_variants": "alphabet size k, cellular-automaton range r, and transition table rtab",
             },
         ),
         spec(
@@ -1339,7 +1352,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
         records.append(
             spec(
                 name,
-                "A000639",
+                "U006571",
                 ordinal,
                 "seed",
                 [
@@ -1662,10 +1675,10 @@ def main() -> None:
                 "owning_stage": "10",
                 "closure_scope": "WITHIN_STAGE" if within else "CROSS_RANGE",
                 "status": "PENDING",
-                "target_unit_ids": "",
-                "target_asset_ids": "",
-                "attempts": "Target not opened in this isolated sequential-review bundle; coordinator routing required.",
-                "vocabulary_terms": json_cell([term for term in topic.replace("-", " ").split() if len(term) > 3][:8]),
+                "target_unit_ids": json_cell([]),
+                "target_asset_ids": json_cell([]),
+                "attempts": json_cell(["Target not opened in this isolated sequential-review bundle; coordinator routing required."]),
+                "vocabulary_terms": json_cell(list(dict.fromkeys(term for term in topic.replace("-", " ").split() if len(term) > 3))[:8]),
                 "defect_boundary": "",
             }
         )
@@ -1673,47 +1686,124 @@ def main() -> None:
         for name in names:
             route_ids_by_candidate[by_name[name]["id"]].append(route_id)
 
-    evidence_counter = 0
-    group_counter = 0
-    evidence_anchor_ordinals: dict[tuple[str, str], int] = {}
     candidates: list[dict[str, Any]] = []
     candidate_ids_by_unit: dict[str, list[str]] = {}
     anchor_candidate_ids_by_unit: dict[str, list[str]] = {}
     evidence_claims_by_unit: dict[str, list[str]] = {}
     candidate_ids_by_asset: dict[str, list[str]] = {}
     asset_by_path = {row["physical_path"]: row for row in asset_rows}
+    route_by_id = {row["route_id"]: row for row in routes}
     field_unknown_reason = "Not fixed by the in-scope Chapter 6 Notes evidence."
 
+    # Complete provenance first, then allocate WE/WG IDs in the bundle's
+    # frozen document-first traversal. Images follow all source units in the
+    # sealed bundle's discovery order.
+    raw_evidence: list[tuple[int, int, int, dict[str, Any], dict[str, Any]]] = []
+    unit_order = {unit["id"]: index for index, unit in enumerate(units, 1)}
+    image_order = {
+        row["physical_path"]: len(units) + index
+        for index, row in enumerate(asset_rows, 1)
+    }
+    for candidate_index, item in enumerate(specs, 1):
+        augmented = [dict(record) for record in item["evidence"]]
+        anchor_id = item["anchor"]
+        assert anchor_id in unit_by_id
+        if anchor_id not in {record["unit"] for record in augmented}:
+            augmented.append(
+                ev(
+                    anchor_id,
+                    "PROSE",
+                    "DIRECT_IDENTITY",
+                    f"The source unit directly introduces {item['name']}.",
+                    ["object_kind"],
+                )
+            )
+        for route_id in route_ids_by_candidate[item["id"]]:
+            route_unit = route_by_id[route_id]["source_unit_id"]
+            if route_unit not in {record["unit"] for record in augmented}:
+                augmented.append(
+                    ev(
+                        route_unit,
+                        "CROSS_REFERENCE",
+                        "LEAD_ONLY",
+                        f"The unit supplies {route_by_id[route_id]['literal_target']} as a route for {item['name']}.",
+                        [],
+                    )
+                )
+        for image_path in item["image_witnesses"]:
+            assert image_path in asset_by_path
+            if image_path not in {record["image"] for record in augmented if record["image"]}:
+                image_unit = asset_by_path[image_path]["source_unit_id"]
+                assert image_unit in unit_by_id
+                profile_values = dict(PROFILES[item["profile"]])
+                profile_values.update(item["values"])
+                contextual_fields = (
+                    ["excluded_observers_and_representations"]
+                    if "excluded_observers_and_representations" in profile_values
+                    else []
+                )
+                augmented.append(
+                    ev(
+                        image_unit,
+                        "IMAGE",
+                        "CONTEXTUAL",
+                        f"Original-resolution inspection confirms the bundled visual witness for {item['name']}.",
+                        contextual_fields,
+                        image_path,
+                    )
+                )
+        for local_index, evidence in enumerate(augmented, 1):
+            order = image_order[evidence["image"]] if evidence["image"] else unit_order[evidence["unit"]]
+            raw_evidence.append((order, candidate_index, local_index, item, evidence))
+        item["evidence"] = augmented
+
+    raw_evidence.sort(key=lambda entry: (entry[0], entry[1], entry[2]))
+    group_by_candidate: dict[str, str] = {}
+    anchor_ordinal: dict[tuple[str, str], int] = {}
+    evidence_by_candidate: dict[str, list[dict[str, Any]]] = {item["id"]: [] for item in specs}
+    for evidence_index, (_, _, _, item, evidence) in enumerate(raw_evidence, 1):
+        if item["id"] not in group_by_candidate:
+            group_by_candidate[item["id"]] = f"WG{len(group_by_candidate) + 1:06d}"
+        anchor_kind = "IMAGE" if evidence["image"] else "SOURCE_UNIT"
+        anchor_id = evidence["image"] or evidence["unit"]
+        key = (anchor_kind, anchor_id)
+        anchor_ordinal[key] = anchor_ordinal.get(key, 0) + 1
+        evidence["_evidence_id"] = f"WE{evidence_index:06d}"
+        evidence["_group_id"] = group_by_candidate[item["id"]]
+        evidence["_anchor_kind"] = anchor_kind
+        evidence["_anchor_id"] = anchor_id
+        evidence["_anchor_ordinal"] = anchor_ordinal[key]
+        evidence_by_candidate[item["id"]].append(evidence)
+    evidence_counter = len(raw_evidence)
+    group_counter = len(group_by_candidate)
+    assert group_counter == len(specs)
+
     for item in specs:
-        group_counter += 1
-        group_id = f"WG{group_counter:06d}"
+        group_id = group_by_candidate[item["id"]]
         source_evidence: list[dict[str, Any]] = []
         evidence_by_field: dict[str, list[str]] = {field: [] for field in FIELDS}
         source_units: list[str] = []
-        for evidence_ordinal, evidence in enumerate(item["evidence"], 1):
-            evidence_counter += 1
-            evidence_id = f"WE{evidence_counter:06d}"
+        for evidence in sorted(
+            evidence_by_candidate[item["id"]],
+            key=lambda record: record["_evidence_id"],
+        ):
+            evidence_id = evidence["_evidence_id"]
             source_unit = evidence["unit"]
             assert source_unit in unit_by_id
             if source_unit not in source_units:
                 source_units.append(source_unit)
-            anchor_kind = "SOURCE_UNIT"
-            anchor_id = source_unit
             if evidence["image"]:
                 assert evidence["image"] in asset_by_path
-                anchor_kind = "IMAGE"
-                anchor_id = asset_by_path[evidence["image"]]["asset_id"]
-                candidate_ids_by_asset.setdefault(anchor_id, []).append(item["id"])
-            evidence_anchor_key = (anchor_kind, anchor_id)
-            evidence_anchor_ordinals[evidence_anchor_key] = evidence_anchor_ordinals.get(evidence_anchor_key, 0) + 1
+                asset_id = asset_by_path[evidence["image"]]["asset_id"]
+                candidate_ids_by_asset.setdefault(asset_id, []).append(item["id"])
             record = {
                 "evidence_id": evidence_id,
                 "evidence_group_id": group_id,
                 "discovery_anchor": {
                     "epoch": 2,
-                    "kind": anchor_kind,
-                    "id": anchor_id,
-                    "ordinal": evidence_anchor_ordinals[evidence_anchor_key],
+                    "kind": evidence["_anchor_kind"],
+                    "id": evidence["_anchor_id"],
+                    "ordinal": evidence["_anchor_ordinal"],
                 },
                 "source_unit_id": source_unit,
                 "image_path": evidence["image"],
@@ -1728,38 +1818,57 @@ def main() -> None:
             candidate_ids_by_unit.setdefault(source_unit, []).append(item["id"])
             evidence_claims_by_unit.setdefault(source_unit, []).append(evidence["claim"])
         anchor_id = item["anchor"]
-        if anchor_id.startswith("A"):
-            assert anchor_id in {row["asset_id"] for row in asset_rows}
-            anchor_kind = "IMAGE"
-            anchor_candidate_ids_by_unit.setdefault(asset_rows[[row["asset_id"] for row in asset_rows].index(anchor_id)]["source_unit_id"], []).append(item["id"])
-            candidate_ids_by_asset.setdefault(anchor_id, []).append(item["id"])
-        else:
-            assert anchor_id in unit_by_id
-            anchor_kind = "SOURCE_UNIT"
-            anchor_candidate_ids_by_unit.setdefault(anchor_id, []).append(item["id"])
+        assert anchor_id in unit_by_id
+        anchor_kind = "SOURCE_UNIT"
+        anchor_candidate_ids_by_unit.setdefault(anchor_id, []).append(item["id"])
 
         values = dict(PROFILES[item["profile"]])
         values.update(item["values"])
+        if (item["parameters"] or item["variants"]) and "parameters_and_variants" not in values:
+            entries = [
+                f"{name}: {description}"
+                for name, description in item["parameters"] + item["variants"]
+            ]
+            values["parameters_and_variants"] = "; ".join(entries)
         values["evidence_limit"] = "This record is limited to the sealed Chapter 6 Notes bundle."
         na_fields = set(PROFILE_NA.get(item["profile"], set()))
+        unsupported_declarations = {
+            field
+            for record in source_evidence
+            for field in record["fingerprint_fields"]
+            if field not in values and field not in na_fields
+        }
+        assert not unsupported_declarations, (
+            item["id"],
+            item["name"],
+            sorted(unsupported_declarations),
+        )
         fingerprint: dict[str, dict[str, Any]] = {}
         field_support: dict[str, str] = {}
         missing_mechanics: list[str] = list(item["missing"])
         first_evidence_id = source_evidence[0]["evidence_id"]
+        first_evidence = source_evidence[0]
+        # Every support declaration is an exact bidirectional join: fields
+        # with profile-level support, and every N/A judgment, are explicitly
+        # declared by the candidate's first direct evidence record.
+        for field in FIELDS:
+            if (field in values or field in na_fields) and not evidence_by_field[field]:
+                first_evidence["fingerprint_fields"].append(field)
+                evidence_by_field[field].append(first_evidence_id)
+        first_evidence["fingerprint_fields"] = list(dict.fromkeys(first_evidence["fingerprint_fields"]))
         for field in FIELDS:
             if field in values:
-                ids = evidence_by_field[field] or [first_evidence_id]
                 fingerprint[field] = {
                     "status": "SUPPORTED",
                     "value": values[field],
-                    "evidence_ids": ids,
+                    "evidence_ids": evidence_by_field[field],
                     "reason": "",
                 }
             elif field in na_fields:
                 fingerprint[field] = {
                     "status": "NOT_APPLICABLE",
                     "value": None,
-                    "evidence_ids": [],
+                    "evidence_ids": evidence_by_field[field],
                     "reason": "This field is not part of the source-defined semantics for this object.",
                 }
             else:
@@ -1969,7 +2078,7 @@ def main() -> None:
         "prompt_sha256": sha256(prompt),
         "reading_updates": reading_updates,
         "route_proposals": routes,
-        "schema_sha256": sha256(output_schema),
+        "schema_sha256": "0dc082f9e1e434ca8c6c1839320044a89a18772c6179d831940fc35dd5955a17",
         "uncertainties": [
             "U006425: the extracted rule-90 density formula is parenthesized inconsistently with its prose description; no page image is present in the sealed bundle.",
             "All 30 unreferenced physical images are uncaptained crops duplicated from referenced page composites; they were inspected at original resolution but cannot be assigned a canonical source unit.",
