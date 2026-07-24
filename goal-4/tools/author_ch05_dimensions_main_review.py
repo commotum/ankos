@@ -162,7 +162,7 @@ def profile_blueprint(
             "object_kind": "cellular automaton",
             "native_time": "discrete successive steps",
             "carrier": f"{dimension} regular cell array",
-            "support": "finite active pattern represented on an unbounded or wrapped array",
+            "support": "the finite active pattern explicitly shown at each finite stage",
             "topology": f"{dimension} grid/lattice topology",
             "structural_invariants": "carrier adjacency is fixed while cell values update",
             "alphabet_or_value_schema": "black/white cell values",
@@ -303,7 +303,6 @@ def profile_blueprint(
             "law_kind": "declarative graph specification",
             "rule_relation_constraint_function_or_probability_law": name,
             "result_kind": "graph or graph-isomorphism class",
-            "determinism_branching_or_measure": "one denoted graph/class or enumerated finite set",
             "witness_semantics": "the checked drawing witnesses incidence but its coordinates are non-semantic",
             "parameters_and_variants": "dimension, branching, node count, or nesting as stated",
             "excluded_observers_and_representations": "node positions and line-above/line-below page layouts are representations",
@@ -321,6 +320,7 @@ def profile_blueprint(
             "read_dependencies_or_neighborhood",
             "write_replacement_assembly_or_commit",
             "successor_cardinality",
+            "determinism_branching_or_measure",
             "termination_completion_failure",
         }
     elif kind == "NETWORK_GENERAL":
@@ -459,27 +459,86 @@ def profile_blueprint(
             "boundary",
             "read_dependencies_or_neighborhood",
         }
-    elif kind == "CONSTRAINT":
+    elif kind in {
+        "CONSTRAINT_1D",
+        "CONSTRAINT_NEIGHBOR2D",
+        "CONSTRAINT_TEMPLATE_CROSS",
+        "CONSTRAINT_TEMPLATE_REQUIRED",
+        "CONSTRAINT_TEMPLATE_3X3",
+    }:
+        constraint_profiles = {
+            "CONSTRAINT_1D": {
+                "carrier": "one-dimensional line of cells",
+                "support": "a complete infinite line coloring",
+                "topology": "two nearest neighbors on a line",
+                "boundary": "unbounded one-dimensional line",
+                "read": "the center cell and its two nearest neighbors as stated",
+                "law": "one-dimensional local neighbor constraint",
+                "parameters": "the permitted relation between a cell and its two neighbors",
+                "witness": "a complete infinite line coloring that satisfies the relation at every cell",
+            },
+            "CONSTRAINT_NEIGHBOR2D": {
+                "carrier": "two-dimensional square grid of cells",
+                "support": "a complete infinite grid coloring",
+                "topology": "four orthogonal nearest neighbors",
+                "boundary": "unbounded grid; wrapping in a displayed finite tile is a representation of periodicity",
+                "read": "the center cell and its four orthogonal neighbors",
+                "law": "two-dimensional black/white neighbor-count constraint",
+                "parameters": "the required black/white neighbor counts for black and white center cells",
+                "witness": "a complete infinite grid coloring that satisfies both count conditions at every cell",
+            },
+            "CONSTRAINT_TEMPLATE_CROSS": {
+                "carrier": "two-dimensional square grid of cells",
+                "support": "a complete infinite grid coloring",
+                "topology": "overlapping center-plus-four-orthogonal-neighbor templates",
+                "boundary": "unbounded two-dimensional grid",
+                "read": "the center cell and its four orthogonal neighbors",
+                "law": "overlapping allowed-cross-template constraint",
+                "parameters": "the allowed set of five-cell cross templates",
+                "witness": "a complete infinite grid coloring whose cross neighborhood at every cell is allowed",
+            },
+            "CONSTRAINT_TEMPLATE_REQUIRED": {
+                "carrier": "two-dimensional square grid of cells",
+                "support": "a complete infinite grid coloring",
+                "topology": "overlapping center-plus-four-orthogonal-neighbor templates",
+                "boundary": "unbounded two-dimensional grid",
+                "read": "the center cell and its four orthogonal neighbors",
+                "law": "allowed-cross-template constraint plus one required template occurrence",
+                "parameters": "the allowed cross-template set and the designated template that must occur",
+                "witness": "a complete infinite grid coloring that uses only allowed cross templates and contains the required one",
+            },
+            "CONSTRAINT_TEMPLATE_3X3": {
+                "carrier": "two-dimensional square grid of cells",
+                "support": "a complete infinite grid coloring",
+                "topology": "overlapping complete 3 × 3 blocks including diagonals",
+                "boundary": "unbounded two-dimensional grid",
+                "read": "the complete 3 × 3 neighborhood centered at each cell",
+                "law": "overlapping allowed-3 × 3-template constraint plus a required occurrence where stated",
+                "parameters": "the allowed 3 × 3 template set and required template occurrence",
+                "witness": "a complete infinite grid coloring whose every 3 × 3 block is allowed and that contains the required template",
+            },
+        }
+        constraint_profile = constraint_profiles[kind]
         supported = {
             "object_kind": "constraint-defined model set",
             "native_time": "none; declarative satisfaction relation",
-            "carrier": "one- or two-dimensional array of cells as stated",
-            "support": "infinite line/grid, or finite region used as a witness/refutation",
-            "topology": "nearest-neighbor line/grid or overlapping 3x3 templates as stated",
+            "carrier": constraint_profile["carrier"],
+            "support": constraint_profile["support"],
+            "topology": constraint_profile["topology"],
             "structural_invariants": "the same local constraint applies at every cell",
             "alphabet_or_value_schema": "black/white cell values",
             "complete_state": "a complete cell assignment",
-            "boundary": "wrapping only where explicitly stated; otherwise an infinite carrier",
+            "boundary": constraint_profile["boundary"],
             "frontier_or_activation": "every cell must satisfy the relation",
-            "read_dependencies_or_neighborhood": "the stated neighbor count or overlapping template footprint",
-            "law_kind": "declarative local constraint",
+            "read_dependencies_or_neighborhood": constraint_profile["read"],
+            "law_kind": constraint_profile["law"],
             "rule_relation_constraint_function_or_probability_law": name,
-            "result_kind": "the set of satisfying assignments, possibly empty or unique",
+            "result_kind": "the set of complete satisfying assignments",
             "determinism_branching_or_measure": "declarative solution set without probability measure",
-            "witness_semantics": "a complete satisfying pattern witnesses acceptance; a finite unsatisfiable region refutes global satisfiability",
-            "parameters_and_variants": "neighbor counts, allowed template set, and required-occurrence template",
+            "witness_semantics": constraint_profile["witness"],
+            "parameters_and_variants": constraint_profile["parameters"],
             "excluded_observers_and_representations": "search order, gray unknown cells, tessellation rendering, and CA correspondence are not the native constraint",
-            "evidence_limit": "template contents are asserted only when checked in the assigned image",
+            "evidence_limit": "only the stated or independently checked local relation is asserted; numeric codes are not treated as decoded laws",
         }
         na = {
             "visible_history",
@@ -505,7 +564,6 @@ def profile_blueprint(
             "law_kind": "declarative coverage relation",
             "rule_relation_constraint_function_or_probability_law": name,
             "result_kind": "finite set of satisfying-pattern witnesses",
-            "determinism_branching_or_measure": "finite deterministic enumeration",
             "termination_completion_failure": "if none of the 171 witnesses satisfies a constraint in scope, no pattern satisfies it",
             "witness_semantics": "each member is a positive satisfying witness for the minimal labelled constraint and possibly others",
             "parameters_and_variants": "minimal constraint labels and quotient symmetries",
@@ -524,6 +582,7 @@ def profile_blueprint(
             "read_dependencies_or_neighborhood",
             "write_replacement_assembly_or_commit",
             "successor_cardinality",
+            "determinism_branching_or_measure",
         }
     elif kind == "SOLVER_ENUMERATION":
         supported = {
@@ -1041,6 +1100,12 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["U001072", "U001074"],
         ["A000883"],
         parameters={"node counts": "one, two, or three", "equivalence": "node labels ignored; unreachable-node cases excluded"},
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "the finite set of reachable graph-isomorphism classes on one, two, or three nodes",
+            )
+        },
     )
     graph_indices: list[int] = []
     for ordinal, dimension in enumerate(("one", "two", "three"), 1):
@@ -1324,29 +1389,49 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     add(
         "one-dimensional exact-one-black-and-one-white-neighbor constraint",
-        "CONSTRAINT",
+        "CONSTRAINT_1D",
         "SOURCE_UNIT",
         "U001162",
         1,
         ["U001162", "U001164"],
         ["A000908"],
         parameters={"constraint": "every cell has exactly one black and one white neighbor"},
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "the unique satisfying periodic line pattern stated by the source",
+            ),
+            "witness_semantics": (
+                "SUPPORTED",
+                "the displayed complete periodic coloring is the source's unique-model witness",
+            ),
+        },
         parent_index=constraint_family,
     )
     add(
         "one-dimensional at-least-one-unlike-neighbor constraint",
-        "CONSTRAINT",
+        "CONSTRAINT_1D",
         "SOURCE_UNIT",
         "U001166",
         1,
         ["U001166", "U001168"],
         ["A000909"],
         parameters={"constraint": "every cell has at least one neighbor of the opposite color"},
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "many satisfying line colorings, exactly those with no run longer than two equal-colored cells",
+            ),
+            "witness_semantics": (
+                "SUPPORTED",
+                "each displayed complete coloring witnesses one member of the many-model set",
+            ),
+        },
         parent_index=constraint_family,
     )
     fixed_specific = add(
         "two-dimensional neighbor-count constraint: black has one black, white has two white",
-        "CONSTRAINT",
+        "CONSTRAINT_NEIGHBOR2D",
         "SOURCE_UNIT",
         "U001173",
         1,
@@ -1356,11 +1441,21 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "black-center condition": "one black and three white orthogonal neighbors",
             "white-center condition": "two white and two black orthogonal neighbors",
         },
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "one satisfying periodic grid pattern up to rotations and reflections",
+            ),
+            "witness_semantics": (
+                "SUPPORTED",
+                "the displayed periodic grid and its rotations/reflections are the complete source-stated model class",
+            ),
+        },
         parent_index=constraint_family,
     )
     fixed_family = add(
         "two-dimensional fixed black/white-neighbor-count constraint family",
-        "CONSTRAINT",
+        "CONSTRAINT_NEIGHBOR2D",
         "SOURCE_UNIT",
         "U001178",
         1,
@@ -1379,11 +1474,12 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             if row_black_neighbors == 1 and col_white_neighbors == 2:
                 continue
             ordinal = row_black_neighbors * 5 + visual_column + 1
+            is_unsatisfiable = ordinal in {4, 10}
             add(
                 "two-dimensional neighbor-count preset "
                 f"(black-center black={row_black_neighbors}, "
                 f"white-center white={col_white_neighbors})",
-                "CONSTRAINT",
+                "CONSTRAINT_NEIGHBOR2D",
                 "IMAGE",
                 "A000911",
                 ordinal,
@@ -1399,12 +1495,35 @@ def build_candidate_specs() -> list[dict[str, Any]]:
                         f"{4 - col_white_neighbors} black orthogonal neighbors"
                     ),
                     "survey panel": str(ordinal),
+                    "model outcome": (
+                        "unsatisfiable"
+                        if is_unsatisfiable
+                        else "at least one displayed satisfying pattern"
+                    ),
+                },
+                overrides={
+                    "result_kind": (
+                        "SUPPORTED",
+                        (
+                            "the empty set of complete satisfying grid assignments"
+                            if is_unsatisfiable
+                            else "a nonempty set of complete satisfying grid assignments"
+                        ),
+                    ),
+                    "witness_semantics": (
+                        "SUPPORTED",
+                        (
+                            "the blank panel, interpreted by the caption, records that no pattern satisfies the constraint"
+                            if is_unsatisfiable
+                            else "the displayed complete periodic pattern witnesses satisfiability"
+                        ),
+                    ),
                 },
                 parent_index=fixed_family,
             )
     template_family = add(
         "overlapping local-template constraint family",
-        "CONSTRAINT",
+        "CONSTRAINT_TEMPLATE_CROSS",
         "SOURCE_UNIT",
         "U001182",
         1,
@@ -1418,7 +1537,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     ):
         add(
             f"local-template constraint {code}",
-            "CONSTRAINT",
+            "CONSTRAINT_TEMPLATE_CROSS",
             "SOURCE_UNIT",
             "U001184",
             ordinal,
@@ -1426,6 +1545,16 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             ["A000912"],
             aliases=[f"constraint {code}"],
             parameters={"constraint code": code, "displayed tessellation block": block},
+            overrides={
+                "result_kind": (
+                    "SUPPORTED",
+                    "a nonempty set of complete satisfying grid assignments",
+                ),
+                "witness_semantics": (
+                    "SUPPORTED",
+                    f"the displayed {block} periodic tessellation is a positive complete-model witness",
+                ),
+            },
             parent_index=template_family,
         )
     add(
@@ -1444,7 +1573,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     required_family = add(
         "local-template constraint with a required template occurrence",
-        "CONSTRAINT",
+        "CONSTRAINT_TEMPLATE_REQUIRED",
         "SOURCE_UNIT",
         "U001190",
         1,
@@ -1469,7 +1598,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     for ordinal, code in enumerate(required_codes, 1):
         code_to_index[code] = add(
             f"required-template constraint {code}",
-            "CONSTRAINT",
+            "CONSTRAINT_TEMPLATE_REQUIRED",
             "IMAGE",
             "A000915",
             ordinal,
@@ -1532,7 +1661,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         has_infinite_model = code == "373384574"
         add(
             f"solver-witnessed constraint {code}",
-            "CONSTRAINT",
+            "CONSTRAINT_TEMPLATE_REQUIRED",
             "SOURCE_UNIT",
             "U001205",
             ordinal,
@@ -1578,7 +1707,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         )
     add(
         "required-template constraint 18762389",
-        "CONSTRAINT",
+        "CONSTRAINT_TEMPLATE_REQUIRED",
         "SOURCE_UNIT",
         "U001210",
         1,
@@ -1590,12 +1719,22 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "allowed templates": "12 checked cross-neighborhood templates",
             "required occurrence": "a template containing a stacked black pair",
         },
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "one satisfying nonperiodic grid pattern up to translations",
+            ),
+            "witness_semantics": (
+                "SUPPORTED",
+                "the displayed infinite pattern is the unique source-stated model class up to translation",
+            ),
+        },
         parent_index=required_family,
         route_keys=["pages-214-215-constraint-order"],
     )
     template3 = add(
         "3x3 allowed-template constraint family",
-        "CONSTRAINT",
+        "CONSTRAINT_TEMPLATE_3X3",
         "SOURCE_UNIT",
         "U001213",
         1,
@@ -1607,7 +1746,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     add(
         "33-template rule-60-correspondence constraint",
-        "CONSTRAINT",
+        "CONSTRAINT_TEMPLATE_3X3",
         "SOURCE_UNIT",
         "U001216",
         1,
@@ -1618,11 +1757,22 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "required occurrence": "the first displayed template",
             "correspondence": "rule 60 elementary one-dimensional cellular automaton",
         },
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "a nonempty set of complete grid assignments containing the forced nested pattern",
+            ),
+            "witness_semantics": (
+                "SUPPORTED",
+                "the displayed rule-60-correspondence pattern is a positive complete-model witness",
+            ),
+        },
         parent_index=template3,
+        route_keys=["rule-60-correspondence"],
     )
     add(
         "56-template rule-30-correspondence constraint",
-        "CONSTRAINT",
+        "CONSTRAINT_TEMPLATE_3X3",
         "SOURCE_UNIT",
         "U001217",
         1,
@@ -1633,7 +1783,18 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "required occurrence": "the first displayed template",
             "correspondence": "shifted rule 30 elementary one-dimensional cellular automaton pattern",
         },
+        overrides={
+            "result_kind": (
+                "SUPPORTED",
+                "the source-stated sole satisfying pattern, derived from a shifted rule-30 evolution",
+            ),
+            "witness_semantics": (
+                "SUPPORTED",
+                "the displayed rule-30-derived pattern is the source-stated complete model",
+            ),
+        },
         parent_index=template3,
+        route_keys=["rule-30-correspondence"],
     )
 
     assert len(specs) == 195, len(specs)
@@ -1669,6 +1830,8 @@ def build_route_specs() -> list[dict[str, str]]:
         ("previous-page-multiway-k", "U001150", "previous page", "PAGE", "multiway rule (k)", "WITHIN_STAGE"),
         ("pages-214-215-constraint-order", "U001206", "pages 214 and 215", "PAGE", "ordering of local-template constraints", "WITHIN_STAGE"),
         ("page-216-constraint-family", "U001212", "page 216", "PAGE", "required-template constraint family", "WITHIN_STAGE"),
+        ("rule-60-correspondence", "U001216", "rule 60 elementary one-dimensional cellular automaton", "OTHER", "constraint correspondence with elementary cellular automaton rule 60", "CROSS_RANGE"),
+        ("rule-30-correspondence", "U001217", "rule 30 cellular automaton", "OTHER", "constraint correspondence with a shifted elementary cellular automaton rule-30 pattern", "CROSS_RANGE"),
     ]
     result = []
     anchor_ordinals: dict[str, int] = defaultdict(int)
@@ -1705,7 +1868,7 @@ def build_route_specs() -> list[dict[str, str]]:
                 "defect_boundary": "",
             }
         )
-    assert [r["route_id"] for r in result] == [f"WR{i:04d}" for i in range(1, 23)]
+    assert [r["route_id"] for r in result] == [f"WR{i:04d}" for i in range(1, 25)]
     return result
 
 
@@ -2499,7 +2662,7 @@ def validate_output(
     routes = output["route_proposals"]
     if len(readings) != 276 or len(assets) != 80 or len(candidates) != 195:
         raise ValueError("unexpected output row count")
-    if len(routes) != 22:
+    if len(routes) != 24:
         raise ValueError("unexpected route count")
     if [row["source_unit_id"] for row in readings] != [
         row["source_unit_id"] for row in state["readings"]
@@ -2514,7 +2677,7 @@ def validate_output(
     ]:
         raise ValueError("candidate sequence is not contiguous")
     if [row["route_id"] for row in routes] != [
-        f"WR{i:04d}" for i in range(1, 23)
+        f"WR{i:04d}" for i in range(1, 25)
     ]:
         raise ValueError("route sequence is not contiguous")
 
