@@ -2,8 +2,8 @@
 """Author one closed Stage 9 Chapter 5 LOCAL-search proposal.
 
 The first invocation appends the mechanically deduplicated Chapter 5
-vocabulary, the frozen fifteen-family search, and eighteen candidates recovered
-by the omission challenge.  A later invocation against the applied first round
+vocabulary, the frozen fifteen-family search, and the candidates recovered by
+the omission challenge.  A later invocation against the applied first round
 repeats the exact query family with no semantic delta.
 
 This reproducer is deliberately bound to the canonical Goal 4 state after
@@ -144,7 +144,589 @@ SIERPINSKI_SPECS = [
     ),
 ]
 
-PROPOSED_VOCABULARY = [
+
+def _spec(
+    name: str,
+    units: list[str],
+    object_kind: str,
+    carrier: str,
+    input_value: str,
+    law: str,
+    result: str,
+    *,
+    aliases: list[str] | None = None,
+    related: list[str] | None = None,
+    limit: str = (
+        "Only the identity and mechanics stated in the assigned source "
+        "units are asserted."
+    ),
+    uncertainties: list[str] | None = None,
+) -> dict[str, Any]:
+    return {
+        "name": name,
+        "units": units,
+        "object_kind": object_kind,
+        "carrier": carrier,
+        "input": input_value,
+        "law": law,
+        "result": result,
+        "aliases": aliases or [],
+        "related": related or [],
+        "limit": limit,
+        "uncertainties": uncertainties or [],
+    }
+
+
+RECOVERED_SPECS = [
+    _spec(
+        "centered-singleton two-dimensional binary-array seed",
+        ["U006080", "U006081"],
+        "deterministic initial-state constructor",
+        "finite n by n binary cell array",
+        "array side length n",
+        "PadLeft a singleton 1 to an n by n zero array with floor-half padding",
+        "one centered-singleton binary array",
+        aliases=["2D single-black-square seed"],
+        related=["B0014"],
+    ),
+    _spec(
+        "outer-totalistic cellular automaton code 686",
+        ["U006102", "U006117"],
+        "cellular-automaton rule preset",
+        "two-dimensional binary cell array",
+        "one complete cell configuration",
+        "apply the outer-totalistic rule identified by code 686",
+        "one successor cell configuration",
+        aliases=["2D outer-totalistic code 686"],
+        related=["B0859", "B0868"],
+        limit=(
+            "The identity is explicit, but the phrase “s alone” conflicts "
+            "with the p/q/r component names actually defined nearby."
+        ),
+        uncertainties=[
+            "The source does not soundly identify which p/q/r ablation the "
+            "corrupt phrase “s alone” denotes."
+        ],
+    ),
+    _spec(
+        "stacked two-dimensional-cellular-automaton history embedding",
+        ["U000969", "U000971"],
+        "history embedding/representation function",
+        "successive two-dimensional cellular-automaton states",
+        "an ordered cellular-automaton evolution history",
+        "stack each successive 2D state along a third axis in time order",
+        "one three-dimensional space-time object",
+        aliases=["3D stack of 2D CA states"],
+    ),
+    _spec(
+        "two-dimensional-grid total-order linearization scan",
+        ["U001061"],
+        "scan-order/linearization class",
+        "two-dimensional grid",
+        "grid elements and a selected traversal variant",
+        "visit every element in a total order by snaking rows or spiralling outward",
+        "one ordered one-dimensional traversal",
+        aliases=["snaking 2D scan", "spiralling 2D scan"],
+        related=["B0290", "B0915"],
+        limit=(
+            "The source identifies snaking and spiral variants but does not "
+            "give a coordinate formula or tie-breaking convention."
+        ),
+    ),
+    _spec(
+        "network evolution node-count observer",
+        ["U001112", "U001115"],
+        "trajectory observer",
+        "network-system evolution history",
+        "the network at each retained step",
+        "count the total nodes in every retained network state",
+        "a node-count time series",
+        aliases=["network size trajectory"],
+    ),
+    _spec(
+        "multiway state-count and first-difference observer",
+        ["U001130", "U001134", "U001135", "U001139"],
+        "trajectory observer",
+        "multiway-system evolution history",
+        "the distinct state collection at each retained step",
+        "count distinct states per step and take successive count differences",
+        "a state-count series and its first-difference series",
+    ),
+    _spec(
+        "arbitrary-offset neighborhood-configuration enumerator",
+        ["U006096", "U006097"],
+        "finite configuration enumerator",
+        "ordered arbitrary-dimensional cellular-automaton neighborhood",
+        "offset list os and alphabet size k",
+        "reverse the table of length-|os| base-k digit vectors",
+        "all k^|os| neighborhood configurations in canonical order",
+        related=["B0857"],
+    ),
+    _spec(
+        "general cellular-automaton rule-number codec",
+        ["U006096", "U006098", "U006099", "U006100", "U006101"],
+        "rule-table codec",
+        "k-color cellular-automaton rule table over arbitrary offsets",
+        "ordered output table u or rule number num, alphabet size k, and offsets os",
+        "encode with FromDigits[Reverse[u], k] and decode base-k digits in the stated neighborhood order",
+        "a canonical rule number, rule table, or equivalent one-step lookup",
+        related=["B0857"],
+    ),
+    _spec(
+        "two-dimensional cellular-automaton rule-family cardinality query",
+        ["U006102", "U006105"],
+        "finite-family cardinality query",
+        "two-dimensional binary cellular-automaton rule families",
+        "neighborhood topology and symmetry/totalistic restriction class",
+        "return the exact tabled number of possible rules for the selected class",
+        "one finite rule-family cardinality",
+        related=["B0858", "B0859", "B0860"],
+    ),
+    _spec(
+        "growth-totalistic trigger-list-to-outer-totalistic-code encoder",
+        ["U006103", "U006104", "U006110"],
+        "rule-code encoder",
+        "binary growth-totalistic cellular-automaton trigger list",
+        "neighbor count s or n and the counts that turn a cell black",
+        "encode forced persistence plus the trigger list using either stated equivalent power-sum parameterization",
+        "one outer-totalistic code number for the growth rule",
+        related=["B0859", "B0860"],
+    ),
+    _spec(
+        "symmetric-5-neighbor-to-general-rule-code converter",
+        ["U006106", "U006107", "U006108", "U006109"],
+        "rule-code converter",
+        "binary 5-neighbor cellular-automaton rule table",
+        "a 12-bit completely symmetric rule number",
+        "expand each symmetry-class bit to its 32 general-neighborhood positions and read the result as a base-2 number",
+        "one equivalent general-form rule number",
+        related=["B0861"],
+    ),
+    _spec(
+        "two-dimensional Turing-machine head-position trajectory observer",
+        ["U006139"],
+        "trajectory observer",
+        "two-dimensional Turing-machine evolution",
+        "a 2D Turing-machine run and retained step bound",
+        "select the head position at each successive retained step",
+        "an ordered two-dimensional position trajectory",
+        limit=(
+            "The assigned source states the 500-step trajectory projection "
+            "but gives no standalone implementation formula."
+        ),
+    ),
+    _spec(
+        "finite-automaton digit-array substitution-pattern generator",
+        ["U006147", "U006148", "U006149"],
+        "uniterated finite-array generator",
+        "k^n by k^n binary array",
+        "step n, radix k, and excluded digit-pair pattern form",
+        "test each transposed pair of position-digit sequences against form and emit 1 exactly when it is absent",
+        "one complete step-n binary substitution pattern",
+        related=["B0897", "B0898"],
+    ),
+    _spec(
+        "GoldenRatio line-cut Fibonacci sequence generator",
+        ["U006182"],
+        "cut-and-project sequence generator",
+        "a line through the two-dimensional square lattice",
+        "a line of GoldenRatio slope",
+        "record how the irrational-slope line cuts the square lattice",
+        "the one-dimensional Fibonacci substitution sequence",
+    ),
+    _spec(
+        "five-dimensional cut-and-project Penrose tiling generator",
+        ["U006182"],
+        "cut-and-project tiling generator",
+        "a two-dimensional plane through a five-dimensional hypercubic lattice",
+        "a plane whose slopes are based on GoldenRatio",
+        "project the plane/lattice intersection to obtain the induced tiling",
+        "a Penrose tiling with approximate fivefold symmetry",
+        related=["B0904"],
+    ),
+    _spec(
+        "quadratic-irrational hyperplane cut-and-project nested-pattern family",
+        ["U006183"],
+        "cut-and-project pattern family",
+        "hyperplanes projected from regular lattices in arbitrary dimensions",
+        "a regular lattice and quadratic-irrational hyperplane slopes",
+        "project the regular lattice along the selected irrational hyperplane",
+        "a nested pattern representable by shape subdivision",
+    ),
+    _spec(
+        "base-(i-1) binary-digit point-set generator",
+        ["U006187", "U006188"],
+        "uniterated geometric point-set generator",
+        "complex plane",
+        "digit length t",
+        "evaluate every t-digit binary integer in complex base i-1",
+        "the finite step-t dragon-curve point set",
+        related=["B0905"],
+    ),
+    _spec(
+        "box-counting fractal-dimension observer",
+        ["U006193", "U006195"],
+        "geometric scaling observer",
+        "a planar pattern under successively finer grids",
+        "pattern and grid edge scale a",
+        "infer d from occupied-square count N(a) scaling as (1/a)^d",
+        "a dimension estimate or scale-dependent exponent profile",
+        limit=(
+            "The exponent may fluctuate or fail to converge; the source does "
+            "not fix one estimator for every nonconvergent case."
+        ),
+    ),
+    _spec(
+        "grid-occupancy distribution-moment observer",
+        ["U006196"],
+        "geometric distribution observer",
+        "gray amount distributed among grid squares",
+        "a gridded pattern and selected moment orders",
+        "compute mean, variance, and higher moments of grid-square gray amount",
+        "generalized fractal-dimension descriptors",
+    ),
+    _spec(
+        "Julia-set zero-membership to Mandelbrot-boundary relation",
+        ["U006202", "U006203"],
+        "parameter-space membership relation",
+        "complex parameters c and their Julia sets",
+        "a parameter c",
+        "accept exactly when the Julia set for c contains z=0",
+        "membership in the boundary of the Mandelbrot set",
+        related=["B0912", "B0913"],
+    ),
+    _spec(
+        "Julia-set nearest-distance field observer",
+        ["U006203"],
+        "parameter-space distance observer",
+        "Julia set associated with each complex parameter c",
+        "parameter c and fixed point z0",
+        "minimize Abs[z-z0] over points z in the Julia set",
+        "one nonnegative distance/gray-level field value",
+        related=["B0912", "B0913"],
+    ),
+    _spec(
+        "directed cyclic-network generator",
+        ["U006211", "U006212"],
+        "uniterated graph generator",
+        "n labelled nodes with above and below directed connections",
+        "positive node count n",
+        "connect each node to its two cyclic neighbors using CyclicNet",
+        "one directed cyclic network represented as n connection pairs",
+        aliases=["CyclicNet"],
+        related=["B0789", "B0916"],
+    ),
+    _spec(
+        "directed-network connection-path follower",
+        ["U006213", "U006214"],
+        "graph path query",
+        "directed above/below connection-list network",
+        "network list, start node i, and connection-symbol sequence s",
+        "fold the indexed connection choices over the start node",
+        "the uniquely reached node",
+        aliases=["Follow"],
+        related=["B0916"],
+    ),
+    _spec(
+        "directed-network radius-layer node-count observer",
+        ["U006215", "U006216"],
+        "graph neighborhood observer",
+        "directed above/below connection-list network",
+        "network list, start node i, and depth d",
+        "repeatedly union reachable nodes and count each distance layer",
+        "a list of distinct-node counts through depth d",
+        aliases=["NeighborNumbers"],
+        related=["B0916"],
+    ),
+    _spec(
+        "directed-network reachable-component query",
+        ["U006219", "U006220"],
+        "graph reachability query",
+        "directed above/below connection-list network",
+        "network list and start node i",
+        "take the fixed point of adjoining all outgoing neighbors",
+        "the set of all nodes reachable from i",
+        aliases=["ConnectedNodes"],
+        related=["B0916"],
+    ),
+    _spec(
+        "directed-network induced-subgraph renumbering transform",
+        ["U006221", "U006222"],
+        "graph relabelling transform",
+        "directed connection-list network",
+        "network list and retained node sequence",
+        "select retained rows and replace every endpoint by its position in the retained sequence",
+        "one compactly renumbered induced network",
+        aliases=["RenumberNodes"],
+        related=["B0916"],
+    ),
+    _spec(
+        "page-202(c) network node-count sequence generator",
+        ["U006227", "U006228"],
+        "uniterated integer-sequence generator",
+        "network-size trajectory for the stated page-202(c) preset",
+        "maximum step t",
+        "evaluate the supplied FoldList and binary-digit recurrence d",
+        "the list of node counts through step t",
+    ),
+    _spec(
+        "network dimensionality observer",
+        ["U006234"],
+        "graph-volume scaling observer",
+        "a network at a selected evolution step",
+        "network, reference node, and connection radius r",
+        "count distinct nodes reachable within r connections and compare with r^d",
+        "a dimension estimate or reachable-volume growth curve",
+    ),
+    _spec(
+        "polynomial-growth string-multiway preset",
+        ["U006252"],
+        "multiway-system preset",
+        "strings rewritten by three bidirectional-availability replacement rules",
+        "the displayed rule and an initial string containing n B symbols",
+        "apply all replacements and merge equal successor strings",
+        "a multiway evolution whose state count grows as t^(n+1)",
+        related=["B0921"],
+    ),
+    _spec(
+        "bounded-length multiway reachability observer",
+        ["U006258"],
+        "multiway reachability observer",
+        "string-multiway evolution",
+        "the referenced system and maximum string length 10",
+        "retain which strings of length at most 10 are reached anywhere in the evolution",
+        "a bounded set or incidence map of reachable strings",
+        limit=(
+            "OCR truncates one word in the caption and the unit does not state "
+            "the plotted encoding or a standalone implementation."
+        ),
+        uncertainties=[
+            "The source contains the defective text “shows wh” and omits the "
+            "plot-axis/string encoding."
+        ],
+    ),
+    _spec(
+        "multiway equivalence-class quotient representation",
+        ["U006262"],
+        "quotient representation",
+        "all strings under a group or semigroup rewrite relation",
+        "a bidirectional rule presentation",
+        "partition strings by mutual transformability under the rules",
+        "group/semigroup elements as disconnected multiway-network components",
+    ),
+    _spec(
+        "group-or-semigroup Cayley-graph generator family",
+        ["U006263"],
+        "graph generator family",
+        "elements of a presented group or semigroup",
+        "a presentation and its generator symbols",
+        "connect each element to the element obtained by appending each generator",
+        "the presentation's Cayley graph",
+    ),
+    _spec(
+        "free-semigroup Cayley-tree preset",
+        ["U006263"],
+        "Cayley-graph preset",
+        "all finite strings over the selected free generators",
+        "a generator alphabet with no relations",
+        "append each generator to form distinct child elements",
+        "a rooted branching Cayley tree",
+    ),
+    _spec(
+        "commutative-semigroup Cayley-grid preset",
+        ["U006263"],
+        "Cayley-graph preset",
+        "equivalence classes of strings over A and B",
+        "relations AB→BA and BA→AB",
+        "quotient by permutation of A and B order and connect by generator appends",
+        "a two-dimensional grid Cayley graph",
+    ),
+    _spec(
+        "A5 icosahedral-group presentation",
+        ["U006264"],
+        "finite-group presentation",
+        "words in generators x and y modulo relations",
+        "relations x^2 = y^3 = (x y)^5 = 1",
+        "identify words modulo the stated presentation",
+        "the 60-element icosahedral group A5",
+    ),
+    _spec(
+        "finite presented-group cardinality observer",
+        ["U006264", "U006265"],
+        "finite quotient cardinality observer",
+        "elements induced by a finite group presentation",
+        "a group presentation known to yield a finite group",
+        "count distinct equivalence classes/elements of the presented group",
+        "one finite group order",
+        limit=(
+            "The source provides example orders but no general enumeration "
+            "algorithm or failure semantics for infinite presentations."
+        ),
+    ),
+    _spec(
+        "nim zero-XOR losing-position predicate",
+        ["U006276"],
+        "game-position predicate/strategy query",
+        "normal-play nim pile-height vectors",
+        "pile-height vector h",
+        "accept exactly when Apply[BitXor,h] equals zero",
+        "whether the position is the stated forced-loss target class",
+        related=["B0933"],
+    ),
+    _spec(
+        "finite-element PDE discretization family",
+        ["U006280"],
+        "continuous-to-discrete approximation family",
+        "partial differential equation with initial or boundary data",
+        "a PDE problem and discretization choices",
+        "construct a finite-element discrete approximation for numerical solution",
+        "a discrete algebraic approximation to the PDE problem",
+        related=["B0647", "B0935", "B0936"],
+        limit=(
+            "The source identifies the method family and role but supplies no "
+            "element basis, mesh, assembly formula, or convergence contract."
+        ),
+    ),
+    _spec(
+        "linear-vector forward-map evaluator",
+        ["U006281"],
+        "uniterated linear map",
+        "continuous-number vectors and matrices",
+        "matrix m and vector v",
+        "compute u = m.v",
+        "one vector u",
+        related=["B0937"],
+    ),
+    _spec(
+        "linear-system inverse solver",
+        ["U006281"],
+        "uniterated equation solver",
+        "continuous-number vectors and matrices",
+        "matrix m and target vector u",
+        "evaluate LinearSolve[m,u] to find v satisfying u = m.v",
+        "a solution vector v",
+        aliases=["LinearSolve inverse"],
+        related=["B0937"],
+        limit=(
+            "The source does not state singular, inconsistent, or "
+            "underdetermined-system behavior."
+        ),
+    ),
+    _spec(
+        "two-dimensional constraint-number decoder",
+        ["U006286", "U006287", "U006288"],
+        "constraint-code decoder",
+        "the canonically ordered 32 binary 5-cell templates",
+        "integer constraint number n",
+        "select template positions where IntegerDigits[n,2,32] has value 1",
+        "the allowed-template set encoded by n",
+        related=["B0943"],
+    ),
+    _spec(
+        "allowed-template satisfaction predicate",
+        ["U006288", "U006289"],
+        "finite-array constraint predicate",
+        "binary arrays and 3 by 3 template patterns",
+        "array list and allowed-template pattern",
+        "partition into overlapping 3 by 3 blocks and require every block to match allowed",
+        "one Boolean satisfaction judgment",
+        aliases=["SatisfiedQ"],
+        related=["B0943"],
+    ),
+    _spec(
+        "overlapping-corner tessellation descriptor and Fill generator",
+        ["U006290", "U006291", "U006292", "U006293"],
+        "repetitive-pattern codec/generator",
+        "finite rectangular binary array",
+        "four overlap vectors, one data tile, and output dimensions nx by ny",
+        "map output coordinates through the overlap lattice and replace canonical residue positions by tile data",
+        "one finite array filled by the represented repetitive tessellation",
+        aliases=["Fill overlapping-corner tessellation"],
+    ),
+    _spec(
+        "Ammann 16-symbol substitution system",
+        ["U006301", "U006302"],
+        "two-dimensional substitution system",
+        "arrays over sixteen substitution symbols/colors",
+        "the displayed 16-symbol replacement table and an initial symbol",
+        "replace every symbol by its displayed block at each step",
+        "one successor nested-pattern array",
+        related=["B0948"],
+    ),
+    _spec(
+        "Cook-polyomino stage type-count observer",
+        ["U006316"],
+        "stage-indexed count-vector observer",
+        "the stated Cook aperiodic polyomino construction",
+        "construction stage n",
+        "evaluate Fibonacci[2 n - {2,0,1}] / {1,2,1}",
+        "the three polyomino-type counts at stage n",
+        related=["B0954"],
+    ),
+    _spec(
+        "square-free sequence enumerator",
+        ["U006318", "U006319", "U006320"],
+        "finite solution enumerator",
+        "length-n sequences over k symbols",
+        "alphabet size k and target length n",
+        "extend every surviving sequence by each symbol and delete any containing adjacent identical blocks",
+        "all length-n square-free sequences",
+        related=["B0959"],
+    ),
+    _spec(
+        "Pell least-x continued-fraction solver",
+        ["U006326", "U006327", "U006328"],
+        "Diophantine least-solution solver",
+        "positive integer solutions of x^2 = a y^2 + 1",
+        "positive nonsquare integer a",
+        "evaluate the stated continued-fraction convergent numerator",
+        "the least positive solution value x",
+        related=["B0968"],
+    ),
+    _spec(
+        "primitive Pythagorean-triple parameterization",
+        ["U006330"],
+        "Diophantine solution generator",
+        "integer triples satisfying x^2 + y^2 = z^2",
+        "integer parameters r and s under the unstated primitive-case restrictions",
+        "return {r^2-s^2, 2 r s, r^2+s^2}",
+        "a Pythagorean triple, primitive after removing common factors",
+        related=["B0969"],
+        limit=(
+            "The source states the parameterization after removing common "
+            "factors but does not spell out parity, ordering, or coprimality "
+            "restrictions."
+        ),
+    ),
+]
+
+for unit_id, name, expression, result_kind in SIERPINSKI_SPECS:
+    RECOVERED_SPECS.append(
+        _spec(
+            name,
+            [
+                "U006150",
+                *(["U006160"] if "coordinate" in name else []),
+                unit_id,
+            ],
+            "uniterated finite-pattern generator",
+            (
+                "finite two-dimensional integer-coordinate set"
+                if "coordinate" in name
+                else "finite two-dimensional binary array"
+            ),
+            "nonnegative step index n",
+            expression,
+            result_kind,
+            related=["B0898"],
+            limit=(
+                "The source states output equivalence up to orientation; it "
+                "does not collapse the independently delimited native formula."
+            ),
+        )
+    )
+
+PROPOSED_VOCABULARY = list(dict.fromkeys([
     "two-dimensional cellular automaton",
     "five-neighbor cellular automaton",
     "nine-neighbor cellular automaton",
@@ -230,7 +812,8 @@ PROPOSED_VOCABULARY = [
     "box-counting fractal-dimension observer",
     "grid-occupancy moment observer",
     *[name for _, name, _, _ in SIERPINSKI_SPECS],
-]
+    *[spec["name"] for spec in RECOVERED_SPECS],
+]))
 
 QUERY_SPECS = [
     (
@@ -341,7 +924,8 @@ QUERY_SPECS = [
             r"equations?|games?|initial conditions?|evolution|positions?|"
             r"patterns?)\b|(?:^|\n)\s*(?:!\[[^\]]*\]\([^)]+\)|```)|"
             r"`[^`\n]*(?:->|→|==|:=|:>|Nest|NestList|Map|Table|Replace|"
-            r"Rule|Step|Evolve)[^`\n]*`"
+            r"Rule|Step|Evolve)[^`\n]*`|"
+            r"`[^`\n]*\[[^`\n]*\][^`\n]*`"
         ),
         "REGEX",
     ),
@@ -550,6 +1134,7 @@ def _new_candidate(
     name: str,
     aliases: list[str],
     discovery_hit_id: str,
+    discovery_ordinal: int,
     source_unit_ids: list[str],
     evidence: list[dict[str, Any]],
     supported_values: dict[str, Any],
@@ -605,7 +1190,7 @@ def _new_candidate(
             "epoch": 2,
             "kind": "SEARCH_HIT",
             "id": discovery_hit_id,
-            "ordinal": 1,
+            "ordinal": discovery_ordinal,
         },
         "source_unit_ids": source_unit_ids,
         "source_evidence": evidence,
@@ -634,6 +1219,7 @@ def _evidence(
     *,
     evidence_number: int,
     hit_id: str,
+    hit_ordinal: int,
     unit_id: str,
     strength: str,
     modality: str,
@@ -647,7 +1233,7 @@ def _evidence(
             "epoch": 2,
             "kind": "SEARCH_HIT",
             "id": hit_id,
-            "ordinal": 1,
+            "ordinal": hit_ordinal,
         },
         "source_unit_id": unit_id,
         "image_path": None,
@@ -1281,6 +1867,300 @@ def _build_enrichment(
     ]:
         raise AuthoringError("Stage 9 search candidate allocation drifted")
     return updated, candidates
+
+
+def _build_final_enrichment(
+    *,
+    reading_by_id: dict[str, dict[str, str]],
+    hit_by_pair: dict[tuple[int, str], str],
+) -> tuple[list[dict[str, str]], list[dict[str, Any]], list[str]]:
+    """Build the final omission delta in immutable search-hit order."""
+
+    if len(RECOVERED_SPECS) != EXPECTED_NEW_CANDIDATE_COUNT:
+        raise AuthoringError(
+            "recovered candidate specification count drifted: "
+            f"{len(RECOVERED_SPECS)}"
+        )
+    hit_number = {
+        pair: int(hit_id[1:]) for pair, hit_id in hit_by_pair.items()
+    }
+
+    annotated: list[dict[str, Any]] = []
+    for spec_index, original in enumerate(RECOVERED_SPECS):
+        spec = dict(original)
+        missing_units = [
+            unit_id
+            for unit_id in spec["units"]
+            if unit_id not in reading_by_id
+        ]
+        if missing_units:
+            raise AuthoringError(
+                f"{spec['name']} reaches unknown units {missing_units}"
+            )
+        candidate_pairs = [
+            (rank, ordinal, unit_id)
+            for (ordinal, unit_id), rank in hit_number.items()
+            if ordinal <= 10 and unit_id in spec["units"]
+        ]
+        if not candidate_pairs:
+            raise AuthoringError(
+                f"{spec['name']} lacks an F01-F10 discovery hit"
+            )
+        rank, ordinal, unit_id = min(candidate_pairs)
+        spec["_spec_index"] = spec_index
+        spec["_discovery_rank"] = rank
+        spec["_discovery_pair"] = (ordinal, unit_id)
+        annotated.append(spec)
+    annotated.sort(
+        key=lambda spec: (spec["_discovery_rank"], spec["_spec_index"])
+    )
+
+    candidate_anchor_counts: dict[str, int] = {}
+    for offset, spec in enumerate(annotated):
+        candidate_id = f"B{981 + offset:04d}"
+        hit_id = hit_by_pair[spec["_discovery_pair"]]
+        candidate_anchor_counts[hit_id] = (
+            candidate_anchor_counts.get(hit_id, 0) + 1
+        )
+        spec["_candidate_id"] = candidate_id
+        spec["_discovery_hit"] = hit_id
+        spec["_discovery_ordinal"] = candidate_anchor_counts[hit_id]
+    expected_ids = [
+        f"B{number:04d}"
+        for number in range(
+            981,
+            981 + EXPECTED_NEW_CANDIDATE_COUNT,
+        )
+    ]
+    if [spec["_candidate_id"] for spec in annotated] != expected_ids:
+        raise AuthoringError("search candidate-ID allocation drifted")
+
+    evidence_plans: list[dict[str, Any]] = []
+    for spec in annotated:
+        for source_index, unit_id in enumerate(spec["units"]):
+            unit_pairs = [
+                (rank, ordinal, pair_unit)
+                for (ordinal, pair_unit), rank in hit_number.items()
+                if pair_unit == unit_id
+            ]
+            if not unit_pairs:
+                raise AuthoringError(
+                    f"{spec['name']} evidence unit {unit_id} lacks a hit"
+                )
+            rank, ordinal, _ = min(unit_pairs)
+            evidence_plans.append(
+                {
+                    "spec": spec,
+                    "unit_id": unit_id,
+                    "source_index": source_index,
+                    "rank": rank,
+                    "query_ordinal": ordinal,
+                    "hit_id": hit_by_pair[(ordinal, unit_id)],
+                }
+            )
+    evidence_plans.sort(
+        key=lambda plan: (
+            plan["rank"],
+            int(plan["spec"]["_candidate_id"][1:]),
+            plan["source_index"],
+        )
+    )
+    evidence_anchor_counts: dict[str, int] = {}
+    evidence_by_candidate: dict[str, list[dict[str, Any]]] = {
+        spec["_candidate_id"]: [] for spec in annotated
+    }
+    block_modality = {
+        "fenced_code": "CODE",
+        "list": "FORMULA",
+        "table": "TABLE",
+        "paragraph": "PROSE",
+        "heading": "PROSE",
+    }
+    supported_fields = [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "input",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ]
+    for offset, plan in enumerate(evidence_plans):
+        row = reading_by_id[plan["unit_id"]]
+        hit_id = plan["hit_id"]
+        evidence_anchor_counts[hit_id] = (
+            evidence_anchor_counts.get(hit_id, 0) + 1
+        )
+        source_status = row["source_status"]
+        strength = (
+            "DEFECT_LIMITED"
+            if source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"}
+            else (
+                "DIRECT_COMPLETE_MECHANICS"
+                if row["block_kind"] in {"fenced_code", "list", "table"}
+                else "DIRECT_PARTIAL_MECHANICS"
+            )
+        )
+        modality = block_modality.get(row["block_kind"])
+        if modality is None:
+            raise AuthoringError(
+                f"unsupported evidence block kind {row['block_kind']} "
+                f"at {plan['unit_id']}"
+            )
+        evidence_by_candidate[plan["spec"]["_candidate_id"]].append(
+            _evidence(
+                evidence_number=4049 + offset,
+                hit_id=hit_id,
+                hit_ordinal=evidence_anchor_counts[hit_id],
+                unit_id=plan["unit_id"],
+                strength=strength,
+                modality=modality,
+                claim=(
+                    f"This source unit supplies identity, mechanics, or an "
+                    f"explicit evidence limit for "
+                    f"{plan['spec']['name']}: {plan['spec']['law']}."
+                ),
+                fields=supported_fields,
+            )
+        )
+
+    candidates: list[dict[str, Any]] = []
+    for spec in annotated:
+        candidate_id = spec["_candidate_id"]
+        evidence = sorted(
+            evidence_by_candidate[candidate_id],
+            key=lambda item: spec["units"].index(item["source_unit_id"]),
+        )
+        evidence_ids = [item["evidence_id"] for item in evidence]
+        relations = [
+            {
+                "candidate_id": related_id,
+                "relation": "SOURCE_COMPARE",
+                "proof_kind": "PROVISIONAL_COMPARISON",
+                "before_rationale": "",
+                "after_rationale": "",
+                "evidence_ids": evidence_ids[:1],
+                "uncertainty": (
+                    "The source makes these objects related in role or output "
+                    "without establishing native-law identity."
+                ),
+            }
+            for related_id in spec["related"]
+        ]
+        source_status = list(
+            dict.fromkeys(
+                reading_by_id[unit_id]["source_status"]
+                for unit_id in spec["units"]
+            )
+        )
+        native_time = (
+            "discrete successive update steps"
+            if spec["object_kind"]
+            in {
+                "cellular-automaton rule preset",
+                "multiway-system preset",
+                "two-dimensional substitution system",
+            }
+            else "direct uniterated evaluation over the supplied input"
+        )
+        candidates.append(
+            _new_candidate(
+                candidate_id=candidate_id,
+                name=spec["name"],
+                aliases=spec["aliases"],
+                discovery_hit_id=spec["_discovery_hit"],
+                discovery_ordinal=spec["_discovery_ordinal"],
+                source_unit_ids=spec["units"],
+                evidence=evidence,
+                supported_values={
+                    "object_kind": spec["object_kind"],
+                    "native_time": native_time,
+                    "carrier": spec["carrier"],
+                    "input": spec["input"],
+                    "law_kind": spec["object_kind"],
+                    "rule_relation_constraint_function_or_probability_law": (
+                        spec["law"]
+                    ),
+                    "result_kind": spec["result"],
+                    "successor_cardinality": (
+                        "exactly one result for each valid supplied input"
+                    ),
+                    "determinism_branching_or_measure": "deterministic",
+                    "parameters_and_variants": spec["input"],
+                    "excluded_observers_and_representations": (
+                        "page layout, plotting, rasterization, and "
+                        "implementation notation are non-semantic unless "
+                        "explicitly included in the stated law"
+                    ),
+                    "evidence_limit": spec["limit"],
+                },
+                not_applicable_fields=set(),
+                parameters=[],
+                uncertainties=spec["uncertainties"],
+                related_candidate_ids=relations,
+                source_status=source_status,
+            )
+        )
+
+    reading_additions: dict[str, list[str]] = {}
+    anchor_units: set[str] = set()
+    names_by_unit: dict[str, list[str]] = {}
+    for spec in annotated:
+        candidate_id = spec["_candidate_id"]
+        anchor_units.add(spec["_discovery_pair"][1])
+        for unit_id in spec["units"]:
+            reading_additions.setdefault(unit_id, []).append(candidate_id)
+            names_by_unit.setdefault(unit_id, []).append(spec["name"])
+    updated: list[dict[str, str]] = []
+    for unit_id in sorted(reading_additions):
+        old = reading_by_id[unit_id]
+        row = dict(old)
+        additions = sorted(
+            reading_additions[unit_id],
+            key=lambda candidate_id: int(candidate_id[1:]),
+        )
+        row["candidate_ids"] = _append_links(
+            old["candidate_ids"],
+            additions,
+            f"{unit_id}.candidate_ids",
+        )
+        if old["review_disposition"] != "SOURCE_DEFECT_OR_AMBIGUITY":
+            if (
+                old["review_disposition"] == "CANDIDATE"
+                or unit_id in anchor_units
+            ):
+                row["review_disposition"] = "CANDIDATE"
+            else:
+                row["review_disposition"] = "SUPPORTS_CANDIDATE"
+        names = names_by_unit[unit_id]
+        role = (
+            "directly anchors"
+            if unit_id in anchor_units
+            else "supplies supporting identity or mechanics for"
+        )
+        row["evidence_statement"] = (
+            f"Search omission challenge {role} {len(names)} recovered "
+            f"candidate(s): {'; '.join(names)}."
+        )
+        updated.append(row)
+
+    new_group_ids = [
+        f"G{4049 + offset:06d}" for offset in range(len(evidence_plans))
+    ]
+    if len(updated) != EXPECTED_READING_UPDATE_COUNT:
+        raise AuthoringError(
+            f"reading update count drifted: {len(updated)}"
+        )
+    if len(new_group_ids) != EXPECTED_NEW_EVIDENCE_COUNT:
+        raise AuthoringError(
+            f"new evidence count drifted: {len(new_group_ids)}"
+        )
+    return updated, candidates, new_group_ids
 
 
 def _normalized_hit_projection(
