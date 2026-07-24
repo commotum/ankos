@@ -24,6 +24,14 @@ Status: **IN PROGRESS**.
   LOCAL rounds.
 - The exact Stage 10 assignment contains 607 pending source units and 177
   pending physical images.
+- Three sealed epoch-2 bundles were built and verified normally and under
+  optimized Python:
+  - main content-set hash:
+    `794e8c1ff3b7c862a06bf0728d0957846f149b99bb87eac512a6217aad07c5f6`;
+  - Notes content-set hash:
+    `84c3dd2b8cbdfd3162bf5ab974e73e5f71cae0c053334131c139b3228f2dc6ce`;
+  - pristine union content-set hash:
+    `27889ae08200e3619158f160eaf726ad54cc24b5339bdbc317e8e43bbf895879`.
 - No Stage 11 or later source may be opened while this stage is active.
 
 ## Updated Assumptions
