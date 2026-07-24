@@ -634,43 +634,9 @@ for Stage 18. Ordinary and optimized validators both report
 screened=688 rounds=16`; hostile terminal review returned `ACCEPT`, and the
 full regression suite passed with `110 passed in 725.66s`.
 
-The exact Stage 11 starting state is `V000030`, epoch 2. Its six mutable-ledger
-hashes are:
-
-- `reading-ledger.csv`:
-  `e6fcdf7ca4ab1dbaf0f51aa29d4451eef98e15762f9fe22803d2c2121271303d`;
-- `candidate-ledger.jsonl`:
-  `8ba1ffba5061a2e115063c6b552b10369e53a3fd3bf4fcb08d3bfcaf7c8bf1c7`;
-- `cross-reference-ledger.csv`:
-  `fda975932dade9ffd2b78380d87f27347ef45d32736f53418318b719d117a6fc`;
-- `asset-ledger.csv`:
-  `b57d00e4d9bc1cde61d79acf869b3968e5b2e5e871d9938de099d0bb035d8f4e`;
-- `search-rounds.json`:
-  `f614cce2bff0e040fca38cd1a82036432d951c2082febfcb9cf0eb86c03ae94d`;
-- `review-history.jsonl`:
-  `174f07cf729016aa3e921ce934836b05d11fe806b83fe26af51e43c9f9bd9e34`.
-
-Stage 11 owns 713 pending units (`U001577..U002011` and
-`U006592..U006869`) and 194 pending assets. The exact ledger-only assignment
-is repeated below; no Stage 11 Book source was opened to derive it.
-
 ### 11-CH07-MECHANISMS
 
-#### Exact Starting Handoff
-
-| Assignment | Pending source units | Pending physical images |
-|---|---:|---:|
-| `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` | 435, `U001577..U002011` | 92 referenced: `A001028..A001040`, `A001042..A001056`, `A001058..A001121` |
-| `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 278, `U006592..U006869` | 43 referenced + 59 unreferenced: `A000001..A000018`, `A000661..A000744` |
-| **Total** | **713** | **194** |
-
-The main and Notes source hashes are
-`e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`
-and
-`fd8696100529789964578841267bbd841411691d05248840ede6e0b4b7bd69f3`.
-`A001041` and `A001057` are already Stage 5-owned shared assets, so they are
-not pending Stage 11 work. This handoff comes only from the terminal ledgers
-and corpus manifest; no Stage 11 Book source was opened.
+Status: **COMPLETE** in `goal-4/11-CH07-MECHANISMS.md`.
 
 #### Big Picture Objective
 
@@ -690,7 +656,78 @@ Blindly audit Chapter 7 main text and Chapter 7 Notes.
 - Candidate fingerprints include draw/event timing and measure semantics where evidenced.
 - No relevant reference is lost.
 
+#### Stage Results And Handoff
+
+All 435 main-text and 278 Notes units are reviewed, and all 92 main-text and
+102 Notes images are screened. `V000031` creates 163 candidates
+`B1251..B1413`, 596 evidence records `E005191..E005786` in 367 groups
+`G004986..G005352`, and 141 routes `R000568..R000708`; its event hash is
+`7ed422b6525a82a18c350b65724fb84d500f527da9789d57acdc7708ed765a8e`.
+`V000032` resolves all 41 within-stage routes and all 22 reachable incoming
+cross-range routes; its event hash is
+`8591957742594eaa43c969cab60b8b61a730854977910bdafc0c7088ac16c885`.
+`V000033` records `S017` and has event hash
+`7be9a15996d4a682ecd4778c22ec79a5d93ead82b1edff8ec38e14aade61ae83`;
+`V000034` records the zero-delta `S018` rerun and has event hash
+`d1f928b7fa742c246d5f63de164f56139b6a7fdf367a7575f75633e0239e6357`.
+
+The 713 reading dispositions are 249 `SUPPORTS_CANDIDATE`, 148 `CANDIDATE`,
+203 `NO_CONSTRUCTION`, 87 `REPRESENTATION_OR_OBSERVER`, 10
+`CROSS_REFERENCE`, 7 `APPLICATION_OR_EMULATION`, 7
+`SOURCE_DEFECT_OR_AMBIGUITY`, and 2 `HISTORICAL_ONLY`. The 194 assets comprise
+146 relation, 31 native-evidence, 11 observer, 4 control, 1 source-defect, and
+1 decorative image. Candidate fingerprints contain 3,056 supported, 502
+source-unknown, 1,002 not-applicable, and 4 conflicting-source fields; no
+supported field is weak-only. The final Stage 11 route universe is 41 resolved
+within-stage routes, 22 resolved incoming cross-range routes, and 100 pending
+outgoing cross-range routes.
+
+`S017` and `S018` each use 15 query families and disposition 2,478 hits over
+704 unique units. Their normalized query/unit-result digest is
+`c604632660a66ca6c815be6ecb03e6a6d0c2505b95082ee010a8154429fcb69d`
+and their identical normalized hit digest is
+`0aa120c8aa645bd7846f789a7126066a9fdff14465b84ee153fbe2cefdd67946`.
+This proves local Stage 11 closure, not the whole-corpus fixed point reserved
+for Stage 18. Main, Notes, paired-union, route, and search hostile terminal
+reviews all returned `ACCEPT`. Ordinary and optimized validators both report
+`units=14311 reviewed=4045 candidates=1413 routes=708 assets=1607
+screened=882 rounds=18`; the full regression suite passed with
+`110 passed in 769.66s`.
+
+The exact Stage 12 starting state is `V000034`, epoch 2. Its six
+mutable-ledger hashes are:
+
+- `reading-ledger.csv`:
+  `9bb64de8b08873355191bd404febc5895f9c6e772706c291865cb6e83607232d`;
+- `candidate-ledger.jsonl`:
+  `8676464e94072acec5bcfa03b98d056018dfbc77bd7915d4a647bbfc46ec1442`;
+- `cross-reference-ledger.csv`:
+  `8f3cd4b4bbd793410f511be5b899224a5a09b06f8b1ba053929f0b0774434748`;
+- `asset-ledger.csv`:
+  `717e20c259292fab63f40e3a34de76cff7770c4c288d741a8310c491e58db881`;
+- `search-rounds.json`:
+  `c2c0cdfb2992baa9ecb0038cb7a853706a7ef8c15db01efed72f8265283fc1e2`;
+- `review-history.jsonl`:
+  `f64e62531e64c39a36cb4fd8ed83e271fe30fa267c9fccd016e634aa517d5e0f`.
+
 ### 12-CH08-EVERYDAY
+
+#### Exact Starting Handoff
+
+| Assignment | Pending source units | Pending physical images |
+|---|---:|---:|
+| `CHAPTERS/08-Implications-for-Everyday-Systems.md` | 385, `U002012..U002396` | 45 referenced: `A001122..A001126`, `A001128..A001138`, `A001142..A001143`, `A001148..A001151`, `A001153..A001162`, `A001165..A001177` |
+| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 125, `U006870..U006994` | 12 referenced + 29 unreferenced: referenced `A000019`, `A000024`, `A000034..A000038`, `A000046`, `A000049`, `A000054..A000055`, `A000059`; unreferenced `A000020..A000023`, `A000025..A000033`, `A000039..A000045`, `A000047..A000048`, `A000050..A000053`, `A000056..A000058` |
+| **Total** | **510** | **86** |
+
+The main and Notes source hashes are
+`5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`
+and
+`3acc85433fca526eca898e6a0f116fc1017b88bb7b0048fc8f96f7d0afcead53`.
+All 510 source units and all 86 assets are pending, and no assigned asset is
+shared or already owned. This exact handoff comes only from the terminal Goal
+4 ledgers and corpus manifest; no Stage 12 Book source was opened. Stage 12
+bundles must use the active global discovery epoch 2.
 
 #### Big Picture Objective
 
