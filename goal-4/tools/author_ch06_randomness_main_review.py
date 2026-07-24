@@ -175,6 +175,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         evidence_overrides: dict[str, dict[str, Any]] | None = None,
         route_units: list[str] | None = None,
         related_names: list[str] | None = None,
+        related_evidence_units: dict[str, list[str]] | None = None,
         variant_units: dict[str, list[str]] | None = None,
         anchor_priority: int = 0,
     ) -> None:
@@ -198,6 +199,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "evidence_overrides": evidence_overrides or {},
                 "route_units": route_units or [],
                 "related_names": related_names or [],
+                "related_evidence_units": related_evidence_units or {},
                 "variant_units": variant_units or {},
                 "anchor_priority": anchor_priority,
             }
@@ -4375,6 +4377,13 @@ def build_output(bundle: Path) -> dict[str, Any]:
             set(candidate["evidence_overrides"]) <= set(candidate["units"]),
             f"{candidate['id']} evidence override outside units",
         )
+        check(
+            all(
+                set(unit_ids) <= set(candidate["units"])
+                for unit_ids in candidate["related_evidence_units"].values()
+            ),
+            f"{candidate['id']} related-candidate evidence unit outside units",
+        )
     check(
         [ordinal[c["units"][0]] for c in candidates] == sorted(ordinal[c["units"][0]] for c in candidates),
         "candidate definitions are not in canonical discovery order",
@@ -4680,7 +4689,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
                         "candidate_id": candidate_id_by_name[name],
                         "relation": "SOURCE_COMPARE",
                         "proof_kind": "PROVISIONAL_COMPARISON",
-                        "evidence_ids": supporting_evidence_ids,
+                        "evidence_ids": [
+                            evidence_by_unit[unit_id]
+                            for unit_id in candidate["related_evidence_units"].get(name, [])
+                        ]
+                        or supporting_evidence_ids,
                         "before_rationale": "",
                         "after_rationale": "",
                         "uncertainty": (

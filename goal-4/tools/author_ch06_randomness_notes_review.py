@@ -327,7 +327,7 @@ def spec(
     status: str = "CLEAR",
     uncertainties: list[str] | None = None,
     image_witnesses: list[str] | None = None,
-    related: list[str] | None = None,
+    related: list[str | tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
     return {
         "name": name,
@@ -631,7 +631,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("sparse live-position list", "count coincident translated live positions", "U006353"),
                 ("sorted-run optimization", "find runs of multiplicity 3 and 4 in the sorted sparse list", "U006355"),
             ],
-            related=["nine-neighbor outer-totalistic two-dimensional class-4 preset family"],
+            related=[("nine-neighbor outer-totalistic two-dimensional class-4 preset family", "U006350")],
         ),
         spec(
             "three-dimensional Life-like cellular automaton family",
@@ -3617,6 +3617,35 @@ def main() -> None:
 
         parameters = [structured_record(entry) for entry in item["parameters"]]
         variants = [structured_record(entry) for entry in item["variants"]]
+
+        def related_record(entry: str | tuple[str, str]) -> dict[str, Any]:
+            name = entry
+            evidence_id = primary_evidence_id
+            if isinstance(entry, tuple):
+                name, source_unit_id = entry
+                matching = [
+                    record["evidence_id"]
+                    for record in source_evidence
+                    if record["source_unit_id"] == source_unit_id
+                ]
+                assert matching, (
+                    item["id"],
+                    item["name"],
+                    name,
+                    source_unit_id,
+                    "related-candidate entry lacks exact source-unit evidence",
+                )
+                evidence_id = matching[0]
+            return {
+                "candidate_id": by_name[name]["id"],
+                "relation": "SOURCE_COMPARE",
+                "proof_kind": "PROVISIONAL_COMPARISON",
+                "evidence_ids": [evidence_id],
+                "before_rationale": "",
+                "after_rationale": "",
+                "uncertainty": "The records are source-linked for comparison but preserve distinct mechanics and result kinds.",
+            }
+
         candidates.append(
             {
                 "id": item["id"],
@@ -3642,16 +3671,7 @@ def main() -> None:
                 "missing_mechanics": missing_mechanics,
                 "uncertainties": item["uncertainties"],
                 "related_candidate_ids": [
-                    {
-                        "candidate_id": by_name[name]["id"],
-                        "relation": "SOURCE_COMPARE",
-                        "proof_kind": "PROVISIONAL_COMPARISON",
-                        "evidence_ids": [primary_evidence_id],
-                        "before_rationale": "",
-                        "after_rationale": "",
-                        "uncertainty": "The records are source-linked for comparison but preserve distinct mechanics and result kinds.",
-                    }
-                    for name in item["related"]
+                    related_record(entry) for entry in item["related"]
                 ],
                 "cross_reference_ids": route_ids_by_candidate[item["id"]],
                 "evidence_reassignments": [],
