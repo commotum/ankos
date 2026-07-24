@@ -2913,9 +2913,10 @@ def candidate_records(
         evidence["evidence_group_id"] = f"WG{ordinal:06d}"
 
     def remap_ids(values: list[str]) -> list[str]:
-        return [evidence_id_map[value] for value in values]
+        return sorted(evidence_id_map[value] for value in values)
 
     for record in records:
+        record["source_evidence"].sort(key=lambda row: row["evidence_id"])
         for field in FIELDS:
             record["fingerprint"][field]["evidence_ids"] = remap_ids(
                 record["fingerprint"][field]["evidence_ids"]
