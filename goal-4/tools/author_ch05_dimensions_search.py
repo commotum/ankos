@@ -159,6 +159,7 @@ def _spec(
     *,
     aliases: list[str] | None = None,
     related: list[str] | None = None,
+    related_names: list[str] | None = None,
     limit: str = (
         "Only the identity and mechanics stated in the assigned source "
         "units are asserted."
@@ -232,6 +233,7 @@ def _spec(
         "result": result,
         "aliases": aliases or [],
         "related": related or [],
+        "related_names": related_names or [],
         "limit": limit,
         "uncertainties": uncertainties or [],
         "profile": profile,
@@ -604,6 +606,7 @@ RECOVERED_SPECS = [
                 "carrier",
                 "input",
                 "law_kind",
+                "result_kind",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
@@ -614,23 +617,19 @@ RECOVERED_SPECS = [
                 "law_kind",
                 "rule_relation_constraint_function_or_probability_law",
                 "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
                 "parameters_and_variants",
                 "excluded_observers_and_representations",
                 "evidence_limit",
             ],
             "U006099": [
                 "rule_relation_constraint_function_or_probability_law",
-                "result_kind",
-                "successor_cardinality",
-                "determinism_branching_or_measure",
                 "parameters_and_variants",
                 "excluded_observers_and_representations",
             ],
             "U006101": [
                 "rule_relation_constraint_function_or_probability_law",
-                "result_kind",
-                "successor_cardinality",
-                "determinism_branching_or_measure",
                 "parameters_and_variants",
                 "excluded_observers_and_representations",
             ],
@@ -652,6 +651,7 @@ RECOVERED_SPECS = [
                 "carrier",
                 "input",
                 "law_kind",
+                "result_kind",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
@@ -679,6 +679,7 @@ RECOVERED_SPECS = [
                 "carrier",
                 "input",
                 "law_kind",
+                "result_kind",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
@@ -995,6 +996,24 @@ RECOVERED_SPECS = [
         "the uniquely reached node",
         aliases=["Follow"],
         related=["B0916"],
+        evidence_scopes={
+            "U006213": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006214": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "directed-network cumulative-radius node-count observer",
@@ -1009,6 +1028,24 @@ RECOVERED_SPECS = [
         "counts of distinct nodes reachable within radii 1 through d",
         aliases=["NeighborNumbers"],
         related=["B0916"],
+        evidence_scopes={
+            "U006215": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006216": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "directed-network reachable-component query",
@@ -1020,6 +1057,24 @@ RECOVERED_SPECS = [
         "the set of all nodes reachable from i",
         aliases=["ConnectedNodes"],
         related=["B0916"],
+        evidence_scopes={
+            "U006219": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006220": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "directed-network closed-retained-sequence renumbering transform",
@@ -1055,6 +1110,24 @@ RECOVERED_SPECS = [
             "returns the compact renumbering when every selected endpoint is "
             "present in seq; failure behavior otherwise is unknown"
         ),
+        evidence_scopes={
+            "U006221": [
+                "object_kind",
+                "carrier",
+                "law_kind",
+                "result_kind",
+            ],
+            "U006222": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
     ),
     _spec(
         "page-202(c) network node-count sequence generator",
@@ -1474,72 +1547,207 @@ RECOVERED_SPECS = [
         aliases=["SatisfiedQ"],
         related=["B0943"],
         profile="FUNCTION",
+        evidence_scopes={
+            "U006288": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006289": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
-        "overlapping-corner tessellation descriptor and Fill generator",
-        ["U006290", "U006291", "U006292", "U006293"],
-        "repetitive-pattern codec/generator",
-        "finite rectangular binary array",
-        "four overlap vectors, one data tile, and output dimensions nx by ny",
-        "map output coordinates through the overlap lattice and replace canonical residue positions by tile data",
-        "one finite array filled by the represented repetitive tessellation",
+        "overlapping-corner tessellation descriptor",
+        ["U006290", "U006291"],
+        "repetitive-pattern descriptor/denotation",
+        (
+            "a finite pair consisting of an integer quadruple and a "
+            "rectangular data tile"
+        ),
+        "an integer quadruple and rectangular data tile",
+        (
+            "the source states that the concrete pair specifies a repetitive "
+            "pattern as a tessellation of rectangles whose corners overlap"
+        ),
+        "the repetitive tessellation denoted by the finite descriptor",
+        profile="DENOTATION",
+        related_names=["overlapping-corner tessellation Fill generator"],
+        limit=(
+            "The source gives one concrete descriptor and states its "
+            "overlapping-corner tessellation meaning, but does not define "
+            "descriptor equivalence, canonical encoding, or the full valid "
+            "descriptor domain."
+        ),
+        missing_mechanics=[
+            "Descriptor equivalence, canonical encoding, and the complete "
+            "validity domain are unspecified."
+        ],
+        evidence_scopes={
+            "U006290": [
+                "object_kind",
+                "carrier",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006291": [
+                "input",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+        },
+    ),
+    _spec(
+        "overlapping-corner tessellation Fill generator",
+        ["U006292", "U006293"],
+        "finite repetitive-pattern generator",
+        "finite rectangular arrays over the descriptor tile's values",
+        (
+            "a valid overlapping-corner tessellation descriptor and valid "
+            "output dimensions nx by ny"
+        ),
+        (
+            "map output coordinates through the overlap lattice and replace "
+            "canonical residue positions by descriptor tile data"
+        ),
+        (
+            "one finite array over the descriptor data values when the "
+            "descriptor and dimensions satisfy the unstated valid domain"
+        ),
         aliases=["Fill overlapping-corner tessellation"],
+        related_names=["overlapping-corner tessellation descriptor"],
+        limit=(
+            "The code divides by d = d1 d2 + d1 d4 + d3 d4 without stating "
+            "the required d != 0 domain, does not state whether descriptor "
+            "residues cover every generated c-position, does not delimit the "
+            "valid nx/ny dimension domain, and gives no failure convention "
+            "for invalid or unmatched inputs."
+        ),
+        missing_mechanics=[
+            "The required nonzero-denominator condition d != 0 is unstated.",
+            "Residue coverage and behavior for unmatched c[...] positions are "
+            "unspecified.",
+            "The valid output-dimension domain and invalid-input failure "
+            "behavior are unspecified.",
+        ],
+        cardinality=(
+            "one finite array only for a valid descriptor and dimension tuple "
+            "satisfying the source-unstated denominator and coverage conditions"
+        ),
+        measure=(
+            "deterministic on the unstated valid domain; behavior for invalid "
+            "descriptors, dimensions, or unmatched residues is unknown"
+        ),
+        completion=(
+            "returns the finite filled array on the unstated valid domain; "
+            "failure behavior otherwise is unknown"
+        ),
+        evidence_scopes={
+            "U006292": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006293": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
     ),
     _spec(
         "Ammann 16-symbol substitution system",
         ["U006301", "U006302", "U006303", "U006304"],
         "two-dimensional substitution system",
-        "arrays over sixteen substitution symbols/colors",
+        "sixteen substitution symbols/colors and their heterogeneous blocks",
         (
-            "a current finite array over the sixteen symbols and the displayed "
-            "16-symbol replacement table"
+            "the displayed 16-symbol replacement table; the source does not "
+            "state a starting configuration or valid assemblable-state domain"
         ),
-        "replace every symbol by its displayed block at each step",
-        "one successor nested-pattern array",
+        (
+            "map each symbol to its displayed replacement block; global "
+            "assembly of heterogeneous blocks is not stated"
+        ),
+        (
+            "the displayed nested-pattern trajectory/result under an "
+            "unstated valid starting state and assembly convention"
+        ),
         related=["B0948"],
         limit=(
             "The complete 16-symbol replacement table is explicit, but the "
-            "source does not state the initial symbol or array used for the "
-            "displayed nested pattern."
+            "source does not state the starting configuration, valid "
+            "assemblable-state domain, heterogeneous-block assembly, or a "
+            "unique successor/result contract."
         ),
         uncertainties=[
-            "The seed or initial condition for the displayed Ammann pattern "
-            "is not stated."
+            "The starting configuration and assembly convention for the "
+            "displayed Ammann pattern are not stated.",
+            "The displayed nested pattern is only an example from an "
+            "unstated-valid trajectory, not a unique result for an arbitrary "
+            "current array.",
         ],
         missing_mechanics=[
-            "The initial symbol or finite seed array is unspecified."
+            "The starting symbol or finite starting array is unspecified.",
+            "The valid current-state domain and assembly rule for the "
+            "heterogeneous replacement-block shapes, including block "
+            "alignment, are unspecified.",
+            "Schedule, commit, successor cardinality, determinism, and result "
+            "uniqueness are not established.",
         ],
         evidence_scopes={
             "U006301": [
                 "object_kind",
                 "native_time",
                 "carrier",
-                "support",
                 "alphabet_or_value_schema",
-                "input",
                 "law_kind",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
             "U006302": [
-                "complete_state",
-                "frontier_or_activation",
-                "schedule",
-                "read_dependencies_or_neighborhood",
                 "rule_relation_constraint_function_or_probability_law",
-                "write_replacement_assembly_or_commit",
-                "successor_cardinality",
-                "determinism_branching_or_measure",
                 "parameters_and_variants",
             ],
             "U006303": [
                 "result_kind",
-                "parameters_and_variants",
                 "evidence_limit",
             ],
             "U006304": [
                 "result_kind",
             ],
+        },
+        suppress_supported_fields={
+            "support",
+            "complete_state",
+            "input",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
         },
     ),
     _spec(
@@ -2671,12 +2879,12 @@ EXPECTED_STAGE_UNIT_COUNT = 539
 EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
-EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
+EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 416
 EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
 EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 214
 EXPECTED_NEW_ROUTE_COUNT = 151
 EXPECTED_READING_UPDATE_COUNT = 163
-EXPECTED_NEW_CANDIDATE_COUNT = 88
+EXPECTED_NEW_CANDIDATE_COUNT = 89
 EXPECTED_NEW_EVIDENCE_COUNT = 211
 EXPECTED_RESULT_PAIR_COUNT = 1553
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 524
@@ -2737,7 +2945,7 @@ EXPECTED_OMISSION_CHALLENGE_DIGEST = (
     "06c2daa57628b1ce0fb054d22b606bcacf4ac67b32299cf0ec9d17ac638d35e2"
 )
 EXPECTED_NEW_VOCABULARY_DIGEST = (
-    "f2bb0778817ace90ee9f3e4b0d9c3a9a246f704ef77859368a2888bdfb9a115a"
+    "a6bd364c2e9628952cbe9ad222cf8b699c73323056c2b46d15ad2ab2ecf6e6ab"
 )
 EXPECTED_DISPOSITION_COUNTS = {
     "EXCLUSION": 56,
@@ -4191,6 +4399,28 @@ def _build_final_enrichment(
     if [spec["_candidate_id"] for spec in annotated] != expected_ids:
         raise AuthoringError("search candidate-ID allocation drifted")
 
+    recovered_candidate_ids_by_name = {
+        spec["name"]: spec["_candidate_id"] for spec in annotated
+    }
+    for spec in annotated:
+        unknown_related_names = [
+            name
+            for name in spec["related_names"]
+            if name not in recovered_candidate_ids_by_name
+        ]
+        if unknown_related_names:
+            raise AuthoringError(
+                f"{spec['name']} has unknown recovered relations "
+                f"{unknown_related_names}"
+            )
+        spec["_resolved_related"] = [
+            *spec["related"],
+            *[
+                recovered_candidate_ids_by_name[name]
+                for name in spec["related_names"]
+            ],
+        ]
+
     for spec in annotated:
         values, not_applicable = _typed_semantics(spec)
         source_rows = [reading_by_id[unit_id] for unit_id in spec["units"]]
@@ -4401,7 +4631,7 @@ def _build_final_enrichment(
                     "without establishing native-law identity."
                 ),
             }
-            for related_id in spec["related"]
+            for related_id in spec["_resolved_related"]
         ]
         source_status = list(
             dict.fromkeys(
