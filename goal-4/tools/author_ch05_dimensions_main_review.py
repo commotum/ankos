@@ -590,8 +590,8 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U000982",
         1,
-        ["U000982", "U000993"],
-        ["A000855"],
+        ["U000982", "U000983", "U000984", "U000993", "U000997", "U001002"],
+        ["A000855", "A000856", "A000857", "A000858", "A000859", "A000860"],
         aliases=["code 174826"],
         parameters={
             "neighborhood": "eight neighbors including diagonals",
@@ -700,15 +700,23 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["A000865"],
         parameters={"head states": "three", "movement directions": "four"},
     )
-    for ordinal, label in enumerate("abcde", 1):
+    tm_output_assets = ["A000866", "A000867", "A000868", "A000869", "A000871"]
+    for ordinal, (label, output_asset) in enumerate(
+        zip("abcde", tm_output_assets, strict=True), 1
+    ):
+        units = ["U001016", "U001026"]
+        assets = ["A000870", output_asset]
+        if label == "e":
+            units.append("U001031")
+            assets.extend(["A000872", "A000873"])
         add(
             f"four-state two-dimensional Turing-machine rule ({label})",
             "TM2",
             "IMAGE",
             "A000870",
             ordinal,
-            ["U001016", "U001026"],
-            ["A000870"],
+            units,
+            assets,
             aliases=[f"rule ({label})"],
             parameters={"head states": "four", "rule panel": label},
             parent_index=tm2,
@@ -756,7 +764,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001045",
         1,
-        ["U001042", "U001045"],
+        ["U001042", "U001045", "U001053"],
         ["A000877", "A000878"],
         parameters={"replacement count": "two smaller black squares", "orientation": "carried by each square"},
     )
@@ -790,7 +798,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001056",
         1,
-        ["U001056", "U001059"],
+        ["U001052", "U001056", "U001059"],
         ["A000882"],
         parameters={"boundary": "grid wraps in both dimensions", "dependency": "neighboring cells"},
         parent_index=sub2,
@@ -827,7 +835,15 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001067",
         1,
-        ["U001066", "U001067", "U001071", "U001090"],
+        [
+            "U001066",
+            "U001067",
+            "U001069",
+            "U001070",
+            "U001071",
+            "U001090",
+            "U001094",
+        ],
         [],
         parameters={"outgoing connections per node": "two"},
     )
@@ -850,7 +866,11 @@ def build_candidate_specs() -> list[dict[str, Any]]:
                 "IMAGE",
                 "A000884",
                 ordinal,
-                [["U001079", "U001080"], ["U001079", "U001081"], ["U001079", "U001082"]][ordinal - 1],
+                [
+                    ["U001079", "U001080"],
+                    ["U001078", "U001079", "U001081"],
+                    ["U001079", "U001082"],
+                ][ordinal - 1],
                 ["A000884"],
                 parameters={"effective dimension": dimension},
             )
@@ -901,7 +921,9 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             parameters={"rule panel": label},
             parent_index=network,
         )
-    for ordinal, label in enumerate("ab", 1):
+    for ordinal, (label, asset_id) in enumerate(
+        (("a", "A000889"), ("b", "A000890")), 1
+    ):
         add(
             f"node-inserting network rule ({label})",
             "NETWORK",
@@ -909,7 +931,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "U001104",
             ordinal,
             ["U001100", "U001101", "U001104"],
-            [f"A00088{8 + ordinal}"],
+            [asset_id],
             aliases=[f"node-addition rule ({label})"],
             parameters={"rule panel": label, "seed": "single-node network"},
             parent_index=network,
@@ -1211,7 +1233,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001190",
         1,
-        ["U001190", "U001193"],
+        ["U001190", "U001191", "U001193"],
         ["A000915"],
         parameters={"global condition": "one designated allowed template must occur at least once"},
         parent_index=template_family,
@@ -1248,7 +1270,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001197",
         1,
-        ["U001197"],
+        ["U001194", "U001195", "U001196", "U001197"],
         [],
         parameters={"strategy": "enumerate every possible pattern and test the constraint"},
     )
@@ -1258,7 +1280,14 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001198",
         1,
-        ["U001198", "U001200", "U001201", "U001205"],
+        [
+            "U001198",
+            "U001199",
+            "U001200",
+            "U001201",
+            "U001202",
+            "U001205",
+        ],
         ["A000916"],
         parameters={"strategy": "extend a small region in all possible ways and backtrack on violation"},
     )
@@ -1346,3 +1375,419 @@ def build_candidate_specs() -> list[dict[str, Any]]:
 def unit_literal(unit_id: str) -> str:
     # Stable symbolic marker expanded to source text after bundle loading.
     return f"@UNIT:{unit_id}"
+
+
+def build_route_specs() -> list[dict[str, str]]:
+    specs = [
+        ("page-173-code-1022", "U000965", "page 173", "PAGE", "two-dimensional CA rule-code numbering", "WITHIN_STAGE"),
+        ("page-173-code-942", "U000968", "page 173", "PAGE", "two-dimensional CA rule-code numbering", "WITHIN_STAGE"),
+        ("page-60-code-comparison", "U000974", "page 60", "PAGE", "earlier cellular-automaton code convention", "CROSS_RANGE"),
+        ("page-178-circle", "U000981", "page 178", "PAGE", "approximate-circle two-dimensional cellular automaton", "WITHIN_STAGE"),
+        ("pages-179-181-exact3", "U000982", "pages 179–181", "PAGE", "eight-neighbor exactly-three retaining cellular automaton", "WITHIN_STAGE"),
+        ("page-179-seeds", "U000983", "top of page 179", "PAGE", "seed-length sweep for exactly-three retaining CA", "WITHIN_STAGE"),
+        ("page-181-row11", "U000984", "page 181", "PAGE", "row-of-eleven evolution for exactly-three retaining CA", "WITHIN_STAGE"),
+        ("pages-182-183-3d", "U000995", "pages 182 and 183", "PAGE", "three-dimensional cellular-automaton examples", "WITHIN_STAGE"),
+        ("page-171-3d-analogy", "U001005", "page 171", "PAGE", "two-dimensional nested cellular-automaton analog", "WITHIN_STAGE"),
+        ("page-186-turing-rule", "U001016", "page 186", "PAGE", "complex four-state two-dimensional Turing-machine rule", "WITHIN_STAGE"),
+        ("page-82-substitution", "U001033", "page 82", "PAGE", "one-dimensional substitution-system mechanics", "CROSS_RANGE"),
+        ("page-83-substitution", "U001038", "page 83", "PAGE", "one-dimensional substitution-system nested patterns", "CROSS_RANGE"),
+        ("page-85-interacting-substitution", "U001052", "page 85", "PAGE", "neighbor interaction in one-dimensional substitution systems", "CROSS_RANGE"),
+        ("chapter-3-substitution-schedules", "U001057", "Chapter 3", "SECTION", "parallel and sequential one-dimensional substitution schedules", "CROSS_RANGE"),
+        ("chapter-9-sequential-highd", "U001062", "Chapter 9", "SECTION", "order-independent higher-dimensional sequential substitution", "CROSS_RANGE"),
+        ("chapter-9-network-physics", "U001113", "Chapter 9", "SECTION", "network-system variants for space and spacetime", "CROSS_RANGE"),
+        ("page-88-sequential-substitution", "U001129", "page 88", "PAGE", "sequential substitution replacement rules", "CROSS_RANGE"),
+        ("page-205-rapid-multiway", "U001147", "page 205", "PAGE", "rapid-growth multiway rule", "WITHIN_STAGE"),
+        ("page-205-multiway-df", "U001150", "page 205", "PAGE", "multiway rules (d) and (f)", "WITHIN_STAGE"),
+        ("previous-page-multiway-k", "U001150", "previous page", "PAGE", "multiway rule (k)", "WITHIN_STAGE"),
+        ("pages-214-215-constraint-order", "U001206", "pages 214 and 215", "PAGE", "ordering of local-template constraints", "WITHIN_STAGE"),
+        ("page-216-constraint-family", "U001212", "page 216", "PAGE", "required-template constraint family", "WITHIN_STAGE"),
+    ]
+    result = []
+    for ordinal, (key, unit, literal, kind, topic, scope) in enumerate(specs, 1):
+        result.append(
+            {
+                "key": key,
+                "route_id": f"WR{ordinal:04d}",
+                "source_unit_id": unit,
+                "source_asset_id": "",
+                "discovery_epoch": EPOCH,
+                "discovery_kind": "SOURCE_UNIT",
+                "discovery_id": unit,
+                "discovery_ordinal": "1",
+                "literal_target": literal,
+                "route_kind": kind,
+                "expected_topic": topic,
+                "owning_stage": STAGE,
+                "closure_scope": scope,
+                "status": "PENDING",
+                "target_unit_ids": "[]",
+                "target_asset_ids": "[]",
+                "attempts": "Sequential blind review recorded the literal route; resolution is reserved for the coordinator.",
+                "vocabulary_terms": json.dumps(
+                    sorted(set(re.findall(r"[A-Za-z0-9]+", topic.lower()))),
+                    separators=(",", ":"),
+                ),
+                "defect_boundary": "No source defect; the target is intentionally unresolved in the isolated worker.",
+            }
+        )
+    assert [r["route_id"] for r in result] == [f"WR{i:04d}" for i in range(1, 23)]
+    return result
+
+
+def asset_judgment_specs() -> dict[str, dict[str, Any]]:
+    roles: dict[str, str] = {}
+
+    def assign(role: str, ids: str) -> None:
+        for asset_id in ids.split():
+            assert asset_id not in roles
+            roles[asset_id] = role
+
+    assign("DECORATIVE", "A000843")
+    assign("RELATION", "A000844 A000887 A000906 A000907")
+    assign("CONTROL", "A000855")
+    assign(
+        "NATIVE_EVIDENCE",
+        "A000845 A000849 A000853 A000861 A000864 A000865 A000870 "
+        "A000875 A000876 A000878 A000880 A000881 A000882 A000883 "
+        "A000884 A000885 A000886 A000888 A000891 A000892 A000894 "
+        "A000895 A000897 A000898 A000899 A000900 A000901 A000904 "
+        "A000905 A000911 A000912 A000913 A000914 A000915 A000916 "
+        "A000918 A000919 A000922",
+    )
+    assign(
+        "OBSERVER",
+        "A000846 A000847 A000848 A000850 A000851 A000852 A000854 "
+        "A000856 A000857 A000858 A000859 A000860 A000862 A000863 "
+        "A000866 A000867 A000868 A000869 A000871 A000872 A000873 "
+        "A000874 A000877 A000879 A000889 A000890 A000893 A000896 "
+        "A000902 A000903 A000908 A000909 A000910 A000917 A000920 A000921",
+    )
+    assert set(roles) == {f"A{i:06d}" for i in range(843, 923)}
+
+    text_bearing = {
+        "A000843",
+        "A000844",
+        "A000846",
+        "A000847",
+        "A000849",
+        "A000850",
+        "A000851",
+        "A000852",
+        "A000855",
+        "A000856",
+        "A000857",
+        "A000858",
+        "A000859",
+        "A000860",
+        "A000862",
+        "A000863",
+        "A000865",
+        "A000866",
+        "A000867",
+        "A000868",
+        "A000869",
+        "A000870",
+        "A000871",
+        "A000872",
+        "A000873",
+        "A000874",
+        "A000876",
+        "A000877",
+        "A000879",
+        "A000881",
+        "A000882",
+        "A000883",
+        "A000884",
+        "A000885",
+        "A000887",
+        "A000888",
+        "A000889",
+        "A000890",
+        "A000891",
+        "A000892",
+        "A000893",
+        "A000894",
+        "A000895",
+        "A000896",
+        "A000897",
+        "A000898",
+        "A000899",
+        "A000900",
+        "A000901",
+        "A000902",
+        "A000903",
+        "A000904",
+        "A000905",
+        "A000906",
+        "A000907",
+        "A000911",
+        "A000913",
+        "A000914",
+        "A000915",
+        "A000916",
+    }
+    result: dict[str, dict[str, Any]] = {}
+    for asset_id in sorted(roles):
+        role = roles[asset_id]
+        flags = []
+        if role == "NATIVE_EVIDENCE":
+            flags.append("CONSTRUCTION_BEARING")
+        if asset_id in text_bearing:
+            flags.append("TEXT_BEARING")
+        result[asset_id] = {
+            "role": role,
+            "risk_flags": flags,
+            # Every source file was inspected either directly or in an unscaled
+            # native-pixel audit sheet after the thumbnail pass.
+            "original_resolution_status": "REVIEWED",
+            "transcription_status": "CHECKED" if flags else "NOT_REQUIRED",
+        }
+    return result
+
+
+def candidate_records(
+    state: dict[str, Any],
+    route_specs: list[dict[str, str]],
+    asset_specs: dict[str, dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, list[str]], dict[str, list[str]], int]:
+    specs = build_candidate_specs()
+    route_by_key = {row["key"]: row["route_id"] for row in route_specs}
+    candidate_ids = [f"W{i:04d}" for i in range(1, len(specs) + 1)]
+    evidence_counter = 0
+    group_counter = 0
+    unit_links: dict[str, list[str]] = defaultdict(list)
+    asset_links: dict[str, list[str]] = defaultdict(list)
+    records: list[dict[str, Any]] = []
+
+    # Evidence anchors are independently ordinal within each immutable source.
+    evidence_anchor_counts: dict[tuple[str, str], int] = defaultdict(int)
+
+    for index, spec in enumerate(specs):
+        candidate_id = candidate_ids[index]
+        name = spec["name"]
+        blueprint = profile_blueprint(
+            spec["kind"], name, spec["overrides"]
+        )
+        supported_fields = [
+            field for field in FIELDS if blueprint[field]["status"] == "SUPPORTED"
+        ]
+        evidence: list[dict[str, Any]] = []
+
+        def add_evidence(
+            kind: str,
+            source_id: str,
+            strength: str,
+            modality: str,
+            claim: str,
+            fields: list[str],
+        ) -> None:
+            nonlocal evidence_counter, group_counter
+            evidence_counter += 1
+            group_counter += 1
+            evidence_anchor_counts[(kind, source_id)] += 1
+            anchor_ordinal = evidence_anchor_counts[(kind, source_id)]
+            if kind == "SOURCE_UNIT":
+                source_unit_id: str | None = source_id
+                image_path: str | None = None
+            else:
+                source_unit_id = state["asset_by_id"][source_id]["source_unit_id"]
+                image_path = state["asset_by_id"][source_id]["physical_path"]
+            evidence.append(
+                {
+                    "evidence_id": f"WE{evidence_counter:06d}",
+                    "evidence_group_id": f"WG{group_counter:06d}",
+                    "discovery_anchor": {
+                        "epoch": 2,
+                        "kind": kind,
+                        "id": source_id,
+                        "ordinal": anchor_ordinal,
+                    },
+                    "source_unit_id": source_unit_id,
+                    "image_path": image_path,
+                    "strength": strength,
+                    "modality": modality,
+                    "claim": claim,
+                    "fingerprint_fields": fields,
+                }
+            )
+
+        for unit_id in spec["units"]:
+            block_kind = state["unit_by_id"][unit_id]["block_kind"]
+            if block_kind == "image":
+                continue
+            modality = (
+                "CODE"
+                if block_kind == "fenced_code"
+                else "CAPTION"
+                if state["unit_by_id"][unit_id]["line_start"] > 1
+                and any(
+                    u["line_end"] == state["unit_by_id"][unit_id]["line_start"] - 1
+                    and u["block_kind"] == "image"
+                    for u in state["units"]
+                )
+                else "PROSE"
+            )
+            strength = (
+                "DIRECT_COMPLETE_MECHANICS"
+                if block_kind == "fenced_code"
+                else "DIRECT_PARTIAL_MECHANICS"
+            )
+            add_evidence(
+                "SOURCE_UNIT",
+                unit_id,
+                strength,
+                modality,
+                f"{name}: {excerpt(state, unit_id)}",
+                supported_fields,
+            )
+
+        for asset_id in spec["assets"]:
+            role = asset_specs[asset_id]["role"]
+            strength = (
+                "DIRECT_PARTIAL_MECHANICS"
+                if role == "NATIVE_EVIDENCE"
+                else "CORROBORATING"
+                if role in {"CONTROL", "RELATION", "OBSERVER"}
+                else "CONTEXTUAL"
+            )
+            image_fields = [
+                field
+                for field in supported_fields
+                if field
+                in {
+                    "object_kind",
+                    "carrier",
+                    "support",
+                    "topology",
+                    "alphabet_or_value_schema",
+                    "complete_state",
+                    "seed",
+                    "frontier_or_activation",
+                    "read_dependencies_or_neighborhood",
+                    "law_kind",
+                    "rule_relation_constraint_function_or_probability_law",
+                    "write_replacement_assembly_or_commit",
+                    "result_kind",
+                    "witness_semantics",
+                    "parameters_and_variants",
+                    "excluded_observers_and_representations",
+                    "evidence_limit",
+                }
+            ]
+            add_evidence(
+                "IMAGE",
+                asset_id,
+                strength,
+                "IMAGE",
+                f"Original-resolution inspection of {asset_id} "
+                f"{'directly shows checked native symbols for' if role == 'NATIVE_EVIDENCE' else 'corroborates the displayed result/representation for'} {name}.",
+                image_fields,
+            )
+
+        assert evidence, name
+        evidence_ids_by_field = {
+            field: [
+                row["evidence_id"]
+                for row in evidence
+                if field in row["fingerprint_fields"]
+            ]
+            for field in FIELDS
+        }
+        fingerprint: dict[str, dict[str, Any]] = {}
+        missing: list[str] = []
+        for field in FIELDS:
+            entry = dict(blueprint[field])
+            entry["evidence_ids"] = (
+                evidence_ids_by_field[field]
+                if entry["status"] in {"SUPPORTED", "CONFLICTING_SOURCE"}
+                else []
+            )
+            if entry["status"] == "SUPPORTED":
+                assert entry["evidence_ids"], (name, field)
+            if entry["status"] == "UNKNOWN_FROM_SOURCE":
+                missing.append(f"The assigned source does not establish {field} for {name}.")
+            fingerprint[field] = entry
+
+        parameters = []
+        all_evidence_ids = [row["evidence_id"] for row in evidence]
+        for parameter_name, description in spec["parameters"].items():
+            if description.startswith("@UNIT:"):
+                description = unit_text(state, description[6:])
+            parameters.append(
+                {
+                    "name": parameter_name,
+                    "source_description": description,
+                    "evidence_ids": all_evidence_ids,
+                }
+            )
+        variants = [
+            {
+                "name": variant_name,
+                "source_description": description,
+                "evidence_ids": all_evidence_ids,
+            }
+            for variant_name, description in spec["variants"].items()
+        ]
+        related = []
+        if spec["parent_index"] is not None:
+            parent_id = candidate_ids[spec["parent_index"] - 1]
+            related.append(
+                {
+                    "candidate_id": parent_id,
+                    "relation": "POSSIBLE_VARIANT_OF",
+                    "proof_kind": "PROVISIONAL_COMPARISON",
+                    "evidence_ids": [evidence[0]["evidence_id"]],
+                    "before_rationale": f"{name} is independently delimited by the source.",
+                    "after_rationale": "Family/preset implementation equivalence is deliberately deferred until whole-corpus reconciliation.",
+                    "uncertainty": "The blind review records a possible family relation without collapsing the preset.",
+                }
+            )
+        route_ids = [route_by_key[key] for key in spec["route_keys"]]
+        record = {
+            "id": candidate_id,
+            "record_status": "ACTIVE",
+            "provisional_name": name,
+            "aliases": spec["aliases"],
+            "discovery_stage": 9,
+            "discovery_anchor": {
+                "epoch": 2,
+                "kind": spec["anchor_kind"],
+                "id": spec["anchor_id"],
+                "ordinal": spec["ordinal"],
+            },
+            "source_unit_ids": spec["units"],
+            "source_evidence": evidence,
+            "source_status": ["CLEAR"],
+            "image_witnesses": [
+                state["asset_by_id"][asset_id]["physical_path"]
+                for asset_id in spec["assets"]
+            ],
+            "evidence_strength": list(
+                dict.fromkeys(row["strength"] for row in evidence)
+            ),
+            "field_support": {
+                field: fingerprint[field]["status"] for field in FIELDS
+            },
+            "fingerprint": fingerprint,
+            "parameters": parameters,
+            "variants": variants,
+            "missing_mechanics": missing,
+            "uncertainties": [],
+            "related_candidate_ids": related,
+            "cross_reference_ids": route_ids,
+            "evidence_reassignments": [],
+        }
+        records.append(record)
+        for unit_id in spec["units"]:
+            if candidate_id not in unit_links[unit_id]:
+                unit_links[unit_id].append(candidate_id)
+        for asset_id in spec["assets"]:
+            if candidate_id not in asset_links[asset_id]:
+                asset_links[asset_id].append(candidate_id)
+            image_unit_id = state["asset_by_id"][asset_id]["source_unit_id"]
+            if candidate_id not in unit_links[image_unit_id]:
+                unit_links[image_unit_id].append(candidate_id)
+
+    assert [row["id"] for row in records] == candidate_ids
+    assert evidence_counter == group_counter
+    return records, unit_links, asset_links, evidence_counter
