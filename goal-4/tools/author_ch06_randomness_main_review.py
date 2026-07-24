@@ -1231,11 +1231,20 @@ def candidate_definitions() -> list[dict[str, Any]]:
         clone["units"] = units
         clone["semantic_units"] = semantic_units
         clone["mechanics_units"] = ["U001285"]
-        clone["values"]["object_kind"] = "three-color nearest-neighbor totalistic cellular-automaton preset"
-        clone["values"]["rule_relation_constraint_function_or_probability_law"] = (
-            f"preset code {code} under the source's three-color nearest-neighbor totalistic code scheme"
-        )
-        clone["values"]["parameters_and_variants"] = f"code {code}"
+        clone["values"] = {
+            "object_kind": "class-4 three-color nearest-neighbor totalistic cellular-automaton preset",
+            "native_time": "successive cellular-automaton steps",
+            "carrier": "one-dimensional array of cells",
+            "alphabet_or_value_schema": "three possible colors for each cell",
+            "seed": "a random initial condition",
+            "read_dependencies_or_neighborhood": "nearest neighbors, read totalistically",
+            "law_kind": "totalistic nearest-neighbor cellular-automaton rule",
+            "rule_relation_constraint_function_or_probability_law": (
+                f"preset code {code} under the source's three-color nearest-neighbor totalistic code scheme"
+            ),
+            "result_kind": "a finite 1500-step evolution from a random initial condition",
+            "parameters_and_variants": f"code {code}; displayed run length 1500 steps",
+        }
         clone["variants"] = [f"code {code}"]
         clone["variant_units"] = {f"code {code}": units}
         clone["field_units"] = {
@@ -1317,6 +1326,9 @@ def candidate_definitions() -> list[dict[str, Any]]:
         strength: str = "DIRECT_PARTIAL_MECHANICS",
         allow_direct_image: bool = False,
     ) -> None:
+        # evidence_limit describes the review record, not mechanics stated by
+        # an individual source unit.
+        fields = [field for field in fields if field != "evidence_limit"]
         candidate(name)["evidence_overrides"][unit_id] = {
             "fields": fields,
             "claim": claim,
@@ -1335,17 +1347,19 @@ def candidate_definitions() -> list[dict[str, Any]]:
         caption_unit: str,
     ) -> None:
         row = candidate(name)
-        row["values"].update(
-            {
-                "object_kind": object_kind,
-                "law_kind": "parametric family of deterministic local transition laws",
-                "rule_relation_constraint_function_or_probability_law": law,
-                "result_kind": "one successor configuration after a family member is selected",
-                "successor_cardinality": "one successor for each complete state and selected rule",
-                "determinism_branching_or_measure": "deterministic conditional on the selected rule parameter",
-                "parameters_and_variants": parameters,
-            }
-        )
+        prior_values = row["values"]
+        row["values"] = {
+            "object_kind": object_kind,
+            "carrier": prior_values["carrier"],
+            "alphabet_or_value_schema": prior_values["alphabet_or_value_schema"],
+            "read_dependencies_or_neighborhood": prior_values[
+                "read_dependencies_or_neighborhood"
+            ],
+            "law_kind": "parameterized cellular-automaton rule family",
+            "rule_relation_constraint_function_or_probability_law": law,
+            "result_kind": "the behavior of a selected family member",
+            "parameters_and_variants": parameters,
+        }
         row["mechanics_units"] = [caption_unit]
         row["variants"] = variants
         row["variant_units"] = {variant: [image_unit, caption_unit] for variant in variants}
@@ -2700,7 +2714,14 @@ def candidate_definitions() -> list[dict[str, Any]]:
     rule110["related_names"] = ["periodic-block cellular-automaton initial-condition generator"]
     rule110_specs = {
         "U001558": (
-            ["seed", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            [
+                "native_time",
+                "seed",
+                "result_kind",
+                "witness_semantics",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+            ],
             "U001558 gives the random seed context and the 14-cell/7-step periodic background; it supplies no native transition entries.",
         ),
         "U001561": (
@@ -2724,7 +2745,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "U001568 labels a persistent-structure catalog and extension variants.",
         ),
         "U001570": (
-            ["seed", "input", "result_kind", "termination_completion_failure", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["seed", "input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
             "U001570 records the length-41 seed and measured 77-step growth cycle, displacement, and separations.",
         ),
         "U001572": (
@@ -2736,7 +2757,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "U001574 records a collision between catalog structures e and o.",
         ),
         "U001576": (
-            ["input", "result_kind", "termination_completion_failure", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
             "U001576 records a greater-than-4000-step collision outcome producing eight structures.",
         ),
     }
@@ -2922,13 +2943,49 @@ def candidate_definitions() -> list[dict[str, Any]]:
 
     # Rule 110 has directly stated two-color/nearest-neighbor scope, but its
     # code table remains outside the reviewed range.
-    rule110["values"].update(
-        {
-            "input": "a complete rule-110 configuration together with any source-delimited experimental seed or background",
-            "witness_semantics": "finite backgrounds, catalogs, growth runs, and collisions witness behavior but not transition entries",
-        }
+    rule110["values"] = {
+        "object_kind": "one-dimensional cellular-automaton preset",
+        "native_time": "successive cellular-automaton steps",
+        "carrier": "one-dimensional array of cells",
+        "alphabet_or_value_schema": "two colors of cells",
+        "seed": "random initial conditions or a source-delimited periodic background with inserted finite structures",
+        "input": "a source-delimited experimental seed, background, or pair of catalog structures",
+        "read_dependencies_or_neighborhood": "nearest neighbors in one dimension",
+        "law_kind": "simple nearest-neighbor cellular-automaton rule",
+        "rule_relation_constraint_function_or_probability_law": (
+            "rule 110; the complete transition table is outside this reviewed range"
+        ),
+        "result_kind": "a stepwise evolution, persistent-structure catalog, growth run, or collision outcome",
+        "witness_semantics": (
+            "finite backgrounds, catalogs, growth runs, and collisions witness behavior but not transition entries"
+        ),
+        "parameters_and_variants": (
+            "rule 110; random or 14-cell/7-step periodic background and source-delimited experiments"
+        ),
+        "excluded_observers_and_representations": (
+            "the 14-cell periodic background is a seed/environment; persistent-structure catalogs, growth panels, "
+            "and collision diagrams are observer/experiment outputs rather than rule-110 transition-law evidence"
+        ),
+    }
+    rule110["mechanics_units"] = []
+    evidence(
+        rule110_name,
+        "U001560",
+        fields=[
+            "object_kind",
+            "carrier",
+            "alphabet_or_value_schema",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        ],
+        claim=(
+            "U001560 identifies rule 110 as a simple cellular-automaton rule involving nearest neighbors "
+            "and two cell colors; it does not transcribe the transition table or generic update mechanics."
+        ),
+        strength="DIRECT_IDENTITY",
     )
-    rule110["mechanics_units"] = ["U001560"]
 
     # Evolution/parameter images for continuous rules are witnesses only.
     for unit_id in ["U001315", "U001317", "U001319"]:
@@ -2956,8 +3013,85 @@ def candidate_definitions() -> list[dict[str, Any]]:
 
     # Survey panels are represented by their captioned inventory/outcome, not
     # as one complete transition table.
-    candidate("uniform-attractor elementary cellular-automaton preset panel")["mechanics_units"] = ["U001236"]
-    candidate(panel4_name)["mechanics_units"] = ["U001240"]
+    rule254_name = "elementary cellular automaton rule 254"
+    rule254 = candidate(rule254_name)
+    rule254["values"] = {
+        "object_kind": "one-dimensional binary cellular-automaton preset",
+        "native_time": "successive evolution steps",
+        "carrier": "a row of cells",
+        "alphabet_or_value_schema": "black and white",
+        "seed": "a typical random initial condition",
+        "read_dependencies_or_neighborhood": "the two adjacent neighbors",
+        "law_kind": "local cellular-automaton transition rule",
+        "rule_relation_constraint_function_or_probability_law": (
+            "a cell becomes black if either adjacent neighbor is black"
+        ),
+        "write_replacement_assembly_or_commit": "set the cell's next color from the two neighboring colors",
+        "result_kind": "the next row and its successive evolution",
+        "determinism_branching_or_measure": "deterministic once the initial condition is fixed",
+        "parameters_and_variants": "rule 254",
+    }
+    rule254["mechanics_units"] = []
+    evidence(
+        rule254_name,
+        "U001229",
+        fields=list(rule254["values"]),
+        claim=(
+            "U001229 defines the rule-254 example from a random initial condition: at each step a cell "
+            "becomes black when either adjacent neighbor is black."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+
+    panel_specs = {
+        "uniform-attractor elementary cellular-automaton preset panel": {
+            "codes": "rules 0, 32, 160, and 250",
+            "result": "evolution from random initial conditions to completely uniform states",
+            "unit": "U001236",
+        },
+        panel4_name: {
+            "codes": "rules 4, 108, 218, and 232",
+            "result": (
+                "evolution from random initial conditions to rule-specific fixed or periodic simple structures"
+            ),
+            "unit": "U001240",
+        },
+    }
+    for name, spec in panel_specs.items():
+        row = candidate(name)
+        row["values"] = {
+            "object_kind": "source-delimited four-preset elementary cellular-automaton panel",
+            "carrier": "one-dimensional binary cellular-automaton configurations",
+            "alphabet_or_value_schema": "black and white",
+            "seed": "random initial conditions",
+            "law_kind": "four code-identified cellular-automaton presets",
+            "rule_relation_constraint_function_or_probability_law": spec["codes"],
+            "result_kind": spec["result"],
+            "witness_semantics": "the displayed evolutions witness the panel's stated outcome class",
+            "parameters_and_variants": spec["codes"],
+        }
+        row["mechanics_units"] = []
+        evidence(
+            name,
+            spec["unit"],
+            fields=list(row["values"]),
+            claim=(
+                f"{spec['unit']} delimits {spec['codes']} and states their shared outcome from random "
+                "initial conditions; it does not transcribe any member's transition table."
+            ),
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+
+    # evidence_limit records the blind review's epistemic boundary. It is not
+    # a source-described program mechanic, so no source unit can support it as
+    # a fingerprint field.
+    for row in defs:
+        row["values"].pop("evidence_limit", None)
+        row["field_units"].pop("evidence_limit", None)
+        for override in row["evidence_overrides"].values():
+            override["fields"] = [
+                field for field in override.get("fields", []) if field != "evidence_limit"
+            ]
 
     defs.sort(
         key=lambda candidate: (
@@ -3474,6 +3608,14 @@ def build_output(bundle: Path) -> dict[str, Any]:
         },
         "A000952": {
             "evidence_statement": "Original-resolution labeled inventory: four-color totalistic codes 1000816 through 1000940 in increments of 4."
+        },
+        "A000956": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": (
+                "Original-resolution weighted continuous-cellular-automaton evolution rendered through the "
+                "neighbor-difference gray display; it is a finite observer witness, not native-state or "
+                "transition-law evidence."
+            ),
         },
         "A000957": {
             "evidence_statement": "Original-resolution native-family step survey labeled codes 4,12,24,30,38,52 at steps 1,2,5,100,500."
