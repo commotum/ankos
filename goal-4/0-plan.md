@@ -148,7 +148,7 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current facts after completion of Stages 1–9:
+These are current facts after completion of Stages 1–10:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   that pre-execution state is retained only as historical provenance in
@@ -233,6 +233,17 @@ These are current facts after completion of Stages 1–9:
   reviewed units, 511 screened images, 1,069 active candidates, 402 routes
   (200 resolved and 202 pending), and 14 LOCAL rounds, and is resumable at
   Stage 10.
+- Stage 10 is complete in `10-CH06-RANDOMNESS.md`: all 607 paired Chapter 6
+  units and 177 images are reviewed at the required depth; `B1070..B1250`
+  preserve 181 deliberately uncollapsed blind candidates backed by 704
+  evidence records in 499 groups; all 58 within-stage and 14 reachable
+  incoming routes are resolved, while 107 outgoing obligations remain
+  pending. `S015` and `S016` each record 2,665 fully dispositioned hits across
+  591 unique units, with identical normalized source results and a zero-delta
+  rerun. The valid live state is terminal at `V000030`, epoch 2, with 3,332
+  reviewed units, 688 screened images, 1,250 active candidates, 567 routes
+  (272 resolved and 295 pending), and 16 LOCAL rounds, and is resumable at
+  Stage 11.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -570,6 +581,8 @@ handoff.
 
 ### 10-CH06-RANDOMNESS
 
+Status: **COMPLETE** in `goal-4/10-CH06-RANDOMNESS.md`.
+
 #### Big Picture Objective
 
 Blindly audit Chapter 6 main text and Chapter 6 Notes.
@@ -588,7 +601,76 @@ Blindly audit Chapter 6 main text and Chapter 6 Notes.
 - Behavior/property/analyzer records are separated from construction candidates.
 - Cross-range references are completely queued.
 
+#### Stage Results And Handoff
+
+All 354 main-text and 253 Notes units are reviewed, and all 105 main-text and
+72 Notes images are screened. `V000027` creates 181 candidates
+`B1070..B1250`, 704 evidence records `E004487..E005190` in 499 groups
+`G004487..G004985`, and 165 routes `R000403..R000567`. `V000028` resolves
+all 58 within-stage routes and all 14 reachable incoming cross-range routes.
+`V000029` records `S015`, 2,665 hits, and 268 candidate-derived vocabulary
+terms without adding candidates, evidence, or routes. `V000030` records
+`S016` with the identical normalized hit projection and zero semantic delta.
+
+The 607 reading dispositions are 368 `SUPPORTS_CANDIDATE`, 130 `CANDIDATE`,
+89 `NO_CONSTRUCTION`, 7 `CROSS_REFERENCE`, 5
+`REPRESENTATION_OR_OBSERVER`, 7 `SOURCE_DEFECT_OR_AMBIGUITY`, and 1
+`HISTORICAL_ONLY`. The 177 assets comprise 56 native-evidence, 58 observer,
+29 relation, 31 source-defect, 2 control, and 1 decorative images. Candidate
+fingerprints contain 1,726 supported, 1,352 source-unknown, 1,986
+not-applicable, and 4 conflicting fields; no supported field is weak-only.
+The final Stage 10 route universe is 58 resolved within-stage routes, 14
+resolved incoming cross-range routes, and 107 pending outgoing cross-range
+routes.
+
+`S015` and `S016` each use 15 query families and disposition 2,665 hits over
+591 unique units. Their normalized query/unit-result digest is
+`69c987503995ba8624d58a1b6df87ca251f9838c71a9b1788a48b7b4582016c9`
+and their identical normalized hit digest is
+`08c4877cf250c1215cb6b7a90a551960a32c121ae4d610b24ca7a6a4e5c47c61`.
+This proves local Stage 10 closure, not the whole-corpus fixed point reserved
+for Stage 18. Ordinary and optimized validators both report
+`units=14311 reviewed=3332 candidates=1250 routes=567 assets=1607
+screened=688 rounds=16`; hostile terminal review returned `ACCEPT`, and the
+full regression suite passed with `110 passed in 725.66s`.
+
+The exact Stage 11 starting state is `V000030`, epoch 2. Its six mutable-ledger
+hashes are:
+
+- `reading-ledger.csv`:
+  `e6fcdf7ca4ab1dbaf0f51aa29d4451eef98e15762f9fe22803d2c2121271303d`;
+- `candidate-ledger.jsonl`:
+  `8ba1ffba5061a2e115063c6b552b10369e53a3fd3bf4fcb08d3bfcaf7c8bf1c7`;
+- `cross-reference-ledger.csv`:
+  `fda975932dade9ffd2b78380d87f27347ef45d32736f53418318b719d117a6fc`;
+- `asset-ledger.csv`:
+  `b57d00e4d9bc1cde61d79acf869b3968e5b2e5e871d9938de099d0bb035d8f4e`;
+- `search-rounds.json`:
+  `f614cce2bff0e040fca38cd1a82036432d951c2082febfcb9cf0eb86c03ae94d`;
+- `review-history.jsonl`:
+  `174f07cf729016aa3e921ce934836b05d11fe806b83fe26af51e43c9f9bd9e34`.
+
+Stage 11 owns 713 pending units (`U001577..U002011` and
+`U006592..U006869`) and 194 pending assets. The exact ledger-only assignment
+is repeated below; no Stage 11 Book source was opened to derive it.
+
 ### 11-CH07-MECHANISMS
+
+#### Exact Starting Handoff
+
+| Assignment | Pending source units | Pending physical images |
+|---|---:|---:|
+| `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` | 435, `U001577..U002011` | 92 referenced: `A001028..A001040`, `A001042..A001056`, `A001058..A001121` |
+| `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 278, `U006592..U006869` | 43 referenced + 59 unreferenced: `A000001..A000018`, `A000661..A000744` |
+| **Total** | **713** | **194** |
+
+The main and Notes source hashes are
+`e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`
+and
+`fd8696100529789964578841267bbd841411691d05248840ede6e0b4b7bd69f3`.
+`A001041` and `A001057` are already Stage 5-owned shared assets, so they are
+not pending Stage 11 work. This handoff comes only from the terminal ledgers
+and corpus manifest; no Stage 11 Book source was opened.
 
 #### Big Picture Objective
 
