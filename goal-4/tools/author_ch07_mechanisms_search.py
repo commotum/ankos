@@ -625,9 +625,32 @@ EXPECTED_ROUND_GUARDS: dict[str, dict[str, Any]] = {
         ),
     },
     "S018": {
-        "prior_event_sha256": None,
-        "base_artifact_sha256": None,
-        "result_digest": None,
+        "prior_event_sha256": (
+            "7be9a15996d4a682ecd4778c22ec79a5d93ead82b1edff8ec38e14aade61ae83"
+        ),
+        "base_artifact_sha256": {
+            "asset-ledger.csv": (
+                "717e20c259292fab63f40e3a34de76cff7770c4c288d741a8310c491e58db881"
+            ),
+            "candidate-ledger.jsonl": (
+                "8676464e94072acec5bcfa03b98d056018dfbc77bd7915d4a647bbfc46ec1442"
+            ),
+            "cross-reference-ledger.csv": (
+                "8f3cd4b4bbd793410f511be5b899224a5a09b06f8b1ba053929f0b0774434748"
+            ),
+            "reading-ledger.csv": (
+                "9bb64de8b08873355191bd404febc5895f9c6e772706c291865cb6e83607232d"
+            ),
+            "review-history.jsonl": (
+                "4ca97401c6f0e9ca126e7ddbb412703ed78a710a5f77a90c1b5f4292acbbc2bd"
+            ),
+            "search-rounds.json": (
+                "fc56b8033fee4a7a482eec7448d9b1ada6e63e9a2cf1be446ac0be394d6a01df"
+            ),
+        },
+        "result_digest": (
+            "a546b8f88ecde0d3d44ae5550b53bea022c13df4fec2e67a7caf01bf82ede434"
+        ),
     },
 }
 
