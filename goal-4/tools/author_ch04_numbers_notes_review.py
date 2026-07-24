@@ -2532,6 +2532,10 @@ def _complete_stepwise_profile(
 _complete_stepwise_profile(
     "Gray-code ordering generator",
     {
+        "native_time": FF(
+            "the m discrete Nest generations",
+            "U005648",
+        ),
         "control_state": _na(
             "U005648",
             "GrayCode has no controller separate from its fixed Nest count m.",
@@ -2767,19 +2771,43 @@ _complete_stepwise_profile(
         ),
     ),
 )
-for bitwise_name, bitwise_law in (
-    ("BitXor[2 n,n] integer iteration", "BitXor[2 n,n]"),
-    ("BitXor[3+2 n,n] integer iteration", "BitXor[3+2 n,n]"),
-    ("BitXor[3 n,n] integer iteration", "BitXor[3 n,n]"),
-    ("BitXor[6 n,n] integer iteration", "BitXor[6 n,n]"),
-    ("BitOr[2 n,n] integer iteration", "BitOr[2 n,n]"),
-    ("BitOr[6 n,n] integer iteration", "BitOr[6 n,n]"),
+for bitwise_name, bitwise_law, bitwise_anchors in (
+    (
+        "BitXor[2 n,n] integer iteration",
+        "BitXor[2 n,n]",
+        ("U005649", "U005725", BITWISE_IMAGE),
+    ),
+    (
+        "BitXor[3+2 n,n] integer iteration",
+        "BitXor[3+2 n,n]",
+        ("U005725", BITWISE_IMAGE),
+    ),
+    (
+        "BitXor[3 n,n] integer iteration",
+        "BitXor[3 n,n]",
+        ("U005725", BITWISE_IMAGE),
+    ),
+    (
+        "BitXor[6 n,n] integer iteration",
+        "BitXor[6 n,n]",
+        ("U005725", BITWISE_IMAGE),
+    ),
+    (
+        "BitOr[2 n,n] integer iteration",
+        "BitOr[2 n,n]",
+        ("U005725", BITWISE_IMAGE),
+    ),
+    (
+        "BitOr[6 n,n] integer iteration",
+        "BitOr[6 n,n]",
+        ("U005725", BITWISE_IMAGE),
+    ),
 ):
     _complete_stepwise_profile(
         bitwise_name,
         _exact_transition_facts(
             bitwise_name,
-            "U005725",
+            bitwise_anchors,
             native_time=f"discrete repeated applications of {bitwise_law}",
             state="the current integer n",
             seed=None,
@@ -2854,6 +2882,11 @@ _complete_stepwise_profile(
 _complete_stepwise_profile(
     "page-131 sequence (c) hump generator",
     {
+        "native_time": FF(
+            "successive cumulative-sum stages as the selected finite "
+            "increment list is consumed by FoldList",
+            ("U005754", "U005756"),
+        ),
         "control_state": _na(
             ("U005754", "U005756"),
             "The remaining finite input list is part of each FoldList state, "
@@ -2996,6 +3029,11 @@ _complete_stepwise_profile(
 _complete_stepwise_profile(
     "successive-integer concatenation sequence",
     {
+        "read_dependencies_or_neighborhood": FF(
+            "indices i through bound n, base k, and IntegerDigits[i,k] in "
+            "Flatten[Table[IntegerDigits[i,k],{i,n}]]",
+            "U005867",
+        ),
         "successor_cardinality": _na(
             "U005867",
             "The direct finite concatenation is not a successor relation.",
@@ -3053,6 +3091,11 @@ _complete_stepwise_profile(
 _complete_stepwise_profile(
     "rational-pair continued-fraction term enumerator",
     {
+        "read_dependencies_or_neighborhood": FF(
+            "bound n, indices a and b, and "
+            "Rest[ContinuedFraction[a/b]] in the bounded Table/Flatten",
+            "U005906",
+        ),
         "successor_cardinality": _na(
             "U005906",
             "The bounded Table/Flatten enumeration is not a successor relation.",
@@ -3081,6 +3124,11 @@ _complete_stepwise_profile(
 _complete_stepwise_profile(
     "Farey-sequence generator",
     {
+        "read_dependencies_or_neighborhood": FF(
+            "bound n and indices a,b in "
+            "Union[Flatten[Table[a/b,{b,n},{a,0,b}]]]",
+            "U005924",
+        ),
         "successor_cardinality": _na(
             "U005924",
             "The bounded Table/Flatten/Union construction is not a successor relation.",
@@ -3242,6 +3290,11 @@ _complete_stepwise_profile(
 _complete_stepwise_profile(
     "continuous cellular-automaton averaging implementation",
     {
+        "native_time": FF(
+            "the t discrete synchronous cellular-automaton steps performed "
+            "by CCAEvolveList",
+            ("U005997", "U005998"),
+        ),
         "complete_state": FF(
             "the complete current periodic list, fixed transfer function f, "
             "and accumulated NestList output",
@@ -3416,23 +3469,23 @@ _complete_stepwise_profile(
         "frontier_or_activation": FF("the current integer n", "U005694"),
         "schedule": FF(
             "apply the visible even/odd rule once and retest whether n equals 1",
-            "U005694",
+            ("U005694", "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg"),
         ),
         "read_dependencies_or_neighborhood": FF(
             "the current n and EvenQ[n]",
-            "U005694",
+            ("U005694", "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg"),
         ),
         "write_replacement_assembly_or_commit": FF(
             "replace n by n/2 when even or (n+1)/2 when odd",
-            "U005694",
+            ("U005694", "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg"),
         ),
         "successor_cardinality": FF(
             "one next integer before the terminal value 1",
-            "U005694",
+            ("U005694", "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg"),
         ),
         "determinism_branching_or_measure": FF(
             "deterministic parity branch with no probability measure",
-            "U005694",
+            ("U005694", "BACK-MATTER/NOTES/_page_919_Figure_10.jpeg"),
         ),
     },
 )
@@ -4219,6 +4272,7 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         "- Gray code, both sequence-(c) FoldList formulations, Ulam, the page-122 NestList, Shallit Nest, Euclid, the recurrence-ratio solver, and complete continuous CAs retain their literal seeds/state/history/completion semantics. Direct indexed/Table/Flatten/Union denotations receive no invented trajectory layer.",
         "- Recorded source-supported initial conditions and history/closed-form boundaries for the AGM solver, continued-fraction trajectory, Gauss/multiplier/tent maps, and both finite-storage shift-map representations.",
         "- Transcribed the complete continued-fraction substitution, parity-trace reconstruction, sequence-(d), sequence-(c), and AGM laws; every law spanning two source units is partial at both units and complete only through their joint field evidence.",
+        "- Completed the bounded provenance cleanup: source-explicit clocks and direct reads are restored, while the bitwise iterations and case-(b) transition fields cite their native figure evidence.",
         "- Restored the two-Gaussian periodic preset, the dimensional stationary-square-pulse preset, and the split PDEKernel/PDEStep provenance without inventing unstated grid, domain, pulse, or boundary details.",
         "- Added symmetric candidate-local comparison evidence for the irrational/Beatty/substitution family, prime/zeta family, normality witnesses, and exact-versus-finite shift maps; all remain provisional comparisons rather than identity merges.",
         "- Every `UNKNOWN_FROM_SOURCE` reason is reproduced verbatim in that candidate's `missing_mechanics`; every supported/N/A/conflicting field cites only its declared unit/image anchors.",
