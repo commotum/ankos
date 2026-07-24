@@ -2922,6 +2922,13 @@ def _prepare_search_append_locked(
     existing_evidence_ids, existing_group_ids = _existing_evidence_sequences(
         candidates
     )
+    # Candidate records group evidence by owner, while SEARCH_HIT allocation
+    # follows the immutable global hit traversal and may therefore interleave
+    # owners.  Recover that global allocation before checking the append-only
+    # E/G sequences, just as the blind worker merge does for WE/WG IDs.
+    appended_evidence.sort(
+        key=lambda item: int(str(item.get("evidence_id", ""))[1:])
+    )
     appended_evidence_ids = [
         str(evidence.get("evidence_id")) for evidence in appended_evidence
     ]

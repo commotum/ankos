@@ -166,6 +166,7 @@ def _spec(
     measure: str | None = None,
     completion: str | None = None,
     evidence_scopes: dict[str, list[str]] | None = None,
+    missing_mechanics: list[str] | None = None,
 ) -> dict[str, Any]:
     if profile is None:
         lowered = object_kind.lower()
@@ -184,17 +185,21 @@ def _spec(
         elif any(
             marker in lowered
             for marker in (
-                "predicate",
-                "relation",
-                "presentation",
+                "history embedding",
+                "representation function",
                 "quotient representation",
             )
         ):
+            profile = "REPRESENTATION"
+        elif any(
+            marker in lowered
+            for marker in (
+                "predicate",
+                "relation",
+                "presentation",
+            )
+        ):
             profile = "RELATION"
-        elif "history embedding" in lowered:
-            profile = "REPRESENTATION"
-        elif "representation function" in lowered:
-            profile = "REPRESENTATION"
         else:
             profile = "FUNCTION"
     if profile not in {"FUNCTION", "RELATION", "ITERATED", "REPRESENTATION"}:
@@ -216,6 +221,7 @@ def _spec(
         "measure": measure,
         "completion": completion,
         "evidence_scopes": evidence_scopes or {},
+        "missing_mechanics": missing_mechanics or [],
     }
 
 
@@ -249,6 +255,10 @@ RECOVERED_SPECS = [
             "The source does not soundly identify which p/q/r ablation the "
             "corrupt phrase “s alone” denotes."
         ],
+        missing_mechanics=[
+            "The component ablation associated with the defective phrase "
+            "“s alone” is unresolved; only the code-686 identity is retained."
+        ],
     ),
     _spec(
         "stacked two-dimensional-cellular-automaton history embedding",
@@ -274,6 +284,10 @@ RECOVERED_SPECS = [
             "The source identifies snaking and spiral variants but does not "
             "give a coordinate formula or tie-breaking convention."
         ),
+        missing_mechanics=[
+            "Start cell, orientation, turn convention, extent, and tie "
+            "breaking for the snaking and spiral scans are not specified."
+        ],
     ),
     _spec(
         "network evolution node-count observer",
@@ -376,6 +390,10 @@ RECOVERED_SPECS = [
         "project the plane/lattice intersection to obtain the induced tiling",
         "a Penrose tiling with approximate fivefold symmetry",
         related=["B0904"],
+        missing_mechanics=[
+            "The cut window, plane offset, lattice-intersection convention, "
+            "and exact projection map are not specified."
+        ],
     ),
     _spec(
         "quadratic-irrational hyperplane cut-and-project nested-pattern family",
@@ -385,6 +403,10 @@ RECOVERED_SPECS = [
         "a regular lattice and quadratic-irrational hyperplane slopes",
         "project the regular lattice along the selected irrational hyperplane",
         "a nested pattern representable by shape subdivision",
+        missing_mechanics=[
+            "The source does not specify the acceptance window, offsets, "
+            "projection coordinates, or boundary convention for this family."
+        ],
     ),
     _spec(
         "base-(i-1) binary-digit point-set generator",
@@ -408,6 +430,10 @@ RECOVERED_SPECS = [
             "The exponent may fluctuate or fail to converge; the source does "
             "not fix one estimator for every nonconvergent case."
         ),
+        missing_mechanics=[
+            "Grid-origin dependence and the estimator/reporting convention "
+            "for a fluctuating or nonconvergent small-scale exponent are open."
+        ],
     ),
     _spec(
         "grid-occupancy distribution-moment observer",
@@ -510,6 +536,10 @@ RECOVERED_SPECS = [
         "network, reference node, and connection radius r",
         "count distinct nodes reachable within r connections and compare with r^d",
         "a dimension estimate or reachable-volume growth curve",
+        missing_mechanics=[
+            "The fitting range, estimator, root-node aggregation, and behavior "
+            "when the r^d exponent does not converge are not specified."
+        ],
     ),
     _spec(
         "polynomial-growth string-multiway preset",
@@ -536,6 +566,10 @@ RECOVERED_SPECS = [
         uncertainties=[
             "The source contains the defective text “shows wh” and omits the "
             "plot-axis/string encoding."
+        ],
+        missing_mechanics=[
+            "The OCR-defective caption leaves the displayed incidence/axis "
+            "encoding and any standalone bounded-reach algorithm unspecified."
         ],
     ),
     _spec(
@@ -596,6 +630,10 @@ RECOVERED_SPECS = [
             "but explicitly notes that classification supplies no practical "
             "general enumeration procedure."
         ),
+        missing_mechanics=[
+            "No executable enumeration algorithm, isomorphism test, or "
+            "completion bound is supplied for the finite-structure counts."
+        ],
     ),
     _spec(
         "nim zero-XOR losing-position predicate",
@@ -620,6 +658,11 @@ RECOVERED_SPECS = [
             "The source identifies the method family and role but supplies no "
             "element basis, mesh, assembly formula, or convergence contract."
         ),
+        missing_mechanics=[
+            "Element family, basis, mesh construction, weak form, matrix "
+            "assembly, boundary enforcement, solver, and convergence/error "
+            "contract are all unspecified."
+        ],
     ),
     _spec(
         "linear-vector forward-map evaluator",
@@ -724,13 +767,21 @@ RECOVERED_SPECS = [
         "integer triples satisfying x^2 + y^2 = z^2",
         "integer parameters r and s under the unstated primitive-case restrictions",
         "return {r^2-s^2, 2 r s, r^2+s^2}",
-        "a Pythagorean triple, primitive after removing common factors",
+        "a Pythagorean triple for valid primitive-case parameter choices",
         related=["B0969"],
         limit=(
             "The source states the parameterization after removing common "
             "factors but does not spell out parity, ordering, or coprimality "
-            "restrictions."
+            "restrictions, nor a completeness convention."
         ),
+        uncertainties=[
+            "The valid parity, coprimality, ordering, sign, and completeness "
+            "conditions on r and s are UNKNOWN_FROM_SOURCE."
+        ],
+        missing_mechanics=[
+            "Parity, coprimality, order, sign, duplicate-removal, and "
+            "completeness conditions for r and s are not specified."
+        ],
     ),
     _spec(
         "four-neighbor two-dimensional mobile-automaton rule cardinality",
@@ -809,7 +860,7 @@ RECOVERED_SPECS = [
     _spec(
         "numeric-multiway Fibonacci state-count function",
         ["U006275"],
-        "asymptotic trajectory growth-profile observer",
+        "exact trajectory count function",
         "distinct numbers in the n→{n+1,2n} multiway evolution",
         "step t",
         "evaluate Fibonacci[t+2]",
@@ -860,6 +911,10 @@ RECOVERED_SPECS = [
             "cases and qualitative variation for more general patterns, not "
             "one closed formula for every pattern."
         ),
+        missing_mechanics=[
+            "No exact all-pattern counting law or uniform asymptotic/error "
+            "contract is given for the parameterized avoidance family."
+        ],
     ),
     _spec(
         "integer square-ratio Diophantine relation",
@@ -899,6 +954,10 @@ RECOVERED_SPECS = [
             "a positive/nontrivial-domain statement, with the exact domain "
             "UNKNOWN_FROM_SOURCE."
         ),
+        missing_mechanics=[
+            "The positivity, zero, sign, and nontriviality domain conventions "
+            "needed for the power-of-two characterization are unspecified."
+        ],
     ),
     _spec(
         "stacked geometric-substitution evolution representation",
@@ -972,7 +1031,7 @@ RECOVERED_SPECS = [
     _spec(
         "polynomial-growth multiway state-count asymptotic profile",
         ["U006252"],
-        "exact trajectory count function",
+        "asymptotic trajectory growth-profile observer",
         "the displayed three-rule string multiway preset",
         "step t and number n of B symbols in the initial condition",
         "the displayed rule's state count grows at rate t^(n+1)",
@@ -1666,6 +1725,7 @@ def _new_candidate(
     not_applicable_fields: set[str],
     parameters: list[dict[str, Any]],
     uncertainties: list[str],
+    exact_missing_mechanics: list[str],
     related_candidate_ids: list[dict[str, Any]],
     source_status: list[str],
     image_witnesses: list[str],
@@ -1730,8 +1790,16 @@ def _new_candidate(
         "parameters": parameters,
         "variants": [],
         "missing_mechanics": [
-            "The assigned source leaves these fields unknown: "
-            + ", ".join(missing)
+            *exact_missing_mechanics,
+            *(
+                [
+                    "The assigned source leaves these remaining fingerprint "
+                    "fields UNKNOWN_FROM_SOURCE: "
+                    + ", ".join(missing)
+                ]
+                if missing
+                else []
+            ),
         ],
         "uncertainties": uncertainties,
         "related_candidate_ids": related_candidate_ids,
@@ -2398,12 +2466,8 @@ def _build_enrichment(
 
 DIRECT_FUNCTION_NA = {
     "native_time",
-    "topology",
-    "complete_state",
-    "visible_history",
     "control_state",
     "seed",
-    "boundary",
     "external_data",
     "frontier_or_activation",
     "schedule",
@@ -2414,15 +2478,12 @@ DIRECT_FUNCTION_NA = {
 
 RELATION_NA = {
     "native_time",
-    "topology",
-    "complete_state",
-    "visible_history",
     "control_state",
     "seed",
-    "boundary",
     "external_data",
     "frontier_or_activation",
     "schedule",
+    "read_dependencies_or_neighborhood",
     "write_replacement_assembly_or_commit",
     "successor_cardinality",
     "termination_completion_failure",
@@ -2450,11 +2511,6 @@ def _typed_semantics(
         "rule_relation_constraint_function_or_probability_law": spec["law"],
         "result_kind": spec["result"],
         "parameters_and_variants": spec["input"],
-        "excluded_observers_and_representations": (
-            "Page layout, plotting, rasterization, and implementation "
-            "notation are non-semantic except where this candidate is "
-            "explicitly the stated representation or observer."
-        ),
         "evidence_limit": spec["limit"],
     }
     if profile == "FUNCTION":
@@ -2467,16 +2523,10 @@ def _typed_semantics(
                 "determinism_branching_or_measure": (
                     spec["measure"] or "deterministic direct evaluation"
                 ),
-                "termination_completion_failure": (
-                    spec["completion"]
-                    or (
-                        "Direct evaluation is defined for the stated valid "
-                        "inputs; invalid-input and implementation-failure "
-                        "behavior is not stated."
-                    )
-                ),
             }
         )
+        if spec["completion"] is not None:
+            values["termination_completion_failure"] = spec["completion"]
         return values, set(DIRECT_FUNCTION_NA)
     if profile == "REPRESENTATION":
         values.update(
@@ -2489,25 +2539,14 @@ def _typed_semantics(
                     spec["measure"]
                     or "deterministic ordering/embedding of supplied states"
                 ),
-                "termination_completion_failure": (
-                    spec["completion"]
-                    or "finite assembly for a finite retained history"
-                ),
-                "witness_semantics": (
-                    "The inspected stacked image corroborates the ordered "
-                    "history output but does not define native update mechanics."
-                ),
             }
         )
-        na = set(DIRECT_FUNCTION_NA)
-        na.remove("witness_semantics")
-        return values, na
+        if spec["completion"] is not None:
+            values["termination_completion_failure"] = spec["completion"]
+        return values, set(DIRECT_FUNCTION_NA)
     if profile == "RELATION":
         values.update(
             {
-                "read_dependencies_or_neighborhood": (
-                    "all variables and parameters named in the stated relation"
-                ),
                 "determinism_branching_or_measure": (
                     spec["measure"]
                     or (
@@ -2621,13 +2660,10 @@ def _typed_evidence_scopes(
         "evidence_limit",
     }
     image_fields = {
-        "carrier",
-        "support",
         "visible_history",
         "result_kind",
         "witness_semantics",
         "excluded_observers_and_representations",
-        "evidence_limit",
     }
     for row in rows:
         unit_id = row["source_unit_id"]
@@ -2646,12 +2682,26 @@ def _typed_evidence_scopes(
             key=FINGERPRINT_FIELDS.index,
         )
 
-    covered = {
-        field for fields in scopes.values() for field in fields
-    }
     primary_fields = set(scopes[primary_id])
     primary_fields.update(not_applicable_fields)
-    primary_fields.update(supported_fields - covered)
+    primary_fields.update(
+        supported_fields
+        & {
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+    )
+    if len(non_image) == 1:
+        primary_fields.update(
+            supported_fields
+            & {
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+            }
+        )
     scopes[primary_id] = sorted(
         primary_fields,
         key=FINGERPRINT_FIELDS.index,
@@ -2861,7 +2911,7 @@ def _build_final_enrichment(
         candidate_id = spec["_candidate_id"]
         evidence = sorted(
             evidence_by_candidate[candidate_id],
-            key=lambda item: spec["units"].index(item["source_unit_id"]),
+            key=lambda item: int(item["evidence_id"][1:]),
         )
         evidence_ids = [item["evidence_id"] for item in evidence]
         relations = [
@@ -2918,6 +2968,7 @@ def _build_final_enrichment(
                     }
                 ],
                 uncertainties=spec["uncertainties"],
+                exact_missing_mechanics=spec["missing_mechanics"],
                 related_candidate_ids=relations,
                 source_status=source_status,
                 image_witnesses=image_witnesses,
@@ -2984,12 +3035,6 @@ def _build_final_enrichment(
             old_asset["candidate_ids"],
             additions,
             f"{old_asset['asset_id']}.candidate_ids",
-        )
-        asset["evidence_statement"] = (
-            f"Original-resolution image review corroborates the result, "
-            f"history, or witness representation for "
-            f"{'; '.join(names_by_unit[unit_id])}; it supplies no additional "
-            f"native update mechanics."
         )
         asset_updates.append(asset)
 
