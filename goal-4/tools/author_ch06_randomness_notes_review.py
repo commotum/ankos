@@ -294,20 +294,11 @@ def spec(
 
 CA_FIELDS = [
     "object_kind",
-    "native_time",
-    "carrier",
-    "support",
-    "topology",
     "alphabet_or_value_schema",
-    "complete_state",
-    "frontier_or_activation",
-    "schedule",
     "read_dependencies_or_neighborhood",
     "law_kind",
     "rule_relation_constraint_function_or_probability_law",
-    "write_replacement_assembly_or_commit",
     "result_kind",
-    "successor_cardinality",
     "determinism_branching_or_measure",
 ]
 OBS_FIELDS = [
@@ -316,7 +307,6 @@ OBS_FIELDS = [
     "law_kind",
     "rule_relation_constraint_function_or_probability_law",
     "result_kind",
-    "determinism_branching_or_measure",
 ]
 CONSTRAINT_FIELDS = [
     "object_kind",
@@ -324,33 +314,24 @@ CONSTRAINT_FIELDS = [
     "law_kind",
     "rule_relation_constraint_function_or_probability_law",
     "result_kind",
-    "determinism_branching_or_measure",
     "witness_semantics",
 ]
 SEED_FIELDS = [
     "object_kind",
     "carrier",
     "support",
-    "alphabet_or_value_schema",
     "complete_state",
     "seed",
-    "law_kind",
-    "rule_relation_constraint_function_or_probability_law",
     "result_kind",
-    "determinism_branching_or_measure",
 ]
 MAP_FIELDS = [
     "object_kind",
     "native_time",
     "carrier",
     "complete_state",
-    "frontier_or_activation",
-    "schedule",
     "law_kind",
     "rule_relation_constraint_function_or_probability_law",
-    "write_replacement_assembly_or_commit",
     "result_kind",
-    "successor_cardinality",
     "determinism_branching_or_measure",
 ]
 
@@ -903,7 +884,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006424", "PROSE", "DIRECT_IDENTITY", "An exact density-after-t function for rule 90 is introduced.", ["object_kind", "input", "result_kind"]),
-                ev("U006425", "FORMULA", "DEFECT_LIMITED", "The extracted formula has a parenthesis placement that does not preserve the prose dependence on DigitCount in the expected way.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "evidence_limit"]),
+                ev("U006425", "FORMULA", "DEFECT_LIMITED", "The extracted formula has a parenthesis placement that does not preserve the prose dependence on DigitCount in the expected way.", ["law_kind", "rule_relation_constraint_function_or_probability_law"]),
             ],
             values={
                 "input": "initial density p and step t",
@@ -1471,8 +1452,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006514", "FORMULA", "DEFECT_LIMITED", "The extraction prints Limit[Sum[UnitStep[p[i]],{i,k^n}]/n,n->Infinity], which counts supported blocks but omits the logarithm needed for a finite exponential growth rate.", OBS_FIELDS + ["evidence_limit"]),
-                ev("U006515", "PROSE", "DEFECT_LIMITED", "The prose identifies the intended quantity as set entropy, topological entropy, capacity, and fractal dimension, but does not repair the defective printed expression.", ["result_kind", "parameters_and_variants", "evidence_limit"]),
+                ev("U006514", "FORMULA", "DEFECT_LIMITED", "The extraction prints Limit[Sum[UnitStep[p[i]],{i,k^n}]/n,n->Infinity], which counts supported blocks but omits the logarithm needed for a finite exponential growth rate.", OBS_FIELDS),
+                ev("U006515", "PROSE", "DEFECT_LIMITED", "The prose identifies the intended quantity as set entropy, topological entropy, capacity, and fractal dimension, but does not repair the defective printed expression.", ["result_kind", "parameters_and_variants"]),
             ],
             values={
                 "input": "block probabilities p[i] for k-symbol blocks of length n",
@@ -1491,8 +1472,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006516", "FORMULA", "DEFECT_LIMITED", "The source prints h[q,n]=Log_k Sum_i p_i^q /(n(q-1)); for the stated uniform distribution this evaluates to -1, not the +1 maximum asserted next.", OBS_FIELDS + ["evidence_limit"]),
-                ev("U006517", "PROSE", "DEFECT_LIMITED", "The prose asserts maximum h[q,n]=1 for uniform probabilities, names the q=0, q→1, and q=2 cases, and states monotonicity, contradicting the sign of the printed denominator.", ["result_kind", "parameters_and_variants", "structural_invariants", "evidence_limit"]),
+                ev("U006516", "FORMULA", "DEFECT_LIMITED", "The source prints h[q,n]=Log_k Sum_i p_i^q /(n(q-1)); for the stated uniform distribution this evaluates to -1, not the +1 maximum asserted next.", OBS_FIELDS),
+                ev("U006517", "PROSE", "DEFECT_LIMITED", "The prose asserts maximum h[q,n]=1 for uniform probabilities, names the q=0, q→1, and q=2 cases, and states monotonicity, contradicting the sign of the printed denominator.", ["result_kind", "parameters_and_variants", "structural_invariants"]),
             ],
             values={
                 "input": "block probabilities p[i], alphabet size k, block length n, and order q",
@@ -2391,7 +2372,7 @@ def main() -> None:
                 "strength": evidence["strength"],
                 "modality": evidence["modality"],
                 "claim": evidence["claim"],
-                "fingerprint_fields": list(dict.fromkeys(evidence["fields"] + ["evidence_limit"])),
+                "fingerprint_fields": list(dict.fromkeys(evidence["fields"])),
             }
             source_evidence.append(record)
             for field in record["fingerprint_fields"]:
@@ -2411,7 +2392,6 @@ def main() -> None:
                 for name, description in item["parameters"] + item["variants"]
             ]
             values["parameters_and_variants"] = "; ".join(entries)
-        values["evidence_limit"] = "This record is limited to the sealed Chapter 6 Notes bundle."
         na_fields = set(PROFILE_NA.get(item["profile"], set()))
         unsupported_declarations = {
             field
@@ -2428,24 +2408,25 @@ def main() -> None:
         field_support: dict[str, str] = {}
         missing_mechanics: list[str] = list(item["missing"])
         first_evidence_id = source_evidence[0]["evidence_id"]
-        first_evidence = source_evidence[0]
-        # Every support declaration is an exact bidirectional join: fields
-        # with profile-level support, and every N/A judgment, are explicitly
-        # declared by the candidate's first direct evidence record.
         for field in FIELDS:
-            if (field in values or field in na_fields) and not evidence_by_field[field]:
-                first_evidence["fingerprint_fields"].append(field)
-                evidence_by_field[field].append(first_evidence_id)
-        first_evidence["fingerprint_fields"] = list(dict.fromkeys(first_evidence["fingerprint_fields"]))
-        for field in FIELDS:
-            if field in values:
+            if field == "evidence_limit":
+                reason = "The sealed-bundle audit boundary is record metadata, not content established by a source unit."
+                fingerprint[field] = {
+                    "status": "UNKNOWN_FROM_SOURCE",
+                    "value": None,
+                    "evidence_ids": [],
+                    "reason": reason,
+                }
+                if reason not in missing_mechanics:
+                    missing_mechanics.append(reason)
+            elif field in values and evidence_by_field[field]:
                 fingerprint[field] = {
                     "status": "SUPPORTED",
                     "value": values[field],
                     "evidence_ids": evidence_by_field[field],
                     "reason": "",
                 }
-            elif field in na_fields:
+            elif field in na_fields and evidence_by_field[field]:
                 fingerprint[field] = {
                     "status": "NOT_APPLICABLE",
                     "value": None,
