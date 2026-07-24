@@ -209,6 +209,14 @@ def mark_unknown(spec: CandidateSpec, reasons: dict[str, str]) -> None:
         spec["unknown_reasons"][field] = reason
 
 
+def mark_not_applicable(spec: CandidateSpec, reasons: dict[str, str]) -> None:
+    """Reclassify evidenced category facts as not applicable."""
+    for field, reason in reasons.items():
+        spec["facts"].pop(field, None)
+        spec["unknown_reasons"].pop(field, None)
+        spec["not_applicable"][field] = reason
+
+
 def spec_by_key(key: str) -> CandidateSpec:
     try:
         return next(item for item in ALL_CANDIDATES if item["key"] == key)
@@ -274,6 +282,11 @@ SEED_NA = {
     "termination_completion_failure": "Providing the complete seed completes this object.",
 }
 
+UNSUPPORTED_REQUESTED_STEP_COMPLETION = (
+    "The law is iterated for the requested number of steps unless its stated "
+    "domain condition fails."
+)
+
 
 def iterative_facts(
     *,
@@ -295,7 +308,7 @@ def iterative_facts(
     result: str,
     successor: str = "Exactly one successor follows from each complete state.",
     determinism: str = "Deterministic for a fixed rule and complete state.",
-    termination: str = "The law is iterated for the requested number of steps unless its stated domain condition fails.",
+    termination: str = UNSUPPORTED_REQUESTED_STEP_COMPLETION,
     witness: str = "Every adjacent pair in a valid trajectory satisfies the stated update law.",
     variants: str,
     excluded: str,
@@ -968,6 +981,16 @@ register_arithmetic_map = source_candidate(
     claim="The caption explicitly prints the two-branch arithmetic rule and routes its machine realization to page 100.",
     strength="DIRECT_COMPLETE_MECHANICS",
     route_keys=["register-page100"],
+)
+mark_not_applicable(
+    register_arithmetic_map,
+    {
+        "seed": (
+            "This record identifies the fixed arithmetic map; the compared "
+            "trajectory relationship is not an initial state for the "
+            "referenced register machine."
+        )
+    },
 )
 
 parity_observer = source_candidate(
@@ -1843,10 +1866,13 @@ rational_periodicity = source_candidate(
 mark_unknown(
     rational_periodicity,
     {
+        "topology": "The caption does not state a topology for the radix-expansion relation.",
+        "structural_invariants": "The caption states periodicity and its period bound but no separate structural-invariant semantics.",
         "successor_cardinality": "The source does not choose one representation when a rational has dual terminating and nonterminating radix expansions.",
         "determinism_branching_or_measure": "No selection convention is stated for a rational with dual radix expansions.",
     },
 )
+rational_periodicity["evidence"][0]["strength"] = "DIRECT_PARTIAL_MECHANICS"
 
 long_division = source_candidate(
     "binary-long-division",
@@ -2412,15 +2438,21 @@ zeta_function = source_candidate(
         determinism="Deterministic.",
         termination="The displayed denotation is an infinite sum rather than a finite summation procedure.",
         witness="Partial sums converge to the stated value in the admitted domain.",
-        variants="The source relates the function to prime distribution.",
+        variants="The displayed denotation uses the argument s.",
         excluded="The plotted Riemann-Siegel curve is a related function, not Zeta's native representation.",
         limit="Analytic continuation, the complete complex domain, and a finite numerical approximation method are not specified.",
     ),
     not_applicable=DECLARATIVE_NA,
-    missing="Analytic continuation, convergence domain, and evaluation method are not supplied.",
+    missing="Analytic continuation, convergence domain, evaluation method, and parameter/variant family are not supplied.",
     claim="The caption explicitly defines Zeta[s] by Sum[1/k^s,{k,infinity}].",
     strength="DIRECT_PARTIAL_MECHANICS",
     modality="FORMULA",
+)
+mark_unknown(
+    zeta_function,
+    {
+        "parameters_and_variants": "The caption displays an argument s but does not state a parameterization or variant family for the zeta denotation."
+    },
 )
 
 riemann_siegel = source_candidate(
@@ -3584,6 +3616,8 @@ mark_unknown(
     {
         "alphabet_or_value_schema": "The source says components come from discrete sets but does not list the vocabulary or formal value schema.",
         "support": "The source does not delimit expression size or syntactic structure.",
+        "topology": "The source does not state an ordering, indexing, adjacency, or other topology for symbolic PDE expressions.",
+        "structural_invariants": "Without a supplied expression grammar, the source establishes no structural invariants for sampled formulas.",
         "complete_state": "No operational sampler state is specified.",
         "input": "No concrete component vocabulary or generator input schema is supplied.",
         "successor_cardinality": "No enumeration or measure over possible expressions is specified.",
@@ -3638,6 +3672,33 @@ context_evidence(
     fields=["result_kind", "excluded_observers_and_representations", "evidence_limit"],
     strength="CORROBORATING",
 )
+
+# The shared iterative template describes one-step laws and finite displayed
+# windows.  None of the 52 users below supplies a runner request or a generic
+# stopping/completion contract, so retain that policy as source-limited
+# unknown rather than importing it into every candidate.
+_requested_step_specs = [
+    item
+    for item in ALL_CANDIDATES
+    if item["facts"].get("termination_completion_failure")
+    == UNSUPPORTED_REQUESTED_STEP_COMPLETION
+]
+if len(_requested_step_specs) != 52:
+    raise AuthoringError(
+        "requested-step completion repair expected 52 candidates, found "
+        f"{len(_requested_step_specs)}"
+    )
+for _spec in _requested_step_specs:
+    mark_unknown(
+        _spec,
+        {
+            "termination_completion_failure": (
+                f"The assigned source defines or displays {_spec['name']} "
+                "but does not state a stopping, completion, or failure policy "
+                "for its iteration."
+            )
+        },
+    )
 
 
 # Literal construction-bearing routes discovered during the sequential pass.
@@ -3770,7 +3831,7 @@ context_evidence(
     zeta_function,
     "zeta-introduction",
     "U000823",
-    "The passage first identifies the zeta function as the construction behind the following plotted example.",
+    "The passage identifies the zeta function as the construction behind the following plot and relates it to prime distribution; this is relation context, not parameter or variant evidence.",
     strength="DIRECT_IDENTITY",
 )
 context_evidence(
