@@ -1203,3 +1203,61 @@ def test_reconciliation_schemas_are_typed_and_closed() -> None:
     assert build_worker_bundle.json_schema_errors(coverage, coverage_schema) == []
     coverage["existing_t_ids"] = ["T99"]
     assert build_worker_bundle.json_schema_errors(coverage, coverage_schema)
+
+
+def _route_only_candidate_replay_errors(
+    *,
+    pair_mode: str,
+    mutate_non_route_field: bool = False,
+):
+    candidate = copy.deepcopy(load()[3][0])
+    candidate_id = candidate["id"]
+    route_id = "R999999"
+    after = copy.deepcopy(candidate)
+    after["cross_reference_ids"].append(route_id)
+    if mutate_non_route_field:
+        after["aliases"].append("unauthorized route-only alias")
+    errors = []
+    MODULE._validate_candidate_enrichment_update(
+        candidate,
+        after,
+        {
+            "source_paths": [
+                "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
+            ]
+        },
+        trigger_hit_ids={"H999999"},
+        trigger_unit_ids=set(),
+        trigger_candidate_ids={candidate_id},
+        trigger_route_ids={route_id},
+        trigger_route_candidate_pairs={
+            "exact": {(route_id, candidate_id)},
+            "wrong_candidate": {(route_id, "B9999")},
+            "wrong_hit": set(),
+        }[pair_mode],
+        snapshot={"asset_results": []},
+        errors=errors,
+        prefix="route-only fixture",
+    )
+    return errors
+
+
+def test_route_only_candidate_replay_requires_exact_same_hit_pair() -> None:
+    assert _route_only_candidate_replay_errors(pair_mode="exact") == []
+    for pair_mode in ("wrong_candidate", "wrong_hit"):
+        assert any(
+            "candidate UPDATE appends no evidence" in error
+            for error in _route_only_candidate_replay_errors(
+                pair_mode=pair_mode
+            )
+        )
+
+
+def test_route_only_candidate_replay_rejects_other_field_changes() -> None:
+    assert any(
+        "candidate UPDATE appends no evidence" in error
+        for error in _route_only_candidate_replay_errors(
+            pair_mode="exact",
+            mutate_non_route_field=True,
+        )
+    )
