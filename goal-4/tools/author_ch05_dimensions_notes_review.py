@@ -822,7 +822,7 @@ def candidate_specs() -> list[dict[str, Any]]:
     add("smaller-template local constraint family", "CONSTRAINT", ("SOURCE_UNIT", "U006298"),
         [ev("U006298", "Constraints based on smaller templates are independently delimited."),
          ev("U006299", "Five exact template shapes are related to counts 4,7,17,11,12 of required repetitive patterns.", modality="IMAGE",
-            image="BACK-MATTER/NOTES/_page_957_Constraint_Template_Icons_and_Ratios.jpeg", strength="DIRECT_PARTIAL_MECHANICS")],
+            image="BACK-MATTER/NOTES/_page_957_Constraint_Template_Icons_and_Ratios.jpeg", strength="CORROBORATING")],
         params=[("template shape", "one of the five displayed smaller neighborhoods")])
     add("every-allowed-template-must-occur constraint", "CONSTRAINT", ("SOURCE_UNIT", "U006300"),
         [ev("U006300", "The variant requires not only that every local block be allowed, but also that every template in the selected set occur somewhere.")],
@@ -1006,7 +1006,7 @@ ROLE_MAP = {
     "A000527": ("RELATION", ["TEXT_BEARING", "CAPTION_INCOMPLETE"], "CHECKED", "CLEAR"),
     "A000528": ("OBSERVER", ["TEXT_BEARING"], "CHECKED", "CLEAR"),
     "A000541": ("CONTROL", ["TEXT_BEARING"], "CHECKED", "CLEAR"),
-    "A000542": ("CONTROL", ["TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"], "CHECKED", "DEFECTIVE"),
+    "A000542": ("CONTROL", ["TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"], "CHECKED", "CONFLICTING"),
     "A000543": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "CHECKED", "CLEAR"),
     "A000544": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED", "CLEAR"),
     "A000545": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED", "CLEAR"),
@@ -1083,6 +1083,7 @@ HISTORY_UNITS = {"U006114", "U006136", "U006138", "U006197", "U006261", "U006264
 APPLICATION_UNITS = {"U006121", "U006227"}
 DEFECT_UNITS = {
     "U006117": "The prose says undefined “s alone” although the code defines only p/q/r and the image labels r/q/p compositions.",
+    "U006118": "The image labels r/q/p compositions while its governing prose says undefined “s alone”.",
     "U006258": "The caption contains OCR truncation “shows wh” and does not specify the plotted axis/string encoding.",
 }
 
@@ -1124,28 +1125,80 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     unit_candidates: dict[str, list[str]] = {}
     asset_candidates: dict[str, list[str]] = {}
     proposals: list[dict[str, Any]] = []
-    evidence_ordinal = 0
-    evidence_group_ordinal = 0
+
+    unit_order = {row["source_unit_id"]: i + 1 for i, row in enumerate(reading_rows)}
+    asset_by_id = {row["asset_id"]: row for row in asset_rows}
+    asset_by_path = {row["physical_path"]: row for row in asset_rows}
+    image_order = {
+        row["physical_path"]: len(reading_rows) + i + 1
+        for i, row in enumerate(asset_rows)
+    }
+
+    # Candidate discovery uses the image-link source unit even when the
+    # decisive identity is visually carried by that unit's owned image.  This
+    # preserves the document-first source traversal; image evidence itself
+    # retains an IMAGE anchor.
+    candidate_anchors: list[tuple[str, str, int]] = []
+    candidate_ordinals: dict[str, int] = {}
+    for spec in specs:
+        kind, anchor_id = spec["anchor"]
+        if kind == "IMAGE":
+            anchor_unit = asset_by_id[anchor_id]["source_unit_id"]
+            if not anchor_unit:
+                raise AssertionError(f"image candidate anchor {anchor_id} has no source unit")
+        else:
+            anchor_unit = anchor_id
+        candidate_ordinals[anchor_unit] = candidate_ordinals.get(anchor_unit, 0) + 1
+        candidate_anchors.append(
+            ("SOURCE_UNIT", anchor_unit, candidate_ordinals[anchor_unit])
+        )
+    candidate_keys = [
+        (unit_order[anchor_id], ordinal)
+        for _, anchor_id, ordinal in candidate_anchors
+    ]
+    if candidate_keys != sorted(candidate_keys):
+        raise AssertionError("candidate specs are not in frozen source traversal order")
+
+    # Evidence IDs are globally ordered by immutable anchor traversal rather
+    # than candidate grouping.  Ordinals restart at one for each exact anchor.
+    evidence_occurrences: list[tuple[int, int, int, str, str]] = []
+    for spec_index, spec in enumerate(specs):
+        for raw_index, raw in enumerate(spec["evidence"]):
+            if raw["image"]:
+                anchor_kind = "IMAGE"
+                anchor_id = raw["image"]
+                anchor_order = image_order[anchor_id]
+            else:
+                anchor_kind = "SOURCE_UNIT"
+                anchor_id = raw["unit"]
+                anchor_order = unit_order[anchor_id]
+            evidence_occurrences.append(
+                (anchor_order, spec_index, raw_index, anchor_kind, anchor_id)
+            )
+    evidence_occurrences.sort()
+    evidence_assignments: dict[tuple[int, int], tuple[str, str, str, str, int]] = {}
+    evidence_anchor_ordinals: dict[tuple[str, str], int] = {}
+    for global_ordinal, (_, spec_index, raw_index, anchor_kind, anchor_id) in enumerate(
+        evidence_occurrences, 1
+    ):
+        anchor_key = (anchor_kind, anchor_id)
+        evidence_anchor_ordinals[anchor_key] = evidence_anchor_ordinals.get(anchor_key, 0) + 1
+        evidence_assignments[(spec_index, raw_index)] = (
+            f"WE{global_ordinal:06d}",
+            f"WG{global_ordinal:06d}",
+            anchor_kind,
+            anchor_id,
+            evidence_anchor_ordinals[anchor_key],
+        )
 
     for i, spec in enumerate(specs):
         cid = candidate_ids[i]
         values = profile_values(spec)
         records: list[dict[str, Any]] = []
-        for raw in spec["evidence"]:
-            evidence_ordinal += 1
-            evidence_group_ordinal += 1
-            eid = f"WE{evidence_ordinal:06d}"
-            gid = f"WG{evidence_group_ordinal:06d}"
-            anchor_kind = "IMAGE" if raw["image"] else "SOURCE_UNIT"
-            anchor_id = (
-                next(
-                    r["asset_id"]
-                    for r in asset_rows
-                    if raw["image"] and r["physical_path"] == raw["image"]
-                )
-                if raw["image"]
-                else raw["unit"]
-            )
+        for raw_index, raw in enumerate(spec["evidence"]):
+            eid, gid, anchor_kind, anchor_id, anchor_ordinal = evidence_assignments[
+                (i, raw_index)
+            ]
             supported_fields = raw["fields"] or [f for f, value in values.items() if value is not None]
             records.append(
                 {
@@ -1155,7 +1208,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                         "epoch": 2,
                         "kind": anchor_kind,
                         "id": anchor_id,
-                        "ordinal": evidence_ordinal,
+                        "ordinal": anchor_ordinal,
                     },
                     "source_unit_id": raw["unit"],
                     "image_path": raw["image"],
@@ -1168,7 +1221,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
             if raw["unit"]:
                 unit_candidates.setdefault(raw["unit"], []).append(cid)
             if raw["image"]:
-                asset_candidates.setdefault(anchor_id, []).append(cid)
+                asset_candidates.setdefault(asset_by_path[raw["image"]]["asset_id"], []).append(cid)
 
         statuses: dict[str, str] = {}
         fingerprint: dict[str, dict[str, Any]] = {}
@@ -1209,10 +1262,19 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                 "reason": reason,
             }
 
-        anchor_kind, anchor_id = spec["anchor"]
+        # Make the evidence-to-fingerprint join exact after unknown,
+        # not-applicable, and conflicting fields have been adjudicated.
+        for record in records:
+            record["fingerprint_fields"] = [
+                field
+                for field in FIELDS
+                if record["evidence_id"] in fingerprint[field]["evidence_ids"]
+            ]
+
+        anchor_kind, anchor_id, anchor_ordinal = candidate_anchors[i]
         image_paths = sorted({r["image_path"] for r in records if r["image_path"]})
         unit_ids = sorted({r["source_unit_id"] for r in records if r["source_unit_id"]})
-        evidence_ids = [r["evidence_id"] for r in records]
+        evidence_ids = sorted(r["evidence_id"] for r in records)
         proposals.append(
             {
                 "id": cid,
@@ -1224,7 +1286,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                     "epoch": 2,
                     "kind": anchor_kind,
                     "id": anchor_id,
-                    "ordinal": i + 1,
+                    "ordinal": anchor_ordinal,
                 },
                 "source_unit_ids": unit_ids,
                 "source_evidence": records,
@@ -1253,19 +1315,41 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     unit_routes: dict[str, list[str]] = {}
     asset_routes: dict[str, list[str]] = {}
     route_proposals: list[dict[str, str]] = []
-    for ordinal, (unit, asset, target, kind, topic, rid) in enumerate(ROUTES, 1):
-        unit_routes.setdefault(unit, []).append(rid)
+    ordered_routes = sorted(
+        ROUTES,
+        key=lambda row: (
+            len(reading_rows) + int(row[1][1:]) - 518
+            if row[1]
+            else unit_order[row[0]]
+        ),
+    )
+    route_anchor_ordinals: dict[tuple[str, str], int] = {}
+    for route_index, (unit, asset, target, kind, topic, _) in enumerate(ordered_routes, 1):
+        rid = f"WR{route_index:04d}"
         if asset:
+            discovery_kind = "IMAGE"
+            discovery_id = asset
+            source_unit_id = ""
+            source_asset_id = asset
             asset_routes.setdefault(asset, []).append(rid)
+            anchor_key = (discovery_kind, asset)
+        else:
+            discovery_kind = "SOURCE_UNIT"
+            discovery_id = unit
+            source_unit_id = unit
+            source_asset_id = ""
+            unit_routes.setdefault(unit, []).append(rid)
+            anchor_key = (discovery_kind, unit)
+        route_anchor_ordinals[anchor_key] = route_anchor_ordinals.get(anchor_key, 0) + 1
         route_proposals.append(
             {
                 "route_id": rid,
-                "source_unit_id": unit,
-                "source_asset_id": asset,
+                "source_unit_id": source_unit_id,
+                "source_asset_id": source_asset_id,
                 "discovery_epoch": EPOCH,
-                "discovery_kind": "SOURCE_UNIT",
-                "discovery_id": unit,
-                "discovery_ordinal": str(ordinal),
+                "discovery_kind": discovery_kind,
+                "discovery_id": discovery_id,
+                "discovery_ordinal": str(route_anchor_ordinals[anchor_key]),
                 "literal_target": target,
                 "route_kind": kind,
                 "expected_topic": topic,
@@ -1274,9 +1358,9 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                 "status": "PENDING",
                 "target_unit_ids": "[]",
                 "target_asset_ids": "[]",
-                "attempts": "Blind sequential review recorded the literal target; coordinator routing is required.",
+                "attempts": jlist(["Blind sequential review recorded the literal target; coordinator routing is required."]),
                 "vocabulary_terms": jlist(sorted(set(topic.lower().replace("/", " ").replace("-", " ").split()))),
-                "defect_boundary": "Target is outside this sealed Notes assignment and was not inspected.",
+                "defect_boundary": "",
             }
         )
 
@@ -1299,16 +1383,22 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
             cids = list(dict.fromkeys(cids + asset_candidates.get(asset_by_unit[u], [])))
         rids = unit_routes.get(u, [])
         uncertainty = DEFECT_UNITS.get(u, "")
-        source_status = "DEFECTIVE" if uncertainty else "CLEAR"
-        if u in candidate_anchor_units or asset_by_unit.get(u) in image_anchor_assets:
+        source_status = (
+            "CONFLICTING"
+            if u in {"U006117", "U006118"}
+            else "DEFECTIVE"
+            if uncertainty
+            else "CLEAR"
+        )
+        if uncertainty:
+            disposition = "SOURCE_DEFECT_OR_AMBIGUITY"
+            statement = uncertainty
+        elif u in candidate_anchor_units or asset_by_unit.get(u) in image_anchor_assets:
             disposition = "CANDIDATE"
             statement = "Introduces one or more independently delimited construction or relation candidates linked in candidate_ids."
         elif cids:
             disposition = "SUPPORTS_CANDIDATE"
             statement = "Supplies identity, mechanics, parameters, witness semantics, or bounded context for the linked candidate(s)."
-        elif uncertainty:
-            disposition = "SOURCE_DEFECT_OR_AMBIGUITY"
-            statement = uncertainty
         elif rids:
             disposition = "CROSS_REFERENCE"
             statement = "Construction-relevant content is principally an unresolved literal route recorded in route_ids."
@@ -1422,29 +1512,21 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         )
         asset_updates.append(update)
 
-    # Candidate cross-reference links are derived only from shared source units.
+    # Candidate cross-reference links are derived from shared source or image
+    # provenance; routes themselves remain unresolved.
     routes_by_unit = {u: ids for u, ids in unit_routes.items()}
     for proposal in proposals:
         linked: list[str] = []
         for unit in proposal["source_unit_ids"]:
             linked.extend(routes_by_unit.get(unit, []))
+        for image_path in proposal["image_witnesses"]:
+            linked.extend(asset_routes.get(asset_by_path[image_path]["asset_id"], []))
         proposal["cross_reference_ids"] = list(dict.fromkeys(linked))
 
     defect_uncertainties = [
-        {
-            "source_unit_id": unit,
-            "source_asset_id": "",
-            "status": "DEFECTIVE",
-            "boundary": text,
-        }
-        for unit, text in DEFECT_UNITS.items()
+        f"{unit}: {text}" for unit, text in DEFECT_UNITS.items()
     ] + [
-        {
-            "source_unit_id": "",
-            "source_asset_id": aid,
-            "status": "DEFECTIVE",
-            "boundary": next(a["uncertainty"] for a in asset_updates if a["asset_id"] == aid),
-        }
+        f"{aid}: {next(a['uncertainty'] for a in asset_updates if a['asset_id'] == aid)}"
         for aid in sorted(set(ORPHANS) | {"A000542", "A000565"})
     ]
 
@@ -1459,15 +1541,18 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     assert len(proposals) == len({p["id"] for p in proposals})
     assert [p["id"] for p in proposals] == [f"W{i:04d}" for i in range(1, len(proposals) + 1)]
     assert [r["route_id"] for r in route_proposals] == [f"WR{i:04d}" for i in range(1, len(route_proposals) + 1)]
-    all_evidence = [e for p in proposals for e in p["source_evidence"]]
+    all_evidence = sorted(
+        (e for p in proposals for e in p["source_evidence"]),
+        key=lambda row: row["evidence_id"],
+    )
     assert [e["evidence_id"] for e in all_evidence] == [f"WE{i:06d}" for i in range(1, len(all_evidence) + 1)]
     assert [e["evidence_group_id"] for e in all_evidence] == [f"WG{i:06d}" for i in range(1, len(all_evidence) + 1)]
     assert all(r["review_status"] == "REVIEWED" and r["review_epoch"] == EPOCH for r in reading_updates)
     assert all(a["inspection_status"] == "SCREENED" and a["original_resolution_status"] == "REVIEWED" for a in asset_updates)
     assert len(ORPHANS) == 33
     assert all(next(a for a in asset_updates if a["asset_id"] == aid)["visual_role"] == "SOURCE_DEFECT" for aid in ORPHANS)
-    assert next(r for r in reading_updates if r["source_unit_id"] == "U006117")["source_status"] == "DEFECTIVE"
-    assert next(a for a in asset_updates if a["asset_id"] == "A000542")["source_status"] == "DEFECTIVE"
+    assert next(r for r in reading_updates if r["source_unit_id"] == "U006117")["source_status"] == "CONFLICTING"
+    assert next(a for a in asset_updates if a["asset_id"] == "A000542")["source_status"] == "CONFLICTING"
     assert next(a for a in asset_updates if a["asset_id"] == "A000565")["source_status"] == "DEFECTIVE"
     assert all(
         not (

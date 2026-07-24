@@ -354,6 +354,41 @@ def profile_blueprint(
             "termination_completion_failure",
             "witness_semantics",
         }
+    elif kind == "CONSTRAINT_GENERAL":
+        supported = {
+            "object_kind": "constraint-defined model set",
+            "native_time": "none; the source contrasts constraints with explicit evolution rules",
+            "structural_invariants": "every accepted object satisfies the stated constraints",
+            "law_kind": "declarative constraint relation",
+            "rule_relation_constraint_function_or_probability_law": name,
+            "write_replacement_assembly_or_commit": "not applicable; the source supplies conditions to satisfy rather than an update",
+            "result_kind": "the set of objects that satisfy the constraints",
+            "successor_cardinality": "not applicable; there is no native successor relation",
+            "determinism_branching_or_measure": "declarative solution set rather than a probability law",
+            "witness_semantics": "an object satisfying the stated constraints is an accepted model",
+            "parameters_and_variants": "the object domain and constraints",
+            "excluded_observers_and_representations": "a procedure for finding a model is separate from the constraint itself",
+            "evidence_limit": "the introductory passage does not yet restrict the carrier, value schema, locality, or solution-set cardinality",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "seed",
+            "input",
+            "external_data",
+            "frontier_or_activation",
+            "schedule",
+            "termination_completion_failure",
+        }
+        unknown = {
+            "carrier",
+            "support",
+            "topology",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "boundary",
+            "read_dependencies_or_neighborhood",
+        }
     elif kind == "CONSTRAINT":
         supported = {
             "object_kind": "constraint-defined model set",
@@ -1103,7 +1138,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
 
     constraint_family = add(
         "constraint-specified system family",
-        "CONSTRAINT",
+        "CONSTRAINT_GENERAL",
         "SOURCE_UNIT",
         "U001161",
         1,
@@ -1743,6 +1778,22 @@ def candidate_records(
                 }
             )
         route_ids = [route_by_key[key] for key in spec["route_keys"]]
+        # A candidate's source-unit projection includes the immutable unit that
+        # owns every image witness, not merely the prose/caption units named by
+        # the semantic specification.
+        source_order = {
+            unit["id"]: position for position, unit in enumerate(state["units"])
+        }
+        record_source_units = sorted(
+            {
+                *spec["units"],
+                *(
+                    state["asset_by_id"][asset_id]["source_unit_id"]
+                    for asset_id in spec["assets"]
+                ),
+            },
+            key=source_order.__getitem__,
+        )
         record = {
             "id": candidate_id,
             "record_status": "ACTIVE",
@@ -1755,7 +1806,7 @@ def candidate_records(
                 "id": spec["anchor_id"],
                 "ordinal": spec["ordinal"],
             },
-            "source_unit_ids": spec["units"],
+            "source_unit_ids": record_source_units,
             "source_evidence": evidence,
             "source_status": ["CLEAR"],
             "image_witnesses": [
@@ -1791,3 +1842,555 @@ def candidate_records(
     assert [row["id"] for row in records] == candidate_ids
     assert evidence_counter == group_counter
     return records, unit_links, asset_links, evidence_counter
+
+
+def explicit_unlinked_dispositions() -> dict[str, tuple[str, list[str]]]:
+    """Return the audited disposition for every unit with no candidate link.
+
+    The sets are intentionally exhaustive and disjoint.  Candidate-linked
+    units are classified separately by identity-anchor precedence.
+    """
+
+    groups: dict[str, tuple[str, list[str]]] = {}
+
+    def assign(
+        disposition: str, roles: list[str], unit_ids: str
+    ) -> None:
+        for unit_id in unit_ids.split():
+            if unit_id in groups:
+                raise ValueError(f"duplicate explicit disposition: {unit_id}")
+            groups[unit_id] = (disposition, roles)
+
+    assign(
+        "CROSS_REFERENCE",
+        [],
+        "U000981 U000995 U001033 U001038 U001057 U001062 U001113 U001212",
+    )
+    assign("HISTORICAL_ONLY", ["HISTORICAL_MENTION"], "U001013")
+    assign("APPLICATION_OR_EMULATION", ["APPLICATION"], "U001068")
+    assign(
+        "REPRESENTATION_OR_OBSERVER",
+        ["REPRESENTATION", "OBSERVER_OR_ANALYZER"],
+        "U000952 U000953 U000954 U000969 U000970 U000971 U000972 "
+        "U000975 U000976 U000977 U000978 U000979 U000980 U000987 "
+        "U001014 U001015 U001018 U001021 U001024 U001028 U001030 "
+        "U001061 U001064 U001065 U001075 U001076 U001091 U001092 "
+        "U001093 U001105 U001108 U001112 U001123 U001130 U001135 "
+        "U001138 U001144 U001165 U001169 U001171 U001176 U001177 "
+        "U001179 U001203 U001207 U001221",
+    )
+    assign(
+        "NO_CONSTRUCTION",
+        [],
+        "U000947 U000948 U000949 U000950 U000951 U000955 U000956 "
+        "U000957 U000958 U000959 U000985 U001009 U001032 U001063 "
+        "U001089 U001122 U001125 U001159 U001160 U001170 U001172 "
+        "U001189 U001211 U001222",
+    )
+    return groups
+
+
+def reading_records(
+    state: dict[str, Any],
+    candidates: list[dict[str, Any]],
+    routes: list[dict[str, str]],
+    unit_links: dict[str, list[str]],
+) -> list[dict[str, str]]:
+    explicit = explicit_unlinked_dispositions()
+    all_units = [unit["id"] for unit in state["units"]]
+    linked_units = set(unit_links)
+    expected_unlinked = set(all_units) - linked_units
+    if set(explicit) != expected_unlinked:
+        raise ValueError(
+            "explicit disposition inventory mismatch: "
+            f"missing={sorted(expected_unlinked - set(explicit))}, "
+            f"extra={sorted(set(explicit) - expected_unlinked)}"
+        )
+
+    anchor_units: set[str] = set()
+    for candidate in candidates:
+        anchor = candidate["discovery_anchor"]
+        if anchor["kind"] == "SOURCE_UNIT":
+            anchor_units.add(anchor["id"])
+        elif anchor["kind"] == "IMAGE":
+            anchor_units.add(state["asset_by_id"][anchor["id"]]["source_unit_id"])
+        else:
+            raise ValueError(f"disallowed sequential anchor: {anchor}")
+
+    routes_by_unit: dict[str, list[str]] = defaultdict(list)
+    for route in routes:
+        routes_by_unit[route["source_unit_id"]].append(route["route_id"])
+
+    records: list[dict[str, str]] = []
+    for base in state["readings"]:
+        unit_id = base["source_unit_id"]
+        candidate_ids = unit_links.get(unit_id, [])
+        if candidate_ids:
+            disposition = (
+                "CANDIDATE" if unit_id in anchor_units else "SUPPORTS_CANDIDATE"
+            )
+            secondary_roles: list[str] = []
+        else:
+            disposition, secondary_roles = explicit[unit_id]
+
+        route_ids = routes_by_unit.get(unit_id, [])
+        row = dict(base)
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": EPOCH,
+                "review_disposition": disposition,
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": json.dumps(
+                    secondary_roles, separators=(",", ":")
+                ),
+                "candidate_ids": json.dumps(
+                    candidate_ids, separators=(",", ":")
+                ),
+                "route_ids": json.dumps(route_ids, separators=(",", ":")),
+                "evidence_statement": (
+                    f"Complete review of {unit_id} ({base['block_kind']}): "
+                    f"{excerpt(state, unit_id)} "
+                    f"Primary disposition: {disposition}."
+                ),
+                "review_stage": STAGE,
+                "reviewer": REVIEWER,
+            }
+        )
+        records.append(row)
+    return records
+
+
+def asset_records(
+    state: dict[str, Any],
+    asset_specs: dict[str, dict[str, Any]],
+    asset_links: dict[str, list[str]],
+) -> list[dict[str, str]]:
+    records: list[dict[str, str]] = []
+    for base in state["assets"]:
+        asset_id = base["asset_id"]
+        judgment = asset_specs[asset_id]
+        candidate_ids = asset_links.get(asset_id, [])
+        flags = judgment["risk_flags"]
+        role_phrase = judgment["role"].lower().replace("_", " ")
+        row = dict(base)
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": EPOCH,
+                "visual_role": judgment["role"],
+                "source_status": "CLEAR",
+                "risk_flags": json.dumps(flags, separators=(",", ":")),
+                "original_resolution_status": judgment[
+                    "original_resolution_status"
+                ],
+                "transcription_status": judgment["transcription_status"],
+                "candidate_ids": json.dumps(
+                    candidate_ids, separators=(",", ":")
+                ),
+                "route_ids": "[]",
+                "evidence_statement": (
+                    f"{asset_id} ({base['physical_path']}) was inspected at "
+                    f"original pixel resolution and classified as {role_phrase}; "
+                    f"{'construction/text symbols were independently checked' if flags else 'no construction-bearing or text-bearing transcription was required'}."
+                ),
+                "review_stage": STAGE,
+                "reviewer": REVIEWER,
+                "uncertainty": "",
+            }
+        )
+        records.append(row)
+    return records
+
+
+def build_output(bundle: Path, prohibited_nonuse: bool) -> dict[str, Any]:
+    state = load_bundle(bundle)
+    route_specs = build_route_specs()
+    asset_specs = asset_judgment_specs()
+    candidates, unit_links, asset_links, _ = candidate_records(
+        state, route_specs, asset_specs
+    )
+    readings = reading_records(state, candidates, route_specs, unit_links)
+    assets = asset_records(state, asset_specs, asset_links)
+    routes = [
+        {key: value for key, value in row.items() if key != "key"}
+        for row in route_specs
+    ]
+    return {
+        "worker_id": WORKER_ID,
+        "bundle_sha256": EXPECTED_BUNDLE_SHA,
+        "allowed_manifest_sha256": EXPECTED_MANIFEST_SHA,
+        "prompt_sha256": EXPECTED_PROMPT_SHA,
+        "schema_sha256": EXPECTED_SCHEMA_SHA,
+        "prohibited_input_nonuse": prohibited_nonuse,
+        "reading_updates": readings,
+        "asset_updates": assets,
+        "candidate_proposals": candidates,
+        "route_proposals": routes,
+        "uncertainties": [],
+    }
+
+
+def canonical_bytes(output: dict[str, Any]) -> bytes:
+    return (
+        json.dumps(output, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    ).encode("utf-8")
+
+
+def validate_output(
+    bundle: Path,
+    output: dict[str, Any],
+    *,
+    require_finalized: bool | None = None,
+) -> dict[str, int]:
+    """Validate schema, provenance, link symmetry, and semantic guardrails."""
+
+    import jsonschema
+
+    state = load_bundle(bundle)
+    schema = json.loads(
+        (bundle / "input/schemas/worker-output.schema.json").read_text()
+    )
+    # The delivered schema intentionally requires the final declaration.  A
+    # draft must pass every other schema constraint while keeping that
+    # declaration false until verification and finalization are complete.
+    if output["prohibited_input_nonuse"] is False:
+        schema["properties"]["prohibited_input_nonuse"] = {"type": "boolean"}
+    jsonschema.Draft202012Validator(schema).validate(output)
+
+    if output["worker_id"] != WORKER_ID:
+        raise ValueError("worker identity changed")
+    expected_hashes = {
+        "bundle_sha256": EXPECTED_BUNDLE_SHA,
+        "allowed_manifest_sha256": EXPECTED_MANIFEST_SHA,
+        "prompt_sha256": EXPECTED_PROMPT_SHA,
+        "schema_sha256": EXPECTED_SCHEMA_SHA,
+    }
+    for key, value in expected_hashes.items():
+        if output[key] != value:
+            raise ValueError(f"{key} changed")
+    if (
+        require_finalized is not None
+        and output["prohibited_input_nonuse"] is not require_finalized
+    ):
+        raise ValueError(
+            "prohibited-input declaration does not match required finalization state"
+        )
+    if output["uncertainties"]:
+        raise ValueError("bundle-level uncertainties were not expected")
+
+    readings = output["reading_updates"]
+    assets = output["asset_updates"]
+    candidates = output["candidate_proposals"]
+    routes = output["route_proposals"]
+    if len(readings) != 276 or len(assets) != 80 or len(candidates) != 192:
+        raise ValueError("unexpected output row count")
+    if len(routes) != 22:
+        raise ValueError("unexpected route count")
+    if [row["source_unit_id"] for row in readings] != [
+        row["source_unit_id"] for row in state["readings"]
+    ]:
+        raise ValueError("reading order changed")
+    if [row["asset_id"] for row in assets] != [
+        row["asset_id"] for row in state["assets"]
+    ]:
+        raise ValueError("asset order changed")
+    if [row["id"] for row in candidates] != [
+        f"W{i:04d}" for i in range(1, 193)
+    ]:
+        raise ValueError("candidate sequence is not contiguous")
+    if [row["route_id"] for row in routes] != [
+        f"WR{i:04d}" for i in range(1, 23)
+    ]:
+        raise ValueError("route sequence is not contiguous")
+
+    immutable_reading_fields = [
+        "source_unit_id",
+        "document_order",
+        "path",
+        "block_kind",
+        "byte_start",
+        "byte_end",
+        "line_start",
+        "line_end",
+        "global_line_start",
+        "global_line_end",
+        "unit_sha256",
+    ]
+    for base, row in zip(state["readings"], readings, strict=True):
+        for field in immutable_reading_fields:
+            if row[field] != base[field]:
+                raise ValueError(f"reading projection changed: {row['source_unit_id']} {field}")
+        if (
+            row["review_status"] != "REVIEWED"
+            or row["review_epoch"] != EPOCH
+            or row["review_stage"] != STAGE
+            or row["reviewer"] != REVIEWER
+            or row["source_status"] != "CLEAR"
+            or row["uncertainty"]
+        ):
+            raise ValueError(f"incomplete reading adjudication: {row['source_unit_id']}")
+        as_json_array(row["secondary_roles"])
+        as_json_array(row["candidate_ids"])
+        as_json_array(row["route_ids"])
+
+    immutable_asset_fields = [
+        "asset_id",
+        "link_id",
+        "physical_path",
+        "sha256",
+        "bytes",
+        "source_path",
+        "source_unit_id",
+        "assignment_path",
+        "assignment_stage",
+        "assignment_basis",
+        "reference_status",
+    ]
+    asset_by_id: dict[str, dict[str, str]] = {}
+    for base, row in zip(state["assets"], assets, strict=True):
+        for field in immutable_asset_fields:
+            if row[field] != base[field]:
+                raise ValueError(f"asset projection changed: {row['asset_id']} {field}")
+        if (
+            row["inspection_status"] != "SCREENED"
+            or row["review_epoch"] != EPOCH
+            or row["review_stage"] != STAGE
+            or row["reviewer"] != REVIEWER
+            or row["source_status"] != "CLEAR"
+            or row["uncertainty"]
+            or row["original_resolution_status"] != "REVIEWED"
+        ):
+            raise ValueError(f"incomplete asset adjudication: {row['asset_id']}")
+        flags = as_json_array(row["risk_flags"])
+        as_json_array(row["candidate_ids"])
+        as_json_array(row["route_ids"])
+        if flags and row["transcription_status"] != "CHECKED":
+            raise ValueError(f"unchecked risk-bearing asset: {row['asset_id']}")
+        if (
+            row["visual_role"] == "NATIVE_EVIDENCE"
+            and "CONSTRUCTION_BEARING" not in flags
+        ):
+            raise ValueError(f"native asset lacks construction risk: {row['asset_id']}")
+        asset_by_id[row["asset_id"]] = row
+
+    evidence_ids: list[str] = []
+    group_ids: list[str] = []
+    candidate_by_id = {row["id"]: row for row in candidates}
+    reading_by_id = {row["source_unit_id"]: row for row in readings}
+    for candidate in candidates:
+        if (
+            candidate["record_status"] != "ACTIVE"
+            or candidate["discovery_stage"] != 9
+            or candidate["source_status"] != ["CLEAR"]
+            or candidate["uncertainties"]
+        ):
+            raise ValueError(f"invalid candidate adjudication: {candidate['id']}")
+        if set(candidate["field_support"]) != set(FIELDS):
+            raise ValueError(f"incomplete field support: {candidate['id']}")
+        if set(candidate["fingerprint"]) != set(FIELDS):
+            raise ValueError(f"incomplete fingerprint: {candidate['id']}")
+        anchor = candidate["discovery_anchor"]
+        if anchor["epoch"] != 2:
+            raise ValueError(f"wrong candidate epoch: {candidate['id']}")
+        if anchor["kind"] == "SOURCE_UNIT":
+            if anchor["id"] not in reading_by_id:
+                raise ValueError(f"foreign source anchor: {candidate['id']}")
+        elif anchor["kind"] == "IMAGE":
+            if anchor["id"] not in asset_by_id:
+                raise ValueError(f"foreign image anchor: {candidate['id']}")
+        else:
+            raise ValueError(f"search anchor in sequential review: {candidate['id']}")
+
+        local_evidence_ids: set[str] = set()
+        for evidence in candidate["source_evidence"]:
+            evidence_ids.append(evidence["evidence_id"])
+            group_ids.append(evidence["evidence_group_id"])
+            local_evidence_ids.add(evidence["evidence_id"])
+            evidence_anchor = evidence["discovery_anchor"]
+            if evidence_anchor["epoch"] != 2:
+                raise ValueError(f"wrong evidence epoch: {evidence['evidence_id']}")
+            if evidence["source_unit_id"] not in candidate["source_unit_ids"]:
+                raise ValueError(
+                    f"evidence unit omitted from candidate: {evidence['evidence_id']}"
+                )
+            if evidence_anchor["kind"] == "IMAGE":
+                asset = asset_by_id[evidence_anchor["id"]]
+                if (
+                    evidence["strength"]
+                    in {"DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
+                    and asset["visual_role"] != "NATIVE_EVIDENCE"
+                ):
+                    raise ValueError(
+                        f"non-native image promoted to direct mechanics: {evidence['evidence_id']}"
+                    )
+                if evidence["image_path"] != asset["physical_path"]:
+                    raise ValueError(f"image path mismatch: {evidence['evidence_id']}")
+            elif evidence_anchor["kind"] == "SOURCE_UNIT":
+                if evidence_anchor["id"] != evidence["source_unit_id"]:
+                    raise ValueError(f"source anchor mismatch: {evidence['evidence_id']}")
+            else:
+                raise ValueError(f"search evidence in sequential review: {evidence['evidence_id']}")
+            if not set(evidence["fingerprint_fields"]) <= set(FIELDS):
+                raise ValueError(f"unknown evidence field: {evidence['evidence_id']}")
+
+        for field in FIELDS:
+            item = candidate["fingerprint"][field]
+            if item["status"] != candidate["field_support"][field]:
+                raise ValueError(f"field status mismatch: {candidate['id']} {field}")
+            if item["status"] not in STATUSES:
+                raise ValueError(f"unknown field status: {candidate['id']} {field}")
+            if not set(item["evidence_ids"]) <= local_evidence_ids:
+                raise ValueError(f"foreign field evidence: {candidate['id']} {field}")
+            if item["status"] == "SUPPORTED":
+                if item["value"] is None or not item["evidence_ids"]:
+                    raise ValueError(f"unsupported supported field: {candidate['id']} {field}")
+            else:
+                if item["value"] is not None or item["evidence_ids"]:
+                    raise ValueError(f"nonempty unresolved/N/A field: {candidate['id']} {field}")
+            if item["status"] == "UNKNOWN_FROM_SOURCE":
+                expected = (
+                    f"The assigned source does not establish {field} for "
+                    f"{candidate['provisional_name']}."
+                )
+                if expected not in candidate["missing_mechanics"]:
+                    raise ValueError(
+                        f"missing-mechanics duplication absent: {candidate['id']} {field}"
+                    )
+        for relation in candidate["related_candidate_ids"]:
+            if relation["candidate_id"] not in candidate_by_id:
+                raise ValueError(f"foreign candidate relation: {candidate['id']}")
+            if relation["proof_kind"] != "PROVISIONAL_COMPARISON":
+                raise ValueError(f"blind identity collapse attempted: {candidate['id']}")
+        for route_id in candidate["cross_reference_ids"]:
+            if route_id not in {row["route_id"] for row in routes}:
+                raise ValueError(f"foreign candidate route: {candidate['id']}")
+
+    if evidence_ids != [f"WE{i:06d}" for i in range(1, len(evidence_ids) + 1)]:
+        raise ValueError("evidence sequence is not contiguous")
+    if group_ids != [f"WG{i:06d}" for i in range(1, len(group_ids) + 1)]:
+        raise ValueError("evidence-group sequence is not contiguous")
+    if len(set(evidence_ids)) != len(evidence_ids) or len(set(group_ids)) != len(group_ids):
+        raise ValueError("duplicate evidence identifiers")
+
+    route_by_id = {row["route_id"]: row for row in routes}
+    for route in routes:
+        if (
+            route["status"] != "PENDING"
+            or route["discovery_epoch"] != EPOCH
+            or route["owning_stage"] != STAGE
+            or as_json_array(route["target_unit_ids"])
+            or as_json_array(route["target_asset_ids"])
+        ):
+            raise ValueError(f"invalid blind route: {route['route_id']}")
+        if route["source_unit_id"] not in reading_by_id:
+            raise ValueError(f"foreign route source: {route['route_id']}")
+    for reading in readings:
+        for route_id in as_json_array(reading["route_ids"]):
+            if route_id not in route_by_id:
+                raise ValueError(f"foreign reading route: {reading['source_unit_id']}")
+            if route_by_id[route_id]["source_unit_id"] != reading["source_unit_id"]:
+                raise ValueError(f"reading/route source mismatch: {route_id}")
+
+    # Candidate links are symmetric across all candidate source/image rows.
+    for candidate in candidates:
+        candidate_id = candidate["id"]
+        for unit_id in candidate["source_unit_ids"]:
+            if candidate_id not in as_json_array(reading_by_id[unit_id]["candidate_ids"]):
+                raise ValueError(f"missing reading link: {candidate_id} {unit_id}")
+        for image_path in candidate["image_witnesses"]:
+            matching = [
+                row for row in assets if row["physical_path"] == image_path
+            ]
+            if len(matching) != 1:
+                raise ValueError(f"nonunique image witness: {candidate_id} {image_path}")
+            if candidate_id not in as_json_array(matching[0]["candidate_ids"]):
+                raise ValueError(f"missing asset link: {candidate_id} {image_path}")
+    for reading in readings:
+        for candidate_id in as_json_array(reading["candidate_ids"]):
+            candidate = candidate_by_id[candidate_id]
+            image_units = {
+                asset_by_id[evidence["discovery_anchor"]["id"]]["source_unit_id"]
+                for evidence in candidate["source_evidence"]
+                if evidence["discovery_anchor"]["kind"] == "IMAGE"
+            }
+            if (
+                reading["source_unit_id"] not in candidate["source_unit_ids"]
+                and reading["source_unit_id"] not in image_units
+            ):
+                raise ValueError(
+                    f"orphan reading candidate link: {reading['source_unit_id']} {candidate_id}"
+                )
+    for asset in assets:
+        for candidate_id in as_json_array(asset["candidate_ids"]):
+            if asset["physical_path"] not in candidate_by_id[candidate_id]["image_witnesses"]:
+                raise ValueError(f"orphan asset candidate link: {asset['asset_id']} {candidate_id}")
+
+    dispositions: dict[str, int] = defaultdict(int)
+    for row in readings:
+        dispositions[row["review_disposition"]] += 1
+    roles: dict[str, int] = defaultdict(int)
+    for row in assets:
+        roles[row["visual_role"]] += 1
+    return {
+        "readings": len(readings),
+        "assets": len(assets),
+        "candidates": len(candidates),
+        "routes": len(routes),
+        "evidence": len(evidence_ids),
+        **{f"disposition:{key}": value for key, value in sorted(dispositions.items())},
+        **{f"asset_role:{key}": value for key, value in sorted(roles.items())},
+    }
+
+
+def write_output(path: Path, output: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(canonical_bytes(output))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("bundle", type=Path)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--author", action="store_true")
+    mode.add_argument("--finalize", action="store_true")
+    mode.add_argument("--verify", action="store_true")
+    parser.add_argument("--require-finalized", action="store_true")
+    args = parser.parse_args()
+
+    bundle = args.bundle.resolve()
+    output_path = bundle / "output/output.json"
+    if args.author:
+        output = build_output(bundle, False)
+        counts = validate_output(bundle, output, require_finalized=False)
+        write_output(output_path, output)
+    elif args.finalize:
+        if not output_path.is_file():
+            raise FileNotFoundError(output_path)
+        current = output_path.read_bytes()
+        expected_draft = build_output(bundle, False)
+        if current != canonical_bytes(expected_draft):
+            raise ValueError(
+                "refusing finalization: current draft is not the verified deterministic author projection"
+            )
+        output = build_output(bundle, True)
+        counts = validate_output(bundle, output, require_finalized=True)
+        write_output(output_path, output)
+    else:
+        output = json.loads(output_path.read_text())
+        counts = validate_output(
+            bundle,
+            output,
+            require_finalized=True if args.require_finalized else None,
+        )
+        rebuilt = build_output(bundle, output["prohibited_input_nonuse"])
+        if output_path.read_bytes() != canonical_bytes(rebuilt):
+            raise ValueError("output is not the deterministic helper projection")
+
+    print(json.dumps(counts, sort_keys=True))
+    print(f"output_sha256={sha256(output_path)}")
+
+
+if __name__ == "__main__":
+    main()
