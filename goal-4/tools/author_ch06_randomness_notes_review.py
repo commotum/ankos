@@ -166,7 +166,38 @@ PROFILES: dict[str, dict[str, str]] = {
 }
 
 PROFILE_NA: dict[str, set[str]] = {
+    "ca1d": {
+        "visible_history",
+        "control_state",
+        "external_data",
+        "witness_semantics",
+    },
+    "ca2d": {
+        "visible_history",
+        "control_state",
+        "external_data",
+        "witness_semantics",
+    },
+    "map": {
+        "visible_history",
+        "control_state",
+        "seed",
+        "boundary",
+        "external_data",
+        "read_dependencies_or_neighborhood",
+        "witness_semantics",
+    },
+    "stochastic": {
+        "visible_history",
+        "control_state",
+        "boundary",
+        "external_data",
+        "read_dependencies_or_neighborhood",
+        "write_replacement_assembly_or_commit",
+        "witness_semantics",
+    },
     "generator": {
+        "native_time",
         "visible_history",
         "control_state",
         "seed",
@@ -179,6 +210,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "witness_semantics",
     },
     "seed": {
+        "native_time",
         "visible_history",
         "control_state",
         "boundary",
@@ -191,6 +223,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "witness_semantics",
     },
     "observer": {
+        "native_time",
         "carrier",
         "support",
         "topology",
@@ -206,9 +239,12 @@ PROFILE_NA: dict[str, set[str]] = {
         "schedule",
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
         "witness_semantics",
     },
     "constraint": {
+        "native_time",
         "visible_history",
         "control_state",
         "seed",
@@ -217,8 +253,11 @@ PROFILE_NA: dict[str, set[str]] = {
         "schedule",
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
     },
     "representation": {
+        "native_time",
         "carrier",
         "support",
         "topology",
@@ -234,6 +273,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "schedule",
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
+        "successor_cardinality",
         "witness_semantics",
     },
 }
@@ -438,9 +478,40 @@ def candidate_specs() -> list[dict[str, Any]]:
             image_witnesses=[p + "_page_963_Frequencies_of_Classes_Four_Pie_Charts.jpeg"],
         ),
         spec(
-            "continuously parameterized cellular automaton family",
+            "class-1 no-surviving-pattern decision query",
             "U006350",
             1,
+            "constraint",
+            [
+                ev(
+                    "U006350",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "A proposed class-1 test checks that no initial pattern of any size can survive; borderline cases can take arbitrarily long and the general classification problem can be undecidable.",
+                    [
+                        "object_kind",
+                        "input",
+                        "law_kind",
+                        "rule_relation_constraint_function_or_probability_law",
+                        "result_kind",
+                        "termination_completion_failure",
+                        "witness_semantics",
+                    ],
+                )
+            ],
+            values={
+                "input": "a cellular-automaton rule",
+                "rule_relation_constraint_function_or_probability_law": "accept the class-1 hypothesis only if no initial pattern of any size can survive",
+                "result_kind": "a class-1 classification decision or an unresolved borderline case",
+                "termination_completion_failure": "the search can take arbitrarily long and the general classification problem can be undecidable",
+                "witness_semantics": "a surviving initial pattern refutes the no-surviving-pattern condition",
+            },
+            missing=["The source gives the decision criterion but no terminating general algorithm or formal survival threshold."],
+        ),
+        spec(
+            "continuously parameterized cellular automaton family",
+            "U006350",
+            2,
             "ca1d",
             [ev("U006350", "PROSE", "DIRECT_IDENTITY", "Continuous cellular automata are delimited by rules whose parameters can be varied smoothly.", ["object_kind", "parameters_and_variants", "law_kind"])],
             values={
@@ -453,7 +524,7 @@ def candidate_specs() -> list[dict[str, Any]]:
         spec(
             "larger-range cellular-automaton rule embedding transform",
             "U006350",
-            2,
+            3,
             "representation",
             [ev("U006350", "PROSE", "DIRECT_COMPLETE_MECHANICS", "A range-r rule is embedded at any larger range by making all cells farther than r irrelevant.", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"])],
             values={
@@ -466,7 +537,7 @@ def candidate_specs() -> list[dict[str, Any]]:
         spec(
             "edge-local cellular-automaton rule-nearness relation",
             "U006350",
-            3,
+            4,
             "constraint",
             [ev("U006350", "PROSE", "DIRECT_PARTIAL_MECHANICS", "At a common enlarged range, nearby rules are defined by differences involving only cells close to the neighborhood edge.", CONSTRAINT_FIELDS)],
             values={
@@ -482,7 +553,7 @@ def candidate_specs() -> list[dict[str, Any]]:
         spec(
             "nine-neighbor outer-totalistic two-dimensional class-4 preset family",
             "U006350",
-            4,
+            5,
             "ca2d",
             [ev("U006350", "PROSE", "DIRECT_IDENTITY", "The note identifies nine-neighbor outer-totalistic codes 224, 226, 4320, 5344, 6248, 6752, 6754, and 8416 as class-4 examples.", ["object_kind", "topology", "read_dependencies_or_neighborhood", "parameters_and_variants"])],
             values={
@@ -491,6 +562,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "codes 224, 226, 4320, 5344, 6248, 6752, 6754, and 8416",
             },
             aliases=["2D class 4 outer-totalistic rules"],
+            variants=[("HighLife", "the source's name for member preset code 4320")],
             missing=["The code-to-transition-table convention is not restated in this unit."],
         ),
         spec(
@@ -501,14 +573,23 @@ def candidate_specs() -> list[dict[str, Any]]:
             [
                 ev("U006351", "PROSE", "DIRECT_IDENTITY", "The Life two-dimensional cellular automaton is named and its step implementation introduced.", ["object_kind", "carrier", "topology", "alphabet_or_value_schema", "complete_state"]),
                 ev("U006352", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep counts the 3x3 neighborhood including self and returns black for a live cell at total 4 or any cell at total 3.", ["frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
+                ev("U006353", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The same Life state can be represented sparsely as the list of live-cell positions.", ["complete_state", "parameters_and_variants"]),
                 ev("U006354", "CODE", "CORROBORATING", "The sparse implementation produces births at multiplicity 3 and retains live positions at multiplicity 4.", ["rule_relation_constraint_function_or_probability_law"]),
+                ev("U006355", "PROSE", "CORROBORATING", "A further implementation variant finds runs of length 3 and 4 in the sorted sparse-neighborhood list.", ["parameters_and_variants"]),
             ],
             values={
                 "alphabet_or_value_schema": "binary live/dead cells",
+                "complete_state": "the complete binary lattice configuration, represented densely or by the list of live-cell positions",
                 "read_dependencies_or_neighborhood": "the 3x3 Moore neighborhood including self",
                 "rule_relation_constraint_function_or_probability_law": "live survives with 2 or 3 live neighbors; dead is born with 3 live neighbors",
+                "parameters_and_variants": "dense-array, sparse live-position, and sorted-run implementations",
             },
             aliases=["Life", "code 224"],
+            variants=[
+                ("dense array", "count the 3x3 neighborhood at every array position"),
+                ("sparse live-position list", "count coincident translated live positions"),
+                ("sorted-run optimization", "find runs of multiplicity 3 and 4 in the sorted sparse list"),
+            ],
         ),
         spec(
             "three-dimensional Life-like cellular automaton family",
@@ -529,6 +610,16 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "a live cell survives when p <= neighbor count <= q; any cell is live when neighbor count == r",
                 "parameters_and_variants": "{p,q,r}, including {5,7,6}, {4,5,5}, and {5,6,5}",
             },
+            parameters=[
+                ("p", "minimum neighbor count for survival"),
+                ("q", "maximum neighbor count for survival"),
+                ("r", "neighbor count for birth"),
+            ],
+            variants=[
+                ("{5,7,6}", "source-enumerated three-dimensional Life-like preset"),
+                ("{4,5,5}", "source-enumerated preset used by the pictured moving structure"),
+                ("{5,6,5}", "source-enumerated three-dimensional Life-like preset"),
+            ],
             image_witnesses=[p + "_page_964_Picture_11.jpeg"],
         ),
         spec(
@@ -552,20 +643,52 @@ def candidate_specs() -> list[dict[str, Any]]:
             missing=["No single probability distribution is specified for the general family."],
         ),
         spec(
-            "cellular-automaton difference-pattern transform",
+            "cellular-automaton difference-pattern observer",
             "U006364",
             1,
             "representation",
             [
-                ev("U006364", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The region of change propagates no faster than the cellular-automaton range.", ["object_kind", "input", "law_kind", "result_kind", "parameters_and_variants"]),
-                ev("U006365", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Differences between two k-color initial conditions can be reproduced as evolution of a suitable 2k-color rule.", ["rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit"]),
+                ev("U006364", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A difference region records cells affected by an initial change, and its edge can move by at most the underlying cellular-automaton range per step.", ["object_kind", "input", "result_kind", "structural_invariants"]),
+                ev("U006365", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source compares two cellular-automaton evolutions through their cellwise pattern of differences.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind"]),
             ],
             values={
                 "input": "two initial conditions or histories of a cellular automaton",
-                "rule_relation_constraint_function_or_probability_law": "mark cellwise changes; equivalently evolve one encoded initial state under a suitable 2k-color rule",
+                "structural_invariants": "the difference-region edge can propagate no faster than r cells per step for a range-r rule",
+                "rule_relation_constraint_function_or_probability_law": "compare the two evolutions cell by cell and mark where their colors differ",
                 "result_kind": "a spacetime pattern of changed cells",
-                "parameters_and_variants": "direct pairwise comparison or the equivalent 2k-color cellular-automaton encoding",
             },
+            related=["two-k-color cellular-automaton difference-emulation lift"],
+        ),
+        spec(
+            "two-k-color cellular-automaton difference-emulation lift",
+            "U006365",
+            1,
+            "representation",
+            [
+                ev(
+                    "U006365",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "For a k-color rule, the difference pattern between two initial conditions can be reproduced by one initial condition of a suitable 2k-color cellular automaton.",
+                    [
+                        "object_kind",
+                        "input",
+                        "law_kind",
+                        "rule_relation_constraint_function_or_probability_law",
+                        "result_kind",
+                        "parameters_and_variants",
+                    ],
+                )
+            ],
+            values={
+                "input": "a k-color cellular automaton and a pair of its initial conditions",
+                "rule_relation_constraint_function_or_probability_law": "encode the pair into one initial condition of a suitable 2k-color rule whose evolution reproduces their difference pattern",
+                "result_kind": "a 2k-color cellular automaton and encoded initial state reproducing the pairwise difference history",
+                "parameters_and_variants": "source alphabet size k and lifted alphabet size 2k",
+            },
+            parameters=[("k", "number of colors in the source cellular automaton; the lifted rule has 2k colors")],
+            missing=["The source asserts existence but does not give the state-pair encoding or the lifted transition table."],
+            related=["cellular-automaton difference-pattern observer"],
         ),
         spec(
             "cellular-automaton perturbation-growth Lyapunov analyzer",
@@ -665,6 +788,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a source-stated divisibility bound for the repetition period",
                 "parameters_and_variants": "the source table records actual-period divisors for n=11,13,19,25,27,29,37,41,43,53",
             },
+            parameters=[("n", "odd cyclic ring size")],
             related=["finite cyclic rule-60 polynomial cellular automaton"],
         ),
         spec(
@@ -699,6 +823,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a source-stated divisibility bound and typical period prediction",
                 "parameters_and_variants": "period usually equals q[n]; the first stated exception is n=37",
             },
+            parameters=[("n", "odd cyclic ring size")],
             related=["finite cyclic rule-90 polynomial cellular automaton"],
         ),
         spec(
@@ -736,11 +861,41 @@ def candidate_specs() -> list[dict[str, Any]]:
             related=["finite cyclic rule-60 polynomial cellular automaton", "finite cyclic rule-90 polynomial cellular automaton"],
         ),
         spec(
-            "elementary cellular automaton rule 225",
+            "rule-22 randomness-producing seed family",
             "U006390",
             1,
+            "seed",
+            [
+                ev(
+                    "U006390",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "Rule 22 yields randomness from two black cells separated by 4^m positions for m>=2 and from the binary digit sequences of an enumerated integer family.",
+                    SEED_FIELDS + ["parameters_and_variants"],
+                )
+            ],
+            values={
+                "carrier": "a one-dimensional binary rule-22 configuration",
+                "support": "two-black-cell separation seeds and the source's enumerated binary-integer seeds",
+                "alphabet_or_value_schema": "black and white cells",
+                "complete_state": "one selected finite rule-22 initial pattern on a white background",
+                "rule_relation_constraint_function_or_probability_law": "choose either two black cells 4^m positions apart for m>=2 or the base-2 digit sequence of a listed integer",
+                "parameters_and_variants": "m>=2; listed integers begin 19,25,37,39,41,45,47,51,57,61,...",
+            },
+            parameters=[("m", "integer exponent m>=2 in the two-cell separation 4^m")],
+            variants=[
+                ("power-of-four separation", "two black cells 4^m positions apart for m>=2"),
+                ("binary-integer presets", "base-2 digit sequences for 19,25,37,39,41,45,47,51,57,61,..."),
+            ],
+            missing=["The integer list is explicitly open-ended, and the source does not state a fixed-width or leading-zero convention for its binary seed encoding."],
+            related=["elementary cellular automaton rule 22"],
+        ),
+        spec(
+            "elementary cellular automaton rule 225",
+            "U006390",
+            2,
             "ca1d",
-            [ev("U006390", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Rule 225 is stated as not-p XOR (q OR r), with explicit finite seed variants.", CA_FIELDS)],
+            [ev("U006390", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Rule 225 is stated as not-p XOR (q OR r), with explicit finite seed variants.", CA_FIELDS + ["parameters_and_variants"])],
             values={
                 "alphabet_or_value_schema": "binary values",
                 "read_dependencies_or_neighborhood": "left, center, and right values p,q,r",
@@ -784,15 +939,24 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [
+                ev("U006394", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source enumerates the eight additive elementary rules {0,60,90,102,150,170,204,240} and groups them as trivial or equivalent to rules 90 or 150.", ["parameters_and_variants", "structural_invariants"]),
                 ev("U006395", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Every k-color range-r additive rule sums neighborhood values modulo k using position weights.", ["object_kind", "alphabet_or_value_schema", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
+                ev("U006397", "PROSE", "CONTEXTUAL", "The source introduces the implementation of one complete weighted-additive step.", []),
                 ev("U006398", "CODE", "DIRECT_COMPLETE_MECHANICS", "One synchronous step is Mod[ListCorrelate[w,list,Ceiling[Length[w]/2]],k].", ["complete_state", "schedule", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
             ],
             values={
                 "alphabet_or_value_schema": "values modulo k",
+                "structural_invariants": "the eight additive elementary rules are 0, 60, 90, 102, 150, 170, 204, and 240; each is trivial or essentially equivalent to rule 90 or 150",
                 "read_dependencies_or_neighborhood": "2r+1 cells with weights w",
                 "rule_relation_constraint_function_or_probability_law": "new cell = Mod[weighted sum of neighborhood values,k]",
                 "parameters_and_variants": "alphabet size k, range r, and weights w in 0..k-1",
             },
+            parameters=[
+                ("k", "number of cell colors and modulus"),
+                ("r", "cellular-automaton range"),
+                ("w", "the 2r+1 position weights, each in 0..k-1"),
+            ],
+            variants=[("additive elementary rules", "{0,60,90,102,150,170,204,240}")],
             image_witnesses=[p + "_page_967_Picture_4.jpeg"],
         ),
         spec(
@@ -801,7 +965,13 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [
-                ev("U006400", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "Generalized additivity requires phi[u⊕v] == phi[u]⊕phi[v].", ["object_kind", "structural_invariants", "law_kind", "rule_relation_constraint_function_or_probability_law"]),
+                ev("U006400", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Generalized additivity combines evolution histories using an operation ⊕.", ["object_kind", "law_kind"]),
+                ev("U006401", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Generalized additivity requires phi[u⊕v] == phi[u]⊕phi[v].", ["rule_relation_constraint_function_or_probability_law"]),
+                ev("U006402", "PROSE", "CORROBORATING", "The property is a homomorphism condition and ordinary modulo-k addition supplies the standard Xor example.", ["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
+                ev("U006404", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule 250 supplies the Max/Or generalized-additive variant.", ["parameters_and_variants"]),
+                ev("U006406", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source requires an associative, commutative operation with identity to obtain the familiar additive construction from basic histories.", ["structural_invariants"]),
+                ev("U006407", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source enumerates counts of inequivalent commutative monoids by color count k.", ["parameters_and_variants"]),
+                ev("U006409", "TABLE", "DIRECT_PARTIAL_MECHANICS", "The source tabulates numbers of rules additive over each commutative monoid for stated k and r cases.", ["parameters_and_variants"]),
                 ev("U006410", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Every such local rule applies monoid endomorphisms sigma to neighborhood cells and combines the results with ⊕.", ["alphabet_or_value_schema", "read_dependencies_or_neighborhood", "write_replacement_assembly_or_commit", "parameters_and_variants"]),
             ],
             values={
@@ -810,6 +980,12 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "read_dependencies_or_neighborhood": "a finite neighborhood with a monoid endomorphism at each position",
                 "rule_relation_constraint_function_or_probability_law": "phi combines sigma_i[cell_i] using ⊕ and obeys phi[u⊕v]=phi[u]⊕phi[v]",
             },
+            parameters=[
+                ("k", "number of monoid elements or cell colors"),
+                ("r", "cellular-automaton range"),
+                ("⊕", "commutative-monoid operation"),
+                ("σ", "position-specific monoid endomorphisms"),
+            ],
             variants=[("Xor-additive", "ordinary addition modulo k"), ("Or-additive", "Max/Or, exemplified by rule 250")],
             image_witnesses=[
                 p + "_page_967_Rule_90_Generalized_Additivity_Four_Panel_Row.jpeg",
@@ -822,13 +998,50 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006412",
             1,
             "ca1d",
-            [ev("U006412", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "For integer or real cell values, ordinary-additive rules have linear forms such as ax+by, with Cauchy-additive endomorphisms as a generalized real case.", CA_FIELDS)],
+            [ev("U006412", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "For integer or real cell values, ordinary-additive cellular-automaton rules are linear forms such as ax+by.", CA_FIELDS + ["parameters_and_variants"])],
             values={
                 "alphabet_or_value_schema": "integer or real cell values",
                 "read_dependencies_or_neighborhood": "the finite set of cells appearing in the linear form",
-                "rule_relation_constraint_function_or_probability_law": "a linear form such as a x + b y, or sums of Cauchy-additive sigma_i[x_i]",
+                "rule_relation_constraint_function_or_probability_law": "a linear form such as a x + b y",
+                "parameters_and_variants": "integer-valued or real-valued cells with coefficients such as a and b",
             },
-            variants=[("continuous sigma", "sigma[x]=c x"), ("discontinuous Cauchy sigma", "source says only nonconstructive exotic possibilities are known")],
+            parameters=[("linear coefficients", "coefficients such as a and b in the local linear form")],
+            variants=[
+                ("integer-valued linear CA", "cell values and the linear form are over integers"),
+                ("real-valued linear CA", "cell values and coefficients are real"),
+            ],
+            related=["Cauchy-additive function constraint"],
+        ),
+        spec(
+            "Cauchy-additive function constraint",
+            "U006412",
+            2,
+            "constraint",
+            [
+                ev(
+                    "U006412",
+                    "FORMULA",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "A real function sigma is admitted when sigma[x+y]=sigma[x]+sigma[y]; continuity forces sigma[x]=c x, while the source describes nonconstructive discontinuous possibilities under the Axiom of Choice.",
+                    CONSTRAINT_FIELDS + ["parameters_and_variants", "termination_completion_failure"],
+                )
+            ],
+            values={
+                "carrier": "real-valued functions sigma",
+                "input": "a candidate function sigma over real values",
+                "rule_relation_constraint_function_or_probability_law": "sigma[x+y] == sigma[x] + sigma[y] for all real x and y",
+                "result_kind": "the class of Cauchy-additive functions",
+                "witness_semantics": "a satisfying function obeys the additive equation for every pair x,y",
+                "parameters_and_variants": "continuous solutions sigma[x]=c x; discontinuous solutions require nonconstructive choices across rational-equivalence classes",
+                "termination_completion_failure": "the source states that the exotic discontinuous solutions are not explicitly constructible by a real computational system",
+            },
+            parameters=[("c", "constant slope for each continuous solution sigma[x]=c x")],
+            variants=[
+                ("continuous solution", "sigma[x]=c x"),
+                ("discontinuous Axiom-of-Choice solution", "different slopes on distinct rational-equivalence classes; source gives no explicit construction"),
+            ],
+            missing=["No explicit discontinuous solution or computational construction is supplied."],
+            related=["integer- or real-valued linear cellular automaton family"],
         ),
         spec(
             "irrational-modulus additive cellular automaton",
@@ -873,7 +1086,9 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "input": "current density p and elementary rule number m",
                 "rule_relation_constraint_function_or_probability_law": "form independent neighborhood probabilities and dot them with the rule table",
                 "result_kind": "the approximated next-step density",
+                "parameters_and_variants": "approximation order controls the neighborhood-block size and number of cellular-automaton steps used to retain correlations",
             },
+            parameters=[("approximation order", "one-step independence or a larger-block multi-step correlation approximation")],
             variants=[("one-step independence", "8 neighborhoods"), ("multi-step correlation approximation", "larger blocks over two or more CA steps")],
             image_witnesses=[p + "_page_968_Figure_9.jpeg", p + "_page_968_Figure_10.jpeg"],
         ),
@@ -972,7 +1187,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             [
                 ev("U006432", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The target is strict first return at p steps, not merely return at a time divisible by a smaller period, and a repeating-block witness has bounded length.", CONSTRAINT_FIELDS + ["parameters_and_variants"]),
                 ev("U006434", "PROSE", "CONTEXTUAL", "The bounded survey distinguishes obtainable exact periods and records working block sizes up to 25.", ["result_kind", "parameters_and_variants"]),
-                ev("U006439", "PROSE", "DIRECT_COMPLETE_MECHANICS", "For a non-one-sided-additive rule, inspect all blocks of length 2pr+1 whose center returns after p steps and concatenate compatible blocks.", ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics"]),
+                ev("U006439", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For a non-one-sided-additive rule, inspect all blocks of length 2pr+1 whose center returns after p steps and concatenate compatible blocks; this constructs p-return configurations and needs a lower-period exclusion for strict exactness.", ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics"]),
             ],
             values={
                 "input": "a 1D cellular-automaton rule, range r, and requested period p",
@@ -983,6 +1198,11 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "witness_semantics": "a repeating sequence of compatible local blocks, with a spatial block-length witness bounded by 2^(2pr), whose first temporal return is p",
                 "parameters_and_variants": "strict exact period p is distinguished from periods merely dividing p",
             },
+            parameters=[
+                ("p", "requested strict temporal period"),
+                ("r", "cellular-automaton range; local test blocks have length 2pr+1"),
+            ],
+            missing=["The local p-return block construction must additionally exclude every smaller positive return period to enumerate strict exact-period configurations."],
             image_witnesses=[p + "_page_969_Picture_7.jpeg"],
         ),
         spec(
@@ -992,7 +1212,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "seed",
             [
                 ev("U006435", "PROSE", "DIRECT_IDENTITY", "Rule 90 admits every temporal period and the note supplies repeating-block seed examples for periods through 10.", ["object_kind", "carrier", "support", "alphabet_or_value_schema", "law_kind", "result_kind", "parameters_and_variants"]),
-                ev("U006436", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Ten integers encode the source's period-indexed repeating blocks for periods 1 through 10.", ["complete_state", "seed", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
+                ev("U006436", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "Ten integers are listed as encodings of period-indexed repeating blocks for periods 1 through 10, but widths and leading-zero handling are not printed with the list.", ["complete_state", "seed", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
                 ev("U006437", "PROSE", "CORROBORATING", "The source spells out multiple working period-1 and period-2 blocks.", ["complete_state", "parameters_and_variants"]),
             ],
             values={
@@ -1003,27 +1223,17 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "decode the period-indexed integer as a binary block and repeat that block as the rule-90 initial condition",
                 "parameters_and_variants": "ten period-indexed presets for p=1 through 10, with multiple examples explicitly stated for p=1 and p=2",
             },
+            parameters=[
+                ("p", "requested period, from 1 through 10 in the listed survey"),
+                ("integer block encoding", "one source-listed integer whose binary digits represent a repeating block"),
+            ],
+            missing=["The list does not state the block width or leading-zero convention needed to decode each integer unambiguously."],
             related=["exact-period-p repeating-configuration constraint for one-dimensional cellular automata"],
-        ),
-        spec(
-            "exact-period cellular-automaton configuration count query",
-            "U006437",
-            1,
-            "observer",
-            [ev("U006432", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source distinguishes configurations whose first return is exactly p from those whose period merely divides p.", OBS_FIELDS), ev("U006437", "PROSE", "CONTEXTUAL", "The source separately supplies a count for configurations whose period divides p, establishing the comparison class.", ["parameters_and_variants"])],
-            values={
-                "input": "a cellular-automaton rule and requested positive period p",
-                "rule_relation_constraint_function_or_probability_law": "count configurations that return after p steps and do not return after any smaller positive number of steps",
-                "result_kind": "the number of configurations of exact temporal period p",
-                "parameters_and_variants": "distinct from the source's period-dividing count",
-            },
-            missing=["The source defines the exact-period distinction but does not print a standalone exact-count algorithm or formula."],
-            related=["exact-period-p repeating-configuration constraint for one-dimensional cellular automata", "period-dividing cellular-automaton configuration count function"],
         ),
         spec(
             "period-dividing cellular-automaton configuration count function",
             "U006437",
-            2,
+            1,
             "observer",
             [
                 ev("U006437", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "For rule 90 the number of configurations whose temporal period divides p is 4^p.", OBS_FIELDS),
@@ -1035,33 +1245,75 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "the number of configurations whose temporal period divides p",
                 "parameters_and_variants": "rule 90 exact formula; rule 30 values {3,3,15,10,8,99,18,14,30,163} for p=1..10; one-sided-additive asymptotic growth k^(h_tx p)",
             },
-            related=["exact-period cellular-automaton configuration count query"],
+            parameters=[("p", "positive return time; the function counts configurations with period dividing p")],
+            related=["exact-period-p repeating-configuration constraint for one-dimensional cellular automata"],
+        ),
+        spec(
+            "two-dimensional repeating-configuration constraint",
+            "U006441",
+            1,
+            "constraint",
+            [
+                ev(
+                    "U006441",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "The two-dimensional repeating-configuration problem lacks the one-dimensional guarantee of a repetitive fixed-block witness; satisfying configurations may be arbitrarily complex, while infinite stripes reduce to the one-dimensional case.",
+                    [
+                        "object_kind",
+                        "carrier",
+                        "input",
+                        "law_kind",
+                        "rule_relation_constraint_function_or_probability_law",
+                        "result_kind",
+                        "witness_semantics",
+                        "parameters_and_variants",
+                    ],
+                )
+            ],
+            values={
+                "carrier": "two-dimensional cellular-automaton configurations",
+                "input": "a two-dimensional cellular-automaton rule and requested return period",
+                "rule_relation_constraint_function_or_probability_law": "accept configurations that return to themselves after the requested number of cellular-automaton steps",
+                "result_kind": "the satisfying two-dimensional repeating configurations, or their existence",
+                "witness_semantics": "a witness may be arbitrarily complex; unlike in one dimension, no periodic fixed-block array is guaranteed",
+                "parameters_and_variants": "the infinite-stripe restriction reduces the problem to the one-dimensional case",
+            },
+            variants=[("infinite-stripe restriction", "configurations made only of infinite stripes reduce to a one-dimensional repeating-configuration problem")],
+            missing=["The note gives no finite complete search bound or general constructive procedure for two-dimensional witnesses."],
+            related=["exact-period-p repeating-configuration constraint for one-dimensional cellular automata"],
         ),
         spec(
             "modular multiplication circle map",
             "U006442",
             1,
             "map",
-            [ev("U006442", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The iterated map is x -> Mod[a x,1], with rational initial states yielding repetitive behavior for rational a.", MAP_FIELDS)],
+            [ev("U006442", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The iterated map is x -> Mod[a x,1], with rational initial states yielding repetitive behavior for rational a.", MAP_FIELDS + ["seed", "parameters_and_variants"])],
             values={
                 "carrier": "real values modulo 1",
                 "complete_state": "the current residue x",
                 "rule_relation_constraint_function_or_probability_law": "x -> Mod[a x,1]",
                 "parameters_and_variants": "multiplier a",
+                "seed": "a rational initial value yields repetitive behavior when a is rational",
             },
+            parameters=[("a", "rational multiplier in the stated repetitive-behavior case"), ("initial x", "rational initial value in the stated repetitive-behavior case")],
+            variants=[("rational repetitive orbit", "rational a together with rational initial x yields repetitive behavior")],
         ),
         spec(
             "Anosov torus map family",
             "U006442",
             2,
             "map",
-            [ev("U006442", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "A higher-dimensional map is explicitly given as {x,y} -> Mod[m.{x,y},1].", MAP_FIELDS)],
+            [ev("U006442", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "A higher-dimensional map is explicitly given as {x,y} -> Mod[m.{x,y},1], with rational initial states stated to be repetitive.", MAP_FIELDS + ["seed", "parameters_and_variants"])],
             values={
                 "carrier": "pairs of real values modulo 1",
                 "complete_state": "the current pair {x,y}",
                 "rule_relation_constraint_function_or_probability_law": "{x,y} -> Mod[m.{x,y},1]",
                 "parameters_and_variants": "matrix m",
+                "seed": "a rational initial vector yields repetitive behavior in the stated rational setting",
             },
+            parameters=[("m", "matrix defining the torus map"), ("initial {x,y}", "rational initial vector in the stated repetitive-behavior case")],
+            variants=[("rational repetitive orbit", "a rational initial vector yields repetitive behavior under the stated map family")],
             missing=["The admissible matrices m are not constrained in the unit."],
         ),
         spec(
@@ -1069,12 +1321,16 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006442",
             3,
             "map",
-            [ev("U006442", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The continued-fraction map is x -> Mod[1/x,1].", MAP_FIELDS)],
+            [ev("U006442", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The continued-fraction map is x -> Mod[1/x,1] and becomes repetitive when its initial value solves a quadratic equation.", MAP_FIELDS + ["seed", "parameters_and_variants"])],
             values={
                 "carrier": "real values modulo 1, excluding undefined division at zero",
                 "complete_state": "the current value x",
                 "rule_relation_constraint_function_or_probability_law": "x -> Mod[1/x,1]",
+                "seed": "an initial value satisfying a quadratic equation yields repetitive behavior",
+                "parameters_and_variants": "quadratic-irrational initial values are the stated repetitive-orbit family",
             },
+            parameters=[("initial x", "a solution of a quadratic equation in the stated repetitive-orbit family")],
+            variants=[("quadratic repetitive orbit", "an initial value solving a quadratic equation yields repetitive behavior")],
         ),
         spec(
             "polynomial iterated-map family",
@@ -1091,7 +1347,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             variants=[("logistic map", "f[x]=a x(1-x)")],
         ),
         spec(
-            "period-p point query for an iterated map",
+            "p-return point query for an iterated map",
             "U006443",
             2,
             "constraint",
@@ -1102,6 +1358,8 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "Nest[f,x,p] == x and Im[x] == 0",
                 "result_kind": "the set of real points whose period divides p",
             },
+            parameters=[("p", "positive return time; lower periods are included")],
+            missing=["The code does not remove solutions with a smaller positive return period, so it is a p-return/period-dividing query rather than a strict exact-period query."],
         ),
         spec(
             "Sarkovskii period-implication relation",
