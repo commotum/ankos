@@ -1105,7 +1105,6 @@ RELINK_SPECS = [
             "U000977": [
                 "result_kind",
                 "excluded_observers_and_representations",
-                "evidence_limit",
             ],
             "U000978": [
                 "input",
@@ -1124,7 +1123,6 @@ RELINK_SPECS = [
             "U006113": [
                 "result_kind",
                 "excluded_observers_and_representations",
-                "evidence_limit",
             ],
         },
         "claim": (
@@ -1188,7 +1186,6 @@ RELINK_SPECS = [
             "U006199": [
                 "result_kind",
                 "excluded_observers_and_representations",
-                "evidence_limit",
             ]
         },
         "claim": (
@@ -1203,7 +1200,6 @@ RELINK_SPECS = [
                 "result_kind",
                 "witness_semantics",
                 "excluded_observers_and_representations",
-                "evidence_limit",
             ]
         },
         "claim": (
@@ -1216,9 +1212,7 @@ RELINK_SPECS = [
         "units": {
             "U006233": [
                 "result_kind",
-                "parameters_and_variants",
                 "excluded_observers_and_representations",
-                "evidence_limit",
             ]
         },
         "claim": (
@@ -1262,11 +1256,15 @@ RELINK_SPECS = [
                 "parameters_and_variants",
                 "evidence_limit",
             ],
+            "U006258": [
+                "result_kind",
+                "witness_semantics",
+                "evidence_limit",
+            ],
             "U006259": [
                 "result_kind",
                 "witness_semantics",
                 "excluded_observers_and_representations",
-                "evidence_limit",
             ],
             "U006260": [
                 "seed",
@@ -1540,8 +1538,9 @@ QUERY_SPECS = [
         "typed cross-reference and locator obligations",
         (
             r"\b(?:pages?|page|chapter)\s+(?:\d+|[IVX]+)(?:[–-]\d+)?\b|"
-            r"\b(?:see|compare|discussed on|shown on|introduced on|from)\s+"
-            r"(?:the )?(?:facing|previous|next)\s+page\b"
+            r"\b(?:the\s+)?(?:"
+            r"(?:top|bottom)\s+of\s+(?:the\s+)?)?"
+            r"(?:facing|previous|next)(?:\s+(?:one|two|three))?\s+pages?\b"
         ),
         "REGEX",
     ),
@@ -1550,15 +1549,21 @@ QUERY_SPECS = [
 EXPECTED_STAGE_UNIT_COUNT = 539
 EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
-EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 386
+EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 410
 EXPECTED_STAGE_ROUTE_COUNT = 62
 EXPECTED_READING_UPDATE_COUNT = 96
-EXPECTED_NEW_CANDIDATE_COUNT = 62
-EXPECTED_NEW_EVIDENCE_COUNT = 122
-EXPECTED_RESULT_PAIR_COUNT = 1522
-EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 0
-EXPECTED_PATH_PAIR_COUNTS: dict[str, int] = {}
-EXPECTED_PATH_UNIQUE_UNIT_COUNTS: dict[str, int] = {}
+EXPECTED_NEW_CANDIDATE_COUNT = 86
+EXPECTED_NEW_EVIDENCE_COUNT = 0
+EXPECTED_RESULT_PAIR_COUNT = 1552
+EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
+EXPECTED_PATH_PAIR_COUNTS = {
+    STAGE_PATHS[0]: 752,
+    STAGE_PATHS[1]: 800,
+}
+EXPECTED_PATH_UNIQUE_UNIT_COUNTS = {
+    STAGE_PATHS[0]: 264,
+    STAGE_PATHS[1]: 259,
+}
 EXPECTED_HIT_COUNTS = [
     66,
     17,
@@ -1569,18 +1574,18 @@ EXPECTED_HIT_COUNTS = [
     5,
     14,
     9,
-    475,
+    479,
     160,
     202,
     65,
     133,
-    118,
+    144,
 ]
 EXPECTED_QUERY_SPEC_DIGEST = (
-    "253d03a56244bd2baf76216229e03b4a5a485f2c4f91f90e74634f88e29958c6"
+    "f7134a224edcc824eed6b2f037f599d359f498ab96338240262e69da0aea874e"
 )
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
-    "2055489225361387e4babfb9eab33eb9d58eceb340665e5f8289c08139aa712a"
+    "97d4f2ffa3322834e9a1ef7d9c9fd1327bf718420af7c91967e02d96c551a5e0"
 )
 EXPECTED_TRIAGE_DIGEST = ""
 EXPECTED_ACTIVE_SEMANTIC_DIGEST = (
@@ -1591,7 +1596,7 @@ EXPECTED_ROUTE_COVERAGE_DIGEST = ""
 EXPECTED_OMISSION_CHALLENGE_COUNT = 0
 EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
 EXPECTED_NEW_VOCABULARY_DIGEST = (
-    "f189780314f2aad8a2618357d7e7a22ec2aedd008c91d096638c29e9dd7f2bef"
+    "81aaaa3068297d2c408f399e71e89caf697adb6d0e2c955cdc6585a9baddf50f"
 )
 EXPECTED_DISPOSITION_COUNTS: dict[str, int] = {}
 EXPECTED_ROUND_DIGESTS: dict[str, str] = {}
@@ -2714,10 +2719,177 @@ def _typed_evidence_scopes(
     return scopes
 
 
+def _append_novel(values: list[Any], additions: list[Any]) -> list[Any]:
+    """Preserve an audited array as an exact prefix and append novel values."""
+
+    result = list(values)
+    for item in additions:
+        if item not in result:
+            result.append(item)
+    return result
+
+
+def _enrich_existing_candidate(
+    *,
+    old: dict[str, Any],
+    evidence: list[dict[str, Any]],
+    reading_by_id: dict[str, dict[str, str]],
+) -> dict[str, Any]:
+    """Append source-grounded search evidence to one existing candidate."""
+
+    candidate = deepcopy(old)
+    candidate_id = candidate["id"]
+    evidence = sorted(
+        evidence,
+        key=lambda item: int(item["evidence_id"][1:]),
+    )
+    unit_ids = [item["source_unit_id"] for item in evidence]
+    candidate["source_unit_ids"] = _append_novel(
+        candidate["source_unit_ids"],
+        unit_ids,
+    )
+    candidate["source_evidence"] = [
+        *candidate["source_evidence"],
+        *evidence,
+    ]
+    candidate["source_status"] = _append_novel(
+        candidate["source_status"],
+        [reading_by_id[unit_id]["source_status"] for unit_id in unit_ids],
+    )
+    candidate["evidence_strength"] = _append_novel(
+        candidate["evidence_strength"],
+        [item["strength"] for item in evidence],
+    )
+    candidate["image_witnesses"] = _append_novel(
+        candidate["image_witnesses"],
+        [
+            item["image_path"]
+            for item in evidence
+            if item["image_path"] is not None
+        ],
+    )
+    for item in evidence:
+        evidence_id = item["evidence_id"]
+        for field in item["fingerprint_fields"]:
+            if candidate["field_support"].get(field) != "SUPPORTED":
+                raise AuthoringError(
+                    f"{candidate_id} relink attempts to support non-SUPPORTED "
+                    f"field {field}"
+                )
+            fingerprint = candidate["fingerprint"][field]
+            if fingerprint["status"] != "SUPPORTED":
+                raise AuthoringError(
+                    f"{candidate_id}.{field} support records disagree"
+                )
+            fingerprint["evidence_ids"] = _append_novel(
+                fingerprint["evidence_ids"],
+                [evidence_id],
+            )
+
+    evidence_by_unit = {
+        item["source_unit_id"]: item["evidence_id"] for item in evidence
+    }
+    semantic_appends: dict[str, dict[str, list[dict[str, Any]]]] = {
+        "B0032": {
+            "parameters": [
+                {
+                    "name": "spatial slice selector",
+                    "source_description": (
+                        "middle-line selection or a sequence of offsets from "
+                        "the center of a two-dimensional evolution"
+                    ),
+                    "evidence_ids": [
+                        evidence_by_unit["U000978"],
+                        evidence_by_unit["U006112"],
+                    ],
+                }
+            ],
+            "variants": [
+                {
+                    "name": "center-line history slice",
+                    "source_description": (
+                        "the one-dimensional line through the middle of each "
+                        "successive two-dimensional pattern"
+                    ),
+                    "evidence_ids": [evidence_by_unit["U000978"]],
+                },
+                {
+                    "name": "offset vertical-slice sequence",
+                    "source_description": (
+                        "vertical slices at a sequence of offsets from the "
+                        "center, as stated for the code-942 example"
+                    ),
+                    "evidence_ids": [evidence_by_unit["U006112"]],
+                },
+            ],
+        },
+        "B0595": {
+            "variants": [
+                {
+                    "name": "GoldenRatio square-lattice line cut",
+                    "source_description": (
+                        "a line of GoldenRatio slope cuts a two-dimensional "
+                        "square lattice to yield the one-dimensional Fibonacci "
+                        "sequence"
+                    ),
+                    "evidence_ids": [evidence_by_unit["U006182"]],
+                }
+            ],
+        },
+        "B0922": {
+            "parameters": [
+                {
+                    "name": "alternate initial string",
+                    "source_description": (
+                        "ABA dies out, while ABAABABA grows exponentially "
+                        "forever for the same three-rule preset"
+                    ),
+                    "evidence_ids": [evidence_by_unit["U006260"]],
+                }
+            ],
+            "variants": [
+                {
+                    "name": "alternate-seed behavior",
+                    "source_description": (
+                        "the preset has source-stated extinction and "
+                        "exponential-growth behaviors under alternate seeds"
+                    ),
+                    "evidence_ids": [evidence_by_unit["U006260"]],
+                }
+            ],
+        },
+    }
+    for collection, additions in semantic_appends.get(
+        candidate_id,
+        {},
+    ).items():
+        candidate[collection] = [*candidate[collection], *additions]
+
+    if candidate_id == "B0094":
+        candidate["uncertainties"] = _append_novel(
+            candidate["uncertainties"],
+            [
+                "The Chapter 5 source calls rule 90 the one-dimensional "
+                "component result but uses the undefined phrase “s alone” "
+                "for the neighboring two-dimensional attribution."
+            ],
+        )
+    if candidate_id == "B0922":
+        candidate["uncertainties"] = _append_novel(
+            candidate["uncertainties"],
+            [
+                "The bounded-reachability caption is OCR-defective (“shows "
+                "wh”) and does not state its plotted axis/string encoding."
+            ],
+        )
+    return {field: candidate[field] for field in CANDIDATE_FIELDS}
+
+
 def _build_final_enrichment(
     *,
     reading_by_id: dict[str, dict[str, str]],
     asset_by_unit: dict[str, dict[str, str]],
+    candidates_by_id: dict[str, dict[str, Any]],
     hit_by_pair: dict[tuple[int, str], str],
 ) -> tuple[
     list[dict[str, str]],
@@ -2814,8 +2986,57 @@ def _build_final_enrichment(
             rank, ordinal, _ = min(unit_pairs)
             evidence_plans.append(
                 {
+                    "plan_kind": "NEW_CANDIDATE",
                     "spec": spec,
+                    "candidate_id": spec["_candidate_id"],
                     "unit_id": unit_id,
+                    "source_index": source_index,
+                    "rank": rank,
+                    "query_ordinal": ordinal,
+                    "hit_id": hit_by_pair[(ordinal, unit_id)],
+                }
+            )
+    for relink in RELINK_SPECS:
+        candidate_id = relink["candidate_id"]
+        old_candidate = candidates_by_id.get(candidate_id)
+        if old_candidate is None or old_candidate.get("record_status") != "ACTIVE":
+            raise AuthoringError(
+                f"relink target {candidate_id} is absent or inactive"
+            )
+        for source_index, (unit_id, fields) in enumerate(
+            relink["units"].items()
+        ):
+            if unit_id not in reading_by_id:
+                raise AuthoringError(
+                    f"{candidate_id} relink reaches unknown unit {unit_id}"
+                )
+            invalid_fields = [
+                field
+                for field in fields
+                if old_candidate["field_support"].get(field) != "SUPPORTED"
+            ]
+            if invalid_fields:
+                raise AuthoringError(
+                    f"{candidate_id} relink fields are not already SUPPORTED: "
+                    f"{invalid_fields}"
+                )
+            unit_pairs = [
+                (rank, ordinal, pair_unit)
+                for (ordinal, pair_unit), rank in hit_number.items()
+                if pair_unit == unit_id
+            ]
+            if not unit_pairs:
+                raise AuthoringError(
+                    f"{candidate_id} relink unit {unit_id} lacks a hit"
+                )
+            rank, ordinal, _ = min(unit_pairs)
+            evidence_plans.append(
+                {
+                    "plan_kind": "EXISTING_RELINK",
+                    "candidate_id": candidate_id,
+                    "unit_id": unit_id,
+                    "fields": fields,
+                    "claim": relink["claim"],
                     "source_index": source_index,
                     "rank": rank,
                     "query_ordinal": ordinal,
@@ -2825,7 +3046,7 @@ def _build_final_enrichment(
     evidence_plans.sort(
         key=lambda plan: (
             plan["rank"],
-            int(plan["spec"]["_candidate_id"][1:]),
+            int(plan["candidate_id"][1:]),
             plan["source_index"],
         )
     )
@@ -2833,6 +3054,12 @@ def _build_final_enrichment(
     evidence_by_candidate: dict[str, list[dict[str, Any]]] = {
         spec["_candidate_id"]: [] for spec in annotated
     }
+    evidence_by_candidate.update(
+        {
+            relink["candidate_id"]: []
+            for relink in RELINK_SPECS
+        }
+    )
     block_modality = {
         "fenced_code": "CODE",
         "list": "FORMULA",
@@ -2843,7 +3070,7 @@ def _build_final_enrichment(
     }
     for offset, plan in enumerate(evidence_plans):
         row = reading_by_id[plan["unit_id"]]
-        spec = plan["spec"]
+        spec = plan.get("spec")
         hit_id = plan["hit_id"]
         evidence_anchor_counts[hit_id] = (
             evidence_anchor_counts.get(hit_id, 0) + 1
@@ -2868,11 +3095,20 @@ def _build_final_enrichment(
                     f"image evidence {plan['unit_id']} lacks an asset row"
                 )
             image_path = asset["physical_path"]
-            claim = (
-                f"Original-resolution inspection corroborates the stated "
-                f"result/history representation for {spec['name']}; pixels "
-                f"do not supply additional native law mechanics."
-            )
+            if plan["plan_kind"] == "NEW_CANDIDATE":
+                claim = (
+                    f"Original-resolution inspection corroborates the stated "
+                    f"result/history representation for {spec['name']}; "
+                    f"pixels do not supply additional native law mechanics."
+                )
+            else:
+                claim = (
+                    f"{plan['claim']} Original-resolution pixels corroborate "
+                    f"only the scoped result/witness representation."
+                )
+        elif plan["plan_kind"] == "EXISTING_RELINK":
+            image_path = None
+            claim = plan["claim"]
         elif row["block_kind"] in {"fenced_code", "list", "table"}:
             image_path = None
             claim = (
@@ -2892,7 +3128,12 @@ def _build_final_enrichment(
                 f"parameter, witness, or evidence-limit context for "
                 f"{spec['name']}."
             )
-        evidence_by_candidate[spec["_candidate_id"]].append(
+        fields = (
+            spec["_evidence_scopes"][plan["unit_id"]]
+            if plan["plan_kind"] == "NEW_CANDIDATE"
+            else plan["fields"]
+        )
+        evidence_by_candidate[plan["candidate_id"]].append(
             _evidence(
                 evidence_number=4049 + offset,
                 hit_id=hit_id,
@@ -2901,7 +3142,7 @@ def _build_final_enrichment(
                 strength=strength,
                 modality=modality,
                 claim=claim,
-                fields=spec["_evidence_scopes"][plan["unit_id"]],
+                fields=fields,
                 image_path=image_path,
             )
         )
@@ -2974,6 +3215,18 @@ def _build_final_enrichment(
                 image_witnesses=image_witnesses,
             )
         )
+    for relink in RELINK_SPECS:
+        candidate_id = relink["candidate_id"]
+        relink_evidence = evidence_by_candidate[candidate_id]
+        if not relink_evidence:
+            raise AuthoringError(f"{candidate_id} has no relink evidence")
+        candidates.append(
+            _enrich_existing_candidate(
+                old=candidates_by_id[candidate_id],
+                evidence=relink_evidence,
+                reading_by_id=reading_by_id,
+            )
+        )
 
     reading_additions: dict[str, list[str]] = {}
     anchor_units: set[str] = set()
@@ -2984,12 +3237,23 @@ def _build_final_enrichment(
         for unit_id in spec["units"]:
             reading_additions.setdefault(unit_id, []).append(candidate_id)
             names_by_unit.setdefault(unit_id, []).append(spec["name"])
+    for relink in RELINK_SPECS:
+        candidate_id = relink["candidate_id"]
+        candidate_name = candidates_by_id[candidate_id]["provisional_name"]
+        for unit_id in relink["units"]:
+            current_links = parse_links(
+                reading_by_id[unit_id]["candidate_ids"],
+                f"{unit_id}.candidate_ids",
+            )
+            if candidate_id not in current_links:
+                reading_additions.setdefault(unit_id, []).append(candidate_id)
+            names_by_unit.setdefault(unit_id, []).append(candidate_name)
     updated: list[dict[str, str]] = []
     for unit_id in sorted(reading_additions):
         old = reading_by_id[unit_id]
         row = dict(old)
         additions = sorted(
-            reading_additions[unit_id],
+            list(dict.fromkeys(reading_additions[unit_id])),
             key=lambda candidate_id: int(candidate_id[1:]),
         )
         row["candidate_ids"] = _append_links(
@@ -3028,7 +3292,7 @@ def _build_final_enrichment(
             )
         asset = dict(old_asset)
         additions = sorted(
-            reading_additions[unit_id],
+            list(dict.fromkeys(reading_additions[unit_id])),
             key=lambda candidate_id: int(candidate_id[1:]),
         )
         asset["candidate_ids"] = _append_links(
@@ -3203,7 +3467,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     asset_by_unit = {
         row["source_unit_id"]: row
         for row in assets
-        if row["source_unit_id"]
+        if row["source_unit_id"] and row["assignment_path"] in STAGE_PATHS
     }
     candidates_by_id = {candidate["id"]: candidate for candidate in candidates}
     routes_by_id = {route["route_id"]: route for route in routes}
@@ -3211,7 +3475,11 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         len(unit_by_id) != len(units)
         or len(reading_by_id) != len(reading)
         or len(asset_by_unit)
-        != sum(bool(row["source_unit_id"]) for row in assets)
+        != sum(
+            bool(row["source_unit_id"])
+            and row["assignment_path"] in STAGE_PATHS
+            for row in assets
+        )
         or len(candidates_by_id) != len(candidates)
         or len(routes_by_id) != len(routes)
     ):
@@ -3486,6 +3754,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         ) = _build_final_enrichment(
             reading_by_id=reading_by_id,
             asset_by_unit=asset_by_unit,
+            candidates_by_id=candidates_by_id,
             hit_by_pair=hit_by_pair,
         )
     else:
@@ -3779,7 +4048,9 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         "hits": hits,
         "new_vocabulary": new_vocabulary,
         "new_candidates": [
-            candidate["id"] for candidate in candidate_updates
+            candidate["id"]
+            for candidate in candidate_updates
+            if candidate["id"] not in candidates_by_id
         ],
         "new_evidence_groups": new_evidence_group_ids,
         "new_routes": [],
