@@ -101,6 +101,57 @@ SOURCE_EVIDENCE_OVERRIDES = {
             "evidence_limit",
         },
     ),
+    "U001053": (
+        "DIRECT_PARTIAL_MECHANICS",
+        {
+            "topology",
+            "structural_invariants",
+            "read_dependencies_or_neighborhood",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001071": (
+        "DIRECT_PARTIAL_MECHANICS",
+        {
+            "object_kind",
+            "carrier",
+            "structural_invariants",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "parameters_and_variants",
+            "evidence_limit",
+        },
+    ),
+    "U001090": (
+        "DIRECT_PARTIAL_MECHANICS",
+        {
+            "object_kind",
+            "carrier",
+            "structural_invariants",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001094": (
+        "DIRECT_PARTIAL_MECHANICS",
+        {
+            "object_kind",
+            "native_time",
+            "frontier_or_activation",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "parameters_and_variants",
+            "evidence_limit",
+        },
+    ),
     "U001121": (
         "CONTEXTUAL",
         {
@@ -330,6 +381,72 @@ def profile_blueprint(
             "witness_semantics",
         }
         unknown = {"topology", "alphabet_or_value_schema", "seed"}
+    elif kind == "SUB_GEOM_GENERAL":
+        supported = {
+            "object_kind": "geometrical replacement/fractal system",
+            "native_time": "discrete repeated geometrical replacement steps",
+            "carrier": "geometrical black-square elements placed in the plane",
+            "support": "a finite collection of geometrical square elements",
+            "topology": "free geometrical placement in the plane rather than a fixed grid",
+            "structural_invariants": "the same geometrical replacement rule is reused for every element",
+            "alphabet_or_value_schema": "black square elements; no color or orientation alphabet is established for the family",
+            "complete_state": "the current squares together with their geometrical placement and scale",
+            "frontier_or_activation": "all current elements eligible under the repeated replacement rule",
+            "schedule": "parallel replacement at each step",
+            "read_dependencies_or_neighborhood": "the replaced element alone; the source explicitly excludes dependence on other elements",
+            "law_kind": "deterministic noninteracting geometrical replacement rule",
+            "rule_relation_constraint_function_or_probability_law": name,
+            "write_replacement_assembly_or_commit": "replace each black square by two or more smaller black squares in the stated geometry",
+            "result_kind": "one successor geometrical pattern",
+            "successor_cardinality": "one",
+            "determinism_branching_or_measure": "deterministic",
+            "parameters_and_variants": "number, relative scale, and placement of the smaller black squares",
+            "excluded_observers_and_representations": "nested appearance and rendered stages are outcomes; neighbor interaction is explicitly absent",
+            "evidence_limit": "the family passage does not establish a seed, color/orientation types, collision policy, or interacting neighborhood",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "input",
+            "boundary",
+            "external_data",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+        unknown = {"seed"}
+    elif kind == "SUB_GRID_NEIGHBOR":
+        supported = {
+            "object_kind": "two-dimensional neighbor-dependent substitution system",
+            "native_time": "discrete replacement steps",
+            "carrier": "black/white cells on a fixed two-dimensional grid",
+            "support": "the finite wrapped grid used by the rule",
+            "topology": "square grid wrapping in both dimensions",
+            "structural_invariants": "grid adjacency and extent remain fixed while cell values are replaced",
+            "alphabet_or_value_schema": "black/white cell values shown by the checked rule panels",
+            "complete_state": "all cell values on the wrapped grid at one step",
+            "boundary": "the grid wraps in both dimensions",
+            "frontier_or_activation": "all grid cells are eligible for parallel replacement",
+            "schedule": "parallel replacement at every step",
+            "read_dependencies_or_neighborhood": "the cell and the neighboring grid cells selected by the rule",
+            "law_kind": "deterministic neighbor-dependent grid replacement rule",
+            "rule_relation_constraint_function_or_probability_law": name,
+            "write_replacement_assembly_or_commit": "replace each grid-cell value according to its old local neighborhood",
+            "result_kind": "one successor wrapped-grid pattern",
+            "successor_cardinality": "one",
+            "determinism_branching_or_measure": "deterministic",
+            "parameters_and_variants": "local neighborhood, replacement table, and wrapped-grid extent",
+            "excluded_observers_and_representations": "rendered stages and sequential scan orders are not native mechanics",
+            "evidence_limit": "the source does not establish a generic seed or any oriented-element or free-geometry semantics",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "input",
+            "external_data",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+        unknown = {"seed"}
     elif kind in {"SUB_GRID", "SUB_GEOM"}:
         carrier = (
             "two-dimensional grid of colored square elements"
@@ -340,6 +457,11 @@ def profile_blueprint(
             "fixed square grid, with wrapping where explicitly stated"
             if kind == "SUB_GRID"
             else "geometrical placement and orientation rather than a fixed grid"
+        )
+        read_dependencies = (
+            "the individual grid element alone"
+            if kind == "SUB_GRID"
+            else "the individual geometrical element alone; neighboring-element interaction is absent"
         )
         supported = {
             "object_kind": "two-dimensional substitution system",
@@ -353,7 +475,7 @@ def profile_blueprint(
             "seed": "a single black square unless another seed is stated",
             "frontier_or_activation": "all elements eligible under the parallel replacement rule",
             "schedule": "parallel replacement at every step",
-            "read_dependencies_or_neighborhood": "the element alone, or its checked neighboring cells for neighbor-dependent presets",
+            "read_dependencies_or_neighborhood": read_dependencies,
             "law_kind": "deterministic structural replacement rule",
             "rule_relation_constraint_function_or_probability_law": name,
             "write_replacement_assembly_or_commit": "replace each matched element by the displayed smaller-element template",
@@ -441,6 +563,41 @@ def profile_blueprint(
             "successor_cardinality",
             "determinism_branching_or_measure",
         }
+    elif kind == "NETWORK_BINARY_GENERAL":
+        supported = {
+            "object_kind": "binary-outdegree network-system restriction",
+            "native_time": "discrete successive network states",
+            "carrier": "nodes with exactly two outgoing connection slots",
+            "structural_invariants": "every node has exactly two outgoing connections, each targeting another node or itself",
+            "alphabet_or_value_schema": "identical nodes and two outgoing connection slots",
+            "complete_state": "all nodes and both outgoing targets for every node",
+            "frontier_or_activation": "the outgoing connections of each node are eligible for local rerouting",
+            "read_dependencies_or_neighborhood": "the local connection structure around the node, as selected by a supplied rule",
+            "law_kind": "local network connection-rerouting rule",
+            "rule_relation_constraint_function_or_probability_law": "a supplied local rerouting rule restricted to networks with two outgoing connections per node",
+            "write_replacement_assembly_or_commit": "reroute outgoing connections according to the supplied local rule",
+            "result_kind": "a successor binary-outdegree network",
+            "parameters_and_variants": "the two-outgoing restriction and the supplied local rerouting rule",
+            "excluded_observers_and_representations": "node layout and nested drawings are representations, not mechanics",
+            "evidence_limit": "the restriction passage does not establish finite support, a seed, a schedule, determinism, node insertion, or first-component retention",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "input",
+            "boundary",
+            "external_data",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+        unknown = {
+            "support",
+            "topology",
+            "seed",
+            "schedule",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        }
     elif kind == "NETWORK":
         supported = {
             "object_kind": "network evolution system",
@@ -507,6 +664,39 @@ def profile_blueprint(
             "termination_completion_failure",
             "witness_semantics",
         }
+    elif kind == "TRANSITION_RELATION":
+        supported = {
+            "object_kind": "derived state-transition relation/representation",
+            "native_time": "none; an immutable relation derived from the multiway evolution",
+            "carrier": "distinct finite sequences as nodes and one-step generation links as directed edges",
+            "support": "the sequences and transition links reached from the stated seed under the stated replacement system",
+            "topology": "directed sequence-to-sequence transition network",
+            "structural_invariants": "each distinct sequence is represented once, with repeated generation shown by links to the same node",
+            "alphabet_or_value_schema": "the sequence elements of the represented multiway system",
+            "complete_state": "the derived directed relation between represented sequences",
+            "law_kind": "derived one-step reachability relation",
+            "rule_relation_constraint_function_or_probability_law": "an edge connects a sequence to every distinct sequence produced by one allowed native replacement",
+            "result_kind": "an immutable directed transition network/relation",
+            "witness_semantics": "each node witnesses one reached sequence and each edge witnesses one native one-step generation relation",
+            "parameters_and_variants": "the represented replacement set, seed, and accumulated reachability extent",
+            "excluded_observers_and_representations": "breadth-wise layer placement, duplicate drawings of the same sequence, and page geometry are presentation choices; the relation is not the native successor set",
+            "evidence_limit": "the source establishes the relation for the displayed multiway system without asserting completion of an infinite transitive closure",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "seed",
+            "input",
+            "boundary",
+            "external_data",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "termination_completion_failure",
+        }
     elif kind == "CONSTRAINT_GENERAL":
         supported = {
             "object_kind": "constraint-defined model set",
@@ -548,6 +738,7 @@ def profile_blueprint(
         "CONSTRAINT_TEMPLATE_CROSS",
         "CONSTRAINT_TEMPLATE_REQUIRED",
         "CONSTRAINT_TEMPLATE_3X3",
+        "CONSTRAINT_TEMPLATE_3X3_REQUIRED",
     }:
         constraint_profiles = {
             "CONSTRAINT_1D": {
@@ -596,8 +787,18 @@ def profile_blueprint(
                 "topology": "overlapping complete 3 × 3 blocks including diagonals",
                 "boundary": "unbounded two-dimensional grid",
                 "read": "the complete 3 × 3 neighborhood centered at each cell",
-                "law": "overlapping allowed-3 × 3-template constraint plus a required occurrence where stated",
-                "parameters": "the allowed 3 × 3 template set and required template occurrence",
+                "law": "overlapping allowed-3 × 3-template constraint",
+                "parameters": "the allowed 3 × 3 template set",
+                "witness": "a complete infinite grid coloring whose every 3 × 3 block is allowed",
+            },
+            "CONSTRAINT_TEMPLATE_3X3_REQUIRED": {
+                "carrier": "two-dimensional square grid of cells",
+                "support": "a complete infinite grid coloring",
+                "topology": "overlapping complete 3 × 3 blocks including diagonals",
+                "boundary": "unbounded two-dimensional grid",
+                "read": "the complete 3 × 3 neighborhood centered at each cell",
+                "law": "overlapping allowed-3 × 3-template constraint plus one required template occurrence",
+                "parameters": "the allowed 3 × 3 template set and the designated template that must occur",
                 "witness": "a complete infinite grid coloring whose every 3 × 3 block is allowed and that contains the required template",
             },
         }
@@ -1058,14 +1259,15 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         )
     geom_family = add(
         "geometrical replacement and fractal-system family",
-        "SUB_GEOM",
+        "SUB_GEOM_GENERAL",
         "SOURCE_UNIT",
         "U001042",
         1,
         ["U001042", "U001050", "U001051", "U001053"],
         [],
         parameters={
-            "replacement domain": "oriented geometrical square elements without a fixed grid"
+            "replacement domain": "geometrical black-square elements without a fixed grid",
+            "interaction": "none; replacement does not depend on other elements",
         },
     )
     add(
@@ -1105,7 +1307,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         )
     neighbor_sub = add(
         "two-dimensional neighbor-dependent substitution-system family",
-        "SUB_GRID",
+        "SUB_GRID_NEIGHBOR",
         "SOURCE_UNIT",
         "U001056",
         1,
@@ -1117,7 +1319,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     add(
         "illustrated neighbor-dependent substitution demonstration",
-        "SUB_GRID",
+        "SUB_GRID_NEIGHBOR",
         "IMAGE",
         "A000882",
         1,
@@ -1129,7 +1331,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     for ordinal, label in enumerate("abcdefgh", 2):
         add(
             f"neighbor-dependent substitution preset ({label})",
-            "SUB_GRID",
+            "SUB_GRID_NEIGHBOR",
             "IMAGE",
             "A000882",
             ordinal,
@@ -1160,7 +1362,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     network = add(
         "binary-outdegree network-system restriction",
-        "NETWORK",
+        "NETWORK_BINARY_GENERAL",
         "SOURCE_UNIT",
         "U001071",
         1,
@@ -1487,6 +1689,25 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "seed": "the checked two-element initial sequence",
         },
         parent_index=multiway,
+    )
+    add(
+        "derived sequence-transition network for the page-224 multiway evolution",
+        "TRANSITION_RELATION",
+        "SOURCE_UNIT",
+        "U001156",
+        1,
+        ["U001151", "U001152", "U001155", "U001156", "U001158"],
+        ["A000906", "A000907"],
+        aliases=[
+            "network of what sequence leads to what other",
+            "multiway state-transition relation",
+        ],
+        parameters={
+            "represented system": "the checked three-replacement multiway rule",
+            "represented seed": "the checked two-element initial sequence",
+            "node identity": "each distinct sequence is shown once",
+            "edge identity": "one-step native generation of one sequence from another",
+        },
     )
 
     constraint_family = add(
@@ -1857,7 +2078,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     add(
         "33-template rule-60-correspondence constraint",
-        "CONSTRAINT_TEMPLATE_3X3",
+        "CONSTRAINT_TEMPLATE_3X3_REQUIRED",
         "SOURCE_UNIT",
         "U001216",
         1,
@@ -1883,7 +2104,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     add(
         "56-template rule-30-correspondence constraint",
-        "CONSTRAINT_TEMPLATE_3X3",
+        "CONSTRAINT_TEMPLATE_3X3_REQUIRED",
         "SOURCE_UNIT",
         "U001217",
         1,
@@ -1908,7 +2129,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         route_keys=["rule-30-correspondence"],
     )
 
-    assert len(specs) == 195, len(specs)
+    assert len(specs) == 196, len(specs)
     return specs
 
 
@@ -2778,7 +2999,7 @@ def validate_output(
     assets = output["asset_updates"]
     candidates = output["candidate_proposals"]
     routes = output["route_proposals"]
-    if len(readings) != 276 or len(assets) != 80 or len(candidates) != 195:
+    if len(readings) != 276 or len(assets) != 80 or len(candidates) != 196:
         raise ValueError("unexpected output row count")
     if len(routes) != 24:
         raise ValueError("unexpected route count")
@@ -2791,7 +3012,7 @@ def validate_output(
     ]:
         raise ValueError("asset order changed")
     if [row["id"] for row in candidates] != [
-        f"W{i:04d}" for i in range(1, 196)
+        f"W{i:04d}" for i in range(1, 197)
     ]:
         raise ValueError("candidate sequence is not contiguous")
     if [row["route_id"] for row in routes] != [

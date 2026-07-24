@@ -1781,7 +1781,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     # Freeze the hostile semantic dispositions that motivated the e3 rewrite.
     by_name = {p["provisional_name"]: p for p in proposals}
     assert len(proposals) == 128
-    assert len(all_evidence) == 265
+    assert len(all_evidence) == 266
     assert len(route_proposals) == 22
     assert proposals.index(by_name["two-dimensional totalistic cellular-automaton family"]) < proposals.index(
         by_name["two-dimensional outer-totalistic cellular-automaton family"]
@@ -1824,8 +1824,23 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         "sequential directed network-system family",
         "final sequential-network six-case preset",
     } <= set(by_name)
+    assert by_name["L-shaped geometric substitution system"]["discovery_anchor"]["id"] == "U006176"
+    assert by_name["L-shaped geometric substitution system"]["source_unit_ids"] == ["U006176"]
+    assert by_name["final sequential-network six-case preset"]["source_unit_ids"] == [
+        "U006230",
+        "U006231",
+        "U006232",
+    ]
+    assert "BACK-MATTER/NOTES/_page_951_Sequential_Networks_Three_Panel_Row.jpeg" in by_name[
+        "final sequential-network six-case preset"
+    ]["image_witnesses"]
     assert {"vants", "turmites", "turning machines"} <= set(
         by_name["two-dimensional Turing machine"]["aliases"]
+    )
+    assert "U006136" in by_name["two-dimensional Turing machine"]["source_unit_ids"]
+    assert any(
+        e["source_unit_id"] == "U006136" and e["strength"] == "DIRECT_IDENTITY"
+        for e in by_name["two-dimensional Turing machine"]["source_evidence"]
     )
     assert {
         "semi-Thue systems",
