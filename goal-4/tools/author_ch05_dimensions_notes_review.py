@@ -738,6 +738,8 @@ def candidate_specs() -> list[dict[str, Any]]:
                    "evidence_limit": "the Notes fix 2D nested-array lookup, replacement, flattening, rule, init, and t only"})
     add("page-187 Sierpiński block-substitution preset", "SUB", ("SOURCE_UNIT", "U006145"),
         [ev("U006145", "The exact page-187 rule maps 1 to {{1,0},{1,1}}, maps 0 to an all-zero 2x2 block, and starts from {{1}}."),
+         ev("U006146", "SS2DEvolve and Flatten2D supply the parallel nested-array assembly used by the exact preset.", modality="CODE",
+            fields=["schedule", "write_replacement_assembly_or_commit", "result_kind", "termination_completion_failure"]),
          ev("U006149", "The resulting page-187 construction is explicitly identified as the Sierpiński pattern.", strength="DIRECT_IDENTITY",
             fields=["object_kind", "parameters_and_variants"])],
         aliases=["page-187 Sierpinski pattern"],
@@ -866,7 +868,8 @@ def candidate_specs() -> list[dict[str, Any]]:
                    "control_state": None,
                    "frontier_or_activation": "all current nodes are rule sites each step",
                    "schedule": "parallel synchronous local rewriting of every current node, followed by global assembly, renumbering, and stated unreachable-node removal",
-                   "result_kind": "one successor directed network with no active-node component"})
+                   "result_kind": "one successor directed network with no active-node component",
+                   "termination_completion_failure": "NetEvolveList runs the requested t parallel steps; otherwise the deterministic network evolution can continue"})
     add("undirected network rewriting system", "UNDIRECTED_NETWORK", ("SOURCE_UNIT", "U006226"),
         [ev("U006226", "Undirected-connection networks are independently delimited, but their update rules are routed to Chapter 9.")],
         missing=["The assigned Notes do not state the undirected-network state-transition, frontier, schedule, read, rewrite, commit, branching, or termination mechanics."])
@@ -1835,7 +1838,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     # Freeze the hostile semantic dispositions that motivated the e3–r4 rewrites.
     by_name = {p["provisional_name"]: p for p in proposals}
     assert len(proposals) == 128
-    assert len(all_evidence) == 268
+    assert len(all_evidence) == 269
     assert len(route_proposals) == 22
     assert proposals.index(by_name["two-dimensional totalistic cellular-automaton family"]) < proposals.index(
         by_name["two-dimensional outer-totalistic cellular-automaton family"]
@@ -1940,6 +1943,9 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     assert parallel["frontier_or_activation"]["value"] == "all current nodes are rule sites each step"
     assert parallel["schedule"]["value"].startswith("parallel synchronous")
     assert parallel["result_kind"]["value"] == "one successor directed network with no active-node component"
+    assert parallel["termination_completion_failure"]["value"] == (
+        "NetEvolveList runs the requested t parallel steps; otherwise the deterministic network evolution can continue"
+    )
     string_multiway = by_name["string multiway system"]["fingerprint"]
     assert string_multiway["carrier"]["value"] == "a deduplicated set or list of strings"
     assert string_multiway["parameters_and_variants"]["value"] == (

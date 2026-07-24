@@ -128,19 +128,6 @@ SOURCE_EVIDENCE_OVERRIDES = {
         "DIRECT_PARTIAL_MECHANICS",
         {
             "object_kind",
-            "carrier",
-            "structural_invariants",
-            "alphabet_or_value_schema",
-            "complete_state",
-            "parameters_and_variants",
-            "excluded_observers_and_representations",
-            "evidence_limit",
-        },
-    ),
-    "U001094": (
-        "DIRECT_PARTIAL_MECHANICS",
-        {
-            "object_kind",
             "native_time",
             "frontier_or_activation",
             "read_dependencies_or_neighborhood",
@@ -149,6 +136,15 @@ SOURCE_EVIDENCE_OVERRIDES = {
             "write_replacement_assembly_or_commit",
             "result_kind",
             "parameters_and_variants",
+            "evidence_limit",
+        },
+    ),
+    "U001094": (
+        "DIRECT_PARTIAL_MECHANICS",
+        {
+            "alphabet_or_value_schema",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
             "evidence_limit",
         },
     ),
@@ -188,10 +184,67 @@ SOURCE_EVIDENCE_OVERRIDES = {
             "evidence_limit",
         },
     ),
-    "U001158": (
-        "CONTEXTUAL",
+    "U001151": (
+        "CORROBORATING",
         {
+            "structural_invariants",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001152": (
+        "DIRECT_IDENTITY",
+        {
+            "object_kind",
+            "structural_invariants",
+            "complete_state",
             "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001155": (
+        "DIRECT_IDENTITY",
+        {
+            "object_kind",
+            "structural_invariants",
+            "complete_state",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001156": (
+        "DIRECT_IDENTITY",
+        {
+            "object_kind",
+            "native_time",
+            "carrier",
+            "support",
+            "topology",
+            "structural_invariants",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "witness_semantics",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001158": (
+        "DIRECT_IDENTITY",
+        {
+            "object_kind",
+            "carrier",
+            "topology",
+            "result_kind",
+            "witness_semantics",
             "parameters_and_variants",
             "excluded_observers_and_representations",
             "evidence_limit",
@@ -381,6 +434,39 @@ def profile_blueprint(
             "witness_semantics",
         }
         unknown = {"topology", "alphabet_or_value_schema", "seed"}
+    elif kind == "SUB_BLOCK_LOCAL":
+        supported = {
+            "object_kind": "element-local two-dimensional block substitution system",
+            "native_time": "discrete parallel replacement steps",
+            "carrier": "a finite collection of square elements",
+            "support": "the finite hierarchical square pattern at one step",
+            "topology": "two-dimensional square-subdivision geometry",
+            "structural_invariants": "every square is independently replaced by the same four-square block template",
+            "alphabet_or_value_schema": "the square-element symbols shown by the checked rule strip",
+            "complete_state": "the current square elements with their block placement and displayed symbols",
+            "frontier_or_activation": "every current square element",
+            "schedule": "parallel replacement of every square at each step",
+            "read_dependencies_or_neighborhood": "the individual square element alone",
+            "law_kind": "deterministic element-local four-square block substitution",
+            "rule_relation_constraint_function_or_probability_law": name,
+            "write_replacement_assembly_or_commit": "replace each square by the displayed block of four smaller squares",
+            "result_kind": "one successor block pattern",
+            "successor_cardinality": "one",
+            "determinism_branching_or_measure": "deterministic",
+            "parameters_and_variants": "the displayed four-square replacement block",
+            "excluded_observers_and_representations": "nested appearance and rendered stages are outcomes rather than additional mechanics",
+            "evidence_limit": "only the element-local parallel four-square replacement stated in the caption and checked rule strip is asserted",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "input",
+            "boundary",
+            "external_data",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+        unknown = {"seed"}
     elif kind == "SUB_GEOM_GENERAL":
         supported = {
             "object_kind": "geometrical replacement/fractal system",
@@ -418,25 +504,25 @@ def profile_blueprint(
         supported = {
             "object_kind": "two-dimensional neighbor-dependent substitution system",
             "native_time": "discrete replacement steps",
-            "carrier": "black/white cells on a fixed two-dimensional grid",
-            "support": "the finite wrapped grid used by the rule",
-            "topology": "square grid wrapping in both dimensions",
-            "structural_invariants": "grid adjacency and extent remain fixed while cell values are replaced",
+            "carrier": "a finite two-dimensional block of black/white square cells",
+            "support": "the finite square block produced at the current step",
+            "topology": "square-cell adjacency, with old-state neighborhood reads wrapping in both dimensions",
+            "structural_invariants": "each old cell is replaced by one 2 × 2 child block, so linear extent doubles and cell count quadruples at every step",
             "alphabet_or_value_schema": "black/white cell values shown by the checked rule panels",
-            "complete_state": "all cell values on the wrapped grid at one step",
-            "boundary": "the grid wraps in both dimensions",
-            "frontier_or_activation": "all grid cells are eligible for parallel replacement",
+            "complete_state": "the current finite square block and all of its cell values",
+            "boundary": "old-state neighborhood lookup wraps in both dimensions",
+            "frontier_or_activation": "all old-state cells are eligible for parallel block replacement",
             "schedule": "parallel replacement at every step",
-            "read_dependencies_or_neighborhood": "the cell and the neighboring grid cells selected by the rule",
-            "law_kind": "deterministic neighbor-dependent grid replacement rule",
+            "read_dependencies_or_neighborhood": "the old cell and the neighboring old-state cells selected by the rule",
+            "law_kind": "deterministic neighbor-dependent 2 × 2 block-substitution rule",
             "rule_relation_constraint_function_or_probability_law": name,
-            "write_replacement_assembly_or_commit": "replace each grid-cell value according to its old local neighborhood",
-            "result_kind": "one successor wrapped-grid pattern",
+            "write_replacement_assembly_or_commit": "evaluate every old neighborhood, replace each old cell by its selected 2 × 2 block, and tile all child blocks into the successor atomically",
+            "result_kind": "one successor square block with twice the prior linear extent",
             "successor_cardinality": "one",
             "determinism_branching_or_measure": "deterministic",
-            "parameters_and_variants": "local neighborhood, replacement table, and wrapped-grid extent",
+            "parameters_and_variants": "old-state neighborhood, 2 × 2 replacement table, and wrapped neighborhood reads",
             "excluded_observers_and_representations": "rendered stages and sequential scan orders are not native mechanics",
-            "evidence_limit": "only the wrapped-grid neighbor-dependent mechanics shown by the checked source and rule panels are asserted; no generic seed is established",
+            "evidence_limit": "the checked source and rule panels establish parallel 2 × 2 block growth (1 × 1, 2 × 2, 4 × 4, …); no generic seed beyond the displayed demonstrations is asserted",
         }
         na = {
             "visible_history",
@@ -1018,14 +1104,35 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         return len(specs)
 
     ca2 = add(
-        "two-dimensional totalistic cellular-automaton family",
+        "five-site square-neighborhood totalistic cellular-automaton family",
         "CA2",
         "SOURCE_UNIT",
         "U000960",
         1,
         ["U000960", "U000962"],
         ["A000845"],
+        aliases=[
+            "square-grid center-plus-four-orthogonal-neighbor totalistic CA family"
+        ],
         parameters={"neighborhood": "four orthogonal neighbors plus the center cell"},
+        overrides={
+            "topology": (
+                "SUPPORTED",
+                "two-dimensional square grid with four orthogonal adjacencies",
+            ),
+            "law_kind": (
+                "SUPPORTED",
+                "binary five-site square-neighborhood totalistic transition rule",
+            ),
+            "parameters_and_variants": (
+                "SUPPORTED",
+                "the totalistic output map over the center cell plus its four orthogonal neighbors",
+            ),
+            "evidence_limit": (
+                "SUPPORTED",
+                "this main-text family is scoped to the five-site square neighborhood stated here",
+            ),
+        },
     )
     add(
         "two-dimensional CA code 1022 (any black orthogonal neighbor)",
@@ -1234,7 +1341,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     )
     add(
         "four-square two-dimensional subdivision preset",
-        "SUB_GRID",
+        "SUB_BLOCK_LOCAL",
         "SOURCE_UNIT",
         "U001037",
         1,
@@ -1682,8 +1789,8 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "IMAGE",
         "A000905",
         1,
-        ["U001151", "U001152", "U001155", "U001156", "U001158"],
-        ["A000905", "A000906", "A000907"],
+        ["U001151"],
+        ["A000905"],
         parameters={
             "replacement set": "three checked graphical replacements",
             "seed": "the checked two-element initial sequence",
