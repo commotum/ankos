@@ -171,6 +171,7 @@ def _spec(
     identity_unit: str | None = None,
     semantic_values: dict[str, Any] | None = None,
     not_applicable_exclusions: set[str] | None = None,
+    suppress_supported_fields: set[str] | None = None,
 ) -> dict[str, Any]:
     if profile is None:
         lowered = object_kind.lower()
@@ -234,6 +235,37 @@ def _spec(
         "identity_unit": identity_unit,
         "semantic_values": semantic_values or {},
         "not_applicable_exclusions": not_applicable_exclusions or set(),
+        "suppress_supported_fields": suppress_supported_fields or set(),
+    }
+
+
+def _grammar_example_scopes(unit_id: str) -> dict[str, list[str]]:
+    """Keep generic derivation mechanics separate from one grammar preset."""
+
+    return {
+        "U006267": [
+            "native_time",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        ],
+        unit_id: [
+            "object_kind",
+            "carrier",
+            "support",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "input",
+            "seed",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+            "evidence_limit",
+        ],
     }
 
 
@@ -256,9 +288,9 @@ RECOVERED_SPECS = [
         ["U006102", "U006117", "U006118"],
         "cellular-automaton rule preset",
         "two-dimensional binary cell array",
-        "one complete cell configuration",
+        "the source-stated code-686 two-dimensional rule preset",
         "apply the outer-totalistic rule identified by code 686",
-        "one successor cell configuration",
+        "the displayed component-pattern result attributed to code 686",
         aliases=["2D outer-totalistic code 686"],
         related=["B0859", "B0868"],
         limit=(
@@ -273,6 +305,35 @@ RECOVERED_SPECS = [
             "The component ablation associated with the defective phrase "
             "“s alone” is unresolved; only the code-686 identity is retained."
         ],
+        evidence_scopes={
+            "U006102": [
+                "carrier",
+                "support",
+                "alphabet_or_value_schema",
+                "read_dependencies_or_neighborhood",
+                "law_kind",
+                "evidence_limit",
+            ],
+            "U006117": [
+                "object_kind",
+                "carrier",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006118": ["result_kind"],
+        },
+        suppress_supported_fields={
+            "native_time",
+            "complete_state",
+            "input",
+            "frontier_or_activation",
+            "schedule",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        },
         discovery_unit="U006117",
         identity_unit="U006117",
     ),
@@ -354,6 +415,14 @@ RECOVERED_SPECS = [
             )
         },
         not_applicable_exclusions={"external_data"},
+        cardinality=(
+            "one diagram for each fully specified node ordering and routing "
+            "choice; the source does not fix those choices"
+        ),
+        measure=(
+            "the source does not establish a unique or deterministic layout "
+            "from the network and origin metadata alone"
+        ),
         evidence_scopes={
             "U001091": [
                 "object_kind",
@@ -362,6 +431,8 @@ RECOVERED_SPECS = [
                 "law_kind",
                 "rule_relation_constraint_function_or_probability_law",
                 "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
@@ -660,6 +731,11 @@ RECOVERED_SPECS = [
         "a bidirectional rule presentation",
         "partition strings by mutual transformability under the rules",
         "group/semigroup elements as disconnected multiway-network components",
+        cardinality=(
+            "one quotient partition/element representation per fully "
+            "specified bidirectional presentation"
+        ),
+        measure="deterministic declarative quotient formation",
     ),
     _spec(
         "group-or-semigroup Cayley-graph generator family",
@@ -696,6 +772,9 @@ RECOVERED_SPECS = [
         "relations x^2 = y^3 = (x y)^5 = 1",
         "identify words modulo the stated presentation",
         "the 60-element icosahedral group A5",
+        profile="FUNCTION",
+        cardinality="one denoted quotient group",
+        measure="deterministic declarative denotation",
     ),
     _spec(
         "finite group-and-semigroup count-by-order observer",
@@ -916,6 +995,7 @@ RECOVERED_SPECS = [
         "apply the regular productions in all possible ways",
         "sequences in which no pair of B symbols appears together",
         related=["B0926"],
+        evidence_scopes=_grammar_example_scopes("U006268"),
         discovery_unit="U006268",
         identity_unit="U006268",
     ),
@@ -928,6 +1008,7 @@ RECOVERED_SPECS = [
         "replace any occurrence of x by AxA or B",
         "the generated context-free language",
         related=["B0927"],
+        evidence_scopes=_grammar_example_scopes("U006269"),
         discovery_unit="U006269",
         identity_unit="U006269",
     ),
@@ -940,6 +1021,7 @@ RECOVERED_SPECS = [
         "apply all permitted context-sensitive replacements",
         "strings A^n B^n A^n in the source's stated form",
         related=["B0928"],
+        evidence_scopes=_grammar_example_scopes("U006270"),
         discovery_unit="U006270",
         identity_unit="U006270",
     ),
@@ -980,12 +1062,15 @@ RECOVERED_SPECS = [
         "strings over symbols 0, 1, and 2",
         "rules 0→012, 1→02, 2→1 with initial symbol 0",
         "replace every symbol in parallel by its rule image",
-        "an infinite nested square-free sequence",
+        (
+            "one finite successor word at each step; the nested infinite "
+            "square-free sequence is the limiting behavior"
+        ),
         related=["B0959"],
     ),
     _spec(
         "pattern-avoidance sequence-count growth observer family",
-        ["U006320", "U006321", "U006322"],
+        ["U006318", "U006319", "U006320", "U006321", "U006322"],
         "parameterized solution-count observer",
         "finite sequences avoiding a selected repeated-block pattern",
         "alphabet size k, length n, and forbidden block-variable pattern",
@@ -1001,6 +1086,36 @@ RECOVERED_SPECS = [
             "No exact all-pattern counting law or uniform asymptotic/error "
             "contract is given for the parameterized avoidance family."
         ],
+        discovery_unit="U006322",
+        identity_unit="U006322",
+        evidence_scopes={
+            "U006318": [
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+            ],
+            "U006319": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            "U006320": ["result_kind", "parameters_and_variants"],
+            "U006321": ["result_kind", "parameters_and_variants"],
+            "U006322": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
     ),
     _spec(
         "integer square-ratio Diophantine relation",
@@ -1129,13 +1244,35 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "two-dimensional local-template constraint census",
-        ["U001185"],
+        ["U001183", "U001184", "U001185", "U001186", "U001187"],
         "finite-family census query",
         "all binary five-cell-template constraint codes",
         "the complete 2^32 constraint family",
         "partition constraints into unsatisfiable and satisfiable classes and count the sufficient repetitive witness set",
         "the four stated totals: all, unsatisfiable, satisfiable, and 171 sufficient repetitive patterns",
         related=["B0699", "B0702"],
+        discovery_unit="U001185",
+        identity_unit="U001184",
+        evidence_scopes={
+            "U001183": ["result_kind"],
+            "U001184": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U001185": [
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U001186": ["result_kind"],
+            "U001187": ["result_kind"],
+        },
     ),
     _spec(
         "required-template constraint-family cardinality",
@@ -1640,9 +1777,9 @@ EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
 EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 414
 EXPECTED_STAGE_ROUTE_COUNT = 62
-EXPECTED_READING_UPDATE_COUNT = 142
+EXPECTED_READING_UPDATE_COUNT = 146
 EXPECTED_NEW_CANDIDATE_COUNT = 87
-EXPECTED_NEW_EVIDENCE_COUNT = 186
+EXPECTED_NEW_EVIDENCE_COUNT = 192
 EXPECTED_RESULT_PAIR_COUNT = 1552
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -2612,6 +2749,8 @@ def _typed_semantics(
 
     def finalize(not_applicable: set[str]) -> tuple[dict[str, Any], set[str]]:
         values.update(spec["semantic_values"])
+        for field in spec["suppress_supported_fields"]:
+            values.pop(field, None)
         not_applicable = (
             set(not_applicable) - set(spec["not_applicable_exclusions"])
         )
@@ -2674,7 +2813,31 @@ def _typed_semantics(
         raise AuthoringError(f"unsupported typed profile {profile}")
 
     lowered = spec["object_kind"].lower()
-    if "grammar" in lowered or "multiway" in lowered:
+    if "grammar" in lowered:
+        frontier = (
+            "each occurrence in one sentential form at which a displayed "
+            "production can match"
+        )
+        schedule = (
+            "one derivation successor applies one matching production at one "
+            "matching occurrence; the source considers all such possibilities"
+        )
+        dependencies = (
+            "the production left-hand side and any context explicitly written "
+            "around its replaced nonterminal"
+        )
+        write = (
+            "replace the selected occurrence by that production's right-hand "
+            "side to form one successor sentential form"
+        )
+        cardinality = (
+            "zero, one, or many derivation successors per sentential form"
+        )
+        measure = (
+            "nondeterministic exhaustive branching; no probability measure "
+            "or duplicate-merging policy is stated"
+        )
+    elif "multiway" in lowered:
         frontier = "every applicable rule occurrence in every current state"
         schedule = "retain all possible rewrites as the next aggregate state"
         dependencies = "the left-hand side and local matching context of each rule"
@@ -2801,32 +2964,33 @@ def _typed_evidence_scopes(
 
     primary_fields = set(scopes[primary_id])
     primary_fields.update(not_applicable_fields)
-    primary_fields.update(
-        supported_fields
-        & {
-            "result_kind",
-            "successor_cardinality",
-            "determinism_branching_or_measure",
-            "termination_completion_failure",
-            "witness_semantics",
-        }
-    )
-    if spec["profile"] == "ITERATED":
+    if not explicit:
         primary_fields.update(
             supported_fields
             & {
-                "rule_relation_constraint_function_or_probability_law",
-                "write_replacement_assembly_or_commit",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "witness_semantics",
             }
         )
-    if len(non_image) == 1:
-        primary_fields.update(
-            supported_fields
-            & {
-                "rule_relation_constraint_function_or_probability_law",
-                "write_replacement_assembly_or_commit",
-            }
-        )
+        if spec["profile"] == "ITERATED":
+            primary_fields.update(
+                supported_fields
+                & {
+                    "rule_relation_constraint_function_or_probability_law",
+                    "write_replacement_assembly_or_commit",
+                }
+            )
+        if len(non_image) == 1:
+            primary_fields.update(
+                supported_fields
+                & {
+                    "rule_relation_constraint_function_or_probability_law",
+                    "write_replacement_assembly_or_commit",
+                }
+            )
     scopes[primary_id] = sorted(
         primary_fields,
         key=FINGERPRINT_FIELDS.index,
