@@ -2313,6 +2313,785 @@ MISSING_FIELD_HINTS: dict[str, dict[str, str]] = {
     },
 }
 
+# Every member of STEPWISE_KINDS receives an explicit source-bounded profile.
+# No state, schedule, seed, successor, determinism, history, or completion
+# semantics are inferred merely from the kind label.
+STEPWISE_STATE_FIELDS = (
+    "native_time",
+    "complete_state",
+    "visible_history",
+    "control_state",
+    "seed",
+    "frontier_or_activation",
+    "schedule",
+    "read_dependencies_or_neighborhood",
+    "write_replacement_assembly_or_commit",
+    "successor_cardinality",
+    "determinism_branching_or_measure",
+    "termination_completion_failure",
+)
+_PROFILED_STEPWISE_NAMES: set[str] = set()
+
+
+def _na(anchor: str | tuple[str, ...], reason: str) -> dict[str, Any]:
+    return FF(None, anchor, status="NOT_APPLICABLE", reason=reason)
+
+
+def _unknown_fact(reason: str) -> dict[str, Any]:
+    return FF(None, (), status="UNKNOWN_FROM_SOURCE", reason=reason)
+
+
+def _exact_transition_facts(
+    name: str,
+    anchors: str | tuple[str, ...],
+    *,
+    native_time: str,
+    state: str,
+    seed: str | None,
+    frontier: str,
+    schedule: str,
+    reads: str,
+    commit: str,
+    completion: str | None = None,
+    history: str | None = None,
+) -> dict[str, dict[str, Any]]:
+    facts = {
+        "native_time": FF(native_time, anchors),
+        "complete_state": FF(state, anchors),
+        "visible_history": (
+            FF(history, anchors)
+            if history is not None
+            else _na(
+                anchors,
+                f"{name} defines the current state or result, not a "
+                "history-retaining state component.",
+            )
+        ),
+        "control_state": _na(
+            anchors,
+            f"{name} has no source-stated controller separate from its law.",
+        ),
+        "frontier_or_activation": FF(frontier, anchors),
+        "schedule": FF(schedule, anchors),
+        "read_dependencies_or_neighborhood": FF(reads, anchors),
+        "write_replacement_assembly_or_commit": FF(commit, anchors),
+        "successor_cardinality": FF(
+            "one successor for each complete defined current state and "
+            "fixed parameter choice",
+            anchors,
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic for complete defined inputs; no probability "
+            "measure is introduced",
+            anchors,
+        ),
+    }
+    if seed is not None:
+        facts["seed"] = FF(seed, anchors)
+    if completion is not None:
+        facts["termination_completion_failure"] = FF(completion, anchors)
+    return facts
+
+
+def _direct_denotation_facts(
+    name: str,
+    anchor: str | tuple[str, ...],
+    *,
+    reads: str,
+    completion: str | None = None,
+) -> dict[str, dict[str, Any]]:
+    facts = {
+        "native_time": _na(
+            anchor,
+            f"{name} is directly indexed or finitely denoted; its index is "
+            "not a source-stated intrinsic update clock.",
+        ),
+        "complete_state": _na(
+            anchor,
+            f"{name} has no evolving native state in the printed denotation.",
+        ),
+        "visible_history": _na(
+            anchor,
+            f"{name} returns its denoted value/list rather than a transition history.",
+        ),
+        "control_state": _na(
+            anchor,
+            f"{name} has no transition controller.",
+        ),
+        "seed": _na(
+            anchor,
+            f"{name} takes direct arguments rather than a trajectory seed.",
+        ),
+        "frontier_or_activation": _na(
+            anchor,
+            f"{name} selects no active component for a one-step rewrite.",
+        ),
+        "schedule": _na(
+            anchor,
+            f"{name} states an index domain/expression, not a one-step schedule.",
+        ),
+        "read_dependencies_or_neighborhood": FF(reads, anchor),
+        "write_replacement_assembly_or_commit": _na(
+            anchor,
+            f"{name} directly assembles a value/list and has no state commit.",
+        ),
+        "successor_cardinality": _na(
+            anchor,
+            f"{name} is not a successor relation.",
+        ),
+        "determinism_branching_or_measure": FF(
+            "the direct expression is single-valued for complete defined "
+            "arguments and introduces no probability measure",
+            anchor,
+        ),
+    }
+    if completion is not None:
+        facts["termination_completion_failure"] = FF(completion, anchor)
+    else:
+        facts["termination_completion_failure"] = _na(
+            anchor,
+            f"{name} is a denotation rather than a stopping process.",
+        )
+    return facts
+
+
+def _local_ca_facts(
+    name: str,
+    anchors: str | tuple[str, ...],
+    *,
+    state: str,
+    seed: str | None,
+    reads: str,
+    local_write: str,
+) -> dict[str, dict[str, Any]]:
+    facts = {
+        "native_time": FF("discrete cellular-automaton generations", anchors),
+        "complete_state": FF(state, anchors),
+        "visible_history": _na(
+            anchors,
+            f"{name}'s local law does not make earlier configurations part "
+            "of the current configuration.",
+        ),
+        "control_state": _na(
+            anchors,
+            f"{name} has no source-stated controller separate from the local rule.",
+        ),
+        "frontier_or_activation": FF(
+            "a cell position at which the printed local rule is evaluated",
+            anchors,
+        ),
+        "read_dependencies_or_neighborhood": FF(reads, anchors),
+        "write_replacement_assembly_or_commit": FF(local_write, anchors),
+        "schedule": _unknown_fact(
+            f"{name}: the sealed Notes source gives a local rule but not a "
+            "global update schedule."
+        ),
+        "successor_cardinality": _unknown_fact(
+            f"{name}: global successor cardinality depends on the unstated "
+            "schedule and topology."
+        ),
+        "determinism_branching_or_measure": _unknown_fact(
+            f"{name}: the local output is deterministic, but the sealed "
+            "source does not fix a global schedule or measure."
+        ),
+        "termination_completion_failure": _unknown_fact(
+            f"{name}: the sealed Notes source states no terminal condition."
+        ),
+    }
+    if seed is not None:
+        facts["seed"] = FF(seed, anchors)
+    return facts
+
+
+def _complete_stepwise_profile(
+    name: str,
+    facts: dict[str, dict[str, Any]],
+) -> None:
+    spec = spec_named(name)
+    if spec["kind"] not in STEPWISE_KINDS:
+        raise RuntimeError(f"{name!r} is not a STEPWISE_KINDS candidate")
+    merged = dict(spec.get("facts", {}))
+    merged.update(facts)
+    hints = MISSING_FIELD_HINTS.get(name, {})
+    for field in STEPWISE_STATE_FIELDS:
+        if field in merged:
+            continue
+        merged[field] = _unknown_fact(
+            hints.get(
+                field,
+                f"{name}: the sealed Notes evidence does not state "
+                f"{field.replace('_', ' ')}.",
+            )
+        )
+    spec["facts"] = merged
+    if name in _PROFILED_STEPWISE_NAMES:
+        raise RuntimeError(f"duplicate stepwise profile for {name!r}")
+    _PROFILED_STEPWISE_NAMES.add(name)
+
+
+_complete_stepwise_profile(
+    "Gray-code ordering generator",
+    {
+        "control_state": _na(
+            "U005648",
+            "GrayCode has no controller separate from its fixed Nest count m.",
+        ),
+        "successor_cardinality": FF(
+            "one reflected-and-extended ordering list per generation",
+            "U005648",
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic Join/Reverse generation with no probability measure",
+            "U005648",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "truncated powers-of-three congruential generator",
+    _direct_denotation_facts(
+        "truncated powers-of-three congruential generator",
+        ("U005669", "U005670"),
+        reads="the direct index n, retained width s, and expression Mod[3^n,2^s]",
+    ),
+)
+_complete_stepwise_profile(
+    "base-6 cellular automaton for powers of three",
+    _local_ca_facts(
+        "base-6 cellular automaton for powers of three",
+        "U005671",
+        state="a configuration of six-valued base-6 digit cells",
+        seed=None,
+        reads="the three-cell input {a,b,c}; the value depends on b and c",
+        local_write="write the local value 3 Mod[b,2] + Floor[c/2] at the evaluated cell",
+    ),
+)
+_complete_stepwise_profile(
+    "base-6 cellular automaton for powers of 3/2",
+    _local_ca_facts(
+        "base-6 cellular automaton for powers of 3/2",
+        ("U005674", "U005675", "U005676"),
+        state="a configuration of base-6 digits",
+        seed="the base-6 digits of the supplied value u",
+        reads="the local three-cell tuple {a,b,c}",
+        local_write=(
+            "write the printed base-6 value "
+            "3 Mod[a+Quotient[b,2],2] + "
+            "Quotient[3 Mod[b,2]+Quotient[c,2],2]"
+        ),
+    ),
+)
+_complete_stepwise_profile(
+    "continued-fraction-derived substitution generator",
+    {
+        "native_time": FF(
+            "successive applications of the finite generated rule list",
+            ("U005682", "U005684"),
+        ),
+        "control_state": _na(
+            ("U005682", "U005684"),
+            "The remaining ordered rule list is already part of the complete "
+            "Fold state, not a separate controller.",
+        ),
+        "successor_cardinality": FF(
+            "one replacement word at each Fold stage",
+            ("U005682", "U005684"),
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic ordered rule generation and Fold replacement",
+            ("U005682", "U005684"),
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "rotated page-117 digit substitution preset",
+    {
+        "native_time": FF(
+            "substitution generations are referenced, but their mechanics are routed",
+            "U005657",
+        ),
+        "complete_state": FF(
+            "the current digit word for the referenced substitution system",
+            "U005657",
+        ),
+        "control_state": _na(
+            "U005657",
+            "No separate controller is stated for the referenced substitution preset.",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "page-122 parity integer map",
+    _exact_transition_facts(
+        "page-122 parity integer map",
+        ("U005687", "U005688"),
+        native_time="the t discrete applications returned by NestList",
+        state="the current integer",
+        seed="literal seed 1",
+        frontier="the current integer",
+        schedule=(
+            "NestList applies If[EvenQ[#],3#/2,3(#+1)/2]& once per "
+            "iteration and retains every result"
+        ),
+        reads="the parity and value of the current integer",
+        commit="replace the current integer by 3 n/2 or 3(n+1)/2",
+        completion="exactly t requested iterations are returned by NestList",
+        history="the complete NestList trajectory beginning with seed 1",
+    ),
+)
+_complete_stepwise_profile(
+    "standard 3n+1 map",
+    _exact_transition_facts(
+        "standard 3n+1 map",
+        "U005689",
+        native_time="discrete applications of the parity map",
+        state="the current integer n",
+        seed="the supplied initial integer n",
+        frontier="the current integer n",
+        schedule="apply the even or odd branch once to the current n",
+        reads="n and EvenQ[n]",
+        commit="replace n by n/2 when even or (3n+1)/2 when odd",
+        completion=(
+            "the source asks whether every positive initial n reaches 1 and "
+            "states that no general proof is known"
+        ),
+    ),
+)
+_complete_stepwise_profile(
+    "main-text 5n/2 parity map",
+    _exact_transition_facts(
+        "main-text 5n/2 parity map",
+        "U005691",
+        native_time="discrete applications of the parity map",
+        state="the current integer n",
+        seed="the supplied initial integer n",
+        frontier="the current integer n",
+        schedule="apply the even or odd branch once to the current n",
+        reads="n and EvenQ[n]",
+        commit="replace n by 5n/2 when even or (n+1)/2 when odd",
+        completion=(
+            "a trajectory repeats if it reaches 2, 4, or 40; the source says "
+            "many tested initial values instead appear to grow"
+        ),
+    ),
+)
+_complete_stepwise_profile(
+    "base-6 cellular automaton for the 3n+1 map",
+    _local_ca_facts(
+        "base-6 cellular automaton for the 3n+1 map",
+        ("U005696", "U005697", "U005698"),
+        state="a base-6 digit configuration with color 6 as an end marker",
+        seed="the base-6 digit configuration of the represented integer n",
+        reads="the local three-cell tuple {a,b,c}, with a and b used by the printed rule",
+        local_write="write the printed seven-color local-rule result at the evaluated cell",
+    ),
+)
+_complete_stepwise_profile(
+    "reversible rounded integer map",
+    _exact_transition_facts(
+        "reversible rounded integer map",
+        ("U005701", "U005702", "U005703", "U005704"),
+        native_time="discrete forward or inverse map applications",
+        state="the current integer n and selected direction",
+        seed="the supplied integer n",
+        frontier="the current integer n",
+        schedule="apply the selected forward or inverse branch once",
+        reads="n, its parity for the forward rule, or Mod[n,3] for the inverse rule",
+        commit="replace n by the printed forward or inverse rounded value",
+    ),
+)
+_complete_stepwise_profile(
+    "binary reversal-addition map",
+    _exact_transition_facts(
+        "binary reversal-addition map",
+        ("U005707", "U005708", "U005709", "U005711"),
+        native_time="discrete reversal-addition iterations",
+        state="the current integer and its base-2 digit representation",
+        seed="the supplied initial integer n",
+        frontier="the current integer n",
+        schedule="reverse the current base-2 digits and add once per iteration",
+        reads="n and Reverse[IntegerDigits[n,2]]",
+        commit="replace n by n + FromDigits[Reverse[IntegerDigits[n,2]],2]",
+    ),
+)
+_complete_stepwise_profile(
+    "iterated run-length encoder",
+    _exact_transition_facts(
+        "iterated run-length encoder",
+        ("U005717", "U005718"),
+        native_time="discrete run-length replacement iterations",
+        state="the current finite list",
+        seed="the source example starts from {1}",
+        frontier="the runs returned by Split[list]",
+        schedule="split the current list into runs, map each run, and flatten once",
+        reads="each maximal equal-value run in the current list",
+        commit="replace the list by flattened {run length, run value} pairs",
+    ),
+)
+_complete_stepwise_profile(
+    "92-token substitution realization of run-length encoding",
+    {
+        "native_time": FF(
+            "substitution generations on a tokenized run-length sequence",
+            ("U005719", "U005720"),
+        ),
+        "complete_state": FF(
+            "the current sequence of the 92 possible subsequence tokens",
+            ("U005719", "U005720"),
+        ),
+        "visible_history": _na(
+            ("U005719", "U005720"),
+            "The source discusses the current generated sequence, not a "
+            "history-retaining state component.",
+        ),
+        "control_state": _na(
+            ("U005719", "U005720"),
+            "No controller separate from the substitution rules is stated.",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "digit-count sequence append system",
+    _exact_transition_facts(
+        "digit-count sequence append system",
+        ("U005721", "U005722", "U005723"),
+        native_time="discrete append iterations",
+        state="the complete accumulated binary-digit list",
+        seed="the source example starts from {1}",
+        frontier="the complete current list whose sum is read",
+        schedule="sum the current list, take its base-2 digits, and append them once",
+        reads="Apply[Plus,list] and its IntegerDigits[...,2]",
+        commit="Join the current list with the base-2 digits of its sum",
+        history=(
+            "the growing current list retains all previously generated "
+            "digits as its prefix"
+        ),
+    ),
+)
+for bitwise_name, bitwise_law in (
+    ("BitXor[2 n,n] integer iteration", "BitXor[2 n,n]"),
+    ("BitXor[3+2 n,n] integer iteration", "BitXor[3+2 n,n]"),
+    ("BitXor[3 n,n] integer iteration", "BitXor[3 n,n]"),
+    ("BitXor[6 n,n] integer iteration", "BitXor[6 n,n]"),
+    ("BitOr[2 n,n] integer iteration", "BitOr[2 n,n]"),
+    ("BitOr[6 n,n] integer iteration", "BitOr[6 n,n]"),
+):
+    _complete_stepwise_profile(
+        bitwise_name,
+        _exact_transition_facts(
+            bitwise_name,
+            "U005725",
+            native_time=f"discrete repeated applications of {bitwise_law}",
+            state="the current integer n",
+            seed=None,
+            frontier="the current integer n",
+            schedule=f"evaluate {bitwise_law} once on the current n",
+            reads=f"the integer operands in {bitwise_law}",
+            commit=f"replace n by {bitwise_law}",
+        ),
+    )
+
+_complete_stepwise_profile(
+    "page-128 linear recurrence family",
+    {
+        "native_time": FF(
+            "discrete recurrence indices for the routed linear-recursive sequences",
+            "U005728",
+        ),
+        "control_state": _na(
+            "U005728",
+            "No controller distinct from the unavailable recurrence clauses is stated.",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "factorial recurrence",
+    _exact_transition_facts(
+        "factorial recurrence",
+        ("U005729", "U005730"),
+        native_time="successive positive recurrence indices n",
+        state="the current index n and immediately preceding value f[n-1]",
+        seed="f[1] = 1",
+        frontier="the next requested recurrence value f[n]",
+        schedule="for n>1 evaluate f[n] from n and f[n-1]",
+        reads="n and f[n-1]",
+        commit="assign f[n] := n f[n-1]",
+        completion="evaluation reaches the literal base clause f[1]=1",
+    ),
+)
+_complete_stepwise_profile(
+    "quadratic logistic recurrence",
+    _exact_transition_facts(
+        "quadratic logistic recurrence",
+        ("U005732", "U005733", "U005734"),
+        native_time="successive nonnegative recurrence indices n",
+        state="the current index n and immediately preceding value f[n-1]",
+        seed="f[0] = x",
+        frontier="the next requested recurrence value f[n]",
+        schedule="for n>0 evaluate one recurrence clause from f[n-1]",
+        reads="parameter a and f[n-1]",
+        commit="assign f[n] := a f[n-1](1-f[n-1])",
+        completion="a finite requested index n reaches the literal base clause f[0]=x",
+    ),
+)
+_complete_stepwise_profile(
+    "memoized self-indexed recurrence",
+    _exact_transition_facts(
+        "memoized self-indexed recurrence",
+        ("U005742", "U005743", "U005744"),
+        native_time="recursive evaluation indices under the separately captured evaluation policy",
+        state="the memoized table of defined f values and the requested index n",
+        seed="f[1] = f[2] = 1",
+        frontier="the next unresolved f[k] selected by the stated evaluation policy",
+        schedule="evaluate dependencies f[n-f[n-1]] and f[n-f[n-2]] before memoizing f[n]",
+        reads="f[n-1], f[n-2], and the two indexed dependency values",
+        commit="memoize the sum as f[n] when both dependency values are defined",
+        completion=(
+            "evaluation can fail by demanding undefined f[-1] under "
+            "leftmost-innermost evaluation"
+        ),
+    ),
+)
+_complete_stepwise_profile(
+    "page-131 sequence (c) hump generator",
+    {
+        "control_state": _na(
+            ("U005754", "U005756"),
+            "The remaining finite input list is part of each FoldList state, "
+            "not a separate controller.",
+        ),
+        "successor_cardinality": FF(
+            "one next partial sum for each next increment in either formulation",
+            ("U005754", "U005756"),
+        ),
+        "determinism_branching_or_measure": FF(
+            "both FoldList formulations are deterministic and introduce no measure",
+            ("U005754", "U005756"),
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "Ulam sequence",
+    {
+        "native_time": FF(
+            "discrete append generations of the Ulam sequence",
+            ("U005796", "U005797"),
+        ),
+        "control_state": _na(
+            ("U005796", "U005797"),
+            "The increasing candidate search is part of the append law, not "
+            "a separately represented controller.",
+        ),
+        "successor_cardinality": FF(
+            "one next term: the least integer with exactly one qualifying representation",
+            ("U005796", "U005797"),
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic least-qualifying-term selection",
+            ("U005796", "U005797"),
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "decimation system",
+    _exact_transition_facts(
+        "decimation system",
+        "U005803",
+        native_time="discrete decimation rounds",
+        state="the current ordered line of surviving cells",
+        seed="the supplied initial line of cells",
+        frontier="the currently surviving cells counted in their current order",
+        schedule="remove every kth currently surviving cell in one round",
+        reads="the current survivor order and fixed k",
+        commit="replace the line by the cells that survive the current decimation round",
+    ),
+)
+_complete_stepwise_profile(
+    "iterated aliquot-sum map",
+    _exact_transition_facts(
+        "iterated aliquot-sum map",
+        ("U005833", "U005835", "U005836"),
+        native_time="discrete aliquot-map iterations",
+        state="the current positive integer n",
+        seed="the supplied initial integer n",
+        frontier="the current integer n",
+        schedule="compute the proper-divisor sum once per iteration",
+        reads="Divisors[n] or equivalently DivisorSigma[1,n]",
+        commit="replace n by Apply[Plus,Divisors[n]]-n",
+    ),
+)
+_complete_stepwise_profile(
+    "arithmetic-geometric-mean pi solver",
+    {
+        "native_time": FF(
+            "successive NestWhile four-tuple updates",
+            "U005846",
+        ),
+        "successor_cardinality": FF(
+            "one updated four-tuple whenever the a != b continuation test holds",
+            "U005846",
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic tuple update and continuation test",
+            "U005846",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "Newton square-root iteration",
+    _exact_transition_facts(
+        "Newton square-root iteration",
+        "U005861",
+        native_time="discrete Newton iterations t",
+        state="the current estimate x with fixed radicand n",
+        seed="the supplied initial estimate x",
+        frontier="the current scalar estimate x",
+        schedule="apply x -> (x+n/x)/2 once per Newton step",
+        reads="the current x and fixed n",
+        commit="replace x by (x+n/x)/2",
+        completion=(
+            "after t steps the source states that the estimate is accurate "
+            "to about 2^t digits"
+        ),
+    ),
+)
+_complete_stepwise_profile(
+    "recurrence-ratio square-root solver",
+    _exact_transition_facts(
+        "recurrence-ratio square-root solver",
+        "U005862",
+        native_time="successive recurrence steps t",
+        state="the two most recent recurrence values {f[i-1], f[i]}",
+        seed="f[1] = f[2] = 1",
+        frontier="the next recurrence value f[i+1]",
+        schedule="compute f[i+1]=2 f[i]+f[i-1], then form successive ratios",
+        reads="the two preceding recurrence values",
+        commit="shift the two-term state and append 2 f[i]+f[i-1]",
+        completion=(
+            "after t steps the successive-ratio approximation yields about "
+            "2.5 t base-2 digits"
+        ),
+    ),
+)
+_complete_stepwise_profile(
+    "digit-by-digit square-root solver",
+    {
+        "native_time": FF(
+            "successive digit positions t in the routed construction",
+            "U005863",
+        ),
+        "complete_state": FF(
+            "values s, r, and t constrained by s^2 + 4 r == 4^t n",
+            "U005863",
+        ),
+        "control_state": _na(
+            "U005863",
+            "No controller separate from the unavailable per-digit update is stated.",
+        ),
+        "seed": _unknown_fact(
+            "digit-by-digit square-root solver: the sealed Notes unit does "
+            "not state the initial s,r,t tuple."
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "successive-integer concatenation sequence",
+    {
+        "successor_cardinality": _na(
+            "U005867",
+            "The direct finite concatenation is not a successor relation.",
+        ),
+        "determinism_branching_or_measure": FF(
+            "the direct finite Table/Flatten expression is single-valued for k and n",
+            "U005867",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "Gauss-map continued-fraction trajectory",
+    {
+        "native_time": FF(
+            "the n discrete reciprocal-fractional-part iterations returned by NestList",
+            "U005891",
+        ),
+        "complete_state": FF(
+            "the current scalar iterate together with the accumulated NestList output",
+            "U005891",
+        ),
+        "control_state": _na(
+            "U005891",
+            "The fixed iteration count n is not a separate trajectory controller.",
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "the current scalar x through 1/Mod[x,1]",
+            "U005891",
+        ),
+        "successor_cardinality": FF(
+            "one next reciprocal-fractional-part value while the map is defined",
+            "U005891",
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic while Mod[current,1] is nonzero",
+            "U005891",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "Shallit nested continued-fraction substitution",
+    _exact_transition_facts(
+        "Shallit nested continued-fraction substitution",
+        ("U005899", "U005900"),
+        native_time="exactly n discrete replacement generations",
+        state="the current list of indices into the printed ten-entry replacement table",
+        seed="literal seed 1",
+        frontier="every current index replaced through the fixed lookup table",
+        schedule="perform one lookup replacement over the current object and Flatten it per Nest generation",
+        reads="the current indices and the printed ten-entry replacement table",
+        commit="replace the current object by the flattened lookup result",
+        completion="Nest performs exactly n replacement generations",
+    ),
+)
+_complete_stepwise_profile(
+    "rational-pair continued-fraction term enumerator",
+    {
+        "successor_cardinality": _na(
+            "U005906",
+            "The bounded Table/Flatten enumeration is not a successor relation.",
+        ),
+        "determinism_branching_or_measure": FF(
+            "the bounded direct enumeration is single-valued for n",
+            "U005906",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "subtractive Euclidean algorithm",
+    _exact_transition_facts(
+        "subtractive Euclidean algorithm",
+        "U005912",
+        native_time="discrete subtraction iterations",
+        state="the current ordered integer pair {a,b}",
+        seed="starting integers {a,b}",
+        frontier="the larger nonzero member of the current pair",
+        schedule="subtract the smaller member from the larger once per iteration",
+        reads="the current a,b comparison and their difference",
+        commit="replace {a,b} by {a-b,b} when a>b, otherwise {a,b-a}",
+        completion="iteration eventually reaches {GCD[a,b],0}",
+    ),
+)
+_complete_stepwise_profile(
+    "Farey-sequence generator",
+    {
+        "successor_cardinality": _na(
+            "U005924",
+            "The bounded Table/Flatten/Union construction is not a successor relation.",
+        ),
+        "determinism_branching_or_measure": FF(
+            "the direct finite Farey construction is single-valued for n",
+            "U005924",
+        ),
+    },
+)
+
 
 def decision(
     status: str,

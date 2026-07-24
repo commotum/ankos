@@ -210,12 +210,14 @@ def mark_unknown(spec: CandidateSpec, reasons: dict[str, str]) -> None:
 
 
 def mark_not_applicable(spec: CandidateSpec, reasons: dict[str, str]) -> None:
-    """Reclassify evidenced category facts as not applicable."""
+    """Classify fields as category-inapplicable without claiming mechanics evidence."""
     for field, reason in reasons.items():
         spec["facts"].pop(field, None)
         spec["unknown_reasons"].pop(field, None)
-        if not any(field in item["fields"] for item in spec["evidence"]):
-            spec["evidence"][0]["fields"].append(field)
+        for item in spec["evidence"]:
+            item["fields"] = [
+                present for present in item["fields"] if present != field
+            ]
         spec["not_applicable"][field] = reason
 
 
@@ -4728,8 +4730,6 @@ def _allocate_tail(
                     "reason": "",
                 }
             elif field in item["not_applicable"]:
-                if not supporting:
-                    raise AuthoringError(f"{item['key']} lacks N/A evidence for {field}")
                 field_support[field] = "NOT_APPLICABLE"
                 fingerprint[field] = {
                     "status": "NOT_APPLICABLE",
