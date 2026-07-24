@@ -1735,6 +1735,11 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "select one of the referenced nested sequences as the rule-90 initial condition",
                 "parameters_and_variants": "three pictured nested-sequence initial-condition variants",
             },
+            variants=[
+                ("pictured nested sequence 1", "the first of three source-pictured initial-condition variants; its generator is deferred to page 83"),
+                ("pictured nested sequence 2", "the second of three source-pictured initial-condition variants; its generator is deferred to page 83"),
+                ("pictured nested sequence 3", "the third of three source-pictured initial-condition variants; its generator is deferred to page 83"),
+            ],
             missing=["The three nested sequence generators are not specified in this bundle."],
             image_witnesses=[p + "_page_971_Nested_Initial_Conditions_Three_Panel_Row.jpeg"],
         ),
@@ -1820,7 +1825,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "termination_completion_failure": "a unique minimal DFA exists; the printed implementation takes about n^2 steps for an n-node result, an n Log[n] method is known, and the source characterizes the general problem as PSPACE-complete",
                 "parameters_and_variants": "input network net, label count k, source-node count q, and minimized result-node count n; a concrete rule-126 result is supplied",
             },
-            aliases=["MinNet", "DFA minimizer", "deterministic finite-automaton minimizer"],
+            aliases=["MinNet", "DFA minimizer"],
             parameters=[
                 ("net", "input nondeterministic finite automaton", "U006485"),
                 ("k", "number of arc labels, default 2 in the printed implementation and fixed to 2 in the count sequence", "U006491"),
@@ -2805,14 +2810,13 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "seed",
                 [
                     ev("U006570", "PROSE", "DIRECT_IDENTITY", "Life persistent structures are introduced as recurring products of random initial conditions.", ["object_kind", "carrier", "alphabet_or_value_schema"]),
-                    ev("U006571", "IMAGE", "DIRECT_PARTIAL_MECHANICS", f"The original-resolution labeled panel identifies the {name.removeprefix('Game of Life ')} and shows its {behavior} across frames.", ["complete_state", "seed", "result_kind", "parameters_and_variants"], common_image),
+                    ev("U006571", "IMAGE", "DIRECT_PARTIAL_MECHANICS", f"The original-resolution labeled panel identifies the {name.removeprefix('Game of Life ')} and shows its {behavior} across frames.", ["complete_state", "seed", "result_kind"], common_image),
                 ],
                 values={
                     "carrier": "a finite set of live cells on the infinite Life lattice",
                     "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": f"the pictured {name.removeprefix('Game of Life ')} finite pattern",
                     "rule_relation_constraint_function_or_probability_law": f"use the pictured finite pattern as a Life seed; it exhibits {behavior}",
-                    "parameters_and_variants": f"the pictured phases demonstrate the structure's {behavior}",
                 },
                 missing=["Exact live-cell coordinates are not independently transcribed from the image."],
                 image_witnesses=[common_image],
@@ -3183,6 +3187,8 @@ def main() -> None:
     assert [row["source_unit_id"] for row in reading_rows] == [unit["id"] for unit in units]
 
     specs = candidate_specs()
+    unit_order = {unit["id"]: index for index, unit in enumerate(units)}
+    specs.sort(key=lambda item: (unit_order[item["anchor"]], item["ordinal"]))
     for index, item in enumerate(specs, 1):
         item["id"] = f"W{index:04d}"
     assert len(specs) == 121
@@ -3193,7 +3199,9 @@ def main() -> None:
     route_names_by_unit: dict[str, list[str]] = {}
     route_ids_by_candidate: dict[str, list[str]] = {item["id"]: [] for item in specs}
     route_ordinals: dict[str, int] = {}
-    for index, (unit, literal, topic, kind, names) in enumerate(route_specs(), 1):
+    route_items = route_specs()
+    route_items.sort(key=lambda item: unit_order[item[0]])
+    for index, (unit, literal, topic, kind, names) in enumerate(route_items, 1):
         assert unit in unit_by_id
         route_id = f"WR{index:04d}"
         route_ordinals[unit] = route_ordinals.get(unit, 0) + 1
