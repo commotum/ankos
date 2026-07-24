@@ -965,7 +965,7 @@ CANDIDATES = [
         topology="a local lattice with four or eight neighbors in stated cases",
         alphabet="two or more cell colors",
         seed="a finite initial configuration",
-        boundary="not stated",
+        boundary=None,
         external="fresh random choices among proposed/eligible additions",
         frontier="positions adjacent to or otherwise eligible around the cluster",
         schedule="one accepted addition per step",
@@ -1279,7 +1279,7 @@ CANDIDATES = [
     C(
         "two-dimensional Ising equilibrium model",
         "U006762",
-        ["U006762", "U006763", "U006764", "U006765", "U006766", "U006767", "U006768", "U006769", "U006770", "U006771", "U006772", "U006773", "U006774", "U006775"],
+        ["U006762", "U006763", "U006764", "U006765", "U006766", "U006767", "U006768", "U006769", "U006770", "U006771", "U006772", "U006773", "U006774", "U006775", "U006781", "U006782", "U006784"],
         template="declarative",
         carrier="an n by n square array of spins",
         state="a complete spin configuration s",
@@ -1313,7 +1313,7 @@ CANDIDATES = [
     C(
         "deterministic checkerboard Ising cellular automaton",
         "U006776",
-        ["U006776", "U006777", "U006778", "U006779", "U006780", "U006781", "U006782", "U006783", "U006784", "U006785"],
+        ["U006776", "U006777", "U006778", "U006779", "U006780", "U006781", "U006782", "U006783", "U006784", "U006785", "U006787"],
         template="deterministic",
         carrier="a binary 2D array plus a checkerboard mask",
         state="the spin array and the current checkerboard mask",
@@ -1874,6 +1874,7 @@ CANDIDATES = [
 # Explicit, source-local routes only.  Same-stage page headings point back to
 # Chapter 7 main text; all other page/section targets remain cross-range.
 ROUTE_SPECS = [
+    ("U006596", "page 299", "main discussion defining the three randomness mechanisms"),
     ("U006596", "page 552", "definition of randomness"),
     ("U006596", "page 1135", "free will and determinism"),
     ("U006596", "page 911", "random-looking mathematical digit sequences"),
@@ -1883,6 +1884,7 @@ ROUTE_SPECS = [
     ("U006598", "page 312", "pegboard randomness"),
     ("U006598", "page 974", "card shuffling and pseudorandom generators"),
     ("U006600", "page 301", "stochastic models"),
+    ("U006600", "page 302", "random walks and electronic noise"),
     ("U006600", "page 588", "random-variable models"),
     ("U006600", "page 1192", "Monte Carlo applications"),
     ("U006600", "page 1001", "ocean surfaces"),
@@ -1907,13 +1909,16 @@ ROUTE_SPECS = [
     ("U006621", "page 1177", "weather instability"),
     ("U006621", "page 313", "three-body problem"),
     ("U006621", "page 1132", "three-body computation"),
+    ("U006621", "Chapter 12", "computational irreducibility and universality"),
     ("U006626", "page 314", "Sitnikov-type simple case"),
     ("U006630", "page 314", "solar-system randomness"),
     ("U006630", "page 1021", "solar-system evolution"),
     ("U006633", "page 1067", "algorithmic randomness"),
+    ("U006633", "page 316", "intrinsic generation and algorithmic randomness"),
     ("U006633", "page 317", "Mathematica cellular-automaton randomness"),
     ("U006633", "page 321", "cellular-automaton random generators"),
     ("U006633", "page 603", "finite cellular-automaton randomness deviations"),
+    ("U006633", "Chapter 4", "random-looking number systems"),
     ("U006634", "page 321", "perfect card shuffling"),
     ("U006639", "page 903", "runs in number generators"),
     ("U006642", "page 962", "all starting values of modular maps"),
@@ -1940,6 +1945,7 @@ ROUTE_SPECS = [
     ("U006694", "page 969", "1/f noise"),
     ("U006695", "page 328", "random walks"),
     ("U006704", "page 1082", "random-walk power spectra"),
+    ("U006705", "page 330", "boundaries of random-walk particle clouds"),
     ("U006715", "page 163", "diffusion equation"),
     ("U006719", "page 331", "basic aggregation model"),
     ("U006727", "page 332", "generalized aggregation models"),
@@ -1954,9 +1960,10 @@ ROUTE_SPECS = [
     ("U006751", "page 336", "domain interfaces"),
     ("U006755", "page 339", "one-dimensional transitions"),
     ("U006759", "page 340", "two-dimensional transitions"),
-    ("U006775", "page 435", "reversible evolution"),
     ("U006786", "page 989", "nested random patterns"),
     ("U006786", "page 1149", "nested random patterns"),
+    ("U006787", "page 435", "reversible evolution"),
+    ("U006788", "page 339", "finite-size exceptions near the transition"),
     ("U006790", "page 273", "nested phase competition"),
     ("U006790", "page 955", "renormalization group"),
     ("U006791", "page 325", "probabilistic cellular automata"),
@@ -1977,8 +1984,10 @@ ROUTE_SPECS = [
     ("U006813", "page 1143", "NP completeness history"),
     ("U006813", "page 349", "2D cellular automata and circle packing"),
     ("U006813", "page 927", "rule-number scheme"),
+    ("U006813", "page 43", "ancient hexagonal circle packing"),
     ("U006813", "page 987", "circle packing"),
     ("U006814", "page 350", "unequal-circle packing procedure"),
+    ("U006820", "page 509", "Apollonian tangency network"),
     ("U006823", "page 1007", "position-dependent circle packings"),
     ("U006824", "page 929", "Voronoi cells of close packings"),
     ("U006832", "page 929", "lattice Voronoi cells"),
@@ -1993,6 +2002,7 @@ ROUTE_SPECS = [
     ("U006846", "page 144", "continued-fraction repetition"),
     ("U006846", "page 1001", "continuous instability patterns"),
     ("U006846", "page 358", "nesting in numbers"),
+    ("U006846", "Chapter 4", "number systems with nested behavior"),
     ("U006850", "page 939", "context-free languages"),
     ("U006854", "page 273", "rule-184 nesting"),
     ("U006854", "page 983", "statistical-mechanics sampling"),
@@ -2229,12 +2239,14 @@ def field_template(spec: dict[str, Any]) -> dict[str, tuple[str, str | None, str
         # missing entries remain explicit UNKNOWN_FROM_SOURCE above.
         pass
     for field in spec["conflicting_fields"]:
-        old = values[field]
         values[field] = (
             "CONFLICTING_SOURCE",
             None,
-            "The in-scope source gives incompatible statements for this field: " + "; ".join(spec["uncertainties"]),
+            spec["uncertainties"][0],
         )
+    for field, (status, value, reason) in list(values.items()):
+        if status == "SUPPORTED":
+            values[field] = (status, value, "")
     assert set(values) == set(FIELDS)
     assert anchor in spec["sources"]
     return values
@@ -2260,10 +2272,13 @@ def main() -> int:
     indexed_specs = list(enumerate(CANDIDATES))
     indexed_specs.sort(key=lambda pair: (unit_order[pair[1]["anchor"]], pair[0]))
     candidate_specs: list[dict[str, Any]] = []
+    candidate_anchor_counts: dict[str, int] = defaultdict(int)
     for index, (_, spec) in enumerate(indexed_specs, 1):
         value = dict(spec)
         value["id"] = f"W{index:04d}"
         value["group_id"] = f"WG{index:06d}"
+        candidate_anchor_counts[value["anchor"]] += 1
+        value["anchor_ordinal"] = candidate_anchor_counts[value["anchor"]]
         value["field_defs"] = field_template(value)
         candidate_specs.append(value)
 
@@ -2286,10 +2301,19 @@ def main() -> int:
             )
     evidence_refs.sort(key=lambda item: item[0])
     evidence_id_by_ref: dict[tuple[str, str], str] = {}
+    evidence_ordinal_by_ref: dict[tuple[str, str], int] = {}
+    evidence_anchor_counts: dict[tuple[str, str], int] = defaultdict(int)
     for index, (_order, spec, kind, ref) in enumerate(evidence_refs, 1):
         key = (spec["id"], ref)
         assert key not in evidence_id_by_ref
         evidence_id_by_ref[key] = f"WE{index:06d}"
+        anchor_id = (
+            ref
+            if kind == "SOURCE_UNIT"
+            else asset_by_id[ref]["physical_path"]
+        )
+        evidence_anchor_counts[(kind, anchor_id)] += 1
+        evidence_ordinal_by_ref[key] = evidence_anchor_counts[(kind, anchor_id)]
 
     candidate_by_unit: dict[str, list[str]] = defaultdict(list)
     candidate_by_asset: dict[str, list[str]] = defaultdict(list)
@@ -2421,7 +2445,9 @@ def main() -> int:
                         "epoch": 2,
                         "kind": "SOURCE_UNIT",
                         "id": source,
-                        "ordinal": unit_order[source],
+                        "ordinal": evidence_ordinal_by_ref[
+                            (spec["id"], source)
+                        ],
                     },
                     "source_unit_id": source,
                     "image_path": None,
@@ -2444,8 +2470,10 @@ def main() -> int:
                     "discovery_anchor": {
                         "epoch": 2,
                         "kind": "IMAGE",
-                        "id": asset_id,
-                        "ordinal": asset_order[asset_id],
+                        "id": row["physical_path"],
+                        "ordinal": evidence_ordinal_by_ref[
+                            (spec["id"], asset_id)
+                        ],
                     },
                     "source_unit_id": None,
                     "image_path": row["physical_path"],
@@ -2498,7 +2526,7 @@ def main() -> int:
                     "epoch": 2,
                     "kind": "SOURCE_UNIT",
                     "id": spec["anchor"],
-                    "ordinal": unit_order[spec["anchor"]],
+                    "ordinal": spec["anchor_ordinal"],
                 },
                 "source_unit_ids": spec["sources"],
                 "source_evidence": evidence,
@@ -2638,6 +2666,12 @@ def main() -> int:
         "A000733",
         "A000740",
     }
+    direct_image_assets = {
+        asset_id
+        for spec in candidate_specs
+        for asset_id, strength, _claim in spec["images"]
+        if strength in {"DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
+    }
     asset_updates: list[dict[str, str]] = []
     for row in asset_rows:
         asset = row["asset_id"]
@@ -2654,7 +2688,11 @@ def main() -> int:
             )
             statement = "Thumbnail and native-pixel crop inspected; no identity or mechanics were promoted."
         else:
-            role = "NATIVE_EVIDENCE" if asset in native_assets else ("OBSERVER" if asset in observer_assets else "RELATION")
+            role = (
+                "NATIVE_EVIDENCE"
+                if asset in direct_image_assets
+                else ("OBSERVER" if asset in observer_assets else "RELATION")
+            )
             status = "CLEAR"
             flags = ["CONSTRUCTION_BEARING"]
             if asset in native_assets or asset in observer_assets:

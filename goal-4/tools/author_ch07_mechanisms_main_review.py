@@ -19,7 +19,7 @@ WORKER_ID = "ch07-main"
 STAGE = 11
 EPOCH = 2
 SOURCE_PATH = "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md"
-EXPECTED_CANDIDATES = 84
+EXPECTED_CANDIDATES = 82
 
 FIELDS = [
     "object_kind",
@@ -262,7 +262,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
 
     add(
         "per-step random-cell recoloring process",
-        "U001599",
+        "U001596",
         "EVOLUTION",
         evolution(
             "stochastic cell-field process",
@@ -276,14 +276,15 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="continual random input from the environment",
             external="fresh random color input is supplied for every cell at every step",
         ),
-        units=["U001600"],
+        units=["U001599", "U001600"],
         mechanics="U001600",
+        identity_units=["U001596"],
         aliases=["stochastic-model randomness mechanism"],
         uncertainty="The color distribution, field extent, boundary, and independence assumptions are not stated.",
     )
     add(
         "random-start deterministic left-shift process",
-        "U001599",
+        "U001597",
         "EVOLUTION",
         evolution(
             "deterministic cell-field shift process",
@@ -296,10 +297,34 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="random initial conditions followed by a left shift",
             external="randomness is supplied only in the initial condition",
         ),
-        units=["U001602", "U001603", "U001604"],
+        units=["U001599", "U001602", "U001603", "U001604"],
         mechanics="U001603",
+        identity_units=["U001597"],
         aliases=["initial-condition transcription mechanism"],
         complete=True,
+    )
+    add(
+        "intrinsic deterministic randomness process",
+        "U001598",
+        "EVOLUTION",
+        evolution(
+            "deterministic binary cell process with no random input",
+            "apply a fixed simple local rule from a simple initial condition, producing the displayed irregular evolution without random input",
+            carrier="a one-dimensional field of binary cells",
+            alphabet="black and white",
+            state="the complete binary cell field",
+            seed="a simple nonrandom initial condition",
+            activation="every cell in the displayed evolution",
+            neighborhood="a fixed local neighborhood whose complete table is not stated in this spread",
+            result="one deterministic successor cell field",
+            variants="the third mechanism in the three-mechanism comparison",
+            external="no random input is supplied",
+        ),
+        units=["U001599", "U001608", "U001609"],
+        mechanics="U001608",
+        identity_units=["U001598"],
+        aliases=["intrinsic generation of randomness"],
+        uncertainty="This opening comparison does not identify or transcribe the complete local rule; rule 30 is introduced explicitly later.",
     )
     add(
         "microscopic-breakdown noise amplifier",
@@ -340,7 +365,13 @@ def candidate_definitions() -> list[dict[str, Any]]:
             neighborhood="the ball state together with friction from the surface",
             result="a stopped orientation and the black-or-white color on top",
             variants="the source-displayed sequence of nearby initial speeds",
-        ),
+        )
+        | {
+            "input": "the selected initial rolling speed for a run",
+            "termination_completion_failure": (
+                "the run terminates when friction brings the ball to rest; the top color is then read"
+            )
+        },
         units=["U001641", "U001642", "U001643", "U001644"],
         parameters=["initial speed", "initial orientation", "friction"],
         uncertainty="The equations of motion, friction law, surface boundary, and stopping threshold are not stated.",
@@ -559,6 +590,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="two, three, and more initial black cells",
         ),
         units=["U001748", "U001749", "U001750"],
+        mechanics="U001749",
         parameters=["number of initial black cells"],
         variants=["two black cells", "three black cells", "more than three black cells"],
         uncertainty="The prose does not state the exact placement convention for every added black cell or a numeric sequence-comparison tolerance.",
@@ -579,7 +611,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="continuous rule 90 with several perturbation percentages",
             external="a bounded random perturbation is added to every cell value on every step",
         ),
-        units=["U001755", "U001757"],
+        units=["U001755", "U001756", "U001757"],
         mechanics="U001757",
         parameters=["perturbation percentage"],
         uncertainty="The exact probability distribution and the analytic form of the continuous modulo-2 display are not stated in text.",
@@ -600,7 +632,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="continuous rule 30 with several perturbation percentages",
             external="a bounded random perturbation is added to every cell value on every step",
         ),
-        units=["U001756", "U001757"],
+        units=["U001755", "U001756", "U001757"],
         mechanics="U001757",
         parameters=["perturbation percentage"],
         uncertainty="The algebraic continuous rule-30 formula and perturbation probability distribution are not stated.",
@@ -838,15 +870,26 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "EVOLUTION",
         evolution(
             "one-dimensional four-color cellular automaton",
-            "black and white regions are separated by two gray interface states whose local interactions expand the gray region as displayed",
+            "black and white regions are separated by two gray interface states whose local interactions expand the gray region; a later co-reference states that different initial conditions can select uniform-white or uniform-black terminal phases",
             carrier="a one-dimensional row of cells",
             alphabet="black, white, and two gray interface colors",
             seed="black and white regions separated by the source-displayed interface",
             activation="every cell",
             neighborhood="a local one-dimensional neighborhood shown in the rule diagram",
-            variants="the displayed four-color interface rule",
+            variants="gray-interface evolution and its uniform-white or uniform-black phase-selection behavior",
         ),
-        units=["U001824", "U001825", "U001826"],
+        units=[
+            "U001824",
+            "U001825",
+            "U001826",
+            "U001931",
+            "U001932",
+            "U001933",
+        ],
+        aliases=["binary phase-selecting cellular automaton from page 339"],
+        parameters=["initial condition and its total quantity"],
+        variants=["gray-interface expansion", "uniform-white or uniform-black phase selection"],
+        item_evidence="U001933",
         uncertainty="The prose and image do not supply an independently transcribed complete transition table.",
     )
     add(
@@ -1268,6 +1311,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="elementary rule 0",
         ),
         units=["U001915", "U001916"],
+        mechanics="U001915",
         aliases=["binary independent-element convergence"],
         complete=True,
     )
@@ -1288,6 +1332,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="the displayed continuous pointwise map",
         ),
         units=["U001915", "U001916"],
+        mechanics="U001915",
         aliases=["continuous independent-element convergence"],
         uncertainty="The icon depicts the pointwise map, but the prose does not transcribe its exact formula or value interval.",
     )
@@ -1379,25 +1424,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
         complete=True,
     )
     add(
-        "binary phase-selecting cellular automaton",
-        "U001931",
-        "EVOLUTION",
-        evolution(
-            "binary cellular-automaton preset with two uniform attractors",
-            "evolve from different initial conditions to either uniform white or uniform black, with the selected phase depending on a total quantity",
-            carrier="a one-dimensional row of binary cells",
-            alphabet="black and white",
-            state="the complete binary cell row",
-            seed="a binary initial condition",
-            activation="every cell",
-            neighborhood="the page-339 cellular-automaton neighborhood",
-            result="successive configurations ending in one of two uniform phases",
-            variants="the page-339 cellular automaton",
-        ),
-        units=["U001932", "U001933"],
-        uncertainty="The local rule and the precise conserved or threshold quantity are not stated in this range.",
-    )
-    add(
         "two-neighbor uniformity constraint",
         "U001934",
         "CONSTRAINT",
@@ -1432,62 +1458,22 @@ def candidate_definitions() -> list[dict[str, Any]]:
         complete=True,
     )
     add(
-        "localized finite-support automaton family",
-        "U001940",
-        "EVOLUTION",
-        evolution(
-            "localized mobile- and cellular-automaton family",
-            "effects remain confined to a finite spatial region, leaving only finitely many reachable localized states and therefore eventual repetition",
-            carrier="a cell field with a localized active region",
-            alphabet="the source-displayed automaton states",
-            state="the finite affected region and any active-element state",
-            seed="a localized initial configuration",
-            activation="the active element or cells inside the affected region",
-            neighborhood="the displayed local automaton dependencies",
-            result="a localized successor state",
-            variants="mobile-automaton and cellular-automaton examples",
-        ),
-        units=["U001941", "U001942"],
-        variants=["mobile automaton", "cellular automaton"],
-        uncertainty="The complete rules of the displayed examples are not transcribed in prose.",
-    )
-    add(
-        "moving-periodic-element wave family",
-        "U001943",
-        "EVOLUTION",
-        evolution(
-            "spatially moving periodic-element process",
-            "an element repeats in time while systematically moving in space, producing spatial repetition",
-            carrier="a spatial medium containing moving periodic elements",
-            alphabet="the source-displayed element states",
-            state="element phase and position",
-            seed="a source-displayed periodic element",
-            activation="the repeating moving element",
-            neighborhood="the local medium used by the displayed motion",
-            result="a translated periodic successor state",
-            variants="automaton example and standard wave motion",
-        ),
-        units=["U001944", "U001945", "U001946"],
-        variants=["moving automaton element", "standard wave motion"],
-        uncertainty="The source gives the semantic mechanism but not complete equations or transition tables for the two examples.",
-    )
-    add(
-        "partial-table simple-seed repetitive cellular automaton",
+        "elementary cellular automaton rule 50 simple-seed preset",
         "U001948",
         "EVOLUTION",
         evolution(
-            "partially specified elementary cellular-automaton preset",
-            "the visible table gives 101 to black, 100 to black, 010 to white, 001 to black, and 000 to white",
+            "source-cropped elementary cellular-automaton rule 50 preset",
+            "the source identifies the preset as rule 50; the cropped visible table gives 101 to black, 100 to black, 010 to white, 001 to black, and 000 to white",
             carrier="a one-dimensional binary cell row",
             alphabet="black and white",
             seed="the simple localized seed displayed above the rule table",
             activation="every cell",
             neighborhood="a cell and its immediate left and right neighbors",
             result="the displayed repetitive space-time evolution",
-            variants="the first page-370 simple-seed cellular automaton",
+            variants="elementary rule 50",
         ),
         units=["U001951"],
-        uncertainty="The source crop omits the outputs for neighborhoods 111, 110, and 011, so no complete elementary-rule identity is asserted.",
+        uncertainty="The source crop omits the displayed outputs for neighborhoods 111, 110, and 011, so those table entries are not transcribed here.",
     )
     add(
         "elementary cellular automaton rule 94 simple-seed preset",
@@ -1608,7 +1594,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "EVOLUTION",
         evolution(
             "two-dimensional neighbor-independent substitution system",
-            "replace each square independently by the source-displayed two-by-two block associated with its type",
+            "replace black by the two-by-two block [[black, white], [black, black]] and replace white by an all-white two-by-two block",
             carrier="a two-dimensional square array",
             alphabet="the two source-displayed square types",
             state="the complete current square array",
@@ -1616,11 +1602,11 @@ def candidate_definitions() -> list[dict[str, Any]]:
             activation="every square independently",
             neighborhood="each square reads only its own type",
             result="a square array refined by a factor of two in each spatial direction",
-            variants="the displayed two-dimensional block replacement",
+            variants="black to three-black one-white block; white to all-white block",
         ),
         units=["U001969", "U001970"],
         mechanics="U001969",
-        uncertainty="The small raster key is visibly construction-bearing, but its two complete block patterns are not independently transcribed in the prose.",
+        complete=True,
     )
     add(
         "two-state recursive Y-branching preset",
@@ -1956,14 +1942,26 @@ PROFILE_NA = {
     },
 }
 
-SOURCE_UNCERTAINTY = {
+SOURCE_ISSUES = {
     "U001803": (
+        "AMBIGUOUS",
         "The code-746 prose gives outputs for black-neighbor counts 1 through 8 "
-        "but does not state the zero-neighbor output."
+        "but does not state the zero-neighbor output.",
     ),
     "U001809": (
+        "AMBIGUOUS",
         "The code-976 prose gives outputs for totals below 4, exactly 4, exactly "
-        "5, and above 6 but does not state the total-6 output."
+        "5, and above 6 but does not state the total-6 output.",
+    ),
+    "U001948": (
+        "DEFECTIVE",
+        "The source crop preserves only five of the eight elementary-rule table "
+        "cases; 111, 110, and 011 are absent from the raster.",
+    ),
+    "U002002": (
+        "DEFECTIVE",
+        "The asset reference is inside a commented editorial source-accounting "
+        "note and is not a live construction figure.",
     ),
 }
 
@@ -2232,13 +2230,13 @@ def build_output(bundle: Path) -> dict[str, Any]:
             if unit_id in asset_by_unit
         ]
         source_statuses = {
-            "AMBIGUOUS" if unit_id in SOURCE_UNCERTAINTY else "CLEAR"
+            SOURCE_ISSUES.get(unit_id, ("CLEAR", ""))[0]
             for unit_id in definition["units"]
         }
         route_ids: list[str] = []
         if definition["name"] == "page-211 square-array constraint":
             route_ids.append("WR0001")
-        if definition["name"] == "binary phase-selecting cellular automaton":
+        if definition["name"] == "four-color interface-expansion cellular automaton":
             route_ids.append("WR0002")
         candidate_records.append(
             {
@@ -2302,8 +2300,17 @@ def build_output(bundle: Path) -> dict[str, Any]:
         unit_id = row["source_unit_id"]
         ids = candidate_ids_by_unit.get(unit_id, [])
         local_routes = route_ids_by_unit.get(unit_id, [])
-        roles = roles_by_unit.get(unit_id, [])
-        if any((candidate_id, unit_id) in anchors for candidate_id in ids):
+        roles = list(roles_by_unit.get(unit_id, []))
+        source_status, uncertainty = SOURCE_ISSUES.get(unit_id, ("CLEAR", ""))
+        if source_status != "CLEAR":
+            if "SOURCE_DEFECT" not in roles:
+                roles.append("SOURCE_DEFECT")
+            disposition = "SOURCE_DEFECT_OR_AMBIGUITY"
+            statement = (
+                "Fully read in canonical context; the exact source ambiguity or defect recorded for this "
+                "unit bounds every linked claim."
+            )
+        elif any((candidate_id, unit_id) in anchors for candidate_id in ids):
             disposition = "CANDIDATE"
             statement = (
                 "Fully read in canonical order; this unit introduces one or more linked source-defined "
@@ -2336,8 +2343,6 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 "Fully read with adjacent context; the unit supplies exposition, behavior, application, or "
                 "argument but no independent identity-plus-law object or unresolved construction route."
             )
-        source_status = "AMBIGUOUS" if unit_id in SOURCE_UNCERTAINTY else "CLEAR"
-        uncertainty = SOURCE_UNCERTAINTY.get(unit_id, "")
         row.update(
             {
                 "review_status": "REVIEWED",
@@ -2372,8 +2377,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
         unit_id = row["source_unit_id"]
         ids = candidate_ids_by_unit.get(unit_id, [])
         local_routes = route_ids_by_unit.get(unit_id, [])
-        source_status = "AMBIGUOUS" if unit_id in SOURCE_UNCERTAINTY else "CLEAR"
-        uncertainty = SOURCE_UNCERTAINTY.get(unit_id, "")
+        source_status, uncertainty = SOURCE_ISSUES.get(unit_id, ("CLEAR", ""))
         if row["asset_id"] == "A001028":
             visual_role = "DECORATIVE"
             risks: list[str] = []
@@ -2413,13 +2417,18 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 "Screened as a thumbnail and at original resolution; visible labels and panel structure were "
                 "checked, but the image does not independently delimit another source-defined object."
             )
+        if source_status != "CLEAR" and row["asset_id"] != "A001120":
+            for flag in ("AMBIGUOUS", "CAPTION_INCOMPLETE"):
+                if flag not in risks:
+                    risks.append(flag)
+            statement = f"{statement} Recorded source boundary: {uncertainty}"
         if row["asset_id"] == "A001120":
-            visual_role = "RELATION"
-            risks = ["TEXT_BEARING", "CAPTION_INCOMPLETE"]
+            visual_role = "SOURCE_DEFECT"
+            risks = ["TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"]
             transcription = "CHECKED"
             statement = (
-                "Original-resolution legacy label raster checked against the adjacent live label; it contributes "
-                "source accounting only and no additional mechanics."
+                "Original-resolution legacy label raster checked: its reference occurs only inside a commented "
+                "editorial source-accounting note, so it is not treated as live construction evidence."
             )
         row.update(
             {
@@ -2457,6 +2466,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
             "The page-211 constraint and page-339 cellular automaton require their recorded target pages for complete local mechanics.",
             "Several late chapter examples are semantically delimited by prose and original-resolution figures but lack transcribed complete rule tables.",
             "The generalized random-walk and aggregation families leave parts of their direction, sampling, or eligible-site measures unstated.",
+            "The first simple-seed rule-50 raster is cropped to five transition cases, and the legacy code-1893 label asset occurs only inside a commented source-accounting note.",
         ],
     }
     verify_output(bundle, output)
