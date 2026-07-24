@@ -49,9 +49,16 @@ STAGE_PATHS = (
 EXPECTED_SPEC_COUNTS = {"incoming": 14, "within": 58}
 EXPECTED_UPDATE_COUNT = 72
 EXPECTED_UNTOUCHED_CROSS_RANGE_COUNT = 107
-EXPECTED_SPEC_SHA256 = "TO_BE_COMPUTED"
+EXPECTED_SPEC_SHA256 = (
+    "17c340e52471357e5bbc1c26d9579312aea0b2c015a0bb3dacb451ab006ee5cf"
+)
+EXPECTED_CROSS_RANGE_SHA256 = (
+    "d6ae9a4090e14a8a2035a99f07ce1445f158c0ec4fda8f87937593d6f0683034"
+)
 UNIT_ID = re.compile(r"^U[0-9]{6}$")
 ASSET_ID = re.compile(r"^A[0-9]{6}$")
+PRINTED_PAGE = re.compile(r"\bpages?\s+([0-9]{2,4})", re.IGNORECASE)
+CHAPTER6_PRINTED_PAGE_RANGE = range(223, 297)
 
 
 class AuthoringError(ValueError):
@@ -1343,14 +1350,15 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "PAGE",
         "page 287",
         "code-1329 spacefiller analog",
-        "U001547 U001548 U001549 U001550",
+        "U001547 U001548 U001549 U001550 U001551",
         "A001019",
         (
-            "Resolved printed page 287 to U001547-U001550/A001019, the "
-            "stationary and moving persistent structures of code 1329. The "
-            "actual code-1329 unbounded-growth structures follow on later "
-            "pages, so this closure preserves U006587's comparison as an "
-            "analogy rather than an identity."
+            "Resolved printed page 287 to U001547-U001551/A001019. The "
+            "target identifies stationary and moving code-1329 structures "
+            "and U001551 introduces the period-256 moving part that leaves "
+            "an unbounded trail; the full growth panel is on the following "
+            "page. The Life spacefiller remains an analogy, not the same "
+            "state or rule."
         ),
     ),
 )
@@ -1358,7 +1366,116 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
 
 UNTOUCHED_CROSS_RANGE_IDENTITIES: tuple[
     tuple[str, str, str, str, str], ...
-] = ()
+] = tuple(
+    tuple(line.split("\\t"))  # type: ignore[misc]
+    for line in """U001233\\t\\tPAGE\\tpage 24\\tearlier presentation of rule 254
+U001233\\t\\tPAGE\\tpage 53\\telementary cellular-automaton rule-number scheme
+U001254\\t\\tPAGE\\tpage 32\\tearlier rule-110 discussion
+U001311\\t\\tPAGE\\tpage 155\\tcontinuous cellular-automaton construction
+U001316\\t\\tPAGE\\tpage 155\\tcontinuous cellular-automaton construction
+U001358\\t\\tOTHER\\tlater in this book\\tinformation handling in systems in nature
+U001366\\t\\tSECTION\\tthe next chapter\\tlimited-size repetition in nature
+U001399\\t\\tPAGE\\tpage 27\\trule-30 simple-initial-condition construction
+U001423\\t\\tSECTION\\tthe next few chapters\\tnatural-system stability from intrinsic randomness
+U001431\\t\\tPAGE\\tpage 210\\tconstraint satisfaction for periodic behavior
+U001470\\t\\tPAGE\\tpage 82\\tsubstitution-system construction
+U001474\\t\\tPAGE\\tpage 83\\tsubstitution-system construction
+U001478\\t\\tPAGE\\tpage 338\\tequal-density rule-184 nested patterns
+U001559\\t\\tSECTION\\tChapter 11\\tcomputation and universality
+U001560\\t\\tPAGE\\tpage 32\\tearlier rule-110 discussion
+U006341\\t\\tPAGE\\tpage 953\\tmethod for estimating long-run cellular-automaton densities
+U006343\\t\\tPAGE\\tpage 871\\trule-30 triangle-density analysis
+U006344\\t\\tPAGE\\tpage 869\\talgebraic representation convention for elementary cellular automata
+U006346\\t\\tPAGE\\tpage 1012\\treaction-diffusion pattern-formation construction lead
+U006346\\t\\tPAGE\\tpage 880\\tself-gravitating-system construction lead
+U006348\\t\\tPAGE\\tpage 597\\tdeviations among random initial conditions
+U006348\\t\\tPAGE\\tpages 944 and 1193\\tstates-of-matter classification context
+U006348\\t\\tPAGE\\tpage 70\\ttotalistic class-4 rule 1599 example
+U006348\\t\\tPAGE\\tpage 67\\ttotalistic class-4 rule 1635 example
+U006348\\t\\tPAGE\\tpage 68\\ttotalistic class-4 rule 2049 example
+U006350\\t\\tPAGE\\tpage 1138\\tundecidability of cellular-automaton class tests
+U006350\\t\\tPAGE\\tpage 922\\tcontinuous cellular-automaton mechanics
+U006351\\t\\tPAGE\\tpage 877\\tGame of Life historical context
+U006356\\t\\tPAGE\\tpage 183\\tcubic lattice convention
+U006360\\t\\tPAGE\\tpage 154\\trandom digit sequences for continuous numbers
+U006360\\t\\tPAGE\\tpage 1070\\trandomness for finite integer representations
+U006360\\t\\tPAGE\\tpages 963 and 1038\\trandom networks as initial conditions for network systems
+U006360\\t\\tPAGE\\tpage 920\\trandom initial conditions across other system classes
+U006363\\t\\tPAGE\\tpage 601\\tone-sided perturbation propagation in rule 30
+U006363\\t\\tPAGE\\tpage 871\\trule-30 nonrepetitive-region growth rate
+U006367\\t\\tPAGE\\tpage 155\\texponential sensitivity analogy
+U006367\\t\\tPAGE\\tpage 921\\tLyapunov exponents for number-based dynamical systems
+U006369\\t\\tPAGE\\tpage 613\\tfull-period cyclic-addition parameter pairs
+U006372\\t\\tPAGE\\tpage 1093\\tmultiplicative-order mechanics
+U006372\\t\\tPAGE\\tpage 912\\tdigit-sequence repetition-period relation
+U006386\\t\\tPAGE\\tpage 1087\\tlongest-period comparison across elementary rules and symmetries
+U006388\\t\\tPAGE\\tpage 865\\tbitwise cellular-automaton representation
+U006390\\t\\tPAGE\\tpage 58\\tsingle-cell rule-225 nested pattern
+U006390\\t\\tPAGE\\tpage 949\\trule-22 difference-region spread rate
+U006395\\t\\tPAGE\\tpage 955\\tnested patterns from modular-additive rules
+U006395\\t\\tPAGE\\tpage 870\\talgebraic additive-rule analysis
+U006399\\t\\tPAGE\\tpage 1087\\tpartial additivity
+U006411\\t\\tPAGE\\tpage 886\\tassociative rule analogs
+U006411\\t\\tPAGE\\tpage 956\\tgeneral associative-rule nesting results
+U006413\\t\\tPAGE\\tpage 922\\tcontinuous additive cellular automata
+U006413\\t\\tPAGE\\tpage 161\\tcontinuous-function local evolution
+U006423\\t\\tPAGE\\tpage 949\\tdifference-pattern growth estimates
+U006424\\t\\tPAGE\\tpage 870\\trule-90 superposition cell-count derivation
+U006424\\t\\tPAGE\\tpage 602\\trule-90 density relation
+U006427\\t\\tPAGE\\tpage 339\\tcontrasting cellular-automaton density response
+U006429\\t\\tPAGE\\tpage 699\\trule-73 independent-region mechanics
+U006432\\t\\tPAGE\\tpage 211\\tconstraint construction for repeating configurations
+U006438\\t\\tPAGE\\tpage 960\\tspacetime-entropy growth of period-dividing counts
+U006439\\t\\tPAGE\\tpage 958\\tfinite-complement language mechanics
+U006440\\t\\tPAGE\\tpage 700\\tadditional repeating-configuration examples
+U006441\\t\\tPAGE\\tpages 281 and 1118\\tlocalized-structure construction
+U006441\\t\\tPAGE\\tpage 942\\ttwo-dimensional constraint mechanics
+U006441\\t\\tPAGE\\tpage 1139\\tcomplexity of two-dimensional repeating configurations
+U006441\\t\\tPAGE\\tpage 349\\tstripe reduction of two-dimensional configurations
+U006442\\t\\tPAGE\\tpage 150\\titerated-map definition
+U006442\\t\\tPAGE\\tpage 914\\tcontinued-fraction map mechanics
+U006445\\t\\tPAGE\\tpage 961\\texplicit solutions of polynomial-map periodic points
+U006448\\t\\tPAGE\\tpage 869\\tCantor-set view of cellular automata
+U006449\\t\\tPAGE\\tpages 702 and 1118\\trule emulations
+U006449\\t\\tPAGE\\tpage 981\\tcritical-point nesting
+U006449\\t\\tPAGE\\tpage 983\\trenormalization-group universality
+U006450\\t\\tPAGE\\tpage 989\\tlimits of renormalization for cellular automata
+U006451\\t\\tPAGE\\tpage 952\\tprime-modulus additive rules
+U006451\\t\\tPAGE\\tpage 870\\tadditive self-similarity
+U006457\\t\\tPAGE\\tpage 58\\tfractal dimensions of rule-90 and rule-150 histories
+U006457\\t\\tPAGE\\tpage 952\\tother additive-rule families used by the fractal-dimension analysis
+U006459\\t\\tPAGE\\tpage 870\\tother additive-rule dimensions
+U006461\\t\\tPAGE\\tpage 886\\tassociative cellular-automaton rules
+U006468\\t\\tPAGE\\tpage 887\\tnoncommutative associative example
+U006468\\t\\tPAGE\\tpage 952\\tgeneralized-additive implication for nested behavior
+U006469\\t\\tPAGE\\tpage 701\\trule-45 nested background seed
+U006469\\t\\tPAGE\\tpage 1186\\tpattern-equivalence counts
+U006471\\t\\tPAGE\\tpage 83\\tnested sequence generators
+U006471\\t\\tPAGE\\tpage 1091\\tnested initial-condition details
+U006492\\t\\tPAGE\\tpage 939\\tregular-language mechanics
+U006493\\t\\tPAGE\\tpage 891\\tregular-language and substitution-system connections
+U006504\\t\\tPAGE\\tpage 1084\\ttopological entropy
+U006504\\t\\tPAGE\\tpage 1138\\tundecidability of limiting entropy bounds
+U006518\\t\\tPAGE\\tpage 83\\tsubstitution-system construction of nested Cantor sets
+U006518\\t\\tPAGE\\tpage 869\\tcellular automata as global state-space maps
+U006518\\t\\tPAGE\\tpages 601 and 1087\\tadditivity criteria for surjectivity
+U006518\\t\\tPAGE\\tpage 957\\tminimal-automaton surjectivity test
+U006518\\t\\tPAGE\\tpage 1085\\tsurjective cellular-automaton rules used as DES S-box input
+U006519\\t\\tPAGE\\tpage 1017\\treversible cellular automata
+U006520\\t\\tPAGE\\tpage 1138\\ttwo-dimensional undecidability of injectivity and surjectivity
+U006527\\t\\tPAGE\\tpage 878\\tsliding-block codes as cellular automata
+U006527\\t\\tPAGE\\tpage 869\\tlocality and continuity analogy
+U006528\\t\\tPAGE\\tpage 876\\tself-reproduction and Garden-of-Eden context for cellular-automaton surjectivity
+U006530\\t\\tPAGE\\tpage 922\\tordinary differential-equation attractors
+U006531\\t\\tPAGE\\tpages 920 and 955\\tlogistic-map attractor progression
+U006531\\t\\tPAGE\\tpage 938\\tTuring-machine accept-state grammars
+U006542\\t\\tPAGE\\tpage 1087\\tlarge finite cellular-automaton state graphs
+U006546\\t\\tPAGE\\tpage 950\\tspatial-period state counts
+U006548\\t\\tPAGE\\tpage 950\\tprimitive spatial-period count used for exact shift cycles
+U006552\\t\\tPAGE\\tpage 951\\tcycle lengths of finite additive cellular automata
+U006570\\t\\tPAGE\\tpage 949\\tGame of Life native rule
+U006591\\t\\tPAGE\\tpage 888\\tpersistent structures in Turing machines""".splitlines()
+)
 
 
 def embedded_spec_payload() -> list[dict[str, Any]]:
@@ -1451,6 +1568,24 @@ def validate_embedded_specs() -> str:
         != EXPECTED_UNTOUCHED_CROSS_RANGE_COUNT
     ):
         raise AuthoringError("untouched CROSS_RANGE partition drifted")
+    if any(
+        len(identity) != len(IDENTITY_FIELDS)
+        for identity in UNTOUCHED_CROSS_RANGE_IDENTITIES
+    ):
+        raise AuthoringError("untouched CROSS_RANGE identity is malformed")
+    cross_digest = hashlib.sha256(
+        canonical_json_bytes(
+            [
+                dict(zip(IDENTITY_FIELDS, identity, strict=True))
+                for identity in UNTOUCHED_CROSS_RANGE_IDENTITIES
+            ]
+        )
+    ).hexdigest()
+    if cross_digest != EXPECTED_CROSS_RANGE_SHA256:
+        raise AuthoringError(
+            "untouched CROSS_RANGE projection digest drifted: "
+            f"{cross_digest} != {EXPECTED_CROSS_RANGE_SHA256}"
+        )
     if identities & set(UNTOUCHED_CROSS_RANGE_IDENTITIES):
         raise AuthoringError(
             "an untouched CROSS_RANGE identity entered the closure map"
@@ -1533,6 +1668,17 @@ def atomic_create(path: Path, payload: bytes) -> None:
 
 def route_identity(row: dict[str, str]) -> tuple[str, str, str, str, str]:
     return tuple(row[field] for field in IDENTITY_FIELDS)  # type: ignore[return-value]
+
+
+def points_into_stage10(literal_target: str) -> bool:
+    """Recognize the closed printed-page/section assignment for Chapter 6."""
+
+    if literal_target.strip().casefold() == "chapter 6":
+        return True
+    return any(
+        int(match.group(1)) in CHAPTER6_PRINTED_PAGE_RANGE
+        for match in PRINTED_PAGE.finditer(literal_target)
+    )
 
 
 def parsed_string_list(value: str, *, label: str) -> list[str]:
@@ -1672,6 +1818,33 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     ] = {}
     for row in routes:
         routes_by_identity.setdefault(route_identity(row), []).append(row)
+
+    expected_incoming = {
+        spec.identity for spec in ROUTE_SPECS if spec.origin == "incoming"
+    }
+    observed_incoming_rows = [
+        row
+        for row in routes
+        if row["owning_stage"] != "10"
+        and row["closure_scope"] == "CROSS_RANGE"
+        and row["status"] == "PENDING"
+        and points_into_stage10(row["literal_target"])
+    ]
+    observed_incoming = {
+        route_identity(row) for row in observed_incoming_rows
+    }
+    if (
+        len(observed_incoming_rows) != EXPECTED_SPEC_COUNTS["incoming"]
+        or observed_incoming != expected_incoming
+    ):
+        missing = sorted(expected_incoming - observed_incoming)
+        extra = sorted(observed_incoming - expected_incoming)
+        raise AuthoringError(
+            "incoming Stage 10 route set differs from the governed map: "
+            f"missing={missing!r} extra={extra!r}"
+        )
+    for row in observed_incoming_rows:
+        require_pending_route(row, label="incoming Stage 10")
 
     expected_within = {
         spec.identity for spec in ROUTE_SPECS if spec.origin == "within"
@@ -1865,7 +2038,9 @@ def main() -> int:
             return 1
         print(
             "Chapter 6 route specification valid: "
-            f"incoming=14 within=58 untouched-cross=107 sha256={digest}"
+            f"incoming=14 within=58 untouched-cross=107 "
+            f"spec-sha256={digest} "
+            f"cross-sha256={EXPECTED_CROSS_RANGE_SHA256}"
         )
         return 0
 

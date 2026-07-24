@@ -533,7 +533,9 @@ QUERY_SPECS = [
             r"(?:\d+|[IVX]+)(?:[–-]\d+)?\b|"
             r"\b(?:the\s+)?(?:(?:top|bottom)\s+of\s+(?:the\s+)?)?"
             r"(?:facing|previous|next)(?:\s+(?:one|two|three))?"
-            r"\s+pages?\b"
+            r"\s+pages?\b|"
+            r"\b(?:previous section|next chapter|next few chapters|"
+            r"later in (?:this|the) book)\b"
         ),
         "REGEX",
     ),
@@ -542,7 +544,7 @@ QUERY_SPECS = [
 # Source-only constants can be established before V000028.  They are filled
 # after running --self-check-source during authoring.
 EXPECTED_QUERY_SPEC_DIGEST = (
-    "7dc60e44f6d926fcc8852af1c2fad9fd4d3af6feebcaf22aed5d9307c37df1ad"
+    "40ea5944b0ff1d77a6d48b234474ae697cd6762ea3891dc4c5b75b1161262bf0"
 )
 EXPECTED_STAGE_VOCABULARY_COUNT = 268
 EXPECTED_STAGE_VOCABULARY_DIGEST = (
@@ -564,7 +566,7 @@ EXPECTED_SOURCE_SHA256 = {
         "23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93"
     ),
 }
-EXPECTED_RESULT_PAIR_COUNT = 2658
+EXPECTED_RESULT_PAIR_COUNT = 2665
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 591
 EXPECTED_HIT_COUNTS = [
     213,
@@ -581,10 +583,10 @@ EXPECTED_HIT_COUNTS = [
     135,
     7,
     12,
-    138,
+    145,
 ]
 EXPECTED_PATH_PAIR_COUNTS = {
-    STAGE_PATHS[0]: 1539,
+    STAGE_PATHS[0]: 1546,
     STAGE_PATHS[1]: 1119,
 }
 EXPECTED_PATH_UNIQUE_UNIT_COUNTS = {
@@ -592,7 +594,7 @@ EXPECTED_PATH_UNIQUE_UNIT_COUNTS = {
     STAGE_PATHS[1]: 241,
 }
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
-    "1e53f2db28df8b3a10a087ac0f4a704bb7a83499bded14b8f45c8db0179eb9b5"
+    "69c987503995ba8624d58a1b6df87ca251f9838c71a9b1788a48b7b4582016c9"
 )
 EXPECTED_RESULT_UNIT_IDS_DIGEST = (
     "d99900888698352eacad691e91b957f1c61d4d391db593c112113b7d31e30ab8"
@@ -605,7 +607,7 @@ EXPECTED_CLOSED_ROUNDS_DIGEST = (
     "0e6d5001c789c5c30965a986033265ae036dff2b26354b29676f73732c1e3a0b"
 )
 EXPECTED_QUERY_START = {"S015": 179, "S016": 194}
-EXPECTED_HIT_START = {"S015": 13301, "S016": 15959}
+EXPECTED_HIT_START = {"S015": 13301, "S016": 15966}
 EXPECTED_GLOBAL_VOCABULARY_COUNT: dict[str, int] = {
     "S015": 448,
     "S016": 716,
@@ -1386,6 +1388,23 @@ def _analyze_post_merge(
         )
         if route["owning_stage"] == str(STAGE) or target_units & stage_unit_ids:
             active_route_ids.add(route["route_id"])
+
+    locator_result_units = {
+        unit_id
+        for ordinal, unit_id in normalized_pairs
+        if ordinal == len(QUERY_SPECS)
+    }
+    stage_route_source_units = {
+        routes_by_id[route_id]["source_unit_id"]
+        for route_id in active_route_ids
+        if routes_by_id[route_id]["source_unit_id"] in stage_unit_ids
+    }
+    missing_locator_sources = stage_route_source_units - locator_result_units
+    if missing_locator_sources:
+        raise AuthoringError(
+            "F15 misses Stage 10 typed-route source units: "
+            f"{sorted(missing_locator_sources)}"
+        )
 
     candidate_route_witnesses: dict[str, set[str]] = {}
     for candidate_id in expected_candidates:
