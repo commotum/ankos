@@ -1079,7 +1079,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             [
                 ev("U006400", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Generalized additivity combines evolution histories using an operation ⊕.", ["object_kind", "law_kind"]),
                 ev("U006401", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Generalized additivity requires phi[u⊕v] == phi[u]⊕phi[v].", ["rule_relation_constraint_function_or_probability_law"]),
-                ev("U006402", "PROSE", "CORROBORATING", "The property is a homomorphism condition and ordinary modulo-k addition supplies the standard Xor example.", ["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
+                ev("U006402", "PROSE", "CORROBORATING", "The property is a homomorphism condition and ordinary Mod[u+v,k] supplies the modular-addition example, coinciding with Xor only for k=2.", ["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
                 ev("U006404", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule 250 supplies the Max/Or generalized-additive variant.", ["parameters_and_variants"]),
                 ev("U006406", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source requires an associative, commutative operation with identity to obtain the familiar additive construction from basic histories.", ["structural_invariants"]),
                 ev("U006407", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source enumerates counts of inequivalent commutative monoids by color count k.", ["parameters_and_variants"]),
@@ -1198,8 +1198,8 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ev("U006414", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "Assuming independent cell colors at density p gives product probabilities for every neighborhood.", ["object_kind", "input", "law_kind", "parameters_and_variants"]),
                 ev("U006415", "CODE", "DIRECT_COMPLETE_MECHANICS", "The code constructs the eight three-cell neighborhood probabilities as products of p and 1-p.", ["rule_relation_constraint_function_or_probability_law"]),
                 ev("U006416", "PROSE", "CORROBORATING", "The next density is obtained by weighting the rule table with those neighborhood probabilities.", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
-                ev("U006417", "CODE", "DIRECT_COMPLETE_MECHANICS", "The next density is probs . IntegerDigits[m,2,8], and repeated application gives the approximation trajectory.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"]),
-                ev("U006418", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule 22 gives 3p(1-p)^2 at one-step order, with larger-block multi-step approximations accounting for correlations.", ["parameters_and_variants", "result_kind"]),
+                ev("U006417", "CODE", "DIRECT_COMPLETE_MECHANICS", "The next density is probs . IntegerDigits[m,2,8].", ["rule_relation_constraint_function_or_probability_law", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"]),
+                ev("U006418", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule 22 gives 3p(1-p)^2 at one-step order, subsequent densities are obtained by iterating that map, and larger-block multi-step approximations account for correlations.", ["native_time", "determinism_branching_or_measure", "parameters_and_variants", "result_kind"]),
                 ev("U006421", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The one-step mean-field maps for rules 90 and 30 are respectively 2p(1-p) and p(2p^2-5p+3), and both imply final density 1/2.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
                 ev("U006422", "PROSE", "CONTEXTUAL", "The approximation scheme is also called mean field theory and is stated to tend to work better in higher dimensions.", ["parameters_and_variants"]),
             ],
@@ -1426,7 +1426,14 @@ def candidate_specs() -> list[dict[str, Any]]:
                         "witness_semantics",
                         "parameters_and_variants",
                     ],
-                )
+                ),
+                ev(
+                    "U006591",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "For two-dimensional cellular automata, no completely general procedure finds all persistent structures of arbitrary size having a specified repetition period.",
+                    ["input", "result_kind", "termination_completion_failure"],
+                ),
             ],
             values={
                 "carrier": "two-dimensional cellular-automaton configurations",
@@ -1435,6 +1442,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "the satisfying two-dimensional repeating configurations, or their existence",
                 "witness_semantics": "a witness may be arbitrarily complex; unlike in one dimension, no periodic fixed-block array is guaranteed",
                 "parameters_and_variants": "the infinite-stripe restriction reduces the problem to the one-dimensional case",
+                "termination_completion_failure": "there is no completely general procedure for enumerating all arbitrary-size two-dimensional structures at a specified repetition period",
             },
             variants=[("infinite-stripe restriction", "configurations made only of infinite stripes reduce to a one-dimensional repeating-configuration problem")],
             parameters=[
@@ -1754,6 +1762,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ev("U006477", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A list is accepted when it labels a path beginning at at least one network node.", ["input", "result_kind", "witness_semantics"]),
                 ev("U006478", "CODE", "DIRECT_COMPLETE_MECHANICS", "Fold[NetStep,...] accepts exactly when at least one starting-node path remains after consuming the input list.", ["rule_relation_constraint_function_or_probability_law", "determinism_branching_or_measure", "witness_semantics"]),
                 ev("U006490", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The labeled sequence network is a finite automaton or finite state machine; in the nondeterministic case one input word can label more than one path.", ["object_kind", "structural_invariants", "parameters_and_variants"]),
+                ev("U006493", "PROSE", "DIRECT_IDENTITY", "The source records sequential machine as an alternate name historically used for a finite automaton.", ["object_kind"]),
             ],
             values={
                 "carrier": "a finite set of nodes with labeled arcs",
@@ -1949,9 +1958,9 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ev("U006498", "CODE", "DIRECT_COMPLETE_MECHANICS", "The path-count implementation sums all entries of MatrixPower[m,n].", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
                 ev("U006499", "PROSE", "CONTEXTUAL", "The source introduces the network adjacency matrix used by the path-count formula.", ["input", "parameters_and_variants"]),
                 ev("U006500", "CODE", "DIRECT_COMPLETE_MECHANICS", "The adjacency matrix code increments m[i,j] for each network arc from node i to node j.", ["input", "rule_relation_constraint_function_or_probability_law"]),
-                ev("U006501", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "For rule 32, length-n path counts are Fibonacci[n+3] and grow asymptotically as GoldenRatio^n.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
-                ev("U006502", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "For rule 126 after one and two image steps, the source gives characteristic polynomials with largest eigenvalues approximately 1.755 and 1.732.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
-                ev("U006503", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The growth factor kappa is a Perron algebraic number, and every Perron number can be realized by some finite-complement language.", ["structural_invariants", "result_kind", "parameters_and_variants"]),
+                ev("U006501", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "For rule 32, length-n path counts are Fibonacci[n+3] with GoldenRatio growth; for rule 126 after one image step the characteristic polynomial is x^3-2x^2+x-1 with largest eigenvalue about 1.755, and the after-two-step polynomial is introduced.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+                ev("U006502", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The continued degree-13 characteristic polynomial for the rule-126 after-two-image-step network is printed.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+                ev("U006503", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The rule-126 after-two-step polynomial has largest eigenvalue about 1.732; in general kappa is a Perron algebraic number, and every Perron number can be realized by some finite-complement language.", ["structural_invariants", "result_kind", "parameters_and_variants"]),
                 ev("U006504", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Spatial entropy is h=Log[2,kappa], where kappa is the adjacency matrix's largest eigenvalue; successive cellular-automaton image steps t give a nonincreasing sequence.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants", "parameters_and_variants"]),
                 ev("U006523", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source gives behavior-class signatures in spatial and temporal entropy: class 1 is 0/0, class 2 nonzero/0, class 3 nonzero/nonzero, and class 4 fluctuating.", ["result_kind", "parameters_and_variants"]),
             ],
@@ -1969,8 +1978,9 @@ def candidate_specs() -> list[dict[str, Any]]:
             ],
             variants=[
                 ("rule 32", "s_n=Fibonacci[n+3], with growth factor GoldenRatio", "U006501"),
-                ("rule 126 after one step", "characteristic polynomial x^3-2x^2+x-1 and kappa approximately 1.755", "U006502"),
-                ("rule 126 after two steps", "degree-13 characteristic polynomial and kappa approximately 1.732", "U006502"),
+                ("rule 126 after one step", "characteristic polynomial x^3-2x^2+x-1 and kappa approximately 1.755", "U006501"),
+                ("rule 126 after-two-step polynomial", "the printed degree-13 characteristic polynomial", "U006502"),
+                ("rule 126 after-two-step growth factor", "kappa approximately 1.732", "U006503"),
                 ("class 1 signature", "h_x=0 and h_t=0", "U006523"),
                 ("class 2 signature", "h_x is nonzero and h_t=0", "U006523"),
                 ("class 3 signature", "h_x and h_t are both nonzero", "U006523"),
@@ -2487,8 +2497,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006548", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The number of shift-rule cycles of exact length m is s[m,k]/m.", OBS_FIELDS + ["structural_invariants", "parameters_and_variants"]),
-                ev("U006549", "CODE", "DIRECT_PARTIAL_MECHANICS", "For prime k the cycles except all-zero correspond to factors of x^(k^n-1)-1 modulo k.", ["structural_invariants", "parameters_and_variants"]),
+                ev("U006548", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The number of shift-rule cycles of exact length m is s[m,k]/m; for prime k, every cycle except all-zero corresponds to a term in the following factor product.", OBS_FIELDS + ["structural_invariants", "parameters_and_variants"]),
+                ev("U006549", "CODE", "DIRECT_PARTIAL_MECHANICS", "The source code factors x^(k^n-1)-1 with Modulus -> k.", ["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
             ],
             values={
                 "input": "requested exact cycle length m and alphabet size k",
@@ -2500,9 +2510,12 @@ def candidate_specs() -> list[dict[str, Any]]:
             parameters=[
                 ("m", "requested exact shift-cycle length"),
                 ("k", "number of colors"),
-                ("n", "ring length used by the prime-k polynomial-factorization variant"),
+                ("n", "ring length used by the prime-k polynomial-factorization variant", "U006549"),
             ],
-            variants=[("prime-k factorization", "nonzero cycles correspond to factors of x^(k^n-1)-1 modulo k")],
+            variants=[
+                ("prime-k cycle correspondence", "every cycle except all-zero corresponds to a term in the factor product", "U006548"),
+                ("prime-k factorization expression", "Factor[x^(k^n-1)-1, Modulus->k]", "U006549"),
+            ],
             related=["left-shift cellular automaton rule 170", "primitive spatial-period state-count function"],
         ),
         spec(
@@ -3574,6 +3587,8 @@ def main() -> None:
             source_status = "CLEAR"
             uncertainty = ""
             roles = ["REPRESENTATION"] if unit["block_kind"] == "image" else (["IMPLEMENTATION_DETAIL"] if unit["block_kind"] in {"fenced_code", "table"} else [])
+            if unit_id == "U006591" and route_ids:
+                roles.append("EXTERNAL_ONLY")
         elif unit_id in historical_units or text.lstrip().startswith("■ **History.**"):
             disposition = "HISTORICAL_ONLY"
             source_status = "CLEAR"
