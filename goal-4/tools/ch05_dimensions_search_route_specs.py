@@ -2061,7 +2061,9 @@ def canonical_spec_digest() -> str:
 
 ROUTE_SPEC_DIGEST = route_spec_digest()
 CANONICAL_SPEC_DIGEST = canonical_spec_digest()
-EXPECTED_CANONICAL_SPEC_DIGEST = "__FILL_AFTER_VALIDATION__"
+EXPECTED_CANONICAL_SPEC_DIGEST = (
+    "5e575deef81eb316173de75edad0a2d1857e14b7327984f290a3a954c1bae27f"
+)
 
 
 def assert_frozen_spec() -> str:

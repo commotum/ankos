@@ -995,7 +995,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Pell least-x continued-fraction solver",
-        ["U006326", "U006327", "U006328", "U006329"],
+        ["U006326", "U006327", "U006329"],
         "Diophantine least-solution solver",
         "positive integer solutions of x^2 = a y^2 + 1",
         "positive nonsquare integer a",
@@ -1338,7 +1338,10 @@ RECOVERED_SPECS = [
         discovery_unit="U001185",
         identity_unit="U001184",
         evidence_scopes={
-            "U001183": ["result_kind"],
+            "U001183": [
+                "carrier",
+                "parameters_and_variants",
+            ],
             "U001184": [
                 "object_kind",
                 "carrier",
@@ -1895,6 +1898,12 @@ EXPECTED_QUERY_SPEC_DIGEST = (
 )
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
     "97d4f2ffa3322834e9a1ef7d9c9fd1327bf718420af7c91967e02d96c551a5e0"
+)
+EXPECTED_ROUTE_SPEC_DIGEST = (
+    "1bc5019c7236aef8bf0186b179997a3e83e2f385444ea8aa9bbf94aab226c6f3"
+)
+EXPECTED_ROUTE_AUDIT_DIGEST = (
+    "5e575deef81eb316173de75edad0a2d1857e14b7327984f290a3a954c1bae27f"
 )
 EXPECTED_TRIAGE_DIGEST = (
     "1d2d0c50a27a20dd283952077f73d6fc71057ffdfa3b062a9a082ceefb33c06f"
@@ -4156,6 +4165,37 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         raise AuthoringError(
             f"frozen Stage 9 query family drifted: {query_spec_digest}"
         )
+    try:
+        route_audit_digest = (
+            ch05_dimensions_search_route_specs.assert_frozen_spec()
+        )
+    except AssertionError as exc:
+        raise AuthoringError(f"frozen F15 route audit failed: {exc}") from exc
+    if (
+        ch05_dimensions_search_route_specs.ROUTE_SPEC_DIGEST
+        != EXPECTED_ROUTE_SPEC_DIGEST
+        or route_audit_digest != EXPECTED_ROUTE_AUDIT_DIGEST
+    ):
+        raise AuthoringError(
+            "frozen F15 route-spec or inventory digest drifted"
+        )
+    expected_route_counts = (
+        ch05_dimensions_search_route_specs.EXPECTED_COUNTS
+    )
+    if expected_route_counts != {
+        "f15_hit_units": 144,
+        "new_routes": EXPECTED_NEW_ROUTE_COUNT,
+        "new_route_source_units": 117,
+        "within_stage_routes": 86,
+        "cross_range_routes": 65,
+        "stage_existing_routes": 46,
+        "f15_existing_route_uses": 45,
+        "f15_existing_route_source_units": 37,
+        "non_bearing_locators": 17,
+        "non_bearing_source_units": 6,
+        "locator_dispositions": 213,
+    }:
+        raise AuthoringError("frozen F15 route inventory counts drifted")
 
     units = read_jsonl(goal_dir / merge_worker_output.UNITS_NAME)
     reading = read_csv(goal_dir / merge_worker_output.READING_NAME)
