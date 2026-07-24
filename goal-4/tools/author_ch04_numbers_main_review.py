@@ -4687,6 +4687,23 @@ def _allocate_tail(
                 raise AuthoringError(
                     f"evidence {ev['label']} predates candidate {item['key']}"
                 )
+            strength = ev["strength"]
+            if ev["image_path"] is not None:
+                asset_id = asset_by_path[ev["image_path"]]["asset_id"]
+                visual_role = ASSET_REVIEW[asset_id][0]
+                if (
+                    visual_role != "NATIVE_EVIDENCE"
+                    and strength
+                    in {
+                        "DIRECT_IDENTITY",
+                        "DIRECT_PARTIAL_MECHANICS",
+                        "DIRECT_COMPLETE_MECHANICS",
+                    }
+                ):
+                    # Controls, observers, and relation diagrams can
+                    # corroborate a field already grounded in the assigned
+                    # source, but they are not native construction evidence.
+                    strength = "CORROBORATING"
             local.append(
                 {
                     "evidence_id": eid,
@@ -4699,7 +4716,7 @@ def _allocate_tail(
                     },
                     "source_unit_id": ev["unit"],
                     "image_path": ev["image_path"],
-                    "strength": ev["strength"],
+                    "strength": strength,
                     "modality": ev["modality"],
                     "claim": ev["claim"],
                     "fingerprint_fields": ev["fields"],
@@ -4707,6 +4724,22 @@ def _allocate_tail(
             )
         if not local:
             raise AuthoringError(f"candidate {item['key']} has no evidence")
+        for row in local:
+            if (
+                row["image_path"] is not None
+                and row["strength"]
+                in {
+                    "DIRECT_IDENTITY",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "DIRECT_COMPLETE_MECHANICS",
+                }
+            ):
+                asset_id = asset_by_path[row["image_path"]]["asset_id"]
+                if ASSET_REVIEW[asset_id][0] != "NATIVE_EVIDENCE":
+                    raise AuthoringError(
+                        f"{row['evidence_id']} gives direct image strength to "
+                        f"non-native asset {asset_id}"
+                    )
         local.sort(key=lambda x: int(x["evidence_id"][2:]))
         units = sorted(
             {ev["source_unit_id"] for ev in local},
