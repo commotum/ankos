@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Author the governed Stage 12 incoming-route resolution proposal.
+"""Author the governed Stage 12 route-resolution proposal.
 
-The helper closes only the 24 previously discovered routes whose literal
-landings were read during the Chapter 8 main/Notes sequential review.  Routes
-are frozen by both their current global route ID and immutable five-field
-identity:
+The helper closes the 24 previously discovered incoming routes whose literal
+landings were read during the Chapter 8 main/Notes sequential review, plus
+all 23 new Stage-12 WITHIN_STAGE routes. Routes are frozen by both their
+current global route ID and immutable five-field identity:
 
     (source_unit_id, source_asset_id, route_kind,
      literal_target, expected_topic)
@@ -60,7 +60,11 @@ EXPECTED_TERMINAL_REVIEWER = "ch08-union"
 EXPECTED_STAGE_UNIT_COUNT = 510
 EXPECTED_STAGE_ASSET_COUNT = 86
 EXPECTED_STAGE_ROUTE_COUNT = 79
-EXPECTED_UPDATE_COUNT = 24
+EXPECTED_INCOMING_COUNT = 24
+EXPECTED_WITHIN_COUNT = 23
+EXPECTED_UPDATE_COUNT = 47
+EXPECTED_OUTGOING_COUNT = 56
+EXPECTED_OUTGOING_IDENTITY_SHA256 = "TO_BE_FILLED"
 EXPECTED_SPEC_SHA256 = (
     "2d680994e6fb874695ad3773e28ab40f3fc0af512482f52c819a8a250ddd9cb3"
 )
