@@ -135,6 +135,7 @@ def C(
     images: list[tuple[str, str, str]] | None = None,
     uncertainties: list[str] | None = None,
     conflicting_fields: list[str] | None = None,
+    conflict_sources: list[str] | None = None,
     unknown_fields: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     return {
@@ -170,6 +171,7 @@ def C(
         "images": images or [],
         "uncertainties": uncertainties or [],
         "conflicting_fields": conflicting_fields or [],
+        "conflict_sources": conflict_sources or [],
         "unknown_fields": unknown_fields or {},
     }
 
@@ -478,7 +480,7 @@ CANDIDATES = [
     C(
         "three-body gravitational trajectory system",
         "U006621",
-        ["U006621", "U006622", "U006624"],
+        ["U006621", "U006622", "U006623", "U006624"],
         template="continuous_partial",
         carrier="three mutually interacting bodies",
         state="the bodies' positions and velocities",
@@ -495,7 +497,10 @@ CANDIDATES = [
         termination="no native termination; escape is an observed outcome",
         invariants="total mechanical energy and angular momentum",
         witness="the three trajectories and any escape event",
-        images=[("A000680", "CONTEXTUAL", "The six paired trajectory examples show different escape delays under nearby initial velocities.")],
+        images=[
+            ("A000673", "CONTEXTUAL", "The five-panel row witnesses idealized repetitive planet orbits in the field of an elliptically orbiting star pair."),
+            ("A000680", "CONTEXTUAL", "The six paired trajectory examples show different escape delays under nearby initial velocities."),
+        ],
         uncertainties=["The explicit general force equation and mass parameters are not present in the assigned notes."],
     ),
     C(
@@ -1143,6 +1148,71 @@ CANDIDATES = [
         uncertainties=["The rule tables, alphabets, neighborhoods, and boundary conditions are absent from the assigned notes."],
     ),
     C(
+        "tensor and multipole isotropy analyzer",
+        "U006744",
+        ["U006744", "U006745", "U006746", "U006747", "U006748", "U006749", "U006750"],
+        template="declarative",
+        carrier="a finite point set or a continuous-system expression whose directional symmetry is to be tested",
+        state="N/A",
+        law="for a point list v, sum rank-n outer products of each position, compare the result with the displayed ideal d-dimensional isotropic tensor, and optionally test rank-4 beta ratios or multipole sums; for a continuous PDE expression, require coordinates to appear only through nabla",
+        support="Euclidean coordinate space in dimension d and tensor or multipole orders n",
+        topology="Euclidean geometry with rotations and the symmetry group of any underlying lattice",
+        alphabet="real coordinate vectors, tensor components, complex multipole values, and Boolean or numeric anisotropy results",
+        input_value="point positions v with dimension d and rank/order n, or a continuous PDE expression for the stated criterion",
+        boundary="the complete supplied point set or expression",
+        external="none",
+        result="a point-set moment tensor and isotropy comparison, a beta/multipole anisotropy test, or the stated continuous-expression criterion",
+        determinism="deterministic for fixed inputs",
+        witness="proportionality to the ideal isotropic tensor, beta=3 for the stated rank-4 2D ratio, vanishing nonzero-order multipoles, or coordinate occurrence only through nabla",
+        params=[
+            (
+                "dimension d",
+                "Selects the ideal target tensor and the available lattice-symmetry restrictions.",
+                ["U006746", "U006747", "U006748"],
+            ),
+            (
+                "tensor or multipole order n",
+                "Selects the moment rank or order being tested.",
+                ["U006744", "U006745", "U006746", "U006747", "U006748"],
+            ),
+            (
+                "rank-4 component ratio beta",
+                "For 2D rank-4 isotropy the {1,1,1,1} to {1,1,2,2} ratio must be 3.",
+                ["U006748", "U006749"],
+            ),
+        ],
+        variants=[
+            (
+                "point-set tensor transform",
+                "Sum the rank-n outer product of every position vector.",
+                ["U006744", "U006745"],
+            ),
+            (
+                "ideal isotropic tensor comparison",
+                "Compare the point-set tensor with the displayed d-dimensional target tensor.",
+                ["U006746", "U006747", "U006748"],
+            ),
+            (
+                "beta component-ratio test",
+                "Use the rank-4 beta ratio, whose isotropic target is 3 in the stated 2D case.",
+                ["U006748", "U006749"],
+            ),
+            (
+                "multipole test",
+                "Sum r_i Exp[i n theta_i] in 2D, or the stated higher-dimensional harmonic analogs; only order zero may remain nonzero for isotropy.",
+                ["U006748"],
+            ),
+            (
+                "continuous-PDE coordinate criterion",
+                "Require coordinates to occur only through nabla in the continuous expression.",
+                ["U006750"],
+            ),
+        ],
+        uncertainties=[
+            "The source supplies exact point-set tensor formulas and criteria but does not prescribe a tolerance for approximate numerical isotropy."
+        ],
+    ),
+    C(
         "flat-domain-interface rule-150 process",
         "U006751",
         ["U006751"],
@@ -1335,38 +1405,110 @@ CANDIDATES = [
         uncertainties=["The main illustrated rules, their decoded tables, probabilities, and boundary conditions are outside this bundle."],
     ),
     C(
-        "two-dimensional Ising equilibrium model",
-        "U006762",
-        ["U006762", "U006763", "U006764", "U006765", "U006766", "U006767", "U006768", "U006769", "U006770", "U006771", "U006772", "U006773", "U006774", "U006775", "U006781", "U006782", "U006784"],
+        "microcanonical fixed-energy Ising measure",
+        "U006766",
+        ["U006762", "U006763", "U006764", "U006765", "U006766", "U006767", "U006768", "U006769", "U006770", "U006771", "U006772", "U006773", "U006774", "U006781", "U006782", "U006784"],
         template="declarative",
         carrier="an n by n square array of spins",
         state="a complete spin configuration s",
-        law="energy is minus one half the sum over each spin times its four-neighbor convolution; equilibrium configurations are weighted by Exp[-beta e[s]] or conditioned on fixed energy",
+        law="condition on a specified value of the four-neighbor Ising energy e[s] and give equal weight to all configurations at that energy",
         support="finite square grids and the n->infinity limit",
-        topology="2D square lattice with cyclic boundary in the enumerated examples",
+        topology="2D square lattice with cyclic boundary in the finite enumeration",
         alphabet="{+1,-1}",
-        input_value="array size and ensemble/energy or inverse-temperature condition",
+        input_value="array size n and a fixed total energy or energy density",
         boundary="cyclic boundary conditions in the finite enumeration",
-        invariants="energy is the conditioned quantity in the microcanonical formulation",
-        result="an equilibrium measure over spin configurations and derived energy/magnetization relation",
+        invariants="the selected energy is fixed throughout the ensemble",
+        result="a fixed-energy probability measure and its induced magnetization distribution",
         determinism="a probability measure, not a native time evolution",
-        witness="energy/magnetization distributions and the limiting phase transition",
+        witness="the distribution of m[s] over all configurations at fixed e[s] and its sharp limiting branches",
         params=[
             ("array size n", "The carrier is n by n and the sharp transition is an n->infinity limit.", ["U006766", "U006767"]),
-            ("inverse temperature beta", "Canonical weight Exp[-beta e[s]] and the exact magnetization relation use beta.", ["U006769", "U006771", "U006773"]),
-            ("energy density e", "The critical value is -sqrt(2).", ["U006768", "U006772"]),
+            ("fixed energy density e", "The critical value in the stated normalization is -sqrt(2).", ["U006768", "U006772"]),
         ],
         variants=[
-            ("microcanonical ensemble", "Uniformly considers configurations at a specified energy.", ["U006766", "U006773"]),
-            ("canonical ensemble", "Weights configurations by Exp[-beta e[s]].", ["U006773"]),
-            ("Monte Carlo heat-bath sampler", "Randomly flips spins to sample the canonical weights; exact acceptance rule is not supplied.", ["U006775"]),
+            (
+                "finite exhaustive fixed-energy measure",
+                "Enumerate all cyclic n by n configurations at a specified energy and measure their magnetizations.",
+                ["U006766", "U006767"],
+            ),
+            (
+                "infinite-size limiting measure",
+                "Take n to infinity, where the magnetization distribution becomes sharp.",
+                ["U006766", "U006768", "U006772"],
+            ),
         ],
-        images=[("A000738", "CONTEXTUAL", "The finite-n and limiting energy/magnetization panels visualize the equilibrium relation.")],
+        images=[("A000738", "CONTEXTUAL", "The finite-n and limiting energy/magnetization panels visualize the fixed-energy measure.")],
         uncertainties=[
-            "The source first defines m[s] as the sum of +/-1 spins but later calls m a +1-cell density and states m=p; that observable normalization is conflicting.",
-            "The Monte Carlo spin-flip acceptance law is not supplied.",
+            "The source first defines m[s] as the sum of +/-1 spins but later calls m a +1-cell density and states m=p; that observable normalization is conflicting."
         ],
         conflicting_fields=["witness_semantics"],
+        conflict_sources=["U006781", "U006782", "U006784"],
+    ),
+    C(
+        "canonical Boltzmann-weight Ising measure",
+        "U006773",
+        ["U006762", "U006763", "U006764", "U006765", "U006768", "U006769", "U006770", "U006771", "U006772", "U006773", "U006774", "U006781", "U006782", "U006784"],
+        template="declarative",
+        carrier="an n by n square array of spins",
+        state="a complete spin configuration s",
+        law="assign each spin configuration the canonical weight Exp[-beta e[s]], where e[s] is the four-neighbor Ising energy",
+        support="finite square grids and the n->infinity limit",
+        topology="a 2D four-neighbor square lattice",
+        alphabet="{+1,-1}",
+        input_value="array size n and inverse temperature beta",
+        boundary=None,
+        result="the canonical probability measure over spin configurations and its induced observables",
+        determinism="a probability measure, not a native time evolution",
+        witness="canonical averages that agree in the n->infinity limit with the stated fixed-energy results for most quantities",
+        params=[
+            ("array size n", "The thermodynamic comparison is stated in the n->infinity limit.", ["U006773"]),
+            ("inverse temperature beta", "Sets the configuration weight Exp[-beta e[s]] and parametrizes the exact magnetization/energy formulas.", ["U006769", "U006771", "U006773"]),
+        ],
+        uncertainties=[
+            "The source first defines m[s] as the sum of +/-1 spins but later calls m a +1-cell density and states m=p; that observable normalization is conflicting.",
+            "The finite-grid boundary and explicit normalization of the stated Exp[-beta e[s]] weights are not supplied for this canonical measure.",
+        ],
+        conflicting_fields=["witness_semantics"],
+        conflict_sources=["U006781", "U006782", "U006784"],
+    ),
+    C(
+        "Ising heat-bath Monte Carlo sampler",
+        "U006775",
+        ["U006773", "U006774", "U006775"],
+        template="stochastic_partial",
+        carrier="a finite square array of Ising spins plus a random spin-flip sampler",
+        state="the current complete spin configuration",
+        law=None,
+        support="a finite square lattice",
+        topology="the four-neighbor square-lattice energy model",
+        alphabet="{+1,-1}",
+        seed=None,
+        input_value="inverse temperature beta or the corresponding target canonical weights",
+        boundary=None,
+        external="random spin choices and random heat-bath decisions",
+        frontier="the spin selected for the next proposal",
+        schedule="repeated random spin-flip proposals; the sweep convention is not stated",
+        read=None,
+        write="flip the selected spin when the unspecified heat-bath procedure accepts the proposal",
+        result="a stochastic trajectory of spin configurations intended to sample the canonical measure",
+        successor="a probability measure over an unchanged or spin-flipped next configuration",
+        determinism="stochastic",
+        termination=None,
+        witness="empirical configuration frequencies approaching the target canonical probabilities",
+        params=[
+            (
+                "inverse temperature beta",
+                "Determines the target canonical configuration weights Exp[-beta e[s]].",
+                ["U006773"],
+            )
+        ],
+        uncertainties=[
+            "The source names random spin flipping and the heat-bath interpretation but supplies no proposal distribution, acceptance probability, sweep convention, seed, boundary, or stopping rule."
+        ],
+        unknown_fields={
+            "rule_relation_constraint_function_or_probability_law": "The in-scope source does not supply the heat-bath spin-flip acceptance law.",
+            "read_dependencies_or_neighborhood": "The in-scope source does not state which local or global quantities the heat-bath decision reads.",
+        },
     ),
     C(
         "deterministic checkerboard Ising cellular automaton",
@@ -1404,6 +1546,7 @@ CANDIDATES = [
         ],
         uncertainties=["The p/m statement conflicts with the earlier +/-1 magnetization definition: the source says m=p where normalized spin sum would be 2p-1."],
         conflicting_fields=["witness_semantics", "parameters_and_variants"],
+        conflict_sources=["U006781", "U006782", "U006784"],
     ),
     C(
         "site-percolation model",
@@ -1988,8 +2131,58 @@ CANDIDATES = [
         ],
     ),
     C(
-        "one-dimensional sandpile stabilization cellular automaton",
+        "d-dimensional conserved sandpile cellular-automaton family",
         "U006863",
+        ["U006863", "U006867"],
+        template="deterministic_partial",
+        carrier="a d-dimensional integer-valued cellular-automaton configuration",
+        state="the complete array s",
+        law=None,
+        support="a d-dimensional lattice",
+        topology=None,
+        alphabet="integer values with 2d final values",
+        seed="an initial d-dimensional configuration",
+        boundary=None,
+        external="none",
+        frontier=None,
+        schedule="discrete cellular-automaton steps",
+        read=None,
+        write=None,
+        result="a d-dimensional sandpile evolution and its final-value configuration",
+        successor="one for a fixed complete rule and initial configuration",
+        determinism="deterministic",
+        termination=None,
+        invariants="the total value of s is conserved",
+        witness="the complete evolution, including the more complicated behavior stated for some d>1 initial conditions",
+        params=[
+            (
+                "dimension d",
+                "Sets the cellular-automaton and final-value counts.",
+                ["U006863", "U006867"],
+            ),
+            (
+                "cellular-automaton count k=4d",
+                "The source identifies the d-dimensional family as k=4d.",
+                ["U006863"],
+            ),
+            (
+                "final-value count 2d",
+                "The source states that the generalized family has 2d final values.",
+                ["U006863"],
+            ),
+        ],
+        uncertainties=[
+            "The source states the dimensional family, k=4d, 2d final values, and conservation law, but does not write the generic d-dimensional local transition, topology, boundary, activation rule, or convergence condition."
+        ],
+        unknown_fields={
+            "rule_relation_constraint_function_or_probability_law": "The in-scope source does not supply the generic d-dimensional sandpile transition rule.",
+            "read_dependencies_or_neighborhood": "The in-scope source does not state the generic d-dimensional read neighborhood.",
+            "write_replacement_assembly_or_commit": "The in-scope source does not state the generic d-dimensional replacement or commit operation.",
+        },
+    ),
+    C(
+        "one-dimensional sandpile stabilization cellular automaton",
+        "U006864",
         ["U006863", "U006864", "U006865", "U006866", "U006867"],
         template="deterministic",
         carrier="a one-dimensional integer height list",
@@ -2011,6 +2204,13 @@ CANDIDATES = [
         termination="reaches a fixed point; time is reported to scale roughly as total initial value squared",
         invariants="total height is stated to be conserved in the d-dimensional family",
         witness="a fixed configuration with all values below 2",
+        params=[
+            (
+                "dimension d=1",
+                "The one-dimensional specialization has k=4 and 2 final values in the stated d-dimensional family.",
+                ["U006863", "U006864"],
+            )
+        ],
         variants=[("repeated center addition", "Repeatedly add at the center before stabilization/evolution.", ["U006865", "U006866"])],
         images=[("A000014", "CONTEXTUAL", "The evolution row shows typical one-dimensional stabilization histories.")],
     ),
@@ -2561,7 +2761,11 @@ def main() -> int:
             }:
                 field_sources[field] = law_eids
             elif status == "CONFLICTING_SOURCE":
-                field_sources[field] = strong_eids[:2]
+                conflict_sources = spec["conflict_sources"] or spec["sources"][:2]
+                field_sources[field] = [
+                    evidence_id_by_ref[(spec["id"], source)]
+                    for source in conflict_sources
+                ]
             elif status in {"NOT_APPLICABLE", "UNKNOWN_FROM_SOURCE"}:
                 field_sources[field] = [anchor_eid]
             else:

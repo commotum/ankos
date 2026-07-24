@@ -238,9 +238,14 @@ def candidate_definitions() -> list[dict[str, Any]]:
         variants: list[str] | None = None,
         item_evidence: str | None = None,
         identity_units: list[str] | None = None,
+        na_fields: list[str] | None = None,
         uncertainty: str = "",
         complete: bool = False,
     ) -> None:
+        explicit_na = na_fields or []
+        values = {
+            field: value for field, value in values.items() if field not in explicit_na
+        }
         ordered_units = [anchor] + [unit for unit in (units or []) if unit != anchor]
         rows.append(
             {
@@ -255,6 +260,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "variants": variants or [],
                 "item_evidence": item_evidence or mechanics or anchor,
                 "identity_units": identity_units or [],
+                "na_fields": explicit_na,
                 "uncertainty": uncertainty,
                 "complete": complete,
             }
@@ -553,6 +559,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="multipliers 3, 37, and 65539 in the displayed generator comparison",
         ),
         units=["U001720", "U001726", "U001727"],
+        mechanics="U001727",
         aliases=["linear congruential random number generator"],
         parameters=["31-bit width", "multiplier"],
         variants=["multiplier 3", "multiplier 37", "multiplier 65539"],
@@ -572,7 +579,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="two-dimensional and three-dimensional coordinate plots",
         ),
         units=["U001726", "U001727"],
-        mechanics="U001727",
         parameters=["coordinate dimension"],
         variants=["successive pairs", "successive triples"],
     )
@@ -886,14 +892,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "U001932",
             "U001933",
         ],
-        mechanics="U001825",
-        field_units={
-            "rule_relation_constraint_function_or_probability_law": [
-                "U001825",
-                "U001933",
-            ],
-            "parameters_and_variants": ["U001825", "U001933"],
-        },
         aliases=["binary phase-selecting cellular automaton from page 339"],
         parameters=["initial condition and its total quantity"],
         variants=["gray-interface expansion", "uniform-white or uniform-black phase selection"],
@@ -934,7 +932,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             result="continuous trajectories and eventual discrete-looking positions",
             variants="the four displayed double-well examples",
         ),
-        units=["U001831", "U001832", "U001833", "U001834", "U001835", "U001836", "U001837", "U001838"],
+        units=["U001832", "U001833", "U001834", "U001835", "U001836", "U001837", "U001838"],
         uncertainty="The force law, potential, damping, boundary, and numerical parameters are not stated.",
     )
     add(
@@ -1447,22 +1445,24 @@ def candidate_definitions() -> list[dict[str, Any]]:
         complete=True,
     )
     add(
-        "closed-curve finite-state recurrence process",
+        "deterministic finite-state eventual-periodicity relation",
         "U001935",
-        "EVOLUTION",
-        evolution(
-            "recurrent state-space trajectory",
-            "follow a closed curve, or deterministically revisit states in a finite reachable state set, so that a prior state is eventually repeated",
-            carrier="a closed geometric path or finite reachable state space",
-            alphabet="positions or system states",
-            state="the current position or state",
-            seed="a starting point or state",
-            activation="the current state",
-            neighborhood="the rule-defined successor of the current state",
-            result="a successor state on an eventually periodic trajectory",
-            variants="literal closed curve and finite-state recurrence",
-        ),
+        "RELATION",
+        relation(
+            "deterministic eventual-periodicity criterion",
+            "a deterministic trajectory is eventually recurrent when it follows a closed orbit or when its reachable state set is finite, because revisiting a state forces the subsequent trajectory to repeat",
+            carrier="a deterministic transition system together with one trajectory or orbit",
+            input_value="a deterministic transition rule and trajectory, or an initial state that delimits one",
+            result="an eventual-recurrence or eventual-periodicity judgment",
+            variants="closed-orbit criterion and finite-reachable-state criterion",
+        )
+        | {"law_kind": "declarative eventual-periodicity criterion"},
         units=["U001936", "U001937", "U001938", "U001939"],
+        mechanics="U001936",
+        aliases=["closed-curve recurrence criterion", "finite-state recurrence criterion"],
+        parameters=["deterministic trajectory", "reachable state set"],
+        variants=["closed orbit", "finite reachable-state set"],
+        na_fields=["native_time"],
         complete=True,
     )
     add(
@@ -2039,6 +2039,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
             set(definition["identity_units"]) <= set(definition["units"]),
             f"{definition['id']} identity evidence",
         )
+        check(
+            set(definition["na_fields"]) <= set(FIELDS),
+            f"{definition['id']} explicit not-applicable fields",
+        )
         definition["values"]["evidence_limit"] = (
             "Only mechanics stated or directly visible in the sealed Chapter 7 main-text bundle are supported; "
             "unstated profile fields remain unknown and profile-irrelevant fields are explicitly not applicable."
@@ -2111,7 +2115,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
             supported_fields.extend(
                 field
                 for field in FIELDS
-                if field in PROFILE_NA[definition["profile"]]
+                if field
+                in (
+                    PROFILE_NA[definition["profile"]]
+                    | set(definition["na_fields"])
+                )
                 and field not in definition["values"]
             )
         if is_mechanics:
@@ -2199,7 +2207,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 value = definition["values"][field]
                 reason = ""
                 check(ids, f"{definition['id']} supported field lacks evidence: {field}")
-            elif field in PROFILE_NA[definition["profile"]]:
+            elif field in (
+                PROFILE_NA[definition["profile"]]
+                | set(definition["na_fields"])
+            ):
                 status = "NOT_APPLICABLE"
                 value = None
                 reason = (
