@@ -327,7 +327,6 @@ RECOVERED_SPECS = [
                 "object_kind",
                 "carrier",
                 "law_kind",
-                "rule_relation_constraint_function_or_probability_law",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
@@ -339,6 +338,7 @@ RECOVERED_SPECS = [
             "input",
             "frontier_or_activation",
             "schedule",
+            "rule_relation_constraint_function_or_probability_law",
             "write_replacement_assembly_or_commit",
             "successor_cardinality",
             "determinism_branching_or_measure",
@@ -485,6 +485,24 @@ RECOVERED_SPECS = [
         "reverse the table of length-|os| base-k digit vectors",
         "all k^|os| neighborhood configurations in canonical order",
         related=["B0857"],
+        evidence_scopes={
+            "U006096": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006097": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "general cellular-automaton rule-number codec",
@@ -492,9 +510,59 @@ RECOVERED_SPECS = [
         "rule-table codec",
         "k-color cellular-automaton rule table over arbitrary offsets",
         "ordered output table u or rule number num, alphabet size k, and offsets os",
-        "encode with FromDigits[Reverse[u], k] and decode base-k digits in the stated neighborhood order",
-        "a canonical rule number, rule table, or equivalent one-step lookup",
+        (
+            "encode with FromDigits[Reverse[u], k] and recover the indexed "
+            "base-k output digits in the stated neighborhood order"
+        ),
+        "a canonical rule number or decoded rule-output table",
         related=["B0857"],
+        semantic_values={
+            "excluded_observers_and_representations": (
+                "The Map/ListCorrelate whole-state cellular-automaton update "
+                "is an application of the decoded table governed by B0857, "
+                "not part of this representation codec."
+            )
+        },
+        not_applicable_exclusions={
+            "excluded_observers_and_representations",
+        },
+        evidence_scopes={
+            "U006096": [
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006098": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            "U006099": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+            ],
+            "U006101": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+            ],
+        },
+        identity_unit="U006098",
     ),
     _spec(
         "two-dimensional cellular-automaton rule-family cardinality query",
@@ -505,6 +573,23 @@ RECOVERED_SPECS = [
         "return the exact tabled number of possible rules for the selected class",
         "one finite rule-family cardinality",
         related=["B0858", "B0859", "B0860"],
+        evidence_scopes={
+            "U006102": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006105": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "growth-totalistic trigger-list-to-outer-totalistic-code encoder",
@@ -515,6 +600,29 @@ RECOVERED_SPECS = [
         "encode forced persistence plus the trigger list using either stated equivalent power-sum parameterization",
         "one outer-totalistic code number for the growth rule",
         related=["B0859", "B0860"],
+        evidence_scopes={
+            "U006103": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006104": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U006110": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "symmetric-5-neighbor-to-general-rule-code converter",
@@ -525,6 +633,37 @@ RECOVERED_SPECS = [
         "expand each symmetry-class bit to its 32 general-neighborhood positions and read the result as a base-2 number",
         "one equivalent general-form rule number",
         related=["B0861"],
+        evidence_scopes={
+            "U006106": [
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006107": [
+                "carrier",
+                "input",
+                "parameters_and_variants",
+            ],
+            "U006108": [
+                "object_kind",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006109": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
+        identity_unit="U006108",
     ),
     _spec(
         "two-dimensional Turing-machine head-position trajectory observer",
@@ -548,6 +687,30 @@ RECOVERED_SPECS = [
         "test each transposed pair of position-digit sequences against form and emit 1 exactly when it is absent",
         "one complete step-n binary substitution pattern",
         related=["B0897", "B0898"],
+        evidence_scopes={
+            "U006147": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006148": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U006149": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "five-dimensional cut-and-project Penrose tiling generator",
@@ -555,7 +718,10 @@ RECOVERED_SPECS = [
         "cut-and-project tiling generator",
         "a two-dimensional plane through a five-dimensional hypercubic lattice",
         "a plane whose slopes are based on GoldenRatio",
-        "project the plane/lattice intersection to obtain the induced tiling",
+        (
+            "derive the tiling from how the selected two-dimensional plane "
+            "cuts through the five-dimensional hypercubic lattice"
+        ),
         "a Penrose tiling with approximate fivefold symmetry",
         related=["B0904"],
         missing_mechanics=[
@@ -635,6 +801,23 @@ RECOVERED_SPECS = [
         "a gridded pattern and selected moment orders",
         "compute mean, variance, and higher moments of grid-square gray amount",
         "generalized fractal-dimension descriptors",
+        limit=(
+            "The source identifies distribution moments as possible "
+            "descriptors but does not fix grid origin, gray normalization, "
+            "moment orders, descriptor mapping, or reporting convention."
+        ),
+        missing_mechanics=[
+            "Grid placement, gray-mass normalization, selected moments, the "
+            "moment-to-descriptor map, and reporting conventions are omitted."
+        ],
+        cardinality=(
+            "one descriptor collection only after the omitted grid, "
+            "normalization, moment, mapping, and reporting choices are supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic descriptor "
+            "collection from the pattern alone"
+        ),
     ),
     _spec(
         "Julia-set zero-membership to Mandelbrot-boundary relation",
@@ -645,6 +828,28 @@ RECOVERED_SPECS = [
         "accept exactly when the Julia set for c contains z=0",
         "membership in the boundary of the Mandelbrot set",
         related=["B0912", "B0913"],
+        evidence_scopes={
+            "U006202": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006203": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "determinism_branching_or_measure",
+                "witness_semantics",
+                "parameters_and_variants",
+            ],
+            "U006204": [
+                "result_kind",
+                "witness_semantics",
+            ],
+        },
     ),
     _spec(
         "Julia-set nearest-distance field observer",
@@ -1277,6 +1482,23 @@ RECOVERED_SPECS = [
         "an ordered geometric-substitution evolution history",
         "stack successive pattern states along a third display axis",
         "one three-dimensional space-time history object",
+        limit=(
+            "The source identifies a stacked three-dimensional visualization "
+            "of successive states but gives no unique orientation, spacing, "
+            "alignment, or rendering convention."
+        ),
+        missing_mechanics=[
+            "Within-layer alignment, axis orientation, layer spacing, and "
+            "rendering geometry are not specified."
+        ],
+        cardinality=(
+            "one layered representation only after the omitted alignment, "
+            "orientation, spacing, and rendering choices are supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic rendered "
+            "three-dimensional visualization from the history alone"
+        ),
     ),
     _spec(
         "stacked multiway-state evolution representation",
@@ -2119,6 +2341,14 @@ def _new_candidate(
         for field, status in field_support.items()
         if status == "UNKNOWN_FROM_SOURCE"
     )
+    missing_reason = (
+        "The assigned source leaves these remaining fingerprint fields "
+        f"UNKNOWN_FROM_SOURCE for {name}: {', '.join(missing)}"
+        if missing
+        else ""
+    )
+    for field in missing:
+        fingerprint[field]["reason"] = missing_reason
     record: dict[str, Any] = {
         "id": candidate_id,
         "record_status": "ACTIVE",
@@ -2144,15 +2374,7 @@ def _new_candidate(
         "variants": [],
         "missing_mechanics": [
             *exact_missing_mechanics,
-            *(
-                [
-                    "The assigned source leaves these remaining fingerprint "
-                    "fields UNKNOWN_FROM_SOURCE: "
-                    + ", ".join(missing)
-                ]
-                if missing
-                else []
-            ),
+            *([missing_reason] if missing_reason else []),
         ],
         "uncertainties": uncertainties,
         "related_candidate_ids": related_candidate_ids,
