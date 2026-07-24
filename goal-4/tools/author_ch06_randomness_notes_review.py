@@ -169,22 +169,30 @@ PROFILE_NA: dict[str, set[str]] = {
     "ca1d": {
         "visible_history",
         "control_state",
+        "seed",
+        "input",
         "external_data",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "ca2d": {
         "visible_history",
         "control_state",
+        "seed",
+        "input",
         "external_data",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "map": {
         "visible_history",
         "control_state",
         "seed",
+        "input",
         "boundary",
         "external_data",
         "read_dependencies_or_neighborhood",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "stochastic": {
@@ -194,6 +202,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "external_data",
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "generator": {
@@ -207,12 +216,14 @@ PROFILE_NA: dict[str, set[str]] = {
         "schedule",
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "seed": {
         "native_time",
         "visible_history",
         "control_state",
+        "input",
         "boundary",
         "external_data",
         "frontier_or_activation",
@@ -220,6 +231,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
         "successor_cardinality",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "observer": {
@@ -241,6 +253,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "write_replacement_assembly_or_commit",
         "successor_cardinality",
         "determinism_branching_or_measure",
+        "parameters_and_variants",
         "witness_semantics",
     },
     "constraint": {
@@ -255,6 +268,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "write_replacement_assembly_or_commit",
         "successor_cardinality",
         "determinism_branching_or_measure",
+        "parameters_and_variants",
     },
     "representation": {
         "native_time",
@@ -274,6 +288,7 @@ PROFILE_NA: dict[str, set[str]] = {
         "read_dependencies_or_neighborhood",
         "write_replacement_assembly_or_commit",
         "successor_cardinality",
+        "parameters_and_variants",
         "witness_semantics",
     },
 }
@@ -383,7 +398,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006341",
             1,
             "seed",
-            [ev("U006341", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A random initial condition is assigned average black-cell density 1/2.", SEED_FIELDS)],
+            [ev("U006341", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A random initial condition is assigned average black-cell density 1/2.", SEED_FIELDS + ["parameters_and_variants"])],
             values={
                 "carrier": "a cellular-automaton cell array",
                 "support": "random black/white configurations",
@@ -627,7 +642,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006360",
             1,
             "seed",
-            [ev("U006360", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Systems whose initial states contain an infinite element sequence can take that sequence at random, while a mobile head retains a definite initial location.", SEED_FIELDS)],
+            [ev("U006360", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Systems whose initial states contain an infinite element sequence can take that sequence at random, while a mobile head retains a definite initial location.", SEED_FIELDS + ["parameters_and_variants"])],
             values={
                 "carrier": "an infinite sequence of cells, symbols, or digits",
                 "support": "infinite initial sequences compatible with the target system",
@@ -1337,7 +1352,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006443",
             1,
             "map",
-            [ev("U006443", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "A map x -> f[x] with polynomial f, including f[x]=a x(1-x), is explicitly delimited.", MAP_FIELDS)],
+            [ev("U006443", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "A map x -> f[x] with polynomial f, including f[x]=a x(1-x), is explicitly delimited.", MAP_FIELDS + ["parameters_and_variants"])],
             values={
                 "carrier": "real values",
                 "complete_state": "the current real value x",
@@ -1351,7 +1366,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006443",
             2,
             "constraint",
-            [ev("U006444", "CODE", "DIRECT_COMPLETE_MECHANICS", "Real period-p return points are selected from solutions of Nest[f,x,p]==x.", CONSTRAINT_FIELDS)],
+            [ev("U006444", "CODE", "DIRECT_COMPLETE_MECHANICS", "Real period-p return points are selected from solutions of Nest[f,x,p]==x.", CONSTRAINT_FIELDS + ["parameters_and_variants"])],
             values={
                 "input": "an iterated function f and requested period p",
                 "carrier": "real candidate initial values x",
@@ -1478,7 +1493,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "the source fixes the period-3 ■■□ background and a single black insertion",
             },
             variants=[("■■□ background", "single black cell on the repeated period-3 background")],
-            related=["elementary cellular automaton rule 22"],
+            related=["finite cyclic rule-90 polynomial cellular automaton"],
         ),
         spec(
             "elementary-rule pattern-uniqueness analyzer",
@@ -1486,7 +1501,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             2,
             "observer",
             [
-                ev("U006469", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Starting every elementary rule from one black cell, the analyzer sorts successive configurations and counts distinct configurations and complete patterns across all 256 rules.", OBS_FIELDS + ["parameters_and_variants"]),
+                ev("U006469", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Starting every elementary rule from one black cell, the analyzer sorts successive configurations and counts distinct configurations and complete patterns across all 256 rules.", OBS_FIELDS + ["parameters_and_variants", "excluded_observers_and_representations"]),
                 ev("U006470", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders the sorted configuration comparison across the 256 elementary rules.", ["result_kind", "excluded_observers_and_representations"], p + "_page_971_Figure_11.jpeg"),
             ],
             values={
@@ -1697,7 +1712,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006497", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The number s_n of length-n paths is obtained from powers of the network adjacency matrix.", OBS_FIELDS),
+                ev("U006497", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The number s_n of length-n paths is obtained from powers of the network adjacency matrix.", OBS_FIELDS + ["parameters_and_variants"]),
                 ev("U006498", "CODE", "DIRECT_COMPLETE_MECHANICS", "The path-count implementation sums all entries of MatrixPower[m,n].", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
                 ev("U006499", "PROSE", "CONTEXTUAL", "The source introduces the network adjacency matrix used by the path-count formula.", ["input"]),
                 ev("U006500", "CODE", "DIRECT_COMPLETE_MECHANICS", "The adjacency matrix code increments m[i,j] for each network arc from node i to node j.", ["input", "rule_relation_constraint_function_or_probability_law"]),
@@ -1728,6 +1743,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                         "rule_relation_constraint_function_or_probability_law",
                         "result_kind",
                         "termination_completion_failure",
+                        "parameters_and_variants",
                     ],
                 )
             ],
@@ -2201,7 +2217,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006558", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For the first indexed code-20 initial conditions, the source records steps survived and counts seeds said to lead to persistent structures over stated sample bounds.", OBS_FIELDS + ["parameters_and_variants"]),
+                ev("U006558", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For the first indexed code-20 initial conditions, the source records steps survived and counts seeds said to lead to persistent structures over stated sample bounds.", OBS_FIELDS + ["parameters_and_variants", "excluded_observers_and_representations"]),
                 ev("U006559", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders survival times for the first 1000 initial conditions.", ["result_kind", "excluded_observers_and_representations"], p + "_page_979_Figure_4.jpeg"),
             ],
             values={
@@ -2589,8 +2605,8 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006348", "page 70", "totalistic class-4 rule 1599 example", "PAGE", ["three-color one-dimensional totalistic class-4 preset family"]),
         ("U006348", "page 67", "totalistic class-4 rule 1635 example", "PAGE", ["three-color one-dimensional totalistic class-4 preset family"]),
         ("U006348", "page 68", "totalistic class-4 rule 2049 example", "PAGE", ["three-color one-dimensional totalistic class-4 preset family"]),
-        ("U006350", "page 240", "printed undecidability discussion", "PAGE", []),
-        ("U006350", "page 1138", "undecidability of cellular-automaton class tests", "PAGE", []),
+        ("U006350", "page 240", "printed undecidability discussion", "PAGE", ["class-1 no-surviving-pattern decision query"]),
+        ("U006350", "page 1138", "undecidability of cellular-automaton class tests", "PAGE", ["class-1 no-surviving-pattern decision query"]),
         ("U006350", "page 244", "printed continuous-cellular-automaton discussion", "PAGE", ["continuously parameterized cellular automaton family"]),
         ("U006350", "page 922", "continuous cellular-automaton mechanics", "PAGE", ["continuously parameterized cellular automaton family"]),
         ("U006351", "page 249", "printed Game of Life construction", "PAGE", ["Game of Life cellular automaton"]),
@@ -2601,9 +2617,11 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006360", "page 1070", "randomness for finite integer representations", "PAGE", ["random infinite-sequence initial-condition generator"]),
         ("U006360", "pages 963 and 1038", "random networks as initial conditions for network systems", "PAGE", ["random infinite-sequence initial-condition generator"]),
         ("U006360", "page 920", "random initial conditions across other system classes", "PAGE", ["random infinite-sequence initial-condition generator"]),
-        ("U006362", "page 251", "printed perturbation-propagation properties", "PAGE", ["cellular-automaton difference-pattern transform", "cellular-automaton perturbation-growth Lyapunov analyzer"]),
-        ("U006363", "page 601", "one-sided perturbation propagation in rule 30", "PAGE", ["cellular-automaton difference-pattern transform"]),
-        ("U006363", "page 871", "rule-30 nonrepetitive-region growth rate", "PAGE", ["cellular-automaton difference-pattern transform"]),
+        ("U006362", "page 251", "printed perturbation-propagation properties", "PAGE", ["cellular-automaton difference-pattern observer", "cellular-automaton perturbation-growth Lyapunov analyzer"]),
+        ("U006363", "page 601", "one-sided perturbation propagation in rule 30", "PAGE", ["cellular-automaton difference-pattern observer"]),
+        ("U006363", "page 871", "rule-30 nonrepetitive-region growth rate", "PAGE", ["cellular-automaton difference-pattern observer"]),
+        ("U006365", "page 976", "two-dimensional difference-region shape and Central Limit context", "PAGE", ["cellular-automaton difference-pattern observer", "two-k-color cellular-automaton difference-emulation lift"]),
+        ("U006367", "page 155", "exponential sensitivity analogy", "PAGE", ["cellular-automaton perturbation-growth Lyapunov analyzer"]),
         ("U006367", "page 921", "Lyapunov exponents for number-based dynamical systems", "PAGE", ["cellular-automaton perturbation-growth Lyapunov analyzer"]),
         ("U006369", "page 255", "printed cyclic-addition construction", "PAGE", ["cyclic addition dot system"]),
         ("U006369", "page 613", "full-period cyclic-addition parameter pairs", "PAGE", ["cyclic addition dot system"]),
@@ -2614,8 +2632,9 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006377", "page 963", "finite cellular-automaton state-count context", "PAGE", ["primitive spatial-period state-count function"]),
         ("U006385", "page 260", "rule-90 repetition-period figure assumptions", "PAGE", ["finite cyclic rule-90 repetition-period bound function"]),
         ("U006386", "page 962", "finite-size period exceptions", "PAGE", ["finite cyclic rule-60 polynomial cellular automaton", "finite cyclic rule-60 repetition-period bound function", "finite-ring cellular-automaton repetition-period comparison survey"]),
+        ("U006386", "page 1087", "longest-period comparison across elementary rules and symmetries", "PAGE", ["finite-ring cellular-automaton repetition-period comparison survey"]),
         ("U006388", "page 865", "bitwise cellular-automaton representation", "PAGE", ["finite cellular-automaton boundary implementation codec"]),
-        ("U006390", "page 263", "printed rule-22 and rule-225 discussion", "PAGE", ["elementary cellular automaton rule 22", "elementary cellular automaton rule 225"]),
+        ("U006390", "page 263", "printed rule-22 and rule-225 discussion", "PAGE", ["elementary cellular automaton rule 22", "rule-22 randomness-producing seed family", "elementary cellular automaton rule 225"]),
         ("U006390", "page 58", "single-cell rule-225 nested pattern", "PAGE", ["elementary cellular automaton rule 225"]),
         ("U006390", "page 949", "rule-22 difference-region spread rate", "PAGE", ["cellular-automaton perturbation-growth Lyapunov analyzer"]),
         ("U006395", "page 955", "nested patterns from modular-additive rules", "PAGE", ["weighted additive cellular automaton family"]),
@@ -2637,12 +2656,12 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006439", "page 958", "finite-complement language mechanics", "PAGE", ["exact-period-p repeating-configuration constraint for one-dimensional cellular automata"]),
         ("U006440", "page 700", "additional repeating-configuration examples", "PAGE", ["exact-period-p repeating-configuration constraint for one-dimensional cellular automata"]),
         ("U006441", "pages 281 and 1118", "localized-structure construction", "PAGE", []),
-        ("U006441", "page 942", "two-dimensional constraint mechanics", "PAGE", []),
-        ("U006441", "page 1139", "complexity of two-dimensional repeating configurations", "PAGE", []),
-        ("U006441", "page 349", "stripe reduction of two-dimensional configurations", "PAGE", []),
+        ("U006441", "page 942", "two-dimensional constraint mechanics", "PAGE", ["two-dimensional repeating-configuration constraint"]),
+        ("U006441", "page 1139", "complexity of two-dimensional repeating configurations", "PAGE", ["two-dimensional repeating-configuration constraint"]),
+        ("U006441", "page 349", "stripe reduction of two-dimensional configurations", "PAGE", ["two-dimensional repeating-configuration constraint"]),
         ("U006442", "page 150", "iterated-map definition", "PAGE", ["modular multiplication circle map"]),
         ("U006442", "page 914", "continued-fraction map mechanics", "PAGE", ["continued-fraction map"]),
-        ("U006445", "page 961", "explicit solutions of polynomial-map periodic points", "PAGE", ["period-p point query for an iterated map"]),
+        ("U006445", "page 961", "explicit solutions of polynomial-map periodic points", "PAGE", ["p-return point query for an iterated map"]),
         ("U006448", "page 869", "Cantor-set view of cellular automata", "PAGE", ["Sarkovskii period-implication relation"]),
         ("U006449", "page 269", "printed rule-emulation and renormalization discussion", "PAGE", ["renormalization-group blocking transformation"]),
         ("U006449", "pages 702 and 1118", "rule emulations", "PAGE", []),
@@ -2657,7 +2676,7 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006461", "page 886", "associative cellular-automaton rules", "PAGE", ["associative-operation cellular automaton family"]),
         ("U006468", "page 887", "noncommutative associative example", "PAGE", ["associative-operation cellular automaton family"]),
         ("U006468", "page 952", "generalized-additive implication for nested behavior", "PAGE", ["associative-operation cellular automaton family", "generalized-additive monoid cellular automaton family"]),
-        ("U006469", "page 701", "rule-45 nested background seed", "PAGE", []),
+        ("U006469", "page 701", "rule-45 nested background seed", "PAGE", ["rule-45 nested-background seed preset"]),
         ("U006469", "page 1186", "pattern-equivalence counts", "PAGE", ["elementary-rule pattern-uniqueness analyzer"]),
         ("U006471", "page 272", "printed nested-initial-condition examples", "PAGE", ["nested-sequence initial-condition family for rule 90"]),
         ("U006471", "page 83", "nested sequence generators", "PAGE", ["nested-sequence initial-condition family for rule 90"]),
@@ -2668,11 +2687,12 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006493", "page 278", "printed finite-network growth properties", "PAGE", ["cellular-automaton image-network growth and maximum-size analyzer"]),
         ("U006493", "page 891", "regular-language and substitution-system connections", "PAGE", []),
         ("U006504", "page 1084", "topological entropy", "PAGE", ["spatial topological-entropy analyzer"]),
-        ("U006504", "page 1138", "undecidability of limiting entropy bounds", "PAGE", ["spatial topological-entropy analyzer"]),
-        ("U006518", "page 83", "substitution-system construction of nested Cantor sets", "PAGE", ["sequence-set to Cantor-set encoding"]),
+        ("U006504", "page 1138", "undecidability of limiting entropy bounds", "PAGE", ["spatial topological-entropy analyzer", "limiting spatial-entropy bound decision query"]),
+        ("U006518", "page 83", "substitution-system construction of nested Cantor sets", "PAGE", ["sequence-set to Cantor-set encoding", "finite sequence-network to substitution-system transform"]),
         ("U006518", "page 869", "cellular automata as global state-space maps", "PAGE", ["cellular-automaton surjectivity decision query", "cellular-automaton injectivity, bijectivity, and reversibility decision relation"]),
         ("U006518", "pages 601 and 1087", "additivity criteria for surjectivity", "PAGE", ["cellular-automaton surjectivity decision query"]),
         ("U006518", "page 957", "minimal-automaton surjectivity test", "PAGE", ["cellular-automaton surjectivity decision query"]),
+        ("U006518", "page 1085", "surjective cellular-automaton rules used as DES S-box input", "PAGE", ["cellular-automaton surjectivity decision query"]),
         ("U006519", "page 1017", "reversible cellular automata", "PAGE", ["cellular-automaton injectivity, bijectivity, and reversibility decision relation"]),
         ("U006520", "page 1138", "two-dimensional undecidability of injectivity and surjectivity", "PAGE", ["cellular-automaton surjectivity decision query", "cellular-automaton injectivity, bijectivity, and reversibility decision relation"]),
         ("U006527", "page 878", "sliding-block codes as cellular automata", "PAGE", ["full left-shift symbolic dynamical system"]),
@@ -2818,20 +2838,13 @@ def main() -> None:
             if image_path not in {record["image"] for record in augmented if record["image"]}:
                 image_unit = asset_by_path[image_path]["source_unit_id"]
                 assert image_unit in unit_by_id
-                profile_values = dict(PROFILES[item["profile"]])
-                profile_values.update(item["values"])
-                contextual_fields = (
-                    ["excluded_observers_and_representations"]
-                    if "excluded_observers_and_representations" in profile_values
-                    else []
-                )
                 augmented.append(
                     ev(
                         image_unit,
                         "IMAGE",
                         "CONTEXTUAL",
                         f"Original-resolution inspection confirms the bundled visual witness for {item['name']}.",
-                        contextual_fields,
+                        [],
                         image_path,
                     )
                 )
@@ -3065,7 +3078,7 @@ def main() -> None:
         "U006517": "The stated generalized q-entropy maximum +1 and monotonicity conflict with the sign of the formula printed in U006516.",
     }
     historical_units = {"U006527", "U006528", "U006529"}
-    cross_only_units = {"U006440", "U006441", "U006448", "U006520", "U006591"}
+    cross_only_units = {"U006440", "U006448", "U006520", "U006591"}
     for row, unit in zip(reading_rows, units):
         updated = dict(row)
         unit_id = row["source_unit_id"]
