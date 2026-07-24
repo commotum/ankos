@@ -43,7 +43,7 @@ EMBEDDED_BASE_OUTPUT_SHA256 = (
     "14d7d80028430854ef8cd618587a068f37d6bc7963527c1442b3fb20fb6b8596"
 )
 EXPECTED_OUTPUT_SHA256 = (
-    "40045de7508cdb6677e8d887cc6514f420bb8259ee3d27bbf61cc5c3f2fa1fc4"
+    "9f39dc4fd1149495cc44fb94dad57006337729b5efd28ee5eb4c6ba47ea2f139"
 )
 
 READING_IMMUTABLE_FIELDS = (
@@ -71,6 +71,60 @@ ASSET_IMMUTABLE_FIELDS = (
     "assignment_stage",
     "assignment_basis",
     "reference_status",
+)
+WITHIN_STAGE_ROUTE_REPAIRS = frozenset(
+    {
+        (
+            "U006899",
+            "page 378",
+            "cellular-automaton fluids",
+        ),
+        (
+            "U006909",
+            "page 378",
+            "global CA flow results",
+        ),
+        (
+            "U006917",
+            "page 377",
+            "Bénard convection",
+        ),
+        (
+            "U006929",
+            "page 1012",
+            "reaction–diffusion biological form",
+        ),
+        (
+            "U006934",
+            "page 1006",
+            "branching-model properties",
+        ),
+        (
+            "U006952",
+            "page 1011",
+            "discrete symmetry",
+        ),
+        (
+            "U006952",
+            "page 1010",
+            "harmonic growth",
+        ),
+        (
+            "U006969",
+            "page 1007",
+            "harmonic flat growth",
+        ),
+        (
+            "U006975",
+            "page 428",
+            "shell-pattern CA",
+        ),
+        (
+            "U006981",
+            "page 1004",
+            "diffusion in development",
+        ),
+    }
 )
 
 # Deterministic payload: zlib level-9 compressed, Base85-encoded accepted output.
@@ -160,14 +214,19 @@ def _validate_projection(
 
 
 def _apply_merge_preview_repairs(output: dict[str, object]) -> None:
-    """Apply the two canonical merge-preview findings to the sealed base."""
+    """Apply the canonical merge-preview findings to the sealed base."""
 
     readings = output.get("reading_updates")
     assets = output.get("asset_updates")
-    if not isinstance(readings, list) or not isinstance(assets, list):
+    routes = output.get("route_proposals")
+    if (
+        not isinstance(readings, list)
+        or not isinstance(assets, list)
+        or not isinstance(routes, list)
+    ):
         raise AuthoringError("embedded accepted output lacks review projections")
 
-    route_rows = [
+    review_rows = [
         row
         for row in readings
         if isinstance(row, dict) and row.get("source_unit_id") == "U006884"
@@ -177,12 +236,12 @@ def _apply_merge_preview_repairs(output: dict[str, object]) -> None:
         for row in assets
         if isinstance(row, dict) and row.get("asset_id") == "A000055"
     ]
-    if len(route_rows) != 1 or len(native_assets) != 1:
+    if len(review_rows) != 1 or len(native_assets) != 1:
         raise AuthoringError("merge-preview repair anchors are not unique")
 
-    route_row = route_rows[0]
-    route_row["review_disposition"] = "CROSS_REFERENCE"
-    route_row["evidence_statement"] = (
+    review_row = review_rows[0]
+    review_row["review_disposition"] = "CROSS_REFERENCE"
+    review_row["evidence_statement"] = (
         "Routes the polycrystalline multi-seed region-boundary comparison to "
         "page 1038 for Voronoi regions (WR0004); the pending target is required "
         "before crediting any additional construction mechanics."
@@ -196,6 +255,29 @@ def _apply_merge_preview_repairs(output: dict[str, object]) -> None:
         "labels or rule table are embedded, so only the visible sequence was "
         "transcribed."
     )
+
+    repaired_route_identities: set[tuple[object, object, object]] = set()
+    for route in routes:
+        if not isinstance(route, dict):
+            raise AuthoringError("embedded route proposal is not an object")
+        identity = (
+            route.get("source_unit_id"),
+            route.get("literal_target"),
+            route.get("expected_topic"),
+        )
+        if identity not in WITHIN_STAGE_ROUTE_REPAIRS:
+            continue
+        if (
+            identity in repaired_route_identities
+            or route.get("closure_scope") != "CROSS_RANGE"
+        ):
+            raise AuthoringError(
+                "within-stage route repair anchor is duplicated or drifted"
+            )
+        route["closure_scope"] = "WITHIN_STAGE"
+        repaired_route_identities.add(identity)
+    if repaired_route_identities != WITHIN_STAGE_ROUTE_REPAIRS:
+        raise AuthoringError("within-stage route repair anchors are incomplete")
 
 
 def _accepted_output(bundle: Path) -> bytes:

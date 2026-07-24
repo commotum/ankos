@@ -948,9 +948,10 @@ _ROUTE_DATA: tuple[tuple[str, ...], ...] = (
         "U002090-U002091",
         "A001129",
         (
-            "The labeled physical-flow catalog contains the reviewed Bénard "
-            "convection panel and caption as observational comparison "
-            "evidence; it supplies no native convection state or update law."
+            "The labeled physical-flow catalog contains the reviewed "
+            "\"convection cells\" panel that the source identifies as its "
+            "Bénard comparison. This is observational evidence; the landing "
+            "supplies no native convection state or update law."
         ),
     ),
     (
@@ -1042,13 +1043,14 @@ _ROUTE_DATA: tuple[tuple[str, ...], ...] = (
         "PAGE",
         "page 428",
         "shell-pattern CA",
-        "U002364-U002366",
+        "U002365-U002366",
         "A001173",
         (
             "The landing gives the distance-weighted two-dimensional "
             "cellular-automaton pigmentation model and its full reviewed "
-            "array of stationary shell-like patterns across the two "
-            "weight parameters."
+            "array of stationary animal-pigmentation patterns across the "
+            "two weight parameters. The source supplies the cowrie analogy; "
+            "the landing specifies no shell-specific law."
         ),
     ),
     (
