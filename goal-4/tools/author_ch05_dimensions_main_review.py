@@ -189,7 +189,6 @@ SOURCE_EVIDENCE_OVERRIDES = {
         {
             "structural_invariants",
             "parameters_and_variants",
-            "excluded_observers_and_representations",
             "evidence_limit",
         },
     ),
@@ -664,7 +663,7 @@ def profile_blueprint(
             "write_replacement_assembly_or_commit": "reroute outgoing connections according to the supplied local rule",
             "result_kind": "a successor binary-outdegree network",
             "parameters_and_variants": "the two-outgoing restriction and the supplied local rerouting rule",
-            "excluded_observers_and_representations": "node layout and nested drawings are representations, not mechanics",
+            "excluded_observers_and_representations": "placing one connection above and one below the node line is a display convention for distinguishing the two outgoing slots",
             "evidence_limit": "only the two-outgoing restriction and generic local rerouting described here are asserted; support, topology, seed, schedule, successor count, and determinism remain unknown",
         }
         na = {
@@ -1127,6 +1126,11 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "parameters_and_variants": (
                 "SUPPORTED",
                 "the totalistic output map over the center cell plus its four orthogonal neighbors",
+            ),
+            "support": ("UNKNOWN_FROM_SOURCE", None),
+            "excluded_observers_and_representations": (
+                "SUPPORTED",
+                "the checked five-site rule stencil is a representation of the local input, not an evolution history",
             ),
             "evidence_limit": (
                 "SUPPORTED",
@@ -1794,6 +1798,12 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         parameters={
             "replacement set": "three checked graphical replacements",
             "seed": "the checked two-element initial sequence",
+        },
+        overrides={
+            "excluded_observers_and_representations": (
+                "SUPPORTED",
+                "the checked panel's page placement and rendered evolution are not part of the replacement rule or seed",
+            ),
         },
         parent_index=multiway,
     )
