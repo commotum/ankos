@@ -135,7 +135,7 @@ EXPECTED_PRIOR_HISTORY = {
         "mode": "REOPEN",
         "reviewer": "ch04-numbers-reopen-e2",
     },
-    # Filled with the deterministic V000021 successor after S011 preview.
+    # Deterministic V000021 successor established by the S011 dry-run.
     "S012": {
         "review_id": "V000021",
         "event_sha256": (
