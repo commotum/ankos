@@ -178,7 +178,8 @@ def profile_blueprint(
             "evidence_limit": "only mechanics explicitly stated or checked in the assigned source are asserted",
         }
         na = {"visible_history", "control_state", "input", "external_data"}
-        unknown = {"seed", "boundary", "termination_completion_failure", "witness_semantics"}
+        na.update({"termination_completion_failure", "witness_semantics"})
+        unknown = {"seed", "boundary"}
     elif kind == "TM2":
         supported = {
             "object_kind": "two-dimensional Turing machine",
@@ -250,11 +251,11 @@ def profile_blueprint(
             "visible_history",
             "control_state",
             "input",
+            "boundary",
             "external_data",
             "termination_completion_failure",
             "witness_semantics",
         }
-        unknown = {"boundary"}
     elif kind == "GRAPH":
         supported = {
             "object_kind": "directed graph/network object",
@@ -360,7 +361,7 @@ def profile_blueprint(
             "native_time": "none; the source contrasts constraints with explicit evolution rules",
             "structural_invariants": "every accepted object satisfies the stated constraints",
             "law_kind": "declarative constraint relation",
-            "rule_relation_constraint_function_or_probability_law": name,
+            "rule_relation_constraint_function_or_probability_law": "a supplied set of constraints to satisfy",
             "write_replacement_assembly_or_commit": "not applicable; the source supplies conditions to satisfy rather than an update",
             "result_kind": "the set of objects that satisfy the constraints",
             "successor_cardinality": "not applicable; there is no native successor relation",
@@ -857,10 +858,14 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "IMAGE",
             "A000882",
             ordinal,
-            ["U001060"],
+            ["U001059", "U001060"],
             ["A000882"],
             aliases=[f"neighbor-dependent preset ({label})"],
-            parameters={"panel": label, "horizon": "eight steps"},
+            parameters={
+                "panel": label,
+                "horizon": "eight steps",
+                "boundary": "grid wraps in both dimensions",
+            },
             parent_index=neighbor_sub,
         )
 
@@ -1099,6 +1104,13 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["U001145", "U001147"],
         ["A000903"],
         parameters={"eventual state set": "all states beginning with a white cell"},
+        overrides={
+            "seed": ("UNKNOWN_FROM_SOURCE", None),
+            "rule_relation_constraint_function_or_probability_law": (
+                "UNKNOWN_FROM_SOURCE",
+                None,
+            ),
+        },
         parent_index=multiway,
         route_keys=["page-205-rapid-multiway"],
     )
@@ -1438,7 +1450,9 @@ def build_route_specs() -> list[dict[str, str]]:
         ("page-216-constraint-family", "U001212", "page 216", "PAGE", "required-template constraint family", "WITHIN_STAGE"),
     ]
     result = []
+    anchor_ordinals: dict[str, int] = defaultdict(int)
     for ordinal, (key, unit, literal, kind, topic, scope) in enumerate(specs, 1):
+        anchor_ordinals[unit] += 1
         result.append(
             {
                 "key": key,
@@ -1448,7 +1462,7 @@ def build_route_specs() -> list[dict[str, str]]:
                 "discovery_epoch": EPOCH,
                 "discovery_kind": "SOURCE_UNIT",
                 "discovery_id": unit,
-                "discovery_ordinal": "1",
+                "discovery_ordinal": str(anchor_ordinals[unit]),
                 "literal_target": literal,
                 "route_kind": kind,
                 "expected_topic": topic,
@@ -1600,8 +1614,40 @@ def candidate_records(
     for index, spec in enumerate(specs):
         candidate_id = candidate_ids[index]
         name = spec["name"]
+        effective_overrides = dict(spec["overrides"])
+        seed_descriptions = [
+            description
+            for key, description in spec["parameters"].items()
+            if key in {"seed", "seed sweep"}
+        ]
+        if seed_descriptions and "seed" not in effective_overrides:
+            effective_overrides["seed"] = (
+                "SUPPORTED",
+                "; ".join(seed_descriptions),
+            )
+        if (
+            "boundary" in spec["parameters"]
+            and "boundary" not in effective_overrides
+        ):
+            effective_overrides["boundary"] = (
+                "SUPPORTED",
+                spec["parameters"]["boundary"],
+            )
+        neighborhood_descriptions = [
+            spec["parameters"][key]
+            for key in ("neighborhood", "local footprint", "dependency radius")
+            if key in spec["parameters"]
+        ]
+        if (
+            neighborhood_descriptions
+            and "read_dependencies_or_neighborhood" not in effective_overrides
+        ):
+            effective_overrides["read_dependencies_or_neighborhood"] = (
+                "SUPPORTED",
+                "; ".join(neighborhood_descriptions),
+            )
         blueprint = profile_blueprint(
-            spec["kind"], name, spec["overrides"]
+            spec["kind"], name, effective_overrides
         )
         supported_fields = [
             field for field in FIELDS if blueprint[field]["status"] == "SUPPORTED"
@@ -1646,6 +1692,17 @@ def candidate_records(
                 }
             )
 
+        prose_units = [
+            unit_id
+            for unit_id in spec["units"]
+            if state["unit_by_id"][unit_id]["block_kind"] != "image"
+        ]
+        primary_mechanics_unit = (
+            spec["anchor_id"]
+            if spec["anchor_kind"] == "SOURCE_UNIT"
+            and spec["anchor_id"] in prose_units
+            else prose_units[0]
+        )
         for unit_id in spec["units"]:
             block_kind = state["unit_by_id"][unit_id]["block_kind"]
             if block_kind == "image":
@@ -1667,13 +1724,43 @@ def candidate_records(
                 if block_kind == "fenced_code"
                 else "DIRECT_PARTIAL_MECHANICS"
             )
+            evidence_fields = (
+                supported_fields
+                if unit_id == primary_mechanics_unit
+                else [
+                    field
+                    for field in (
+                        "parameters_and_variants",
+                        "excluded_observers_and_representations",
+                        "evidence_limit",
+                    )
+                    if field in supported_fields
+                ]
+            )
+            supplemental_text = unit_text(state, unit_id).lower()
+            if (
+                "seed" in supported_fields
+                and any(
+                    marker in supplemental_text
+                    for marker in ("initial", "start", "seed")
+                )
+                and "seed" not in evidence_fields
+            ):
+                evidence_fields.append("seed")
+            if (
+                "boundary" in supported_fields
+                and "wrap" in supplemental_text
+                and "boundary" not in evidence_fields
+            ):
+                evidence_fields.append("boundary")
+            evidence_fields.sort(key=FIELDS.index)
             add_evidence(
                 "SOURCE_UNIT",
                 unit_id,
                 strength,
                 modality,
                 f"{name}: {excerpt(state, unit_id)}",
-                supported_fields,
+                evidence_fields,
             )
 
         for asset_id in spec["assets"]:
@@ -2275,6 +2362,7 @@ def validate_output(
         raise ValueError("duplicate evidence identifiers")
 
     route_by_id = {row["route_id"]: row for row in routes}
+    route_anchors: set[tuple[str, str, str, str]] = set()
     for route in routes:
         if (
             route["status"] != "PENDING"
@@ -2286,6 +2374,15 @@ def validate_output(
             raise ValueError(f"invalid blind route: {route['route_id']}")
         if route["source_unit_id"] not in reading_by_id:
             raise ValueError(f"foreign route source: {route['route_id']}")
+        route_anchor = (
+            route["discovery_epoch"],
+            route["discovery_kind"],
+            route["discovery_id"],
+            route["discovery_ordinal"],
+        )
+        if route_anchor in route_anchors:
+            raise ValueError(f"duplicate route discovery anchor: {route['route_id']}")
+        route_anchors.add(route_anchor)
     for reading in readings:
         for route_id in as_json_array(reading["route_ids"]):
             if route_id not in route_by_id:
