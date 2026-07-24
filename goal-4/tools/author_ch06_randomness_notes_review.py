@@ -1364,6 +1364,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": f"the pictured {name.removeprefix('Game of Life ')} finite pattern",
                     "rule_relation_constraint_function_or_probability_law": f"use the pictured finite pattern as a Life seed; it exhibits {behavior}",
+                    "parameters_and_variants": f"the pictured phases demonstrate the structure's {behavior}",
                 },
                 missing=["Exact live-cell coordinates are not independently transcribed from the image."],
                 image_witnesses=[common_image],
@@ -1410,6 +1411,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "input": "a finite Life configuration and requested period p<=18",
                     "rule_relation_constraint_function_or_probability_law": "LifeStep^p[state] == state with the displayed examples selected by exact period",
                     "result_kind": "period-indexed oscillator examples",
+                    "parameters_and_variants": "requested exact period p, with pictured examples for every period through 18",
                 },
                 image_witnesses=[prefix + "_page_980_Figure_3.jpeg"],
             ),
@@ -1424,6 +1426,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "input": "a Life structure and requested displacement per period",
                     "rule_relation_constraint_function_or_probability_law": "after p steps the structure equals a spatial translation by the stated horizontal/vertical displacement",
                     "result_kind": "structures grouped by velocity",
+                    "parameters_and_variants": "seven pictured horizontal/vertical direction-and-speed classes",
                 },
                 missing=["The exact seeds and periods behind every pictured velocity label are not transcribed."],
                 image_witnesses=[prefix + "_page_980_Picture_5.jpeg"],
@@ -1437,6 +1440,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "a 21-live-cell seed in the simplest stated gun",
+                    "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "a glider-gun initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use the glider-gun seed under Life; it emits one glider every 30 steps",
                 },
@@ -1452,8 +1456,10 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "10 live cells, or seeds bounded by 5x5 or 39x1 as stated",
+                    "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "a switch-engine initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use a switch-engine seed under Life; the moving structure leaves an unbounded trail",
+                    "parameters_and_variants": "10-live-cell, 5x5-bounded, and 39x1-bounded seed forms; horizontal and vertical growth are pictured",
                 },
                 missing=["Exact live-cell coordinates are not stated."],
                 image_witnesses=[prefix + "_page_980_Picture_7.jpeg"],
@@ -1495,6 +1501,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 values={
                     "carrier": "the infinite two-dimensional Life lattice",
                     "support": "all cells on one infinite straight lattice line are live",
+                    "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "one infinite live line on an otherwise dead background",
                     "rule_relation_constraint_function_or_probability_law": "select the infinite-line seed; under Life its effective one-dimensional evolution is rule 22",
                 },
@@ -1508,6 +1515,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "206 live cells",
+                    "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "the spacefiller initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use the 206-cell seed under Life; it generates uniform unbounded growth",
                 },
@@ -1523,6 +1531,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "23 live cells",
+                    "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "the puffer-train initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use the 23-cell seed under Life; after a transient exceeding 1100 steps it repeats with period 140",
                 },
@@ -2065,6 +2074,26 @@ def main() -> None:
             }
         )
         asset_updates.append(updated)
+
+    reading_status_by_unit = {
+        row["source_unit_id"]: row["source_status"] for row in reading_updates
+    }
+    asset_status_by_path = {
+        row["physical_path"]: row["source_status"] for row in asset_updates
+    }
+    status_order = {"CLEAR": 0, "DEFECTIVE": 1, "AMBIGUOUS": 2}
+    for candidate in candidates:
+        provenance_statuses = {
+            reading_status_by_unit[unit_id]
+            for unit_id in candidate["source_unit_ids"]
+        } | {
+            asset_status_by_path[image_path]
+            for image_path in candidate["image_witnesses"]
+        }
+        candidate["source_status"] = sorted(
+            provenance_statuses,
+            key=lambda status: (status_order.get(status, 99), status),
+        )
 
     manifest = bundle / "allowed-manifest.json"
     prompt = bundle / "input/brief.md"
