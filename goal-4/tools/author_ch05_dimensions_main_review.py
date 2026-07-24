@@ -65,6 +65,89 @@ STATUSES = {
     "CONFLICTING_SOURCE",
 }
 
+# Prose units that state a complete executable law or complete native
+# constraint for every candidate to which they are attached. Fenced code is
+# treated the same way when evidence records are built.
+DIRECT_COMPLETE_SOURCE_UNITS = {
+    "U000966",
+    "U000968",
+    "U000982",
+    "U000989",
+    "U001099",
+    "U001104",
+    "U001162",
+    "U001166",
+    "U001173",
+}
+
+# These units identify, summarize, or visualize already-delimited systems; they
+# do not independently state the native transition or constraint mechanics.
+SOURCE_EVIDENCE_OVERRIDES = {
+    "U000997": (
+        "CONTEXTUAL",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001031": (
+        "CONTEXTUAL",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001121": (
+        "CONTEXTUAL",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001134": (
+        "CORROBORATING",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001139": (
+        "CORROBORATING",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001150": (
+        "DIRECT_IDENTITY",
+        {
+            "object_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001158": (
+        "CONTEXTUAL",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+}
+
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -1157,8 +1240,27 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["A000886"],
         parameters={"effective structure": "nested geometrical connection pattern"},
     )
+    rerouting_cases = {
+        "a": {
+            "above replacement": "follow below then above: path {2,1}",
+            "below replacement": "retain below: path {2}",
+        },
+        "b": {
+            "above replacement": "follow above twice: path {1,1}",
+            "below replacement": "retain below: path {2}",
+        },
+        "c": {
+            "above replacement": "loop to the source node: empty path {}",
+            "below replacement": "retain below: path {2}",
+        },
+        "d": {
+            "above replacement": "loop to the source node: empty path {}",
+            "below replacement": "follow the old above connection: path {1}",
+        },
+    }
     for ordinal, label in enumerate("abcd", 1):
         units = ["U001095", "U001096", "U001097", "U001099"]
+        case = rerouting_cases[label]
         add(
             f"binary-outdegree network rerouting rule ({label})",
             "NETWORK",
@@ -1168,11 +1270,11 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             units,
             ["A000888"],
             aliases=[f"network rule ({label})"],
-            parameters={"rule panel": label},
+            parameters={"rule panel": label, **case},
             overrides={
                 "write_replacement_assembly_or_commit": (
                     "SUPPORTED",
-                    "reroute the existing outgoing connections according to the stated path expressions; do not insert nodes",
+                    f"reroute existing connections only: above -> {case['above replacement']}; below -> {case['below replacement']}; do not insert nodes",
                 ),
                 "parameters_and_variants": (
                     "SUPPORTED",
@@ -1181,9 +1283,14 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             },
             parent_index=network,
         )
+    insertion_cases = {
+        "a": "the new node copies the original node's above and below targets",
+        "b": "the new node swaps the original node's above and below targets",
+    }
     for ordinal, (label, asset_id) in enumerate(
         (("a", "A000889"), ("b", "A000890")), 1
     ):
+        new_node_targets = insertion_cases[label]
         add(
             f"node-inserting network rule ({label})",
             "NETWORK",
@@ -1193,11 +1300,15 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             ["U001100", "U001101", "U001104"],
             [asset_id],
             aliases=[f"node-addition rule ({label})"],
-            parameters={"rule panel": label, "seed": "single-node network"},
+            parameters={
+                "rule panel": label,
+                "seed": "single-node network",
+                "new-node outgoing targets": new_node_targets,
+            },
             overrides={
                 "write_replacement_assembly_or_commit": (
                     "SUPPORTED",
-                    "insert one new node in each above connection and assign its two outgoing targets as stated",
+                    f"insert one new node in each above connection; {new_node_targets}",
                 ),
                 "parameters_and_variants": (
                     "SUPPORTED",
@@ -2145,15 +2256,25 @@ def candidate_records(
                 )
                 else "PROSE"
             )
-            strength = (
-                "DIRECT_COMPLETE_MECHANICS"
-                if block_kind == "fenced_code"
-                else "DIRECT_PARTIAL_MECHANICS"
+            is_complete = (
+                block_kind == "fenced_code"
+                or unit_id in DIRECT_COMPLETE_SOURCE_UNITS
             )
-            evidence_fields = (
-                supported_fields
-                if unit_id == primary_mechanics_unit
-                else [
+            special_evidence = SOURCE_EVIDENCE_OVERRIDES.get(unit_id)
+            if is_complete:
+                strength = "DIRECT_COMPLETE_MECHANICS"
+                evidence_fields = list(supported_fields)
+            elif special_evidence is not None:
+                strength, allowed_fields = special_evidence
+                evidence_fields = [
+                    field for field in supported_fields if field in allowed_fields
+                ]
+            elif unit_id == primary_mechanics_unit:
+                strength = "DIRECT_PARTIAL_MECHANICS"
+                evidence_fields = list(supported_fields)
+            else:
+                strength = "DIRECT_PARTIAL_MECHANICS"
+                evidence_fields = [
                     field
                     for field in (
                         "parameters_and_variants",
@@ -2162,23 +2283,22 @@ def candidate_records(
                     )
                     if field in supported_fields
                 ]
-            )
-            supplemental_text = unit_text(state, unit_id).lower()
-            if (
-                "seed" in supported_fields
-                and any(
-                    marker in supplemental_text
-                    for marker in ("initial", "start", "seed")
-                )
-                and "seed" not in evidence_fields
-            ):
-                evidence_fields.append("seed")
-            if (
-                "boundary" in supported_fields
-                and "wrap" in supplemental_text
-                and "boundary" not in evidence_fields
-            ):
-                evidence_fields.append("boundary")
+                supplemental_text = unit_text(state, unit_id).lower()
+                if (
+                    "seed" in supported_fields
+                    and any(
+                        marker in supplemental_text
+                        for marker in ("initial", "start", "seed")
+                    )
+                    and "seed" not in evidence_fields
+                ):
+                    evidence_fields.append("seed")
+                if (
+                    "boundary" in supported_fields
+                    and "wrap" in supplemental_text
+                    and "boundary" not in evidence_fields
+                ):
+                    evidence_fields.append("boundary")
             evidence_fields.sort(key=FIELDS.index)
             add_evidence(
                 "SOURCE_UNIT",
@@ -2201,29 +2321,27 @@ def candidate_records(
                 if role in {"CONTROL", "RELATION", "OBSERVER"}
                 else "CONTEXTUAL"
             )
+            # NATIVE_EVIDENCE is reserved for original-resolution rule/evolution
+            # panels that delimit the candidate itself, including image-first
+            # candidates whose adjacent prose is only a statistical summary.
+            native_image_fields = set(supported_fields)
+            contextual_image_fields = {
+                "object_kind",
+                "result_kind",
+                "witness_semantics",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            }
             image_fields = [
                 field
                 for field in supported_fields
                 if field
-                in {
-                    "object_kind",
-                    "carrier",
-                    "support",
-                    "topology",
-                    "alphabet_or_value_schema",
-                    "complete_state",
-                    "seed",
-                    "frontier_or_activation",
-                    "read_dependencies_or_neighborhood",
-                    "law_kind",
-                    "rule_relation_constraint_function_or_probability_law",
-                    "write_replacement_assembly_or_commit",
-                    "result_kind",
-                    "witness_semantics",
-                    "parameters_and_variants",
-                    "excluded_observers_and_representations",
-                    "evidence_limit",
-                }
+                in (
+                    native_image_fields
+                    if role == "NATIVE_EVIDENCE"
+                    else contextual_image_fields
+                )
             ]
             if asset_id == "A000915":
                 image_fields = [
