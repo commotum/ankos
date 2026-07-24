@@ -2437,6 +2437,10 @@ def candidate_definitions() -> list[dict[str, Any]]:
     additivity = candidate(additivity_name)
     additivity["semantic_units"].append("U001411")
     additivity["mechanics_units"] = []
+    additivity["parameters"] = [
+        "additive cellular-automaton rule",
+        "component initial configurations",
+    ]
     additivity["uncertainties"] = [
         "The source states superposition consequences but does not define the algebraic superposition operator in this range."
     ]
@@ -2518,7 +2522,9 @@ def candidate_definitions() -> list[dict[str, Any]]:
     # 14-cell/7-step background variant.
     periodic_name = "periodic-block cellular-automaton initial-condition generator"
     periodic = candidate(periodic_name)
-    periodic["units"].extend(["U001558", "U001561", "U001570"])
+    periodic["units"].extend(["U001435", "U001558", "U001561", "U001570"])
+    periodic["semantic_units"].append("U001435")
+    periodic["parameters"] = ["finite period block", "spatial period"]
     periodic["values"].update(
         {
             "object_kind": "deterministic periodic-block initial-condition generator",
@@ -2529,7 +2535,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "determinism_branching_or_measure": "deterministic",
             "termination_completion_failure": "construction is complete once the finite period block is specified",
             "structural_invariants": (
-                "an n-cell repeated block evolves like an n-cell cyclic system and therefore repeats within at most 2^n steps"
+                "an n-cell repeated block evolves like an n-cell cyclic system and therefore repeats within at most "
+                "2^n steps; for rule 30, only repeated-block initial conditions can yield repetitive behavior"
             ),
             "parameters_and_variants": (
                 "finite period block and width n; rule-30 fixed-period examples; rule-110 14-cell background with temporal period 7"
@@ -2556,6 +2563,21 @@ def candidate_definitions() -> list[dict[str, Any]]:
         fields=["structural_invariants", "parameters_and_variants"],
         claim="U001434 records attainable short periods and a missing exact period-2 block for rule 30.",
         strength="CORROBORATING",
+    )
+    evidence(
+        periodic_name,
+        "U001435",
+        fields=[
+            "object_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "structural_invariants",
+            "parameters_and_variants",
+        ],
+        claim=(
+            "U001435 states the rule-30 exclusivity result: no initial condition other than a single "
+            "fixed block repeated forever can yield repetitive behavior."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
     )
     evidence(
         periodic_name,
@@ -2596,6 +2618,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
     two_block["field_units"]["structural_invariants"] = ["U001439"]
     two_block["field_units"]["alphabet_or_value_schema"] = ["U001439"]
     two_block["mechanics_units"] = ["U001439"]
+    two_block["parameters"] = ["permitted four-cell blocks", "block probability law"]
 
     # Block emulations expose their scale, codec, and temporal resampling as
     # structural invariants rather than hiding these mechanics in prose.
@@ -2747,6 +2770,29 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "structural_invariants": invariant,
         }
         row["mechanics_units"] = []
+        row["parameters"] = {
+            "rule-126 to rule-90 pair-block emulation": [
+                "source rule",
+                "target rule",
+                "spatial block width",
+                "temporal sampling interval",
+            ],
+            "rule-90 pair-block self-emulation": [
+                "cellular-automaton rule",
+                "spatial block codec",
+                "temporal sampling interval",
+            ],
+            "rule-150 block self-emulation": [
+                "cellular-automaton rule",
+                "spatial block codec",
+                "temporal sampling interval",
+            ],
+            "rule-184 three-cell-block self-emulation": [
+                "cellular-automaton rule",
+                "spatial block codec",
+                "temporal sampling interval",
+            ],
+        }[name]
         evidence(
             name,
             spec["anchor"],
@@ -2795,6 +2841,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
     nested["uncertainties"] = [
         "The source supplies the productions and seed but does not state a preferred finite depth for the displayed initial condition."
     ]
+    nested["parameters"] = ["substitution depth"]
     evidence(
         nested_name,
         "U001470",
@@ -3129,6 +3176,118 @@ def candidate_definitions() -> list[dict[str, Any]]:
         strength="CORROBORATING",
     )
 
+    # The unrestricted initial language is a declarative set, not a seed
+    # sampler or a time-evolving program.  U001483 states the language before
+    # the later network representation is introduced.
+    full_binary_name = "full binary configuration language"
+    full_binary = candidate(full_binary_name)
+    full_binary["units"] = ["U001483", "U001494", "U001498"]
+    full_binary["semantic_units"] = ["U001483", "U001494", "U001498"]
+    full_binary["mechanics_units"] = []
+    full_binary["values"] = {
+        "object_kind": "declarative full binary configuration language",
+        "carrier": "one-dimensional binary cell sequences",
+        "alphabet_or_value_schema": "black and white",
+        "complete_state": "one complete black-or-white sequence",
+        "law_kind": "declarative sequence-membership constraint",
+        "rule_relation_constraint_function_or_probability_law": (
+            "allow any number of black and white cells in any order"
+        ),
+        "result_kind": "the set of all binary cell sequences",
+        "determinism_branching_or_measure": (
+            "a many-member declarative set; no sampling measure is implied"
+        ),
+    }
+    evidence(
+        full_binary_name,
+        "U001483",
+        fields=list(full_binary["values"]),
+        claim=(
+            "U001483 directly states that random initial conditions can contain absolutely any "
+            "sequence of black and white cells; it defines the unrestricted language, not a probability measure."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    evidence(
+        full_binary_name,
+        "U001494",
+        fields=[
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+        ],
+        claim="U001494 restates the step-1 language as all black-and-white sequences before showing its path network.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        full_binary_name,
+        "U001498",
+        fields=["result_kind"],
+        claim="U001498 corroborates that the first network represents all possible binary sequences.",
+        strength="CORROBORATING",
+    )
+
+    conflict_name = "conflicted adjacent-black constrained initial-condition language"
+    conflict = candidate(conflict_name)
+    conflict["mechanics_units"] = []
+    conflict["values"] = {
+        "object_kind": "source-conflicted declarative binary configuration language",
+        "carrier": "one-dimensional binary cell sequences",
+        "alphabet_or_value_schema": "black and white",
+        "complete_state": "one proposed black-or-white initial sequence",
+        "law_kind": "declarative sequence-membership constraint",
+        "rule_relation_constraint_function_or_probability_law": (
+            "CONFLICT: U001513 forbids adjacent black cells, while U001515 says black cells may appear only in pairs"
+        ),
+        "result_kind": (
+            "CONFLICT: the admissible initial-condition language cannot be resolved from this source range"
+        ),
+        "determinism_branching_or_measure": (
+            "declarative membership would be deterministic once the contradictory condition is resolved"
+        ),
+    }
+    evidence(
+        conflict_name,
+        "U001513",
+        fields=[
+            "object_kind",
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "determinism_branching_or_measure",
+        ],
+        claim=(
+            "U001513 defines a binary initial-condition language forbidding adjacent black cells; "
+            "its condition conflicts with U001515."
+        ),
+        strength="DEFECT_LIMITED",
+    )
+    evidence(
+        conflict_name,
+        "U001514",
+        fields=[],
+        claim="A001011 is the owned network witness but does not resolve the contradictory live captions.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        conflict_name,
+        "U001515",
+        fields=[
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+        ],
+        claim=(
+            "U001515 says black cells are allowed only in pairs, directly contradicting U001513's "
+            "adjacent-black prohibition."
+        ),
+        strength="DEFECT_LIMITED",
+    )
+
     # The allowed-sequence network is an observer with worked path-language
     # examples; later growth panels support outputs only.
     network_name = "allowed-sequence path-network observer"
@@ -3159,6 +3318,21 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "parameters_and_variants": ["U001494", "U001495", "U001496", "U001498", "U001500", "U001503", "U001504", "U001506"],
         }
     )
+    network["parameters"] = ["allowed sequence language", "evolution step"]
+    network["variants"] = [
+        "full binary language network",
+        "all-black language network",
+        "isolated-black language network",
+        "rule-128 shrinking-block network sequence",
+        "rule-126 forbidden-block and network-growth survey",
+    ]
+    network["variant_units"] = {
+        "full binary language network": ["U001494"],
+        "all-black language network": ["U001495", "U001498"],
+        "isolated-black language network": ["U001496", "U001498"],
+        "rule-128 shrinking-block network sequence": ["U001500", "U001503"],
+        "rule-126 forbidden-block and network-growth survey": ["U001504", "U001506"],
+    }
     network_specs = {
         "U001492": (
             ["object_kind", "carrier", "result_kind"],
@@ -3281,7 +3455,19 @@ def candidate_definitions() -> list[dict[str, Any]]:
                     unit_id,
                     fields=["excluded_observers_and_representations"],
                     claim=f"{unit_id} is a search/result witness explicitly excluded from {name}'s native-law mechanics.",
-                    strength="CONTEXTUAL" if unit_id in {"U001532", "U001535", "U001543", "U001549", "U001552", "U001555"} else "CORROBORATING",
+                    strength=(
+                        "CONTEXTUAL"
+                        if unit_id
+                        in {
+                            "U001532",
+                            "U001535",
+                            "U001543",
+                            "U001549",
+                            "U001552",
+                            "U001555",
+                        }
+                        else "DIRECT_PARTIAL_MECHANICS"
+                    ),
                 )
 
     brute_name = "persistent-structure exhaustive search query"
@@ -3459,55 +3645,54 @@ def candidate_definitions() -> list[dict[str, Any]]:
     rule110["related_names"] = ["periodic-block cellular-automaton initial-condition generator"]
     rule110_specs = {
         "U001558": (
-            [
-                "native_time",
-                "seed",
-                "result_kind",
-                "witness_semantics",
-                "parameters_and_variants",
-                "excluded_observers_and_representations",
-            ],
+            ["excluded_observers_and_representations"],
             "U001558 gives the random seed context and the 14-cell/7-step periodic background; it supplies no native transition entries.",
         ),
         "U001561": (
-            ["seed", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001561 states that rule-110 structures are disruptions in a regular 14-cell/7-step background.",
         ),
         "U001562": (
-            ["result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001562 introduces a bounded seed search and persistent-structure catalog as observer evidence.",
         ),
         "U001563": (
-            ["input", "result_kind", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001563 routes a width-41 unbounded-growth search result and is not native-law evidence.",
         ),
         "U001564": (
-            ["input", "result_kind", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001564 routes rule-110 collision experiments and is not native-law evidence.",
         ),
         "U001568": (
-            ["result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001568 labels a persistent-structure catalog and extension variants.",
         ),
         "U001570": (
-            ["seed", "input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001570 records the length-41 seed and measured 77-step growth cycle, displacement, and separations.",
         ),
         "U001572": (
-            ["input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001572 records spacing variants in collisions between catalog structures o and j.",
         ),
         "U001574": (
-            ["input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001574 records a collision between catalog structures e and o.",
         ),
         "U001576": (
-            ["input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            ["excluded_observers_and_representations"],
             "U001576 records a greater-than-4000-step collision outcome producing eight structures.",
         ),
     }
     for unit_id, (fields, claim) in rule110_specs.items():
-        evidence(rule110_name, unit_id, fields=fields, claim=claim, strength="CORROBORATING")
+        evidence(
+            rule110_name,
+            unit_id,
+            fields=fields,
+            claim=claim,
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
     for unit_id in ["U001557", "U001567", "U001569", "U001571", "U001573", "U001575"]:
         evidence(
             rule110_name,
@@ -3534,23 +3719,15 @@ def candidate_definitions() -> list[dict[str, Any]]:
         row["mechanics_units"] = []
         row["values"] = {
             "object_kind": "source-identified cellular-automaton preset",
-            "visible_history": "the finite evolution histories shown in this range",
             "rule_relation_constraint_function_or_probability_law": code,
-            "result_kind": "a finite displayed evolution history",
-            "witness_semantics": "the cited image or caption witnesses identity and finite behavior, not an unstated transition table",
             "parameters_and_variants": code,
-            "evidence_limit": "The complete transition table is not transcribed in this Chapter 6 main-text range.",
         }
         if extra_values:
             row["values"].update(extra_values)
         fields = [
             "object_kind",
-            "visible_history",
             "rule_relation_constraint_function_or_probability_law",
-            "result_kind",
-            "witness_semantics",
             "parameters_and_variants",
-            "evidence_limit",
         ] + (extra_fields or [])
         evidence(
             name,
@@ -3558,7 +3735,11 @@ def candidate_definitions() -> list[dict[str, Any]]:
             fields=fields,
             claim=claim
             or f"{mechanics_unit} identifies {code} and provides a finite behavior witness; no unstated transition entries are inferred.",
-            strength="DIRECT_IDENTITY",
+            strength=(
+                "DIRECT_PARTIAL_MECHANICS"
+                if extra_fields
+                else "DIRECT_IDENTITY"
+            ),
             allow_direct_image=image_mechanics,
         )
 
@@ -3690,29 +3871,44 @@ def candidate_definitions() -> list[dict[str, Any]]:
     # code table remains outside the reviewed range.
     rule110["values"] = {
         "object_kind": "one-dimensional cellular-automaton preset",
-        "native_time": "successive cellular-automaton steps",
         "carrier": "one-dimensional array of cells",
         "alphabet_or_value_schema": "two colors of cells",
-        "seed": "random initial conditions or a source-delimited periodic background with inserted finite structures",
-        "input": "a source-delimited experimental seed, background, or pair of catalog structures",
         "read_dependencies_or_neighborhood": "nearest neighbors in one dimension",
         "law_kind": "simple nearest-neighbor cellular-automaton rule",
         "rule_relation_constraint_function_or_probability_law": (
             "rule 110; the complete transition table is outside this reviewed range"
         ),
-        "result_kind": "a stepwise evolution, persistent-structure catalog, growth run, or collision outcome",
-        "witness_semantics": (
-            "finite backgrounds, catalogs, growth runs, and collisions witness behavior but not transition entries"
-        ),
-        "parameters_and_variants": (
-            "rule 110; random or 14-cell/7-step periodic background and source-delimited experiments"
-        ),
+        "parameters_and_variants": "rule 110",
         "excluded_observers_and_representations": (
             "the 14-cell periodic background is a seed/environment; persistent-structure catalogs, growth panels, "
             "and collision diagrams are observer/experiment outputs rather than rule-110 transition-law evidence"
         ),
     }
     rule110["mechanics_units"] = []
+    rule110["parameters"] = ["rule code"]
+    rule110["variants"] = [
+        "random-initial-condition evolution",
+        "14-cell/7-step periodic-background evolution",
+        "bounded persistent-structure catalog",
+        "width-41 unbounded-growth experiment",
+        "persistent-structure collision experiments",
+    ]
+    rule110["variant_units"] = {
+        "random-initial-condition evolution": ["U001254", "U001256", "U001558"],
+        "14-cell/7-step periodic-background evolution": ["U001558", "U001561"],
+        "bounded persistent-structure catalog": ["U001562", "U001568"],
+        "width-41 unbounded-growth experiment": ["U001563", "U001570"],
+        "persistent-structure collision experiments": [
+            "U001564",
+            "U001572",
+            "U001574",
+            "U001576",
+        ],
+    }
+    rule110["related_names"] = [
+        "periodic-block cellular-automaton initial-condition generator",
+        "single-cell initial-perturbation difference observer",
+    ]
     evidence(
         rule110_name,
         "U001560",
@@ -3729,7 +3925,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "U001560 identifies rule 110 as a simple cellular-automaton rule involving nearest neighbors "
             "and two cell colors; it does not transcribe the transition table or generic update mechanics."
         ),
-        strength="DIRECT_IDENTITY",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
 
     # Rule 128 is identified here through a global shrinkage property; the
@@ -3749,9 +3945,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "result_kind": "progressive evolution toward a class-1 or class-2 final state",
         "structural_invariants": (
             "a black region surviving after t steps has at least t white cells on either side"
-        ),
-        "witness_semantics": (
-            "the successive allowed-sequence networks measure reachable sequence sets and do not define rule 128"
         ),
         "parameters_and_variants": "rule 128",
         "excluded_observers_and_representations": (
@@ -3794,23 +3987,23 @@ def candidate_definitions() -> list[dict[str, Any]]:
     evidence(
         rule128_name,
         "U001501",
-        fields=["witness_semantics", "excluded_observers_and_representations"],
+        fields=["excluded_observers_and_representations"],
         claim="U001501 identifies the successive networks as derived summaries of allowed sequences.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
     evidence(
         rule128_name,
         "U001502",
-        fields=["witness_semantics"],
+        fields=[],
         claim="A001008 is a finite allowed-sequence-network witness, not rule-128 native-law evidence.",
         strength="CONTEXTUAL",
     )
     evidence(
         rule128_name,
         "U001503",
-        fields=["witness_semantics", "excluded_observers_and_representations"],
+        fields=["excluded_observers_and_representations"],
         claim="U001503 describes the network observer outputs and their growth, not a native transition table.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
 
     # Evolution/parameter images for continuous rules are witnesses only.
@@ -3908,6 +4101,42 @@ def candidate_definitions() -> list[dict[str, Any]]:
             strength="DIRECT_PARTIAL_MECHANICS",
         )
 
+    # Expose the source-level knobs separately from prose summaries of fixed
+    # presets.  These names describe only choices actually delimited by this
+    # range; unresolved conventions remain in uncertainties.
+    parameter_specs = {
+        "uniform-attractor elementary cellular-automaton preset panel": [
+            "selected panel rule code"
+        ],
+        "fixed-or-periodic-structure elementary cellular-automaton preset panel": [
+            "selected panel rule code"
+        ],
+        "four-class cellular-automaton behavior classification": [
+            "observed long-run behavior"
+        ],
+        "rule-4 many-to-one basin-of-attraction relation": [
+            "selected final attractor configuration"
+        ],
+        "surjective binary cellular-automaton mapping family": [
+            "selected cellular-automaton rule"
+        ],
+        "persistent-structure exhaustive search query": [
+            "cellular-automaton rule",
+            "initial-region bound or enumeration prefix",
+        ],
+        "localized finite-seed integer codec family": [
+            "radix",
+            "cell alphabet",
+            "nonnegative integer",
+        ],
+        "systematic fixed-period persistent-structure constraint solver": [
+            "cellular-automaton rule",
+            "requested repetition period",
+        ],
+    }
+    for name, parameters in parameter_specs.items():
+        candidate(name)["parameters"] = parameters
+
     # Remove inherited per-unit evidence-limit declarations. build_output()
     # assigns the record boundary once to the strongest identity/law anchor.
     for row in defs:
@@ -3938,7 +4167,7 @@ ROUTE_DEFS = [
     ("U001327", "page 248", "PAGE", "class-4 two-dimensional slice examples", "WITHIN_STAGE", ["class 4"]),
     ("U001327", "page 229", "PAGE", "rule-110 repetitive background comparison", "WITHIN_STAGE", ["rule 110"]),
     ("U001329", "page 249", "PAGE", "Game of Life and its one-dimensional slice", "WITHIN_STAGE", ["Game of Life"]),
-    ("U001359", "later in this book", "OTHER", "information handling in systems in nature", "CROSS_RANGE", ["information handling"]),
+    ("U001358", "later in this book", "OTHER", "information handling in systems in nature", "CROSS_RANGE", ["information handling"]),
     ("U001366", "the next chapter", "SECTION", "limited-size repetition in nature", "CROSS_RANGE", ["repetition"]),
     ("U001399", "page 27", "PAGE", "rule-30 simple-initial-condition construction", "CROSS_RANGE", ["rule 30"]),
     ("U001423", "the next few chapters", "SECTION", "natural-system stability from intrinsic randomness", "CROSS_RANGE", ["stability"]),
@@ -4818,8 +5047,15 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         for row in candidate_by_id["W0012"]["source_evidence"]
         if row["source_unit_id"] == "U001560"
     )
+    rule110_na_fields = {
+        field
+        for field, item in candidate_by_id["W0012"]["fingerprint"].items()
+        if item["status"] == "NOT_APPLICABLE"
+    }
     check(
         set(rule110_unit["fingerprint_fields"])
+        - rule110_na_fields
+        - {"evidence_limit"}
         == {
             "object_kind",
             "carrier",
@@ -4830,6 +5066,10 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
             "parameters_and_variants",
         },
         "rule-110 identity prose must not acquire generic CA mechanics",
+    )
+    check(
+        rule110_unit["strength"] == "DIRECT_PARTIAL_MECHANICS",
+        "rule-110 identity/mechanics prose must be scoped as direct partial mechanics",
     )
     for candidate_id in ("W0017", "W0018", "W0019", "W0020"):
         panel_intro = next(
