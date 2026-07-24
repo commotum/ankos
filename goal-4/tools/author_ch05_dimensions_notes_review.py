@@ -2077,6 +2077,57 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         )
         assert record["strength"] == strength
 
+    # Mirror validate_audit.py's global field contract so worker-valid output
+    # cannot later fail during coordinator preview/merge.
+    direct_strengths = {
+        "DIRECT_IDENTITY",
+        "DIRECT_PARTIAL_MECHANICS",
+        "DIRECT_COMPLETE_MECHANICS",
+    }
+    for proposal in proposals:
+        evidence_by_id = {
+            evidence["evidence_id"]: evidence
+            for evidence in proposal["source_evidence"]
+        }
+        for field in FIELDS:
+            value = proposal["fingerprint"][field]
+            assert proposal["field_support"][field] == value["status"]
+            declared_ids = {
+                evidence_id
+                for evidence_id, evidence in evidence_by_id.items()
+                if field in evidence["fingerprint_fields"]
+            }
+            assert set(value["evidence_ids"]) == declared_ids
+            if value["status"] == SUP:
+                assert isinstance(value["value"], str) and value["value"].strip()
+                assert value["evidence_ids"]
+                assert value["reason"] in {"", None}
+            elif value["status"] == NA:
+                assert value["value"] is None
+                assert value["evidence_ids"]
+                assert isinstance(value["reason"], str) and value["reason"].strip()
+                if any(
+                    evidence["strength"] in direct_strengths
+                    for evidence in evidence_by_id.values()
+                ):
+                    assert all(
+                        evidence_by_id[evidence_id]["strength"] in direct_strengths
+                        for evidence_id in value["evidence_ids"]
+                    )
+            elif value["status"] == UNK:
+                assert value["value"] is None
+                assert isinstance(value["reason"], str) and value["reason"].strip()
+                assert value["reason"] in proposal["missing_mechanics"]
+            elif value["status"] == CONFLICT:
+                assert value["value"] is None
+                assert len(value["evidence_ids"]) >= 2
+                assert isinstance(value["reason"], str) and value["reason"].strip()
+                assert value["reason"] in proposal["uncertainties"]
+            else:
+                raise AssertionError(
+                    f"{proposal['id']} {field} has invalid field support {value['status']}"
+                )
+
     if check_spec:
         print(
             json.dumps(

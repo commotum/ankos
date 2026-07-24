@@ -21,6 +21,7 @@ from typing import Any
 import audit_transaction
 from audit_contract import (
     ASSET_HEADER,
+    FINGERPRINT_FIELDS,
     GOAL_DIR,
     READING_HEADER,
     REPO_ROOT,
@@ -69,6 +70,23 @@ WORKER_ROUTE_RE = re.compile(r"^WR[0-9]{4}$")
 GLOBAL_ROUTE_RE = re.compile(r"^R[0-9]{6}$")
 WORKER_EVIDENCE_RE = re.compile(r"^WE[0-9]{6}$")
 WORKER_EVIDENCE_GROUP_RE = re.compile(r"^WG[0-9]{6}$")
+SUPPORTED_SOURCE_ABSENCE_ONLY = re.compile(
+    r"""
+    \s*
+    (?:unknown(?:\s+from\s+(?:the\s+)?source)?|
+       unstated|unspecified|unidentified|
+       not\s+(?:stated|specified|identified))
+    \s*[.!?]?\s*
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+DIRECT_IMAGE_EVIDENCE_STRENGTHS = frozenset(
+    {
+        "DIRECT_IDENTITY",
+        "DIRECT_PARTIAL_MECHANICS",
+        "DIRECT_COMPLETE_MECHANICS",
+    }
+)
 CHAPTER_PATH_RE = re.compile(
     r"^(?:CHAPTERS|BACK-MATTER/NOTES)/([0-9]{2})-[^/]+\.md$"
 )
@@ -532,6 +550,299 @@ def is_complete_worker_sequence(
     return values == [
         f"{prefix}{index:0{width}d}" for index in range(1, len(values) + 1)
     ]
+
+
+def validate_worker_candidate_semantics(
+    row: dict[str, Any],
+    *,
+    candidate_ids: set[str],
+    route_by_id: dict[str, dict[str, Any]],
+    asset_input_by_id: dict[str, dict[str, str]],
+    asset_update_by_image: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    """Enforce global candidate semantics before local IDs are canonicalized.
+
+    Schema validation handles the worker-local W/WE/WG/WR ID shapes and basic
+    types.  This pass mirrors the global validator's cross-field semantics
+    without requiring premature B/E/G/R allocation.
+    """
+
+    candidate_id = row.get("id", "<unknown>")
+    prefix = f"candidate {candidate_id}"
+    provisional_name = row.get("provisional_name")
+    aliases = row.get("aliases")
+    if not isinstance(provisional_name, str) or not provisional_name.strip():
+        errors.append(f"{prefix} lacks provisional_name")
+    if isinstance(aliases, list) and provisional_name in aliases:
+        errors.append(f"{prefix} repeats provisional_name as an alias")
+
+    evidence_rows = row.get("source_evidence")
+    evidence_by_id: dict[str, dict[str, Any]] = {}
+    evidence_fields: dict[str, set[str]] = {}
+    if isinstance(evidence_rows, list):
+        for evidence in evidence_rows:
+            if not isinstance(evidence, dict):
+                continue
+            evidence_id = evidence.get("evidence_id")
+            if not isinstance(evidence_id, str):
+                continue
+            evidence_by_id[evidence_id] = evidence
+            declared_fields = evidence.get("fingerprint_fields")
+            if isinstance(declared_fields, list) and all(
+                isinstance(field, str) for field in declared_fields
+            ):
+                evidence_fields[evidence_id] = set(declared_fields)
+            claim = evidence.get("claim")
+            if not isinstance(claim, str) or not claim.strip():
+                errors.append(f"{prefix} evidence {evidence_id} claim is empty")
+            image_path = evidence.get("image_path")
+            if (
+                isinstance(image_path, str)
+                and evidence.get("strength")
+                in DIRECT_IMAGE_EVIDENCE_STRENGTHS
+            ):
+                asset = asset_update_by_image.get(image_path)
+                if (
+                    asset is None
+                    or asset.get("inspection_status") != "SCREENED"
+                    or asset.get("visual_role") != "NATIVE_EVIDENCE"
+                    or asset.get("original_resolution_status") != "REVIEWED"
+                    or asset.get("transcription_status") != "CHECKED"
+                ):
+                    errors.append(
+                        f"{prefix} direct image evidence {evidence_id} lacks "
+                        "native/resolution/transcription verification"
+                    )
+
+    missing_mechanics = row.get("missing_mechanics")
+    missing_values = (
+        set(missing_mechanics)
+        if isinstance(missing_mechanics, list)
+        and all(isinstance(value, str) for value in missing_mechanics)
+        else set()
+    )
+    uncertainties = row.get("uncertainties")
+    uncertainty_values = (
+        set(uncertainties)
+        if isinstance(uncertainties, list)
+        and all(isinstance(value, str) for value in uncertainties)
+        else set()
+    )
+    field_support = row.get("field_support")
+    fingerprint = row.get("fingerprint")
+    if isinstance(field_support, dict) and isinstance(fingerprint, dict):
+        for field in FINGERPRINT_FIELDS:
+            support = field_support.get(field)
+            value = fingerprint.get(field)
+            if not isinstance(value, dict):
+                continue
+            if value.get("status") != support:
+                errors.append(f"{prefix}.{field} support/status disagree")
+            raw_evidence_ids = value.get("evidence_ids")
+            field_evidence_ids = (
+                raw_evidence_ids
+                if isinstance(raw_evidence_ids, list)
+                and all(
+                    isinstance(evidence_id, str)
+                    for evidence_id in raw_evidence_ids
+                )
+                else []
+            )
+            declared_ids = {
+                evidence_id
+                for evidence_id, declared_fields in evidence_fields.items()
+                if field in declared_fields
+            }
+            if set(field_evidence_ids) != declared_ids:
+                errors.append(
+                    f"{prefix}.{field} evidence IDs/declarations are not exact"
+                )
+            if any(
+                evidence_id not in evidence_by_id
+                for evidence_id in field_evidence_ids
+            ):
+                errors.append(f"{prefix}.{field} has invalid evidence IDs")
+
+            field_value = value.get("value")
+            reason = value.get("reason")
+            if support == "SUPPORTED":
+                if (
+                    not isinstance(field_value, str)
+                    or not field_value.strip()
+                    or not field_evidence_ids
+                ):
+                    errors.append(
+                        f"{prefix}.{field} supported value lacks evidence"
+                    )
+                elif (
+                    field != "evidence_limit"
+                    and SUPPORTED_SOURCE_ABSENCE_ONLY.fullmatch(field_value)
+                ):
+                    errors.append(
+                        f"{prefix}.{field} supported value encodes source absence"
+                    )
+                if reason not in ("", None):
+                    errors.append(
+                        f"{prefix}.{field} supported value has a reason"
+                    )
+            elif support == "NOT_APPLICABLE":
+                if field_value is not None or not field_evidence_ids:
+                    errors.append(
+                        f"{prefix}.{field} not-applicable value must be null "
+                        "and evidence-justified"
+                    )
+                if not isinstance(reason, str) or not reason.strip():
+                    errors.append(
+                        f"{prefix}.{field} not-applicable value lacks reason"
+                    )
+            elif support == "UNKNOWN_FROM_SOURCE":
+                if field_value is not None:
+                    errors.append(f"{prefix}.{field} unknown value is not null")
+                if not isinstance(reason, str) or not reason.strip():
+                    errors.append(f"{prefix}.{field} unknown value lacks reason")
+                elif reason not in missing_values:
+                    errors.append(
+                        f"{prefix}.{field} unknown reason is absent from "
+                        "missing_mechanics"
+                    )
+            elif support == "CONFLICTING_SOURCE":
+                if field_value is not None or len(field_evidence_ids) < 2:
+                    errors.append(
+                        f"{prefix}.{field} conflict requires null value and "
+                        "at least two evidence IDs"
+                    )
+                if not isinstance(reason, str) or not reason.strip():
+                    errors.append(f"{prefix}.{field} conflict lacks reason")
+                elif reason not in uncertainty_values:
+                    errors.append(
+                        f"{prefix}.{field} conflict reason is absent from "
+                        "uncertainties"
+                    )
+
+    for collection_name in ("parameters", "variants"):
+        collection = row.get(collection_name)
+        if not isinstance(collection, list):
+            continue
+        seen_names: set[str] = set()
+        for item in collection:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name")
+            if not isinstance(name, str) or not name.strip():
+                errors.append(f"{prefix} has unnamed {collection_name} item")
+            elif name in seen_names:
+                errors.append(f"{prefix} repeats {collection_name} name")
+            else:
+                seen_names.add(name)
+            source_description = item.get("source_description")
+            if (
+                not isinstance(source_description, str)
+                or not source_description.strip()
+            ):
+                errors.append(
+                    f"{prefix} {collection_name} item lacks source description"
+                )
+            item_evidence = item.get("evidence_ids")
+            if not isinstance(item_evidence, list) or not item_evidence:
+                errors.append(
+                    f"{prefix}.{collection_name}.evidence_ids must be nonempty"
+                )
+            elif any(
+                evidence_id not in evidence_by_id
+                for evidence_id in item_evidence
+            ):
+                errors.append(
+                    f"{prefix} {collection_name} item has invalid evidence ID"
+                )
+
+    relations = row.get("related_candidate_ids")
+    if isinstance(relations, list):
+        seen_relations: set[tuple[object, object]] = set()
+        for relation in relations:
+            if not isinstance(relation, dict):
+                continue
+            target_id = relation.get("candidate_id")
+            relation_kind = relation.get("relation")
+            relation_key = (target_id, relation_kind)
+            if relation_key in seen_relations:
+                errors.append(f"{prefix} repeats a candidate relation")
+            seen_relations.add(relation_key)
+            if target_id not in candidate_ids:
+                errors.append(
+                    f"{prefix} relates to an undeclared worker candidate"
+                )
+            if target_id == candidate_id:
+                errors.append(f"{prefix} has a self relation")
+            relation_evidence = relation.get("evidence_ids")
+            if not isinstance(relation_evidence, list) or not relation_evidence:
+                errors.append(f"{prefix} relation lacks evidence")
+            elif any(
+                evidence_id not in evidence_by_id
+                for evidence_id in relation_evidence
+            ):
+                errors.append(f"{prefix} relation has invalid evidence ID")
+            if relation_kind in {"MERGED_INTO", "SPLIT_INTO"}:
+                errors.append(
+                    f"{prefix} active worker record has supersession relation"
+                )
+                continue
+            uncertainty = relation.get("uncertainty")
+            if not isinstance(uncertainty, str) or not uncertainty.strip():
+                errors.append(f"{prefix} provisional relation lacks uncertainty")
+            if relation.get("proof_kind") != "PROVISIONAL_COMPARISON":
+                errors.append(
+                    f"{prefix} provisional relation has a definitive proof kind"
+                )
+            if relation.get("before_rationale") or relation.get(
+                "after_rationale"
+            ):
+                errors.append(
+                    f"{prefix} provisional relation carries split rationale "
+                    "fields"
+                )
+
+    if (
+        isinstance(field_support, dict)
+        and "CONFLICTING_SOURCE" in field_support.values()
+        and (
+            not isinstance(row.get("source_status"), list)
+            or "CONFLICTING" not in row["source_status"]
+        )
+    ):
+        errors.append(f"{prefix} conflicting field lacks CONFLICTING source status")
+
+    source_units = {
+        value
+        for value in row.get("source_unit_ids", [])
+        if isinstance(value, str)
+    }
+    image_witnesses = {
+        value
+        for value in row.get("image_witnesses", [])
+        if isinstance(value, str)
+    }
+    cross_reference_ids = row.get("cross_reference_ids")
+    if isinstance(cross_reference_ids, list):
+        for route_id in cross_reference_ids:
+            if not isinstance(route_id, str):
+                continue
+            route = route_by_id.get(route_id)
+            if route is None:
+                continue
+            route_unit_is_owned = route.get("source_unit_id") in source_units
+            route_asset = asset_input_by_id.get(
+                str(route.get("source_asset_id", ""))
+            )
+            route_asset_is_owned = (
+                route_asset is not None
+                and route_asset.get("physical_path") in image_witnesses
+            )
+            if not route_unit_is_owned and not route_asset_is_owned:
+                errors.append(
+                    f"{prefix} cross-reference source is absent from "
+                    "candidate provenance"
+                )
 
 
 def reopened_local_links(
@@ -1021,6 +1332,7 @@ def _validate_worker_output(
     asset_updates = output.get("asset_updates", [])
     candidate_images_from_assets: dict[str, set[str]] = {}
     route_sources_from_assets: dict[str, set[str]] = {}
+    asset_update_by_image: dict[str, dict[str, Any]] = {}
     if isinstance(asset_updates, list):
         seen = set()
         immutable = ASSET_HEADER[: ASSET_HEADER.index("inspection_status")]
@@ -1034,6 +1346,9 @@ def _validate_worker_output(
             if asset_id in seen:
                 errors.append(f"duplicate asset update: {asset_id}")
             seen.add(asset_id)
+            physical_path = row.get("physical_path")
+            if isinstance(physical_path, str):
+                asset_update_by_image[physical_path] = row
             original = assigned_assets.get(asset_id)
             if original is None:
                 errors.append(f"asset update is outside assignment: {asset_id}")
@@ -1526,6 +1841,7 @@ def _validate_worker_output(
 
     routes = output.get("route_proposals", [])
     route_ids: set[str] = set()
+    route_by_id: dict[str, dict[str, Any]] = {}
     route_anchor_keys: list[tuple[int, int, int]] = []
     if isinstance(routes, list):
         proposed_route_ids = [
@@ -1550,6 +1866,7 @@ def _validate_worker_output(
             if route_id in route_ids:
                 errors.append(f"duplicate route proposal: {route_id}")
             route_ids.add(route_id)
+            route_by_id[route_id] = row
             if row.get("source_unit_id") not in assigned_units:
                 if row.get("discovery_kind") == "SOURCE_UNIT":
                     errors.append(
@@ -1689,6 +2006,14 @@ def _validate_worker_output(
             errors.append(
                 f"candidate {candidate_id} references an undeclared worker route"
             )
+        validate_worker_candidate_semantics(
+            row,
+            candidate_ids=set(proposal_by_id),
+            route_by_id=route_by_id,
+            asset_input_by_id=assigned_assets,
+            asset_update_by_image=asset_update_by_image,
+            errors=errors,
+        )
     linked_candidate_ids = set(candidate_sources_from_reading) | set(
         candidate_images_from_assets
     )

@@ -1392,6 +1392,289 @@ def test_interleaved_worker_evidence_rejects_invalid_local_allocations(
     )
 
 
+def _worker_output(bundle: Path) -> dict[str, Any]:
+    return json.loads(
+        (bundle / "output" / "output.json").read_text(encoding="utf-8")
+    )
+
+
+def _worker_candidate_errors(
+    bundle: Path,
+    goal_dir: Path,
+    output: dict[str, Any],
+) -> list[str]:
+    return build_worker_bundle.verify_bundle(
+        bundle,
+        require_completed_output=True,
+        goal_dir=goal_dir,
+        worker_output_override=output,
+    )
+
+
+def _set_worker_fingerprint_field(
+    candidate: dict[str, Any],
+    *,
+    field: str,
+    support: str,
+    value: str | None,
+    evidence_ids: list[str],
+    reason: str,
+) -> None:
+    candidate["field_support"][field] = support
+    candidate["fingerprint"][field] = {
+        "status": support,
+        "value": value,
+        "evidence_ids": evidence_ids,
+        "reason": reason,
+    }
+    for evidence in candidate["source_evidence"]:
+        declared = evidence["fingerprint_fields"]
+        if evidence["evidence_id"] in evidence_ids and field not in declared:
+            declared.append(field)
+        elif evidence["evidence_id"] not in evidence_ids and field in declared:
+            declared.remove(field)
+
+
+def test_worker_candidate_supported_semantics_match_global_validator(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal_dir = tmp_path / "goal-4"
+    supported = _worker_output(bundle)
+    candidate = supported["candidate_proposals"][0]
+    field = "object_kind"
+    _set_worker_fingerprint_field(
+        candidate,
+        field=field,
+        support="SUPPORTED",
+        value="A source-grounded test construction.",
+        evidence_ids=["WE000001"],
+        reason="",
+    )
+    assert _worker_candidate_errors(bundle, goal_dir, supported) == []
+
+    reasoned = copy.deepcopy(supported)
+    reasoned["candidate_proposals"][0]["fingerprint"][field][
+        "reason"
+    ] = "A supported value must not carry a reason."
+    reasoned_errors = _worker_candidate_errors(bundle, goal_dir, reasoned)
+    assert any(
+        "supported value has a reason" in error for error in reasoned_errors
+    )
+
+    absence = copy.deepcopy(supported)
+    absence["candidate_proposals"][0]["fingerprint"][field][
+        "value"
+    ] = "unknown from source"
+    absence_errors = _worker_candidate_errors(bundle, goal_dir, absence)
+    assert any(
+        "supported value encodes source absence" in error
+        for error in absence_errors
+    )
+
+
+def test_worker_candidate_not_applicable_requires_exact_evidence(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal_dir = tmp_path / "goal-4"
+    not_applicable = _worker_output(bundle)
+    candidate = not_applicable["candidate_proposals"][0]
+    field = "native_time"
+    _set_worker_fingerprint_field(
+        candidate,
+        field=field,
+        support="NOT_APPLICABLE",
+        value=None,
+        evidence_ids=["WE000001"],
+        reason="The source explicitly defines this construction without time.",
+    )
+    assert _worker_candidate_errors(bundle, goal_dir, not_applicable) == []
+
+    nonnull = copy.deepcopy(not_applicable)
+    nonnull["candidate_proposals"][0]["fingerprint"][field][
+        "value"
+    ] = "No time"
+    no_reason = copy.deepcopy(not_applicable)
+    no_reason["candidate_proposals"][0]["fingerprint"][field]["reason"] = ""
+    no_evidence = copy.deepcopy(not_applicable)
+    no_evidence_candidate = no_evidence["candidate_proposals"][0]
+    no_evidence_candidate["fingerprint"][field]["evidence_ids"] = []
+    no_evidence_candidate["source_evidence"][0]["fingerprint_fields"].remove(
+        field
+    )
+    declaration_mismatch = copy.deepcopy(not_applicable)
+    declaration_mismatch["candidate_proposals"][0]["source_evidence"][0][
+        "fingerprint_fields"
+    ].remove(field)
+
+    mutations = [
+        (nonnull, "not-applicable value must be null and evidence-justified"),
+        (no_reason, "not-applicable value lacks reason"),
+        (no_evidence, "not-applicable value must be null and evidence-justified"),
+        (
+            declaration_mismatch,
+            "evidence IDs/declarations are not exact",
+        ),
+    ]
+    for mutation, expected in mutations:
+        mutation_errors = _worker_candidate_errors(
+            bundle,
+            goal_dir,
+            mutation,
+        )
+        assert any(expected in error for error in mutation_errors)
+
+
+def test_worker_candidate_unknown_and_conflict_reasons_are_declared(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal_dir = tmp_path / "goal-4"
+    output = _worker_output(bundle)
+    field = "object_kind"
+
+    unknown = copy.deepcopy(output)
+    unknown["candidate_proposals"][0]["fingerprint"][field][
+        "reason"
+    ] = "A different undeclared mechanics gap."
+    unknown_errors = _worker_candidate_errors(bundle, goal_dir, unknown)
+    assert any(
+        "unknown reason is absent from missing_mechanics" in error
+        for error in unknown_errors
+    )
+
+    conflict = copy.deepcopy(output)
+    conflict_candidate = conflict["candidate_proposals"][0]
+    conflict_reason = "The prose and image give incompatible constructions."
+    _set_worker_fingerprint_field(
+        conflict_candidate,
+        field=field,
+        support="CONFLICTING_SOURCE",
+        value=None,
+        evidence_ids=["WE000001", "WE000002"],
+        reason=conflict_reason,
+    )
+    conflict_candidate["uncertainties"] = [conflict_reason]
+    conflict_candidate["source_status"] = ["CONFLICTING"]
+    for reading in conflict["reading_updates"]:
+        if reading["source_unit_id"] in conflict_candidate["source_unit_ids"]:
+            reading["source_status"] = "CONFLICTING"
+    conflict["asset_updates"][0]["source_status"] = "CONFLICTING"
+    assert _worker_candidate_errors(bundle, goal_dir, conflict) == []
+
+    undeclared = copy.deepcopy(conflict)
+    undeclared["candidate_proposals"][0]["fingerprint"][field][
+        "reason"
+    ] = "A different undeclared conflict."
+    undeclared_errors = _worker_candidate_errors(bundle, goal_dir, undeclared)
+    assert any(
+        "conflict reason is absent from uncertainties" in error
+        for error in undeclared_errors
+    )
+
+
+def test_worker_candidate_provisional_relations_require_provisional_proof(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_interleaved_evidence_bundle(tmp_path)
+    goal_dir = tmp_path / "goal-4"
+    related = _worker_output(bundle)
+    relation = {
+        "candidate_id": "W0002",
+        "relation": "POSSIBLY_SAME_AS",
+        "proof_kind": "PROVISIONAL_COMPARISON",
+        "evidence_ids": ["WE000001"],
+        "before_rationale": "",
+        "after_rationale": "",
+        "uncertainty": "The reviewed source does not establish identity.",
+    }
+    related["candidate_proposals"][0]["related_candidate_ids"] = [relation]
+    assert _worker_candidate_errors(bundle, goal_dir, related) == []
+
+    definitive_proof = copy.deepcopy(related)
+    definitive_proof["candidate_proposals"][0]["related_candidate_ids"][0][
+        "proof_kind"
+    ] = "ALIAS_IDENTITY"
+    no_uncertainty = copy.deepcopy(related)
+    no_uncertainty["candidate_proposals"][0]["related_candidate_ids"][0][
+        "uncertainty"
+    ] = ""
+    split_rationale = copy.deepcopy(related)
+    split_rationale["candidate_proposals"][0]["related_candidate_ids"][0][
+        "before_rationale"
+    ] = "This field is reserved for an actual split."
+
+    mutations = [
+        (definitive_proof, "provisional relation has a definitive proof kind"),
+        (no_uncertainty, "provisional relation lacks uncertainty"),
+        (
+            split_rationale,
+            "provisional relation carries split rationale fields",
+        ),
+    ]
+    for mutation, expected in mutations:
+        mutation_errors = _worker_candidate_errors(
+            bundle,
+            goal_dir,
+            mutation,
+        )
+        assert any(expected in error for error in mutation_errors)
+
+
+def test_worker_candidate_route_source_must_be_in_candidate_provenance(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_interleaved_evidence_bundle(tmp_path)
+    goal_dir = tmp_path / "goal-4"
+    output = _worker_output(bundle)
+    output["candidate_proposals"][0]["cross_reference_ids"] = ["WR0001"]
+    errors = _worker_candidate_errors(bundle, goal_dir, output)
+    assert any(
+        "cross-reference source is absent from candidate provenance" in error
+        for error in errors
+    )
+
+
+def test_worker_direct_image_evidence_requires_native_checked_asset(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal_dir = tmp_path / "goal-4"
+    direct = _worker_output(bundle)
+    candidate = direct["candidate_proposals"][0]
+    candidate["source_evidence"][1][
+        "strength"
+    ] = "DIRECT_COMPLETE_MECHANICS"
+    candidate["evidence_strength"] = [
+        "LEAD_ONLY",
+        "DIRECT_COMPLETE_MECHANICS",
+    ]
+    assert _worker_candidate_errors(bundle, goal_dir, direct) == []
+
+    nonnative = copy.deepcopy(direct)
+    nonnative["asset_updates"][0]["visual_role"] = "OBSERVER_ONLY"
+    not_reviewed = copy.deepcopy(direct)
+    not_reviewed["asset_updates"][0][
+        "original_resolution_status"
+    ] = "NOT_REQUIRED"
+    not_checked = copy.deepcopy(direct)
+    not_checked["asset_updates"][0]["transcription_status"] = "NOT_REQUIRED"
+
+    for mutation in (nonnative, not_reviewed, not_checked):
+        mutation_errors = _worker_candidate_errors(
+            bundle,
+            goal_dir,
+            mutation,
+        )
+        assert any(
+            "direct image evidence WE000002 lacks "
+            "native/resolution/transcription verification"
+            in error
+            for error in mutation_errors
+        )
+
+
 def test_apply_uses_validated_staged_ledgers_and_preserves_search(
     tmp_path: Path,
 ) -> None:

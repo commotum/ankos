@@ -83,6 +83,15 @@ DIRECT_COMPLETE_SOURCE_UNITS = {
 # These units identify, summarize, or visualize already-delimited systems; they
 # do not independently state the native transition or constraint mechanics.
 SOURCE_EVIDENCE_OVERRIDES = {
+    "U000981": (
+        "CONTEXTUAL",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
     "U000997": (
         "CONTEXTUAL",
         {
@@ -101,12 +110,39 @@ SOURCE_EVIDENCE_OVERRIDES = {
             "evidence_limit",
         },
     ),
+    "U001033": (
+        "CONTEXTUAL",
+        {
+            "object_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001038": (
+        "CONTEXTUAL",
+        {
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
     "U001053": (
         "DIRECT_PARTIAL_MECHANICS",
         {
             "topology",
             "structural_invariants",
             "read_dependencies_or_neighborhood",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001057": (
+        "CONTEXTUAL",
+        {
+            "schedule",
             "parameters_and_variants",
             "excluded_observers_and_representations",
             "evidence_limit",
@@ -244,6 +280,15 @@ SOURCE_EVIDENCE_OVERRIDES = {
             "topology",
             "result_kind",
             "witness_semantics",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        },
+    ),
+    "U001212": (
+        "CONTEXTUAL",
+        {
+            "object_kind",
             "parameters_and_variants",
             "excluded_observers_and_representations",
             "evidence_limit",
@@ -1047,13 +1092,13 @@ def profile_blueprint(
             blueprint[field] = {
                 "status": "SUPPORTED",
                 "value": supported[field],
-                "reason": "The assigned canonical source directly supports this field.",
+                "reason": "",
             }
         elif field in unknown:
             blueprint[field] = {
                 "status": "UNKNOWN_FROM_SOURCE",
                 "value": None,
-                "reason": f"The assigned source does not establish {field} for this candidate.",
+                "reason": f"The assigned source does not establish {field} for {name}.",
             }
         else:
             blueprint[field] = {
@@ -1221,7 +1266,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U000991",
         1,
-        ["U000991"],
+        ["U000981", "U000991"],
         ["A000854"],
         aliases=["code 746"],
         parameters={
@@ -1339,7 +1384,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001034",
         1,
-        ["U001034", "U001039"],
+        ["U001033", "U001034", "U001039"],
         [],
         route_keys=["page-82-substitution"],
     )
@@ -1361,7 +1406,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "IMAGE",
             "A000876",
             ordinal,
-            ["U001041"],
+            ["U001038", "U001041"],
             ["A000876"],
             aliases=[f"substitution preset ({label})"],
             parameters={"panel": label, "horizon": "five steps", "seed": "single black square"},
@@ -1422,7 +1467,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001056",
         1,
-        ["U001052", "U001056", "U001059"],
+        ["U001052", "U001056", "U001057", "U001059"],
         ["A000882"],
         parameters={"boundary": "grid wraps in both dimensions", "dependency": "neighboring cells"},
         parent_index=sub2,
@@ -2187,7 +2232,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         "SOURCE_UNIT",
         "U001213",
         1,
-        ["U001213"],
+        ["U001212", "U001213"],
         [],
         parameters={"local footprint": "complete 3 × 3 block including diagonals"},
         parent_index=constraint_family,
@@ -2525,6 +2570,11 @@ def candidate_records(
         supported_fields = [
             field for field in FIELDS if blueprint[field]["status"] == "SUPPORTED"
         ]
+        not_applicable_fields = [
+            field
+            for field in FIELDS
+            if blueprint[field]["status"] == "NOT_APPLICABLE"
+        ]
         evidence: list[dict[str, Any]] = []
 
         def add_evidence(
@@ -2637,6 +2687,12 @@ def candidate_records(
                     and "boundary" not in evidence_fields
                 ):
                     evidence_fields.append("boundary")
+            if unit_id == primary_mechanics_unit:
+                evidence_fields.extend(
+                    field
+                    for field in not_applicable_fields
+                    if field not in evidence_fields
+                )
             evidence_fields.sort(key=FIELDS.index)
             add_evidence(
                 "SOURCE_UNIT",
@@ -2650,9 +2706,6 @@ def candidate_records(
         for asset_id in spec["assets"]:
             role = asset_specs[asset_id]["role"]
             strength = (
-                "DIRECT_IDENTITY"
-                if asset_id == "A000915"
-                else
                 "DIRECT_PARTIAL_MECHANICS"
                 if role == "NATIVE_EVIDENCE"
                 else "CORROBORATING"
@@ -2720,10 +2773,13 @@ def candidate_records(
             entry = dict(blueprint[field])
             entry["evidence_ids"] = (
                 evidence_ids_by_field[field]
-                if entry["status"] in {"SUPPORTED", "CONFLICTING_SOURCE"}
+                if entry["status"]
+                in {"SUPPORTED", "NOT_APPLICABLE", "CONFLICTING_SOURCE"}
                 else []
             )
             if entry["status"] == "SUPPORTED":
+                assert entry["evidence_ids"], (name, field)
+            if entry["status"] == "NOT_APPLICABLE":
                 assert entry["evidence_ids"], (name, field)
             if entry["status"] == "UNKNOWN_FROM_SOURCE":
                 missing.append(f"The assigned source does not establish {field} for {name}.")
@@ -2758,8 +2814,8 @@ def candidate_records(
                     "relation": "POSSIBLE_VARIANT_OF",
                     "proof_kind": "PROVISIONAL_COMPARISON",
                     "evidence_ids": [evidence[0]["evidence_id"]],
-                    "before_rationale": f"{name} is independently delimited by the source.",
-                    "after_rationale": "Family/preset implementation equivalence is deliberately deferred until whole-corpus reconciliation.",
+                    "before_rationale": "",
+                    "after_rationale": "",
                     "uncertainty": "The blind review records a possible family relation without collapsing the preset.",
                 }
             )
@@ -2894,7 +2950,7 @@ def explicit_unlinked_dispositions() -> dict[str, tuple[str, list[str]]]:
     assign(
         "CROSS_REFERENCE",
         [],
-        "U000981 U000995 U001033 U001038 U001057 U001062 U001113 U001212",
+        "U000995 U001062 U001113",
     )
     assign("HISTORICAL_ONLY", ["HISTORICAL_MENTION"], "U001013")
     assign("APPLICATION_OR_EMULATION", ["APPLICATION"], "U001068")
@@ -3066,7 +3122,7 @@ def build_output(bundle: Path, prohibited_nonuse: bool) -> dict[str, Any]:
 
 def canonical_bytes(output: dict[str, Any]) -> bytes:
     return (
-        json.dumps(output, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        json.dumps(output, ensure_ascii=False, indent=2) + "\n"
     ).encode("utf-8")
 
 
@@ -3238,10 +3294,14 @@ def validate_output(
             raise ValueError(f"search anchor in sequential review: {candidate['id']}")
 
         local_evidence_ids: set[str] = set()
+        local_evidence_fields: dict[str, set[str]] = {}
         for evidence in candidate["source_evidence"]:
             evidence_ids.append(evidence["evidence_id"])
             group_ids.append(evidence["evidence_group_id"])
             local_evidence_ids.add(evidence["evidence_id"])
+            local_evidence_fields[evidence["evidence_id"]] = set(
+                evidence["fingerprint_fields"]
+            )
             evidence_anchor = evidence["discovery_anchor"]
             if evidence_anchor["epoch"] != 2:
                 raise ValueError(f"wrong evidence epoch: {evidence['evidence_id']}")
@@ -3253,11 +3313,19 @@ def validate_output(
                 asset = asset_by_path[evidence_anchor["id"]]
                 if (
                     evidence["strength"]
-                    in {"DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
-                    and asset["visual_role"] != "NATIVE_EVIDENCE"
+                    in {
+                        "DIRECT_IDENTITY",
+                        "DIRECT_PARTIAL_MECHANICS",
+                        "DIRECT_COMPLETE_MECHANICS",
+                    }
+                    and (
+                        asset["visual_role"] != "NATIVE_EVIDENCE"
+                        or asset["original_resolution_status"] != "REVIEWED"
+                        or asset["transcription_status"] != "CHECKED"
+                    )
                 ):
                     raise ValueError(
-                        f"non-native image promoted to direct mechanics: {evidence['evidence_id']}"
+                        f"unverified image promoted to direct evidence: {evidence['evidence_id']}"
                     )
                 if evidence["image_path"] != asset["physical_path"]:
                     raise ValueError(f"image path mismatch: {evidence['evidence_id']}")
@@ -3277,26 +3345,74 @@ def validate_output(
                 raise ValueError(f"unknown field status: {candidate['id']} {field}")
             if not set(item["evidence_ids"]) <= local_evidence_ids:
                 raise ValueError(f"foreign field evidence: {candidate['id']} {field}")
+            declared_evidence_ids = {
+                evidence_id
+                for evidence_id, evidence_fields in local_evidence_fields.items()
+                if field in evidence_fields
+            }
+            if set(item["evidence_ids"]) != declared_evidence_ids:
+                raise ValueError(
+                    f"inexact field evidence declarations: {candidate['id']} {field}"
+                )
             if item["status"] == "SUPPORTED":
-                if item["value"] is None or not item["evidence_ids"]:
+                if (
+                    not isinstance(item["value"], str)
+                    or not item["value"].strip()
+                    or not item["evidence_ids"]
+                ):
                     raise ValueError(f"unsupported supported field: {candidate['id']} {field}")
-            else:
-                if item["value"] is not None or item["evidence_ids"]:
-                    raise ValueError(f"nonempty unresolved/N/A field: {candidate['id']} {field}")
-            if item["status"] == "UNKNOWN_FROM_SOURCE":
+                if item["reason"] not in ("", None):
+                    raise ValueError(
+                        f"supported field carries reason: {candidate['id']} {field}"
+                    )
+            elif item["status"] == "NOT_APPLICABLE":
+                if (
+                    item["value"] is not None
+                    or not item["evidence_ids"]
+                    or not isinstance(item["reason"], str)
+                    or not item["reason"].strip()
+                ):
+                    raise ValueError(
+                        f"invalid evidence-justified N/A field: {candidate['id']} {field}"
+                    )
+            elif item["status"] == "UNKNOWN_FROM_SOURCE":
                 expected = (
                     f"The assigned source does not establish {field} for "
                     f"{candidate['provisional_name']}."
                 )
-                if expected not in candidate["missing_mechanics"]:
+                if (
+                    item["value"] is not None
+                    or item["evidence_ids"]
+                    or item["reason"] != expected
+                    or expected not in candidate["missing_mechanics"]
+                ):
                     raise ValueError(
-                        f"missing-mechanics duplication absent: {candidate['id']} {field}"
+                        f"invalid unknown-source field: {candidate['id']} {field}"
+                    )
+            elif item["status"] == "CONFLICTING_SOURCE":
+                if (
+                    item["value"] is not None
+                    or len(item["evidence_ids"]) < 2
+                    or not isinstance(item["reason"], str)
+                    or item["reason"] not in candidate["uncertainties"]
+                ):
+                    raise ValueError(
+                        f"invalid conflicting-source field: {candidate['id']} {field}"
                     )
         for relation in candidate["related_candidate_ids"]:
             if relation["candidate_id"] not in candidate_by_id:
                 raise ValueError(f"foreign candidate relation: {candidate['id']}")
             if relation["proof_kind"] != "PROVISIONAL_COMPARISON":
                 raise ValueError(f"blind identity collapse attempted: {candidate['id']}")
+            if (
+                relation["before_rationale"]
+                or relation["after_rationale"]
+                or not isinstance(relation["uncertainty"], str)
+                or not relation["uncertainty"].strip()
+            ):
+                raise ValueError(
+                    f"malformed provisional relation: {candidate['id']}"
+                )
         for route_id in candidate["cross_reference_ids"]:
             if route_id not in {row["route_id"] for row in routes}:
                 raise ValueError(f"foreign candidate route: {candidate['id']}")
