@@ -20,6 +20,7 @@ WORKER_ID = "ch06-main"
 STAGE = 10
 EPOCH = 2
 SOURCE_PATH = "CHAPTERS/06-Starting-from-Randomness.md"
+EXPECTED_CANDIDATE_COUNT = 58
 
 FIELDS = [
     "object_kind",
@@ -984,7 +985,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
 
     add(
         "neighbor-difference gray-field display transformation",
-        ["U001321", "U001323"],
+        ["U001323"],
         ["U001323"],
         {
             **relation_values(
@@ -1238,7 +1239,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         clone["variants"] = [f"code {code}"]
         clone["variant_units"] = {f"code {code}": units}
         clone["field_units"] = {
-            "rule_relation_constraint_function_or_probability_law": semantic_units,
+            "rule_relation_constraint_function_or_probability_law": [semantic_units[-1]],
             "parameters_and_variants": units,
         }
         clone["evidence_overrides"] = {}
@@ -1627,13 +1628,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
     candidate(difference_name)["uncertainties"] = [
         "The source does not state which neighbor is selected, whether the difference is signed or absolute, or how it is remapped to display gray."
     ]
-    evidence(
-        difference_name,
-        "U001321",
-        fields=[],
-        claim="A000956 is a finite output witness for the differenced-gray display; the transformation itself is stated in U001323.",
-        strength="CONTEXTUAL",
-    )
     slice_name = "one-dimensional slice-through-time and spatial-depth-fog observer"
     slice_candidate = candidate(slice_name)
     slice_candidate["mechanics_units"] = ["U001325"]
@@ -2292,6 +2286,679 @@ def candidate_definitions() -> list[dict[str, Any]]:
         strength="CONTEXTUAL",
     )
 
+    # U001473/A001002 is native rule-184 transition evidence, not substitution
+    # seed evidence.
+    rule184_name = "elementary cellular automaton rule 184"
+    candidate(rule184_name)["values"]["read_dependencies_or_neighborhood"] = (
+        "the left neighbor, cell itself, and right neighbor"
+    )
+    evidence(
+        rule184_name,
+        "U001473",
+        fields=[
+            "alphabet_or_value_schema",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        ],
+        claim="A001002 is the original-resolution rule-184 transition-table strip and directly supports the scoped native local law.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        allow_direct_image=True,
+    )
+
+    # The rule-255 native preset and its all-black attractor are distinct.
+    rule255_name = "elementary cellular automaton rule 255"
+    rule255 = candidate(rule255_name)
+    rule255["mechanics_units"] = []
+    rule255["values"] = {
+        "object_kind": "one-dimensional binary nearest-neighbor cellular-automaton preset",
+        "native_time": "discrete successive steps",
+        "carrier": "a one-dimensional row of binary cells",
+        "alphabet_or_value_schema": "black and white",
+        "complete_state": "the color of every cell at one step",
+        "read_dependencies_or_neighborhood": "the left neighbor, cell itself, and right neighbor",
+        "law_kind": "deterministic local transition law",
+        "rule_relation_constraint_function_or_probability_law": "all eight binary nearest-neighbor input triples map to black",
+        "write_replacement_assembly_or_commit": "replace every cell by black on the next synchronous step",
+        "result_kind": "the all-black successor configuration",
+        "successor_cardinality": "one successor for each complete state",
+        "determinism_branching_or_measure": "deterministic",
+        "termination_completion_failure": "after one step the native state is all black and remains there",
+        "witness_semantics": "the displayed transition table and one-step evolution witness the native preset",
+        "parameters_and_variants": "rule 255",
+        "evidence_limit": "The transition table is image-borne and was transcribed at original resolution.",
+    }
+    rule255["uncertainties"] = []
+    evidence(
+        rule255_name,
+        "U001484",
+        fields=["native_time", "result_kind", "termination_completion_failure", "witness_semantics"],
+        claim="U001484 states that the first class-1 example permits only all-black sequences after one step.",
+    )
+    evidence(
+        rule255_name,
+        "U001485",
+        fields=[
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "witness_semantics",
+            "evidence_limit",
+        ],
+        claim="A001005's top transition table maps every binary nearest-neighbor triple to black; original-resolution review confirms all eight entries.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        allow_direct_image=True,
+    )
+    evidence(
+        rule255_name,
+        "U001486",
+        fields=["object_kind", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
+        claim="U001486 identifies the first displayed native preset as rule 255.",
+        strength="DIRECT_IDENTITY",
+    )
+    attractor255_name = "rule-255 all-black attractor"
+    candidate(attractor255_name)["mechanics_units"] = ["U001487"]
+    evidence(
+        attractor255_name,
+        "U001484",
+        fields=["rule_relation_constraint_function_or_probability_law", "result_kind", "termination_completion_failure"],
+        claim="U001484 states the one-step restriction to all-black sequences.",
+    )
+    evidence(
+        attractor255_name,
+        "U001485",
+        fields=["witness_semantics"],
+        claim="A001005 is the finite native/attractor witness shared with rule 255; the attractor relation itself is stated in prose.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        attractor255_name,
+        "U001486",
+        fields=["object_kind", "input", "rule_relation_constraint_function_or_probability_law", "result_kind", "termination_completion_failure"],
+        claim="U001486 associates rule 255 with the one-step all-black allowed-sequence result.",
+    )
+
+    panel4_name = "fixed-or-periodic-structure elementary cellular-automaton preset panel"
+    evidence(
+        panel4_name,
+        "U001485",
+        fields=[],
+        claim="A001005 concerns later rule-255/rule-4 attractors and supplies no mechanics for panel rules 108, 218, or 232.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        panel4_name,
+        "U001486",
+        fields=["parameters_and_variants"],
+        claim="U001486 identifies only the rule-4 member's isolated-black attractor behavior; it does not support the whole four-rule panel.",
+        strength="CORROBORATING",
+    )
+
+    # The allowed-sequence network is an observer with worked path-language
+    # examples; later growth panels support outputs only.
+    network_name = "allowed-sequence path-network observer"
+    network = candidate(network_name)
+    network["mechanics_units"] = ["U001493"]
+    network["values"]["structural_invariants"] = "each permitted cell sequence corresponds to a path through the network"
+    network["values"]["parameters_and_variants"] = (
+        "full binary language, all-black language, isolated-black language, rule-128 shrinking blocks, and class-3/4 forbidden-block surveys"
+    )
+    network["field_units"].update(
+        {
+            "structural_invariants": ["U001493", "U001494", "U001496", "U001498"],
+            "parameters_and_variants": ["U001494", "U001495", "U001496", "U001498", "U001500", "U001503", "U001504", "U001506"],
+        }
+    )
+    network_specs = {
+        "U001492": (
+            ["object_kind", "carrier", "result_kind"],
+            "U001492 identifies a compact network representation for allowed one-dimensional binary sequences.",
+            "DIRECT_IDENTITY",
+        ),
+        "U001494": (
+            ["complete_state", "input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics", "structural_invariants", "parameters_and_variants"],
+            "U001494 gives the worked two-loop path language for all black/white sequences.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001495": (
+            ["input", "result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001495 gives the one-loop all-black path language for rule 255.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001496": (
+            ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics", "structural_invariants", "parameters_and_variants"],
+            "U001496 explains the two-node rule-4 path language and its isolated-black constraint.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001498": (
+            ["result_kind", "witness_semantics", "structural_invariants", "parameters_and_variants"],
+            "U001498 states that paths encode all allowed sequences for rules 255 and 4.",
+            "CORROBORATING",
+        ),
+        "U001500": (
+            ["input", "result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001500 gives the rule-128 allowed-block condition after t steps, not the generic network algorithm.",
+            "CORROBORATING",
+        ),
+        "U001503": (
+            ["result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001503 reports at-most-about-t^2 node growth for class-1/2 network outputs.",
+            "CORROBORATING",
+        ),
+        "U001504": (
+            ["input", "result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001504 supplies rule-126 forbidden-block results and rapid network growth, not the generic construction law.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001506": (
+            ["result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001506 reports at-least-exponential node growth for class-3/4 network outputs.",
+            "CORROBORATING",
+        ),
+    }
+    for unit_id, (fields, claim, strength) in network_specs.items():
+        evidence(network_name, unit_id, fields=fields, claim=claim, strength=strength)
+    for unit_id in ["U001497", "U001499", "U001501", "U001502", "U001505"]:
+        evidence(
+            network_name,
+            unit_id,
+            fields=[],
+            claim=f"{unit_id} is a finite network/result witness and supplies no generic network-construction mechanics.",
+            strength="CONTEXTUAL",
+        )
+
+    surjective_name = "surjective binary cellular-automaton mapping family"
+    surjective = candidate(surjective_name)
+    surjective["variants"] = ["rule 204", "rule 240", "rule 30", "rule 90"]
+    surjective["variant_units"] = {variant: ["U001511", "U001512"] for variant in surjective["variants"]}
+    surjective["values"]["parameters_and_variants"] = "surjective examples rules 204, 240, 30, and 90"
+    surjective["field_units"]["parameters_and_variants"] = ["U001511", "U001512"]
+    evidence(
+        surjective_name,
+        "U001511",
+        fields=["parameters_and_variants"],
+        claim="A001010 preserves the original-resolution surjective-example inventory: rules 204, 240, 30, and 90.",
+        strength="CONTEXTUAL",
+    )
+
+    # Native class-4 codes explicitly exclude their enumeration/result panels.
+    native_search_records = {
+        "two-color next-nearest-neighbor cellular automaton code 20": {
+            "mechanics": "U001526",
+            "excluded_units": ["U001532", "U001533", "U001535", "U001536", "U001539", "U001540"],
+            "excluded": "integer-coded enumeration panels and persistent-structure catalogs are observer/search results, not code-20 transition-law evidence",
+        },
+        "three-color nearest-neighbor cellular automaton code 357": {
+            "mechanics": "U001528",
+            "excluded_units": ["U001542", "U001543", "U001544", "U001545", "U001546"],
+            "excluded": "base-3 enumeration and persistent-structure panels are observer/search results, not code-357 transition-law evidence",
+        },
+        "three-color nearest-neighbor cellular automaton code 1329": {
+            "mechanics": "U001530",
+            "excluded_units": ["U001548", "U001549", "U001550", "U001551", "U001552", "U001553", "U001554", "U001555", "U001556"],
+            "excluded": "persistent-structure and unbounded-growth panels are observer/search results, not code-1329 transition-law evidence",
+        },
+    }
+    for name, spec in native_search_records.items():
+        row = candidate(name)
+        row["mechanics_units"] = [spec["mechanics"]]
+        row["values"]["excluded_observers_and_representations"] = spec["excluded"]
+        row["field_units"]["excluded_observers_and_representations"] = spec["excluded_units"]
+        for unit_id in spec["excluded_units"]:
+            if unit_id in row["units"]:
+                evidence(
+                    name,
+                    unit_id,
+                    fields=["excluded_observers_and_representations"],
+                    claim=f"{unit_id} is a search/result witness explicitly excluded from {name}'s native-law mechanics.",
+                    strength="CONTEXTUAL" if unit_id in {"U001532", "U001535", "U001543", "U001549", "U001552", "U001555"} else "CORROBORATING",
+                )
+
+    brute_name = "persistent-structure exhaustive search query"
+    brute = candidate(brute_name)
+    brute["mechanics_units"] = []
+    brute_specs = {
+        "U001519": (
+            [
+                "object_kind",
+                "native_time",
+                "carrier",
+                "complete_state",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "witness_semantics",
+                "evidence_limit",
+            ],
+            "U001519 defines the brute-force method: try possible initial conditions in turn, evolve each, and test for a new persistent structure.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001532": (
+            ["witness_semantics"],
+            "A001015 is a finite first-200-initial-condition result panel, not the enumeration algorithm.",
+            "CONTEXTUAL",
+        ),
+        "U001533": (
+            ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics"],
+            "U001533 states the finite region bound, base-2 numbering, and per-input persistence outcomes.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001534": (
+            ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "termination_completion_failure", "witness_semantics"],
+            "U001534 reports a finite prefix of 25 billion tested inputs and explicitly does not claim completeness.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001535": (
+            ["witness_semantics"],
+            "A001016 is the finite persistent-structure result catalog from the brute-force prefix.",
+            "CONTEXTUAL",
+        ),
+        "U001536": (
+            ["input", "result_kind", "witness_semantics"],
+            "U001536 labels the first-25-billion result catalog and its base-2 seed numbers.",
+            "CORROBORATING",
+        ),
+    }
+    for unit_id, (fields, claim, strength) in brute_specs.items():
+        evidence(brute_name, unit_id, fields=fields, claim=claim, strength=strength)
+
+    codec_name = "localized finite-seed integer codec family"
+    codec = candidate(codec_name)
+    codec["mechanics_units"] = []
+    codec["values"]["support"] = "a finite localized digit block; U001533 explicitly bounds one binary survey to regions smaller than nine cells"
+    codec["values"]["external_data"] = "the assigned nonnegative integer whose positional digits encode the seed"
+    codec_specs = {
+        "U001533": (
+            [
+                "object_kind",
+                "native_time",
+                "carrier",
+                "support",
+                "alphabet_or_value_schema",
+                "complete_state",
+                "input",
+                "external_data",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+                "evidence_limit",
+            ],
+            "U001533 defines the base-2 integer-digit encoding of binary initial blocks smaller than nine cells.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001536": (
+            ["input", "external_data", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
+            "U001536 corroborates that listed base-2 digit sequences correspond to the binary initial conditions.",
+            "CORROBORATING",
+        ),
+        "U001544": (
+            [
+                "alphabet_or_value_schema",
+                "input",
+                "external_data",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            "U001544 defines the three-color base-3 integer-digit variant used for code-357 initial conditions.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+    }
+    for unit_id, (fields, claim, strength) in codec_specs.items():
+        evidence(codec_name, unit_id, fields=fields, claim=claim, strength=strength)
+
+    solver_name = "systematic fixed-period persistent-structure constraint solver"
+    solver = candidate(solver_name)
+    solver["mechanics_units"] = []
+    solver_specs = {
+        "U001537": (
+            [
+                "object_kind",
+                "native_time",
+                "carrier",
+                "complete_state",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "witness_semantics",
+                "evidence_limit",
+            ],
+            "U001537 states the completeness contract: a systematic procedure finds absolutely all structures for a given small period.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001538": (
+            ["input", "result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001538 reports period-through-15 results and minimum-width facts, not the missing constraint algorithm.",
+            "CORROBORATING",
+        ),
+        "U001539": (
+            ["result_kind", "witness_semantics", "parameters_and_variants"],
+            "A001017 is the original-resolution labeled catalog of systematic period-bounded results.",
+            "CONTEXTUAL",
+        ),
+        "U001540": (
+            [
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "termination_completion_failure",
+                "witness_semantics",
+                "parameters_and_variants",
+            ],
+            "U001540 states that all code-20 structures through period 15 were found by a constraint method routed to page 268.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+    }
+    for unit_id, (fields, claim, strength) in solver_specs.items():
+        evidence(solver_name, unit_id, fields=fields, claim=claim, strength=strength)
+
+    # Rule 110: periodic backgrounds, catalogs, growth, and collisions remain
+    # seed/observer witnesses rather than native transition-law evidence.
+    rule110_name = "elementary cellular automaton rule 110"
+    rule110 = candidate(rule110_name)
+    rule110["units"].extend(["U001563", "U001564"])
+    rule110["mechanics_units"] = ["U001560"]
+    rule110["values"]["excluded_observers_and_representations"] = (
+        "the 14-cell periodic background is a seed/environment; persistent-structure catalogs, growth panels, "
+        "and collision diagrams are observer/experiment outputs rather than rule-110 transition-law evidence"
+    )
+    rule110["field_units"]["excluded_observers_and_representations"] = [
+        "U001558",
+        "U001561",
+        "U001562",
+        "U001563",
+        "U001564",
+        "U001568",
+        "U001570",
+        "U001572",
+        "U001574",
+        "U001576",
+    ]
+    rule110["related_names"] = ["periodic-block cellular-automaton initial-condition generator"]
+    rule110_specs = {
+        "U001558": (
+            ["seed", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001558 gives the random seed context and the 14-cell/7-step periodic background; it supplies no native transition entries.",
+        ),
+        "U001561": (
+            ["seed", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001561 states that rule-110 structures are disruptions in a regular 14-cell/7-step background.",
+        ),
+        "U001562": (
+            ["result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001562 introduces a bounded seed search and persistent-structure catalog as observer evidence.",
+        ),
+        "U001563": (
+            ["input", "result_kind", "excluded_observers_and_representations"],
+            "U001563 routes a width-41 unbounded-growth search result and is not native-law evidence.",
+        ),
+        "U001564": (
+            ["input", "result_kind", "excluded_observers_and_representations"],
+            "U001564 routes rule-110 collision experiments and is not native-law evidence.",
+        ),
+        "U001568": (
+            ["result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001568 labels a persistent-structure catalog and extension variants.",
+        ),
+        "U001570": (
+            ["seed", "input", "result_kind", "termination_completion_failure", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001570 records the length-41 seed and measured 77-step growth cycle, displacement, and separations.",
+        ),
+        "U001572": (
+            ["input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001572 records spacing variants in collisions between catalog structures o and j.",
+        ),
+        "U001574": (
+            ["input", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001574 records a collision between catalog structures e and o.",
+        ),
+        "U001576": (
+            ["input", "result_kind", "termination_completion_failure", "parameters_and_variants", "excluded_observers_and_representations"],
+            "U001576 records a greater-than-4000-step collision outcome producing eight structures.",
+        ),
+    }
+    for unit_id, (fields, claim) in rule110_specs.items():
+        evidence(rule110_name, unit_id, fields=fields, claim=claim, strength="CORROBORATING")
+    for unit_id in ["U001557", "U001567", "U001569", "U001571", "U001573", "U001575"]:
+        evidence(
+            rule110_name,
+            unit_id,
+            fields=[],
+            claim=f"{unit_id} is a rule-110 background, catalog, growth, or collision image and is not native-law evidence.",
+            strength="CONTEXTUAL",
+        )
+
+    # Code-only presets remain candidate identities, but absent transition
+    # tables are left unknown instead of being reconstructed from generic CA
+    # boilerplate.
+    def narrow_code_identity(
+        name: str,
+        *,
+        code: str,
+        mechanics_unit: str,
+        extra_values: dict[str, str] | None = None,
+        extra_fields: list[str] | None = None,
+        claim: str | None = None,
+        image_mechanics: bool = False,
+    ) -> None:
+        row = candidate(name)
+        row["mechanics_units"] = []
+        row["values"] = {
+            "object_kind": "source-identified cellular-automaton preset",
+            "visible_history": "the finite evolution histories shown in this range",
+            "rule_relation_constraint_function_or_probability_law": code,
+            "result_kind": "a finite displayed evolution history",
+            "witness_semantics": "the cited image or caption witnesses identity and finite behavior, not an unstated transition table",
+            "parameters_and_variants": code,
+            "evidence_limit": "The complete transition table is not transcribed in this Chapter 6 main-text range.",
+        }
+        if extra_values:
+            row["values"].update(extra_values)
+        fields = [
+            "object_kind",
+            "visible_history",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "witness_semantics",
+            "parameters_and_variants",
+            "evidence_limit",
+        ] + (extra_fields or [])
+        evidence(
+            name,
+            mechanics_unit,
+            fields=fields,
+            claim=claim
+            or f"{mechanics_unit} identifies {code} and provides a finite behavior witness; no unstated transition entries are inferred.",
+            strength="DIRECT_IDENTITY",
+            allow_direct_image=image_mechanics,
+        )
+
+    narrow_code_identity(
+        "elementary cellular automaton rule 126",
+        code="rule 126",
+        mechanics_unit="U001244",
+        claim="U001244 identifies the displayed cellular automaton as rule 126 and describes its nonsettling behavior.",
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 22",
+        code="rule 22",
+        mechanics_unit="U001245",
+        image_mechanics=True,
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 30",
+        code="rule 30",
+        mechanics_unit="U001246",
+        image_mechanics=True,
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 150",
+        code="rule 150",
+        mechanics_unit="U001247",
+        image_mechanics=True,
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 182",
+        code="rule 182",
+        mechanics_unit="U001248",
+        image_mechanics=True,
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 90",
+        code="rule 90",
+        mechanics_unit="U001250",
+        image_mechanics=True,
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 105",
+        code="rule 105",
+        mechanics_unit="U001250",
+        image_mechanics=True,
+    )
+    narrow_code_identity(
+        "next-nearest cellular automaton rule 4067213884",
+        code="rule 4067213884",
+        mechanics_unit="U001480",
+        extra_values={
+            "alphabet_or_value_schema": "black and white cells",
+            "read_dependencies_or_neighborhood": "nearest and next-nearest neighbors",
+        },
+        extra_fields=["alphabet_or_value_schema", "read_dependencies_or_neighborhood"],
+        claim="U001480 identifies rule 4067213884, its black/white evolution witness, and its nearest-plus-next-nearest dependency range.",
+    )
+    narrow_code_identity(
+        "elementary cellular automaton rule 45 on a finite cycle",
+        code="rule 45 on a finite cyclic row",
+        mechanics_unit="U001388",
+        extra_values={
+            "support": "n cells",
+            "boundary": "cyclic",
+            "excluded_observers_and_representations": (
+                "the rule-45 period curve is an observer result and does not define the transition table"
+            ),
+        },
+        extra_fields=["support", "boundary"],
+        claim="U001388 identifies rule 45 as the elementary finite-cycle example whose periods remain near 2^n.",
+    )
+    rule45 = candidate("elementary cellular automaton rule 45 on a finite cycle")
+    rule45["field_units"]["excluded_observers_and_representations"] = ["U001393"]
+    evidence(
+        "elementary cellular automaton rule 45 on a finite cycle",
+        "U001393",
+        fields=["excluded_observers_and_representations"],
+        claim="U001393 reports an observer period curve and is not rule-45 transition-table evidence.",
+        strength="CORROBORATING",
+    )
+
+    # Native identities with directly stated carrier/alphabet/neighborhood.
+    narrow_code_identity(
+        "two-color next-nearest-neighbor cellular automaton code 20",
+        code="code 20",
+        mechanics_unit="U001526",
+        extra_values={
+            "alphabet_or_value_schema": "two cell colors",
+            "read_dependencies_or_neighborhood": "nearest and next-nearest neighbors",
+            "excluded_observers_and_representations": native_search_records[
+                "two-color next-nearest-neighbor cellular automaton code 20"
+            ]["excluded"],
+        },
+        extra_fields=["alphabet_or_value_schema", "read_dependencies_or_neighborhood"],
+        claim="U001526 identifies code 20 as a two-color nearest-and-next-nearest-neighbor cellular automaton.",
+    )
+    narrow_code_identity(
+        "three-color nearest-neighbor cellular automaton code 357",
+        code="code 357",
+        mechanics_unit="U001528",
+        extra_values={
+            "alphabet_or_value_schema": "three cell colors",
+            "read_dependencies_or_neighborhood": "nearest neighbors",
+            "excluded_observers_and_representations": native_search_records[
+                "three-color nearest-neighbor cellular automaton code 357"
+            ]["excluded"],
+        },
+        extra_fields=["alphabet_or_value_schema", "read_dependencies_or_neighborhood"],
+        claim="U001528 identifies code 357 as a three-color nearest-neighbor cellular automaton.",
+    )
+    narrow_code_identity(
+        "three-color nearest-neighbor cellular automaton code 1329",
+        code="code 1329",
+        mechanics_unit="U001530",
+        extra_values={
+            "alphabet_or_value_schema": "three cell colors",
+            "read_dependencies_or_neighborhood": "nearest neighbors",
+            "excluded_observers_and_representations": native_search_records[
+                "three-color nearest-neighbor cellular automaton code 1329"
+            ]["excluded"],
+        },
+        extra_fields=["alphabet_or_value_schema", "read_dependencies_or_neighborhood"],
+        claim="U001530 identifies code 1329 as a three-color nearest-neighbor cellular automaton.",
+    )
+    for name, spec in native_search_records.items():
+        row = candidate(name)
+        row["field_units"]["excluded_observers_and_representations"] = spec["excluded_units"]
+
+    # Rule 110 has directly stated two-color/nearest-neighbor scope, but its
+    # code table remains outside the reviewed range.
+    rule110["values"].update(
+        {
+            "input": "a complete rule-110 configuration together with any source-delimited experimental seed or background",
+            "witness_semantics": "finite backgrounds, catalogs, growth runs, and collisions witness behavior but not transition entries",
+        }
+    )
+    rule110["mechanics_units"] = ["U001560"]
+
+    # Evolution/parameter images for continuous rules are witnesses only.
+    for unit_id in ["U001315", "U001317", "U001319"]:
+        evidence(
+            continuous_name,
+            unit_id,
+            fields=[],
+            claim=f"{unit_id} is a finite continuous-CA evolution witness, not an independent statement of the update law.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        continuous_name,
+        "U001318",
+        fields=["parameters_and_variants"],
+        claim="U001318 supplies only the displayed additive constant 0.398.",
+        strength="DIRECT_IDENTITY",
+    )
+    evidence(
+        continuous_name,
+        "U001320",
+        fields=["parameters_and_variants"],
+        claim="U001320 supplies only the displayed additive constant 0.4.",
+        strength="DIRECT_IDENTITY",
+    )
+
+    # Survey panels are represented by their captioned inventory/outcome, not
+    # as one complete transition table.
+    candidate("uniform-attractor elementary cellular-automaton preset panel")["mechanics_units"] = ["U001236"]
+    candidate(panel4_name)["mechanics_units"] = ["U001240"]
+
     defs.sort(
         key=lambda candidate: (
             int(candidate["units"][0][1:]),
@@ -2775,6 +3442,116 @@ def build_output(bundle: Path) -> dict[str, Any]:
         for candidate in candidates
         if candidate["role"] in {"EMULATION", "CONSTRAINT"}
     }
+    asset_review_overrides: dict[str, dict[str, str]] = {
+        "A000941": {
+            "evidence_statement": (
+                "Original-resolution labeled survey inventory: rules "
+                "0,4,18,22,32,36,50,54,72,76,90,94,104,108,122,126,"
+                "128,132,146,150,160,164,178,182,200,204,218,222,232,236,250,254."
+            )
+        },
+        "A000942": {
+            "evidence_statement": "Original-resolution labeled inventory: every even totalistic code from 0 through 62 inclusive."
+        },
+        "A000943": {
+            "evidence_statement": "Original-resolution labeled inventory: three-color totalistic codes 1002 through 1095 in increments of 3."
+        },
+        "A000948": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution borderline-classifier panel labeled code 219; source caption permits class 2 or class 4.",
+        },
+        "A000949": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution borderline-classifier panel labeled code 438; source caption permits class 3 or class 4.",
+        },
+        "A000950": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution borderline-classifier panel labeled code 1380; source caption permits class 2 or class 3.",
+        },
+        "A000951": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution borderline-classifier panel labeled code 1632; source caption permits class 1, 2, or 3.",
+        },
+        "A000952": {
+            "evidence_statement": "Original-resolution labeled inventory: four-color totalistic codes 1000816 through 1000940 in increments of 4."
+        },
+        "A000957": {
+            "evidence_statement": "Original-resolution native-family step survey labeled codes 4,12,24,30,38,52 at steps 1,2,5,100,500."
+        },
+        "A000958": {
+            "evidence_statement": "Original-resolution broader two-dimensional survey labeled every even code from 2 through 60 inclusive."
+        },
+        "A000959": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": (
+                "Original-resolution one-dimensional slice/spatial-depth-fog observer output labeled "
+                "codes 4,12,24,30,38,52."
+            ),
+        },
+        "A000975": {
+            "visual_role": "CONTROL",
+            "evidence_statement": "Original-resolution finite cyclic evolution/control inventory labeled rule 90 and rule 30.",
+        },
+        "A000976": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution period-versus-size observer curves labeled rules 90,30,45,110 with a 2^n reference bound.",
+        },
+        "A001002": {
+            "visual_role": "NATIVE_EVIDENCE",
+            "evidence_statement": "Original-resolution rule-184 transition-table strip checked as native local-law evidence, not substitution-seed evidence.",
+        },
+        "A001005": {
+            "visual_role": "NATIVE_EVIDENCE",
+            "evidence_statement": (
+                "Original-resolution rule-table/attractor panel: top rule 255 table maps all eight binary "
+                "nearest-neighbor triples to black; lower rule 4 table and attractor are separately labeled."
+            ),
+        },
+        "A001010": {
+            "visual_role": "RELATION",
+            "evidence_statement": "Original-resolution surjective/onto mapping example inventory labeled rules 204,240,30,90.",
+        },
+        "A001018": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution code-357 brute-force persistent-structure result catalog; not native-law evidence.",
+        },
+        "A001019": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution code-1329 persistent-structure search-result catalog; not native-law evidence.",
+        },
+        "A001020": {
+            "visual_role": "CONTROL",
+            "evidence_statement": "Original-resolution code-1329 unbounded-growth witness/control; not native-law evidence.",
+        },
+        "A001021": {
+            "visual_role": "CONTROL",
+            "evidence_statement": "Original-resolution code-1329 simple/complex growth comparison controls; not native-law evidence.",
+        },
+        "A001022": {
+            "visual_role": "CONTROL",
+            "evidence_statement": "Original-resolution rule-110 random-background witness showing the periodic environment; not native-law evidence.",
+        },
+        "A001023": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": "Original-resolution rule-110 persistent-structure catalog with labels and extensions; not native-law evidence.",
+        },
+        "A001024": {
+            "visual_role": "CONTROL",
+            "evidence_statement": "Original-resolution rule-110 width-41 unbounded-growth experiment; not native-law evidence.",
+        },
+        "A001025": {
+            "visual_role": "RELATION",
+            "evidence_statement": "Original-resolution rule-110 collision/spacing relation for structures o and j; not native-law evidence.",
+        },
+        "A001026": {
+            "visual_role": "RELATION",
+            "evidence_statement": "Original-resolution rule-110 collision relation for structures e and o; not native-law evidence.",
+        },
+        "A001027": {
+            "visual_role": "RELATION",
+            "evidence_statement": "Original-resolution greater-than-4000-step rule-110 collision relation producing eight structures; not native-law evidence.",
+        },
+    }
     asset_updates: list[dict[str, str]] = []
     for input_row in data["assets"]:
         row = dict(input_row)
@@ -2835,6 +3612,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 "Original-pixel finite realization or comparison panel checked; it is treated as a control or "
                 "behavioral witness, not as a probability law or ensemble definition."
             )
+        if row["asset_id"] in asset_review_overrides:
+            override = asset_review_overrides[row["asset_id"]]
+            visual_role = override.get("visual_role", visual_role)
+            evidence_statement = override.get("evidence_statement", evidence_statement)
         row.update(
             {
                 "inspection_status": "SCREENED",
@@ -2887,7 +3668,7 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
     check(output["prohibited_input_nonuse"] is True, "prohibited-input declaration must be true")
     check(len(output["reading_updates"]) == 354, "reading output count")
     check(len(output["asset_updates"]) == 105, "asset output count")
-    check(len(output["candidate_proposals"]) == 47, "candidate output count")
+    check(len(output["candidate_proposals"]) == EXPECTED_CANDIDATE_COUNT, "candidate output count")
     check(len(output["route_proposals"]) == 35, "route output count")
     check(
         [row["source_unit_id"] for row in output["reading_updates"]]
@@ -2934,7 +3715,10 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         check(after["original_resolution_status"] == "REVIEWED", "all 105 images must be original-pixel reviewed")
         check(after["source_status"] == "CLEAR" or after["uncertainty"], "asset uncertainty contract")
     candidate_ids = [row["id"] for row in output["candidate_proposals"]]
-    check(candidate_ids == [f"W{i:04d}" for i in range(1, 48)], "candidate ID sequence")
+    check(
+        candidate_ids == [f"W{i:04d}" for i in range(1, EXPECTED_CANDIDATE_COUNT + 1)],
+        "candidate ID sequence",
+    )
     route_ids = [row["route_id"] for row in output["route_proposals"]]
     check(route_ids == [f"WR{i:04d}" for i in range(1, 36)], "route ID sequence")
     check(all(row["status"] == "PENDING" for row in output["route_proposals"]), "worker routes must remain pending")
