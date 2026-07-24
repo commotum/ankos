@@ -611,6 +611,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca2d",
             [
+                ev("U006350", "PROSE", "DIRECT_IDENTITY", "The nine-neighbor outer-totalistic code list identifies code 224 as Game of Life.", ["object_kind", "parameters_and_variants"]),
                 ev("U006351", "PROSE", "DIRECT_IDENTITY", "The Life two-dimensional cellular automaton is named and its step implementation introduced.", ["object_kind", "carrier", "topology", "alphabet_or_value_schema", "complete_state"]),
                 ev("U006352", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep counts the 3x3 neighborhood including self and returns black for a live cell at total 4 or any cell at total 3.", ["frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"]),
                 ev("U006353", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The same Life state can be represented sparsely as the list of live-cell positions.", ["complete_state", "parameters_and_variants"]),
@@ -630,6 +631,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("sparse live-position list", "count coincident translated live positions", "U006353"),
                 ("sorted-run optimization", "find runs of multiplicity 3 and 4 in the sorted sparse list", "U006355"),
             ],
+            related=["nine-neighbor outer-totalistic two-dimensional class-4 preset family"],
         ),
         spec(
             "three-dimensional Life-like cellular automaton family",
@@ -1827,7 +1829,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("net", "finite labeled transition network supplied as a recognizer input", "U006475"),
                 ("list", "finite sequence of input labels to recognize", "U006477"),
             ],
-            aliases=["finite automaton", "finite state machine", "nondeterministic finite automaton", "NFA", "NDFA", "sequential machine", "sequential machines"],
+            aliases=["finite automaton", "finite state machine", "nondeterministic finite automaton", "NDFA", "sequential machine", "sequential machines"],
         ),
         spec(
             "cellular-automaton image-set network transform",
@@ -2187,7 +2189,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "measure entropy",
                 "parameters_and_variants": "exact block-probability limit or a sampling plug-in estimate with stated downward bias and polynomial-estimator workaround",
             },
-            aliases=["entropy", "information", "information entropy", "information dimension"],
+            aliases=["entropy", "information", "information dimension"],
             parameters=[("k", "alphabet size"), ("n", "block length")],
             variants=[("sampled plug-in estimate", "estimate block probabilities from samples; direct substitution is systematically biased downward", "U006518")],
         ),
@@ -2229,7 +2231,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a source-intended generalized entropy or dimension whose printed formula is sign-inconsistent",
                 "parameters_and_variants": "q=0 set entropy; q->1 measure entropy; q=2 correlation entropy",
             },
-            aliases=["Rényi entropy family", "generalized dimensions"],
+            aliases=["generalized dimensions"],
             parameters=[
                 ("k", "alphabet size", "U006516"),
                 ("n", "block length", "U006516"),
