@@ -4739,8 +4739,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             unit_id,
             fields=["witness_semantics", "parameters_and_variants"],
             claim=f"{unit_id} is the original-resolution borderline panel labeled totalistic code {code}.",
-            strength="DIRECT_IDENTITY",
-            allow_direct_image=True,
+            strength="CONTEXTUAL",
         )
     evidence(
         classifier_name,
@@ -6395,6 +6394,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             ],
             "rule-4 isolated-black attractor-set constraint": ["U001489"],
         },
+        na_fields=["parameters_and_variants"],
         role="CONSTRAINT",
     )
     evidence(
@@ -6499,8 +6499,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001511",
         fields=["parameters_and_variants"],
         claim="A001010 is the original-resolution inventory labeled rules 204, 240, 30, and 90.",
-        strength="DIRECT_IDENTITY",
-        allow_direct_image=True,
+        strength="CONTEXTUAL",
     )
     evidence(
         surjective_name,
@@ -6550,6 +6549,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             ]
         )
     )
+    network["source_statuses"] = ["CLEAR", "CONFLICTING"]
     for unit_id, claim in [
         (
             "U001513",
@@ -7649,7 +7649,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 },
                 "source_unit_ids": candidate["units"],
                 "source_evidence": evidence,
-                "source_status": [candidate["source_status"]],
+                "source_status": candidate.get(
+                    "source_statuses",
+                    [candidate["source_status"]],
+                ),
                 "image_witnesses": image_witnesses,
                 "evidence_strength": list(dict.fromkeys(row["strength"] for row in evidence)),
                 "field_support": {field: fingerprint[field]["status"] for field in FIELDS},
@@ -8156,6 +8159,11 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         "rule-110 identity/mechanics prose must be scoped as direct partial mechanics",
     )
     for candidate_id in ("W0017", "W0018", "W0019", "W0020"):
+        panel_na_fields = {
+            field
+            for field, item in candidate_by_id[candidate_id]["fingerprint"].items()
+            if item["status"] == "NOT_APPLICABLE"
+        }
         panel_intro = next(
             row
             for row in candidate_by_id[candidate_id]["source_evidence"]
@@ -8175,7 +8183,7 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         )
         check(
             not {"seed", "termination_completion_failure"}
-            & set(panel_intro["fingerprint_fields"]),
+            & (set(panel_intro["fingerprint_fields"]) - panel_na_fields),
             f"{candidate_id} class-4 random run contaminates native profile",
         )
     asset_by_id = {row["asset_id"]: row for row in output["asset_updates"]}
@@ -8184,8 +8192,95 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
             asset_by_id[asset_id]["visual_role"] == "OBSERVER",
             f"{asset_id} neighbor-difference rendering role",
         )
+    exact_native_tables = {
+        "W0002": "B, B, B, B, B, B, B, W",
+        "W0003": "rule 250 -> B,B,B,B,B,W,B,W",
+        "W0004": "rule 232 -> B,B,B,W,B,W,W,W",
+        "W0005": "W, B, B, B, B, B, B, W",
+        "W0007": "W, W, W, B, B, B, B, W",
+    }
+    for candidate_id, expected_table_fragment in exact_native_tables.items():
+        check(
+            expected_table_fragment
+            in candidate_by_id[candidate_id]["fingerprint"][
+                "rule_relation_constraint_function_or_probability_law"
+            ]["value"],
+            f"{candidate_id} exact ordered native table missing",
+        )
+    rule110 = candidate_by_id["W0012"]
+    rule110_evidence_by_id = {
+        row["evidence_id"]: row["source_unit_id"]
+        for row in rule110["source_evidence"]
+    }
+    check(not rule110["variants"], "rule 110 experiments must not be native variants")
+    check(
+        {
+            rule110_evidence_by_id[evidence_id]
+            for evidence_id in rule110["fingerprint"]["parameters_and_variants"][
+                "evidence_ids"
+            ]
+        }
+        == {"U001256", "U001558", "U001560"},
+        "rule-110 code parameter evidence scope",
+    )
+    for candidate_id in ("W0017", "W0018", "W0019", "W0020"):
+        check(
+            not candidate_by_id[candidate_id]["variants"],
+            f"{candidate_id} singleton code must not be a variant",
+        )
+        check(
+            candidate_by_id[candidate_id]["fingerprint"]["seed"]["status"]
+            == "NOT_APPLICABLE",
+            f"{candidate_id} random run must not become native seed",
+        )
+    check(
+        not candidate_by_id["W0023"]["parameters"],
+        "neighbor-difference unresolved conventions must not be top-level parameters",
+    )
+    search_units = set(candidate_by_id["W0056"]["source_unit_ids"])
+    check(
+        {
+            "U001542",
+            "U001543",
+            "U001544",
+            "U001545",
+            "U001546",
+            "U001548",
+            "U001549",
+            "U001550",
+            "U001551",
+            "U001552",
+            "U001553",
+            "U001554",
+            "U001555",
+            "U001556",
+            "U001562",
+            "U001563",
+            "U001567",
+            "U001568",
+            "U001569",
+            "U001570",
+        }
+        <= search_units,
+        "expanded bounded-search instance coverage",
+    )
+    for asset_id in ("A001018", "A001019", "A001020", "A001021", "A001023", "A001024"):
+        check(
+            asset_by_id[asset_id]["visual_role"] == "OBSERVER"
+            and "W0056" in json.loads(asset_by_id[asset_id]["candidate_ids"]),
+            f"{asset_id} bounded-search reverse join",
+        )
     route_ids = [row["route_id"] for row in output["route_proposals"]]
     check(route_ids == [f"WR{i:04d}" for i in range(1, 36)], "route ID sequence")
+    check(
+        next(
+            row
+            for row in output["route_proposals"]
+            if row["literal_target"] == "later in this book"
+        )["source_unit_id"]
+        == "U001358",
+        "later-in-book route source",
+    )
     check(all(row["status"] == "PENDING" for row in output["route_proposals"]), "worker routes must remain pending")
     evidence = sorted(
         (record for candidate in output["candidate_proposals"] for record in candidate["source_evidence"]),
