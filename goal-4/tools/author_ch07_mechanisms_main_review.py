@@ -236,6 +236,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
         aliases: list[str] | None = None,
         parameters: list[str] | None = None,
         variants: list[str] | None = None,
+        item_evidence: str | None = None,
+        identity_units: list[str] | None = None,
         uncertainty: str = "",
         complete: bool = False,
     ) -> None:
@@ -251,6 +253,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "aliases": aliases or [],
                 "parameters": parameters or [],
                 "variants": variants or [],
+                "item_evidence": item_evidence or mechanics or anchor,
+                "identity_units": identity_units or [],
                 "uncertainty": uncertainty,
                 "complete": complete,
             }
@@ -542,6 +546,24 @@ def candidate_definitions() -> list[dict[str, Any]]:
         variants=["successive pairs", "successive triples"],
     )
     add(
+        "rule 30 initial-black-cell perturbation observer",
+        "U001746",
+        "OBSERVER",
+        observer(
+            "paired center-sequence perturbation observer",
+            "vary the number of adjacent initial black cells, evolve rule 30, and compare the resulting center-cell sequence with the single-black-cell reference",
+            carrier="paired rule 30 space-time evolutions",
+            input_value="the single-black-cell seed and seeds containing successively more initial black cells",
+            result="a determination of whether the center-cell sequences agree or differ",
+            neighborhood="the center cell at each step in each paired evolution",
+            variants="two, three, and more initial black cells",
+        ),
+        units=["U001748", "U001749", "U001750"],
+        parameters=["number of initial black cells"],
+        variants=["two black cells", "three black cells", "more than three black cells"],
+        uncertainty="The prose does not state the exact placement convention for every added black cell or a numeric sequence-comparison tolerance.",
+    )
+    add(
         "randomly perturbed continuous rule 90 process",
         "U001747",
         "EVOLUTION",
@@ -582,24 +604,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
         mechanics="U001757",
         parameters=["perturbation percentage"],
         uncertainty="The algebraic continuous rule-30 formula and perturbation probability distribution are not stated.",
-    )
-    add(
-        "rule 30 initial-black-cell perturbation observer",
-        "U001746",
-        "OBSERVER",
-        observer(
-            "paired center-sequence perturbation observer",
-            "vary the number of adjacent initial black cells, evolve rule 30, and compare the resulting center-cell sequence with the single-black-cell reference",
-            carrier="paired rule 30 space-time evolutions",
-            input_value="the single-black-cell seed and seeds containing successively more initial black cells",
-            result="a determination of whether the center-cell sequences agree or differ",
-            neighborhood="the center cell at each step in each paired evolution",
-            variants="two, three, and more initial black cells",
-        ),
-        units=["U001748", "U001749", "U001750"],
-        parameters=["number of initial black cells"],
-        variants=["two black cells", "three black cells", "more than three black cells"],
-        uncertainty="The prose does not state the exact placement convention for every added black cell or a numeric sequence-comparison tolerance.",
     )
     add(
         "symmetric nearest-neighbor random walk",
@@ -1087,6 +1091,22 @@ def candidate_definitions() -> list[dict[str, Any]]:
             neighborhood="the source's five-cell neighborhood",
             variants="page-211 unique-invariant-state condition",
         ),
+        units=["U001886", "U001887"],
+        parameters=["five-neighbor rule code"],
+        variants=[
+            "code 530763",
+            "code 18423119",
+            "code 88710593",
+            "code 89759053",
+            "code 116497901",
+            "code 167812175",
+            "code 176239055",
+            "code 1072764257",
+            "code 1840848327",
+            "code 2131825735",
+        ],
+        item_evidence="U001886",
+        identity_units=["U001886"],
         uncertainty="The target pattern and exact five-neighbor code convention are not contained in this sealed range.",
     )
     add(
@@ -1272,6 +1292,58 @@ def candidate_definitions() -> list[dict[str, Any]]:
         uncertainty="The icon depicts the pointwise map, but the prose does not transcribe its exact formula or value interval.",
     )
     add(
+        "elementary cellular automaton rule 128",
+        "U001918",
+        "EVOLUTION",
+        evolution(
+            "class-1 elementary cellular-automaton preset",
+            "for neighborhoods 111 through 000, output black only for 111 and white for the other seven neighborhoods",
+            carrier="a one-dimensional binary cell row",
+            alphabet="black and white",
+            seed="the source-displayed initial binary configuration",
+            activation="every cell",
+            neighborhood="a cell and its immediate left and right neighbors",
+            result="a rule-128 evolution toward a uniform state",
+            variants="elementary rule 128",
+        ),
+        complete=True,
+    )
+    add(
+        "elementary cellular automaton rule 160",
+        "U001919",
+        "EVOLUTION",
+        evolution(
+            "class-1 elementary cellular-automaton preset",
+            "for neighborhoods 111 through 000, output black for 111 and 101 and white for the other six neighborhoods",
+            carrier="a one-dimensional binary cell row",
+            alphabet="black and white",
+            seed="the source-displayed initial binary configuration",
+            activation="every cell",
+            neighborhood="a cell and its immediate left and right neighbors",
+            result="a rule-160 evolution toward a uniform state",
+            variants="elementary rule 160",
+        ),
+        complete=True,
+    )
+    add(
+        "elementary cellular automaton rule 254 class-1 preset",
+        "U001920",
+        "EVOLUTION",
+        evolution(
+            "class-1 elementary cellular-automaton preset",
+            "for neighborhoods 111 through 000, output black for every neighborhood except 000",
+            carrier="a one-dimensional binary cell row",
+            alphabet="black and white",
+            seed="the source-displayed initial binary configuration",
+            activation="every cell",
+            neighborhood="a cell and its immediate left and right neighbors",
+            result="a rule-254 evolution toward a uniform state",
+            variants="elementary rule 254",
+        ),
+        units=["U001921"],
+        complete=True,
+    )
+    add(
         "rule 30 spatial coarse-graining observer",
         "U001922",
         "OBSERVER",
@@ -1400,23 +1472,58 @@ def candidate_definitions() -> list[dict[str, Any]]:
         uncertainty="The source gives the semantic mechanism but not complete equations or transition tables for the two examples.",
     )
     add(
-        "simple-seed repetitive cellular-automaton family",
-        "U001947",
+        "partial-table simple-seed repetitive cellular automaton",
+        "U001948",
         "EVOLUTION",
         evolution(
-            "simple-seed cellular-automaton family",
-            "evolve from a simple seed into a pattern repetitive in both space and time",
-            carrier="a one-dimensional row of cells",
-            alphabet="the source-displayed cellular-automaton colors",
-            state="the complete cell row",
-            seed="a simple localized seed",
+            "partially specified elementary cellular-automaton preset",
+            "the visible table gives 101 to black, 100 to black, 010 to white, 001 to black, and 000 to white",
+            carrier="a one-dimensional binary cell row",
+            alphabet="black and white",
+            seed="the simple localized seed displayed above the rule table",
             activation="every cell",
-            neighborhood="the displayed local cellular-automaton neighborhood",
-            result="a repetitive space-time evolution",
-            variants="the three displayed cellular automata",
+            neighborhood="a cell and its immediate left and right neighbors",
+            result="the displayed repetitive space-time evolution",
+            variants="the first page-370 simple-seed cellular automaton",
         ),
-        units=["U001948", "U001949", "U001950", "U001951"],
-        uncertainty="The three complete rule tables are not transcribed in prose.",
+        units=["U001951"],
+        uncertainty="The source crop omits the outputs for neighborhoods 111, 110, and 011, so no complete elementary-rule identity is asserted.",
+    )
+    add(
+        "elementary cellular automaton rule 94 simple-seed preset",
+        "U001949",
+        "EVOLUTION",
+        evolution(
+            "elementary cellular-automaton preset",
+            "for neighborhoods 111 through 000, the ordered outputs are white, black, white, black, black, black, black, white",
+            carrier="a one-dimensional binary cell row",
+            alphabet="black and white",
+            seed="the simple localized seed displayed above the rule table",
+            activation="every cell",
+            neighborhood="a cell and its immediate left and right neighbors",
+            result="a repetitive rule-94 space-time evolution",
+            variants="elementary rule 94",
+        ),
+        units=["U001951"],
+        complete=True,
+    )
+    add(
+        "elementary cellular automaton rule 54 simple-seed preset",
+        "U001950",
+        "EVOLUTION",
+        evolution(
+            "elementary cellular-automaton preset",
+            "for neighborhoods 111 through 000, the ordered outputs are white, white, black, black, white, black, black, white",
+            carrier="a one-dimensional binary cell row",
+            alphabet="black and white",
+            seed="the simple localized seed displayed above the rule table",
+            activation="every cell",
+            neighborhood="a cell and its immediate left and right neighbors",
+            result="a repetitive rule-54 space-time evolution",
+            variants="elementary rule 54",
+        ),
+        units=["U001951"],
+        complete=True,
     )
     add(
         "random-start domain cellular-automaton family for rules 50, 54, and 62",
@@ -1476,43 +1583,124 @@ def candidate_definitions() -> list[dict[str, Any]]:
         uncertainty="The transition table and random-start probability measure are not stated in this range.",
     )
     add(
-        "neighbor-independent substitution-system family",
+        "binary pair substitution system",
         "U001968",
         "EVOLUTION",
         evolution(
-            "one- and two-dimensional substitution-system family",
-            "replace each element independently by a block of smaller elements according to a fixed rule",
-            carrier="one- or two-dimensional elements",
-            alphabet="the source-displayed element types",
-            state="the complete current collection of elements",
-            seed="a source-displayed initial element",
+            "one-dimensional neighbor-independent substitution system",
+            "replace black by black-white and replace white by white-black",
+            carrier="a one-dimensional string of binary elements",
+            alphabet="black and white",
+            state="the complete current binary string",
+            seed="the source-displayed initial element",
             activation="every element independently",
-            neighborhood="each element reads only its own type",
-            result="a refined collection of smaller elements",
-            variants="one-dimensional and two-dimensional substitutions",
+            neighborhood="each element reads only its own color",
+            result="a binary string twice as long",
+            variants="black to black-white and white to white-black",
         ),
         units=["U001969", "U001970"],
-        variants=["one-dimensional substitution", "two-dimensional substitution"],
-        uncertainty="The complete replacement dictionaries are carried by the figure and are not transcribed in prose.",
+        mechanics="U001969",
+        complete=True,
     )
     add(
-        "recursive branching-process family",
+        "two-dimensional block substitution system",
+        "U001968",
+        "EVOLUTION",
+        evolution(
+            "two-dimensional neighbor-independent substitution system",
+            "replace each square independently by the source-displayed two-by-two block associated with its type",
+            carrier="a two-dimensional square array",
+            alphabet="the two source-displayed square types",
+            state="the complete current square array",
+            seed="the source-displayed initial square",
+            activation="every square independently",
+            neighborhood="each square reads only its own type",
+            result="a square array refined by a factor of two in each spatial direction",
+            variants="the displayed two-dimensional block replacement",
+        ),
+        units=["U001969", "U001970"],
+        mechanics="U001969",
+        uncertainty="The small raster key is visibly construction-bearing, but its two complete block patterns are not independently transcribed in the prose.",
+    )
+    add(
+        "two-state recursive Y-branching preset",
         "U001971",
         "EVOLUTION",
         evolution(
-            "recursive branching process",
-            "each eligible element branches into several smaller elements, recursively producing a tree-like structure",
-            carrier="a growing tree of branch elements",
-            alphabet="branch types, scales, and positions",
-            state="the complete current branch tree",
-            seed="one initial branch element",
-            activation="every eligible terminal element",
-            neighborhood="each terminal element's own type and scale",
-            result="a tree with newly added smaller branches",
-            variants="the displayed branching examples",
+            "state-dependent recursive branching process",
+            "replace each terminal branch by the visibly keyed Y-shaped branch state, recursively producing a thickness- and shade-coded tree",
+            carrier="a growing geometric branch tree",
+            alphabet="the two displayed branch states and continuous branch geometry",
+            state="the complete current branch tree and each terminal state",
+            seed="one initial branch",
+            activation="every eligible terminal branch",
+            neighborhood="each terminal branch's own displayed state",
+            result="a tree with a new generation of Y branches",
+            variants="the leftmost two-state branching preset",
         ),
         units=["U001972", "U001973", "U001974"],
-        uncertainty="The exact branch replacement laws and geometry of each displayed variant are not transcribed.",
+        mechanics="U001972",
+        uncertainty="The raster key fixes the state-dependent Y replacements qualitatively but not exact angles, length ratios, or thickness ratios.",
+    )
+    add(
+        "recursive three-child branching preset",
+        "U001971",
+        "EVOLUTION",
+        evolution(
+            "recursive three-child branching process",
+            "replace every terminal point by three child terminal points in the displayed Y geometry",
+            carrier="a growing geometric branch tree",
+            alphabet="terminal and nonterminal branch points",
+            state="the complete current branch tree",
+            seed="one initial terminal branch",
+            activation="every terminal point",
+            neighborhood="each terminal point independently",
+            result="a tree with three children for every replaced terminal",
+            variants="the second branching preset",
+        ),
+        units=["U001972", "U001973", "U001974"],
+        mechanics="U001972",
+        uncertainty="The exact scale factor and branch angles are visible only schematically.",
+    )
+    add(
+        "recursive two-child orthogonal branching preset",
+        "U001971",
+        "EVOLUTION",
+        evolution(
+            "recursive two-child branching process",
+            "replace every terminal point by two horizontally separated child terminals connected in the displayed orthogonal geometry",
+            carrier="a growing rectilinear branch tree",
+            alphabet="terminal and nonterminal branch points",
+            state="the complete current branch tree",
+            seed="one initial terminal branch",
+            activation="every terminal point",
+            neighborhood="each terminal point independently",
+            result="a tree with two children for every replaced terminal",
+            variants="the third branching preset",
+        ),
+        units=["U001972", "U001973", "U001974"],
+        mechanics="U001972",
+        uncertainty="The exact segment lengths and scale factor are visible only schematically.",
+    )
+    add(
+        "recursive four-child triangular branching preset",
+        "U001971",
+        "EVOLUTION",
+        evolution(
+            "recursive four-child branching process",
+            "replace every terminal point by four child terminals in the displayed triangular geometry",
+            carrier="a growing planar branch tree",
+            alphabet="terminal and nonterminal branch points",
+            state="the complete current branch tree",
+            seed="one initial terminal branch",
+            activation="every terminal point",
+            neighborhood="each terminal point independently",
+            result="a tree with four children for every replaced terminal",
+            variants="the fourth branching preset",
+        ),
+        units=["U001972", "U001973", "U001974"],
+        mechanics="U001972",
+        uncertainty="The exact branch angles and scale factor are visible only schematically.",
     )
     add(
         "additive cellular automaton rule 90",
@@ -1702,6 +1890,14 @@ ROUTE_DEFS = [
         "WITHIN_STAGE",
         ["uniform white", "uniform black", "page 339"],
     ),
+    (
+        "U002007",
+        "Chapter 5",
+        "SECTION",
+        "constraint systems that generate nested patterns",
+        "CROSS_RANGE",
+        ["constraints", "nesting", "Chapter 5"],
+    ),
 ]
 
 
@@ -1832,6 +2028,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
         anchor_counts[definition["anchor"]] = anchor_counts.get(definition["anchor"], 0) + 1
         definition["anchor_ordinal"] = anchor_counts[definition["anchor"]]
         check(definition["mechanics"] in definition["units"], f"{definition['id']} mechanics source")
+        check(definition["item_evidence"] in definition["units"], f"{definition['id']} item evidence")
+        check(
+            set(definition["identity_units"]) <= set(definition["units"]),
+            f"{definition['id']} identity evidence",
+        )
         definition["values"]["evidence_limit"] = (
             "Only mechanics stated or directly visible in the sealed Chapter 7 main-text bundle are supported; "
             "unstated profile fields remain unknown and profile-irrelevant fields are explicitly not applicable."
@@ -1913,7 +2114,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 if definition["complete"]
                 else "DIRECT_PARTIAL_MECHANICS"
             )
-        elif unit_id == definition["anchor"]:
+        elif unit_id in definition["identity_units"] or unit_id == definition["anchor"]:
             strength = "DIRECT_IDENTITY"
         elif source_unit["block_kind"] == "image":
             strength = "CONTEXTUAL"
@@ -2020,6 +2221,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
             for row in evidence
             if row["source_unit_id"] == definition["mechanics"]
         )
+        item_evidence = next(
+            row["evidence_id"]
+            for row in evidence
+            if row["source_unit_id"] == definition["item_evidence"]
+        )
         image_witnesses = [
             asset_by_unit[unit_id]["physical_path"]
             for unit_id in definition["units"]
@@ -2064,7 +2270,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                         "source_description": (
                             f"Source-stated parameter of {definition['name']}."
                         ),
-                        "evidence_ids": [mechanics_evidence],
+                        "evidence_ids": [item_evidence],
                     }
                     for name in definition["parameters"]
                 ],
@@ -2074,7 +2280,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                         "source_description": (
                             f"Source-delimited variant of {definition['name']}."
                         ),
-                        "evidence_ids": [mechanics_evidence],
+                        "evidence_ids": [item_evidence],
                     }
                     for name in definition["variants"]
                 ],
@@ -2150,9 +2356,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
         reading_updates.append(row)
 
     mechanics_image_units = {
-        definition["mechanics"]
+        unit_id
         for definition in definitions
-        if definition["mechanics"] in asset_by_unit
+        for unit_id in [definition["mechanics"], *definition["identity_units"]]
+        if unit_id in asset_by_unit
     }
     observer_ids = {
         definition["id"]
