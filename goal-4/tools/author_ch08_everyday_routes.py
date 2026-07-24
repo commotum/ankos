@@ -2,9 +2,11 @@
 """Author the governed Stage 12 route-resolution proposal.
 
 The helper closes the 24 previously discovered incoming routes whose literal
-landings were read during the Chapter 8 main/Notes sequential review, plus
-all 23 new Stage-12 WITHIN_STAGE routes. Routes are frozen by both their
-current global route ID and immutable five-field identity:
+landings were read during the Chapter 8 main/Notes sequential review, all 23
+new Stage-12 WITHIN_STAGE routes, and the 10 Stage-12 CROSS_RANGE routes whose
+literal page targets actually land inside the reviewed Stage-12 sources.
+Routes are frozen by both their current global route ID and immutable
+five-field identity:
 
     (source_unit_id, source_asset_id, route_kind,
      literal_target, expected_topic)
@@ -62,16 +64,17 @@ EXPECTED_STAGE_ASSET_COUNT = 86
 EXPECTED_STAGE_ROUTE_COUNT = 79
 EXPECTED_INCOMING_COUNT = 24
 EXPECTED_WITHIN_COUNT = 23
-EXPECTED_UPDATE_COUNT = 47
-EXPECTED_OUTGOING_COUNT = 56
+EXPECTED_REACHABLE_CROSS_RANGE_COUNT = 10
+EXPECTED_UPDATE_COUNT = 57
+EXPECTED_OUTGOING_COUNT = 46
 EXPECTED_OUTGOING_IDENTITY_SHA256 = (
-    "e2a7a61fa00c4a74a6afb5ad1c75039df83cf2546c80502a571e4a83370b8675"
+    "TO_BE_FILLED"
 )
 EXPECTED_SPEC_SHA256 = (
-    "b3f45d3ce55a317705ff4cbece6fe58826c48f6c3cd63214bdb87469fb076203"
+    "TO_BE_FILLED"
 )
 EXPECTED_PRESERVATION_SHA256 = (
-    "d337b6a805e4d702837703a20bc4662d8bd9cdd346e07ee433d6c0dc5bd505f6"
+    "TO_BE_FILLED"
 )
 
 ROUTE_ID = re.compile(r"^R[0-9]{6}$")
@@ -903,6 +906,166 @@ _ROUTE_DATA: tuple[tuple[str, ...], ...] = (
             "vertical neighbor weights differ in the two rules."
         ),
     ),
+    (
+        "R000748",
+        "U006899",
+        "",
+        "PAGE",
+        "page 378",
+        "cellular-automaton fluids",
+        "U002092-U002094",
+        "A001130",
+        (
+            "The landing supplies the triangular-lattice particle cellular "
+            "automaton, displayed collision rules, reflecting plate and "
+            "particle injection, and both microscopic and block-averaged "
+            "velocity views."
+        ),
+    ),
+    (
+        "R000750",
+        "U006909",
+        "",
+        "PAGE",
+        "page 378",
+        "global CA flow results",
+        "U002092-U002094",
+        "A001130",
+        (
+            "The landing states that the simple local particle rules produce "
+            "the global flow pattern around the plate and supplies both the "
+            "individual-particle evolution and its coarse-grained velocity "
+            "field."
+        ),
+    ),
+    (
+        "R000754",
+        "U006917",
+        "",
+        "PAGE",
+        "page 377",
+        "Bénard convection",
+        "U002090-U002091",
+        "A001129",
+        (
+            "The labeled physical-flow catalog contains the reviewed Bénard "
+            "convection panel and caption as observational comparison "
+            "evidence; it supplies no native convection state or update law."
+        ),
+    ),
+    (
+        "R000759",
+        "U006929",
+        "",
+        "PAGE",
+        "page 1012",
+        "reaction–diffusion biological form",
+        "U006981-U006983",
+        "",
+        (
+            "The landing gives the two-chemical linear reaction-diffusion "
+            "equation, wavelength-selective instability, Turing's finite-"
+            "difference/random-start construction, nonlinear saturation "
+            "boundary, and biological-pattern context."
+        ),
+    ),
+    (
+        "R000762",
+        "U006934",
+        "",
+        "PAGE",
+        "page 1006",
+        "branching-model properties",
+        "U006941-U006946",
+        "A000038",
+        (
+            "The landing gives the complex branching parameterization, "
+            "existence and connectedness conditions, explicit gap test, "
+            "boundary facts, pruning method, and reviewed parameter-space "
+            "witness. The extraction does not preserve a clean printed-page "
+            "break between pages 1006 and 1007."
+        ),
+    ),
+    (
+        "R000769",
+        "U006952",
+        "",
+        "PAGE",
+        "page 1011",
+        "discrete symmetry",
+        "U006972",
+        "",
+        (
+            "The exact page-1011 landing discusses growth schemes, tumors, "
+            "pollen, radiolarians, self-assembly, animal behavior, and "
+            "regular polyhedral pollen forms; the expected discrete-symmetry "
+            "construction is absent."
+        ),
+    ),
+    (
+        "R000770",
+        "U006952",
+        "",
+        "PAGE",
+        "page 1010",
+        "harmonic growth",
+        "U006969",
+        "",
+        (
+            "The landing's general constraints on growth state that a "
+            "two-dimensional surface remains flat when its local growth "
+            "rate is a harmonic function and contrast the corresponding "
+            "three-dimensional constraint."
+        ),
+    ),
+    (
+        "R000774",
+        "U006969",
+        "",
+        "PAGE",
+        "page 1007",
+        "harmonic flat growth",
+        "U006952",
+        "",
+        (
+            "The landing gives the local-growth transformation and states "
+            "that a flat surface remains flat precisely when the logarithm "
+            "of the growth factor is harmonic. The extraction does not "
+            "preserve a clean printed-page break between pages 1006 and "
+            "1007; the following-page visual A000049 is not claimed."
+        ),
+    ),
+    (
+        "R000781",
+        "U006975",
+        "",
+        "PAGE",
+        "page 428",
+        "shell-pattern CA",
+        "U002364-U002366",
+        "A001173",
+        (
+            "The landing gives the distance-weighted two-dimensional "
+            "cellular-automaton pigmentation model and its full reviewed "
+            "array of stationary shell-like patterns across the two "
+            "weight parameters."
+        ),
+    ),
+    (
+        "R000784",
+        "U006981",
+        "",
+        "PAGE",
+        "page 1004",
+        "diffusion in development",
+        "U006929",
+        "",
+        (
+            "The landing records the early chemical-messenger hypothesis "
+            "for embryo growth and Turing's reaction-diffusion model for "
+            "biological pigmentation and structural pattern formation."
+        ),
+    ),
 )
 
 ROUTE_SPECS = tuple(route_spec(*row) for row in _ROUTE_DATA)
@@ -918,13 +1081,33 @@ WITHIN_STAGE_ROUTE_IDS = (
     "R000717",
     *tuple(f"R{number:06d}" for number in range(719, 737)),
 )
+REACHABLE_CROSS_RANGE_ROUTE_IDS = (
+    "R000748",
+    "R000750",
+    "R000754",
+    "R000759",
+    "R000762",
+    "R000769",
+    "R000770",
+    "R000774",
+    "R000781",
+    "R000784",
+)
+STAGE_CLOSURE_ROUTE_IDS = (
+    *WITHIN_STAGE_ROUTE_IDS,
+    *REACHABLE_CROSS_RANGE_ROUTE_IDS,
+)
 OUTGOING_ROUTE_IDS = (
     "R000709",
     "R000710",
     "R000711",
     "R000716",
     "R000718",
-    *tuple(f"R{number:06d}" for number in range(737, 788)),
+    *tuple(
+        f"R{number:06d}"
+        for number in range(737, 788)
+        if f"R{number:06d}" not in REACHABLE_CROSS_RANGE_ROUTE_IDS
+    ),
 )
 STAGE_ROUTE_IDS = tuple(
     f"R{number:06d}" for number in range(709, 788)
@@ -999,16 +1182,23 @@ def validate_embedded_specs() -> tuple[str, str]:
     if (
         tuple(route_ids[:EXPECTED_INCOMING_COUNT]) != INCOMING_ROUTE_IDS
         or tuple(route_ids[EXPECTED_INCOMING_COUNT:])
-        != WITHIN_STAGE_ROUTE_IDS
+        != STAGE_CLOSURE_ROUTE_IDS
     ):
-        raise AuthoringError("incoming/within route partition drifted")
+        raise AuthoringError("incoming/Stage-12 route partition drifted")
     if (
         len(INCOMING_ROUTE_IDS) != EXPECTED_INCOMING_COUNT
         or len(WITHIN_STAGE_ROUTE_IDS) != EXPECTED_WITHIN_COUNT
+        or len(REACHABLE_CROSS_RANGE_ROUTE_IDS)
+        != EXPECTED_REACHABLE_CROSS_RANGE_COUNT
         or len(OUTGOING_ROUTE_IDS) != EXPECTED_OUTGOING_COUNT
         or len(STAGE_ROUTE_IDS) != EXPECTED_STAGE_ROUTE_COUNT
         or set(WITHIN_STAGE_ROUTE_IDS) & set(OUTGOING_ROUTE_IDS)
-        or set(WITHIN_STAGE_ROUTE_IDS) | set(OUTGOING_ROUTE_IDS)
+        or set(REACHABLE_CROSS_RANGE_ROUTE_IDS) & set(OUTGOING_ROUTE_IDS)
+        or set(WITHIN_STAGE_ROUTE_IDS)
+        & set(REACHABLE_CROSS_RANGE_ROUTE_IDS)
+        or set(WITHIN_STAGE_ROUTE_IDS)
+        | set(REACHABLE_CROSS_RANGE_ROUTE_IDS)
+        | set(OUTGOING_ROUTE_IDS)
         != set(STAGE_ROUTE_IDS)
     ):
         raise AuthoringError("Stage 12 route partition is not exhaustive")
@@ -1220,7 +1410,7 @@ def require_screened_asset(
 
 
 def build_proposal(goal_dir: Path) -> dict[str, Any]:
-    """Build the exact 47-row Stage 12 route-resolution proposal."""
+    """Build the exact 57-row Stage 12 route-resolution proposal."""
 
     goal_dir = goal_dir.resolve()
     if goal_dir != GOAL_DIR.resolve():
@@ -1329,14 +1519,15 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         for route_id, row in observed_stage_routes.items()
         if row["closure_scope"] == "WITHIN_STAGE"
     }
-    observed_outgoing = {
+    observed_cross_range = {
         route_id
         for route_id, row in observed_stage_routes.items()
         if row["closure_scope"] == "CROSS_RANGE"
     }
     if (
         observed_within != set(WITHIN_STAGE_ROUTE_IDS)
-        or observed_outgoing != set(OUTGOING_ROUTE_IDS)
+        or observed_cross_range
+        != set(REACHABLE_CROSS_RANGE_ROUTE_IDS) | set(OUTGOING_ROUTE_IDS)
     ):
         raise AuthoringError("Stage 12 route-scope partition drifted")
     outgoing_digest = payload_sha256(
@@ -1379,6 +1570,15 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             ):
                 raise AuthoringError(
                     f"governed route is not WITHIN_STAGE: {spec.route_id}"
+                )
+        elif spec.route_id in REACHABLE_CROSS_RANGE_ROUTE_IDS:
+            if (
+                before["owning_stage"] != "12"
+                or before["closure_scope"] != "CROSS_RANGE"
+            ):
+                raise AuthoringError(
+                    "governed Stage 12 route is not CROSS_RANGE: "
+                    f"{spec.route_id}"
                 )
         elif (
             spec.route_id not in INCOMING_ROUTE_IDS
@@ -1484,6 +1684,8 @@ def main() -> int:
             "Chapter 8 route specification valid: "
             f"incoming={EXPECTED_INCOMING_COUNT} "
             f"within={EXPECTED_WITHIN_COUNT} "
+            "reachable-cross-range="
+            f"{EXPECTED_REACHABLE_CROSS_RANGE_COUNT} "
             f"preserved-outgoing={EXPECTED_OUTGOING_COUNT} "
             f"deferred={DEFERRED_ROUTE_ID} "
             f"spec-sha256={spec_digest} "
