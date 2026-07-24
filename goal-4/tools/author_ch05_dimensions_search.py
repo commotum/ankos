@@ -264,7 +264,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "general cellular-automaton rule-number codec",
-        ["U006096", "U006098", "U006099", "U006100", "U006101"],
+        ["U006096", "U006098", "U006099", "U006101"],
         "rule-table codec",
         "k-color cellular-automaton rule table over arbitrary offsets",
         "ordered output table u or rule number num, alphabet size k, and offsets os",
