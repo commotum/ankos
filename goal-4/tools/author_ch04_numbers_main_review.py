@@ -82,14 +82,14 @@ def candidate(
         "anchor": anchor,
         "facts": facts,
         "aliases": aliases or [],
-        "not_applicable": not_applicable or {},
+        "not_applicable": deepcopy(not_applicable or {}),
         "missing": missing,
         "source_status": source_status or ["CLEAR"],
         "uncertainties": uncertainties or [],
         "parameters": parameters or [],
         "variants": variants or [],
         "route_keys": route_keys or [],
-        "unknown_reasons": unknown_reasons or {},
+        "unknown_reasons": deepcopy(unknown_reasons or {}),
         "evidence": [],
         "_insertion": len(ALL_CANDIDATES),
     }
@@ -214,6 +214,8 @@ def mark_not_applicable(spec: CandidateSpec, reasons: dict[str, str]) -> None:
     for field, reason in reasons.items():
         spec["facts"].pop(field, None)
         spec["unknown_reasons"].pop(field, None)
+        if not any(field in item["fields"] for item in spec["evidence"]):
+            spec["evidence"][0]["fields"].append(field)
         spec["not_applicable"][field] = reason
 
 
@@ -282,12 +284,6 @@ SEED_NA = {
     "termination_completion_failure": "Providing the complete seed completes this object.",
 }
 
-UNSUPPORTED_REQUESTED_STEP_COMPLETION = (
-    "The law is iterated for the requested number of steps unless its stated "
-    "domain condition fails."
-)
-
-
 def iterative_facts(
     *,
     kind: str,
@@ -308,13 +304,13 @@ def iterative_facts(
     result: str,
     successor: str = "Exactly one successor follows from each complete state.",
     determinism: str = "Deterministic for a fixed rule and complete state.",
-    termination: str = UNSUPPORTED_REQUESTED_STEP_COMPLETION,
+    termination: str | None = None,
     witness: str = "Every adjacent pair in a valid trajectory satisfies the stated update law.",
     variants: str,
     excluded: str,
     limit: str,
 ) -> dict[str, str]:
-    return {
+    facts = {
         "object_kind": kind,
         "native_time": "Discrete successive steps.",
         "carrier": carrier,
@@ -335,12 +331,14 @@ def iterative_facts(
         "result_kind": result,
         "successor_cardinality": successor,
         "determinism_branching_or_measure": determinism,
-        "termination_completion_failure": termination,
         "witness_semantics": witness,
         "parameters_and_variants": variants,
         "excluded_observers_and_representations": excluded,
         "evidence_limit": limit,
     }
+    if termination is not None:
+        facts["termination_completion_failure"] = termination
+    return facts
 
 
 def number_map_facts(
@@ -982,13 +980,13 @@ register_arithmetic_map = source_candidate(
     strength="DIRECT_COMPLETE_MECHANICS",
     route_keys=["register-page100"],
 )
-mark_not_applicable(
+mark_unknown(
     register_arithmetic_map,
     {
         "seed": (
-            "This record identifies the fixed arithmetic map; the compared "
-            "trajectory relationship is not an initial state for the "
-            "referenced register machine."
+            "The comparison in U000693 is not an initial state, and the "
+            "referenced register-machine state encoding and initial-state "
+            "correspondence require the unresolved page-100 target."
         )
     },
 )
@@ -1859,7 +1857,7 @@ rational_periodicity = source_candidate(
         limit="The q-1 period bound is stated; the source does not specify how to select between dual terminating and nonterminating radix expansions of the same rational.",
     ),
     not_applicable=DECLARATIVE_NA,
-    missing="A convention for selecting between dual terminating and nonterminating radix expansions is not stated.",
+    missing="A canonical convention for selecting between dual terminating and nonterminating radix expansions is not stated.",
     claim="The caption explicitly states eventual repetition and the period-at-most-q-1 bound.",
     strength="DIRECT_COMPLETE_MECHANICS",
 )
@@ -1870,6 +1868,7 @@ mark_unknown(
         "structural_invariants": "The caption states periodicity and its period bound but no separate structural-invariant semantics.",
         "successor_cardinality": "The source does not choose one representation when a rational has dual terminating and nonterminating radix expansions.",
         "determinism_branching_or_measure": "No selection convention is stated for a rational with dual radix expansions.",
+        "termination_completion_failure": "The caption states a periodicity relation but no procedure, proof-completion rule, or failure policy.",
     },
 )
 rational_periodicity["evidence"][0]["strength"] = "DIRECT_PARTIAL_MECHANICS"
@@ -3673,32 +3672,59 @@ context_evidence(
     strength="CORROBORATING",
 )
 
-# The shared iterative template describes one-step laws and finite displayed
-# windows.  None of the 52 users below supplies a runner request or a generic
-# stopping/completion contract, so retain that policy as source-limited
-# unknown rather than importing it into every candidate.
-_requested_step_specs = [
+# The shared iterative template describes laws and finite displayed windows,
+# not a runner-level completion contract.  Classify the 52 candidates by
+# their actual identity: generators and explicitly open-ended trajectories
+# retain unknown stopping semantics, while repeatable one-step law identities
+# have no intrinsic completion field.
+_unclassified_iterative_completion = [
     item
     for item in ALL_CANDIDATES
-    if item["facts"].get("termination_completion_failure")
-    == UNSUPPORTED_REQUESTED_STEP_COMPLETION
+    if item["facts"].get("native_time") == "Discrete successive steps."
+    and "termination_completion_failure" not in item["facts"]
+    and "termination_completion_failure" not in item["not_applicable"]
+    and "termination_completion_failure" not in item["unknown_reasons"]
 ]
-if len(_requested_step_specs) != 52:
+if len(_unclassified_iterative_completion) != 52:
     raise AuthoringError(
-        "requested-step completion repair expected 52 candidates, found "
-        f"{len(_requested_step_specs)}"
+        "iterative completion classification expected 52 candidates, found "
+        f"{len(_unclassified_iterative_completion)}"
     )
-for _spec in _requested_step_specs:
-    mark_unknown(
-        _spec,
-        {
-            "termination_completion_failure": (
-                f"The assigned source defines or displays {_spec['name']} "
-                "but does not state a stopping, completion, or failure policy "
-                "for its iteration."
-            )
-        },
-    )
+_unstated_stopping_keys = {
+    "constant-addition-family",
+    *(f"constant-add-{value}" for value in range(1, 9)),
+    "constant-multiplication-family",
+    "multiply-two",
+    "multiply-three",
+    "multiply-three-halves",
+    "three-half-parity-map",
+    "five-half-parity-map",
+    "binary-long-division",
+    "binary-square-root-generator",
+}
+for _spec in _unclassified_iterative_completion:
+    if _spec["key"] in _unstated_stopping_keys:
+        mark_unknown(
+            _spec,
+            {
+                "termination_completion_failure": (
+                    f"The assigned source defines or displays {_spec['name']} "
+                    "but does not state a stopping, completion, or failure "
+                    "policy for its iteration."
+                )
+            },
+        )
+    else:
+        mark_not_applicable(
+            _spec,
+            {
+                "termination_completion_failure": (
+                    "This candidate is a repeatable one-step law identity; "
+                    "a terminal run or completion state is not intrinsic to "
+                    "that law."
+                )
+            },
+        )
 
 
 # Literal construction-bearing routes discovered during the sequential pass.
