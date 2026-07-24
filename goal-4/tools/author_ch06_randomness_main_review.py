@@ -3392,7 +3392,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001500": (
             ["input", "result_kind", "witness_semantics", "parameters_and_variants"],
             "U001500 gives the rule-128 allowed-block condition after t steps, not the generic network algorithm.",
-            "CORROBORATING",
+            "DIRECT_PARTIAL_MECHANICS",
         ),
         "U001503": (
             ["result_kind", "witness_semantics", "parameters_and_variants"],
@@ -4530,7 +4530,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
         related_evidence_units={
             "random cellular-automaton initial-field generator family": ["U001246"],
             "periodic-block cellular-automaton initial-condition generator": [
-                "U001431",
                 "U001435",
             ],
         },
@@ -5953,14 +5952,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "U001561",
         ],
         parameters=["finite block"],
-        variants=["rule-110 14-cell periodic background"],
-        variant_units={
-            "rule-110 14-cell periodic background": [
-                "U001557",
-                "U001558",
-                "U001561",
-            ]
-        },
+        variants=[],
+        variant_units={},
         related_names=[
             "elementary cellular automaton rule 30",
             "elementary cellular automaton rule 110",
@@ -6760,7 +6753,11 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "rule-110 width-41 unbounded-growth survey",
         ],
         variant_units={
-            "code-20 first-200 binary-seed survey": ["U001532", "U001533"],
+            "code-20 first-200 binary-seed survey": [
+                "U001519",
+                "U001532",
+                "U001533",
+            ],
             "code-20 first-25-billion binary-seed survey": [
                 "U001534",
                 "U001535",
@@ -7158,6 +7155,307 @@ def candidate_definitions() -> list[dict[str, Any]]:
         claim="U001544 supplies the universal no-solution result for code-357 repetition periods below five.",
         strength="DIRECT_COMPLETE_MECHANICS",
     )
+
+    # Top-level parameter provenance is deliberately narrower than a
+    # candidate's aggregate supporting evidence.  Keep one exact unit
+    # allowlist per emitted parameter after all record resets so later
+    # normalization cannot widen a parameter back to the whole candidate.
+    trail = candidate("prior-time gray-trail rendering observer")
+    trail["parameters"] = []
+    trail["values"].pop("parameters_and_variants", None)
+    trail["field_units"].pop("parameters_and_variants", None)
+    for override in trail["evidence_overrides"].values():
+        override["fields"] = [
+            field
+            for field in override.get("fields", [])
+            if field != "parameters_and_variants"
+        ]
+
+    parameter_unit_allowlist = {
+        "random cellular-automaton initial-field generator family": {
+            "target carrier": [
+                "U001227",
+                "U001316",
+                "U001324",
+                "U001331",
+                "U001333",
+                "U001416",
+                "U001421",
+            ],
+            "target value domain": [
+                "U001227",
+                "U001316",
+                "U001331",
+                "U001333",
+                "U001416",
+                "U001421",
+            ],
+            "stated black-cell density": ["U001421"],
+        },
+        "uniform-attractor elementary cellular-automaton preset panel": {
+            "selected rule code": ["U001235", "U001236"],
+        },
+        "fixed-or-periodic-structure elementary cellular-automaton preset panel": {
+            "selected rule code": ["U001239", "U001240"],
+        },
+        "elementary cellular automaton rule 110": {
+            "rule code": ["U001256", "U001558", "U001560"],
+        },
+        "four-class cellular-automaton behavior classification": {
+            "chosen reasonable class definition or correlated property": [
+                "U001293",
+                "U001298",
+            ],
+        },
+        "symmetric quiescent-white binary nearest-neighbor cellular-automaton family": {
+            "rule table": ["U001272", "U001273"],
+        },
+        "binary next-nearest-neighbor totalistic cellular-automaton family": {
+            "totalistic rule code": ["U001274", "U001275"],
+        },
+        "three-color nearest-neighbor totalistic cellular-automaton family": {
+            "totalistic rule code": ["U001276", "U001277"],
+        },
+        "four-color nearest-neighbor totalistic cellular-automaton sequence": {
+            "totalistic rule code": ["U001305", "U001306"],
+        },
+        "fractional-average continuous cellular automaton": {
+            "additive constant": [
+                "U001311",
+                "U001316",
+                "U001318",
+                "U001320",
+            ],
+        },
+        "neighbor-weighted fractional-average continuous cellular automaton": {
+            "additive constant": ["U001322", "U001323"],
+            "neighbor multiplier": ["U001322", "U001323"],
+        },
+        "one-dimensional slice-through-time and spatial-depth-fog observer": {
+            "slice location": ["U001325"],
+            "spatial-depth fog enabled": ["U001335"],
+        },
+        "binary two-dimensional von-Neumann-totalistic cellular-automaton family": {
+            "six-bit totalistic rule code": [
+                "U001330",
+                "U001331",
+                "U001332",
+                "U001333",
+            ],
+        },
+        "single-cell initial-perturbation difference observer": {
+            "cellular-automaton rule": ["U001352", "U001359"],
+            "base initial condition": ["U001344", "U001362"],
+            "selected changed cell": [
+                "U001344",
+                "U001352",
+                "U001362",
+            ],
+        },
+        "finite-system repetition-period and maximum-period observer": {
+            "transition rule": [
+                "U001388",
+                "U001390",
+                "U001392",
+                "U001393",
+            ],
+            "finite size or state count": [
+                "U001386",
+                "U001387",
+                "U001388",
+                "U001391",
+                "U001393",
+            ],
+            "initial state": ["U001393"],
+        },
+        "finite cyclic translation of a single dot": {
+            "number of positions n": [
+                "U001367",
+                "U001369",
+                "U001372",
+                "U001374",
+                "U001375",
+                "U001376",
+            ],
+            "displacement k": ["U001367", "U001369", "U001376"],
+        },
+        "finite cyclic doubling map": {
+            "system size n": ["U001380"],
+        },
+        "finite cyclic binary cellular automaton": {
+            "cell count n": ["U001383", "U001387", "U001391"],
+            "cellular-automaton rule": ["U001390", "U001393"],
+        },
+        "additive cellular-automaton superposition relation": {
+            "selected additive cellular-automaton rule": [
+                "U001412",
+                "U001414",
+                "U001463",
+                "U001464",
+            ],
+            "component configurations": ["U001412", "U001414"],
+        },
+        "periodic-block cellular-automaton initial-condition generator": {
+            "finite block": ["U001432"],
+        },
+        "rule-126 random two-block initial-condition ensemble": {
+            "permitted four-cell block set": ["U001439"],
+        },
+        "rule-126 to rule-90 pair-block emulation": {
+            "source rule": ["U001444", "U001445"],
+            "target rule": ["U001444", "U001445"],
+            "spatial block width": ["U001444", "U001448"],
+            "temporal sampling interval": ["U001445", "U001448"],
+        },
+        "rule-90 pair-block self-emulation": {
+            "cellular-automaton rule": ["U001452", "U001453"],
+            "spatial block codec": [
+                "U001453",
+                "U001455",
+                "U001456",
+                "U001457",
+                "U001458",
+            ],
+            "temporal sampling interval": [
+                "U001455",
+                "U001456",
+                "U001457",
+            ],
+        },
+        "rule-150 block self-emulation": {
+            "cellular-automaton rule": [
+                "U001459",
+                "U001463",
+                "U001464",
+            ],
+            "spatial block codec": [
+                "U001460",
+                "U001461",
+                "U001462",
+                "U001463",
+            ],
+            "temporal sampling interval": [
+                "U001460",
+                "U001461",
+                "U001462",
+            ],
+        },
+        "rule-184 three-cell-block self-emulation": {
+            "cellular-automaton rule": ["U001465"],
+            "spatial block codec": [
+                "U001465",
+                "U001466",
+                "U001467",
+                "U001468",
+                "U001469",
+            ],
+            "temporal sampling interval": [
+                "U001466",
+                "U001467",
+                "U001468",
+            ],
+        },
+        "allowed-sequence path-network observer": {
+            "allowed sequence language": [
+                "U001494",
+                "U001495",
+                "U001496",
+                "U001498",
+                "U001500",
+                "U001504",
+                "U001513",
+                "U001514",
+                "U001515",
+            ],
+            "evolution step": [
+                "U001494",
+                "U001495",
+                "U001496",
+                "U001498",
+                "U001500",
+                "U001503",
+                "U001504",
+                "U001506",
+            ],
+        },
+        "surjective binary cellular-automaton mapping family": {
+            "selected cellular-automaton rule": ["U001511", "U001512"],
+        },
+        "persistent-structure exhaustive search query": {
+            "cellular-automaton rule": [
+                "U001519",
+                "U001533",
+                "U001534",
+                "U001536",
+                "U001542",
+                "U001544",
+                "U001548",
+                "U001562",
+                "U001563",
+                "U001570",
+            ],
+            "finite numeric-prefix or block-width bound": [
+                "U001519",
+                "U001533",
+                "U001534",
+                "U001536",
+                "U001542",
+                "U001544",
+                "U001551",
+                "U001562",
+                "U001563",
+                "U001570",
+            ],
+        },
+        "localized finite-seed integer codec family": {
+            "radix": ["U001533", "U001536", "U001544"],
+            "cell alphabet": ["U001533", "U001536", "U001544"],
+            "nonnegative integer": ["U001533", "U001536", "U001544"],
+        },
+        "systematic fixed-period persistent-structure constraint solver": {
+            "cellular-automaton rule": ["U001540", "U001544"],
+            "requested repetition period": [
+                "U001537",
+                "U001538",
+                "U001539",
+                "U001540",
+                "U001544",
+            ],
+        },
+    }
+    parameterized_names = {row["name"] for row in defs if row["parameters"]}
+    check(
+        parameterized_names == set(parameter_unit_allowlist),
+        "exact parameter-unit allowlist must cover every parameterized candidate",
+    )
+    for row in defs:
+        if not row["parameters"]:
+            row["parameter_units"] = {}
+            continue
+        exact = parameter_unit_allowlist[row["name"]]
+        check(
+            set(row["parameters"]) == set(exact),
+            f"{row['name']} parameter-unit allowlist key mismatch",
+        )
+        exact_units = {
+            unit_id
+            for parameter_units in exact.values()
+            for unit_id in parameter_units
+        }
+        check(
+            exact_units <= set(row["units"]),
+            f"{row['name']} parameter evidence unit outside candidate",
+        )
+        row["parameter_units"] = exact
+        row["field_units"]["parameters_and_variants"] = list(exact_units)
+        for unit_id, override in row["evidence_overrides"].items():
+            override["fields"] = [
+                field
+                for field in override.get("fields", [])
+                if field != "parameters_and_variants"
+            ]
+            if unit_id in exact_units:
+                override["fields"].append("parameters_and_variants")
 
     # Remove inherited per-unit evidence-limit declarations. build_output()
     # assigns the record boundary once to the strongest identity/law anchor.
@@ -7661,7 +7959,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
                     {
                         "name": name,
                         "source_description": f"Source parameter for {candidate['name']}.",
-                        "evidence_ids": supporting_evidence_ids,
+                        "evidence_ids": [
+                            evidence_by_unit[unit_id]
+                            for unit_id in candidate["parameter_units"][name]
+                        ],
                     }
                     for name in candidate["parameters"]
                 ],
@@ -7892,6 +8193,69 @@ def build_output(bundle: Path) -> dict[str, Any]:
         "A000976": {
             "visual_role": "OBSERVER",
             "evidence_statement": "Original-resolution period-versus-size observer curves labeled rules 90,30,45,110 with a 2^n reference bound.",
+        },
+        "A000992": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution fine-cell rule-90 evolution checked as the unit-scale side of the "
+                "two-cell/two-step self-emulation relation."
+            ),
+        },
+        "A000993": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution coarse rule-90 evolution checked as the block-scale side of the "
+                "two-cell/two-step self-emulation relation."
+            ),
+        },
+        "A000994": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution rule-90 codec key checked: a two-by-two space-time block maps to "
+                "one black or white coarse cell."
+            ),
+        },
+        "A000996": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution fine-cell rule-150 evolution checked as the unit-scale side of the "
+                "two-cell/two-step self-emulation relation."
+            ),
+        },
+        "A000997": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution coarse rule-150 evolution checked as the block-scale side of the "
+                "two-cell/two-step self-emulation relation."
+            ),
+        },
+        "A000998": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution rule-150 codec key checked: a two-by-two space-time block maps to "
+                "one black or white coarse cell."
+            ),
+        },
+        "A000999": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution fine-cell rule-184 evolution checked as the unit-scale side of the "
+                "three-cell/three-step self-emulation relation."
+            ),
+        },
+        "A001000": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution coarse rule-184 evolution checked as the block-scale side of the "
+                "three-cell/three-step self-emulation relation."
+            ),
+        },
+        "A000995": {
+            "visual_role": "RELATION",
+            "evidence_statement": (
+                "Original-resolution rule-184 codec key checked: a three-by-three space-time block maps "
+                "to one black or white coarse cell."
+            ),
         },
         "A000986": {
             "visual_role": "NATIVE_EVIDENCE",
@@ -8223,6 +8587,48 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         == {"U001256", "U001558", "U001560"},
         "rule-110 code parameter evidence scope",
     )
+    check(
+        len(rule110["parameters"]) == 1
+        and {
+            rule110_evidence_by_id[evidence_id]
+            for evidence_id in rule110["parameters"][0]["evidence_ids"]
+        }
+        == {"U001256", "U001558", "U001560"},
+        "rule-110 top-level code parameter evidence scope",
+    )
+    expected_parameter_units = {
+        row["name"]: row["parameter_units"]
+        for row in candidate_definitions()
+    }
+    for record in output["candidate_proposals"]:
+        evidence_unit_by_id = {
+            evidence["evidence_id"]: evidence["source_unit_id"]
+            for evidence in record["source_evidence"]
+        }
+        exact_parameters = expected_parameter_units[record["provisional_name"]]
+        check(
+            {parameter["name"] for parameter in record["parameters"]}
+            == set(exact_parameters),
+            f"{record['id']} exact top-level parameter key set",
+        )
+        for parameter in record["parameters"]:
+            check(
+                {
+                    evidence_unit_by_id[evidence_id]
+                    for evidence_id in parameter["evidence_ids"]
+                }
+                == set(exact_parameters[parameter["name"]]),
+                f"{record['id']} exact evidence scope for parameter {parameter['name']}",
+            )
+            check(
+                set(parameter["evidence_ids"])
+                <= set(
+                    record["fingerprint"]["parameters_and_variants"][
+                        "evidence_ids"
+                    ]
+                ),
+                f"{record['id']} parameter evidence outside parameter field",
+            )
     for candidate_id in ("W0017", "W0018", "W0019", "W0020"):
         check(
             not candidate_by_id[candidate_id]["variants"],
@@ -8236,6 +8642,28 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
     check(
         not candidate_by_id["W0023"]["parameters"],
         "neighbor-difference unresolved conventions must not be top-level parameters",
+    )
+    check(
+        not candidate_by_id["W0028"]["parameters"]
+        and candidate_by_id["W0028"]["fingerprint"][
+            "parameters_and_variants"
+        ]["status"]
+        == "UNKNOWN_FROM_SOURCE",
+        "prior-time trail's unresolved depth and gray map are not source parameters",
+    )
+    check(
+        {
+            next(
+                evidence["source_unit_id"]
+                for evidence in candidate_by_id["W0007"]["source_evidence"]
+                if evidence["evidence_id"] == evidence_id
+            )
+            for relation in candidate_by_id["W0007"]["related_candidate_ids"]
+            if relation["candidate_id"] == "W0036"
+            for evidence_id in relation["evidence_ids"]
+        }
+        == {"U001435"},
+        "rule-30 periodic-seed relation must use the exact exclusivity unit",
     )
     search_units = set(candidate_by_id["W0056"]["source_unit_ids"])
     check(
