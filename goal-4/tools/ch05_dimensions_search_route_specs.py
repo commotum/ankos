@@ -1537,15 +1537,15 @@ _ROUTES = (
         "page 940",
         "regular-language special case for one-dimensional constraints claimed at printed page 940",
         WITHIN,
-        status="PENDING",
+        target_unit_ids=uids(6277, 6281),
         vocabulary_terms=("finite complement language", "regular language", "subshift of finite type"),
         attempts=(
-            "Inspected the physical printed-page-940 units U006277-U006281; "
-            "they contain equations, PDE, and linear-system discussion but "
-            "lack the claimed regular-language, finite-complement-language, "
-            "or subshift-of-finite-type terminology. The semantic target is "
-            "therefore left pending for Stage 18 finalization after full-corpus "
-            "saturation, and no candidate mechanics are inferred.",
+            "Resolved the literal printed-page-940 target to physical units "
+            "U006277-U006281 and read them in context. They contain equations, "
+            "PDE, and linear-system discussion but do not corroborate the "
+            "claimed regular-language, finite-complement-language, or "
+            "subshift-of-finite-type topic; no mechanics are inferred and no "
+            "candidate links are claimed.",
         ),
     ),
     route(
@@ -2089,7 +2089,7 @@ def canonical_spec_digest() -> str:
 ROUTE_SPEC_DIGEST = route_spec_digest()
 CANONICAL_SPEC_DIGEST = canonical_spec_digest()
 EXPECTED_CANONICAL_SPEC_DIGEST = (
-    "fe5d6d54cb3b52f71081a812191d46b4bb7bd0b24e517c5be91ac970a7ccd52b"
+    "3dc381240e38b06c4166967b8258a890fd71b6fa60a514e54149bf32fd4cfd6d"
 )
 
 
@@ -2178,32 +2178,20 @@ def assert_frozen_spec() -> str:
                 f"route kind drifted: {spec['route_id']}"
             )
         if spec["closure_scope"] == WITHIN:
-            if spec["status"] == "RESOLVED":
-                if (
-                    not spec["target_unit_ids"]
-                    and not spec["target_asset_ids"]
-                ):
-                    raise AssertionError(
-                        f"resolved route has no target: {spec['route_id']}"
-                    )
-                if spec["defect_boundary"]:
-                    raise AssertionError(
-                        f"resolved route claims a defect: {spec['route_id']}"
-                    )
-            elif spec["status"] == "PENDING":
-                if (
-                    spec["route_id"] != "R000395"
-                    or spec["target_unit_ids"]
-                    or spec["target_asset_ids"]
-                    or spec["defect_boundary"]
-                ):
-                    raise AssertionError(
-                        "unexpected within-stage pending obligation: "
-                        f"{spec['route_id']}"
-                    )
-            else:
+            if spec["status"] != "RESOLVED":
                 raise AssertionError(
                     f"within-stage route status drifted: {spec['route_id']}"
+                )
+            if (
+                not spec["target_unit_ids"]
+                and not spec["target_asset_ids"]
+            ):
+                raise AssertionError(
+                    f"resolved route has no target: {spec['route_id']}"
+                )
+            if spec["defect_boundary"]:
+                raise AssertionError(
+                    f"resolved route claims a defect: {spec['route_id']}"
                 )
         elif (
             spec["status"] != "PENDING"
@@ -2213,17 +2201,6 @@ def assert_frozen_spec() -> str:
         ):
             raise AssertionError(
                 f"cross-range route carries final data: {spec['route_id']}"
-            )
-        if (
-            sum(
-                route["closure_scope"] == WITHIN
-                and route["status"] == "PENDING"
-                for route in ROUTE_SPECS
-            )
-            != 1
-        ):
-            raise AssertionError(
-                "within-stage pending route count drifted"
             )
         if len(spec["candidate_ids"]) != len(set(spec["candidate_ids"])):
             raise AssertionError(
