@@ -1770,7 +1770,7 @@ context_evidence(
         "parameters_and_variants",
         "excluded_observers_and_representations",
     ],
-    strength="DIRECT_IDENTITY",
+    strength="CORROBORATING",
 )
 context_evidence(
     pi_digits,
@@ -2706,9 +2706,28 @@ trajectory_difference = source_candidate(
     ),
     not_applicable=DECLARATIVE_NA,
     missing="The exact visual code and finite alignment/cropping convention are not stated.",
-    claim="The caption explicitly identifies the panels as differences in digit sequences from a small initial change.",
-    strength="DIRECT_PARTIAL_MECHANICS",
+    claim=(
+        "Original-resolution inspection confirms that this image is the "
+        "displayed comparison panel, but the pixels alone do not establish "
+        "the comparison law."
+    ),
+    strength="CONTEXTUAL",
     image_path="CHAPTERS/_page_170_Picture_2.jpeg",
+)
+trajectory_difference["evidence"][0]["fields"] = []
+context_evidence(
+    trajectory_difference,
+    "iterated-map-digit-difference-caption",
+    "U000860",
+    (
+        "The caption explicitly identifies the panels as differences in "
+        "digit sequences produced by a small initial-condition change and "
+        "distinguishes the four iterated-map cases."
+    ),
+    fields=list(trajectory_difference["facts"])
+    + list(trajectory_difference["not_applicable"]),
+    strength="DIRECT_PARTIAL_MECHANICS",
+    modality="CAPTION",
 )
 
 random_interval_seed = source_candidate(
@@ -4281,12 +4300,12 @@ ASSET_REVIEW: dict[str, tuple[str, list[str], str]] = {
         ["CONSTRUCTION_BEARING", "TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"],
         "CHECKED",
     ),
-    "A000797": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000797": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000798": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
-    "A000799": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
-    "A000800": ("OBSERVER", [], "NOT_REQUIRED"),
-    "A000801": ("OBSERVER", [], "NOT_REQUIRED"),
-    "A000802": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000799": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000800": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000801": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000802": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000803": ("OBSERVER", [], "NOT_REQUIRED"),
     "A000804": ("OBSERVER", [], "NOT_REQUIRED"),
     "A000805": ("OBSERVER", [], "NOT_REQUIRED"),
@@ -4294,23 +4313,23 @@ ASSET_REVIEW: dict[str, tuple[str, list[str], str]] = {
     "A000807": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000808": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000809": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
-    "A000810": ("CONTROL", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
-    "A000811": ("RELATION", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000810": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000811": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000812": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
     "A000813": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000814": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000815": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
     "A000816": ("CONTROL", [], "NOT_REQUIRED"),
-    "A000817": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
-    "A000818": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000817": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000818": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000819": ("CONTROL", [], "NOT_REQUIRED"),
     "A000821": ("CONTROL", [], "NOT_REQUIRED"),
     "A000822": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "CHECKED"),
     "A000823": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000824": ("OBSERVER", [], "NOT_REQUIRED"),
     "A000825": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "CHECKED"),
-    "A000826": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
-    "A000827": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000826": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000827": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000828": ("OBSERVER", [], "NOT_REQUIRED"),
     "A000829": ("OBSERVER", [], "NOT_REQUIRED"),
     "A000830": ("OBSERVER", [], "NOT_REQUIRED"),
@@ -4328,10 +4347,10 @@ ASSET_REVIEW: dict[str, tuple[str, list[str], str]] = {
     "A000842": ("OBSERVER", [], "NOT_REQUIRED"),
 }
 EXPECTED_ASSET_ROLE_COUNTS = {
-    "NATIVE_EVIDENCE": 13,
-    "RELATION": 1,
-    "CONTROL": 11,
-    "OBSERVER": 36,
+    "NATIVE_EVIDENCE": 24,
+    "RELATION": 0,
+    "CONTROL": 6,
+    "OBSERVER": 31,
     "DECORATIVE": 1,
     "SOURCE_DEFECT": 1,
 }
@@ -4687,23 +4706,6 @@ def _allocate_tail(
                 raise AuthoringError(
                     f"evidence {ev['label']} predates candidate {item['key']}"
                 )
-            strength = ev["strength"]
-            if ev["image_path"] is not None:
-                asset_id = asset_by_path[ev["image_path"]]["asset_id"]
-                visual_role = ASSET_REVIEW[asset_id][0]
-                if (
-                    visual_role != "NATIVE_EVIDENCE"
-                    and strength
-                    in {
-                        "DIRECT_IDENTITY",
-                        "DIRECT_PARTIAL_MECHANICS",
-                        "DIRECT_COMPLETE_MECHANICS",
-                    }
-                ):
-                    # Controls, observers, and relation diagrams can
-                    # corroborate a field already grounded in the assigned
-                    # source, but they are not native construction evidence.
-                    strength = "CORROBORATING"
             local.append(
                 {
                     "evidence_id": eid,
@@ -4716,7 +4718,7 @@ def _allocate_tail(
                     },
                     "source_unit_id": ev["unit"],
                     "image_path": ev["image_path"],
-                    "strength": strength,
+                    "strength": ev["strength"],
                     "modality": ev["modality"],
                     "claim": ev["claim"],
                     "fingerprint_fields": ev["fields"],
