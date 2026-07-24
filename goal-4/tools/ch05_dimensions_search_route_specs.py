@@ -949,3 +949,794 @@ _ROUTES = (
         candidate_ids=bids(915),
         vocabulary_terms=("grid scan", "page 192", "space-filling curves"),
     ),
+    route(
+        "U006227", "H011705", 1,
+        "Page 202 · Properties",
+        "page-202(c) network node-count sequence and binary-digit recurrence",
+        WITHIN,
+        target_unit_ids=uids(1111, 1115), target_asset_ids=aids(892),
+        recovered_candidate_names=(
+            "page-202(c) network node-count sequence generator",
+        ),
+        vocabulary_terms=("binary-digit recurrence", "network node count", "page 202"),
+    ),
+    route(
+        "U006234", "H011706", 1,
+        "page 479",
+        "network dimension defined by radius-r reachable-volume growth",
+        CROSS,
+        recovered_candidate_names=(
+            "network dimensionality observer",
+        ),
+        vocabulary_terms=("dimension", "network radius", "reachable volume"),
+    ),
+    route(
+        "U006234", "H011706", 2,
+        "the systems on pages 202 and 203",
+        "network-rule systems used by the dimensionality observer",
+        WITHIN,
+        target_unit_ids=uids(1111, 1121), target_asset_ids=aids(892, 893),
+        recovered_candidate_names=(
+            "network dimensionality observer",
+        ),
+        vocabulary_terms=("dimension", "network rules", "pages 202 and 203"),
+    ),
+    route(
+        "U006236", "H011707", 1,
+        "page 259",
+        "finite-size cellular-automaton comparison for homogeneous-network automata",
+        CROSS,
+        candidate_ids=bids(891),
+        vocabulary_terms=("cellular automata", "finite size", "homogeneous networks"),
+    ),
+    route(
+        "U006238", "H011708", 1,
+        "Chapter 6",
+        "behavior classes of random Boolean networks",
+        CROSS,
+        route_kind="SECTION",
+        candidate_ids=bids(920),
+        vocabulary_terms=("behavior classes", "random Boolean networks"),
+    ),
+    route(
+        "U006238", "H011708", 2,
+        "page 963",
+        "random-mapping comparison for random Boolean networks",
+        CROSS,
+        candidate_ids=bids(920),
+        vocabulary_terms=("random Boolean networks", "random mappings"),
+    ),
+    route(
+        "U006248", "H011709", 1,
+        "The case shown on page 206",
+        "page-206 three-rule slow-growth multiway preset",
+        WITHIN,
+        target_unit_ids=uids(1140, 1143), target_asset_ids=aids(901, 902),
+        candidate_ids=bids(922),
+        vocabulary_terms=("multiway preset", "page 206", "three rules"),
+    ),
+    route(
+        "U006252", "H011710", 1,
+        "pictures like those on page 208",
+        "page-208 multiway state collections used to illustrate polynomial growth",
+        WITHIN,
+        target_unit_ids=uids(1148, 1150), target_asset_ids=aids(904),
+        recovered_candidate_names=(
+            "polynomial-growth string-multiway preset",
+            "polynomial-growth multiway state-count asymptotic profile",
+        ),
+        vocabulary_terms=("multiway state count", "page 208", "polynomial growth"),
+    ),
+    route(
+        "U006255", "H011711", 1,
+        "Page 206 · Properties",
+        "page-206 multiway preset properties and state-count diagnostics",
+        WITHIN,
+        target_unit_ids=uids(1140, 1143), target_asset_ids=aids(901, 902),
+        candidate_ids=bids(691),
+        recovered_candidate_names=(
+            "multiway state-count and first-difference observer",
+        ),
+        vocabulary_terms=("first differences", "multiway state count", "page 206"),
+    ),
+    route(
+        "U006256", "H011712", 1,
+        "as on page 208",
+        "page-208 layered display of complete multiway state collections",
+        WITHIN,
+        target_unit_ids=uids(1148, 1150), target_asset_ids=aids(904),
+        recovered_candidate_names=(
+            "stacked multiway-state evolution representation",
+        ),
+        vocabulary_terms=("layered history", "multiway states", "page 208"),
+    ),
+    route(
+        "U006258", "H011713", 1,
+        "In analogy with page 796",
+        "bounded-length reachability display for a string multiway system",
+        CROSS,
+        recovered_candidate_names=(
+            "bounded-length multiway reachability observer",
+        ),
+        vocabulary_terms=("bounded length", "multiway reachability", "strings"),
+        defect_boundary=(
+            "The source reads “shows wh different strings”; the missing OCR "
+            "word and the plotted axis/string encoding are not inferred."
+        ),
+        attempts=(
+            "Queued literal target 'In analogy with page 796' for the "
+            "bounded-length reachability display outside the assigned "
+            "Chapter 5 source range. The target was not opened, no target "
+            "mechanics were inferred, and the OCR-defective phrase “shows "
+            "wh different strings” remains unresolved.",
+        ),
+    ),
+    route(
+        "U006261", "H011714", 1,
+        "as on page 206",
+        "page-206 string multiway system used by the group and semigroup interpretation",
+        WITHIN,
+        target_unit_ids=uids(1140, 1143), target_asset_ids=aids(901, 902),
+        candidate_ids=bids(921) + bids(924, 925),
+        vocabulary_terms=("group", "multiway system", "page 206", "semigroup"),
+    ),
+    route(
+        "U006263", "H011715", 1,
+        "the ones shown on page 196",
+        "tree-network exemplars for the free-semigroup Cayley graph",
+        WITHIN,
+        target_unit_ids=uids(1083, 1085), target_asset_ids=aids(885),
+        recovered_candidate_names=(
+            "group-or-semigroup Cayley-graph generator family",
+            "free-semigroup Cayley-tree preset",
+        ),
+        vocabulary_terms=("Cayley graph", "free semigroup", "tree network"),
+    ),
+    route(
+        "U006264", "H011716", 1,
+        "Compare page 945",
+        "homogeneous-network context for the A5 Cayley-graph presentation",
+        WITHIN,
+        target_unit_ids=uids(6132),
+        recovered_candidate_names=(
+            "A5 icosahedral-group presentation",
+        ),
+        vocabulary_terms=("A5", "Cayley graph", "homogeneous network"),
+    ),
+    route(
+        "U006265", "H011717", 1,
+        "See also pages 945 and 1032",
+        "Monster Group finite-group denotation and referenced omitted presentation",
+        CROSS,
+        target_unit_ids=uids(6132),
+        recovered_candidate_names=(
+            "Monster Group finite-group denotation with source-omitted presentation",
+        ),
+        vocabulary_terms=("finite group", "Monster Group", "order", "presentation"),
+        defect_boundary=(
+            "The source gives the exact group order but only says that a "
+            "dozen rules yield the group; it omits the generators, relations, "
+            "rule list, and quotient reconstruction."
+        ),
+        attempts=(
+            "Resolved the page-945 half of literal target 'See also pages "
+            "945 and 1032' only to U006132, which states the homogeneous "
+            "Cayley-graph carrier context. Page 1032 lies outside the "
+            "assigned Chapter 5 range and was not opened; no generators, "
+            "relations, rule list, or quotient mechanics were inferred.",
+        ),
+    ),
+    route(
+        "U006267", "H011718", 1,
+        "page 1104",
+        "Chomsky hierarchy classification of the displayed grammar families",
+        CROSS,
+        candidate_ids=bids(926, 929),
+        vocabulary_terms=("Chomsky hierarchy", "generative grammars", "formal languages"),
+    ),
+    route(
+        "U006268", "H011719", 1,
+        "page 957",
+        "finite-automaton recognition of the no-adjacent-B regular language",
+        CROSS,
+        candidate_ids=bids(926),
+        recovered_candidate_names=(
+            "no-adjacent-B regular-grammar preset",
+        ),
+        vocabulary_terms=("finite automaton", "no adjacent B", "regular language"),
+    ),
+    route(
+        "U006269", "H011720", 1,
+        "pages 1091 and 1103",
+        "context-free-language properties of the AxA-or-B grammar",
+        CROSS,
+        candidate_ids=bids(927),
+        recovered_candidate_names=(
+            "AxA-or-B context-free-grammar preset",
+        ),
+        vocabulary_terms=("AxA or B", "context-free grammar", "formal language"),
+    ),
+    route(
+        "U006275", "H011723", 1,
+        "page 933",
+        "fractal-dimension comparison for the numeric multiway evolution",
+        WITHIN,
+        target_unit_ids=uids(6184, 6196), target_asset_ids=aids(551, 552),
+        candidate_ids=bids(932),
+        vocabulary_terms=("fractal dimension", "multiway system", "numeric evolution"),
+    ),
+    route(
+        "U006275", "H011723", 2,
+        "page 937",
+        "network representation of the numeric multiway evolution",
+        WITHIN,
+        target_unit_ids=uids(6253, 6254),
+        candidate_ids=bids(932),
+        vocabulary_terms=("multiway network", "numeric evolution", "page 937"),
+    ),
+    route(
+        "U006276", "H011724", 1,
+        "page 871",
+        "bitwise-XOR characterization used by the nim losing-position predicate",
+        CROSS,
+        candidate_ids=bids(933),
+        recovered_candidate_names=(
+            "nim zero-XOR losing-position predicate",
+        ),
+        vocabulary_terms=("bitwise XOR", "losing position", "nim"),
+    ),
+    route(
+        "U006279", "H011725", 1,
+        "page 923",
+        "initial-value and boundary-value formulation of partial differential equations",
+        CROSS,
+        candidate_ids=bids(935, 936),
+        vocabulary_terms=("boundary value", "initial value", "partial differential equation"),
+    ),
+    route(
+        "U006282", "H011726", 1,
+        "Page 211 · 1D constraints",
+        "main-text one-dimensional allowed-block constraints",
+        WITHIN,
+        target_unit_ids=uids(1162, 1171), target_asset_ids=aids(908, 909),
+        candidate_ids=bids(940, 941),
+        vocabulary_terms=("allowed blocks", "one-dimensional constraints", "page 211"),
+    ),
+    route(
+        "U006284", "H011727", 1,
+        "The constraint on page 210",
+        "period-four witness for the main-text one-dimensional constraint",
+        WITHIN,
+        target_unit_ids=uids(1162, 1165), target_asset_ids=aids(908),
+        candidate_ids=bids(940, 941),
+        vocabulary_terms=("allowed blocks", "period four", "one-dimensional constraint"),
+    ),
+    route(
+        "U006284", "H011727", 2,
+        "See also page 266",
+        "one-dimensional constraint periodicity comparison",
+        CROSS,
+        candidate_ids=bids(940, 941),
+        vocabulary_terms=("constraint periodicity", "one-dimensional constraint"),
+    ),
+    route(
+        "U006285", "H011728", 1,
+        "page 225",
+        "cellular-automaton convergence to invariant configurations",
+        CROSS,
+        candidate_ids=bids(942),
+        vocabulary_terms=("cellular automaton", "invariant configurations"),
+    ),
+    route(
+        "U006285", "H011728", 2,
+        "See page 954",
+        "cellular-automaton invariant-configuration correspondence",
+        CROSS,
+        candidate_ids=bids(942),
+        vocabulary_terms=("cellular automaton", "fixed point", "invariant configuration"),
+    ),
+    route(
+        "U006285", "H011728", 3,
+        "See page 958",
+        "finite-complement-language and subshift-of-finite-type terminology",
+        CROSS,
+        candidate_ids=bids(940),
+        vocabulary_terms=("finite complement language", "subshift of finite type"),
+    ),
+    route(
+        "U006285", "H011728", 4,
+        "Page 215 · 2D constraints",
+        "main-text minimal two-dimensional local-template constraints",
+        WITHIN,
+        target_unit_ids=uids(1186, 1188), target_asset_ids=aids(913, 914),
+        candidate_ids=bids(943),
+        vocabulary_terms=("local templates", "minimal constraints", "two-dimensional constraints"),
+    ),
+    route(
+        "U006286", "H011729", 1,
+        "See also page 927",
+        "canonical binary rule-number ordering used by the constraint-number decoder",
+        WITHIN,
+        target_unit_ids=uids(6096, 6101),
+        candidate_ids=bids(943),
+        recovered_candidate_names=(
+            "two-dimensional constraint-number decoder",
+        ),
+        vocabulary_terms=("binary code", "constraint numbering", "template ordering"),
+    ),
+    route(
+        "U006290", "H011730", 1,
+        "page 213",
+        "main-text periodic tessellation encoded by overlapping corners",
+        WITHIN,
+        target_unit_ids=uids(1182, 1184), target_asset_ids=aids(912),
+        recovered_candidate_names=(
+            "overlapping-corner tessellation descriptor and Fill generator",
+        ),
+        vocabulary_terms=("Fill", "overlapping corners", "periodic tessellation"),
+    ),
+    route(
+        "U006295", "H011731", 1,
+        "page 1139",
+        "undecidability of infinite-pattern constraint satisfaction",
+        CROSS,
+        candidate_ids=bids(945),
+        vocabulary_terms=("constraint satisfaction", "infinite pattern", "undecidability"),
+    ),
+    route(
+        "U006295", "H011731", 2,
+        "page 1145",
+        "NP-completeness of finite-region constraint satisfaction",
+        CROSS,
+        candidate_ids=bids(945),
+        vocabulary_terms=("finite region", "NP-complete", "satisfaction"),
+    ),
+    route(
+        "U006295", "H011731", 3,
+        "Compare page 959",
+        "enumeration and solver comparison for two-dimensional constraints",
+        CROSS,
+        candidate_ids=bids(945),
+        vocabulary_terms=("constraint solver", "enumeration", "two-dimensional constraints"),
+    ),
+    route(
+        "U006295", "H011731", 4,
+        "Page 219 · Non-periodic pattern",
+        "main-text forced-nonperiodic constraint witness",
+        WITHIN,
+        target_unit_ids=uids(1208, 1210), target_asset_ids=aids(917, 918),
+        candidate_ids=bids(945),
+        vocabulary_terms=("forced nonperiodicity", "non-periodic pattern", "page 219"),
+    ),
+    route(
+        "U006297", "H011732", 1,
+        "page 117",
+        "nested-pattern comparison for the exhaustive constraint search",
+        CROSS,
+        candidate_ids=bids(945),
+        vocabulary_terms=("constraint search", "nested pattern"),
+    ),
+    route(
+        "U006301", "H011733", 1,
+        "page 188",
+        "main-text two-dimensional substitution patterns used by the Ammann-derived constraint",
+        WITHIN,
+        target_unit_ids=uids(1038, 1041), target_asset_ids=aids(876),
+        candidate_ids=bids(948),
+        recovered_candidate_names=(
+            "Ammann 16-symbol substitution system",
+            "substitution-pattern local-template occurrence extractor",
+        ),
+        vocabulary_terms=("Ammann", "local template", "substitution system"),
+    ),
+    route(
+        "U006305", "H011734", 1,
+        "pages 941 and 954",
+        "constraint-number decoding and cellular-automaton correspondence",
+        CROSS,
+        target_unit_ids=uids(6286, 6289), target_asset_ids=aids(572),
+        candidate_ids=bids(949),
+        vocabulary_terms=("cellular automaton", "constraint numbering", "nested pattern"),
+        attempts=(
+            "Resolved the page-941 half of literal target 'pages 941 and "
+            "954' to U006286-U006289/A000572, which supplies the canonical "
+            "constraint-number decoder and satisfaction check. Page 954 "
+            "lies outside the assigned Chapter 5 range and was not opened; "
+            "no cellular-automaton correspondence mechanics were inferred.",
+        ),
+    ),
+    route(
+        "U006305", "H011734", 2,
+        "page 170",
+        "main-text five-site cellular-automaton family used in the constraint correspondence",
+        WITHIN,
+        target_unit_ids=uids(960, 965), target_asset_ids=aids(845, 846),
+        candidate_ids=bids(949),
+        vocabulary_terms=("cellular automaton", "constraint correspondence", "page 170"),
+    ),
+    route(
+        "U006310", "H011735", 1,
+        "page 1139",
+        "undecidability boundary for determining whether a tiling exists",
+        CROSS,
+        candidate_ids=bids(951, 952),
+        vocabulary_terms=("tiling existence", "undecidability"),
+    ),
+    route(
+        "U006312", "H011736", 1,
+        "page 221",
+        "main-text aperiodic tiling and nonrepetitive-pattern examples",
+        WITHIN,
+        target_unit_ids=uids(1217, 1220), target_asset_ids=aids(921, 922),
+        candidate_ids=bids(951, 952),
+        vocabulary_terms=("aperiodic tiling", "nonrepetitive pattern", "page 221"),
+    ),
+    route(
+        "U006318", "H011738", 1,
+        "page 1141",
+        "enumeration complexity for square-free sequences",
+        CROSS,
+        candidate_ids=bids(958),
+        vocabulary_terms=("enumeration", "square-free sequence"),
+    ),
+    route(
+        "U006321", "H011739", 1,
+        "page 83",
+        "Thue-Morse nested-sequence antecedent for cube-free blocks",
+        CROSS,
+        candidate_ids=bids(960),
+        vocabulary_terms=("cube-free", "nested sequence", "Thue-Morse"),
+    ),
+    route(
+        "U006322", "H011740", 1,
+        "page 1068",
+        "unavoidable-block-pattern bounds",
+        CROSS,
+        candidate_ids=bids(961),
+        vocabulary_terms=("avoidable pattern", "block pattern", "unavoidable pattern"),
+    ),
+    route(
+        "U006323", "H011741", 1,
+        "page 938",
+        "formal-language grammar families used to express one-dimensional constraints",
+        WITHIN,
+        target_unit_ids=uids(6267, 6271),
+        vocabulary_terms=("formal language", "generative grammar", "one-dimensional constraint"),
+    ),
+    route(
+        "U006323", "H011741", 2,
+        "page 210",
+        "main-text one-dimensional constraint as a regular-language special case",
+        WITHIN,
+        target_unit_ids=uids(1162, 1165), target_asset_ids=aids(908),
+        vocabulary_terms=("one-dimensional constraint", "regular language"),
+    ),
+    route(
+        "U006323", "H011741", 3,
+        "page 940",
+        "finite-complement and subshift terminology for regular-language constraints",
+        WITHIN,
+        target_unit_ids=uids(6285),
+        vocabulary_terms=("finite complement language", "regular language", "subshift of finite type"),
+    ),
+    route(
+        "U006330", "H011742", 1,
+        "page 1078",
+        "primitive Pythagorean-triple parameterization",
+        CROSS,
+        candidate_ids=bids(969),
+        recovered_candidate_names=(
+            "primitive Pythagorean-triple parameterization",
+        ),
+        vocabulary_terms=("primitive triples", "Pythagorean triples", "parameterization"),
+    ),
+    route(
+        "U006332", "H011743", 1,
+        "page 1160",
+        "odd-binomial-coefficient parity relation",
+        CROSS,
+        recovered_candidate_names=(
+            "odd-binomial-coefficient parity relation",
+        ),
+        vocabulary_terms=("binomial coefficient", "odd parity", "Diophantine relation"),
+    ),
+    route(
+        "U006336", "H011745", 1,
+        "See also page 805",
+        "matrix-power pattern constraints",
+        CROSS,
+        candidate_ids=bids(979),
+        vocabulary_terms=("matrix powers", "pattern constraints"),
+    ),
+    route(
+        "U006336", "H011745", 2,
+        "page 938",
+        "simple finite-group classification context",
+        WITHIN,
+        target_unit_ids=uids(6264, 6266),
+        recovered_candidate_names=(
+            "finite group-and-semigroup count-by-order observer",
+        ),
+        vocabulary_terms=("finite groups", "simple groups", "classification"),
+    ),
+    route(
+        "U006336", "H011745", 3,
+        "See also pages 938 and 1032",
+        "finite-group classification and enumeration boundary",
+        CROSS,
+        target_unit_ids=uids(6264, 6266),
+        recovered_candidate_names=(
+            "finite group-and-semigroup count-by-order observer",
+        ),
+        vocabulary_terms=("enumeration", "finite groups", "simple groups"),
+        attempts=(
+            "Resolved the page-938 half of literal target 'See also pages "
+            "938 and 1032' to U006264-U006266, which supplies finite-group "
+            "examples and the classification context. Page 1032 lies "
+            "outside the assigned Chapter 5 range and was not opened; no "
+            "practical enumeration algorithm or omitted mechanics were "
+            "inferred.",
+        ),
+    ),
+)
+
+
+# Final family-15 hit order.  H011603 corresponds to the first unit and the
+# IDs then increase by one through H011746.
+F15_HIT_UNITS = (
+    "U000965", "U000968", "U000971", "U000972", "U000974", "U000976",
+    "U000978", "U000980", "U000981", "U000982", "U000983", "U000984",
+    "U000991", "U000995", "U000997", "U001002", "U001005", "U001016",
+    "U001031", "U001033", "U001038", "U001046", "U001050", "U001052",
+    "U001053", "U001056", "U001057", "U001062", "U001075", "U001076",
+    "U001091", "U001095", "U001101", "U001108", "U001111", "U001113",
+    "U001129", "U001144", "U001147", "U001148", "U001150", "U001151",
+    "U001152", "U001166", "U001178", "U001184", "U001185", "U001188",
+    "U001199", "U001201", "U001206", "U001212", "U001217", "U006078",
+    "U006082", "U006085", "U006098", "U006106", "U006110", "U006112",
+    "U006114", "U006121", "U006123", "U006126", "U006130", "U006132",
+    "U006139", "U006143", "U006145", "U006147", "U006149", "U006150",
+    "U006151", "U006152", "U006153", "U006154", "U006155", "U006156",
+    "U006157", "U006158", "U006159", "U006162", "U006163", "U006164",
+    "U006165", "U006168", "U006172", "U006175", "U006178", "U006182",
+    "U006184", "U006185", "U006187", "U006189", "U006192", "U006195",
+    "U006196", "U006197", "U006202", "U006205", "U006208", "U006226",
+    "U006227", "U006234", "U006236", "U006238", "U006248", "U006252",
+    "U006255", "U006256", "U006258", "U006261", "U006263", "U006264",
+    "U006265", "U006267", "U006268", "U006269", "U006272", "U006273",
+    "U006275", "U006276", "U006279", "U006282", "U006284", "U006285",
+    "U006286", "U006290", "U006295", "U006297", "U006301", "U006305",
+    "U006310", "U006312", "U006313", "U006318", "U006321", "U006322",
+    "U006323", "U006330", "U006332", "U006335", "U006336", "U006338",
+)
+
+
+def f15_hit_id(source_unit_id: str) -> str:
+    """Return the frozen final-F15 hit ID for one hit unit."""
+
+    return f"H{11603 + F15_HIT_UNITS.index(source_unit_id):06d}"
+
+
+def existing_route_use(
+    route_id: str,
+    source_unit_id: str,
+    literal_target: str,
+    expected_topic: str,
+    *,
+    route_kind: str = "PAGE",
+) -> dict[str, Any]:
+    """Record a final-F15 locator already governed by an existing route."""
+
+    return {
+        "source_unit_id": source_unit_id,
+        "discovery_kind": "SEARCH_HIT",
+        "discovery_id": f15_hit_id(source_unit_id),
+        "discovery_family_ordinal": 15,
+        "literal_target": literal_target,
+        "route_kind": route_kind,
+        "expected_topic": expected_topic,
+        "existing_route_id": route_id,
+        "rationale": (
+            f"Final family-15 search rediscovered literal target "
+            f"{literal_target!r}, already governed by {route_id}; no "
+            "duplicate route is authored."
+        ),
+    }
+
+
+# All Stage-9-owned routes from the earlier sequential review remain retained.
+# R000225 is not itself a final-F15 use because U001216 did not match F15.
+STAGE_EXISTING_ROUTE_IDS = tuple(
+    f"R{number:06d}" for number in range(203, 249)
+)
+
+EXISTING_ROUTE_USES = (
+    existing_route_use(
+        "R000203", "U000965", "page 173",
+        "two-dimensional CA rule-code numbering",
+    ),
+    existing_route_use(
+        "R000204", "U000968", "page 173",
+        "two-dimensional CA rule-code numbering",
+    ),
+    existing_route_use(
+        "R000205", "U000974", "page 60",
+        "earlier cellular-automaton code convention",
+    ),
+    existing_route_use(
+        "R000206", "U000981", "page 178",
+        "approximate-circle two-dimensional cellular automaton",
+    ),
+    existing_route_use(
+        "R000207", "U000982", "pages 179–181",
+        "eight-neighbor exactly-three retaining cellular automaton",
+    ),
+    existing_route_use(
+        "R000208", "U000983", "top of page 179",
+        "seed-length sweep for exactly-three retaining CA",
+    ),
+    existing_route_use(
+        "R000209", "U000984", "page 181",
+        "row-of-eleven evolution for exactly-three retaining CA",
+    ),
+    existing_route_use(
+        "R000210", "U000995", "pages 182 and 183",
+        "three-dimensional cellular-automaton examples",
+    ),
+    existing_route_use(
+        "R000211", "U001005", "page 171",
+        "two-dimensional nested cellular-automaton analog",
+    ),
+    existing_route_use(
+        "R000212", "U001016", "page 186",
+        "complex four-state two-dimensional Turing-machine rule",
+    ),
+    existing_route_use(
+        "R000213", "U001033", "page 82",
+        "one-dimensional substitution-system mechanics",
+    ),
+    existing_route_use(
+        "R000214", "U001038", "page 83",
+        "one-dimensional substitution-system nested patterns",
+    ),
+    existing_route_use(
+        "R000215", "U001052", "page 85",
+        "neighbor interaction in one-dimensional substitution systems",
+    ),
+    existing_route_use(
+        "R000216", "U001057", "Chapter 3",
+        "parallel and sequential one-dimensional substitution schedules",
+        route_kind="SECTION",
+    ),
+    existing_route_use(
+        "R000217", "U001062", "Chapter 9",
+        "order-independent higher-dimensional sequential substitution",
+        route_kind="SECTION",
+    ),
+    existing_route_use(
+        "R000218", "U001113", "Chapter 9",
+        "network-system variants for space and spacetime",
+        route_kind="SECTION",
+    ),
+    existing_route_use(
+        "R000219", "U001129", "page 88",
+        "sequential substitution replacement rules",
+    ),
+    existing_route_use(
+        "R000220", "U001147", "page 205",
+        "rapid-growth multiway rule",
+    ),
+    existing_route_use(
+        "R000221", "U001150", "page 205",
+        "multiway rules (d) and (f)",
+    ),
+    existing_route_use(
+        "R000222", "U001150", "previous page",
+        "multiway rule (k)",
+    ),
+    existing_route_use(
+        "R000223", "U001206", "pages 214 and 215",
+        "ordering of local-template constraints",
+    ),
+    existing_route_use(
+        "R000224", "U001212", "page 216",
+        "required-template constraint family",
+    ),
+    existing_route_use(
+        "R000226", "U001217", "rule 30 cellular automaton",
+        (
+            "constraint correspondence with a shifted elementary cellular-"
+            "automaton rule-30 pattern"
+        ),
+        route_kind="OTHER",
+    ),
+    existing_route_use(
+        "R000227", "U006078", "page 929",
+        "other lattice constructions",
+    ),
+    existing_route_use(
+        "R000228", "U006112", "page 171",
+        "cellular automaton code 942 underlying the displayed slices",
+    ),
+    existing_route_use(
+        "R000229", "U006121", "page 1092",
+        "additive cellular-automaton rules",
+    ),
+    existing_route_use(
+        "R000230", "U006121", "page 980",
+        "cellular automaton code 175850",
+    ),
+    existing_route_use(
+        "R000231", "U006121", "page 177",
+        "main-text cellular automaton code 175850 construction",
+    ),
+    existing_route_use(
+        "R000232", "U006121", "page 178",
+        "main-text cellular automaton code 746 construction",
+    ),
+    existing_route_use(
+        "R000233", "U006121", "page 181",
+        "main-text cellular automaton code 174826 construction",
+    ),
+    existing_route_use(
+        "R000234", "U006123", "page 183",
+        "underlying rules for 3D projection panels (a) and (b)",
+    ),
+    existing_route_use(
+        "R000235", "U006139", "page 185",
+        "rules for 2D Turing-machine head paths (a) through (e)",
+    ),
+    existing_route_use(
+        "R000236", "U006168", "page 583",
+        "non-white-background substitution systems and their nested structure",
+    ),
+    existing_route_use(
+        "R000237", "U006192", "pages 407 and 1006",
+        "parameter-space sets for geometric substitution systems",
+    ),
+    existing_route_use(
+        "R000238", "U006208", "page 1127",
+        "sigma-function scan of an infinite grid quadrant",
+    ),
+    existing_route_use(
+        "R000239", "U006226", "Chapter 9",
+        "undirected-network update rules",
+        route_kind="SECTION",
+    ),
+    existing_route_use(
+        "R000240", "U006273", "page 508",
+        "network substitution systems",
+    ),
+    existing_route_use(
+        "R000241", "U006273", "page 1141",
+        "multiway tag systems",
+    ),
+    existing_route_use(
+        "R000242", "U006276", "page 504",
+        "multiway systems in fundamental physics",
+    ),
+    existing_route_use(
+        "R000243", "U006310", "page 932",
+        "exact Penrose tile subdivision",
+    ),
+    existing_route_use(
+        "R000244", "U006318", "page 981",
+        "exact Ising-model energy law",
+    ),
+    existing_route_use(
+        "R000245", "U006318", "page 757",
+        "correspondence systems",
+    ),
+    existing_route_use(
+        "R000246", "U006336", "page 1073",
+        "Hadamard matrix property",
+    ),
+    existing_route_use(
+        "R000247", "U006336", "page 887",
+        "finite group/semigroup multiplication-table constraints",
+    ),
+    existing_route_use(
+        "R000248", "U006338", "page 1129",
+        "formula constraints and expression complexity",
+    ),
+)

@@ -18,6 +18,7 @@ import hashlib
 import json
 import os
 import sys
+import unicodedata
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,7 @@ import merge_worker_output
 import validate_audit
 from audit_contract import (
     CANDIDATE_FIELDS,
+    CROSS_REFERENCE_HEADER,
     FINGERPRINT_FIELDS,
     GOAL_DIR,
     REPO_ROOT,
@@ -778,7 +780,7 @@ RECOVERED_SPECS = [
         "relations x^2 = y^3 = (x y)^5 = 1",
         "identify words modulo the stated presentation",
         "the 60-element icosahedral group A5",
-        profile="FUNCTION",
+        profile="DENOTATION",
         cardinality="one denoted quotient group",
         measure="deterministic declarative denotation",
     ),
@@ -829,7 +831,6 @@ RECOVERED_SPECS = [
             ],
             "U006265": [
                 "result_kind",
-                "parameters_and_variants",
                 "evidence_limit",
             ],
         },
@@ -1834,7 +1835,9 @@ EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
 EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
-EXPECTED_STAGE_ROUTE_COUNT = 62
+EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
+EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 200
+EXPECTED_NEW_ROUTE_COUNT = 138
 EXPECTED_READING_UPDATE_COUNT = 155
 EXPECTED_NEW_CANDIDATE_COUNT = 88
 EXPECTED_NEW_EVIDENCE_COUNT = 203
@@ -3685,6 +3688,367 @@ def _build_final_enrichment(
     return updated, asset_updates, candidates, new_group_ids
 
 
+def _materialize_route_delta(
+    *,
+    route_specs: list[dict[str, Any]],
+    routes: list[dict[str, str]],
+    reading_by_id: dict[str, dict[str, str]],
+    reading_updates: list[dict[str, str]],
+    candidates_by_id: dict[str, dict[str, Any]],
+    candidate_updates: list[dict[str, Any]],
+    new_evidence_group_ids: list[str],
+    assets_by_id: dict[str, dict[str, str]],
+    unit_text_by_id: dict[str, str],
+    hit_by_pair: dict[tuple[int, str], str],
+) -> tuple[
+    list[dict[str, str]],
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    dict[str, list[str]],
+    list[str],
+]:
+    """Materialize frozen data-only route specs and bidirectional links."""
+
+    if len(routes) != 248:
+        raise AuthoringError(
+            f"pre-search route count drifted: {len(routes)}"
+        )
+    update_by_id = {
+        candidate["id"]: deepcopy(candidate)
+        for candidate in candidate_updates
+    }
+    recovered_by_name = {
+        candidate["provisional_name"]: candidate["id"]
+        for candidate in candidate_updates
+        if candidate["id"] not in candidates_by_id
+    }
+    if len(recovered_by_name) != EXPECTED_NEW_CANDIDATE_COUNT:
+        raise AuthoringError("recovered candidate names are not unique")
+
+    route_rows: list[dict[str, str]] = []
+    route_ids_by_source: dict[str, list[str]] = {}
+    route_candidates_by_source: dict[str, list[str]] = {}
+    candidate_route_additions: dict[str, list[str]] = {}
+    within_hit_counts: dict[str, int] = {}
+    for offset, spec in enumerate(route_specs, start=249):
+        route_id = f"R{offset:06d}"
+        source_unit_id = spec["source_unit_id"]
+        if source_unit_id not in reading_by_id:
+            raise AuthoringError(
+                f"{route_id} reaches unknown source {source_unit_id}"
+            )
+        hit_id = _hit_for(hit_by_pair, 15, source_unit_id)
+        if spec["discovery_id"] != hit_id:
+            raise AuthoringError(
+                f"{route_id} frozen discovery hit drifted: "
+                f"{spec['discovery_id']} != {hit_id}"
+            )
+        within_hit_counts[hit_id] = within_hit_counts.get(hit_id, 0) + 1
+        if spec["discovery_ordinal"] != within_hit_counts[hit_id]:
+            raise AuthoringError(
+                f"{route_id} within-hit route ordinal is not contiguous"
+            )
+        source_text = unit_text_by_id.get(source_unit_id)
+        if source_text is None:
+            raise AuthoringError(f"{route_id} lacks source-bound text")
+        normalize_locator = lambda value: " ".join(  # noqa: E731
+            "".join(
+                " "
+                if unicodedata.category(character).startswith("P")
+                else character.casefold()
+                for character in unicodedata.normalize("NFKC", value)
+            ).split()
+        )
+        if normalize_locator(spec["literal_target"]) not in normalize_locator(
+            source_text
+        ):
+            raise AuthoringError(
+                f"{route_id} literal target is absent from {source_unit_id} "
+                "under NFKC/casefold/punctuation/whitespace normalization"
+            )
+        candidate_ids = [
+            *spec["candidate_ids"],
+            *[
+                recovered_by_name[name]
+                for name in spec["recovered_candidate_names"]
+            ],
+        ]
+        candidate_ids = list(dict.fromkeys(candidate_ids))
+        for candidate_id in candidate_ids:
+            if (
+                candidate_id not in candidates_by_id
+                and candidate_id not in update_by_id
+            ):
+                raise AuthoringError(
+                    f"{route_id} targets unknown candidate {candidate_id}"
+                )
+            candidate_route_additions.setdefault(
+                candidate_id,
+                [],
+            ).append(route_id)
+        route_ids_by_source.setdefault(source_unit_id, []).append(route_id)
+        route_candidates_by_source.setdefault(
+            source_unit_id,
+            [],
+        ).extend(candidate_ids)
+
+        target_unit_ids = list(spec["target_unit_ids"])
+        target_asset_ids = list(spec["target_asset_ids"])
+        if any(unit_id not in reading_by_id for unit_id in target_unit_ids):
+            raise AuthoringError(f"{route_id} has an unknown target unit")
+        if any(asset_id not in assets_by_id for asset_id in target_asset_ids):
+            raise AuthoringError(f"{route_id} has an unknown target asset")
+        if spec["closure_scope"] == "WITHIN_STAGE" and (
+            any(
+                reading_by_id[unit_id]["path"] not in STAGE_PATHS
+                for unit_id in target_unit_ids
+            )
+            or any(
+                assets_by_id[asset_id]["assignment_path"] not in STAGE_PATHS
+                for asset_id in target_asset_ids
+            )
+        ):
+            raise AuthoringError(
+                f"{route_id} WITHIN_STAGE target leaves Stage 9"
+            )
+        raw_row: dict[str, Any] = {
+            "route_id": route_id,
+            "source_unit_id": source_unit_id,
+            "source_asset_id": spec["source_asset_id"],
+            "discovery_epoch": spec["discovery_epoch"],
+            "discovery_kind": spec["discovery_kind"],
+            "discovery_id": hit_id,
+            "discovery_ordinal": spec["discovery_ordinal"],
+            "literal_target": spec["literal_target"],
+            "route_kind": spec["route_kind"],
+            "expected_topic": spec["expected_topic"],
+            "owning_stage": spec["owning_stage"],
+            "closure_scope": spec["closure_scope"],
+            "status": spec["status"],
+            "target_unit_ids": target_unit_ids,
+            "target_asset_ids": target_asset_ids,
+            "attempts": list(spec["attempts"]),
+            "vocabulary_terms": list(spec["vocabulary_terms"]),
+            "defect_boundary": spec["defect_boundary"],
+        }
+        row = {
+            field: (
+                _json_array(raw_row[field])
+                if field
+                in {
+                    "target_unit_ids",
+                    "target_asset_ids",
+                    "attempts",
+                    "vocabulary_terms",
+                }
+                else str(raw_row[field])
+            )
+            for field in CROSS_REFERENCE_HEADER
+        }
+        route_rows.append(row)
+
+    if [row["route_id"] for row in route_rows] != [
+        f"R{number:06d}"
+        for number in range(249, 249 + len(route_specs))
+    ]:
+        raise AuthoringError("new route allocation is not contiguous")
+
+    for unit_id in route_candidates_by_source:
+        route_candidates_by_source[unit_id] = sorted(
+            set(route_candidates_by_source[unit_id]),
+            key=lambda value: int(value[1:]),
+        )
+
+    evidence_anchor_counts: dict[str, int] = {}
+    for candidate in update_by_id.values():
+        for evidence in candidate["source_evidence"]:
+            anchor = evidence["discovery_anchor"]
+            if anchor["kind"] == "SEARCH_HIT":
+                evidence_anchor_counts[anchor["id"]] = max(
+                    evidence_anchor_counts.get(anchor["id"], 0),
+                    int(anchor["ordinal"]),
+                )
+    route_evidence_plans: list[tuple[str, str]] = []
+    for unit_id in route_ids_by_source:
+        for candidate_id in route_candidates_by_source[unit_id]:
+            candidate = update_by_id.get(
+                candidate_id,
+                candidates_by_id.get(candidate_id),
+            )
+            if candidate is None:
+                raise AuthoringError(
+                    f"route provenance reaches unknown {candidate_id}"
+                )
+            if unit_id not in candidate["source_unit_ids"]:
+                route_evidence_plans.append((unit_id, candidate_id))
+
+    next_evidence_number = 4049 + len(new_evidence_group_ids)
+    modality_by_block = {
+        "fenced_code": "CODE",
+        "list": "FORMULA",
+        "table": "TABLE",
+        "paragraph": "PROSE",
+        "heading": "PROSE",
+        "image": "IMAGE",
+    }
+    appended_route_group_ids: list[str] = []
+    for offset, (unit_id, candidate_id) in enumerate(route_evidence_plans):
+        candidate = deepcopy(
+            update_by_id.get(candidate_id, candidates_by_id[candidate_id])
+        )
+        hit_id = _hit_for(hit_by_pair, 15, unit_id)
+        evidence_anchor_counts[hit_id] = (
+            evidence_anchor_counts.get(hit_id, 0) + 1
+        )
+        row = reading_by_id[unit_id]
+        modality = modality_by_block.get(row["block_kind"])
+        if modality is None:
+            raise AuthoringError(
+                f"unsupported route-evidence block {row['block_kind']}"
+            )
+        evidence_number = next_evidence_number + offset
+        evidence = _evidence(
+            evidence_number=evidence_number,
+            hit_id=hit_id,
+            hit_ordinal=evidence_anchor_counts[hit_id],
+            unit_id=unit_id,
+            strength="CONTEXTUAL",
+            modality=modality,
+            claim=(
+                "The literal F15 locator ties this already delimited "
+                "candidate to the appended typed route; it supplies no "
+                "additional native mechanics."
+            ),
+            fields=[],
+        )
+        candidate["source_unit_ids"] = [
+            *candidate["source_unit_ids"],
+            unit_id,
+        ]
+        candidate["source_evidence"] = [
+            *candidate["source_evidence"],
+            evidence,
+        ]
+        candidate["source_status"] = _append_novel(
+            candidate["source_status"],
+            [row["source_status"]],
+        )
+        candidate["evidence_strength"] = _append_novel(
+            candidate["evidence_strength"],
+            ["CONTEXTUAL"],
+        )
+        update_by_id[candidate_id] = {
+            field: candidate[field] for field in CANDIDATE_FIELDS
+        }
+        appended_route_group_ids.append(f"G{evidence_number:06d}")
+
+    for candidate_id, additions in candidate_route_additions.items():
+        if candidate_id in update_by_id:
+            candidate = update_by_id[candidate_id]
+        else:
+            candidate = deepcopy(candidates_by_id[candidate_id])
+        prior = candidate["cross_reference_ids"]
+        if set(prior) & set(additions):
+            raise AuthoringError(
+                f"{candidate_id} repeats a new route link"
+            )
+        candidate["cross_reference_ids"] = [*prior, *additions]
+        update_by_id[candidate_id] = {
+            field: candidate[field] for field in CANDIDATE_FIELDS
+        }
+
+    ordered_candidate_updates: list[dict[str, Any]] = []
+    seen_candidate_ids: set[str] = set()
+    for candidate in candidate_updates:
+        candidate_id = candidate["id"]
+        ordered_candidate_updates.append(update_by_id[candidate_id])
+        seen_candidate_ids.add(candidate_id)
+    for candidate_id in sorted(
+        set(update_by_id) - seen_candidate_ids,
+        key=lambda value: int(value[1:]),
+    ):
+        ordered_candidate_updates.append(update_by_id[candidate_id])
+
+    reading_update_by_id = {
+        row["source_unit_id"]: dict(row) for row in reading_updates
+    }
+    for unit_id, candidate_ids in route_candidates_by_source.items():
+        old = reading_by_id[unit_id]
+        row = reading_update_by_id.get(unit_id, dict(old))
+        present = parse_links(
+            row["candidate_ids"],
+            f"{unit_id}.candidate_ids",
+        )
+        additions = [
+            candidate_id
+            for candidate_id in candidate_ids
+            if candidate_id not in present
+        ]
+        if additions:
+            row["candidate_ids"] = _append_links(
+                row["candidate_ids"],
+                additions,
+                f"{unit_id}.candidate_ids",
+            )
+            if row["review_disposition"] != "SOURCE_DEFECT_OR_AMBIGUITY":
+                row["review_disposition"] = (
+                    "CANDIDATE"
+                    if row["review_disposition"] == "CANDIDATE"
+                    else "SUPPORTS_CANDIDATE"
+                )
+            support_sentence = (
+                f"F15 route provenance contextually supports "
+                f"{len(additions)} route-linked candidate(s)."
+            )
+            if unit_id in reading_update_by_id:
+                row["evidence_statement"] = (
+                    row["evidence_statement"].rstrip()
+                    + " "
+                    + support_sentence
+                )
+            else:
+                row["evidence_statement"] = support_sentence
+            reading_update_by_id[unit_id] = row
+    for unit_id, additions in route_ids_by_source.items():
+        old = reading_by_id[unit_id]
+        row = reading_update_by_id.get(unit_id, dict(old))
+        row["route_ids"] = _append_links(
+            row["route_ids"],
+            additions,
+            f"{unit_id}.route_ids",
+        )
+        if (
+            not parse_links(
+                row["candidate_ids"],
+                f"{unit_id}.candidate_ids",
+            )
+            and row["review_disposition"] != "SOURCE_DEFECT_OR_AMBIGUITY"
+        ):
+            row["review_disposition"] = "CROSS_REFERENCE"
+        route_sentence = (
+            f"Frozen locator search governs {len(additions)} typed "
+            f"cross-reference route(s): {', '.join(additions)}."
+        )
+        if unit_id in reading_update_by_id:
+            row["evidence_statement"] = (
+                row["evidence_statement"].rstrip() + " " + route_sentence
+            )
+        else:
+            row["evidence_statement"] = route_sentence
+        reading_update_by_id[unit_id] = row
+
+    return (
+        [
+            reading_update_by_id[unit_id]
+            for unit_id in sorted(reading_update_by_id)
+        ],
+        ordered_candidate_updates,
+        route_rows,
+        route_candidates_by_source,
+        [*new_evidence_group_ids, *appended_route_group_ids],
+    )
+
+
 def _normalized_hit_projection(
     round_record: dict[str, Any],
 ) -> list[tuple[Any, ...]]:
@@ -3861,6 +4225,19 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         raise AuthoringError(
             f"Stage 9 unit count drifted: {len(stage_unit_ids)}"
         )
+    source_bytes_by_path = {
+        path: (
+            REPO_ROOT / "ref" / "A-New-Kind-of-Science" / path
+        ).read_bytes()
+        for path in STAGE_PATHS
+    }
+    unit_text_by_id = {
+        unit["id"]: source_bytes_by_path[unit["path"]][
+            unit["byte_start"] : unit["byte_end"]
+        ].decode("utf-8")
+        for unit in units
+        if unit["id"] in stage_unit_ids
+    }
     stage_reading = [
         row for row in reading if row["source_unit_id"] in stage_unit_ids
     ]
@@ -3960,7 +4337,12 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         )
         if route["owning_stage"] == "9" or target_units & stage_unit_ids:
             active_route_ids.add(route["route_id"])
-    if len(active_route_ids) != EXPECTED_STAGE_ROUTE_COUNT:
+    expected_active_route_count = (
+        EXPECTED_INITIAL_STAGE_ROUTE_COUNT
+        if first_pass
+        else EXPECTED_ENRICHED_STAGE_ROUTE_COUNT
+    )
+    if len(active_route_ids) != expected_active_route_count:
         raise AuthoringError(
             f"Stage 9 active route count drifted: {len(active_route_ids)}"
         )
@@ -3969,7 +4351,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         for route_id in active_route_ids
         if routes_by_id[route_id]["owning_stage"] == "9"
     ]
-    if (
+    if first_pass and (
         len(stage_owned_routes) != 46
         or sum(
             row["closure_scope"] == "WITHIN_STAGE"
