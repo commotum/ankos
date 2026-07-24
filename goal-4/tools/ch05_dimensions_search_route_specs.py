@@ -2,7 +2,7 @@
 """Frozen Stage 9 Chapter 5 local-search route authoring specification.
 
 This module is data only.  It does not read or write any audit ledger.
-`ROUTE_SPECS` materializes the 137 new route rows in immutable final-F15
+`ROUTE_SPECS` materializes the 138 new route rows in immutable final-F15
 SEARCH_HIT order and within-hit locator order.  Existing-route uses and
 rejected/non-bearing locators are frozen separately so every one of the 144
 final F15 hit units has an explicit disposition.
@@ -1738,5 +1738,198 @@ EXISTING_ROUTE_USES = (
     existing_route_use(
         "R000248", "U006338", "page 1129",
         "formula constraints and expression complexity",
+    ),
+)
+
+
+def non_bearing_locator(
+    source_unit_id: str,
+    literal_target: str,
+    rationale: str,
+) -> dict[str, Any]:
+    """Record a final-F15 locator that does not warrant a route."""
+
+    return {
+        "source_unit_id": source_unit_id,
+        "discovery_kind": "SEARCH_HIT",
+        "discovery_id": f15_hit_id(source_unit_id),
+        "discovery_family_ordinal": 15,
+        "literal_target": literal_target,
+        "disposition": "NON_BEARING",
+        "rationale": rationale,
+    }
+
+
+NON_BEARING_LOCATORS = (
+    non_bearing_locator(
+        "U006078", "Page 170 · 1D phenomena",
+        (
+            "The page label introduces a behavior-only statement about "
+            "phenomena unavailable in one dimension; it does not identify "
+            "target construction mechanics."
+        ),
+    ),
+    non_bearing_locator(
+        "U006078", "page 981",
+        (
+            "The traditional phase-transition comparison is contextual and "
+            "does not supply mechanics for a Chapter 5 construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006114", "pages 876–878",
+        "The locator supports only a history-of-study statement.",
+    ),
+    non_bearing_locator(
+        "U006114", "page 170",
+        "The locator is part of the historical von Neumann attribution.",
+    ),
+    non_bearing_locator(
+        "U006114", "page 177",
+        "The locator is part of the historical Moore attribution.",
+    ),
+    non_bearing_locator(
+        "U006114", "page 369",
+        "The locator is part of the historical Golay attribution.",
+    ),
+    non_bearing_locator(
+        "U006114", "page 1077",
+        "The image-processing reference supplies history, not rule mechanics.",
+    ),
+    non_bearing_locator(
+        "U006114", "page 877",
+        "The Ulam-collaborator reference supplies provenance only.",
+    ),
+    non_bearing_locator(
+        "U006121", "Page 174 · Cellular automaton art",
+        (
+            "The labelled passage concerns an application and display "
+            "choices, not an independently delimited native construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006121", "Compare page 872",
+        "The rug-and-design comparison is application context only.",
+    ),
+    non_bearing_locator(
+        "U006121", "page 979",
+        (
+            "The approximate-circle comment is a behavior detail and does "
+            "not identify additional code-746 construction mechanics."
+        ),
+    ),
+    non_bearing_locator(
+        "U006126", "Compare pages 1029 and 986",
+        (
+            "The comparison concerns crystallographic terminology and "
+            "Voronoi-region shapes, not a distinct executable construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006159", "compare page 1073",
+        (
+            "The formula-output analogy neither changes nor completes the "
+            "block-join Sierpiński construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006162", "compare page 1005",
+        (
+            "The formula-output analogy neither changes nor completes the "
+            "complex-affine Sierpiński construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006197", "page 43",
+        "The locator occurs only in the history of fractal art.",
+    ),
+    non_bearing_locator(
+        "U006197", "page 918",
+        "The locator occurs only in the history of fractal functions.",
+    ),
+    non_bearing_locator(
+        "U006197", "page 191",
+        "The locator occurs only in the historical Koch attribution.",
+    ),
+    non_bearing_locator(
+        "U006197", "page 187",
+        "The locator occurs only in the historical Sierpiński attribution.",
+    ),
+    non_bearing_locator(
+        "U006197", "page 188",
+        "The locator occurs only in the historical Menger attribution.",
+    ),
+    non_bearing_locator(
+        "U006197", "page 190",
+        "The locator occurs only in the historical Lévy attribution.",
+    ),
+    non_bearing_locator(
+        "U006227", "Page 199 · Computer science",
+        (
+            "The labelled passage is an analogy to practical data structures "
+            "and garbage collection, not new network-rule mechanics."
+        ),
+    ),
+    non_bearing_locator(
+        "U006227", "page 1121",
+        "The combinator-system comparison is an application analogy only.",
+    ),
+    non_bearing_locator(
+        "U006261", "page 1150",
+        (
+            "The mathematical-proof comparison belongs to historical and "
+            "terminological context for multiway systems."
+        ),
+    ),
+    non_bearing_locator(
+        "U006272", "See also page 944",
+        (
+            "The bare connective supplies no target topic or mechanics in "
+            "this source unit."
+        ),
+    ),
+    non_bearing_locator(
+        "U006275", "page 907",
+        (
+            "The source calls the recursive-sequence systems only somewhat "
+            "related; it does not make them mechanics of the numeric "
+            "multiway preset."
+        ),
+    ),
+    non_bearing_locator(
+        "U006276", "page 766",
+        (
+            "The comparison concerns computational power of nondeterministic "
+            "systems, not mechanics of the delimited multiway construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006282", "See pages 342 and 1185",
+        (
+            "The molecular examples are applications of variational "
+            "principles and do not supply a new constraint construction."
+        ),
+    ),
+    non_bearing_locator(
+        "U006310", "page 994",
+        (
+            "The locator supports only a fivefold-symmetry observation about "
+            "the Penrose geometry."
+        ),
+    ),
+    non_bearing_locator(
+        "U006313", "See also page 1139",
+        (
+            "The bare connective supplies no additional target topic or "
+            "mechanics beyond the adjacent tiling discussion."
+        ),
+    ),
+    non_bearing_locator(
+        "U006335", "See pages 791 and 1164",
+        (
+            "The connective follows a mathematical fact about sparse "
+            "Diophantine solutions and supplies neither a route topic nor "
+            "construction mechanics."
+        ),
     ),
 )

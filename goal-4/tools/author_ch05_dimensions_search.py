@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any
 
 import audit_transaction
+import ch05_dimensions_search_route_specs
 import merge_worker_output
 import validate_audit
 from audit_contract import (
@@ -1836,8 +1837,8 @@ EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
 EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
 EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
-EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 200
-EXPECTED_NEW_ROUTE_COUNT = 138
+EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 213
+EXPECTED_NEW_ROUTE_COUNT = 151
 EXPECTED_READING_UPDATE_COUNT = 155
 EXPECTED_NEW_CANDIDATE_COUNT = 88
 EXPECTED_NEW_EVIDENCE_COUNT = 203
@@ -1877,9 +1878,12 @@ EXPECTED_NORMALIZED_RESULT_DIGEST = (
 EXPECTED_TRIAGE_DIGEST = (
     "1d2d0c50a27a20dd283952077f73d6fc71057ffdfa3b062a9a082ceefb33c06f"
 )
-EXPECTED_ACTIVE_SEMANTIC_DIGEST = (
-    "d80973df9e95c8fac4b32183fac377c039eb1dab3ab69af86f9f35b5151bac90"
-)
+EXPECTED_ACTIVE_SEMANTIC_DIGESTS = {
+    "S013": (
+        "d80973df9e95c8fac4b32183fac377c039eb1dab3ab69af86f9f35b5151bac90"
+    ),
+    "S014": "",
+}
 EXPECTED_CANDIDATE_COVERAGE_DIGEST = ""
 EXPECTED_ROUTE_COVERAGE_DIGEST = ""
 EXPECTED_OMISSION_CHALLENGE_COUNT = 0
@@ -3737,6 +3741,11 @@ def _materialize_route_delta(
             raise AuthoringError(
                 f"{route_id} reaches unknown source {source_unit_id}"
             )
+        source_asset_id = spec["source_asset_id"]
+        if source_asset_id and source_asset_id not in assets_by_id:
+            raise AuthoringError(
+                f"{route_id} reaches unknown source asset {source_asset_id}"
+            )
         hit_id = _hit_for(hit_by_pair, 15, source_unit_id)
         if spec["discovery_id"] != hit_id:
             raise AuthoringError(
@@ -3814,7 +3823,7 @@ def _materialize_route_delta(
         raw_row: dict[str, Any] = {
             "route_id": route_id,
             "source_unit_id": source_unit_id,
-            "source_asset_id": spec["source_asset_id"],
+            "source_asset_id": source_asset_id,
             "discovery_epoch": spec["discovery_epoch"],
             "discovery_kind": spec["discovery_kind"],
             "discovery_id": hit_id,
@@ -3871,10 +3880,9 @@ def _materialize_route_delta(
     route_evidence_plans: list[tuple[str, str]] = []
     for unit_id in route_ids_by_source:
         for candidate_id in route_candidates_by_source[unit_id]:
-            candidate = update_by_id.get(
-                candidate_id,
-                candidates_by_id.get(candidate_id),
-            )
+            candidate = update_by_id.get(candidate_id)
+            if candidate is None:
+                candidate = candidates_by_id.get(candidate_id)
             if candidate is None:
                 raise AuthoringError(
                     f"route provenance reaches unknown {candidate_id}"
@@ -3893,9 +3901,14 @@ def _materialize_route_delta(
     }
     appended_route_group_ids: list[str] = []
     for offset, (unit_id, candidate_id) in enumerate(route_evidence_plans):
-        candidate = deepcopy(
-            update_by_id.get(candidate_id, candidates_by_id[candidate_id])
-        )
+        candidate = update_by_id.get(candidate_id)
+        if candidate is None:
+            candidate = candidates_by_id.get(candidate_id)
+        if candidate is None:
+            raise AuthoringError(
+                f"route evidence reaches unknown {candidate_id}"
+            )
+        candidate = deepcopy(candidate)
         hit_id = _hit_for(hit_by_pair, 15, unit_id)
         evidence_anchor_counts[hit_id] = (
             evidence_anchor_counts.get(hit_id, 0) + 1
@@ -4202,11 +4215,13 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         for row in assets
         if row["source_unit_id"] and row["assignment_path"] in STAGE_PATHS
     }
+    assets_by_id = {row["asset_id"]: row for row in assets}
     candidates_by_id = {candidate["id"]: candidate for candidate in candidates}
     routes_by_id = {route["route_id"]: route for route in routes}
     if (
         len(unit_by_id) != len(units)
         or len(reading_by_id) != len(reading)
+        or len(assets_by_id) != len(assets)
         or len(asset_by_unit)
         != sum(
             bool(row["source_unit_id"])
@@ -4420,7 +4435,10 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     semantic_digest = hashlib.sha256(
         canonical_json_bytes(semantic_projection)
     ).hexdigest()
-    if semantic_digest != EXPECTED_ACTIVE_SEMANTIC_DIGEST:
+    expected_semantic_digest = EXPECTED_ACTIVE_SEMANTIC_DIGESTS[
+        f"S{len(rounds) + 1:03d}"
+    ]
+    if semantic_digest != expected_semantic_digest:
         raise AuthoringError(
             f"Stage 9 active semantic projection drifted: {semantic_digest}"
         )
@@ -4516,10 +4534,39 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             candidates_by_id=candidates_by_id,
             hit_by_pair=hit_by_pair,
         )
+        route_specs = [
+            deepcopy(spec)
+            for spec in ch05_dimensions_search_route_specs.ROUTE_SPECS
+        ]
+        if len(route_specs) != EXPECTED_NEW_ROUTE_COUNT:
+            raise AuthoringError(
+                "frozen F15 route-spec count drifted: "
+                f"{len(route_specs)}"
+            )
+        (
+            reading_updates,
+            candidate_updates,
+            route_appends,
+            route_candidates_by_source,
+            new_evidence_group_ids,
+        ) = _materialize_route_delta(
+            route_specs=route_specs,
+            routes=routes,
+            reading_by_id=reading_by_id,
+            reading_updates=reading_updates,
+            candidates_by_id=candidates_by_id,
+            candidate_updates=candidate_updates,
+            new_evidence_group_ids=new_evidence_group_ids,
+            assets_by_id=assets_by_id,
+            unit_text_by_id=unit_text_by_id,
+            hit_by_pair=hit_by_pair,
+        )
     else:
         reading_updates = []
         asset_updates = []
         candidate_updates = []
+        route_appends = []
+        route_candidates_by_source = {}
         new_evidence_group_ids = []
     update_by_id = {
         row["source_unit_id"]: row for row in reading_updates
@@ -4532,12 +4579,47 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         **candidates_by_id,
         **{candidate["id"]: candidate for candidate in candidate_updates},
     }
-    expected_stage_candidates = (
-        initial_stage_candidates
-        | {candidate["id"] for candidate in candidate_updates}
-    )
+    expected_stage_candidates = {
+        candidate_id
+        for unit_id in stage_unit_ids
+        for candidate_id in parse_links(
+            proposed_reading_by_id[unit_id]["candidate_ids"],
+            f"{unit_id}.candidate_ids",
+        )
+    }
     if len(expected_stage_candidates) != EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT:
         raise AuthoringError("enriched Stage 9 candidate count drifted")
+
+    proposed_routes_by_id = {
+        **routes_by_id,
+        **{route["route_id"]: route for route in route_appends},
+    }
+    proposed_active_route_ids = {
+        route_id
+        for unit_id in stage_unit_ids
+        for route_id in parse_links(
+            proposed_reading_by_id[unit_id]["route_ids"],
+            f"{unit_id}.route_ids",
+        )
+    }
+    for candidate_id in expected_stage_candidates:
+        proposed_active_route_ids.update(
+            enriched_candidates_by_id[candidate_id]["cross_reference_ids"]
+        )
+    for route in proposed_routes_by_id.values():
+        target_units = set(
+            parse_links(
+                route["target_unit_ids"],
+                f"{route['route_id']}.target_unit_ids",
+            )
+        )
+        if route["owning_stage"] == "9" or target_units & stage_unit_ids:
+            proposed_active_route_ids.add(route["route_id"])
+    if len(proposed_active_route_ids) != EXPECTED_ENRICHED_STAGE_ROUTE_COUNT:
+        raise AuthoringError(
+            "enriched Stage 9 active route count drifted: "
+            f"{len(proposed_active_route_ids)}"
+        )
 
     triage_projection = [
         (
@@ -4634,8 +4716,8 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
 
     route_coverage: list[tuple[str, list[str]]] = []
     result_set = set(result_unit_ids)
-    for route_id in sorted(active_route_ids):
-        route = routes_by_id[route_id]
+    for route_id in sorted(proposed_active_route_ids):
+        route = proposed_routes_by_id[route_id]
         witnesses: set[str] = set()
         if route["source_unit_id"] in stage_unit_ids:
             witnesses.add(route["source_unit_id"])
@@ -4812,7 +4894,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             if candidate["id"] not in candidates_by_id
         ],
         "new_evidence_groups": new_evidence_group_ids,
-        "new_routes": [],
+        "new_routes": [route["route_id"] for route in route_appends],
         "rerun_digest": "",
     }
     digest = validate_audit.search_result_digest(round_record)
@@ -4845,7 +4927,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         "reading_updates": reading_updates,
         "asset_updates": asset_updates,
         "candidate_updates": candidate_updates,
-        "route_appends": [],
+        "route_appends": route_appends,
         "proposed_search": proposed_search,
     }
 
