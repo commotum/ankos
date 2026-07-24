@@ -11,6 +11,7 @@ import argparse
 import csv
 import hashlib
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -1207,6 +1208,100 @@ def candidate_definitions() -> list[dict[str, Any]]:
         mechanics_units=["U001537", "U001540"],
     )
 
+    # The four class-4 code panels share a survey introduction but define four
+    # independently selectable native presets.  Keep their discovery anchor
+    # shared and preserve display order with per-anchor ordinals.
+    panel = next(
+        row
+        for row in defs
+        if row["name"] == "three-color class-4 totalistic cellular-automaton preset panel"
+    )
+    panel_specs = [
+        ("1815", ["U001285", "U001286", "U001287"], ["U001285", "U001287"]),
+        ("2007", ["U001285", "U001288", "U001289"], ["U001285", "U001289"]),
+        ("1659", ["U001285", "U001290"], ["U001285", "U001290"]),
+        ("2043", ["U001285", "U001291", "U001292"], ["U001285", "U001292"]),
+    ]
+    panel_clones: list[dict[str, Any]] = []
+    for code, units, semantic_units in panel_specs:
+        clone = deepcopy(panel)
+        clone["name"] = f"three-color nearest-neighbor totalistic cellular automaton code {code}"
+        clone["aliases"] = [f"code {code}"]
+        clone["units"] = units
+        clone["semantic_units"] = semantic_units
+        clone["mechanics_units"] = ["U001285"]
+        clone["values"]["object_kind"] = "three-color nearest-neighbor totalistic cellular-automaton preset"
+        clone["values"]["rule_relation_constraint_function_or_probability_law"] = (
+            f"preset code {code} under the source's three-color nearest-neighbor totalistic code scheme"
+        )
+        clone["values"]["parameters_and_variants"] = f"code {code}"
+        clone["variants"] = [f"code {code}"]
+        clone["variant_units"] = {f"code {code}": units}
+        clone["field_units"] = {
+            "rule_relation_constraint_function_or_probability_law": semantic_units,
+            "parameters_and_variants": units,
+        }
+        clone["evidence_overrides"] = {}
+        panel_clones.append(clone)
+    panel_index = defs.index(panel)
+    defs[panel_index : panel_index + 1] = panel_clones
+
+    # Keep spatial slice projection/depth fog separate from the prior-time
+    # gray-trail representation used in the Game of Life panels.
+    combined_slice = next(
+        row
+        for row in defs
+        if row["name"] == "one-dimensional slice-through-time and temporal-fog observer"
+    )
+    combined_slice["name"] = "one-dimensional slice-through-time and spatial-depth-fog observer"
+    combined_slice["units"] = ["U001325", "U001326", "U001327", "U001334", "U001335"]
+    combined_slice["semantic_units"] = ["U001325", "U001335"]
+    combined_slice["mechanics_units"] = ["U001325"]
+    combined_slice["values"]["rule_relation_constraint_function_or_probability_law"] = (
+        "extract one spatial line through successive two-dimensional states and optionally show cells spatially "
+        "farther behind the slice in progressively lighter gray"
+    )
+    combined_slice["values"]["visible_history"] = "spatial depth behind the selected slice"
+    combined_slice["values"]["parameters_and_variants"] = (
+        "slice position, spatial-depth fog shading, and displayed codes 4, 12, 24, 30, 38, and 52"
+    )
+    combined_slice["variants"] = [
+        "code 4 slice",
+        "code 12 slice",
+        "code 24 slice",
+        "code 30 slice",
+        "code 38 slice",
+        "code 52 slice",
+        "spatial-depth fog",
+    ]
+    combined_slice["variant_units"] = {
+        variant: ["U001334", "U001335"] for variant in combined_slice["variants"]
+    }
+    add(
+        "prior-time gray-trail rendering observer",
+        ["U001341"],
+        ["U001341"],
+        {
+            **relation_values(
+                "deterministic temporal-history rendering observer",
+                carrier="a two-dimensional cellular-automaton history",
+                input_value="the current state and cells that were black on preceding steps",
+                law="render cells black on preceding steps in progressively lighter shades of gray",
+                result="a layered gray trail behind current black cells",
+            ),
+            "visible_history": "preceding time layers",
+            "read_dependencies_or_neighborhood": "the current cell and its prior-time black history",
+            "parameters_and_variants": "Game of Life prior-time trail display",
+            "excluded_observers_and_representations": (
+                "the gray trail is an observer rendering and is not the Game of Life native state or transition law"
+            ),
+        },
+        aliases=["temporal fog", "prior-step gray trail"],
+        role="OBSERVER",
+        strength="DIRECT_COMPLETE_MECHANICS",
+        mechanics_units=["U001341"],
+    )
+
     by_name = {candidate["name"]: candidate for candidate in defs}
 
     def candidate(name: str) -> dict[str, Any]:
@@ -1423,38 +1518,39 @@ def candidate_definitions() -> list[dict[str, Any]]:
     )
 
     # Code-specific panel evidence: one row supports one displayed code, never the whole panel.
-    panel_name = "three-color class-4 totalistic cellular-automaton preset panel"
-    candidate(panel_name)["mechanics_units"] = ["U001285"]
-    code_claims = {
-        "U001286": ("1815", "CONTEXTUAL"),
-        "U001287": ("1815", "DIRECT_IDENTITY"),
-        "U001288": ("2007", "CONTEXTUAL"),
-        "U001289": ("2007", "DIRECT_IDENTITY"),
-        "U001290": ("1659", "DIRECT_IDENTITY"),
-        "U001291": ("2043", "CONTEXTUAL"),
-        "U001292": ("2043", "DIRECT_IDENTITY"),
+    code_units = {
+        "1815": ("U001286", "U001287"),
+        "2007": ("U001288", "U001289"),
+        "1659": ("U001290", "U001290"),
+        "2043": ("U001291", "U001292"),
     }
-    for unit_id, (code, strength) in code_claims.items():
-        fields = ["parameters_and_variants"]
-        if strength == "DIRECT_IDENTITY":
-            fields.insert(0, "rule_relation_constraint_function_or_probability_law")
+    for code, (image_unit, identity_unit) in code_units.items():
+        preset_name = f"three-color nearest-neighbor totalistic cellular automaton code {code}"
         evidence(
-            panel_name,
-            unit_id,
-            fields=fields,
-            claim=(
-                f"{unit_id} is the {'labeled identity' if strength == 'DIRECT_IDENTITY' else 'finite evolution witness'} "
-                f"for displayed code {code}; it supports no other panel code."
+            preset_name,
+            image_unit,
+            fields=["parameters_and_variants"]
+            + (
+                ["rule_relation_constraint_function_or_probability_law"]
+                if image_unit == identity_unit
+                else []
             ),
-            strength=strength,
-            allow_direct_image=strength == "DIRECT_IDENTITY",
+            claim=(
+                f"{image_unit} is the original-resolution finite evolution"
+                f"{' and visible identity label' if image_unit == identity_unit else ''} for code {code}; "
+                "it supports no other preset."
+            ),
+            strength="DIRECT_IDENTITY" if image_unit == identity_unit else "CONTEXTUAL",
+            allow_direct_image=image_unit == identity_unit,
         )
-    candidate(panel_name)["variant_units"] = {
-        "code 1815": ["U001286", "U001287"],
-        "code 2007": ["U001288", "U001289"],
-        "code 1659 (transcribed from the owned image)": ["U001290"],
-        "code 2043": ["U001291", "U001292"],
-    }
+        if identity_unit != image_unit:
+            evidence(
+                preset_name,
+                identity_unit,
+                fields=["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
+                claim=f"{identity_unit} supplies only the code-{code} identity for its preceding evolution panel.",
+                strength="DIRECT_IDENTITY",
+            )
 
     # Borderline classifier panels retain their exact image-borne code identities.
     classifier_name = "four-class cellular-automaton behavior classification"
@@ -1538,23 +1634,9 @@ def candidate_definitions() -> list[dict[str, Any]]:
         claim="A000956 is a finite output witness for the differenced-gray display; the transformation itself is stated in U001323.",
         strength="CONTEXTUAL",
     )
-    slice_name = "one-dimensional slice-through-time and temporal-fog observer"
+    slice_name = "one-dimensional slice-through-time and spatial-depth-fog observer"
     slice_candidate = candidate(slice_name)
     slice_candidate["mechanics_units"] = ["U001325"]
-    slice_candidate["values"]["rule_relation_constraint_function_or_probability_law"] = (
-        "extract one spatial line through successive two-dimensional states; as separate display variants, shade cells "
-        "spatially farther behind the slice or shade cells black at preceding times in progressively lighter gray"
-    )
-    slice_candidate["values"]["visible_history"] = (
-        "either spatial depth behind the selected slice or preceding time layers, kept distinct as source variants"
-    )
-    slice_candidate["variants"].extend(["spatial-depth fog", "prior-time trail fog"])
-    slice_candidate["variant_units"].update(
-        {
-            "spatial-depth fog": ["U001334", "U001335"],
-            "prior-time trail fog": ["U001341"],
-        }
-    )
     evidence(
         slice_name,
         "U001326",
@@ -1591,19 +1673,623 @@ def candidate_definitions() -> list[dict[str, Any]]:
         claim="U001335 defines the spatial-depth fog variant: cells farther behind the slice are shown progressively lighter.",
     )
     evidence(
-        slice_name,
+        "prior-time gray-trail rendering observer",
         "U001341",
         fields=[
+            "object_kind",
+            "native_time",
+            "carrier",
+            "complete_state",
             "input",
             "visible_history",
             "read_dependencies_or_neighborhood",
             "law_kind",
             "rule_relation_constraint_function_or_probability_law",
             "result_kind",
+            "determinism_branching_or_measure",
+            "termination_completion_failure",
+            "witness_semantics",
             "parameters_and_variants",
             "excluded_observers_and_representations",
+            "evidence_limit",
         ],
         claim="U001341 defines the distinct prior-time trail variant for Game of Life by fading cells black on preceding steps.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+
+    # Life and two-dimensional-family records distinguish native laws from
+    # slice/fog observer outputs.
+    life_name = "Game of Life cellular automaton"
+    life = candidate(life_name)
+    life["mechanics_units"] = ["U001341"]
+    life["values"]["witness_semantics"] = (
+        "finite step panels witness localized structures; gray trails and slices are derived observer renderings"
+    )
+    life["values"]["excluded_observers_and_representations"] = (
+        "one-dimensional slices and progressively lighter prior-step trails are observer outputs, not the native Life state"
+    )
+    evidence(
+        life_name,
+        "U001329",
+        fields=["object_kind", "parameters_and_variants"],
+        claim="U001329 identifies Game of Life and its localized-structure behavior but does not state the transition table.",
+        strength="DIRECT_IDENTITY",
+    )
+    for unit_id in ["U001336", "U001338", "U001339", "U001340"]:
+        evidence(
+            life_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is a finite Game-of-Life behavior/trail witness and does not independently establish the native rule.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        life_name,
+        "U001337",
+        fields=[],
+        claim="U001337 is editorial source accounting for a legacy raster caption and adds no Life mechanics.",
+        strength="CONTEXTUAL",
+    )
+
+    family_2d_name = "binary two-dimensional von-Neumann-totalistic cellular-automaton family"
+    family_2d = candidate(family_2d_name)
+    family_2d["units"].extend(["U001334", "U001335"])
+    family_2d["mechanics_units"] = ["U001331"]
+    family_2d["values"].update(
+        {
+            "object_kind": "parameterized binary two-dimensional von-Neumann-totalistic cellular-automaton family",
+            "law_kind": "parametric family of deterministic local transition laws",
+            "structural_invariants": (
+                "six output bits cover neighborhood totals 5 through 0, giving 64 family members; "
+                "the displayed even-code subset leaves the all-white state unchanged"
+            ),
+            "parameters_and_variants": (
+                "six-bit totalistic code; labeled examples 4,12,24,30,38,52 and the even-code survey 2,4,6,...,60"
+            ),
+            "excluded_observers_and_representations": (
+                "the one-dimensional slice and spatial-depth fog panels are observer projections, not native two-dimensional states"
+            ),
+        }
+    )
+    family_2d["variants"] = [f"code {code}" for code in range(2, 61, 2)]
+    family_2d["variant_units"] = {
+        f"code {code}": (
+            ["U001330", "U001332", "U001333"]
+            if code in {4, 12, 24, 30, 38, 52}
+            else ["U001332", "U001333"]
+        )
+        for code in range(2, 61, 2)
+    }
+    family_2d["field_units"].update(
+        {
+            "structural_invariants": ["U001331", "U001333"],
+            "parameters_and_variants": ["U001330", "U001331", "U001332", "U001333"],
+            "excluded_observers_and_representations": ["U001334", "U001335"],
+        }
+    )
+    evidence(
+        family_2d_name,
+        "U001330",
+        fields=["parameters_and_variants"],
+        claim="A000957 preserves the labeled native-family examples 4, 12, 24, 30, 38, and 52; it does not define the code convention.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        family_2d_name,
+        "U001332",
+        fields=["parameters_and_variants"],
+        claim="A000958 preserves the labeled even-code survey 2,4,6,...,60 as finite 500-step outcomes.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        family_2d_name,
+        "U001333",
+        fields=["structural_invariants", "parameters_and_variants"],
+        claim="U001333 states that the broader survey includes most of the 64 rules that leave the all-white state unchanged.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        family_2d_name,
+        "U001334",
+        fields=["excluded_observers_and_representations"],
+        claim="A000959 is a slice-history observer output linked to this family, not a native two-dimensional state.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        family_2d_name,
+        "U001335",
+        fields=["excluded_observers_and_representations"],
+        claim="U001335 explicitly describes the one-dimensional slice and spatial-depth fog transformation.",
+        strength="CORROBORATING",
+    )
+
+    perturb_name = "single-cell initial-perturbation difference observer"
+    perturb = candidate(perturb_name)
+    perturb["mechanics_units"] = ["U001346"]
+    evidence(
+        perturb_name,
+        "U001344",
+        fields=["input"],
+        claim="U001344 supplies the paired-run input condition: change the initial color of one cell.",
+    )
+    evidence(
+        perturb_name,
+        "U001345",
+        fields=[],
+        claim="A000965 is a finite four-class comparison witness; the difference-mask rule is stated in U001346.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        perturb_name,
+        "U001348",
+        fields=["result_kind", "witness_semantics"],
+        claim="U001348 records the class-dependent fate of a one-cell perturbation, not the comparison algorithm.",
+        strength="CORROBORATING",
+    )
+    for unit_id in ["U001349", "U001350", "U001351"]:
+        evidence(
+            perturb_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is a class-3 or class-4 perturbation-spread witness.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        perturb_name,
+        "U001352",
+        fields=["input", "witness_semantics"],
+        claim="U001352 identifies three class-3 one-cell-change comparisons.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        perturb_name,
+        "U001359",
+        fields=["result_kind", "witness_semantics"],
+        claim="U001359 states that rule-110 perturbations spread through localized structures.",
+        strength="CORROBORATING",
+    )
+    for unit_id in ["U001360", "U001361"]:
+        evidence(
+            perturb_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is a finite rule-110 perturbation witness.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        perturb_name,
+        "U001362",
+        fields=["input"],
+        claim="U001362 labels the comparison as one changed initial cell and adds no observer mechanics.",
+        strength="CORROBORATING",
+    )
+
+    # Finite-system invariants and the dedicated repetition-period observer.
+    translation_name = "finite cyclic translation of a single dot"
+    translation = candidate(translation_name)
+    translation["values"]["structural_invariants"] = (
+        "the period is at most n and is maximal, equal to n, when displacement k is coprime to n"
+    )
+    translation["field_units"]["structural_invariants"] = ["U001375", "U001376"]
+    evidence(
+        translation_name,
+        "U001375",
+        fields=["structural_invariants"],
+        claim="U001375 states that finite-system period may reach its state-count maximum but depends on size and rule.",
+    )
+    evidence(
+        translation_name,
+        "U001376",
+        fields=["structural_invariants"],
+        claim="U001376 gives the maximal-period condition gcd(k,n)=1 for cyclic translation.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    doubling_name = "finite cyclic doubling map"
+    doubling = candidate(doubling_name)
+    doubling["mechanics_units"] = ["U001377"]
+    doubling["values"]["structural_invariants"] = (
+        "the period is at most n; for odd n the displayed period is MultiplicativeOrder[2,n]"
+    )
+    doubling["field_units"]["structural_invariants"] = ["U001380", "U001381"]
+    for unit_id in ["U001378", "U001379"]:
+        evidence(
+            doubling_name,
+            unit_id,
+            fields=[],
+            claim=f"{unit_id} is a finite orbit or period-plot witness for the doubling map.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        doubling_name,
+        "U001380",
+        fields=["rule_relation_constraint_function_or_probability_law", "structural_invariants", "parameters_and_variants"],
+        claim="U001380 gives x_t=Mod[2^t,n] and period MultiplicativeOrder[2,n] for odd n.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    evidence(
+        doubling_name,
+        "U001381",
+        fields=["structural_invariants"],
+        claim="U001381 states the at-most-n bound and size-factor dependence.",
+        strength="CORROBORATING",
+    )
+    finite_ca_name = "finite cyclic binary cellular automaton"
+    finite_ca = candidate(finite_ca_name)
+    finite_ca["units"].extend(["U001385", "U001387", "U001389", "U001393"])
+    finite_ca["values"]["structural_invariants"] = (
+        "the finite deterministic orbit eventually repeats and has period at most 2^n for n binary cells"
+    )
+    finite_ca["values"]["excluded_observers_and_representations"] = (
+        "finite evolution panels and period-versus-size curves are measurements of instantiated rules, not native transition definitions"
+    )
+    finite_ca["field_units"].update(
+        {
+            "structural_invariants": ["U001385", "U001387", "U001389", "U001391"],
+            "excluded_observers_and_representations": ["U001393"],
+        }
+    )
+    evidence(
+        finite_ca_name,
+        "U001390",
+        fields=["parameters_and_variants"],
+        claim="A000975 preserves finite-cycle examples labeled rule 90 and rule 30.",
+        strength="CONTEXTUAL",
+    )
+    for unit_id, claim in {
+        "U001385": "U001385 bounds any finite-system period by its number of possible states.",
+        "U001387": "U001387 counts 2^n complete states for n binary cells.",
+        "U001389": "U001389 applies the 2^n bound to any pattern occupying n cells.",
+        "U001393": "U001393 is a period-curve description and is explicitly excluded from native-law evidence.",
+    }.items():
+        fields = (
+            ["excluded_observers_and_representations"]
+            if unit_id == "U001393"
+            else ["structural_invariants"]
+        )
+        evidence(finite_ca_name, unit_id, fields=fields, claim=claim, strength="CORROBORATING")
+    rule45_name = "elementary cellular automaton rule 45 on a finite cycle"
+    rule45 = candidate(rule45_name)
+    rule45["units"] = ["U001388", "U001393"]
+    rule45["semantic_units"] = ["U001388"]
+    rule45["mechanics_units"] = ["U001388"]
+    rule45["values"]["excluded_observers_and_representations"] = (
+        "the rule-45 period curve is an observer result and does not define the rule-45 transition table"
+    )
+    rule45["field_units"]["excluded_observers_and_representations"] = ["U001393"]
+    evidence(
+        rule45_name,
+        "U001393",
+        fields=["excluded_observers_and_representations"],
+        claim="U001393 reports rule-45 period scaling as an observer result; A000976 is not native rule-45 evidence.",
+        strength="CORROBORATING",
+    )
+
+    period_name = "finite-system repetition-period and maximum-period observer"
+    period = candidate(period_name)
+    period["mechanics_units"] = []
+    period["uncertainties"] = [
+        "The source gives bounds, measured curves, and rule-specific formulas but does not define a general period-computation algorithm."
+    ]
+    period_specs = {
+        "U001385": (
+            ["object_kind", "native_time", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "termination_completion_failure", "evidence_limit"],
+            "U001385 states that a finite definite-rule system must recur and bounds its period by its state count.",
+        ),
+        "U001386": (
+            ["carrier", "support", "input", "parameters_and_variants"],
+            "U001386 identifies state count with system size for the single-dot finite example.",
+        ),
+        "U001387": (
+            ["carrier", "support", "complete_state", "rule_relation_constraint_function_or_probability_law", "structural_invariants", "parameters_and_variants"],
+            "U001387 gives 2^n possible configurations for n binary cellular-automaton cells.",
+        ),
+        "U001388": (
+            ["input", "result_kind", "witness_semantics", "parameters_and_variants"],
+            "U001388 identifies rule- and size-dependent repetition measurements and rule 45's near-maximum behavior.",
+        ),
+        "U001389": (
+            ["support", "rule_relation_constraint_function_or_probability_law", "structural_invariants", "result_kind", "termination_completion_failure"],
+            "U001389 applies the 2^n period bound to a pattern confined to n cells.",
+        ),
+        "U001390": (
+            ["witness_semantics", "parameters_and_variants"],
+            "A000975 is an original-resolution finite-orbit witness labeled rules 90 and 30.",
+        ),
+        "U001391": (
+            ["carrier", "input", "result_kind", "termination_completion_failure", "parameters_and_variants"],
+            "U001391 states that finite cyclic cellular automata eventually repeat and their periods can grow with size.",
+        ),
+        "U001392": (
+            ["input", "result_kind", "witness_semantics", "parameters_and_variants", "excluded_observers_and_representations"],
+            "A000976 is the original-resolution period-versus-size observer for rules 90, 30, 45, and 110.",
+        ),
+        "U001393": (
+            [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "structural_invariants",
+                "result_kind",
+                "determinism_branching_or_measure",
+                "witness_semantics",
+                "parameters_and_variants",
+                "excluded_observers_and_representations",
+            ],
+            "U001393 supplies the single-black seed and the rule-specific period formulas or scalings for rules 90, 30, 45, and 110.",
+        ),
+    }
+    for unit_id, (fields, claim) in period_specs.items():
+        evidence(
+            period_name,
+            unit_id,
+            fields=fields,
+            claim=claim,
+            strength="CONTEXTUAL" if unit_id == "U001390" else "DIRECT_PARTIAL_MECHANICS",
+        )
+
+    # Additivity is a separate source relation; route-bearing comparison units
+    # are also retained as contextual provenance on the relevant native rules.
+    additivity_name = "additive cellular-automaton superposition relation"
+    additivity = candidate(additivity_name)
+    additivity["semantic_units"].append("U001411")
+    additivity["mechanics_units"] = []
+    additivity["uncertainties"] = [
+        "The source states superposition consequences but does not define the algebraic superposition operator in this range."
+    ]
+    additivity_specs = {
+        "U001411": (
+            [],
+            "U001411 motivates the special simple-initial-condition case and supplies no additivity mechanics.",
+            "CONTEXTUAL",
+        ),
+        "U001412": (
+            ["carrier", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics"],
+            "U001412 states that the displayed rule-90 patterns are superpositions of its single-black-cell nested pattern.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001413": (
+            ["witness_semantics"],
+            "A000981 is a finite rule-90 superposition witness and does not define the superposition operation.",
+            "CONTEXTUAL",
+        ),
+        "U001414": (
+            [
+                "object_kind",
+                "native_time",
+                "carrier",
+                "complete_state",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+                "witness_semantics",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U001414 names rule 90's additivity and states that arbitrary-initial-condition patterns are superpositions of the basic nested pattern.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+        "U001463": (
+            ["rule_relation_constraint_function_or_probability_law", "structural_invariants", "parameters_and_variants"],
+            "U001463 identifies rules 90 and 150 as the only fundamentally different elementary additive rules.",
+            "CORROBORATING",
+        ),
+        "U001464": (
+            ["law_kind", "rule_relation_constraint_function_or_probability_law", "structural_invariants", "result_kind", "parameters_and_variants"],
+            "U001464 states that any additive rule self-emulates and yields nested patterns.",
+            "DIRECT_PARTIAL_MECHANICS",
+        ),
+    }
+    for unit_id, (fields, claim, strength) in additivity_specs.items():
+        evidence(additivity_name, unit_id, fields=fields, claim=claim, strength=strength)
+
+    for native_name in [
+        "elementary cellular automaton rule 90",
+        "elementary cellular automaton rule 22",
+    ]:
+        native = candidate(native_name)
+        if native_name.endswith("rule 90"):
+            native["units"].extend(["U001450", "U001463", "U001464"])
+        else:
+            native["units"].append("U001450")
+        evidence(
+            native_name,
+            "U001450",
+            fields=[],
+            claim="U001450 routes the special rule-22 initial-condition emulation of rule 90; it is not native-law evidence.",
+            strength="CORROBORATING",
+        )
+    for unit_id in ["U001463", "U001464"]:
+        evidence(
+            "elementary cellular automaton rule 90",
+            unit_id,
+            fields=["parameters_and_variants"],
+            claim=f"{unit_id} identifies rule 90 as an additive rule; the additivity mechanics belong to the separate relation record.",
+            strength="CORROBORATING",
+        )
+
+    # Periodic seeds are deterministic and include the source-delimited rule-110
+    # 14-cell/7-step background variant.
+    periodic_name = "periodic-block cellular-automaton initial-condition generator"
+    periodic = candidate(periodic_name)
+    periodic["units"].extend(["U001558", "U001561", "U001570"])
+    periodic["values"].update(
+        {
+            "object_kind": "deterministic periodic-block initial-condition generator",
+            "native_time": "one spatial repetition operation for a supplied finite block",
+            "complete_state": "the unique bi-infinite periodic configuration generated by the supplied block",
+            "result_kind": "one periodic initial configuration",
+            "successor_cardinality": "one output configuration per supplied block",
+            "determinism_branching_or_measure": "deterministic",
+            "termination_completion_failure": "construction is complete once the finite period block is specified",
+            "structural_invariants": (
+                "an n-cell repeated block evolves like an n-cell cyclic system and therefore repeats within at most 2^n steps"
+            ),
+            "parameters_and_variants": (
+                "finite period block and width n; rule-30 fixed-period examples; rule-110 14-cell background with temporal period 7"
+            ),
+        }
+    )
+    periodic["mechanics_units"] = ["U001432", "U001433"]
+    periodic["field_units"].update(
+        {
+            "structural_invariants": ["U001432", "U001433", "U001434"],
+            "parameters_and_variants": ["U001432", "U001433", "U001434", "U001441", "U001558", "U001561", "U001570"],
+        }
+    )
+    periodic["variants"].append("rule-110 14-cell periodic background with temporal period 7")
+    periodic["variant_units"]["rule-110 14-cell periodic background with temporal period 7"] = [
+        "U001558",
+        "U001561",
+        "U001570",
+    ]
+    periodic["related_names"] = ["elementary cellular automaton rule 110"]
+    evidence(
+        periodic_name,
+        "U001434",
+        fields=["structural_invariants", "parameters_and_variants"],
+        claim="U001434 records attainable short periods and a missing exact period-2 block for rule 30.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        periodic_name,
+        "U001441",
+        fields=["parameters_and_variants"],
+        claim="U001441 catalogs rule-30 repeated-block seeds through period 10 and the 275-cell period-11 block.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        periodic_name,
+        "U001558",
+        fields=["result_kind", "parameters_and_variants"],
+        claim="U001558 identifies rule 110's background as a 14-cell block repeating every 7 steps.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        periodic_name,
+        "U001561",
+        fields=["result_kind", "parameters_and_variants"],
+        claim="U001561 states that rule-110 structures are disruptions in the 14-cell/7-step periodic background.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        periodic_name,
+        "U001570",
+        fields=["input", "result_kind", "parameters_and_variants"],
+        claim="U001570 supplies a length-41 block inserted between periodic rule-110 background blocks as a seed variant.",
+        strength="CORROBORATING",
+    )
+
+    two_block_name = "rule-126 random two-block initial-condition ensemble"
+    two_block = candidate(two_block_name)
+    two_block["values"]["alphabet_or_value_schema"] = "black and white cells"
+    two_block["values"]["structural_invariants"] = "the configuration is tiled by permitted four-cell blocks BBWW and BBBW"
+    two_block["values"]["parameters_and_variants"] = (
+        "permitted blocks BBWW and BBBW; block probabilities, independence, and extent are not stated"
+    )
+    two_block["field_units"]["structural_invariants"] = ["U001439"]
+    two_block["field_units"]["alphabet_or_value_schema"] = ["U001439"]
+    two_block["mechanics_units"] = ["U001439"]
+
+    # Block emulations expose their scale, codec, and temporal resampling as
+    # structural invariants rather than hiding these mechanics in prose.
+    block_repairs = {
+        "rule-126 to rule-90 pair-block emulation": (
+            "two-cell BB/WW blocks decode to one rule-90 cell and are sampled on alternate steps",
+            ["U001444", "U001445", "U001448", "U001449"],
+            [],
+        ),
+        "rule-90 pair-block self-emulation": (
+            "two-cell spatial blocks, shown as 2-by-2 space-time tiles, decode to one rule-90 macrocell at two-step scale",
+            ["U001453", "U001455", "U001456", "U001457", "U001458"],
+            [
+                "The exact two-cell black/white block codec is image-borne; the prose states only that an appropriate two-cell form is used."
+            ],
+        ),
+        "rule-150 block self-emulation": (
+            "two-cell spatial blocks, shown as 2-by-2 space-time tiles, decode to one rule-150 macrocell at two-step scale",
+            ["U001459", "U001460", "U001461", "U001462", "U001463", "U001464"],
+            [
+                "The prose does not transcribe the full block codec; its two-cell/two-step realization is supplied by the owned images."
+            ],
+        ),
+        "rule-184 three-cell-block self-emulation": (
+            "three-cell spatial blocks, shown as 3-by-3 space-time tiles, decode to one rule-184 macrocell at three-step scale",
+            ["U001465", "U001466", "U001467", "U001468", "U001469", "U001475"],
+            [
+                "The prose states the three-cell width, while the precise 3-by-3 block codec is image-borne."
+            ],
+        ),
+    }
+    for name, (invariant, units, uncertainties) in block_repairs.items():
+        row = candidate(name)
+        row["values"]["structural_invariants"] = invariant
+        row["field_units"]["structural_invariants"] = units
+        row["uncertainties"] = uncertainties
+        for unit_id in units:
+            if unit_id in row["units"] and unit_id not in row["mechanics_units"]:
+                row["evidence_overrides"].setdefault(
+                    unit_id,
+                    {
+                        "fields": ["structural_invariants"],
+                        "claim": f"{unit_id} supports the stated block scale, decoding, or resampling invariant for {name}.",
+                        "strength": "DIRECT_PARTIAL_MECHANICS",
+                    },
+                )
+
+    # Nested rule-184 seed is a deterministic iterative substitution generator.
+    nested_name = "nested substitution initial condition for rule 184"
+    nested = candidate(nested_name)
+    nested["units"] = ["U001470", "U001471", "U001472", "U001474"]
+    nested["semantic_units"] = ["U001470", "U001474"]
+    nested["mechanics_units"] = ["U001474"]
+    nested["values"] = {
+        "object_kind": "deterministic iterative substitution initial-condition generator",
+        "native_time": "discrete substitution depth",
+        "carrier": "a one-dimensional symbolic cell sequence",
+        "alphabet_or_value_schema": "black and white cells",
+        "complete_state": "the complete substitution word at the selected depth",
+        "visible_history": "successive substitution depths can be retained as a nested construction history",
+        "control_state": "the requested substitution depth",
+        "seed": "one black element",
+        "input": "the two substitution productions and a requested finite depth or limiting construction",
+        "frontier_or_activation": "every symbol in the current word",
+        "schedule": "parallel substitution of all symbols at each depth",
+        "read_dependencies_or_neighborhood": "each symbol is rewritten from its own current value",
+        "law_kind": "deterministic parallel substitution law",
+        "rule_relation_constraint_function_or_probability_law": "B -> BWB and W -> WWB, starting from one B",
+        "write_replacement_assembly_or_commit": "concatenate all replacements in source-symbol order to form the next word",
+        "result_kind": "one nested black-or-white seed at each requested depth",
+        "successor_cardinality": "one successor word per current word and one output per depth",
+        "determinism_branching_or_measure": "deterministic",
+        "termination_completion_failure": "finite-depth construction completes at the requested depth; the limiting word is approached by iteration",
+        "structural_invariants": "each depth is a deterministic expansion of the preceding word from the fixed one-black-element seed",
+        "parameters_and_variants": "substitution depth",
+        "evidence_limit": "The source supplies the productions and seed but does not state a preferred finite depth for the displayed initial condition.",
+    }
+    nested["uncertainties"] = [
+        "The source supplies the productions and seed but does not state a preferred finite depth for the displayed initial condition."
+    ]
+    evidence(
+        nested_name,
+        "U001470",
+        fields=["object_kind", "native_time", "law_kind", "parameters_and_variants"],
+        claim="U001470 identifies the initial condition as an iterated substitution-system construction.",
+    )
+    evidence(
+        nested_name,
+        "U001471",
+        fields=[],
+        claim="U001471 describes rule-184 behavior from the nested seed and adds no substitution mechanics.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        nested_name,
+        "U001472",
+        fields=["visible_history"],
+        claim="A001001 is the evolved nested-pattern witness; it does not encode the substitution productions.",
+        strength="CONTEXTUAL",
     )
 
     defs.sort(
