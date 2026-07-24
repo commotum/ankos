@@ -2,11 +2,11 @@
 """Author the governed Stage 12 route-resolution proposal.
 
 The helper closes the 24 previously discovered incoming routes whose literal
-landings were read during the Chapter 8 main/Notes sequential review, all 23
-new Stage-12 WITHIN_STAGE routes, and the 10 Stage-12 CROSS_RANGE routes whose
-literal page targets actually land inside the reviewed Stage-12 sources.
-Routes are frozen by both their current global route ID and immutable
-five-field identity:
+landings were read during the Chapter 8 main/Notes sequential review and all
+33 new Stage-12 WITHIN_STAGE routes. The latter include 10 page routes whose
+targets were corrected during INITIAL authoring to remain within the reviewed
+Stage-12 sources. Routes are frozen by both their current global route ID and
+immutable five-field identity:
 
     (source_unit_id, source_asset_id, route_kind,
      literal_target, expected_topic)
@@ -58,23 +58,27 @@ EXPECTED_PREVIOUS_EVENT_SHA256 = (
     "d1f928b7fa742c246d5f63de164f56139b6a7fdf367a7575f75633e0239e6357"
 )
 EXPECTED_TERMINAL_REVIEW_ID = "V000035"
+EXPECTED_TERMINAL_EVENT_SHA256 = (
+    "e277e81b27bebf9e5252a44e6a86bbec7defd17150b471b5b6056395eef9abcb"
+)
 EXPECTED_TERMINAL_REVIEWER = "ch08-union"
 EXPECTED_STAGE_UNIT_COUNT = 510
 EXPECTED_STAGE_ASSET_COUNT = 86
 EXPECTED_STAGE_ROUTE_COUNT = 79
 EXPECTED_INCOMING_COUNT = 24
-EXPECTED_WITHIN_COUNT = 23
-EXPECTED_REACHABLE_CROSS_RANGE_COUNT = 10
+EXPECTED_BASE_WITHIN_COUNT = 23
+EXPECTED_REPAIRED_WITHIN_COUNT = 10
+EXPECTED_WITHIN_COUNT = 33
 EXPECTED_UPDATE_COUNT = 57
 EXPECTED_OUTGOING_COUNT = 46
 EXPECTED_OUTGOING_IDENTITY_SHA256 = (
-    "TO_BE_FILLED"
+    "ede0b5003734b3c6582543967f3d6dbe6bebb1c85869b2f27d9b959fe6be8beb"
 )
 EXPECTED_SPEC_SHA256 = (
-    "TO_BE_FILLED"
+    "9bbb8d96a0c026e8bc9dfa35a23c9ad96b62c56a132a38d22bedfa75e274a7e4"
 )
 EXPECTED_PRESERVATION_SHA256 = (
-    "TO_BE_FILLED"
+    "93020522cbf2ecf76b615247a7864307b9a7db4e23a9616b035305ce4848b1f0"
 )
 
 ROUTE_ID = re.compile(r"^R[0-9]{6}$")
@@ -1075,7 +1079,7 @@ ROUTE_SPECS = tuple(route_spec(*row) for row in _ROUTE_DATA)
 INCOMING_ROUTE_IDS = tuple(
     spec.route_id for spec in ROUTE_SPECS[:EXPECTED_INCOMING_COUNT]
 )
-WITHIN_STAGE_ROUTE_IDS = (
+BASE_WITHIN_STAGE_ROUTE_IDS = (
     "R000712",
     "R000713",
     "R000714",
@@ -1083,7 +1087,7 @@ WITHIN_STAGE_ROUTE_IDS = (
     "R000717",
     *tuple(f"R{number:06d}" for number in range(719, 737)),
 )
-REACHABLE_CROSS_RANGE_ROUTE_IDS = (
+REPAIRED_WITHIN_STAGE_ROUTE_IDS = (
     "R000748",
     "R000750",
     "R000754",
@@ -1095,9 +1099,9 @@ REACHABLE_CROSS_RANGE_ROUTE_IDS = (
     "R000781",
     "R000784",
 )
-STAGE_CLOSURE_ROUTE_IDS = (
-    *WITHIN_STAGE_ROUTE_IDS,
-    *REACHABLE_CROSS_RANGE_ROUTE_IDS,
+WITHIN_STAGE_ROUTE_IDS = (
+    *BASE_WITHIN_STAGE_ROUTE_IDS,
+    *REPAIRED_WITHIN_STAGE_ROUTE_IDS,
 )
 OUTGOING_ROUTE_IDS = (
     "R000709",
@@ -1108,7 +1112,7 @@ OUTGOING_ROUTE_IDS = (
     *tuple(
         f"R{number:06d}"
         for number in range(737, 788)
-        if f"R{number:06d}" not in REACHABLE_CROSS_RANGE_ROUTE_IDS
+        if f"R{number:06d}" not in REPAIRED_WITHIN_STAGE_ROUTE_IDS
     ),
 )
 STAGE_ROUTE_IDS = tuple(
@@ -1184,22 +1188,19 @@ def validate_embedded_specs() -> tuple[str, str]:
     if (
         tuple(route_ids[:EXPECTED_INCOMING_COUNT]) != INCOMING_ROUTE_IDS
         or tuple(route_ids[EXPECTED_INCOMING_COUNT:])
-        != STAGE_CLOSURE_ROUTE_IDS
+        != WITHIN_STAGE_ROUTE_IDS
     ):
         raise AuthoringError("incoming/Stage-12 route partition drifted")
     if (
         len(INCOMING_ROUTE_IDS) != EXPECTED_INCOMING_COUNT
+        or len(BASE_WITHIN_STAGE_ROUTE_IDS) != EXPECTED_BASE_WITHIN_COUNT
+        or len(REPAIRED_WITHIN_STAGE_ROUTE_IDS)
+        != EXPECTED_REPAIRED_WITHIN_COUNT
         or len(WITHIN_STAGE_ROUTE_IDS) != EXPECTED_WITHIN_COUNT
-        or len(REACHABLE_CROSS_RANGE_ROUTE_IDS)
-        != EXPECTED_REACHABLE_CROSS_RANGE_COUNT
         or len(OUTGOING_ROUTE_IDS) != EXPECTED_OUTGOING_COUNT
         or len(STAGE_ROUTE_IDS) != EXPECTED_STAGE_ROUTE_COUNT
         or set(WITHIN_STAGE_ROUTE_IDS) & set(OUTGOING_ROUTE_IDS)
-        or set(REACHABLE_CROSS_RANGE_ROUTE_IDS) & set(OUTGOING_ROUTE_IDS)
         or set(WITHIN_STAGE_ROUTE_IDS)
-        & set(REACHABLE_CROSS_RANGE_ROUTE_IDS)
-        or set(WITHIN_STAGE_ROUTE_IDS)
-        | set(REACHABLE_CROSS_RANGE_ROUTE_IDS)
         | set(OUTGOING_ROUTE_IDS)
         != set(STAGE_ROUTE_IDS)
     ):
@@ -1448,6 +1449,8 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         raise AuthoringError(
             f"expected terminal history event {EXPECTED_TERMINAL_REVIEW_ID}"
         )
+    if terminal.get("event_sha256") != EXPECTED_TERMINAL_EVENT_SHA256:
+        raise AuthoringError("terminal Stage 12 event identity drifted")
     if terminal.get("previous_event_sha256") != EXPECTED_PREVIOUS_EVENT_SHA256:
         raise AuthoringError("terminal event does not descend from V000034")
     if terminal.get("mode") != "INITIAL" or terminal.get("stage") != 12:
@@ -1528,8 +1531,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     }
     if (
         observed_within != set(WITHIN_STAGE_ROUTE_IDS)
-        or observed_cross_range
-        != set(REACHABLE_CROSS_RANGE_ROUTE_IDS) | set(OUTGOING_ROUTE_IDS)
+        or observed_cross_range != set(OUTGOING_ROUTE_IDS)
     ):
         raise AuthoringError("Stage 12 route-scope partition drifted")
     outgoing_digest = payload_sha256(
@@ -1572,15 +1574,6 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             ):
                 raise AuthoringError(
                     f"governed route is not WITHIN_STAGE: {spec.route_id}"
-                )
-        elif spec.route_id in REACHABLE_CROSS_RANGE_ROUTE_IDS:
-            if (
-                before["owning_stage"] != "12"
-                or before["closure_scope"] != "CROSS_RANGE"
-            ):
-                raise AuthoringError(
-                    "governed Stage 12 route is not CROSS_RANGE: "
-                    f"{spec.route_id}"
                 )
         elif (
             spec.route_id not in INCOMING_ROUTE_IDS
@@ -1686,8 +1679,6 @@ def main() -> int:
             "Chapter 8 route specification valid: "
             f"incoming={EXPECTED_INCOMING_COUNT} "
             f"within={EXPECTED_WITHIN_COUNT} "
-            "reachable-cross-range="
-            f"{EXPECTED_REACHABLE_CROSS_RANGE_COUNT} "
             f"preserved-outgoing={EXPECTED_OUTGOING_COUNT} "
             f"deferred={DEFERRED_ROUTE_ID} "
             f"spec-sha256={spec_digest} "
