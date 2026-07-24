@@ -1490,13 +1490,52 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         statuses: dict[str, str] = {}
         fingerprint: dict[str, dict[str, Any]] = {}
         missing = list(spec["missing"])
+
+        # Global audit validation requires every NOT_APPLICABLE judgment to be
+        # evidence-justified.  Attach those judgments to the candidate's best
+        # native definition/mechanics witness, preferring direct non-image
+        # evidence and never defaulting to an unrelated contextual rendering.
+        def na_evidence_rank(item: tuple[int, dict[str, Any], dict[str, Any]]) -> tuple[int, int]:
+            raw_index, raw, record = item
+            broad = raw["fields"] is None
+            non_image = record["modality"] != "IMAGE"
+            mechanics = record["strength"] in {
+                "DIRECT_COMPLETE_MECHANICS",
+                "DIRECT_PARTIAL_MECHANICS",
+            }
+            identity = record["strength"] == "DIRECT_IDENTITY"
+            if broad and non_image and mechanics:
+                tier = 0
+            elif broad and not non_image and mechanics:
+                tier = 1
+            elif broad and non_image and identity:
+                tier = 2
+            elif non_image and (mechanics or identity):
+                tier = 3
+            elif broad and non_image:
+                tier = 4
+            elif broad:
+                tier = 5
+            elif non_image:
+                tier = 6
+            else:
+                tier = 7
+            return (tier, raw_index)
+
+        na_evidence_id = min(
+            (
+                (raw_index, raw, records[raw_index])
+                for raw_index, raw in enumerate(spec["evidence"])
+            ),
+            key=na_evidence_rank,
+        )[2]["evidence_id"]
         for field in FIELDS:
             value = values[field]
             field_eids = [r["evidence_id"] for r in records if field in r["fingerprint_fields"]]
             if value is None:
                 status = NA
                 reason = f"{field} is not part of the native semantics of this {spec['profile'].lower()} object."
-                field_eids = []
+                field_eids = [na_evidence_id]
             elif field in {"boundary"} and "not fully" in value:
                 status = UNK
                 reason = value
@@ -1519,7 +1558,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                 field_eids = []
             else:
                 status = SUP
-                reason = f"The assigned evidence supports: {value}."
+                reason = ""
                 if not field_eids:
                     raise AssertionError(f"{cid} {field} lacks evidence")
             statuses[field] = status
