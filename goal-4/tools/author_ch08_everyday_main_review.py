@@ -23,7 +23,39 @@ from typing import Any
 
 EXPECTED_MANIFEST_SHA256 = "db7d40b08b753c54b27ae6ef4497f1c6ae2360bb43e17584cb08f08b50dec675"
 EXPECTED_PROJECTION_SHA256 = "7879b9160476bbe4b9955df10b7a910202e36788e1a14b6be6a5215d2b107b35"
-EXPECTED_OUTPUT_SHA256 = "242f2e6f3ff31cd46ca5670b60e3abf9becdc990417b182061ca118f19b21a0b"
+EXPECTED_OUTPUT_SHA256 = "0fa2b84925ff139d5c869d64ebea89569d53323f04f2a39a9fc1ab76656a61af"
+
+CROSS_REFERENCE_SOURCE_UNITS = frozenset(
+    {
+        "U002015",
+        "U002095",
+        "U002097",
+        "U002099",
+        "U002100",
+        "U002116",
+        "U002185",
+        "U002242",
+        "U002246",
+        "U002258",
+        "U002262",
+        "U002283",
+        "U002312",
+        "U002364",
+        "U002367",
+    }
+)
+ASSET_TRANSCRIPTION_STATEMENTS = {
+    "A001150": (
+        "Original-resolution inspection and transcription checking confirm nine rows "
+        "of graphical three-way substitution-rule icons and their limiting branching "
+        "or leaf-like forms; no alphanumeric parameter text is present."
+    ),
+    "A001177": (
+        "Original-resolution inspection and transcription checking confirm a text-free "
+        "black-and-white cellular-automaton spacetime field for W0024; no alphanumeric "
+        "labels are present."
+    ),
+}
 
 READING_HEADER = [
     "source_unit_id",
@@ -509,6 +541,75 @@ def _merge_annotations(
         row.update(annotation)
 
 
+def _apply_merge_preview_repairs(
+    reading: list[dict[str, str]],
+    assets: list[dict[str, str]],
+    routes: Any,
+) -> None:
+    _require(isinstance(routes, list), "route projection is not a list")
+    routes_by_source = {
+        source_unit_id: [] for source_unit_id in CROSS_REFERENCE_SOURCE_UNITS
+    }
+    for route in routes:
+        source_unit_id = route.get("source_unit_id")
+        if source_unit_id in routes_by_source:
+            routes_by_source[source_unit_id].append(route)
+
+    repaired_units: set[str] = set()
+    for row in reading:
+        source_unit_id = row["source_unit_id"]
+        if source_unit_id not in CROSS_REFERENCE_SOURCE_UNITS:
+            continue
+        source_routes = routes_by_source[source_unit_id]
+        _require(source_routes, "missing route projection for " + source_unit_id)
+        projected_route_ids = [route["route_id"] for route in source_routes]
+        _require(
+            json.loads(row["route_ids"]) == projected_route_ids,
+            "reading-to-route join differs for " + source_unit_id,
+        )
+        route_descriptions = [
+            route["route_id"]
+            + ' points literally to "'
+            + route["literal_target"]
+            + '" for '
+            + route["expected_topic"]
+            for route in source_routes
+        ]
+        row["review_disposition"] = "CROSS_REFERENCE"
+        row["secondary_roles"] = json.dumps(["EXTERNAL_ONLY"])
+        row["evidence_statement"] = (
+            "The unit is a literal cross-reference origin: "
+            + "; ".join(route_descriptions)
+            + "; coordinator resolution remains PENDING."
+        )
+        repaired_units.add(source_unit_id)
+    _require(
+        repaired_units == CROSS_REFERENCE_SOURCE_UNITS,
+        "not all cross-reference source units were repaired",
+    )
+
+    repaired_assets: set[str] = set()
+    for row in assets:
+        asset_id = row["asset_id"]
+        if asset_id not in ASSET_TRANSCRIPTION_STATEMENTS:
+            continue
+        _require(
+            row["visual_role"] == "NATIVE_EVIDENCE",
+            "unexpected visual role for " + asset_id,
+        )
+        _require(
+            row["original_resolution_status"] == "REVIEWED",
+            "original-resolution review is missing for " + asset_id,
+        )
+        row["transcription_status"] = "CHECKED"
+        row["evidence_statement"] = ASSET_TRANSCRIPTION_STATEMENTS[asset_id]
+        repaired_assets.add(asset_id)
+    _require(
+        repaired_assets == set(ASSET_TRANSCRIPTION_STATEMENTS),
+        "not all native-evidence asset annotations were repaired",
+    )
+
+
 def author(bundle_arg: str) -> tuple[Path, str]:
     bundle, manifest, inputs = _verify_bundle(bundle_arg)
     projection = _decode_projection()
@@ -517,6 +618,7 @@ def author(bundle_arg: str) -> tuple[Path, str]:
     assets = _read_csv(inputs["input/asset-input.csv"], ASSET_HEADER, "asset-input.csv")
     _merge_annotations(reading, projection["reading"], READING_HEADER[11:], "reading")
     _merge_annotations(assets, projection["assets"], ASSET_HEADER[11:], "asset")
+    _apply_merge_preview_repairs(reading, assets, projection["routes"])
 
     output = {
         "allowed_manifest_sha256": EXPECTED_MANIFEST_SHA256,

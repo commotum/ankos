@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministically author the hostile-review-corrected Stage 12 Notes review.
+"""Deterministically author the merge-preview-corrected Stage 12 Notes review.
 
 The semantic payload was derived exclusively from the accepted sealed worker
 output. At runtime this helper reads only the bundle supplied on the command
@@ -39,8 +39,11 @@ EXPECTED_MANIFEST = {
 EXPECTED_ALLOWED_MANIFEST_SHA256 = (
     "ac12131bcc8194d17635b37caa06bf88efc1722bee77a6dbf7a2f6e8e387f4ad"
 )
-EXPECTED_OUTPUT_SHA256 = (
+EMBEDDED_BASE_OUTPUT_SHA256 = (
     "14d7d80028430854ef8cd618587a068f37d6bc7963527c1442b3fb20fb6b8596"
+)
+EXPECTED_OUTPUT_SHA256 = (
+    "40045de7508cdb6677e8d887cc6514f420bb8259ee3d27bbf61cc5c3f2fa1fc4"
 )
 
 READING_IMMUTABLE_FIELDS = (
@@ -156,6 +159,45 @@ def _validate_projection(
                 )
 
 
+def _apply_merge_preview_repairs(output: dict[str, object]) -> None:
+    """Apply the two canonical merge-preview findings to the sealed base."""
+
+    readings = output.get("reading_updates")
+    assets = output.get("asset_updates")
+    if not isinstance(readings, list) or not isinstance(assets, list):
+        raise AuthoringError("embedded accepted output lacks review projections")
+
+    route_rows = [
+        row
+        for row in readings
+        if isinstance(row, dict) and row.get("source_unit_id") == "U006884"
+    ]
+    native_assets = [
+        row
+        for row in assets
+        if isinstance(row, dict) and row.get("asset_id") == "A000055"
+    ]
+    if len(route_rows) != 1 or len(native_assets) != 1:
+        raise AuthoringError("merge-preview repair anchors are not unique")
+
+    route_row = route_rows[0]
+    route_row["review_disposition"] = "CROSS_REFERENCE"
+    route_row["evidence_statement"] = (
+        "Routes the polycrystalline multi-seed region-boundary comparison to "
+        "page 1038 for Voronoi regions (WR0004); the pending target is required "
+        "before crediting any additional construction mechanics."
+    )
+
+    native_asset = native_assets[0]
+    native_asset["transcription_status"] = "CHECKED"
+    native_asset["evidence_statement"] = (
+        "Original-resolution inspection and independent transcription check: "
+        "a 3×5 progression develops paired spiral waves from a line; no step "
+        "labels or rule table are embedded, so only the visible sequence was "
+        "transcribed."
+    )
+
+
 def _accepted_output(bundle: Path) -> bytes:
     manifest_path = bundle / "allowed-manifest.json"
     try:
@@ -173,17 +215,25 @@ def _accepted_output(bundle: Path) -> bytes:
     _validate_allowed_inputs(bundle, manifest)
 
     try:
-        output_bytes = zlib.decompress(base64.b85decode(PAYLOAD_B85.encode("ascii")))
+        embedded_bytes = zlib.decompress(
+            base64.b85decode(PAYLOAD_B85.encode("ascii"))
+        )
     except (ValueError, zlib.error) as exc:
         raise AuthoringError(f"embedded accepted output is corrupt: {exc}") from exc
-    if _sha256(output_bytes) != EXPECTED_OUTPUT_SHA256:
-        raise AuthoringError("embedded accepted output hash differs")
+    if _sha256(embedded_bytes) != EMBEDDED_BASE_OUTPUT_SHA256:
+        raise AuthoringError("embedded base output hash differs")
     try:
-        output = json.loads(output_bytes)
+        output = json.loads(embedded_bytes)
     except json.JSONDecodeError as exc:
         raise AuthoringError(f"embedded accepted output is invalid JSON: {exc}") from exc
     if not isinstance(output, dict):
         raise AuthoringError("embedded accepted output is not an object")
+    _apply_merge_preview_repairs(output)
+    output_bytes = (
+        json.dumps(output, indent=2, ensure_ascii=False) + "\n"
+    ).encode("utf-8")
+    if _sha256(output_bytes) != EXPECTED_OUTPUT_SHA256:
+        raise AuthoringError("repaired accepted output hash differs")
 
     expected_metadata = {
         "worker_id": manifest["worker_id"],
