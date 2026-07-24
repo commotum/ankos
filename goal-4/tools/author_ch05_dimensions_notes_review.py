@@ -594,9 +594,12 @@ def candidate_specs() -> list[dict[str, Any]]:
             fields=["carrier", "support", "result_kind"])],
         params=[("filter composition", "p[q[r[c],a]]"), ("offsets", "the four axial unit offsets")])
     add("Ulam component-filter ablation family", "HISTORY_GROWTH", ("SOURCE_UNIT", "U006117"),
-        [ev("U006117", "The prose claims that an undefined component “s alone” yields outer-totalistic code 686 and rule 90.", strength="DEFECT_LIMITED"),
+        [ev("U006115", "The code defines the p, q, and r filters and the full p[q[r[c],a]] composition.", modality="CODE"),
+         ev("U006117", "The prose claims that an undefined component “s alone” yields outer-totalistic code 686 and rule 90.", strength="DEFECT_LIMITED",
+            fields=["rule_relation_constraint_function_or_probability_law", "parameters_and_variants", "evidence_limit"]),
          ev("U006118", "The image instead labels only r[], q[], p[], p[q[]], and p[q[r[]]].", modality="IMAGE",
-            image="BACK-MATTER/NOTES/_page_944_Simple_Rules_Five_Panel_Row.jpeg", strength="DEFECT_LIMITED")],
+            image="BACK-MATTER/NOTES/_page_944_Simple_Rules_Five_Panel_Row.jpeg", strength="DEFECT_LIMITED",
+            fields=["object_kind", "parameters_and_variants", "evidence_limit"])],
         variants=[
             ("r[]", "apply only the uniqueness filter r"),
             ("q[]", "apply only the accumulated-history filter q"),
@@ -606,7 +609,7 @@ def candidate_specs() -> list[dict[str, Any]]:
         ],
         missing=["Whether the prose's “s alone” means the defined r component cannot be resolved from the assigned canonical source."],
         uncertainty=["Prose says “s alone”, while the implementation defines only p, q, and r and the image labels r/q/p compositions."],
-        source_status=["CONFLICTING"],
+        source_status=["CLEAR", "CONFLICTING"],
         overrides={"parameters_and_variants": "r, q, p, and their displayed compositions; prose conflicts on “s”",
                    "evidence_limit": "the source conflict prevents identifying which isolated component is asserted to equal code 686/rule 90"})
     for label, law in [
@@ -622,6 +625,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 image="BACK-MATTER/NOTES/_page_944_Simple_Rules_Five_Panel_Row.jpeg",
                 fields=["object_kind", "parameters_and_variants"])],
             params=[("filter composition", label)],
+            source_status=["CLEAR", "CONFLICTING"],
             overrides={"rule_relation_constraint_function_or_probability_law": law,
                        "parameters_and_variants": f"the explicitly labelled {label} filter composition",
                        "evidence_limit": "the ablation identity and filter composition are clear; no claim is made that it is the prose's undefined “s alone”"})
@@ -984,7 +988,8 @@ def candidate_specs() -> list[dict[str, Any]]:
     add("smaller-template local constraint family", "CONSTRAINT", ("SOURCE_UNIT", "U006298"),
         [ev("U006298", "Constraints based on smaller templates are independently delimited."),
          ev("U006299", "Five exact template shapes are related to counts 4,7,17,11,12 of required repetitive patterns.", modality="IMAGE",
-            image="BACK-MATTER/NOTES/_page_957_Constraint_Template_Icons_and_Ratios.jpeg", strength="CORROBORATING")],
+            image="BACK-MATTER/NOTES/_page_957_Constraint_Template_Icons_and_Ratios.jpeg", strength="CORROBORATING",
+            fields=["read_dependencies_or_neighborhood", "parameters_and_variants"])],
         params=[("template shape", "one of the five displayed smaller neighborhoods")])
     add("every-allowed-template-must-occur constraint", "CONSTRAINT", ("SOURCE_UNIT", "U006300"),
         [ev("U006300", "The variant requires not only that every local block be allowed, but also that every template in the selected set occur somewhere.")],
@@ -994,10 +999,18 @@ def candidate_specs() -> list[dict[str, Any]]:
          ev("U006302", "The complete sixteen-symbol substitution system is listed.", modality="CODE"),
          ev("U006303", "Exactly the 51 occurring 2x2 blocks out of 65,536 become the allowed local templates."),
          ev("U006304", "The image is the resulting nested witness.", modality="IMAGE",
-            image="BACK-MATTER/NOTES/_page_957_Picture_14.jpeg", strength="CORROBORATING")],
+            image="BACK-MATTER/NOTES/_page_957_Picture_14.jpeg", strength="CORROBORATING",
+            fields=["witness_semantics", "excluded_observers_and_representations"])],
         params=[("colors", "16"), ("allowed 2x2 blocks", "the 51 blocks induced by the stated substitution")],
         overrides={"carrier": "two-dimensional arrays of 16 colors",
                    "topology": "overlapping 2x2 blocks"})
+    add("two-dimensional cellular-automaton fixed-point allowed-template relation", "CONSTRAINT", ("SOURCE_UNIT", "U006305"),
+        [ev("U006305", "A 2D cellular-automaton configuration is fixed exactly when every 5-cell neighborhood belongs to the subset whose center remains unchanged by the rule.")],
+        params=[("cellular-automaton rule", "the stated two-dimensional 5-cell rule"), ("allowed templates", "the center-preserving subset of the 32 neighborhoods")],
+        overrides={"carrier": "two-dimensional cellular-automaton configurations",
+                   "topology": "overlapping 5-cell center-plus-axial-neighbor templates",
+                   "rule_relation_constraint_function_or_probability_law": "accept exactly configurations containing only 5-cell neighborhoods on which the cellular-automaton rule leaves the center cell unchanged",
+                   "result_kind": "the fixed-point configuration set of the stated two-dimensional cellular automaton"})
     add("rule-30 history as a two-dimensional constraint", "CONSTRAINT", ("SOURCE_UNIT", "U006306"),
         [ev("U006306", "A 1D cellular-automaton history is reinterpreted as a 2D array constrained by the rule above each cell."),
          ev("U006307", "The exact allowed template set for rule 30 is displayed.", modality="IMAGE",
@@ -1050,7 +1063,8 @@ def candidate_specs() -> list[dict[str, Any]]:
         [ev("U006318", "The exact Flatten[{x,1,x,0,y}] === Flatten[{0,y,0,y,x}] relation is stated with variables ranging over lists.")],
         overrides={"carrier": "finite lists substituted for x and y",
                    "alphabet_or_value_schema": "lists containing the constants 0 and 1",
-                   "topology": "concatenation order in the two flattened expressions"})
+                   "topology": "concatenation order in the two flattened expressions",
+                   "rule_relation_constraint_function_or_probability_law": "accept exactly finite lists x and y satisfying Flatten[{x,1,x,0,y}] === Flatten[{0,y,0,y,x}]"})
     add("adjacent-square-free sequence constraint", "CONSTRAINT", ("SOURCE_UNIT", "U006318"),
         [ev("U006318", "The sequence must not match two adjacent identical nonempty blocks; k=3 admits the stated infinite substitution witness."),
          ev("U006319", "The enumerator appends each symbol then deletes sequences with adjacent repeated blocks.", modality="CODE"),
@@ -1077,7 +1091,8 @@ def candidate_specs() -> list[dict[str, Any]]:
          ev("U006325", "Four labelled exact relation examples and integer-solution witnesses are displayed.", modality="IMAGE",
             image="BACK-MATTER/NOTES/_page_959_Linear_Diophantine_Four_Panel_Row.jpeg")],
         params=[("a,b,c", "integer coefficients")],
-        overrides={"carrier": "integer pairs (x,y)", "alphabet_or_value_schema": "integers"})
+        overrides={"carrier": "integer pairs (x,y)", "alphabet_or_value_schema": "integers",
+                   "rule_relation_constraint_function_or_probability_law": "accept exactly integer pairs (x,y) satisfying a x == b y + c for the stated integer coefficients a, b, and c"})
     for formula in ["3 x == 4 y", "4 x == 5 y", "3 x == 4 y + 1", "4 x == 5 y + 3"]:
         add(f"linear Diophantine relation {formula}", "CONSTRAINT", ("IMAGE", "A000580"),
             [ev("U006324", "The prose fixes integer-domain linear Diophantine semantics."),
@@ -1091,14 +1106,18 @@ def candidate_specs() -> list[dict[str, Any]]:
          ev("U006327", "A continued-fraction formula computes the smallest x.", modality="CODE"),
          ev("U006328", "The a=61 example and plotted observable are stated."),
          ev("U006329", "The image plots the least-solution magnitude over a.", modality="IMAGE",
-            image="BACK-MATTER/NOTES/_page_960_Figure_3.jpeg", strength="CONTEXTUAL")],
+            image="BACK-MATTER/NOTES/_page_960_Figure_3.jpeg", strength="CONTEXTUAL",
+            fields=["excluded_observers_and_representations"])],
         params=[("a", "positive nonsquare integer")],
-        overrides={"carrier": "integer pairs (x,y)", "alphabet_or_value_schema": "integers"})
+        overrides={"carrier": "integer pairs (x,y)", "alphabet_or_value_schema": "integers",
+                   "rule_relation_constraint_function_or_probability_law": "accept exactly integer pairs (x,y) satisfying x^2 == a y^2 + 1 for a positive nonsquare integer a"})
     add("Pythagorean-triple relation x^2 + y^2 == z^2", "CONSTRAINT", ("SOURCE_UNIT", "U006330"),
         [ev("U006330", "The relation, example triples, and complete primitive parameterization are stated."),
          ev("U006331", "The image plots reduced and all integer-solution witnesses.", modality="IMAGE",
-            image="BACK-MATTER/NOTES/_page_960_Figure_5.jpeg", strength="CORROBORATING")],
-        overrides={"carrier": "integer triples (x,y,z)", "alphabet_or_value_schema": "integers"})
+            image="BACK-MATTER/NOTES/_page_960_Figure_5.jpeg", strength="CORROBORATING",
+            fields=["witness_semantics", "excluded_observers_and_representations"])],
+        overrides={"carrier": "integer triples (x,y,z)", "alphabet_or_value_schema": "integers",
+                   "rule_relation_constraint_function_or_probability_law": "accept exactly integer triples (x,y,z) satisfying x^2 + y^2 == z^2"})
     equations = [
         "x + 3 y == 11 z",
         "x == y z",
@@ -1121,6 +1140,7 @@ def candidate_specs() -> list[dict[str, Any]]:
         params=[("n", "integer exponent greater than 2")],
         overrides={"carrier": "positive whole-number tuples (x,y,z,n)",
                    "alphabet_or_value_schema": "positive whole numbers",
+                   "rule_relation_constraint_function_or_probability_law": "accept exactly positive whole-number tuples satisfying x^n + y^n == z^n with integer n > 2",
                    "result_kind": "the empty positive-integer solution set for n>2"})
     add("finite group-or-semigroup multiplication-table constraint", "CONSTRAINT", ("SOURCE_UNIT", "U006336"),
         [ev("U006336", "A finite group or semigroup is characterized by a finite multiplication table satisfying externally routed constraints.")],
@@ -1140,25 +1160,46 @@ def candidate_specs() -> list[dict[str, Any]]:
 
 
 ROUTES = [
-    ("U006078", "", "page 929", "PAGE", "other lattice constructions", "WR0001"),
-    ("U006121", "", "page 1092", "PAGE", "additive cellular-automaton rules", "WR0002"),
-    ("U006121", "", "page 980", "PAGE", "cellular automaton code 175850", "WR0003"),
-    ("U006123", "A000527", "page 183", "PAGE", "underlying rules for 3D projection panels (a) and (b)", "WR0004"),
-    ("U006139", "A000546", "page 185", "PAGE", "rules for 2D Turing-machine head paths (a) through (e)", "WR0005"),
-    ("U006168", "A000548", "main-text rules underlying the non-white-background panels", "SECTION", "exact replacement tables for the displayed panels", "WR0006"),
-    ("U006192", "", "pages 407 and 1006", "PAGE", "parameter-space sets for geometric substitution systems", "WR0007"),
-    ("U006208", "", "page 1127", "PAGE", "sigma-function scan of an infinite grid quadrant", "WR0008"),
-    ("U006226", "", "Chapter 9", "SECTION", "undirected-network update rules", "WR0009"),
-    ("U006273", "", "page 508", "PAGE", "network substitution systems", "WR0010"),
-    ("U006273", "", "page 1141", "PAGE", "multiway tag systems", "WR0011"),
-    ("U006276", "", "page 504", "PAGE", "multiway systems in fundamental physics", "WR0012"),
-    ("U006310", "", "page 932", "PAGE", "exact Penrose tile subdivision", "WR0013"),
-    ("U006318", "", "page 981", "PAGE", "exact Ising-model energy law", "WR0014"),
-    ("U006318", "", "page 757", "PAGE", "correspondence systems", "WR0015"),
-    ("U006336", "", "page 887", "PAGE", "finite group/semigroup multiplication-table constraints", "WR0016"),
-    ("U006336", "", "page 1073", "PAGE", "Hadamard matrix property", "WR0017"),
-    ("U006338", "", "page 1129", "PAGE", "formula constraints and expression complexity", "WR0018"),
+    ("U006078", "", "page 929", "PAGE", "other lattice constructions", "CROSS_RANGE"),
+    ("U006112", "", "page 171", "PAGE", "cellular automaton code 942 underlying the displayed slices", "WITHIN_STAGE"),
+    ("U006121", "", "page 1092", "PAGE", "additive cellular-automaton rules", "CROSS_RANGE"),
+    ("U006121", "", "page 980", "PAGE", "cellular automaton code 175850", "CROSS_RANGE"),
+    ("U006121", "", "page 177", "PAGE", "main-text cellular automaton code 175850 construction", "WITHIN_STAGE"),
+    ("U006121", "", "page 178", "PAGE", "main-text cellular automaton code 746 construction", "WITHIN_STAGE"),
+    ("U006121", "", "page 181", "PAGE", "main-text cellular automaton code 174826 construction", "WITHIN_STAGE"),
+    ("U006123", "", "page 183", "PAGE", "underlying rules for 3D projection panels (a) and (b)", "WITHIN_STAGE"),
+    ("U006139", "", "page 185", "PAGE", "rules for 2D Turing-machine head paths (a) through (e)", "WITHIN_STAGE"),
+    ("U006168", "", "main-text rules underlying the non-white-background panels", "SECTION", "exact replacement tables for the displayed panels", "WITHIN_STAGE"),
+    ("U006192", "", "pages 407 and 1006", "PAGE", "parameter-space sets for geometric substitution systems", "CROSS_RANGE"),
+    ("U006208", "", "page 1127", "PAGE", "sigma-function scan of an infinite grid quadrant", "CROSS_RANGE"),
+    ("U006226", "", "Chapter 9", "SECTION", "undirected-network update rules", "CROSS_RANGE"),
+    ("U006273", "", "page 508", "PAGE", "network substitution systems", "CROSS_RANGE"),
+    ("U006273", "", "page 1141", "PAGE", "multiway tag systems", "CROSS_RANGE"),
+    ("U006276", "", "page 504", "PAGE", "multiway systems in fundamental physics", "CROSS_RANGE"),
+    ("U006310", "", "page 932", "PAGE", "exact Penrose tile subdivision", "CROSS_RANGE"),
+    ("U006318", "", "page 981", "PAGE", "exact Ising-model energy law", "CROSS_RANGE"),
+    ("U006318", "", "page 757", "PAGE", "correspondence systems", "CROSS_RANGE"),
+    ("U006336", "", "page 1073", "PAGE", "Hadamard matrix property", "CROSS_RANGE"),
+    ("U006336", "", "page 887", "PAGE", "finite group/semigroup multiplication-table constraints", "CROSS_RANGE"),
+    ("U006338", "", "page 1129", "PAGE", "formula constraints and expression complexity", "CROSS_RANGE"),
 ]
+
+
+CANDIDATE_ROUTE_TARGETS = {
+    "non-white-background two-dimensional substitution-system family": [
+        "main-text rules underlying the non-white-background panels"
+    ],
+    "affine iterated transformation system": ["pages 407 and 1006"],
+    "square-spiral enumeration of the integer grid": ["page 1127"],
+    "undirected network rewriting system": ["Chapter 9"],
+    "multidimensional block multiway system": ["page 508"],
+    "Penrose two-tile aperiodic tiling constraint": ["page 932"],
+    "generalized spin-system ground-state constraint": ["page 981"],
+    "ordinary Ising ground-state constraint": ["page 981"],
+    "spin-glass random-sign ground-state constraint": ["page 981"],
+    "finite group-or-semigroup multiplication-table constraint": ["page 887"],
+    "formula-search constraint for algebraic roots": ["page 1129"],
+}
 
 
 ROLE_MAP = {
@@ -1168,7 +1209,7 @@ ROLE_MAP = {
     "A000527": ("RELATION", ["TEXT_BEARING", "CAPTION_INCOMPLETE"], "CHECKED", "CLEAR"),
     "A000528": ("OBSERVER", ["TEXT_BEARING"], "CHECKED", "CLEAR"),
     "A000541": ("CONTROL", ["TEXT_BEARING"], "CHECKED", "CLEAR"),
-    "A000542": ("CONTROL", ["TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"], "CHECKED", "CONFLICTING"),
+    "A000542": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"], "CHECKED", "CONFLICTING"),
     "A000543": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "CHECKED", "CLEAR"),
     "A000544": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED", "CLEAR"),
     "A000545": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED", "CLEAR"),
@@ -1401,7 +1442,11 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                 value = None
                 missing.append(reason)
                 field_eids = []
-            elif spec["source_status"] == ["CONFLICTING"] and field == "rule_relation_constraint_function_or_probability_law":
+            elif (
+                "CONFLICTING" in spec["source_status"]
+                and spec["uncertainty"]
+                and field == "rule_relation_constraint_function_or_probability_law"
+            ):
                 status = CONFLICT
                 reason = spec["uncertainty"][0]
                 value = None
@@ -1486,7 +1531,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         ),
     )
     route_anchor_ordinals: dict[tuple[str, str], int] = {}
-    for route_index, (unit, asset, target, kind, topic, _) in enumerate(ordered_routes, 1):
+    for route_index, (unit, asset, target, kind, topic, closure_scope) in enumerate(ordered_routes, 1):
         rid = f"WR{route_index:04d}"
         if asset:
             discovery_kind = "IMAGE"
@@ -1516,7 +1561,7 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
                 "route_kind": kind,
                 "expected_topic": topic,
                 "owning_stage": STAGE,
-                "closure_scope": "CROSS_RANGE",
+                "closure_scope": closure_scope,
                 "status": "PENDING",
                 "target_unit_ids": "[]",
                 "target_asset_ids": "[]",
@@ -1674,16 +1719,17 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         )
         asset_updates.append(update)
 
-    # Candidate cross-reference links are derived from shared source or image
-    # provenance; routes themselves remain unresolved.
-    routes_by_unit = {u: ids for u, ids in unit_routes.items()}
+    # Candidate-route joins are semantic, not merely co-located provenance.
+    # Several Notes units mention unrelated targets in one paragraph; deriving
+    # links from a shared unit leaked those routes onto adjacent candidates.
+    route_ids_by_target = {
+        row["literal_target"]: row["route_id"] for row in route_proposals
+    }
     for proposal in proposals:
-        linked: list[str] = []
-        for unit in proposal["source_unit_ids"]:
-            linked.extend(routes_by_unit.get(unit, []))
-        for image_path in proposal["image_witnesses"]:
-            linked.extend(asset_routes.get(asset_by_path[image_path]["asset_id"], []))
-        proposal["cross_reference_ids"] = list(dict.fromkeys(linked))
+        proposal["cross_reference_ids"] = [
+            route_ids_by_target[target]
+            for target in CANDIDATE_ROUTE_TARGETS.get(proposal["provisional_name"], [])
+        ]
 
     defect_uncertainties = [
         f"{unit}: {text}" for unit, text in DEFECT_UNITS.items()
