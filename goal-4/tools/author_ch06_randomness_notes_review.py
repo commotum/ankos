@@ -482,6 +482,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "codes 357, 438, 600, 792, 924, 1038, 1041, 1086, 1329, 1572, 1599, 1635, 1662, 1815, 2007, and 2049",
             },
             aliases=["1D totalistic class-4 rules"],
+            parameters=[("rule code", "one of 357, 438, 600, 792, 924, 1038, 1041, 1086, 1329, 1572, 1599, 1635, 1662, 1815, 2007, or 2049")],
             missing=["The totalistic code-decoding convention, neighborhood range, and transition tables are not restated in this unit."],
         ),
         spec(
@@ -600,6 +601,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "codes 224, 226, 4320, 5344, 6248, 6752, 6754, and 8416",
             },
             aliases=["2D class 4 outer-totalistic rules"],
+            parameters=[("rule code", "one of 224, 226, 4320, 5344, 6248, 6752, 6754, or 8416")],
             variants=[("HighLife", "the source's name for member preset code 4320")],
             missing=["The code-to-transition-table convention is not restated in this unit."],
         ),
@@ -686,7 +688,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "representation",
             [
-                ev("U006364", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A difference region records cells affected by an initial change, and its edge can move by at most the underlying cellular-automaton range per step.", ["object_kind", "input", "result_kind", "structural_invariants"]),
+                ev("U006364", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A difference region records cells affected by an initial change, and its edge can move by at most the underlying cellular-automaton range per step.", ["object_kind", "input", "result_kind", "structural_invariants", "parameters_and_variants"]),
                 ev("U006365", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source compares two cellular-automaton evolutions through their cellwise pattern of differences.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind"]),
             ],
             values={
@@ -694,7 +696,9 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "structural_invariants": "the difference-region edge can propagate no faster than r cells per step for a range-r rule",
                 "rule_relation_constraint_function_or_probability_law": "compare the two evolutions cell by cell and mark where their colors differ",
                 "result_kind": "a spacetime pattern of changed cells",
+                "parameters_and_variants": "underlying cellular-automaton range r bounds edge propagation by r cells per step",
             },
+            parameters=[("r", "range of the underlying cellular-automaton rule and maximum one-step difference-edge displacement", "U006364")],
             related=["two-k-color cellular-automaton difference-emulation lift"],
         ),
         spec(
@@ -734,6 +738,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
+                ev("U006362", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source reports difference-edge speeds: rule 126 has speed 1 on both edges, rule 30 has right speed 1 and average left speed about 0.2428, and rule 22 has average speed about 0.7660 on both edges.", ["input", "result_kind", "parameters_and_variants"]),
+                ev("U006363", "PROSE", "CORROBORATING", "Additional reported average edge speeds are about 0.1724 for rule 45's left edge and about 0.553 for both rule 54 edges; rule 30's left-edge value is compared with 0.25 and about 0.252 approximations.", ["result_kind", "parameters_and_variants"]),
                 ev("U006366", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For rule 22, a one-cell color change has no effect after one step when the changed cell has a two-black-cell block on each side.", ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
                 ev("U006367", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The speed at which the region of differences expands can be interpreted by analogy as a Lyapunov exponent characterizing instability.", OBS_FIELDS),
             ],
@@ -741,9 +747,19 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "input": "a target cellular-automaton rule, a baseline initial condition, and a paired initial condition containing a localized perturbation",
                 "rule_relation_constraint_function_or_probability_law": "measure the asymptotic speed of the expanding difference-region edge",
                 "result_kind": "a perturbation-growth speed interpreted as a Lyapunov exponent",
-                "parameters_and_variants": "rule 22 has a stated immediate-extinction restriction for a one-cell perturbation bracketed by two-black-cell blocks on both sides",
+                "parameters_and_variants": "target rule and left/right edge direction select the reported growth-speed cases; rule 22 also has a stated immediate-extinction restriction",
             },
+            parameters=[
+                ("target rule", "cellular-automaton rule whose difference growth is measured", "U006362"),
+                ("edge direction", "left edge, right edge, or both when their speeds agree", "U006362"),
+            ],
             variants=[
+                ("rule 126, both edges", "difference-edge speed exactly 1 cell per step", "U006362"),
+                ("rule 30, right edge", "difference-edge speed exactly 1 cell per step", "U006362"),
+                ("rule 30, left edge", "average difference-edge speed about 0.2428 cells per step", "U006362"),
+                ("rule 22, both edges", "average difference-edge speed about 0.7660 cells per step", "U006362"),
+                ("rule 45, left edge", "average difference-edge speed about 0.1724 cells per step", "U006363"),
+                ("rule 54, both edges", "average difference-edge speed about 0.553 cells per step", "U006363"),
                 ("rule-22 immediate extinction", "a one-cell color change vanishes after one step when a ■■ block lies on each side", "U006366"),
             ],
             missing=["The note supplies an analogy and observed expansion speeds but no formal asymptotic estimator, limit convention, or termination rule for a general Lyapunov analyzer."],
@@ -754,7 +770,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "map",
             [
-                ev("U006369", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "After t steps the dot is at Mod[m t,n], with repetition period n/GCD[m,n].", MAP_FIELDS + ["structural_invariants"]),
+                ev("U006369", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "After t steps the dot is at Mod[m t,n], with repetition period n/GCD[m,n].", MAP_FIELDS + ["structural_invariants", "parameters_and_variants"]),
                 ev("U006370", "PROSE", "CORROBORATING", "The period is maximal exactly when m/n is in lowest terms.", ["structural_invariants"]),
             ],
             values={
@@ -775,7 +791,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006372",
             1,
             "map",
-            [ev("U006372", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "After t steps the dot is at Mod[k^t,n]; coprime k,n give return period MultiplicativeOrder[k,n], while powers n=k^s reach the absorbing state 0 after s steps.", MAP_FIELDS + ["structural_invariants"])],
+            [ev("U006372", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "After t steps the dot is at Mod[k^t,n]; coprime k,n give return period MultiplicativeOrder[k,n], while powers n=k^s reach the absorbing state 0 after s steps.", MAP_FIELDS + ["structural_invariants", "parameters_and_variants"])],
             values={
                 "carrier": "n cyclic residue positions",
                 "complete_state": "the current dot position",
@@ -1006,6 +1022,10 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "the note distinguishes initial conditions yielding nested behavior from those yielding random behavior",
             },
             aliases=["rule 94"],
+            variants=[
+                ("nested-behavior seed", "the pictured initial-condition class that yields nested behavior; exact seed encoding is not transcribed"),
+                ("random-behavior seed", "the pictured initial-condition class that yields random behavior; exact seed encoding is not transcribed"),
+            ],
             missing=["The local transition formula and the pictured initial-condition encodings are not transcribed in prose."],
             image_witnesses=[p + "_page_966_Figure_19.jpeg"],
         ),
@@ -1016,9 +1036,13 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca1d",
             [ev("U006394", "PROSE", "DIRECT_IDENTITY", "Rule 218 is identified by rule number and its response to initial conditions with or without adjacent black pairs.", ["object_kind", "parameters_and_variants"])],
             values={
-                "parameters_and_variants": "initial conditions with adjacent black pairs versus initial conditions without them",
+                "parameters_and_variants": "initial conditions containing an adjacent black pair yield uniform black; initial conditions with no adjacent black pair yield a rule-90 nested pattern",
             },
             aliases=["rule 218"],
+            variants=[
+                ("contains an adjacent black pair", "evolves to uniform black"),
+                ("contains no adjacent black pair", "evolves to a rule-90 nested pattern"),
+            ],
             missing=["The local transition formula is not stated."],
         ),
         spec(
@@ -1311,7 +1335,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             [
                 ev("U006432", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The target is strict first return at p steps, not merely return at a time divisible by a smaller period, and a repeating-block witness has bounded length.", CONSTRAINT_FIELDS + ["parameters_and_variants"]),
                 ev("U006434", "PROSE", "CONTEXTUAL", "The bounded survey distinguishes obtainable exact periods and records working block sizes up to 25.", ["result_kind", "parameters_and_variants"]),
-                ev("U006439", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For a non-one-sided-additive rule, inspect all blocks of length 2pr+1 whose center returns after p steps and concatenate compatible blocks; this constructs p-return configurations and needs a lower-period exclusion for strict exactness.", ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics"]),
+                ev("U006439", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For a non-one-sided-additive rule, inspect all blocks of length 2pr+1 whose center returns after p steps and concatenate compatible blocks; this constructs p-return configurations and needs a lower-period exclusion for strict exactness.", ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics", "parameters_and_variants"]),
             ],
             values={
                 "input": "a 1D cellular-automaton rule, range r, and requested period p",
@@ -1474,18 +1498,28 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006443",
             1,
             "map",
-            [ev("U006443", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "A map x -> f[x] with polynomial f, including f[x]=a x(1-x), is explicitly delimited.", MAP_FIELDS + ["parameters_and_variants"])],
+            [
+                ev("U006443", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "A map x -> f[x] with polynomial f, including f[x]=a x(1-x), is explicitly delimited.", MAP_FIELDS + ["parameters_and_variants"]),
+                ev("U006531", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For x -> a x(1-x), the attractor progresses from a fixed point through periods 2, 4, 8, and so on, accumulating near a=3.569946 with nested structure.", ["structural_invariants", "result_kind", "parameters_and_variants"]),
+            ],
             values={
                 "carrier": "real values",
                 "complete_state": "the current real value x",
                 "rule_relation_constraint_function_or_probability_law": "x -> f[x] for polynomial f",
-                "parameters_and_variants": "polynomial coefficients; logistic-map parameter a",
+                "structural_invariants": "the logistic specialization has a fixed-point regime followed by period doubling 2,4,8,... and an accumulation near a=3.569946 with nested structure",
+                "parameters_and_variants": "polynomial coefficients, initial/current value x, and logistic-map parameter a",
             },
             parameters=[
-                ("f", "the polynomial map, equivalently its coefficient vector; the logistic specialization uses parameter a"),
-                ("x", "initial or current real value supplied to the map"),
+                ("f", "the polynomial map, equivalently its coefficient vector", "U006443"),
+                ("x", "initial or current real value supplied to the map", "U006443"),
+                ("a", "logistic-map parameter in f[x]=a x(1-x)", "U006531"),
             ],
-            variants=[("logistic map", "f[x]=a x(1-x)")],
+            variants=[
+                ("logistic map", "f[x]=a x(1-x)", "U006443"),
+                ("small-a fixed point", "the attractor is a fixed point", "U006531"),
+                ("period-doubling regime", "the attractor progresses through periods 2, 4, 8, 16, and so on", "U006531"),
+                ("accumulation point", "near a=3.569946 the limit cycles accumulate with a special nested structure", "U006531"),
+            ],
         ),
         spec(
             "p-return point query for an iterated map",
@@ -1685,6 +1719,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "read_dependencies_or_neighborhood": "range 1/2",
                 "parameters_and_variants": "rule numbers 11736, 11739, and 11742",
             },
+            parameters=[("rule code", "one of 11736, 11739, or 11742")],
             missing=["The rule-number decoding convention and tables are not restated."],
         ),
         spec(
@@ -1730,7 +1765,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("net", "finite labeled transition network supplied as a recognizer input"),
                 ("list", "finite sequence of input labels to recognize"),
             ],
-            aliases=["finite automaton", "finite state machine", "nondeterministic finite automaton", "NFA", "NDFA"],
+            aliases=["finite automaton", "finite state machine", "nondeterministic finite automaton", "NFA", "NDFA", "sequential machine", "sequential machines"],
         ),
         spec(
             "cellular-automaton image-set network transform",
@@ -2158,7 +2193,10 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a substitution system generating the nested levels of the encoded Cantor set",
                 "parameters_and_variants": "one substitution element kind for each of the s network nodes",
             },
-            parameters=[("s", "number of finite-network nodes and resulting substitution element kinds")],
+            parameters=[
+                ("net", "finite sequence network supplied to the transform", "U006518"),
+                ("s", "number of finite-network nodes and resulting substitution element kinds", "U006518"),
+            ],
             missing=["The note states the construction principle but does not print the node-to-replacement rule in executable form."],
             related=["sequence-set to Cantor-set encoding", "regular language"],
         ),
@@ -2173,9 +2211,18 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "construct the finite automaton for possible output sequences and test whether it admits every state sequence",
                 "result_kind": "whether the global cellular-automaton map is onto",
                 "witness_semantics": "for surjectivity, every target state has at least one predecessor",
-                "parameters_and_variants": "the cellular-automaton rule whose global map is tested",
+                "parameters_and_variants": "the cellular-automaton rule, color count k, and range r; the source gives exact k=2,r=1 and k=2,r=2 statistics",
             },
-            parameters=[("cellular-automaton rule", "local rule inducing the global map tested for surjectivity")],
+            aliases=["surjective", "onto"],
+            parameters=[
+                ("cellular-automaton rule", "local rule inducing the global map tested for surjectivity", "U006518"),
+                ("k", "number of cell colors", "U006518"),
+                ("r", "cellular-automaton range", "U006518"),
+            ],
+            variants=[
+                ("k=2, r=1", "exactly 30 onto rules, precisely those additive in at least their first or last dependent position", "U006518"),
+                ("k=2, r=2", "141,884 onto rules, including 11,388 not additive in any position", "U006518"),
+            ],
         ),
         spec(
             "cellular-automaton injectivity, bijectivity, and reversibility decision relation",
@@ -2183,9 +2230,9 @@ def candidate_specs() -> list[dict[str, Any]]:
             4,
             "constraint",
             [
-                ev("U006518", "PROSE", "DIRECT_IDENTITY", "A cellular automaton is treated as a global endomorphism of its state space, providing the common domain for onto and one-to-one properties.", ["object_kind", "carrier", "input", "law_kind", "parameters_and_variants"]),
-                ev("U006519", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Injectivity requires distinct inputs to have distinct outputs; a surjective and injective rule is bijective, equivalently reversible.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics", "structural_invariants"]),
-                ev("U006520", "PROSE", "DIRECT_PARTIAL_MECHANICS", "In two dimensions these properties are undecidable in general.", ["termination_completion_failure"]),
+                ev("U006518", "PROSE", "DIRECT_IDENTITY", "A k-color range-r cellular automaton is treated as a global endomorphism of its state space, providing the common domain for onto and one-to-one properties and the source's finite rule-family examples.", ["object_kind", "carrier", "input", "law_kind", "parameters_and_variants"]),
+                ev("U006519", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Injectivity requires distinct inputs to have distinct outputs; a surjective and injective rule is bijective, equivalently reversible; rules 90, 150, 30, and 45 are stated to be 4-to-1.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "witness_semantics", "structural_invariants", "parameters_and_variants"]),
+                ev("U006520", "PROSE", "DIRECT_PARTIAL_MECHANICS", "In two dimensions these properties are undecidable in general.", ["termination_completion_failure", "parameters_and_variants"]),
             ],
             values={
                 "carrier": "the complete configuration space of a cellular automaton",
@@ -2195,9 +2242,18 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "whether the map is injective, bijective, and therefore reversible",
                 "witness_semantics": "noninjectivity is witnessed by two distinct predecessor configurations with the same successor",
                 "termination_completion_failure": "the decision problem is undecidable in general for two-dimensional cellular automata",
-                "parameters_and_variants": "the cellular-automaton rule or induced global map whose injectivity, bijectivity, and reversibility are tested",
+                "parameters_and_variants": "the cellular-automaton rule or induced global map, with color count k and range r where specified; explicit 4-to-1 and two-dimensional undecidability cases are stated",
             },
-            parameters=[("cellular-automaton rule", "local rule or induced global endomorphism supplied to the decision relation")],
+            aliases=["injective", "one-to-one", "bijective", "automorphism", "reversible"],
+            parameters=[
+                ("cellular-automaton rule", "local rule or induced global endomorphism supplied to the decision relation", "U006518"),
+                ("k", "number of cell colors where a finite rule family is selected", "U006518"),
+                ("r", "cellular-automaton range where a finite rule family is selected", "U006518"),
+            ],
+            variants=[
+                ("4-to-1 examples", "rules 90, 150, 30, and 45 are stated to have four predecessors per image state", "U006519"),
+                ("two-dimensional decision problem", "injectivity and surjectivity are undecidable in general", "U006520"),
+            ],
             related=["cellular-automaton surjectivity decision query"],
         ),
         spec(
@@ -2347,7 +2403,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "representation",
             [
-                ev("U006531", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Each complete state of a finite deterministic system becomes a node with one arc to its rule-defined successor.", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants"]),
+                ev("U006531", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Each complete state of a finite deterministic system becomes a node with one arc to its rule-defined successor.", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants", "parameters_and_variants"]),
                 ev("U006533", "PROSE", "CORROBORATING", "Cyclic-multiplication examples show pure cycles for odd n and transient trees feeding cycles for even n.", ["structural_invariants"]),
                 ev("U006535", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Every deterministic finite-state evolution graph consists of recurrent cycles with possible trees of transient states feeding them.", ["structural_invariants"]),
                 ev("U006536", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The rule-254 four-cell graph has 16 nodes and all but one state reaches the all-black fixed point within two steps.", ["parameters_and_variants", "structural_invariants"]),
@@ -2362,11 +2418,13 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "structural_invariants": "every node has exactly one outgoing arc; every component contains one recurrent cycle with possible transient trees; underlying spatial or color symmetries can produce repeated isomorphic components",
                 "rule_relation_constraint_function_or_probability_law": "create one node per complete state and an arc state -> successor(state)",
                 "result_kind": "a functional directed graph of all system states",
-                "parameters_and_variants": "for finite additive rules, cycle states carry identical rooted trees; the source states binary tree structure for rule 60 and degree-4 tree structure for rule 90",
+                "parameters_and_variants": "source system and deterministic successor rule, finite state-space/system size, and stated rule-254, rule-132, rule-60, and rule-90 variants",
             },
             parameters=[
-                ("finite state-space size", "number of complete states represented as graph nodes"),
-                ("system size", "finite lattice or other size parameter controlling the state space"),
+                ("source system", "finite deterministic system whose complete states become graph nodes", "U006531"),
+                ("successor rule", "deterministic rule supplying the unique outgoing arc from each state", "U006531"),
+                ("finite state-space size", "number of complete states represented as graph nodes", "U006531"),
+                ("system size", "finite lattice or other size parameter controlling the state space", "U006536"),
             ],
             variants=[
                 ("rule 254", "class-1 convergence to one all-black fixed point"),
@@ -2665,6 +2723,65 @@ def candidate_specs() -> list[dict[str, Any]]:
             related=["rule-110 periodic background field", "rule-110 persistent-structure seed preset survey", "rule-110 collision-based structure extension transform", "rule-110 glider-gun initial condition"],
         ),
         *life_structure_specs(p),
+        spec(
+            "long-run cellular-automaton density and pattern-statistics survey",
+            "U006341",
+            2,
+            "observer",
+            [
+                ev(
+                    "U006341",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "The source reports long-run black-cell densities for rules 126, 22, 30, 150, 182, and conditionally 110, and points to page 953 for an estimation method.",
+                    OBS_FIELDS + ["parameters_and_variants", "excluded_observers_and_representations"],
+                ),
+                ev(
+                    "U006342",
+                    "PROSE",
+                    "CORROBORATING",
+                    "The same rules have stated long-run local-pattern properties: rules 30 and 150 retain random-looking rows, rule 126 favors black pairs, rule 182 surrounds white cells by black, and rule 22 has four-cell conditions.",
+                    ["result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+                ),
+                ev(
+                    "U006343",
+                    "FORMULA",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "Triangle densities of size n decay roughly as 2^-n for rules 126, 30, 150, and 182 and roughly as 1.3^-n for rule 22.",
+                    ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants", "excluded_observers_and_representations"],
+                ),
+            ],
+            values={
+                "input": "a selected cellular-automaton rule, its evolved random-initial-condition history, and a selected density or local-pattern statistic",
+                "rule_relation_constraint_function_or_probability_law": "measure long-run black-cell density or the stated local-pattern statistic; the estimation method is deferred to page 953",
+                "result_kind": "the source-reported long-run density or pattern-statistic judgment",
+                "parameters_and_variants": "target rule and statistic; explicit rule-specific densities, pattern restrictions, and triangle-decay rates are stated",
+                "excluded_observers_and_representations": "density and pattern-frequency statistics are derived observations, not native cellular-automaton state",
+            },
+            parameters=[
+                ("cellular-automaton rule", "one of the source's stated rule cases", "U006341"),
+                ("statistic", "black-cell density, local pattern property, or size-n triangle density", "U006341"),
+                ("n", "triangle size in the decay-rate specialization", "U006343"),
+            ],
+            variants=[
+                ("rule 126 black-cell density", "1/2 after many steps", "U006341"),
+                ("rule 22 black-cell density", "approximately 0.35095 after many steps", "U006341"),
+                ("rules 30 and 150 black-cell density", "exactly 1/2 after many steps", "U006341"),
+                ("rule 182 black-cell density", "3/4 after many steps", "U006341"),
+                ("rule 110 black-cell density", "4/7 insofar as the rule converges to a definite density", "U006341"),
+                ("rule 126 local pattern", "black cells tend to appear in pairs", "U006342"),
+                ("rule 182 local pattern", "every white cell tends to be surrounded by black cells", "U006342"),
+                ("rule 22 local pattern", "more complicated restrictions involve four-cell blocks", "U006342"),
+                ("2^-n triangle decay", "rules 126, 30, 150, and 182", "U006343"),
+                ("1.3^-n triangle decay", "rule 22", "U006343"),
+            ],
+            missing=["The page-953 estimation algorithm is outside this sealed worker source; the unit states results but not a complete estimator."],
+            related=[
+                "fair random cellular-automaton initial-condition ensemble",
+                "independent-cell mean-field density map for cellular automata",
+                "cellular-automaton density-response raster analyzer",
+            ],
+        ),
     ]
 
 
@@ -2722,13 +2839,15 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006574",
                 1,
                 "constraint",
-                [ev("U006574", "PROSE", "DIRECT_COMPLETE_MECHANICS", "The catalogue is exactly the Life structures with fewer than eight black cells that are unchanged by one evolution step.", CONSTRAINT_FIELDS), ev("U006575", "IMAGE", "CONTEXTUAL", "The original-resolution panel displays the complete finite catalogue.", ["result_kind"], prefix + "_page_979_Picture_22.jpeg")],
+                [ev("U006574", "PROSE", "DIRECT_COMPLETE_MECHANICS", "The catalogue is exactly the Life structures with fewer than eight black cells that are unchanged by one evolution step.", CONSTRAINT_FIELDS + ["parameters_and_variants"]), ev("U006575", "IMAGE", "CONTEXTUAL", "The original-resolution panel displays the complete finite catalogue.", ["result_kind"], prefix + "_page_979_Picture_22.jpeg")],
                 values={
                     "carrier": "finite live-cell subsets of the Life lattice",
                     "input": "a finite Life configuration with fewer than eight live cells",
                     "rule_relation_constraint_function_or_probability_law": "LifeStep[state] == state and live-cell count < 8",
                     "result_kind": "the complete satisfying still-life set",
+                    "parameters_and_variants": "live-cell bound fewer than 8 together with the one-step fixed-point criterion",
                 },
+                parameters=[("live-cell bound", "strictly fewer than 8 initial live cells")],
                 missing=["The source asserts that the pictured panel is complete, but the member patterns and live-cell coordinates are not transcribed into the text record."],
                 image_witnesses=[prefix + "_page_979_Picture_22.jpeg"],
             ),
@@ -2775,14 +2894,19 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006582",
                 1,
                 "seed",
-                [ev("U006582", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The glider gun emits a glider every 30 steps and has a known 21-live-cell seed.", SEED_FIELDS), ev("U006583", "IMAGE", "CONTEXTUAL", "The original-resolution composite shows the gun and emitted-glider history.", ["result_kind"], prefix + "_page_980_Picture_7.jpeg")],
+                [ev("U006582", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The glider gun emits a glider every 30 steps and has a known 21-live-cell seed.", SEED_FIELDS + ["parameters_and_variants"]), ev("U006583", "IMAGE", "CONTEXTUAL", "The original-resolution composite shows the gun and emitted-glider history.", ["result_kind"], prefix + "_page_980_Picture_7.jpeg")],
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "a 21-live-cell seed in the simplest stated gun",
                     "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "a glider-gun initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use the glider-gun seed under Life; it emits one glider every 30 steps",
+                    "parameters_and_variants": "emission period 30 steps and simplest-known seed size 21 live cells",
                 },
+                parameters=[
+                    ("emission period", "30 Life steps per emitted glider"),
+                    ("simplest-known seed live cells", "21 live cells"),
+                ],
                 missing=["The 21 live-cell coordinates are not stated."],
                 image_witnesses=[prefix + "_page_980_Picture_7.jpeg"],
             ),
@@ -2791,7 +2915,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006582",
                 2,
                 "seed",
-                [ev("U006582", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The switch engine leaves a trail while moving and can start from 10 live cells, a 5x5 region, or a 39x1 region.", SEED_FIELDS + ["parameters_and_variants"]), ev("U006583", "IMAGE", "CONTEXTUAL", "The original-resolution composite shows switch-engine growth horizontally and vertically.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Picture_7.jpeg")],
+                [ev("U006582", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The switch engine leaves a trail while moving and can start from 10 live cells, a 5x5 region, or a 39x1 region; fewer than 10 initial live cells cannot produce unbounded growth.", SEED_FIELDS + ["structural_invariants", "parameters_and_variants"]), ev("U006583", "IMAGE", "CONTEXTUAL", "The original-resolution composite shows switch-engine growth horizontally and vertically.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Picture_7.jpeg")],
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "10 live cells, or seeds bounded by 5x5 or 39x1 as stated",
@@ -2799,7 +2923,14 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "complete_state": "a switch-engine initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use a switch-engine seed under Life; the moving structure leaves an unbounded trail",
                     "parameters_and_variants": "10-live-cell, 5x5-bounded, and 39x1-bounded seed forms; horizontal and vertical growth are pictured",
+                    "structural_invariants": "no Life seed with fewer than 10 initial live cells can produce unbounded growth",
                 },
+                parameters=[("initial live cells", "10 for the stated minimum-size switch-engine seed")],
+                variants=[
+                    ("10-live-cell seed", "a switch engine can be obtained from 10 initial live cells", "U006582"),
+                    ("5x5-bounded seed", "a switch engine can be obtained with all live cells in a 5 by 5 region", "U006582"),
+                    ("39x1-bounded seed", "a switch engine can be obtained with all live cells in a 39 by 1 region", "U006582"),
+                ],
                 missing=["Exact live-cell coordinates are not stated."],
                 image_witnesses=[prefix + "_page_980_Picture_7.jpeg"],
             ),
@@ -2850,14 +2981,17 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006587",
                 1,
                 "seed",
-                [ev("U006587", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The spacefiller starts from 206 live cells and produces uniform unbounded growth.", SEED_FIELDS), ev("U006588", "IMAGE", "CONTEXTUAL", "The original-resolution panels show step 5, step 50, and the expanding history.", ["result_kind"], prefix + "_page_980_Life_Spacefiller_Three_Panel_Row.jpeg")],
+                [ev("U006587", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The spacefiller starts from 206 live cells, produces uniform unbounded growth, and is stated to be closely analogous to code 1329 structures on page 287.", SEED_FIELDS + ["parameters_and_variants"]), ev("U006588", "IMAGE", "CONTEXTUAL", "The original-resolution panels show step 5, step 50, and the expanding history.", ["result_kind"], prefix + "_page_980_Life_Spacefiller_Three_Panel_Row.jpeg")],
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "206 live cells",
                     "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "the spacefiller initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use the 206-cell seed under Life; it generates uniform unbounded growth",
+                    "parameters_and_variants": "206 initial live cells; the resulting spacefiller is closely analogous to the code-1329 structures referenced on page 287",
                 },
+                parameters=[("initial live cells", "206")],
+                variants=[("code-1329 analogy", "closely analogous to the structures shown for code 1329 on page 287")],
                 missing=["The 206 live-cell coordinates are not stated."],
                 image_witnesses=[prefix + "_page_980_Life_Spacefiller_Three_Panel_Row.jpeg"],
             ),
@@ -2866,14 +3000,20 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006589",
                 1,
                 "seed",
-                [ev("U006589", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The puffer train starts from 23 live cells and settles after more than 1100 steps to period 140.", SEED_FIELDS), ev("U006590", "IMAGE", "CONTEXTUAL", "The original-resolution panels show steps 200 and 500 during the long transient.", ["result_kind"], prefix + "_page_980_Life_Puffer_Train_Four_Panel_Group.jpeg")],
+                [ev("U006589", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The puffer train starts from 23 live cells and settles after more than 1100 steps to period 140.", SEED_FIELDS + ["parameters_and_variants"]), ev("U006590", "IMAGE", "CONTEXTUAL", "The original-resolution panels show steps 200 and 500 during the long transient.", ["result_kind"], prefix + "_page_980_Life_Puffer_Train_Four_Panel_Group.jpeg")],
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "23 live cells",
                     "alphabet_or_value_schema": "live/dead cells",
                     "complete_state": "the puffer-train initial pattern",
                     "rule_relation_constraint_function_or_probability_law": "use the 23-cell seed under Life; after a transient exceeding 1100 steps it repeats with period 140",
+                    "parameters_and_variants": "23 initial live cells, eventual period 140, and a transient longer than 1100 steps",
                 },
+                parameters=[
+                    ("initial live cells", "23"),
+                    ("eventual period", "140 Life steps"),
+                    ("transient length", "more than 1100 Life steps"),
+                ],
                 missing=["The 23 live-cell coordinates are not stated."],
                 image_witnesses=[prefix + "_page_980_Life_Puffer_Train_Four_Panel_Group.jpeg"],
             ),
@@ -2885,9 +3025,11 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
 def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
     """(source unit, literal target, expected topic, kind, candidate names)."""
     return [
-        ("U006341", "page 226", "printed source discussion of random-seed pattern densities", "PAGE", ["fair random cellular-automaton initial-condition ensemble"]),
-        ("U006341", "page 953", "method for estimating long-run cellular-automaton densities", "PAGE", ["fair random cellular-automaton initial-condition ensemble"]),
-        ("U006343", "page 871", "rule-30 triangle-density analysis", "PAGE", []),
+        ("U006341", "page 226", "printed source discussion of random-seed pattern densities", "PAGE", ["fair random cellular-automaton initial-condition ensemble", "long-run cellular-automaton density and pattern-statistics survey"]),
+        ("U006341", "page 953", "method for estimating long-run cellular-automaton densities", "PAGE", ["long-run cellular-automaton density and pattern-statistics survey"]),
+        ("U006343", "page 871", "rule-30 triangle-density analysis", "PAGE", ["long-run cellular-automaton density and pattern-statistics survey"]),
+        ("U006346", "page 1012", "reaction-diffusion pattern-formation construction lead", "PAGE", []),
+        ("U006346", "page 880", "self-gravitating-system construction lead", "PAGE", []),
         ("U006344", "page 869", "algebraic representation convention for elementary cellular automata", "PAGE", ["elementary cellular automaton rule 22", "elementary cellular automaton rule 126", "elementary cellular automaton rule 150", "elementary cellular automaton rule 182"]),
         ("U006348", "page 232", "printed elementary-rule examples", "PAGE", ["elementary-rule bit-pattern selector"]),
         ("U006348", "page 235", "printed states-of-matter and class-4 discussion", "PAGE", ["three-color one-dimensional totalistic class-4 preset family"]),
@@ -2966,6 +3108,7 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006451", "page 952", "prime-modulus additive rules", "PAGE", ["prime-modulus additive-CA scale self-emulation transform", "additive-cellular-automaton fractal-dimension analyzer"]),
         ("U006451", "page 870", "additive self-similarity", "PAGE", ["prime-modulus additive-CA scale self-emulation transform"]),
         ("U006457", "page 58", "fractal dimensions of rule-90 and rule-150 histories", "PAGE", ["additive-cellular-automaton fractal-dimension analyzer"]),
+        ("U006457", "page 952", "other additive-rule families used by the fractal-dimension analysis", "PAGE", ["additive-cellular-automaton fractal-dimension analyzer"]),
         ("U006459", "page 870", "other additive-rule dimensions", "PAGE", ["additive-cellular-automaton fractal-dimension analyzer"]),
         ("U006461", "page 886", "associative cellular-automaton rules", "PAGE", ["associative-operation cellular automaton family"]),
         ("U006468", "page 887", "noncommutative associative example", "PAGE", ["associative-operation cellular automaton family"]),
@@ -2989,6 +3132,7 @@ def route_specs() -> list[tuple[str, str, str, str, list[str]]]:
         ("U006518", "page 1085", "surjective cellular-automaton rules used as DES S-box input", "PAGE", ["cellular-automaton surjectivity decision query"]),
         ("U006519", "page 1017", "reversible cellular automata", "PAGE", ["cellular-automaton injectivity, bijectivity, and reversibility decision relation"]),
         ("U006520", "page 1138", "two-dimensional undecidability of injectivity and surjectivity", "PAGE", ["cellular-automaton surjectivity decision query", "cellular-automaton injectivity, bijectivity, and reversibility decision relation"]),
+        ("U006528", "page 876", "self-reproduction and Garden-of-Eden context for cellular-automaton surjectivity", "PAGE", ["cellular-automaton surjectivity decision query", "cellular-automaton injectivity, bijectivity, and reversibility decision relation"]),
         ("U006527", "page 878", "sliding-block codes as cellular automata", "PAGE", ["full left-shift symbolic dynamical system"]),
         ("U006527", "page 869", "locality and continuity analogy", "PAGE", ["full left-shift symbolic dynamical system"]),
         ("U006530", "page 922", "ordinary differential-equation attractors", "PAGE", []),
@@ -3041,7 +3185,7 @@ def main() -> None:
     specs = candidate_specs()
     for index, item in enumerate(specs, 1):
         item["id"] = f"W{index:04d}"
-    assert len(specs) == 120
+    assert len(specs) == 121
     by_name = {item["name"]: item for item in specs}
     assert len(by_name) == len(specs)
 

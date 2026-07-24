@@ -1666,7 +1666,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001323",
         fields=["excluded_observers_and_representations"],
         claim="U001323 explicitly distinguishes actual continuous-CA gray levels from the neighbor-difference values used for display.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
     weighted_name = "neighbor-weighted fractional-average continuous cellular automaton"
     weighted = candidate(weighted_name)
@@ -1723,8 +1723,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
     # New display observers use distinct spatial-depth and prior-time fog variants.
     difference_name = "neighbor-difference gray-field display transformation"
     difference = candidate(difference_name)
-    difference["units"].append("U001321")
-    difference["semantic_units"].append("U001321")
+    difference["units"] = ["U001317", "U001319", "U001321", "U001323"]
+    difference["semantic_units"] = ["U001317", "U001319", "U001321", "U001323"]
     difference["anchor_priority"] = 1
     difference["mechanics_units"] = []
     difference["values"] = {
@@ -1753,6 +1753,21 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "difference convention",
         "gray remapping",
     ]
+    for unit_id, asset_id in [
+        ("U001317", "A000954"),
+        ("U001319", "A000955"),
+    ]:
+        evidence(
+            difference_name,
+            unit_id,
+            fields=[],
+            claim=(
+                f"{asset_id} is one of the three original-resolution page-259 evolutions whose "
+                "display gray levels U001323 defines as neighbor differences; it supplies observer "
+                "output rather than additional transformation mechanics."
+            ),
+            strength="CONTEXTUAL",
+        )
     evidence(
         difference_name,
         "U001321",
@@ -3064,6 +3079,9 @@ def candidate_definitions() -> list[dict[str, Any]]:
 
     attractor4_name = "rule-4 isolated-black attractor-set constraint"
     attractor4 = candidate(attractor4_name)
+    attractor4["units"] = ["U001485", *attractor4["units"]]
+    attractor4["semantic_units"] = ["U001485", *attractor4["semantic_units"]]
+    attractor4["anchor_priority"] = 1
     attractor4["mechanics_units"] = []
     attractor4["values"] = {
         "object_kind": "rule-4 attractor-set membership constraint",
@@ -3080,6 +3098,16 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "parameters_and_variants": "rule 4 one-step attractor",
     }
     attractor4["related_names"] = [rule4_name, "rule-4 many-to-one basin-of-attraction relation"]
+    evidence(
+        attractor4_name,
+        "U001485",
+        fields=[],
+        claim=(
+            "A001005 is the finite rule-4 table/evolution witness; the attractor-set constraint "
+            "itself is supported directly by U001486 and U001488."
+        ),
+        strength="CONTEXTUAL",
+    )
     evidence(
         attractor4_name,
         "U001486",
@@ -3817,7 +3845,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001393",
         fields=["excluded_observers_and_representations"],
         claim="U001393 reports an observer period curve and is not rule-45 transition-table evidence.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
 
     # Native identities with directly stated carrier/alphabet/neighborhood.
@@ -4784,6 +4812,22 @@ def build_output(bundle: Path) -> dict[str, Any]:
         "A000952": {
             "evidence_statement": "Original-resolution labeled inventory: four-color totalistic codes 1000816 through 1000940 in increments of 4."
         },
+        "A000954": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": (
+                "Original-resolution continuous-cellular-automaton evolution rendered through the "
+                "neighbor-difference gray display stated for all three page-259 pictures; it remains "
+                "linked to its native law but is observer output."
+            ),
+        },
+        "A000955": {
+            "visual_role": "OBSERVER",
+            "evidence_statement": (
+                "Original-resolution continuous-cellular-automaton evolution rendered through the "
+                "neighbor-difference gray display stated for all three page-259 pictures; it remains "
+                "linked to its native law but is observer output."
+            ),
+        },
         "A000956": {
             "visual_role": "OBSERVER",
             "evidence_statement": (
@@ -5091,10 +5135,11 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
             f"{candidate_id} class-4 panel intro overstates generic CA mechanics",
         )
     asset_by_id = {row["asset_id"]: row for row in output["asset_updates"]}
-    check(
-        asset_by_id["A000956"]["visual_role"] == "OBSERVER",
-        "A000956 neighbor-difference rendering role",
-    )
+    for asset_id in ("A000954", "A000955", "A000956"):
+        check(
+            asset_by_id[asset_id]["visual_role"] == "OBSERVER",
+            f"{asset_id} neighbor-difference rendering role",
+        )
     route_ids = [row["route_id"] for row in output["route_proposals"]]
     check(route_ids == [f"WR{i:04d}" for i in range(1, 36)], "route ID sequence")
     check(all(row["status"] == "PENDING" for row in output["route_proposals"]), "worker routes must remain pending")
