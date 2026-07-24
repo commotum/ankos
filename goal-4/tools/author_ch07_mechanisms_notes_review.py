@@ -922,7 +922,7 @@ CANDIDATES = [
     C(
         "lattice random walk",
         "U006695",
-        ["U006695", "U006696", "U006697", "U006698", "U006699", "U006700", "U006701", "U006702", "U006703", "U006705", "U006706", "U006707", "U006708", "U006709", "U006710", "U006715"],
+        ["U006695", "U006696", "U006697", "U006698", "U006699", "U006700", "U006701", "U006702", "U006703", "U006705", "U006706", "U006707", "U006708", "U006709", "U006710"],
         template="stochastic",
         carrier="a particle position on a regular lattice",
         state="the current position and optional visited history",
@@ -931,7 +931,7 @@ CANDIDATES = [
         topology="the selected regular lattice",
         alphabet="lattice coordinate vectors",
         seed="the origin in the displayed implementations",
-        boundary="unbounded by default; sources, absorbers, and reflectors are named variants",
+        boundary="unbounded in the displayed exact implementations",
         external="one fresh random direction choice per step",
         frontier="the current particle",
         schedule="one move per discrete step",
@@ -951,8 +951,98 @@ CANDIDATES = [
             ("1D plus/minus walk", "Add (-1)^Random[Integer] at each step.", ["U006695", "U006696", "U006698"]),
             ("d-dimensional axial walk", "Choose a sign and random cyclic axis.", ["U006699", "U006700"]),
             ("k-direction 2D walk", "Choose uniformly from k unit vectors on a circle.", ["U006706", "U006707", "U006709"]),
-            ("source/absorber/reflector walk", "Allow particle sources, absorbers, or reflectors; exact rules are not supplied.", ["U006715"]),
         ],
+    ),
+    C(
+        "random-walk extreme-position distribution analyzer",
+        "U006713",
+        ["U006713", "U006714"],
+        template="declarative",
+        carrier="an ensemble or probability measure of finite random-walk histories",
+        state="N/A",
+        law="for each walk, select the visited position furthest from the origin and form the distribution of those extreme positions",
+        support="the walk's lattice or directional coordinate space",
+        topology="inherits the analyzed walk's lattice and distance from the origin",
+        alphabet="walk positions and nonnegative distribution weights",
+        input_value="random-walk histories or their measure, together with the origin and step count",
+        boundary="the complete finite history of each analyzed walk",
+        external="none beyond the supplied walk ensemble or measure",
+        result="a probability distribution over furthest-reached positions",
+        determinism="deterministic for a fixed supplied ensemble; a measure-valued observer for a walk law",
+        witness="the plotted extreme-position distribution",
+        params=[
+            (
+                "step count",
+                "The source compares walks after 10 and 100 steps.",
+                ["U006713", "U006714"],
+            ),
+            (
+                "lattice or direction set",
+                "The referenced panels cover 4-, 5-, and 6-direction cases.",
+                ["U006713", "U006714"],
+            ),
+        ],
+        images=[
+            (
+                "A000698",
+                "DIRECT_PARTIAL_MECHANICS",
+                "The original-resolution five-panel row labels 4-, 5-, and 6-direction extreme-position distributions.",
+            )
+        ],
+    ),
+    C(
+        "source-absorber-reflector random-walk population process",
+        "U006715",
+        ["U006715"],
+        template="stochastic_partial",
+        carrier="a changing population of random-walking particles together with sources, absorbers, and reflectors",
+        state="all current particle positions plus the fixed or evolving source/absorber/reflector configuration",
+        law="sources may emit new particles each step, particles perform random walks, absorbers remove particles, and reflectors redirect them",
+        support="a lattice or spatial domain containing the named particle controls",
+        topology=None,
+        alphabet="particle positions and source, absorber, and reflector site/region roles",
+        seed="an initial particle population and control configuration",
+        boundary=None,
+        external="fresh random-walk choices and any source emissions",
+        frontier="all current particles plus emitting sources",
+        schedule="discrete particle steps and source/absorber/reflector interactions; their ordering is not stated",
+        read="each particle's local motion choices and any encountered control role",
+        write="move, emit, remove, or reflect particles according to the applicable role",
+        result="a particle-population history and its empirical distribution",
+        successor="a probability measure over particle-population states",
+        determinism="stochastic",
+        termination=None,
+        witness="the particle population or its average spatial distribution",
+        uncertainties=[
+            "The source names sources, absorbers, and reflectors but supplies no emission law, absorption/reflection rule, scheduling order, topology, boundary, or stopping condition."
+        ],
+    ),
+    C(
+        "random-walk population to diffusion-equation relation",
+        "U006715",
+        ["U006715"],
+        template="declarative",
+        carrier="a random-walk particle population and its average spatial density",
+        state="N/A",
+        law=None,
+        support="a continuous spatial domain corresponding to the walk system",
+        topology="continuous space",
+        alphabet="nonnegative real particle-density values",
+        input_value="a random-walk population model with its initial distribution and any sources, absorbers, or reflectors",
+        boundary=None,
+        external="none",
+        result="a smooth continuous average particle-density field described by a diffusion equation",
+        successor="one or more diffusion-equation descriptions; cardinality is not stated",
+        determinism="not determined without the missing diffusion equation and conditions",
+        witness="agreement between the walk population's average distribution and a smooth diffusion-equation solution",
+        uncertainties=[
+            "The source states the random-walk/diffusion relation and points to page 163 but does not include the diffusion equation, coefficients, source terms, initial data, or boundary conditions."
+        ],
+        unknown_fields={
+            "rule_relation_constraint_function_or_probability_law": "The in-scope source does not supply the diffusion equation or its coefficients and forcing terms.",
+            "successor_cardinality": "The in-scope source does not determine a unique diffusion problem without coefficients and initial/boundary/source data.",
+            "determinism_branching_or_measure": "The in-scope source does not determine a complete diffusion relation.",
+        },
     ),
     C(
         "self-avoiding walk",
@@ -986,78 +1076,191 @@ CANDIDATES = [
         uncertainties=["The exact proposal and acceptance distributions for the combination and pivot algorithms are not supplied."],
     ),
     C(
-        "Eden aggregation model",
-        "U006719",
-        ["U006719", "U006721", "U006722", "U006723", "U006724", "U006725"],
+        "type B Eden aggregation process",
+        "U006721",
+        ["U006719", "U006720", "U006721", "U006722", "U006723", "U006724"],
         template="stochastic",
-        carrier="a finite set or grid of occupied lattice cells",
+        carrier="a finite coordinate list of occupied lattice cells",
         state="the complete occupied cluster",
-        law="type B selects an occupied cell and one of its four neighbors, retrying if occupied; type A selects uniformly from all cells adjacent to the cluster",
-        support="a regular lattice, illustrated on the 2D square lattice",
-        topology="nearest-neighbor lattice",
+        law="choose an occupied cluster cell uniformly, choose one of its four neighbors uniformly, append it if empty, and otherwise repeat the sampling step",
+        support="an unbounded 2D square lattice in the displayed implementation, extensible to other regular lattices and dimensions",
+        topology="four-neighbor square lattice in the displayed implementation",
         alphabet="{empty,occupied}",
         seed="one occupied cell at the origin",
-        boundary="unbounded in the coordinate-list form; grid boundary is implementation-specific",
-        external="fresh random choices of cells/sites",
-        frontier="the cluster boundary and, in type B, sampled occupied cells",
-        schedule="add one new occupied cell per successful step",
-        read="cluster membership and immediate neighbors",
-        write="append or set one previously empty adjacent cell",
-        result="a growing occupied cluster",
-        successor="a measure over eligible adjacent additions",
+        boundary="unbounded coordinate-list representation",
+        external="fresh uniform choices of an occupied cell and one of four neighbor offsets",
+        frontier="the sampled occupied cell and sampled neighboring site",
+        schedule="repeat proposals until one empty neighbor is appended; count that as one successful growth step",
+        read="complete cluster membership for the proposed neighboring coordinate",
+        write="append one previously empty neighboring coordinate",
+        result="a growing connected occupied cluster",
+        successor="the probability measure induced by uniform occupied-cell/direction proposals with rejection of occupied targets",
         determinism="stochastic",
         termination="after t successful additions",
-        invariants="occupied cells never become empty; the cluster remains connected",
-        witness="the occupied-cell set after each addition",
-        params=[("step count t", "Number of successful growth steps.", ["U006721", "U006722"])],
-        variants=[
-            ("type B Eden model", "Choose a cluster cell, then one of its neighbors; retry occupied choices.", ["U006721", "U006722", "U006724"]),
-            ("type A Eden model", "Choose directly from all empty cells adjacent to the cluster.", ["U006724", "U006725"]),
-        ],
-        images=[("A000685", "CONTEXTUAL", "The cluster/plot composite documents residual lattice anisotropy at increasing scales.")],
+        invariants="occupied cells never become empty and the cluster remains connected",
+        witness="the ordered coordinate list or occupied-cell set after each accepted addition",
+        params=[("step count t", "Number of successful growth additions.", ["U006721", "U006722"])],
+        images=[("A000685", "CONTEXTUAL", "The cluster/plot composite documents residual anisotropy and roughness of the basic aggregation process.")],
     ),
     C(
-        "generalized aggregation model",
-        "U006727",
-        ["U006727", "U006728", "U006729", "U006730", "U006731", "U006732", "U006733", "U006734", "U006735"],
+        "type A Eden aggregation process",
+        "U006724",
+        ["U006724", "U006725"],
         template="stochastic",
-        carrier="an occupied lattice cluster",
-        state="the complete cell configuration",
-        law="randomly add a cell only at positions whose neighborhoods match an allowed template",
-        support="one- or two-dimensional lattices",
-        topology="a local lattice with four or eight neighbors in stated cases",
-        alphabet="two or more cell colors",
+        carrier="a preallocated binary grid of occupied and empty cells",
+        state="the complete occupied grid",
+        law="form the set of all empty cells adjacent to the cluster, choose one of those cells uniformly, and set it to occupied",
+        support="a finite 2D square grid in the displayed implementation",
+        topology="four-neighbor square lattice",
+        alphabet="{0,1}",
+        seed="a binary grid containing an initial occupied cluster",
+        boundary=None,
+        external="one fresh uniform choice among all currently eligible adjacent empty cells",
+        frontier="all empty sites with at least one occupied four-neighbor",
+        schedule="one eligible-site addition per step",
+        read="the complete grid through the four-neighbor ListConvolve eligibility mask",
+        write="replace one uniformly chosen eligible cell by 1",
+        result="a growing connected occupied cluster",
+        successor="a uniform probability measure over all currently adjacent empty cells",
+        determinism="stochastic",
+        termination="after an externally selected number of additions or when the finite grid has no eligible site",
+        invariants="occupied cells never become empty and the cluster remains connected",
+        witness="the complete occupied grid after each addition",
+        uncertainties=["The grid dimensions and boundary behavior of ListConvolve are not stated in this notes unit."],
+    ),
+    C(
+        "generic two-dimensional template aggregation family",
+        "U006727",
+        ["U006727", "U006728", "U006733"],
+        template="stochastic_partial",
+        carrier="an occupied two-dimensional lattice cluster",
+        state="the complete occupied-cell configuration",
+        law="add a new cell only at a position whose four-neighbor pattern matches a template allowed by the selected rule",
+        support="a 2D lattice",
+        topology="the stated four-neighbor offset set",
+        alphabet="two or more cell colors depending on the selected rule",
         seed="a finite initial configuration",
         boundary=None,
-        external="fresh random choices among proposed/eligible additions",
-        frontier="positions adjacent to or otherwise eligible around the cluster",
+        external="random choices among proposed or eligible additions; the proposal measure is not specified",
+        frontier="positions whose four-neighbor templates are eligible under the rule",
         schedule="one accepted addition per step",
-        read="the local neighborhood template at a proposed position",
-        write="add/color one cell if its template is allowed",
-        result="a growing cluster, possibly blocked",
-        successor="a measure over allowed additions; zero successors if blocked",
-        determinism="stochastic branching constrained by the selected rule",
-        termination="requested step count or no eligible growth site",
-        witness="the complete cluster and whether growth remains possible",
-        params=[("rule code", "Rules are numbered by the stated neighborhood-offset scheme.", ["U006727", "U006728"])],
+        read="the four-neighbor template at a proposed position",
+        write="add or color one cell when its template is allowed",
+        result="a growing two-dimensional cluster with rule-dependent geometry and internal pattern",
+        successor="an incompletely specified probability measure over allowed additions",
+        determinism="stochastic branching constrained by the selected template rule",
+        termination="an externally selected step count or absence of an allowed addition",
+        witness="the complete cluster and its rule-dependent shape/internal pattern",
+        params=[("rule code", "Uses the stated four-neighbor offset numbering scheme.", ["U006727", "U006728"])],
         variants=[
-            ("symmetric four-neighbor family", "32 symmetric rules, 16 of which grow from any seed.", ["U006727"]),
-            ("rule 2 line-growth extreme", "Only the one-black-neighbor template is allowed.", ["U006727"]),
-            ("eight-neighbor totalistic constraint 242", "Allow growth except at exactly 1, 3, or 4 occupied neighbors.", ["U006729", "U006730"]),
+            ("symmetric four-neighbor family", "There are 32 symmetric rules, 16 of which grow from every seed.", ["U006727"]),
+            ("rule 2 line-growth extreme", "Only the single-neighbor template is allowed, producing line growth.", ["U006727"]),
             ("image rule 4531", "A construction-bearing panel explicitly labels rule 4531.", ["U006728"]),
             ("image rule 10779", "A construction-bearing panel explicitly labels rule 10779.", ["U006728"]),
             ("image rule 15320", "A construction-bearing panel explicitly labels rule 15320.", ["U006728"]),
             ("image rule 64881", "A construction-bearing panel explicitly labels rule 64881.", ["U006728"]),
             ("image rule 65415", "A construction-bearing panel explicitly labels rule 65415.", ["U006728"]),
-            ("1D template family", "Four one-dimensional template systems are shown, including the Eden analog.", ["U006734", "U006735"]),
         ],
         images=[
-            ("A000710", "DIRECT_PARTIAL_MECHANICS", "The original-resolution composite transcribes rule labels 4531, 10779, 15320, 64881, and 65415."),
-            ("A000702", "CONTEXTUAL", "The six-step row shows blocking and later successful growth under totalistic constraint 242."),
-            ("A000700", "CONTEXTUAL", "The five-step row shows a successful irregular cluster approaching a rough circle."),
-            ("A000711", "DIRECT_PARTIAL_MECHANICS", "The four-panel row preserves the one-dimensional neighborhood templates and their growth profiles."),
+            ("A000710", "DIRECT_PARTIAL_MECHANICS", "The original-resolution composite transcribes rule labels 4531, 10779, 15320, 64881, and 65415.")
         ],
-        uncertainties=["The rule-number decoding scheme is only cross-referenced, and the boundary convention is not stated in this bundle."],
+        uncertainties=[
+            "The rule-number decoding target is cross-referenced, and the random proposal measure and boundary convention are not stated in this bundle."
+        ],
+    ),
+    C(
+        "eight-neighbor constraint-242 aggregation process",
+        "U006729",
+        ["U006729", "U006730", "U006731", "U006732", "U006733"],
+        template="stochastic_partial",
+        carrier="an occupied two-dimensional lattice cluster",
+        state="the complete occupied-cell configuration",
+        law="permit a cell addition except at positions having exactly 1, 3, or 4 occupied cells in the eight-neighbor neighborhood",
+        support="a 2D lattice",
+        topology="eight-neighbor lattice",
+        alphabet="{empty,occupied}",
+        seed="a given finite configuration",
+        boundary=None,
+        external="an unspecified random choice among allowed additions",
+        frontier="empty sites whose eight-neighbor occupied count is not 1, 3, or 4",
+        schedule="one allowed addition per step",
+        read="the occupied-cell count in the eight-neighbor neighborhood",
+        write="set one allowed empty site to occupied",
+        result="either a dead-end cluster with no allowed site or a successfully growing irregular cluster",
+        successor="a probability measure over allowed additions, with zero successors at a dead end",
+        determinism="stochastic branching under a hard neighborhood constraint",
+        termination="when no addition is allowed or at an externally selected step count",
+        witness="the complete cluster and whether its eligible-site set is empty",
+        params=[
+            (
+                "totalistic constraint 242",
+                "Disallows additions at occupied-neighbor counts 1, 3, and 4.",
+                ["U006729", "U006730"],
+            )
+        ],
+        variants=[
+            (
+                "dead-end outcome",
+                "A finite cluster can reach a state with no site where another cell may be added.",
+                ["U006729", "U006730"],
+            ),
+            (
+                "successful-growth outcome",
+                "Some random-choice histories continue and eventually appear roughly circular.",
+                ["U006731", "U006732"],
+            ),
+        ],
+        images=[
+            ("A000702", "CONTEXTUAL", "The six-step row witnesses a constraint-242 history that reaches blocked growth."),
+            ("A000700", "CONTEXTUAL", "The five-step row witnesses a successful irregular growth history."),
+        ],
+        uncertainties=["The seed, proposal probabilities, and boundary convention are not supplied."],
+    ),
+    C(
+        "one-dimensional template aggregation family",
+        "U006734",
+        ["U006734", "U006735"],
+        template="stochastic_partial",
+        carrier="an occupied one-dimensional lattice configuration",
+        state="the complete occupied-cell configuration",
+        law="add cells according to one of the four displayed one-dimensional neighborhood-template systems",
+        support="a 1D lattice",
+        topology="linear lattice with the finite neighborhoods drawn under each panel",
+        alphabet="{empty,occupied}",
+        seed=None,
+        boundary=None,
+        external="random choices required by the selected template system; their distribution is not stated",
+        frontier="positions matching a displayed allowed template",
+        schedule="one accepted addition per step",
+        read="the displayed finite one-dimensional neighborhood template",
+        write="add one cell at an eligible position",
+        result="a one-dimensional growth history",
+        successor="an incompletely specified probability measure over template-eligible additions",
+        determinism="stochastic in the source's generalized-aggregation context",
+        termination="an externally selected step count or absence of an eligible site",
+        witness="the four displayed growth histories and their neighborhood templates",
+        variants=[
+            (
+                "one-dimensional Eden analog",
+                "The second displayed template system is identified as the analog of the basic aggregation model.",
+                ["U006734", "U006735"],
+            ),
+            (
+                "other displayed 1D templates",
+                "The first, third, and fourth panels define three additional visually specified template systems.",
+                ["U006734", "U006735"],
+            ),
+        ],
+        images=[
+            (
+                "A000711",
+                "DIRECT_PARTIAL_MECHANICS",
+                "The original-resolution four-panel row preserves the four one-dimensional template diagrams and their growth histories.",
+            )
+        ],
+        uncertainties=[
+            "The four local templates are available only in the referenced image; seed, boundary, proposal probabilities, and a textual rule-number mapping are not supplied."
+        ],
     ),
     C(
         "diffusion-limited aggregation",
@@ -1240,7 +1443,7 @@ CANDIDATES = [
     C(
         "two-dimensional domain cellular-automaton family",
         "U006752",
-        ["U006752"],
+        ["U006752", "U006759"],
         template="deterministic_partial",
         carrier="a two-dimensional black/white cellular-automaton grid",
         state="the complete cell configuration",
@@ -1261,36 +1464,11 @@ CANDIDATES = [
         termination="nonterminating",
         witness="the domain configuration and clarity of its boundaries",
         variants=[
-            ("4-neighbor totalistic code 52", "Direct 4-neighbor analog of the illustrated domain rule.", ["U006752"]),
+            ("4-neighbor totalistic code 52", "Direct 4-neighbor analog of the illustrated domain rule and an alternative to the second transition rule.", ["U006752", "U006759"]),
             ("4-neighbor outer-totalistic codes", "Codes 111, 293, 295, and 920.", ["U006752"]),
             ("8-neighbor totalistic code 976", "The rule with the clearest domain boundaries.", ["U006752"]),
         ],
         uncertainties=["Exact decoded rule tables and boundary conditions are not in the assigned notes."],
-    ),
-    C(
-        "Cahn-Hilliard spinodal-decomposition model",
-        "U006753",
-        ["U006753"],
-        template="continuous_partial",
-        carrier="a continuous composition/order-parameter field",
-        state="the field over space",
-        law="the named Cahn-Hilliard equation models separation into coarsening black/white regions",
-        support="continuous space",
-        topology="spatial continuum",
-        alphabet="continuous field values",
-        seed="a mixed initial field",
-        boundary=None,
-        external="none stated",
-        frontier="the entire field",
-        schedule="continuous time",
-        read=None,
-        write=None,
-        result="coarsening domains with average droplet radius approximately t^(1/3)",
-        successor="one for fixed equation, parameters, and initial/boundary data",
-        determinism="deterministic in the named PDE model",
-        termination="nonterminating coarsening",
-        witness="the composition field and droplet-size scaling",
-        uncertainties=["The equation, parameters, and boundary conditions are not written in this notes unit."],
     ),
     C(
         "binary next-nearest-neighbor transition cellular-automaton family",
@@ -1375,34 +1553,36 @@ CANDIDATES = [
         uncertainties=["The rule-number decode, neighborhood, boundary, and mapping of all four colors are not in the assigned notes."],
     ),
     C(
-        "two-dimensional transition cellular-automaton family",
+        "probabilistic Toom two-dimensional transition preset",
         "U006759",
         ["U006759"],
-        template="deterministic_partial",
-        carrier="a two-dimensional binary cellular-automaton grid",
+        template="stochastic_partial",
+        carrier="a two-dimensional black/white cellular-automaton grid",
         state="the complete grid",
-        law="iterate a named four-neighbor totalistic or probabilistic transition rule",
+        law=None,
         support="a 2D lattice",
-        topology="four-neighbor lattice",
+        topology=None,
         alphabet="{black,white}",
-        seed="a random configuration at a selected density",
+        seed=None,
         boundary=None,
-        external="none for deterministic codes; fresh choices for the probabilistic variant",
-        frontier="all cells",
-        schedule="synchronous steps",
-        read="the cell and/or four immediate neighbors as encoded by the rule",
-        write="replace each cell by the selected rule output",
-        result="fixed domains or a discrete transition depending on the rule",
-        successor="one for deterministic codes; a measure for the probabilistic variant",
-        determinism="variant-dependent deterministic or stochastic",
-        termination="nonterminating",
-        witness="the complete spacetime evolution and phase selected",
-        variants=[
-            ("4-neighbor totalistic code 56", "A majority-style rule that yields fixed regions rather than the discrete transition.", ["U006759"]),
-            ("4-neighbor totalistic code 52", "An alternative to the second transition rule.", ["U006759"]),
-            ("probabilistic Toom variant", "A probabilistic version of the first rule; probabilities are not supplied.", ["U006759"]),
+        external="fresh random choices under an unspecified probabilistic rule",
+        frontier=None,
+        schedule=None,
+        read=None,
+        write=None,
+        result="a probabilistic cellular-automaton history intended to exhibit the referenced discrete transition",
+        successor="a probability measure over next configurations",
+        determinism="stochastic",
+        termination=None,
+        witness="the transition behavior of the probabilistic version of the first main-text rule",
+        uncertainties=[
+            "The source only identifies a probabilistic version of the first main-text rule and its Toom provenance; the rule, probabilities, neighborhood, seed, boundary, schedule, commit, and stopping convention are absent."
         ],
-        uncertainties=["The main illustrated rules, their decoded tables, probabilities, and boundary conditions are outside this bundle."],
+        unknown_fields={
+            "rule_relation_constraint_function_or_probability_law": "The in-scope source does not supply the probabilistic Toom transition rule or probabilities.",
+            "read_dependencies_or_neighborhood": "The in-scope source does not supply the rule's neighborhood.",
+            "write_replacement_assembly_or_commit": "The in-scope source does not supply the replacement or commit operation.",
+        },
     ),
     C(
         "microcanonical fixed-energy Ising measure",
@@ -2374,15 +2554,6 @@ REPRESENTATION = {
     "U006710",
     "U006711",
     "U006712",
-    "U006713",
-    "U006714",
-    "U006744",
-    "U006745",
-    "U006746",
-    "U006747",
-    "U006748",
-    "U006749",
-    "U006750",
     "U006782",
     "U006783",
     "U006784",
@@ -2615,7 +2786,7 @@ def main() -> int:
     asset_by_id = {row["asset_id"]: row for row in asset_rows}
     assert len(reading_rows) == 278
     assert len(asset_rows) == 102
-    assert len(CANDIDATES) == 69
+    assert len(CANDIDATES) == 78
 
     # Candidate IDs follow first canonical source occurrence, with list order
     # breaking the intentional same-unit ties.
@@ -2970,6 +3141,14 @@ def main() -> int:
             roles = []
             statement = "Complete in-context reading found no independent construction or unresolved construction route."
 
+        if unit == "U006759":
+            if "CONTROL_OR_COMPARISON" not in roles:
+                roles.append("CONTROL_OR_COMPARISON")
+            statement += (
+                " Code 56 is retained only as a non-transition control; code 52 supports the domain-family record, "
+                "while the probabilistic Toom preset remains a separate incomplete candidate."
+            )
+
         result = dict(row)
         result.update(
             {
@@ -3099,9 +3278,9 @@ def main() -> int:
 
     assert len(output["reading_updates"]) == 278
     assert len(output["asset_updates"]) == 102
-    assert len(output["candidate_proposals"]) == 69
+    assert len(output["candidate_proposals"]) == 78
     assert len({e["evidence_id"] for c in candidate_proposals for e in c["source_evidence"]}) == len(evidence_refs)
-    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 69
+    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 78
     assert all(
         c["fingerprint"]["evidence_limit"]["evidence_ids"]
         == [c["source_evidence"][0]["evidence_id"]]
@@ -3118,7 +3297,7 @@ def main() -> int:
                     "assets": len(asset_updates),
                     "candidates": len(candidate_proposals),
                     "evidence": len(evidence_refs),
-                    "groups": 69,
+                    "groups": 78,
                     "routes": len(route_proposals),
                     "bytes": len(payload.encode("utf-8")),
                 },
@@ -3130,8 +3309,8 @@ def main() -> int:
     temporary.write_text(payload, encoding="utf-8")
     os.replace(temporary, output_path)
     print(
-        f"authored {output_path}: readings=278 assets=102 candidates=69 "
-        f"evidence={len(evidence_refs)} groups=69 routes={len(route_proposals)}"
+        f"authored {output_path}: readings=278 assets=102 candidates=78 "
+        f"evidence={len(evidence_refs)} groups=78 routes={len(route_proposals)}"
     )
     return 0
 
