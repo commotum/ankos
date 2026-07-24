@@ -1560,7 +1560,9 @@ def test_worker_candidate_unknown_and_conflict_reasons_are_declared(
     for reading in conflict["reading_updates"]:
         if reading["source_unit_id"] in conflict_candidate["source_unit_ids"]:
             reading["source_status"] = "CONFLICTING"
+            reading["uncertainty"] = conflict_reason
     conflict["asset_updates"][0]["source_status"] = "CONFLICTING"
+    conflict["asset_updates"][0]["uncertainty"] = conflict_reason
     assert _worker_candidate_errors(bundle, goal_dir, conflict) == []
 
     undeclared = copy.deepcopy(conflict)
