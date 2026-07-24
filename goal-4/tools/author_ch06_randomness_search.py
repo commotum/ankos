@@ -630,26 +630,70 @@ EXPECTED_GLOBAL_ASSUMPTIONS_DIGEST = (
 # route IDs exist.  S016's base/event/result guards become available only
 # after the exact S015 proposal is applied as V000029.
 EXPECTED_POST_MERGE_SEMANTICS: dict[str, Any] = {
-    "stage_reading_count": None,
-    "stage_reading_digest": None,
-    "stage_asset_count": None,
-    "stage_asset_digest": None,
-    "stage_candidate_count": None,
-    "stage_candidate_ids_digest": None,
-    "triage_digest": None,
-    "candidate_coverage_digest": None,
-    "omission_challenge_count": None,
-    "omission_challenge_digest": None,
-    "route_coverage_count": None,
-    "route_coverage_digest": None,
-    "disposition_counts": None,
-    "normalized_hit_projection_digest": None,
+    "stage_reading_count": 607,
+    "stage_reading_digest": (
+        "7a3a51940f6d65be4e0f5ee8fd1684edcf320bf01e94705459c17c3455f59354"
+    ),
+    "stage_asset_count": 177,
+    "stage_asset_digest": (
+        "92ab2772906b38448b204971bc67c9ead196fd983284662efb816d9613af2c6f"
+    ),
+    "stage_candidate_count": 181,
+    "stage_candidate_ids_digest": (
+        "cf6d770bdacbffbcd05dd6681699e3f8b7407b1b46de65bf64460dbf9a2ba963"
+    ),
+    "triage_digest": (
+        "f232e4154fad7d8253c08ead7ad100a942a8c76d7446bacb57dbfe188d85010f"
+    ),
+    "candidate_coverage_digest": (
+        "c3d89c71298eace34c3108fab4acca2544c1bdc0067278a10f1b46222008a013"
+    ),
+    "omission_challenge_count": 331,
+    "omission_challenge_digest": (
+        "840b6a6269eaea0c2ebd70cc068981626e50febb6e40b9103bc5fb4c570ea996"
+    ),
+    "route_coverage_count": 179,
+    "route_coverage_digest": (
+        "153e9b26af249c920f4ff90cf6af0ce554c00a6e5c7845213e3a917a863ea97b"
+    ),
+    "disposition_counts": {
+        "CONTROL_OR_RELATIONSHIP": 12,
+        "CROSS_REFERENCE": 57,
+        "EXCLUSION": 378,
+        "GOVERNED_CANDIDATE_OR_SUPPORT": 2218,
+    },
+    "normalized_hit_projection_digest": (
+        "08c4877cf250c1215cb6b7a90a551960a32c121ae4d610b24ca7a6a4e5c47c61"
+    ),
 }
 EXPECTED_ROUND_GUARDS: dict[str, dict[str, Any]] = {
     "S015": {
-        "prior_event_sha256": None,
-        "base_artifact_sha256": None,
-        "result_digest": None,
+        "prior_event_sha256": (
+            "5c5f09889b0a0ce8ed245d650edfd2c4854e1d5ff6fe157f045edebaa3ba3f7d"
+        ),
+        "base_artifact_sha256": {
+            "asset-ledger.csv": (
+                "b57d00e4d9bc1cde61d79acf869b3968e5b2e5e871d9938de099d0bb035d8f4e"
+            ),
+            "candidate-ledger.jsonl": (
+                "8ba1ffba5061a2e115063c6b552b10369e53a3fd3bf4fcb08d3bfcaf7c8bf1c7"
+            ),
+            "cross-reference-ledger.csv": (
+                "fda975932dade9ffd2b78380d87f27347ef45d32736f53418318b719d117a6fc"
+            ),
+            "reading-ledger.csv": (
+                "e6fcdf7ca4ab1dbaf0f51aa29d4451eef98e15762f9fe22803d2c2121271303d"
+            ),
+            "review-history.jsonl": (
+                "b74fc6f17bb6e4f162afb8158c1c7ce0b4ae944a6cefbae3503a89afa18870fe"
+            ),
+            "search-rounds.json": (
+                "925eb472bf560e859fa6b28106edc913d827f816f2618fb31c000ddbe8c8cfd6"
+            ),
+        },
+        "result_digest": (
+            "f39684dcfdd2e95001082c664ffeddafbf7bb1278e4bef89c9085c022d5fe303"
+        ),
     },
     "S016": {
         "prior_event_sha256": None,
@@ -726,14 +770,17 @@ def atomic_create(path: Path, payload: bytes) -> None:
 
 
 def parse_links(value: str, label: str) -> list[str]:
-    if not value:
-        return []
-    parts = value.split("|")
-    if any(not part or part != part.strip() for part in parts):
-        raise AuthoringError(f"{label} has malformed pipe-separated links")
-    if len(parts) != len(set(parts)):
-        raise AuthoringError(f"{label} has duplicate links")
-    return parts
+    try:
+        links = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise AuthoringError(f"{label} is not JSON") from exc
+    if (
+        not isinstance(links, list)
+        or not all(isinstance(item, str) for item in links)
+        or len(links) != len(set(links))
+    ):
+        raise AuthoringError(f"{label} is not a unique string array")
+    return links
 
 
 def _query_objects(query_start: int) -> list[dict[str, Any]]:
