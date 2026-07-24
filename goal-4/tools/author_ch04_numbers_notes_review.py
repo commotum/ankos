@@ -1496,7 +1496,7 @@ amend_spec(
     ),
     facts={
         "parameters_and_variants": FF(
-            "matrix m and initial vector; the behavior condition on rational entries of m is internally conflicting",
+            None,
             "U005993",
             status="CONFLICTING_SOURCE",
             reason="The two rationality statements in U005993 cannot both delimit the claimed behavior as written.",
@@ -4046,6 +4046,15 @@ def profile(
             raise RuntimeError(f"{spec['name']}.{field} has evidence despite UNKNOWN status")
         if item["status"] != "UNKNOWN_FROM_SOURCE" and not evidence_ids:
             raise RuntimeError(f"{spec['name']}.{field} lacks its declared evidence")
+        if item["status"] == "CONFLICTING_SOURCE":
+            if item["value"] is not None:
+                raise RuntimeError(
+                    f"{spec['name']}.{field} conflict must have a null value"
+                )
+            if len(evidence_ids) < 2:
+                raise RuntimeError(
+                    f"{spec['name']}.{field} conflict requires two-sided evidence"
+                )
         support[field] = item["status"]
         fingerprint[field] = {
             "status": item["status"],
@@ -4257,8 +4266,9 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         lines.append(f"  - `{asset_id}` `{asset['physical_path']}`")
     lines.append(
         "- All 30 unreferenced fragments are `SOURCE_DEFECT` / `DEFECTIVE`, "
-        "original-resolution `REVIEWED`, transcription `NOT_REQUIRED`, and "
-        "have zero candidate and route links:"
+        "original-resolution `REVIEWED`, and have zero candidate and route "
+        "links. Text-bearing fragments have transcription `CHECKED`; the "
+        "remainder are `NOT_REQUIRED`:"
     )
     for asset in orphan_assets:
         lines.append(f"  - `{asset['asset_id']}` `{asset['physical_path']}`")
@@ -4562,11 +4572,26 @@ def author(bundle: Path) -> dict[str, Any]:
                 exact_claims = []
                 for field in fields:
                     item = decisions[field]
-                    exact_claims.append(
-                        f"{field}={item['value']!r}"
-                        if item["value"] is not None
-                        else f"{field}=NOT_APPLICABLE ({item['reason']})"
-                    )
+                    if item["value"] is not None:
+                        exact_claims.append(f"{field}={item['value']!r}")
+                    elif item["status"] == "CONFLICTING_SOURCE":
+                        if (
+                            spec["name"] == "Anosov torus map"
+                            and field == "parameters_and_variants"
+                        ):
+                            exact_claims.append(
+                                "parameters_and_variants=CONFLICTING_SOURCE "
+                                "(rational initial conditions are stated to "
+                                "produce repetitive behavior)"
+                            )
+                        else:
+                            exact_claims.append(
+                                f"{field}=CONFLICTING_SOURCE ({item['reason']})"
+                            )
+                    else:
+                        exact_claims.append(
+                            f"{field}=NOT_APPLICABLE ({item['reason']})"
+                        )
                 append_request(
                     spec=spec,
                     anchor=anchor,
@@ -4584,6 +4609,22 @@ def author(bundle: Path) -> dict[str, Any]:
                     ),
                     fields=fields,
                 )
+
+        if spec["name"] == "Anosov torus map":
+            append_request(
+                spec=spec,
+                anchor="U005993",
+                sort_slot=8,
+                strength="DIRECT_PARTIAL_MECHANICS",
+                modality="PROSE",
+                claim=(
+                    "The same source unit separately attributes complicated "
+                    "behavior to rational entries in m; together with the "
+                    "repetition statement this is the second side of the "
+                    "parameters-and-variants conflict."
+                ),
+                fields=["parameters_and_variants"],
+            )
 
         for peer in spec["relation_names"]:
             for anchor in RELATION_EVIDENCE_ANCHORS.get(
@@ -4970,8 +5011,13 @@ def author(bundle: Path) -> dict[str, Any]:
         elif orphan:
             evidence_statement = (
                 "Original-resolution unreferenced fragment was screened only "
-                "to document the extraction defect/alternate crop. It has no "
-                "candidate or route link and contributes no mechanics."
+                "to document the extraction defect/alternate crop. "
+                + (
+                    "Its visible text was checked, but "
+                    if text_bearing
+                    else ""
+                )
+                + "it has no candidate or route link and contributes no mechanics."
             )
             uncertainty = (
                 "No live Markdown source-unit anchor exists for this physical "
@@ -4983,7 +5029,7 @@ def author(bundle: Path) -> dict[str, Any]:
                 + (
                     "its construction-bearing text/formula was independently checked."
                     if text_bearing
-                    else "its diagrammatic construction role was checked without claiming a text transcription."
+                    else "its diagrammatic construction role and absence of transcribable construction text were checked."
                 )
             )
             uncertainty = ""
@@ -5014,7 +5060,11 @@ def author(bundle: Path) -> dict[str, Any]:
             "source_status": "DEFECTIVE" if defective else "CLEAR",
             "risk_flags": array_text(list(risks)),
             "original_resolution_status": "REVIEWED",
-            "transcription_status": "CHECKED" if text_bearing and not orphan else "NOT_REQUIRED",
+            "transcription_status": (
+                "CHECKED"
+                if text_bearing or role == "NATIVE_EVIDENCE"
+                else "NOT_REQUIRED"
+            ),
             "candidate_ids": array_text(candidate_ids),
             "route_ids": "[]",
             "evidence_statement": evidence_statement,
@@ -5022,6 +5072,16 @@ def author(bundle: Path) -> dict[str, Any]:
             "reviewer": WORKER,
             "uncertainty": uncertainty,
         })
+
+    for row in assets:
+        risks = set(json.loads(row["risk_flags"]))
+        if (
+            row["visual_role"] == "NATIVE_EVIDENCE"
+            or "TEXT_BEARING" in risks
+        ) and row["transcription_status"] != "CHECKED":
+            raise RuntimeError(
+                f"{row['asset_id']} requires checked transcription disposition"
+            )
 
     actual_role_counts = count_values(assets, "visual_role")
     expected_role_counts = {

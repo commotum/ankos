@@ -3913,7 +3913,6 @@ map_specs["iterated-map-b"]["route_keys"].extend(
 )
 continuous_ca_family["route_keys"].append("iterated-maps-previous-section")
 additive_presets["0.3299"]["route_keys"].append("localized-structure-page160")
-neighbor_difference["route_keys"].append("localized-structure-page160")
 additive_ca_family["route_keys"].append("continuous-rules-previous-page")
 for _spec in nonlinear_pdes.values():
     _spec["route_keys"].append("nonlinear-pdes-previous-page")
@@ -4306,10 +4305,10 @@ ASSET_REVIEW: dict[str, tuple[str, list[str], str]] = {
     "A000818": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
     "A000819": ("CONTROL", [], "NOT_REQUIRED"),
     "A000821": ("CONTROL", [], "NOT_REQUIRED"),
-    "A000822": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "NOT_REQUIRED"),
+    "A000822": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "CHECKED"),
     "A000823": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
     "A000824": ("OBSERVER", [], "NOT_REQUIRED"),
-    "A000825": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "NOT_REQUIRED"),
+    "A000825": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "CHECKED"),
     "A000826": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
     "A000827": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
     "A000828": ("OBSERVER", [], "NOT_REQUIRED"),
@@ -4374,8 +4373,16 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
     if {row["asset_id"] for row in assets} != set(ASSET_REVIEW):
         raise AuthoringError("static asset review does not exactly cover the assignment")
     observed_role_counts: defaultdict[str, int] = defaultdict(int)
-    for role, _risks, _transcription in ASSET_REVIEW.values():
+    for role, risks, transcription in ASSET_REVIEW.values():
         observed_role_counts[role] += 1
+        if role == "NATIVE_EVIDENCE" and transcription != "CHECKED":
+            raise AuthoringError(
+                "native evidence must carry a checked transcription disposition"
+            )
+        if "TEXT_BEARING" in risks and transcription != "CHECKED":
+            raise AuthoringError(
+                "text-bearing evidence must carry a checked transcription disposition"
+            )
     if dict(observed_role_counts) != EXPECTED_ASSET_ROLE_COUNTS:
         raise AuthoringError("static asset-role totals changed")
     specs_sorted = sorted(
