@@ -210,7 +210,7 @@ def mark_unknown(spec: CandidateSpec, reasons: dict[str, str]) -> None:
 
 
 def mark_not_applicable(spec: CandidateSpec, reasons: dict[str, str]) -> None:
-    """Classify fields as category-inapplicable without claiming mechanics evidence."""
+    """Classify fields as inapplicable with isolated identity evidence."""
     for field, reason in reasons.items():
         spec["facts"].pop(field, None)
         spec["unknown_reasons"].pop(field, None)
@@ -219,6 +219,18 @@ def mark_not_applicable(spec: CandidateSpec, reasons: dict[str, str]) -> None:
                 present for present in item["fields"] if present != field
             ]
         spec["not_applicable"][field] = reason
+        evidence(
+            spec,
+            f"{spec['key']}-{field}-category",
+            spec["anchor"],
+            (
+                "The source identifies this candidate as a repeatable "
+                "one-step law; this evidence records only why intrinsic "
+                "run completion is not a field of that law."
+            ),
+            [field],
+            strength="DIRECT_IDENTITY",
+        )
 
 
 def spec_by_key(key: str) -> CandidateSpec:
@@ -3727,6 +3739,8 @@ for _spec in _unclassified_iterative_completion:
                 )
             },
         )
+        if _spec["key"] == "continuous-ca-family":
+            _spec["evidence"][-1]["unit"] = "U000866"
 
 
 # Literal construction-bearing routes discovered during the sequential pass.
@@ -4730,6 +4744,8 @@ def _allocate_tail(
                     "reason": "",
                 }
             elif field in item["not_applicable"]:
+                if not supporting:
+                    raise AuthoringError(f"{item['key']} lacks N/A evidence for {field}")
                 field_support[field] = "NOT_APPLICABLE"
                 fingerprint[field] = {
                     "status": "NOT_APPLICABLE",

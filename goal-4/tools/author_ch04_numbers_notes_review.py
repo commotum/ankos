@@ -3092,6 +3092,453 @@ _complete_stepwise_profile(
     },
 )
 
+_complete_stepwise_profile(
+    "zero-spacing substitution realization",
+    {
+        "native_time": FF(
+            "substitution generations for the routed zero-spacing realization",
+            "U005945",
+        ),
+        "complete_state": FF(
+            "the current cosine- or sine-spacing word",
+            "U005945",
+        ),
+        "control_state": _na(
+            "U005945",
+            "No controller separate from the unavailable replacement rules is stated.",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "Gauss fractional-part reciprocal map",
+    _exact_transition_facts(
+        "Gauss fractional-part reciprocal map",
+        "U005967",
+        native_time="discrete applications of the reciprocal fractional-part map",
+        state="the current scalar x",
+        seed="x",
+        frontier="the current scalar x",
+        schedule="apply FractionalPart[1/x] once to the current x",
+        reads="the current nonzero x",
+        commit="replace x by FractionalPart[1/x]",
+        completion="the map is undefined at x=0",
+    ),
+)
+_complete_stepwise_profile(
+    "exact multiplier-mod-one map",
+    _exact_transition_facts(
+        "exact multiplier-mod-one map",
+        "U005968",
+        native_time="discrete map iterations indexed by n",
+        state="the current scalar x with fixed multiplier a",
+        seed="x",
+        frontier="the current scalar x",
+        schedule="apply FractionalPart[a x] once per iteration",
+        reads="the current x and fixed a",
+        commit="replace x by FractionalPart[a x]",
+    ),
+)
+_complete_stepwise_profile(
+    "exact tent-map family",
+    _exact_transition_facts(
+        "exact tent-map family",
+        "U005968",
+        native_time="discrete tent-map iterations indexed by n",
+        state="the current scalar x with fixed parameter a",
+        seed="x",
+        frontier="the current scalar x",
+        schedule="apply the x<1/2 or x>=1/2 branch once",
+        reads="the current x, its comparison with 1/2, and fixed a",
+        commit="replace x by a x or a(1-x)",
+    ),
+)
+_complete_stepwise_profile(
+    "fixed-binary-precision shift-map simulation",
+    {
+        "control_state": _na(
+            "U005972",
+            "The indexed closed form has no transition controller.",
+        ),
+        "successor_cardinality": _na(
+            "U005972",
+            "The printed step-n representation is not itself a successor relation.",
+        ),
+        "determinism_branching_or_measure": FF(
+            "the direct 53-bit representation is single-valued for x and n",
+            "U005972",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "fixed-decimal-precision shift-map simulation",
+    {
+        "control_state": _na(
+            "U005973",
+            "The indexed closed form has no transition controller.",
+        ),
+        "successor_cardinality": _na(
+            "U005973",
+            "The printed step-n BCD representation is not itself a successor relation.",
+        ),
+        "determinism_branching_or_measure": FF(
+            "the direct 12-decimal-digit representation is single-valued for x and n",
+            "U005973",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "finite-precision multiplication-by-3/2 simulation",
+    {
+        "native_time": FF(
+            "repeated finite-precision multiplication steps",
+            "U005981",
+        ),
+        "complete_state": _unknown_fact(
+            "finite-precision multiplication-by-3/2 simulation: the sealed "
+            "unit does not state the stored state or precision format."
+        ),
+        "control_state": _na(
+            "U005981",
+            "No controller distinct from the unavailable finite-precision recurrence is stated.",
+        ),
+        "seed": _unknown_fact(
+            "finite-precision multiplication-by-3/2 simulation: the exact "
+            "initial stored value is not stated in U005981."
+        ),
+        "frontier_or_activation": _unknown_fact(
+            "finite-precision multiplication-by-3/2 simulation: no active "
+            "component is fixed without the storage and fill convention."
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "smooth logistic map",
+    _exact_transition_facts(
+        "smooth logistic map",
+        ("U005990", "U005991"),
+        native_time="discrete logistic-map iterations",
+        state="the current scalar x with fixed parameter a",
+        seed="initial value x; the pictured digit sequences use x = 1/8",
+        frontier="the current scalar x",
+        schedule="apply x -> a x(1-x) once per iteration",
+        reads="the current x and fixed a",
+        commit="replace x by a x(1-x)",
+    ),
+)
+_complete_stepwise_profile(
+    "Anosov torus map",
+    _exact_transition_facts(
+        "Anosov torus map",
+        "U005993",
+        native_time="discrete torus-map iterations",
+        state="the current two-component vector {x,y} with fixed matrix m",
+        seed="the supplied initial vector; the source gives {1,1} as an example",
+        frontier="the complete current vector {x,y}",
+        schedule="multiply by m and reduce both coordinates modulo 1 once",
+        reads="the current vector and matrix m",
+        commit="replace {x,y} by Mod[m.{x,y},1]",
+    ),
+)
+_complete_stepwise_profile(
+    "continuous cellular-automaton averaging implementation",
+    {
+        "complete_state": FF(
+            "the complete current periodic list, fixed transfer function f, "
+            "and accumulated NestList output",
+            ("U005997", "U005998"),
+        ),
+        "visible_history": FF(
+            "CCAEvolveList returns NestList[CCAEvolveStep[f,#]&,init,t], "
+            "including init and every successive list",
+            "U005998",
+        ),
+        "control_state": _na(
+            "U005998",
+            "The fixed transfer function and requested count t are parameters, "
+            "not a separate controller.",
+        ),
+        "seed": FF("the supplied initial list init", "U005998"),
+        "write_replacement_assembly_or_commit": FF(
+            "Map assembles one new full list from the same periodic input list",
+            "U005998",
+        ),
+        "successor_cardinality": FF(
+            "one complete next list for each defined current list and fixed f",
+            "U005998",
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic synchronous Map update; no probability measure is introduced",
+            "U005998",
+        ),
+        "termination_completion_failure": FF(
+            "CCAEvolveList performs exactly the requested t NestList steps; "
+            "approximate arithmetic may accumulate qualitatively significant error",
+            ("U005998", "U005999", "U006000"),
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "additive continuous cellular automaton",
+    {
+        "native_time": FF(
+            "discrete synchronous cellular-automaton steps",
+            ("U006006", "U006007"),
+        ),
+        "complete_state": FF(
+            "the complete periodic list of cell values modulo 1",
+            ("U006006", "U006007"),
+        ),
+        "visible_history": _na(
+            ("U006006", "U006007"),
+            "The printed one-step rule returns the next list, not a retained "
+            "history of earlier lists.",
+        ),
+        "control_state": _na(
+            ("U006006", "U006007"),
+            "No controller separate from the additive rule is stated.",
+        ),
+        "seed": FF(
+            "the source-stated variant has a single nonzero initial cell with value 1/k",
+            ("U006006", "U006007", "U006008"),
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "atomically replace the full list by "
+            "Mod[RotateLeft[list]+RotateRight[list],1]",
+            "U006007",
+        ),
+        "successor_cardinality": FF(
+            "one complete next periodic list for each current list",
+            "U006007",
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic synchronous additive update with no probability measure",
+            "U006007",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "probabilistic cellular automaton family",
+    {
+        "native_time": FF(
+            "discrete probabilistic cellular-automaton generations",
+            "U006010",
+        ),
+        "complete_state": FF(
+            "a configuration of discrete-valued cells; the rule pair and "
+            "random coupling remain routed",
+            "U006010",
+        ),
+        "visible_history": _unknown_fact(
+            "probabilistic cellular automaton family: the local Notes unit "
+            "does not state whether a trajectory history is returned."
+        ),
+        "control_state": _unknown_fact(
+            "probabilistic cellular automaton family: the local Notes unit "
+            "does not state random-choice control state."
+        ),
+        "frontier_or_activation": FF(
+            "each cell is described as choosing probabilistically between two rules",
+            "U006010",
+        ),
+        "termination_completion_failure": _unknown_fact(
+            "probabilistic cellular automaton family: the local Notes unit "
+            "states no completion or terminal condition."
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "finite-difference PDE discretization family",
+    {
+        "native_time": FF(
+            "discrete numerical time levels used to approximate a continuous PDE",
+            "U006052",
+        ),
+        "complete_state": _unknown_fact(
+            "finite-difference PDE discretization family: U006052 does not "
+            "state a particular stencil state."
+        ),
+        "visible_history": _unknown_fact(
+            "finite-difference PDE discretization family: U006052 does not "
+            "state whether a solver returns its time-level history."
+        ),
+        "control_state": _na(
+            "U006052",
+            "No controller is specified independently of the missing stencil.",
+        ),
+        "seed": _unknown_fact(
+            "finite-difference PDE discretization family: U006052 does not "
+            "state initial numerical slices."
+        ),
+        "frontier_or_activation": _unknown_fact(
+            "finite-difference PDE discretization family: no active stencil "
+            "sites are fixed without a particular discretization."
+        ),
+        "termination_completion_failure": _unknown_fact(
+            "finite-difference PDE discretization family: U006052 does not "
+            "state a stopping or convergence criterion."
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "explicit second-order PDE finite-difference solver",
+    {
+        "native_time": FF(
+            "the n discrete second-order time steps returned by PDEEvolveList",
+            "U006063",
+        ),
+        "control_state": _na(
+            "U006063",
+            "The kernel and fixed count n are parameters, not a separate controller.",
+        ),
+        "successor_cardinality": FF(
+            "one synchronously assembled next spatial slice and shifted two-slice state",
+            ("U006061", "U006063"),
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic kernel evaluation and synchronous list assembly",
+            ("U006061", "U006063"),
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "case-b binary-length stopping-time map",
+    {
+        "complete_state": FF("the current integer n", "U005694"),
+        "visible_history": _na(
+            "U005694",
+            "The source states the map and stopping-time count, not a "
+            "history-retaining state component.",
+        ),
+        "control_state": FF(
+            "continue until value 1 is reached",
+            "U005694",
+        ),
+        "frontier_or_activation": FF("the current integer n", "U005694"),
+        "schedule": FF(
+            "apply the visible even/odd rule once and retest whether n equals 1",
+            "U005694",
+        ),
+        "read_dependencies_or_neighborhood": FF(
+            "the current n and EvenQ[n]",
+            "U005694",
+        ),
+        "write_replacement_assembly_or_commit": FF(
+            "replace n by n/2 when even or (n+1)/2 when odd",
+            "U005694",
+        ),
+        "successor_cardinality": FF(
+            "one next integer before the terminal value 1",
+            "U005694",
+        ),
+        "determinism_branching_or_measure": FF(
+            "deterministic parity branch with no probability measure",
+            "U005694",
+        ),
+    },
+)
+_complete_stepwise_profile(
+    "case-c one-bit-count stopping-time map obligation",
+    {
+        "native_time": FF(
+            "discrete applications counted by the stated one-bit-dependent stopping time",
+            "U005694",
+        ),
+        "complete_state": FF(
+            "the current integer input/state, with its one-step rule clipped",
+            "U005694",
+        ),
+        "visible_history": _unknown_fact(
+            "case-c one-bit-count stopping-time map obligation: the clipped "
+            "source does not state whether history is retained."
+        ),
+        "control_state": _unknown_fact(
+            "case-c one-bit-count stopping-time map obligation: the clipped "
+            "source does not state its continuation controller."
+        ),
+        "seed": FF("the supplied starting integer n", "U005694"),
+        "frontier_or_activation": _unknown_fact(
+            "case-c one-bit-count stopping-time map obligation: the clipped "
+            "one-step rule does not reveal its active component."
+        ),
+        "schedule": _unknown_fact(
+            "case-c one-bit-count stopping-time map obligation: the clipped "
+            "one-step rule does not reveal an update schedule."
+        ),
+    },
+)
+for preset_name, transfer_law in (
+    (
+        "page-157 continuous-CA transfer-rule preset",
+        "FractionalPart[3 mean/2]",
+    ),
+    (
+        "page-158 continuous-CA offset-rule preset",
+        "FractionalPart[mean+1/4]",
+    ),
+):
+    _complete_stepwise_profile(
+        preset_name,
+        {
+            "native_time": FF(
+                "the t discrete synchronous steps returned by CCAEvolveList",
+                ("U005997", "U005998"),
+            ),
+            "complete_state": FF(
+                "the complete current periodic list of values between 0 and 1",
+                ("U005997", "U005998"),
+            ),
+            "visible_history": FF(
+                "CCAEvolveList returns the complete NestList trajectory "
+                "beginning with the supplied initial list",
+                "U005998",
+            ),
+            "control_state": _na(
+                "U005998",
+                "The fixed transfer preset and count t are parameters, not a controller.",
+            ),
+            "seed": FF("the supplied initial list init", "U005998"),
+            "frontier_or_activation": FF(
+                "all positions of the periodic list",
+                "U005998",
+            ),
+            "schedule": FF(
+                "one synchronous whole-list Map update per CCAEvolveStep",
+                "U005998",
+            ),
+            "read_dependencies_or_neighborhood": FF(
+                "the periodic left, self, and right values through their arithmetic mean",
+                "U005998",
+            ),
+            "write_replacement_assembly_or_commit": FF(
+                f"atomically assemble one new list by applying {transfer_law} at every position",
+                ("U005997", "U005998"),
+            ),
+            "successor_cardinality": FF(
+                "one complete next list for each defined current list",
+                "U005998",
+            ),
+            "determinism_branching_or_measure": FF(
+                "deterministic synchronous transfer-rule update",
+                ("U005997", "U005998"),
+            ),
+            "termination_completion_failure": FF(
+                "CCAEvolveList performs exactly t steps; approximate "
+                "arithmetic may accumulate qualitatively significant error",
+                ("U005998", "U005999", "U006000"),
+            ),
+        },
+    )
+
+_expected_stepwise_names = {
+    spec["name"] for spec in SPECS if spec["kind"] in STEPWISE_KINDS
+}
+if _PROFILED_STEPWISE_NAMES != _expected_stepwise_names:
+    raise RuntimeError(
+        "stepwise profile coverage differs: "
+        f"missing={sorted(_expected_stepwise_names - _PROFILED_STEPWISE_NAMES)!r}; "
+        f"extra={sorted(_PROFILED_STEPWISE_NAMES - _expected_stepwise_names)!r}"
+    )
+
 
 def decision(
     status: str,
@@ -3178,7 +3625,6 @@ def field_decisions(
     law_anchor = choose_law_anchor(spec, block_kind_by_uid)
     parameters = list(spec["params"])
     variants = list(spec["variants"])
-    dynamic = kind in STEPWISE_KINDS
     continuous_relation = kind in CONTINUOUS_RELATION_KINDS
     hints = MISSING_FIELD_HINTS.get(name, {})
 
@@ -3220,12 +3666,7 @@ def field_decisions(
     d["read_dependencies_or_neighborhood"] = supported(
         spec,
         "read_dependencies_or_neighborhood",
-        (
-            "the current state and explicit arguments appearing in the exact "
-            f"law: {spec['law']}"
-            if dynamic
-            else f"the explicit arguments and subexpressions in: {spec['law']}"
-        ),
+        f"the explicit arguments and subexpressions in: {spec['law']}",
         law_anchor,
     )
 
@@ -3257,106 +3698,9 @@ def field_decisions(
             "no separate parameter or variant is part of this candidate's stated identity.",
         )
 
-    if dynamic:
-        time_value = {
-            "ITERATION": "discrete applications of the map or recurrence",
-            "CA": "discrete cellular update steps",
-            "SUBSTITUTION": "discrete replacement generations",
-            "SOLVER": "discrete construction or approximation steps",
-            "GENERATOR": "discrete generation stages or indices",
-            "PARTIAL_SYSTEM": "discrete steps are described, but their one-step law is incomplete",
-        }[kind]
-        d["native_time"] = supported(spec, "native_time", time_value, law_anchor)
-        d["complete_state"] = supported(
-            spec,
-            "complete_state",
-            {
-                "CA": "the current complete cell configuration plus stated parameters",
-                "SUBSTITUTION": "the current word/list plus stated replacement data",
-                "SOLVER": "the current approximation variables named by the method",
-                "GENERATOR": "the current generated prefix/index and stated parameters",
-                "PARTIAL_SYSTEM": "the current integer input/state; the missing rule prevents a complete successor description",
-            }.get(kind, "the current iterate or recurrence state plus stated parameters"),
-            law_anchor,
-        )
-        d["frontier_or_activation"] = supported(
-            spec,
-            "frontier_or_activation",
-            (
-                "the source object/eligible occurrence selected by the one-step law"
-                if kind != "CA"
-                else "the cell positions to which the local rule is applied"
-            ),
-            law_anchor,
-        )
-        if kind == "CA":
-            d["schedule"] = unknown(
-                spec,
-                "schedule",
-                f"{name}: the sealed Notes evidence gives a local rule but does not state a global cell-update schedule.",
-            )
-            d["determinism_branching_or_measure"] = unknown(
-                spec,
-                "determinism_branching_or_measure",
-                f"{name}: the local expression is deterministic, but the sealed source does not fix a complete global schedule/measure.",
-            )
-            d["successor_cardinality"] = unknown(
-                spec,
-                "successor_cardinality",
-                f"{name}: a local output is fixed, but global successor cardinality depends on the unstated schedule/topology.",
-            )
-        else:
-            d["schedule"] = supported(
-                spec,
-                "schedule",
-                "one application/construction step follows the order written in the exact law",
-                law_anchor,
-            )
-            d["determinism_branching_or_measure"] = supported(
-                spec,
-                "determinism_branching_or_measure",
-                "the stated law selects one next result for complete defined inputs; no probability measure is introduced",
-                law_anchor,
-            )
-            d["successor_cardinality"] = supported(
-                spec,
-                "successor_cardinality",
-                "one next/generated result for each complete defined state and parameter choice",
-                law_anchor,
-            )
-        d["visible_history"] = unknown(
-            spec,
-            "visible_history",
-            f"{name}: the source does not say whether earlier states beyond the stated read dependencies are retained as part of the visible state.",
-        )
-        seed_text = " ".join(parameters).lower() + " " + spec["law"].lower()
-        seed_tokens = (
-            "initial", "start ", "f[0]", "f[1]", "from {0}", "from {1",
-            "seed",
-        )
-        if any(token in seed_text for token in seed_tokens):
-            d["seed"] = supported(
-                spec,
-                "seed",
-                "the initial value/configuration is supplied by the stated parameters or initial clauses",
-                law_anchor,
-            )
-        else:
-            d["seed"] = unknown(
-                spec,
-                "seed",
-                f"{name}: the one-step/generation law is stated, but no initial seed is fixed for this candidate.",
-            )
-        d["write_replacement_assembly_or_commit"] = supported(
-            spec,
-            "write_replacement_assembly_or_commit",
-            (
-                "the local rule computes a replacement cell value; global commit timing is represented separately by schedule"
-                if kind == "CA"
-                else "the exact law produces the next replacement, appended term, or approximation"
-            ),
-            law_anchor,
-        )
+    if kind in STEPWISE_KINDS:
+        if name not in _PROFILED_STEPWISE_NAMES:
+            raise RuntimeError(f"missing explicit stepwise profile for {name!r}")
     elif continuous_relation:
         d["native_time"] = supported(
             spec,
@@ -3870,7 +4214,9 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         "",
         "## Hostile-review repair summary",
         "",
-        "- Replaced the remaining kind-wide generator inferences with candidate-specific state semantics: Gray code, the two FoldList sequence-(c) formulations, and Ulam retain their stated seeds/history, while the three direct Table/Flatten/Union denotations have no invented frontier, schedule, or commit.",
+        "- Removed the kind-wide STEPWISE_KINDS state/schedule inference entirely. An exhaustive registry covers all 57 stepwise candidates and all 12 dynamic fields; import-time assertions reject a missing candidate or field.",
+        "- Each stepwise field is now candidate-specific and source-bounded: supported with exact anchors, explicitly NOT_APPLICABLE, or UNKNOWN_FROM_SOURCE with a candidate-local reason. Routed, clipped, and partial laws inherit no executable schedule, successor, determinism, or commit.",
+        "- Gray code, both sequence-(c) FoldList formulations, Ulam, the page-122 NestList, Shallit Nest, Euclid, the recurrence-ratio solver, and complete continuous CAs retain their literal seeds/state/history/completion semantics. Direct indexed/Table/Flatten/Union denotations receive no invented trajectory layer.",
         "- Recorded source-supported initial conditions and history/closed-form boundaries for the AGM solver, continued-fraction trajectory, Gauss/multiplier/tent maps, and both finite-storage shift-map representations.",
         "- Transcribed the complete continued-fraction substitution, parity-trace reconstruction, sequence-(d), sequence-(c), and AGM laws; every law spanning two source units is partial at both units and complete only through their joint field evidence.",
         "- Restored the two-Gaussian periodic preset, the dimensional stationary-square-pulse preset, and the split PDEKernel/PDEStep provenance without inventing unstated grid, domain, pulse, or boundary details.",
