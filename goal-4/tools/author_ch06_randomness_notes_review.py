@@ -2033,6 +2033,14 @@ def main() -> None:
         "A000655", "A000656", "A000657", "A000658", "A000659", "A000660",
     }
     observer_assets = {"A000590", "A000596", "A000597", "A000612", "A000613", "A000614", "A000617", "A000622", "A000623", "A000624", "A000625", "A000626", "A000627", "A000628", "A000629", "A000630", "A000633", "A000636", "A000637", "A000638"}
+    native_asset_statements = {
+        "A000595": "Original-resolution inspection checked the successive evolution frames of the moving structure under the {4,5,5} three-dimensional Life-like rule described by the adjacent source units.",
+        "A000598": "Original-resolution inspection checked the figure as a visual history accompanying the rule-225 seed variants and behavior described by the adjacent source unit.",
+        "A000609": "Original-resolution inspection checked the pictured nested histories as examples of the weighted modulo-k additive cellular-automaton family described by the adjacent source unit.",
+        "A000615": "Original-resolution inspection checked the pictured region decomposition and repeating behavior accompanying the period-3 density oscillations of rule 73 described by the adjacent source unit.",
+        "A000641": "Original-resolution inspection checked the displayed catalogue against the stated criterion: fewer than eight live cells and no change under a Life step.",
+        "A000643": "Original-resolution inspection checked the pictured rule-110 background against the adjacent source unit's repeated 14-cell block and step-dependent displacement description.",
+    }
     asset_updates: list[dict[str, str]] = []
     for row in asset_rows:
         updated = dict(row)
@@ -2048,7 +2056,10 @@ def main() -> None:
             status = "CLEAR"
             role = "OBSERVER" if asset_id in observer_assets and not candidate_ids else "NATIVE_EVIDENCE"
             uncertainty = ""
-            evidence_statement = "Original-resolution inspection checked the complete referenced figure against its bundled prose context."
+            evidence_statement = native_asset_statements.get(
+                asset_id,
+                "Original-resolution inspection checked the complete referenced figure against its bundled prose context.",
+            )
             risks = ["CONSTRUCTION_BEARING"]
             if asset_id in text_bearing_assets:
                 risks.append("TEXT_BEARING")
@@ -2064,7 +2075,11 @@ def main() -> None:
                 "source_status": status,
                 "risk_flags": json_cell(risks),
                 "original_resolution_status": "REVIEWED",
-                "transcription_status": "CHECKED" if asset_id in text_bearing_assets else "NOT_REQUIRED",
+                "transcription_status": (
+                    "CHECKED"
+                    if role == "NATIVE_EVIDENCE" or asset_id in text_bearing_assets
+                    else "NOT_REQUIRED"
+                ),
                 "candidate_ids": json_cell(candidate_ids),
                 "route_ids": json_cell(route_ids),
                 "evidence_statement": evidence_statement,

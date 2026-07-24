@@ -1392,7 +1392,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 "source_status": source_status,
                 "risk_flags": jdump(risk),
                 "original_resolution_status": "REVIEWED",
-                "transcription_status": "NOT_APPLICABLE" if not risk else "CHECKED",
+                "transcription_status": "NOT_REQUIRED" if not risk else "CHECKED",
                 "candidate_ids": jdump(ids),
                 "route_ids": jdump(route_ids),
                 "evidence_statement": evidence_statement,
