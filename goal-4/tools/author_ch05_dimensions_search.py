@@ -2967,7 +2967,7 @@ EXPECTED_ROUTE_AUDIT_DIGEST = (
     "b1920fc62d8a7256e01a1990ad47120a4aa216be066eaea7a4c8ea6917615930"
 )
 EXPECTED_TRIAGE_DIGEST = (
-    "badcd2eb9c53c029e17357198f4e97cb2ddacffe76d72cf5f3d70ce1ea1527bd"
+    "7f97d3ea4bbfc0d75826ea947c58b53db98ccd4275fd00297d4f127bca5632bd"
 )
 EXPECTED_ACTIVE_SEMANTIC_DIGESTS = {
     "S013": (
@@ -2976,10 +2976,10 @@ EXPECTED_ACTIVE_SEMANTIC_DIGESTS = {
     "S014": "",
 }
 EXPECTED_CANDIDATE_COVERAGE_DIGEST = (
-    "59a465d47d6f1a9e07f2d290418a4c2908f127ec62119192a13c3d234020564a"
+    "d5d40f1751d6088d57bafdb2776e78bb5717e13ab4303f3cc663af03e1290f21"
 )
 EXPECTED_ROUTE_COVERAGE_DIGEST = (
-    "f1385621619fbe2747aacfc85c40a609ae897d9a0c57ae5a09d645223355ec13"
+    "3d9a0851254f1c27e19b2bea0ea2359cf3675c507836489c68cb6f4b9186c4bb"
 )
 EXPECTED_OMISSION_CHALLENGE_COUNT = 78
 EXPECTED_OMISSION_CHALLENGE_DIGEST = (
@@ -3133,7 +3133,6 @@ def _new_candidate(
     image_witnesses: list[str],
 ) -> dict[str, Any]:
     field_support, fingerprint = _unknown_fingerprint(name)
-    all_evidence_ids = [item["evidence_id"] for item in evidence]
     for field, value in supported_values.items():
         field_ids = [
             item["evidence_id"]
@@ -3156,11 +3155,20 @@ def _new_candidate(
             raise AuthoringError(
                 f"{candidate_id}.{field} is both supported and not applicable"
             )
+        field_ids = [
+            item["evidence_id"]
+            for item in evidence
+            if field in item["fingerprint_fields"]
+        ]
+        if not field_ids:
+            raise AuthoringError(
+                f"{candidate_id}.{field} has no not-applicable evidence"
+            )
         field_support[field] = "NOT_APPLICABLE"
         fingerprint[field] = {
             "status": "NOT_APPLICABLE",
             "value": None,
-            "evidence_ids": all_evidence_ids[:1],
+            "evidence_ids": field_ids,
             "reason": f"{field} is not native to {name} as delimited.",
         }
     missing = sorted(
