@@ -618,6 +618,14 @@ RECOVERED_SPECS = [
             "Grid-origin dependence and the estimator/reporting convention "
             "for a fluctuating or nonconvergent small-scale exponent are open."
         ],
+        cardinality=(
+            "one estimate only after the omitted grid origin, sampled scales, "
+            "fitting range, estimator, and reporting convention are supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic estimate "
+            "when the scale-dependent exponent fluctuates or fails to converge"
+        ),
     ),
     _spec(
         "grid-occupancy distribution-moment observer",
@@ -724,6 +732,14 @@ RECOVERED_SPECS = [
             "The fitting range, estimator, root-node aggregation, and behavior "
             "when the r^d exponent does not converge are not specified."
         ],
+        cardinality=(
+            "one estimate only after the omitted fitting range, estimator, "
+            "root-node aggregation, and nonconvergence convention are supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic dimension "
+            "estimate from the network and radius data alone"
+        ),
     ),
     _spec(
         "polynomial-growth string-multiway preset",
@@ -906,6 +922,15 @@ RECOVERED_SPECS = [
             "assembly, boundary enforcement, solver, and convergence/error "
             "contract are all unspecified."
         ],
+        cardinality=(
+            "one discrete approximation only after the omitted element, "
+            "basis, mesh, weak-form, assembly, boundary, and solver choices "
+            "are fully supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic "
+            "discretization from the PDE problem alone"
+        ),
     ),
     _spec(
         "linear-vector forward-map evaluator",
@@ -995,7 +1020,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Pell least-x continued-fraction solver",
-        ["U006326", "U006327", "U006329"],
+        ["U006326", "U006327", "U006328", "U006329"],
         "Diophantine least-solution solver",
         "positive integer solutions of x^2 = a y^2 + 1",
         "positive nonsquare integer a",
@@ -1833,7 +1858,7 @@ QUERY_SPECS = [
     (
         "representation, observer, implementation, and application boundary",
         (
-            r"\b(?:pictures?|plots?|displays?|"
+            r"\b(?:pictures?|plots?|plott(?:ed|ing)|displays?|"
             r"visualiz(?:e|es|ed|ing|ation)|"
             r"represent(?:s|ed|ing|ation)?|"
             r"implement(?:s|ed|ing|ation)?|"
@@ -1863,18 +1888,18 @@ EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
 EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
 EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 213
 EXPECTED_NEW_ROUTE_COUNT = 151
-EXPECTED_READING_UPDATE_COUNT = 155
+EXPECTED_READING_UPDATE_COUNT = 154
 EXPECTED_NEW_CANDIDATE_COUNT = 88
-EXPECTED_NEW_EVIDENCE_COUNT = 203
-EXPECTED_RESULT_PAIR_COUNT = 1552
-EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
+EXPECTED_NEW_EVIDENCE_COUNT = 202
+EXPECTED_RESULT_PAIR_COUNT = 1553
+EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 524
 EXPECTED_PATH_PAIR_COUNTS = {
     STAGE_PATHS[0]: 752,
-    STAGE_PATHS[1]: 800,
+    STAGE_PATHS[1]: 801,
 }
 EXPECTED_PATH_UNIQUE_UNIT_COUNTS = {
     STAGE_PATHS[0]: 264,
-    STAGE_PATHS[1]: 259,
+    STAGE_PATHS[1]: 260,
 }
 EXPECTED_HIT_COUNTS = [
     66,
@@ -1890,14 +1915,14 @@ EXPECTED_HIT_COUNTS = [
     160,
     202,
     65,
-    133,
+    134,
     144,
 ]
 EXPECTED_QUERY_SPEC_DIGEST = (
-    "f7134a224edcc824eed6b2f037f599d359f498ab96338240262e69da0aea874e"
+    "3e545dfd7b930c184489a98eccde200695cf582e38275233896ae80a1376984d"
 )
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
-    "97d4f2ffa3322834e9a1ef7d9c9fd1327bf718420af7c91967e02d96c551a5e0"
+    "14af3dc4c5d59f050f1dd1c05fd691d7307f6d58a78ce592b0de40e1eb5e952f"
 )
 EXPECTED_ROUTE_SPEC_DIGEST = (
     "1bc5019c7236aef8bf0186b179997a3e83e2f385444ea8aa9bbf94aab226c6f3"
