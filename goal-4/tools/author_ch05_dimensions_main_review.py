@@ -216,6 +216,37 @@ def profile_blueprint(
             "termination_completion_failure",
             "witness_semantics",
         }
+    elif kind == "SUB_GENERAL":
+        supported = {
+            "object_kind": "two-dimensional substitution system",
+            "native_time": "discrete replacement steps",
+            "carrier": "a two-dimensional collection of replaceable square elements",
+            "support": "a finite pattern of elements",
+            "structural_invariants": "the same replacement template is reused for every matching element",
+            "complete_state": "the current collection, placement, and types of elements",
+            "frontier_or_activation": "all elements eligible under the replacement rule",
+            "schedule": "parallel replacement at every step",
+            "read_dependencies_or_neighborhood": "the individual element for the noninteracting family introduced here",
+            "law_kind": "deterministic structural replacement rule",
+            "rule_relation_constraint_function_or_probability_law": name,
+            "write_replacement_assembly_or_commit": "replace every matched element by its specified subpattern",
+            "result_kind": "one successor pattern",
+            "successor_cardinality": "one",
+            "determinism_branching_or_measure": "deterministic",
+            "parameters_and_variants": "element types, replacement templates, and placement geometry",
+            "excluded_observers_and_representations": "nested appearance and rendered stages are outcomes",
+            "evidence_limit": "the generic introduction does not choose fixed-grid versus free geometry, a seed, or a complete alphabet",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "input",
+            "boundary",
+            "external_data",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+        unknown = {"topology", "alphabet_or_value_schema", "seed"}
     elif kind in {"SUB_GRID", "SUB_GEOM"}:
         carrier = (
             "two-dimensional grid of colored square elements"
@@ -272,7 +303,6 @@ def profile_blueprint(
             "law_kind": "declarative graph specification",
             "rule_relation_constraint_function_or_probability_law": name,
             "result_kind": "graph or graph-isomorphism class",
-            "successor_cardinality": "not applicable to an immutable graph",
             "determinism_branching_or_measure": "one denoted graph/class or enumerated finite set",
             "witness_semantics": "the checked drawing witnesses incidence but its coordinates are non-semantic",
             "parameters_and_variants": "dimension, branching, node count, or nesting as stated",
@@ -290,6 +320,7 @@ def profile_blueprint(
             "schedule",
             "read_dependencies_or_neighborhood",
             "write_replacement_assembly_or_commit",
+            "successor_cardinality",
             "termination_completion_failure",
         }
     elif kind == "NETWORK_GENERAL":
@@ -400,9 +431,7 @@ def profile_blueprint(
             "structural_invariants": "every accepted object satisfies the stated constraints",
             "law_kind": "declarative constraint relation",
             "rule_relation_constraint_function_or_probability_law": "a supplied set of constraints to satisfy",
-            "write_replacement_assembly_or_commit": "not applicable; the source supplies conditions to satisfy rather than an update",
             "result_kind": "the set of objects that satisfy the constraints",
-            "successor_cardinality": "not applicable; there is no native successor relation",
             "determinism_branching_or_measure": "declarative solution set rather than a probability law",
             "witness_semantics": "an object satisfying the stated constraints is an accepted model",
             "parameters_and_variants": "the object domain and constraints",
@@ -417,6 +446,8 @@ def profile_blueprint(
             "external_data",
             "frontier_or_activation",
             "schedule",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
             "termination_completion_failure",
         }
         unknown = {
@@ -440,21 +471,27 @@ def profile_blueprint(
             "complete_state": "a complete cell assignment",
             "boundary": "wrapping only where explicitly stated; otherwise an infinite carrier",
             "frontier_or_activation": "every cell must satisfy the relation",
-            "schedule": "not applicable; constraints are simultaneous",
             "read_dependencies_or_neighborhood": "the stated neighbor count or overlapping template footprint",
             "law_kind": "declarative local constraint",
             "rule_relation_constraint_function_or_probability_law": name,
-            "write_replacement_assembly_or_commit": "not applicable; acceptance is global satisfaction",
             "result_kind": "the set of satisfying assignments, possibly empty or unique",
-            "successor_cardinality": "not applicable; solution-set cardinality may be zero, one, or many",
             "determinism_branching_or_measure": "declarative solution set without probability measure",
-            "termination_completion_failure": "failure means no global satisfying assignment exists",
             "witness_semantics": "a complete satisfying pattern witnesses acceptance; a finite unsatisfiable region refutes global satisfiability",
             "parameters_and_variants": "neighbor counts, allowed template set, and required-occurrence template",
             "excluded_observers_and_representations": "search order, gray unknown cells, tessellation rendering, and CA correspondence are not the native constraint",
             "evidence_limit": "template contents are asserted only when checked in the assigned image",
         }
-        na = {"visible_history", "control_state", "seed", "input", "external_data"}
+        na = {
+            "visible_history",
+            "control_state",
+            "seed",
+            "input",
+            "external_data",
+            "schedule",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
+            "termination_completion_failure",
+        }
     elif kind == "WITNESS":
         supported = {
             "object_kind": "finite universal witness set for a constraint family",
@@ -468,7 +505,6 @@ def profile_blueprint(
             "law_kind": "declarative coverage relation",
             "rule_relation_constraint_function_or_probability_law": name,
             "result_kind": "finite set of satisfying-pattern witnesses",
-            "successor_cardinality": "not applicable; the collection has 171 members",
             "determinism_branching_or_measure": "finite deterministic enumeration",
             "termination_completion_failure": "if none of the 171 witnesses satisfies a constraint in scope, no pattern satisfies it",
             "witness_semantics": "each member is a positive satisfying witness for the minimal labelled constraint and possibly others",
@@ -487,6 +523,7 @@ def profile_blueprint(
             "schedule",
             "read_dependencies_or_neighborhood",
             "write_replacement_assembly_or_commit",
+            "successor_cardinality",
         }
     elif kind == "SOLVER_ENUMERATION":
         supported = {
@@ -844,7 +881,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
 
     sub2 = add(
         "two-dimensional parallel substitution-system family",
-        "SUB_GRID",
+        "SUB_GENERAL",
         "SOURCE_UNIT",
         "U001034",
         1,
@@ -1067,6 +1104,16 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             ["A000888"],
             aliases=[f"network rule ({label})"],
             parameters={"rule panel": label},
+            overrides={
+                "write_replacement_assembly_or_commit": (
+                    "SUPPORTED",
+                    "reroute the existing outgoing connections according to the stated path expressions; do not insert nodes",
+                ),
+                "parameters_and_variants": (
+                    "SUPPORTED",
+                    f"connection-rerouting case ({label}) over the two distinguished outgoing links",
+                ),
+            },
             parent_index=network,
         )
     for ordinal, (label, asset_id) in enumerate(
@@ -1082,6 +1129,16 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             [asset_id],
             aliases=[f"node-addition rule ({label})"],
             parameters={"rule panel": label, "seed": "single-node network"},
+            overrides={
+                "write_replacement_assembly_or_commit": (
+                    "SUPPORTED",
+                    "insert one new node in each above connection and assign its two outgoing targets as stated",
+                ),
+                "parameters_and_variants": (
+                    "SUPPORTED",
+                    f"node-insertion case ({label})",
+                ),
+            },
             parent_index=network,
         )
     conditional = add(
@@ -1242,7 +1299,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             route_keys=route_keys,
         )
     add(
-        "multiway state-deduplication demonstration rule",
+        "three-replacement multiway rule used in the page-224 evolution",
         "MULTIWAY",
         "IMAGE",
         "A000905",
@@ -1251,7 +1308,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["A000905", "A000906", "A000907"],
         parameters={
             "replacement set": "three checked graphical replacements",
-            "history representation": "each sequence may be shown once with back-arrows to its first occurrence",
+            "seed": "the checked two-element initial sequence",
         },
         parent_index=multiway,
     )
@@ -1420,6 +1477,24 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             ["A000915"],
             aliases=[f"constraint {code}"],
             parameters={"constraint code": code, "survey panel": str(ordinal)},
+            overrides={
+                "rule_relation_constraint_function_or_probability_law": (
+                    "UNKNOWN_FROM_SOURCE",
+                    None,
+                ),
+                "result_kind": (
+                    "SUPPORTED",
+                    "a nonempty set of satisfying assignments; the displayed pattern is one witness",
+                ),
+                "parameters_and_variants": (
+                    "SUPPORTED",
+                    "numeric constraint code and required-center occurrence; the allowed-template set is not decoded in the assigned source",
+                ),
+                "witness_semantics": (
+                    "SUPPORTED",
+                    "the displayed pattern witnesses satisfiability but does not decode the complete allowed-template law",
+                ),
+            },
             parent_index=required_family,
         )
     enumeration_solver = add(
@@ -1454,6 +1529,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
     specs[code_to_index["4670324"] - 1]["units"].append("U001205")
     specs[code_to_index["4670324"] - 1]["assets"].append("A000916")
     for ordinal, code in enumerate(("373384574", "387520105"), 2):
+        has_infinite_model = code == "373384574"
         add(
             f"solver-witnessed constraint {code}",
             "CONSTRAINT",
@@ -1463,7 +1539,41 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             ["U001205"],
             ["A000916"],
             aliases=[f"constraint {code}"],
-            parameters={"constraint code": code, "solver figure panel": chr(96 + ordinal)},
+            parameters={
+                "constraint code": code,
+                "solver figure panel": chr(96 + ordinal),
+                "model outcome": (
+                    "a repetitive infinite pattern exists"
+                    if has_infinite_model
+                    else "no infinite satisfying pattern exists"
+                ),
+            },
+            overrides={
+                "rule_relation_constraint_function_or_probability_law": (
+                    "UNKNOWN_FROM_SOURCE",
+                    None,
+                ),
+                "result_kind": (
+                    "SUPPORTED",
+                    (
+                        "a nonempty set of infinite satisfying assignments"
+                        if has_infinite_model
+                        else "an empty set of infinite satisfying assignments, despite large finite satisfiable regions"
+                    ),
+                ),
+                "parameters_and_variants": (
+                    "SUPPORTED",
+                    "numeric constraint code and solver outcome; the allowed-template set is not decoded in the assigned source",
+                ),
+                "witness_semantics": (
+                    "SUPPORTED",
+                    (
+                        "the displayed repetitive pattern is a positive infinite-model witness"
+                        if has_infinite_model
+                        else "the displayed finite partial pattern is not a global witness; the prose states that no infinite model exists"
+                    ),
+                ),
+            },
             parent_index=required_family,
         )
     add(
@@ -1614,9 +1724,9 @@ def asset_judgment_specs() -> dict[str, dict[str, Any]]:
         "NATIVE_EVIDENCE",
         "A000845 A000849 A000853 A000861 A000864 A000865 A000870 "
         "A000875 A000876 A000878 A000880 A000881 A000882 A000883 "
-        "A000884 A000885 A000886 A000888 A000891 A000892 A000894 "
+        "A000884 A000885 A000886 A000891 A000892 A000894 "
         "A000895 A000897 A000898 A000899 A000900 A000901 A000904 "
-        "A000905 A000911 A000912 A000913 A000914 A000915 A000916 "
+        "A000905 A000911 A000912 A000913 A000914 "
         "A000918 A000919 A000922",
     )
     assign(
@@ -1624,8 +1734,9 @@ def asset_judgment_specs() -> dict[str, dict[str, Any]]:
         "A000846 A000847 A000848 A000850 A000851 A000852 A000854 "
         "A000856 A000857 A000858 A000859 A000860 A000862 A000863 "
         "A000866 A000867 A000868 A000869 A000871 A000872 A000873 "
-        "A000874 A000877 A000879 A000889 A000890 A000893 A000896 "
-        "A000902 A000903 A000908 A000909 A000910 A000917 A000920 A000921",
+        "A000874 A000877 A000879 A000888 A000889 A000890 A000893 "
+        "A000896 A000902 A000903 A000908 A000909 A000910 A000915 "
+        "A000916 A000917 A000920 A000921",
     )
     assert set(roles) == {f"A{i:06d}" for i in range(843, 923)}
 
@@ -1918,6 +2029,9 @@ def candidate_records(
         for asset_id in spec["assets"]:
             role = asset_specs[asset_id]["role"]
             strength = (
+                "DIRECT_IDENTITY"
+                if asset_id == "A000915"
+                else
                 "DIRECT_PARTIAL_MECHANICS"
                 if role == "NATIVE_EVIDENCE"
                 else "CORROBORATING"
@@ -1948,6 +2062,20 @@ def candidate_records(
                     "evidence_limit",
                 }
             ]
+            if asset_id == "A000915":
+                image_fields = [
+                    field
+                    for field in image_fields
+                    if field
+                    in {
+                        "object_kind",
+                        "result_kind",
+                        "witness_semantics",
+                        "parameters_and_variants",
+                        "excluded_observers_and_representations",
+                        "evidence_limit",
+                    }
+                ]
             add_evidence(
                 "IMAGE",
                 asset_id,
