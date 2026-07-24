@@ -1352,8 +1352,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
         strength: str = "DIRECT_PARTIAL_MECHANICS",
         allow_direct_image: bool = False,
     ) -> None:
-        # evidence_limit describes the review record, not mechanics stated by
-        # an individual source unit.
+        # evidence_limit is assigned once later to the strongest identity/law
+        # anchor for the whole candidate, never piecemeal by unit overrides.
         fields = [field for field in fields if field != "evidence_limit"]
         candidate(name)["evidence_overrides"][unit_id] = {
             "fields": fields,
@@ -1723,6 +1723,9 @@ def candidate_definitions() -> list[dict[str, Any]]:
     # New display observers use distinct spatial-depth and prior-time fog variants.
     difference_name = "neighbor-difference gray-field display transformation"
     difference = candidate(difference_name)
+    difference["units"].append("U001321")
+    difference["semantic_units"].append("U001321")
+    difference["anchor_priority"] = 1
     difference["mechanics_units"] = []
     difference["values"] = {
         "object_kind": "derived gray-field display transformation",
@@ -1745,6 +1748,21 @@ def candidate_definitions() -> list[dict[str, Any]]:
     difference["uncertainties"] = [
         "The source does not state which neighbor is selected, whether the difference is signed or absolute, or how it is remapped to display gray."
     ]
+    difference["parameters"] = [
+        "neighbor selection",
+        "difference convention",
+        "gray remapping",
+    ]
+    evidence(
+        difference_name,
+        "U001321",
+        fields=[],
+        claim=(
+            "A000956 is the original-resolution neighbor-difference rendering output linked to this "
+            "observer; U001323 supplies the transformation prose."
+        ),
+        strength="CONTEXTUAL",
+    )
     evidence(
         difference_name,
         "U001323",
@@ -1757,6 +1775,12 @@ def candidate_definitions() -> list[dict[str, Any]]:
     )
     slice_name = "one-dimensional slice-through-time and spatial-depth-fog observer"
     slice_candidate = candidate(slice_name)
+    slice_candidate["aliases"] = [
+        "one-dimensional slice observer",
+        "slice-history projection",
+        "spatial-depth fog display",
+    ]
+    slice_candidate["parameters"] = ["slice location", "spatial-depth fog enabled"]
     slice_candidate["mechanics_units"] = []
     slice_candidate["values"] = {
         "object_kind": "one-dimensional slice-through-time observer with an optional spatial-depth display",
@@ -1841,6 +1865,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
     )
     trail_name = "prior-time gray-trail rendering observer"
     trail = candidate(trail_name)
+    trail["units"].extend(["U001336", "U001338", "U001339", "U001340"])
+    trail["semantic_units"].extend(["U001336", "U001338", "U001339", "U001340"])
     trail["mechanics_units"] = []
     trail["values"] = {
         "object_kind": "prior-time gray-trail rendering observer",
@@ -1864,6 +1890,15 @@ def candidate_definitions() -> list[dict[str, Any]]:
     trail["uncertainties"] = [
         "The source does not state the retained history depth or the exact mapping from temporal age to gray shade."
     ]
+    trail["parameters"] = ["retained history depth", "age-to-gray mapping"]
+    for unit_id in ["U001336", "U001338", "U001339", "U001340"]:
+        evidence(
+            trail_name,
+            unit_id,
+            fields=["visible_history", "result_kind", "witness_semantics"],
+            claim=f"{unit_id} is an original-resolution prior-time gray-trail output linked to the rendering observer.",
+            strength="CONTEXTUAL",
+        )
     evidence(
         trail_name,
         "U001341",
@@ -2025,12 +2060,17 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001335",
         fields=["excluded_observers_and_representations"],
         claim="U001335 explicitly describes the one-dimensional slice and spatial-depth fog transformation.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
 
     perturb_name = "single-cell initial-perturbation difference observer"
     perturb = candidate(perturb_name)
     perturb["mechanics_units"] = ["U001346"]
+    perturb["parameters"] = [
+        "cellular-automaton rule",
+        "base initial condition",
+        "changed cell",
+    ]
     evidence(
         perturb_name,
         "U001344",
@@ -2117,7 +2157,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001369",
         fields=["termination_completion_failure", "parameters_and_variants"],
         claim="U001369 states that the six-position translation is always repetitive and varies the displacement.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
     evidence(
         translation_name,
@@ -2177,7 +2217,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001381",
         fields=["termination_completion_failure", "structural_invariants"],
         claim="U001381 states the at-most-n bound and size-factor dependence.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
     finite_ca_name = "finite cyclic binary cellular automaton"
     finite_ca = candidate(finite_ca_name)
@@ -2247,7 +2287,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001387",
         fields=["alphabet_or_value_schema", "complete_state", "structural_invariants"],
         claim="U001387 identifies every black-or-white arrangement of n cells as a state and counts 2^n such states.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
     evidence(
         finite_ca_name,
@@ -2273,7 +2313,17 @@ def candidate_definitions() -> list[dict[str, Any]]:
             if unit_id == "U001393"
             else ["structural_invariants"]
         )
-        evidence(finite_ca_name, unit_id, fields=fields, claim=claim, strength="CORROBORATING")
+        evidence(
+            finite_ca_name,
+            unit_id,
+            fields=fields,
+            claim=claim,
+            strength=(
+                "DIRECT_PARTIAL_MECHANICS"
+                if unit_id in {"U001385", "U001389", "U001393"}
+                else "CORROBORATING"
+            ),
+        )
     rule45_name = "elementary cellular automaton rule 45 on a finite cycle"
     rule45 = candidate(rule45_name)
     rule45["units"] = ["U001388", "U001393"]
@@ -2288,16 +2338,44 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001393",
         fields=["excluded_observers_and_representations"],
         claim="U001393 reports rule-45 period scaling as an observer result; A000976 is not native rule-45 evidence.",
-        strength="CORROBORATING",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
 
     period_name = "finite-system repetition-period and maximum-period observer"
     period = candidate(period_name)
+    period["units"] = ["U001366", "U001384", *period["units"]]
+    period["semantic_units"] = ["U001366", "U001384", *period["semantic_units"]]
     period["mechanics_units"] = []
+    period["parameters"] = [
+        "finite system or cellular-automaton rule",
+        "system size or state count",
+        "initial state",
+    ]
     period["uncertainties"] = [
         "The source gives bounds, measured curves, and rule-specific formulas but does not define a general period-computation algorithm."
     ]
     period_specs = {
+        "U001366": (
+            [
+                "object_kind",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "termination_completion_failure",
+                "structural_invariants",
+            ],
+            "U001366 states the general finite deterministic-system recurrence result: a discrete limited-size system following definite rules must eventually repeat.",
+        ),
+        "U001384": (
+            [
+                "carrier",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "termination_completion_failure",
+            ],
+            "U001384 applies the finite-system recurrence result to cyclic cellular automata and states that their behavior is ultimately repetitive.",
+        ),
         "U001385": (
             ["object_kind", "native_time", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "termination_completion_failure", "evidence_limit"],
             "U001385 states that a finite definite-rule system must recur and bounds its period by its state count.",
@@ -3830,9 +3908,8 @@ def candidate_definitions() -> list[dict[str, Any]]:
             strength="DIRECT_PARTIAL_MECHANICS",
         )
 
-    # evidence_limit records the blind review's epistemic boundary. It is not
-    # a source-described program mechanic, so no source unit can support it as
-    # a fingerprint field.
+    # Remove inherited per-unit evidence-limit declarations. build_output()
+    # assigns the record boundary once to the strongest identity/law anchor.
     for row in defs:
         row["values"].pop("evidence_limit", None)
         row["field_units"].pop("evidence_limit", None)
