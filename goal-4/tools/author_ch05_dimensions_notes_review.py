@@ -686,7 +686,9 @@ def candidate_specs() -> list[dict[str, Any]]:
 
     add("two-dimensional Turing machine", "TM", ("SOURCE_UNIT", "U006134"),
         [ev("U006134", "A rule maps head state and scanned color to new state, new color, and a 2D displacement."),
-         ev("U006135", "TM2DStep reads, writes, and moves atomically.", modality="CODE")],
+         ev("U006135", "TM2DStep reads, writes, and moves atomically.", modality="CODE"),
+         ev("U006136", "The history passage explicitly names equivalent simple 2D Turing machines as vants, turmites, and turning machines.",
+            strength="DIRECT_IDENTITY", fields=["object_kind", "parameters_and_variants"])],
         aliases=["vant", "vants", "turmite", "turmites", "turning machine", "turning machines"])
     add("Langton's ant", "TM", ("SOURCE_UNIT", "U006136"),
         [ev("U006136", "The historical passage introduces a specific four-state two-color turning rule."),
@@ -740,9 +742,8 @@ def candidate_specs() -> list[dict[str, Any]]:
          ev("U006173", "The exact two replacement arrays are given.", modality="CODE"),
          ev("U006174", "At least d+1 black replacements are required to avoid confinement to a hyperplane.")],
         params=[("dimension", "3"), ("colors", "2")])
-    add("L-shaped geometric substitution system", "SUB", ("SOURCE_UNIT", "U006175"),
-        [ev("U006175", "The first displayed construction extends substitution from squares to an L-shaped geometric region."),
-         ev("U006176", "The first row directly shows successive L-shaped subdivision/replacement stages.", modality="IMAGE",
+    add("L-shaped geometric substitution system", "SUB", ("IMAGE", "A000549"),
+        [ev("U006176", "The first row is the first unambiguous L-shaped referent and directly shows successive subdivision/replacement stages.", modality="IMAGE",
             image="BACK-MATTER/NOTES/_page_947_Picture_10.jpeg")],
         missing=["The exact oriented-piece replacement table for the first L-shaped construction is not written textually."],
         overrides={"carrier": "an L-shaped geometric region recursively assembled from typed/oriented subpieces",
@@ -835,7 +836,10 @@ def candidate_specs() -> list[dict[str, Any]]:
                    "schedule": "one active-node rewrite and move per step",
                    "complete_state": "directed network plus active node"})
     add("final sequential-network six-case preset", "NETWORK", ("SOURCE_UNIT", "U006231"),
-        [ev("U006231", "The final displayed sequential system and its possible active-node trapping are independently identified."),
+        [ev("U006230", "The third/final panel is the visual identity of the sequential network whose exact rule follows.", modality="IMAGE",
+            image="BACK-MATTER/NOTES/_page_951_Sequential_Networks_Three_Panel_Row.jpeg",
+            strength="DIRECT_IDENTITY", fields=["object_kind", "parameters_and_variants"]),
+         ev("U006231", "The final displayed sequential system and its possible active-node trapping are independently identified."),
          ev("U006232", "The complete six-case local rewrite/move table for that final system is given.", modality="CODE",
             strength="DIRECT_COMPLETE_MECHANICS")],
         params=[("neighbor-number cases", "{1,1}, {1,2}, {2,1}, {2,2}, {2,3}, {2,4}")],
