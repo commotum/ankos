@@ -64,12 +64,14 @@ EXPECTED_INCOMING_COUNT = 24
 EXPECTED_WITHIN_COUNT = 23
 EXPECTED_UPDATE_COUNT = 47
 EXPECTED_OUTGOING_COUNT = 56
-EXPECTED_OUTGOING_IDENTITY_SHA256 = "TO_BE_FILLED"
+EXPECTED_OUTGOING_IDENTITY_SHA256 = (
+    "e2a7a61fa00c4a74a6afb5ad1c75039df83cf2546c80502a571e4a83370b8675"
+)
 EXPECTED_SPEC_SHA256 = (
-    "2d680994e6fb874695ad3773e28ab40f3fc0af512482f52c819a8a250ddd9cb3"
+    "b3f45d3ce55a317705ff4cbece6fe58826c48f6c3cd63214bdb87469fb076203"
 )
 EXPECTED_PRESERVATION_SHA256 = (
-    "cbc445c7d640ebdfc399077148cfcd509441d925795e49206bd98ff92ce59b96"
+    "d337b6a805e4d702837703a20bc4662d8bd9cdd346e07ee433d6c0dc5bd505f6"
 )
 
 ROUTE_ID = re.compile(r"^R[0-9]{6}$")
@@ -83,7 +85,7 @@ class AuthoringError(ValueError):
 
 @dataclass(frozen=True)
 class RouteSpec:
-    """One source-grounded incoming-route closure."""
+    """One source-grounded route closure."""
 
     route_id: str
     identity: tuple[str, str, str, str, str]
@@ -547,9 +549,386 @@ _ROUTE_DATA: tuple[tuple[str, ...], ...] = (
             "PDE or construction is absent."
         ),
     ),
+    (
+        "R000712",
+        "U002099",
+        "",
+        "PAGE",
+        "page 377",
+        "Observed paired eddies behind an obstacle",
+        "U002090-U002091",
+        "A001129",
+        (
+            "The landing is the labeled photographic catalog of physical "
+            "fluid flows and its caption; the obstacle-wake panels visibly "
+            "supply the paired-eddy comparison, not a native update law."
+        ),
+    ),
+    (
+        "R000713",
+        "U002100",
+        "",
+        "PAGE",
+        "page 377",
+        "Flow phenomena at changing speed",
+        "U002090-U002091",
+        "A001129",
+        (
+            "The landing is the labeled photographic catalog of laminar, "
+            "vortical, turbulent, and related flow regimes; it is "
+            "observational comparison evidence rather than a transition "
+            "rule."
+        ),
+    ),
+    (
+        "R000714",
+        "U002116",
+        "",
+        "PAGE",
+        "page 378",
+        "Microscopic particle randomness in the lattice-gas example",
+        "U002092-U002094",
+        "A001130",
+        (
+            "The landing supplies the discrete triangular-lattice particles, "
+            "displayed collision rules, reflecting plate and injection "
+            "conditions, together with microscopic and block-averaged views."
+        ),
+    ),
+    (
+        "R000715",
+        "U002123",
+        "",
+        "PAGE",
+        "page 377",
+        "Catalog of fluid-flow patterns",
+        "U002090-U002091",
+        "A001129",
+        (
+            "The landing is the reviewed labeled photographic catalog and "
+            "caption of typical physical flow patterns; it supplies the "
+            "requested comparison catalog without native fluid mechanics."
+        ),
+    ),
+    (
+        "R000717",
+        "U002166",
+        "",
+        "SECTION",
+        "two sections from now",
+        "Mollusc-shell cellular-automaton pigmentation patterns",
+        "U002346-U002354",
+        "A001169 A001170",
+        (
+            "The landing compares natural shell pigmentation with "
+            "one-dimensional cellular automata, states the line-by-line "
+            "neighbor-update hypothesis, and supplies both natural-shell and "
+            "complete symmetric-rule visual witnesses."
+        ),
+    ),
+    (
+        "R000719",
+        "U002204",
+        "",
+        "SECTION",
+        "the next section",
+        "Geometry and relative growth rates in plants and animals",
+        (
+            "U002235-U002238 U002286-U002290 U002292-U002307 "
+            "U002334-U002340"
+        ),
+        "A001158 A001159 A001160 A001161 A001162 A001165",
+        (
+            "The landing anchors the Growth of Plants and Animals section, "
+            "states directly that geometry and relative growth rates "
+            "determine the resulting plant forms, then gives the geometric "
+            "consequences of differential growth for plant disks, horns and "
+            "mollusc shells and the later comparison across animal forms."
+        ),
+    ),
+    (
+        "R000720",
+        "U002242",
+        "",
+        "PAGE",
+        "the next page",
+        "Parameter sequences for three-way branching substitution systems",
+        "U002249-U002250",
+        "A001150",
+        (
+            "The landing supplies the reviewed array of graphical three-way "
+            "substitution-rule variants and their limiting forms; the "
+            "caption identifies relative-length rows and 15-degree angle "
+            "increments across each row."
+        ),
+    ),
+    (
+        "R000721",
+        "U002245",
+        "",
+        "PAGE",
+        "page 403",
+        "Examples of natural leaf shapes",
+        "U002251-U002252",
+        "A001151",
+        (
+            "The landing supplies the natural-leaf photographic comparison "
+            "and caption, including its size range and explicit comparison "
+            "to the generated forms on the facing page."
+        ),
+    ),
+    (
+        "R000722",
+        "U002246",
+        "",
+        "PAGE",
+        "the next page",
+        "Substitution-system outlines resembling leaves",
+        "U002249-U002250",
+        "A001150",
+        (
+            "The landing supplies nine rows of graphical three-way "
+            "substitution rules and limiting leaf-like outlines, with "
+            "relative lengths and systematic angle variation stated in the "
+            "caption."
+        ),
+    ),
+    (
+        "R000723",
+        "U002258",
+        "",
+        "PAGE",
+        "the previous pages",
+        "Complex leaf-shape substitution patterns",
+        "U002249-U002252",
+        "A001150 A001151",
+        (
+            "The two landing clusters pair the complex limiting "
+            "substitution patterns and their rule-variation caption with the "
+            "reviewed natural-leaf comparison."
+        ),
+    ),
+    (
+        "R000724",
+        "U002260",
+        "",
+        "PAGE",
+        "the next page",
+        "Full parameter array for symmetric binary branching",
+        "U002265-U002266",
+        "A001153",
+        (
+            "The landing supplies the full two-parameter array of ten-step "
+            "symmetric two-branch substitutions and states how image "
+            "position encodes the right-hand branch-tip parameter."
+        ),
+    ),
+    (
+        "R000725",
+        "U002262",
+        "",
+        "PAGE",
+        "the next page",
+        "Symmetric branching parameter array",
+        "U002265-U002266",
+        "A001153",
+        (
+            "The landing supplies the full reviewed parameter array and its "
+            "captioned correspondence between array position and the "
+            "symmetric two-branch substitution rule."
+        ),
+    ),
+    (
+        "R000726",
+        "U002262",
+        "",
+        "PAGE",
+        "Page 407",
+        "Peephole overlap maps over branching-rule parameter space",
+        "U002267-U002268",
+        "A001154",
+        (
+            "The landing supplies four peephole-overlap parameter maps, "
+            "their black-to-white overlap interpretation, and magnified "
+            "nested boundaries."
+        ),
+    ),
+    (
+        "R000727",
+        "U002283",
+        "",
+        "PAGE",
+        "the top of the facing page",
+        "Damping variants of the phyllotaxis concentration model",
+        "U002284-U002285",
+        "A001157",
+        (
+            "The landing supplies the 100%, 95%, 75%, 50%, 25%, 5% and 0% "
+            "damping variants and explains their memory interpretation and "
+            "golden-angle convergence."
+        ),
+    ),
+    (
+        "R000728",
+        "U002288",
+        "",
+        "PAGE",
+        "page 409",
+        "Natural plant geometries using the golden angle",
+        "U002275-U002276",
+        "A001155",
+        (
+            "The landing supplies reviewed natural plant arrangements and "
+            "states that their differing geometries share an original "
+            "successive-element angle close to 137.5 degrees."
+        ),
+    ),
+    (
+        "R000729",
+        "U002301",
+        "",
+        "PAGE",
+        "the facing page",
+        "Differentially grown disk forms",
+        "U002293-U002296",
+        "A001160",
+        (
+            "The landing defines radial differences in added material and "
+            "shows the corresponding relaxed flat, cup, wavy and "
+            "self-overlapping disk forms."
+        ),
+    ),
+    (
+        "R000730",
+        "U002307",
+        "",
+        "PAGE",
+        "the previous page",
+        "Base mollusc-shell growth rule and three examples",
+        "U002302-U002305",
+        "A001162",
+        (
+            "The landing states progressive addition at the shell opening, "
+            "differential growth and displacement, and supplies the three "
+            "reviewed rule/profile/evolution examples."
+        ),
+    ),
+    (
+        "R000731",
+        "U002312",
+        "",
+        "PAGE",
+        "the previous page",
+        "Five shell-growth parameter sweeps",
+        "U002306-U002307",
+        "A001165",
+        (
+            "The landing supplies the five labeled sweeps for scale increase, "
+            "opening displacement, opening size, opening shape, and "
+            "differential material addition."
+        ),
+    ),
+    (
+        "R000732",
+        "U002317",
+        "",
+        "PAGE",
+        "page 412",
+        "Differential-growth disk model",
+        "U002293-U002296",
+        "A001160",
+        (
+            "The landing gives the radial material profiles, equal-cell "
+            "relaxation condition, and resulting three-dimensional disk "
+            "forms."
+        ),
+    ),
+    (
+        "R000733",
+        "U002352",
+        "",
+        "PAGE",
+        "the bottom of the facing page",
+        "Complete symmetric binary nearest-neighbor rule array",
+        "U002350-U002352",
+        "A001170",
+        (
+            "The landing supplies the complete labeled array of symmetric "
+            "binary nearest-neighbor rules and outputs from random starts, "
+            "together with the shell-pattern comparison."
+        ),
+    ),
+    (
+        "R000734",
+        "U002359",
+        "",
+        "PAGE",
+        "the facing page",
+        "Natural animal pigmentation examples",
+        "U002357-U002358",
+        "A001171",
+        (
+            "The landing supplies the reviewed natural-animal pigmentation "
+            "examples and notes the recurrence of similar patterns across "
+            "very different animals."
+        ),
+    ),
+    (
+        "R000735",
+        "U002364",
+        "",
+        "PAGE",
+        "the next page",
+        "Weight-parameter array for pigmentation cellular automata",
+        "U002365-U002366",
+        "A001173",
+        (
+            "The landing supplies the full stationary-pattern array and "
+            "states the distance-2 and distance-3 weight ranges encoded down "
+            "and across the page."
+        ),
+    ),
+    (
+        "R000736",
+        "U002367",
+        "",
+        "PAGE",
+        "the top of the facing page",
+        "Anisotropic stripe-producing pigmentation rules",
+        "U002368-U002369",
+        "A001174",
+        (
+            "The landing supplies vertical- and horizontal-stripe "
+            "anisotropic evolutions and states how horizontal versus "
+            "vertical neighbor weights differ in the two rules."
+        ),
+    ),
 )
 
 ROUTE_SPECS = tuple(route_spec(*row) for row in _ROUTE_DATA)
+
+INCOMING_ROUTE_IDS = tuple(
+    spec.route_id for spec in ROUTE_SPECS[:EXPECTED_INCOMING_COUNT]
+)
+WITHIN_STAGE_ROUTE_IDS = (
+    "R000712",
+    "R000713",
+    "R000714",
+    "R000715",
+    "R000717",
+    *tuple(f"R{number:06d}" for number in range(719, 737)),
+)
+OUTGOING_ROUTE_IDS = (
+    "R000709",
+    "R000710",
+    "R000711",
+    "R000716",
+    "R000718",
+    *tuple(f"R{number:06d}" for number in range(737, 788)),
+)
+STAGE_ROUTE_IDS = tuple(
+    f"R{number:06d}" for number in range(709, 788)
+)
 
 
 DEFERRED_ROUTE_ID = "R000543"
@@ -588,12 +967,15 @@ def embedded_spec_payload() -> dict[str, Any]:
 
 
 def preservation_payload() -> dict[str, Any]:
-    """Return the canonical digest payload for the deferred Stage 13 route."""
+    """Return the canonical digest payload for every deferred route."""
 
     return {
-        "route_id": DEFERRED_ROUTE_ID,
-        "identity": list(DEFERRED_ROUTE_IDENTITY),
-        "boundary": DEFERRED_ROUTE_BOUNDARY,
+        "preexisting_stage13_route": {
+            "route_id": DEFERRED_ROUTE_ID,
+            "identity": list(DEFERRED_ROUTE_IDENTITY),
+            "boundary": DEFERRED_ROUTE_BOUNDARY,
+        },
+        "stage12_outgoing_route_ids": list(OUTGOING_ROUTE_IDS),
     }
 
 
@@ -614,6 +996,22 @@ def validate_embedded_specs() -> tuple[str, str]:
         raise AuthoringError("route specifications are missing or duplicated")
     if route_ids != sorted(route_ids):
         raise AuthoringError("route specifications are not in canonical order")
+    if (
+        tuple(route_ids[:EXPECTED_INCOMING_COUNT]) != INCOMING_ROUTE_IDS
+        or tuple(route_ids[EXPECTED_INCOMING_COUNT:])
+        != WITHIN_STAGE_ROUTE_IDS
+    ):
+        raise AuthoringError("incoming/within route partition drifted")
+    if (
+        len(INCOMING_ROUTE_IDS) != EXPECTED_INCOMING_COUNT
+        or len(WITHIN_STAGE_ROUTE_IDS) != EXPECTED_WITHIN_COUNT
+        or len(OUTGOING_ROUTE_IDS) != EXPECTED_OUTGOING_COUNT
+        or len(STAGE_ROUTE_IDS) != EXPECTED_STAGE_ROUTE_COUNT
+        or set(WITHIN_STAGE_ROUTE_IDS) & set(OUTGOING_ROUTE_IDS)
+        or set(WITHIN_STAGE_ROUTE_IDS) | set(OUTGOING_ROUTE_IDS)
+        != set(STAGE_ROUTE_IDS)
+    ):
+        raise AuthoringError("Stage 12 route partition is not exhaustive")
     if DEFERRED_ROUTE_ID in route_ids:
         raise AuthoringError("deferred Stage 13 route entered the closure set")
     for spec in ROUTE_SPECS:
@@ -736,6 +1134,20 @@ def route_identity(row: dict[str, str]) -> tuple[str, str, str, str, str]:
     return tuple(row[field] for field in IDENTITY_FIELDS)  # type: ignore[return-value]
 
 
+def outgoing_identity_payload(
+    routes_by_id: dict[str, dict[str, str]],
+) -> list[dict[str, Any]]:
+    """Return the frozen immutable identities of Stage 12 outgoing routes."""
+
+    return [
+        {
+            "route_id": route_id,
+            "identity": list(route_identity(routes_by_id[route_id])),
+        }
+        for route_id in OUTGOING_ROUTE_IDS
+    ]
+
+
 def parsed_string_list(value: str, *, label: str) -> list[str]:
     parsed = json.loads(value)
     if not isinstance(parsed, list) or not all(
@@ -808,7 +1220,7 @@ def require_screened_asset(
 
 
 def build_proposal(goal_dir: Path) -> dict[str, Any]:
-    """Build the exact 24-row Stage 12 incoming-route proposal."""
+    """Build the exact 47-row Stage 12 route-resolution proposal."""
 
     goal_dir = goal_dir.resolve()
     if goal_dir != GOAL_DIR.resolve():
@@ -902,6 +1314,45 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     ):
         raise AuthoringError("combined Stage 12 asset coverage drifted")
 
+    observed_stage_routes = {
+        row["route_id"]: row
+        for row in routes
+        if row["owning_stage"] == "12"
+    }
+    if (
+        len(observed_stage_routes) != EXPECTED_STAGE_ROUTE_COUNT
+        or set(observed_stage_routes) != set(STAGE_ROUTE_IDS)
+    ):
+        raise AuthoringError("Stage 12 route-ID allocation drifted")
+    observed_within = {
+        route_id
+        for route_id, row in observed_stage_routes.items()
+        if row["closure_scope"] == "WITHIN_STAGE"
+    }
+    observed_outgoing = {
+        route_id
+        for route_id, row in observed_stage_routes.items()
+        if row["closure_scope"] == "CROSS_RANGE"
+    }
+    if (
+        observed_within != set(WITHIN_STAGE_ROUTE_IDS)
+        or observed_outgoing != set(OUTGOING_ROUTE_IDS)
+    ):
+        raise AuthoringError("Stage 12 route-scope partition drifted")
+    outgoing_digest = payload_sha256(
+        outgoing_identity_payload(routes_by_id)
+    )
+    if outgoing_digest != EXPECTED_OUTGOING_IDENTITY_SHA256:
+        raise AuthoringError(
+            "Stage 12 outgoing route identities drifted: "
+            f"{outgoing_digest} != {EXPECTED_OUTGOING_IDENTITY_SHA256}"
+        )
+    for route_id in OUTGOING_ROUTE_IDS:
+        require_pending_route(
+            routes_by_id[route_id],
+            label=f"outgoing {route_id}",
+        )
+
     deferred = routes_by_id.get(DEFERRED_ROUTE_ID)
     if (
         deferred is None
@@ -921,8 +1372,17 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             raise AuthoringError(
                 f"governed route identity drifted: {spec.route_id}"
             )
-        if (
-            before["owning_stage"] == "12"
+        if spec.route_id in WITHIN_STAGE_ROUTE_IDS:
+            if (
+                before["owning_stage"] != "12"
+                or before["closure_scope"] != "WITHIN_STAGE"
+            ):
+                raise AuthoringError(
+                    f"governed route is not WITHIN_STAGE: {spec.route_id}"
+                )
+        elif (
+            spec.route_id not in INCOMING_ROUTE_IDS
+            or before["owning_stage"] == "12"
             or before["closure_scope"] != "CROSS_RANGE"
         ):
             raise AuthoringError(
@@ -1000,7 +1460,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "proposal_kind": "ROUTE_RESOLUTION",
-        "coordinator_id": "ch08-everyday-incoming-route-closure-e2",
+        "coordinator_id": "ch08-everyday-route-closure-e2",
         "epoch": epoch,
         "base_artifact_sha256": {
             name: hashlib.sha256((goal_dir / name).read_bytes()).hexdigest()
@@ -1021,8 +1481,10 @@ def main() -> int:
             )
             return 1
         print(
-            "Chapter 8 incoming-route specification valid: "
-            f"resolved={EXPECTED_UPDATE_COUNT} "
+            "Chapter 8 route specification valid: "
+            f"incoming={EXPECTED_INCOMING_COUNT} "
+            f"within={EXPECTED_WITHIN_COUNT} "
+            f"preserved-outgoing={EXPECTED_OUTGOING_COUNT} "
             f"deferred={DEFERRED_ROUTE_ID} "
             f"spec-sha256={spec_digest} "
             f"preservation-sha256={preservation_digest}"
@@ -1050,7 +1512,7 @@ def main() -> int:
         return 1
     print(
         f"Wrote {output_path} with {len(proposal['route_updates'])} "
-        "route-ID-and-identity-keyed incoming closures."
+        "route-ID-and-identity-keyed closures."
     )
     return 0
 
