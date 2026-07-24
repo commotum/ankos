@@ -1031,11 +1031,18 @@ def build_output(bundle: Path) -> dict[str, Any]:
         [ordinal[c["units"][0]] for c in candidates] == sorted(ordinal[c["units"][0]] for c in candidates),
         "candidate definitions are not in canonical discovery order",
     )
+    candidate_anchor_counts: dict[str, int] = {}
+    for candidate in candidates:
+        anchor_id = candidate["units"][0]
+        candidate_anchor_counts[anchor_id] = candidate_anchor_counts.get(anchor_id, 0) + 1
+        candidate["anchor_ordinal"] = candidate_anchor_counts[anchor_id]
 
     routes: list[dict[str, str]] = []
     route_ids_by_unit: dict[str, list[str]] = {}
+    route_anchor_counts: dict[str, int] = {}
     for index, (unit_id, literal, kind, topic, scope, vocabulary) in enumerate(ROUTE_DEFS, 1):
         route_id = f"WR{index:04d}"
+        route_anchor_counts[unit_id] = route_anchor_counts.get(unit_id, 0) + 1
         route_ids_by_unit.setdefault(unit_id, []).append(route_id)
         routes.append(
             {
@@ -1045,18 +1052,18 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 "discovery_epoch": str(EPOCH),
                 "discovery_kind": "SOURCE_UNIT",
                 "discovery_id": unit_id,
-                "discovery_ordinal": str(ordinal[unit_id]),
+                "discovery_ordinal": str(route_anchor_counts[unit_id]),
                 "literal_target": literal,
                 "route_kind": kind,
                 "expected_topic": topic,
                 "owning_stage": str(STAGE),
                 "closure_scope": scope,
                 "status": "PENDING",
-                "target_unit_ids": "",
-                "target_asset_ids": "",
-                "attempts": "The isolated worker recorded but did not resolve this route.",
+                "target_unit_ids": "[]",
+                "target_asset_ids": "[]",
+                "attempts": "[]",
                 "vocabulary_terms": jdump(vocabulary),
-                "defect_boundary": "Target mechanics were not inspected under the blind worker contract.",
+                "defect_boundary": "",
             }
         )
 
@@ -1076,6 +1083,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
             candidate_ids_by_unit.setdefault(unit_id, []).append(candidate["id"])
             if role not in roles_by_unit.setdefault(unit_id, []):
                 roles_by_unit[unit_id].append(role)
+    candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
 
     # Allocate evidence globally by canonical source occurrence, then candidate ID.
     evidence_allocations: list[tuple[int, str, dict[str, Any], str]] = []
@@ -1084,10 +1092,12 @@ def build_output(bundle: Path) -> dict[str, Any]:
             evidence_allocations.append((ordinal[unit_id], candidate["id"], candidate, unit_id))
     evidence_allocations.sort(key=lambda item: (item[0], item[1]))
     evidence_by_candidate: dict[str, list[dict[str, Any]]] = {candidate["id"]: [] for candidate in candidates}
+    evidence_anchor_counts: dict[str, int] = {}
     for evidence_number, (_, _, candidate, unit_id) in enumerate(evidence_allocations, 1):
         unit = unit_by_id[unit_id]
         asset = asset_by_unit.get(unit_id)
         semantic = unit_id in candidate["semantic_units"]
+        evidence_anchor_counts[unit_id] = evidence_anchor_counts.get(unit_id, 0) + 1
         if candidate["source_status"] == "CONFLICTING":
             strength = "DEFECT_LIMITED"
         elif semantic:
@@ -1096,6 +1106,15 @@ def build_output(bundle: Path) -> dict[str, Any]:
             strength = "CONTEXTUAL"
         else:
             strength = "CORROBORATING"
+        if (
+            unit["block_kind"] == "image"
+            and strength in {"DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
+            and any(
+                candidate_by_id[candidate_id]["role"] in {"OBSERVER", "EMULATION", "CONSTRAINT"}
+                for candidate_id in candidate_ids_by_unit[unit_id]
+            )
+        ):
+            strength = "CONTEXTUAL"
         if unit["block_kind"] == "image":
             modality = "IMAGE"
         else:
@@ -1122,7 +1141,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                     "epoch": EPOCH,
                     "kind": "SOURCE_UNIT",
                     "id": unit_id,
-                    "ordinal": ordinal[unit_id],
+                    "ordinal": evidence_anchor_counts[unit_id],
                 },
                 "source_unit_id": unit_id,
                 "image_path": asset["physical_path"] if asset else None,
@@ -1145,13 +1164,13 @@ def build_output(bundle: Path) -> dict[str, Any]:
         for field in FIELDS:
             if field in candidate["conflicting_fields"]:
                 status = "CONFLICTING_SOURCE"
-                value = candidate["values"].get(field)
+                value = None
                 reason = candidate["uncertainties"][0]
                 ids = evidence_for_field[field]
             elif field in candidate["values"]:
                 status = "SUPPORTED"
                 value = candidate["values"][field]
-                reason = f"The cited Chapter 6 evidence directly supports this {field} statement."
+                reason = ""
                 ids = evidence_for_field[field]
                 check(ids, f"{candidate['id']} supported field lacks evidence: {field}")
             elif field in candidate["na_fields"]:
@@ -1188,7 +1207,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                     "epoch": EPOCH,
                     "kind": "SOURCE_UNIT",
                     "id": candidate["units"][0],
-                    "ordinal": ordinal[candidate["units"][0]],
+                    "ordinal": candidate["anchor_ordinal"],
                 },
                 "source_unit_ids": candidate["units"],
                 "source_evidence": evidence,
@@ -1480,8 +1499,43 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         [row["evidence_group_id"] for row in evidence] == [f"WG{i:06d}" for i in range(1, len(evidence) + 1)],
         "evidence-group ID sequence",
     )
-    anchors = [(row["discovery_anchor"]["ordinal"], row["evidence_id"]) for row in evidence]
-    check(anchors == sorted(anchors, key=lambda item: (item[0], item[1])), "evidence anchor order")
+    unit_order = {row["source_unit_id"]: index for index, row in enumerate(data["reading"], 1)}
+    candidate_anchor_ordinals: dict[str, list[int]] = {}
+    candidate_anchor_keys: list[tuple[int, int]] = []
+    for candidate in output["candidate_proposals"]:
+        anchor = candidate["discovery_anchor"]
+        candidate_anchor_ordinals.setdefault(anchor["id"], []).append(anchor["ordinal"])
+        candidate_anchor_keys.append((unit_order[anchor["id"]], anchor["ordinal"]))
+    check(candidate_anchor_keys == sorted(candidate_anchor_keys), "candidate anchor order")
+    check(
+        all(values == list(range(1, len(values) + 1)) for values in candidate_anchor_ordinals.values()),
+        "candidate anchor ordinal sequence",
+    )
+    evidence_anchor_ordinals: dict[str, list[int]] = {}
+    evidence_anchor_keys: list[tuple[int, int]] = []
+    for row in evidence:
+        anchor = row["discovery_anchor"]
+        evidence_anchor_ordinals.setdefault(anchor["id"], []).append(anchor["ordinal"])
+        evidence_anchor_keys.append((unit_order[anchor["id"]], anchor["ordinal"]))
+    check(evidence_anchor_keys == sorted(evidence_anchor_keys), "evidence anchor order")
+    check(
+        all(sorted(values) == list(range(1, len(values) + 1)) for values in evidence_anchor_ordinals.values()),
+        "evidence anchor ordinal sequence",
+    )
+    route_anchor_ordinals: dict[str, list[int]] = {}
+    route_anchor_keys: list[tuple[int, int]] = []
+    for route in output["route_proposals"]:
+        anchor_id = route["discovery_id"]
+        anchor_ordinal = int(route["discovery_ordinal"])
+        route_anchor_ordinals.setdefault(anchor_id, []).append(anchor_ordinal)
+        route_anchor_keys.append((unit_order[anchor_id], anchor_ordinal))
+        check(route["target_unit_ids"] == "[]" and route["target_asset_ids"] == "[]", "pending route targets")
+        check(route["attempts"] == "[]" and route["defect_boundary"] == "", "pending route closure state")
+    check(route_anchor_keys == sorted(route_anchor_keys), "route anchor order")
+    check(
+        all(values == list(range(1, len(values) + 1)) for values in route_anchor_ordinals.values()),
+        "route anchor ordinal sequence",
+    )
     allowed_candidate_ids = set(candidate_ids)
     allowed_route_ids = set(route_ids)
     for row in output["reading_updates"]:
