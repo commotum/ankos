@@ -109,7 +109,7 @@ def C(
     template: str,
     carrier: str,
     state: str,
-    law: str,
+    law: str | None,
     support: str = "the carrier described by the source",
     topology: str | None = None,
     alphabet: str | None = None,
@@ -135,6 +135,7 @@ def C(
     images: list[tuple[str, str, str]] | None = None,
     uncertainties: list[str] | None = None,
     conflicting_fields: list[str] | None = None,
+    unknown_fields: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     return {
         "name": name,
@@ -169,6 +170,7 @@ def C(
         "images": images or [],
         "uncertainties": uncertainties or [],
         "conflicting_fields": conflicting_fields or [],
+        "unknown_fields": unknown_fields or {},
     }
 
 
@@ -273,7 +275,7 @@ CANDIDATES = [
     C(
         "flicker (1/f) noise process",
         "U006603",
-        ["U006603", "U006604", "U006609"],
+        ["U006603", "U006609"],
         template="physical_partial",
         carrier="a device or natural process observed as a time series",
         state="the observed quantity over time",
@@ -285,9 +287,39 @@ CANDIDATES = [
         result="large low-frequency fluctuations and an approximate 1/f spectrum",
         determinism="the source does not identify a unique generating law",
         witness="the measured power-law spectrum",
-        params=[("spectral exponent alpha", "The general spectrum is 1/f^alpha, with flicker noise near alpha=1.", ["U006604"])],
-        images=[("A000666", "CONTEXTUAL", "The five-panel waveform row depicts spectra from flat through 1/f^2 and contextualizes the 1/f family.")],
         uncertainties=["The source explicitly says the microscopic origin of flicker noise remains mysterious."],
+    ),
+    C(
+        "discrete power-spectrum analyzer",
+        "U006604",
+        ["U006604", "U006605"],
+        template="declarative",
+        carrier="a finite numerical data sequence and its discrete Fourier-frequency bins",
+        state="N/A",
+        law="return Abs[Fourier[data]]^2",
+        support="the frequency bins of the discrete Fourier transform of the supplied data",
+        topology="finite sequence order mapped to discrete frequency order",
+        alphabet="numeric input samples and nonnegative real spectral powers",
+        input_value="a finite numerical sequence data",
+        boundary="the complete supplied sequence under the Fourier convention used by Fourier",
+        external="none",
+        result="a discrete power spectrum, one squared Fourier magnitude per frequency bin",
+        determinism="deterministic for fixed data and Fourier convention",
+        witness="the returned spectrum and any fitted power-law form 1/f^alpha",
+        params=[
+            (
+                "spectral exponent alpha",
+                "The displayed output families are alpha=0, 1/2, 1, 3/2, and 2; alpha describes a spectrum and does not define a generating dynamics.",
+                ["U006604", "U006605"],
+            )
+        ],
+        images=[
+            (
+                "A000666",
+                "DIRECT_PARTIAL_MECHANICS",
+                "The five labeled examples identify analyzed spectrum families alpha=0, 1/2, 1, 3/2, and 2; they do not define a generator.",
+            )
+        ],
     ),
     C(
         "electronic physical-randomness generator",
@@ -745,7 +777,7 @@ CANDIDATES = [
     C(
         "noisy continuous cellular-automaton model",
         "U006673",
-        ["U006673", "U006674", "U006675", "U006676"],
+        ["U006673", "U006674", "U006675"],
         template="stochastic",
         carrier="a one-dimensional array of continuous cell values",
         state="all current real-valued cell colors",
@@ -769,9 +801,35 @@ CANDIDATES = [
         variants=[
             ("continuous rule 90", "Update with lambda[a+c].", ["U006675"]),
             ("continuous rule 30", "Update with lambda[a+b+c+bc].", ["U006675"]),
-            ("continuous-space/time PDE approximation", "The approach is said to extend to PDE approximations, without a PDE here.", ["U006676"]),
         ],
-        uncertainties=["The array boundary condition is not stated; the PDE extension is only a route-level claim, not a defined PDE."],
+        uncertainties=["The array boundary condition is not stated."],
+    ),
+    C(
+        "discrete-cellular-automaton to continuous-PDE approximation relation",
+        "U006676",
+        ["U006676"],
+        template="declarative",
+        carrier="a discrete cellular automaton and a prospective continuous field model",
+        state="N/A",
+        law=None,
+        support="continuous color over continuous space and continuous time",
+        topology="a continuous space-time domain",
+        alphabet="continuous field values",
+        input_value="a discrete cellular automaton together with an unspecified approximation construction",
+        boundary=None,
+        external="none",
+        result="an unspecified partial differential equation intended to approximate the cellular automaton",
+        successor="one or more possible PDE approximations",
+        determinism="not determined by this notes unit",
+        witness="agreement between the discrete automaton and a continuous-space/time field evolution",
+        uncertainties=[
+            "The notes unit states only that the approach can be extended; it supplies neither the PDE nor the discrete-to-continuous mapping, and points to page 464."
+        ],
+        unknown_fields={
+            "rule_relation_constraint_function_or_probability_law": "The in-scope source asserts that a PDE approximation can be made but supplies no PDE or mapping procedure.",
+            "successor_cardinality": "The in-scope source does not determine whether fixed discrete data select one PDE approximation or multiple alternatives.",
+            "determinism_branching_or_measure": "The in-scope source does not determine a discrete-to-continuous selection law.",
+        },
     ),
     C(
         "Gaussian central-limit aggregation law",
@@ -1751,25 +1809,71 @@ CANDIDATES = [
         uncertainties=["The finite/infinite-domain convention and a constructive minimization algorithm are not supplied."],
     ),
     C(
-        "balanced-parentheses context-free language",
+        "PDE linear-stability and dispersion analyzer",
+        "U006846",
+        ["U006846"],
+        template="declarative",
+        carrier="a partial differential equation, a basic solution, and infinitesimal perturbation modes",
+        state="N/A",
+        law="linearize around the basic solution, substitute perturbation modes Exp[i k x] Exp[i omega t], derive the dispersion relation omega(k), classify real, damped, and growing modes by omega, and select the wavelength whose mode has the most negative Im[omega]",
+        support="the PDE's spatial domain and its wavenumber/frequency mode space",
+        topology="continuous space represented by Fourier modes indexed by k",
+        alphabet="symbolic or numeric PDE coefficients, wavenumbers k, and complex frequencies omega",
+        input_value="a PDE and a basic solution about which small fluctuations are analyzed",
+        boundary=None,
+        external="none",
+        result="a dispersion relation omega(k), a stability classification over k, and the dominant growing wavelength when one exists",
+        determinism="deterministic within the stated linear approximation",
+        witness="real omega gives constant-amplitude waves, Im[omega]>0 gives damping, Im[omega]<0 gives growth, and the most-negative imaginary part identifies the fastest-growing mode",
+        params=[
+            (
+                "wavenumber k",
+                "Indexes spatial modes and determines wavelength and omega through the dispersion relation.",
+                ["U006846"],
+            ),
+            (
+                "basic solution",
+                "Fixes the state around which the PDE is linearized.",
+                ["U006846"],
+            ),
+        ],
+        variants=[
+            (
+                "real-frequency mode",
+                "Real omega corresponds to an ordinary constant-amplitude wave.",
+                ["U006846"],
+            ),
+            (
+                "damped mode",
+                "Im[omega]>0 yields exponential damping under the source's Exp[i omega t] convention.",
+                ["U006846"],
+            ),
+            (
+                "growing unstable mode",
+                "Im[omega]<0 yields exponential growth; the most-negative value grows fastest.",
+                ["U006846"],
+            ),
+        ],
+        uncertainties=[
+            "The notes give the analysis procedure but no particular PDE, base solution, boundary condition, or concrete dispersion relation."
+        ],
+    ),
+    C(
+        "balanced-parentheses language membership and denotation",
         "U006847",
-        ["U006847", "U006848", "U006849", "U006850", "U006851", "U006852", "U006853"],
+        ["U006847", "U006848", "U006849", "U006850", "U006852", "U006853"],
         template="declarative",
         carrier="finite strings over opening and closing parentheses",
         state="N/A",
-        law="accept strings whose parentheses are properly paired and nested; count length-2n strings by Catalan n and depth-d strings by the displayed recurrence c",
+        law="accept exactly strings whose parentheses are properly paired and nested, and interpret each accepted string as the corresponding nested-list/expression-tree structure",
         support="finite strings",
         topology="linear string order with a derived parse tree",
         alphabet="{(,)}",
-        input_value="a parenthesis string or counting parameters n,d",
+        input_value="a finite parenthesis string",
         boundary="the entire finite string",
-        result="a membership truth value, parse/nested list, or count",
-        determinism="deterministic relation/function",
-        witness="a balanced parse tree or the returned count",
-        params=[
-            ("pair count n", "There are Catalan(n)=Binomial[2n,n]/(n+1) strings of length 2n.", ["U006850"]),
-            ("depth d", "The recurrence difference counts strings of exact depth d.", ["U006850", "U006851"]),
-        ],
+        result="a membership truth value and, for an accepted string, its balanced nesting denotation",
+        determinism="deterministic membership and denotation relation",
+        witness="complete pair annihilation or the equivalent nested-list/expression-tree structure",
         variants=[
             ("nested-list representation", "Balanced strings correspond to nested Mathematica lists/expression trees.", ["U006849"]),
             ("annihilation representation", "Paired structures annihilate to expose the nesting depth.", ["U006847", "U006848", "U006852", "U006853"]),
@@ -1777,6 +1881,48 @@ CANDIDATES = [
         images=[
             ("A000011", "CONTEXTUAL", "The first image shows paired annihilation/nesting."),
             ("A000012", "CONTEXTUAL", "The second image shows equivalent nested structures."),
+        ],
+    ),
+    C(
+        "balanced-parentheses count analyzer",
+        "U006850",
+        ["U006850", "U006851"],
+        template="declarative",
+        carrier="nonnegative integer size and depth parameters",
+        state="N/A",
+        law="return Binomial[2 n,n]/(n+1) for all balanced strings with n pairs, or c[{n,n},d]-c[{n,n},d-1] using the displayed recurrence for strings of exact depth d",
+        support="nonnegative integer pair counts n and depths d",
+        topology="N/A",
+        alphabet="nonnegative integer inputs and a nonnegative integer count",
+        input_value="pair count n and either all depths or an exact depth d",
+        boundary="n and d are finite nonnegative integers, with the displayed recurrence base and invalid-region cases",
+        external="none",
+        result="one nonnegative integer count",
+        determinism="deterministic",
+        witness="the Catalan formula value or the exact-depth recurrence difference",
+        params=[
+            (
+                "pair count n",
+                "Selects strings of length 2n.",
+                ["U006850", "U006851"],
+            ),
+            (
+                "depth d",
+                "Selects the exact annihilation/nesting depth for the recurrence variant.",
+                ["U006850", "U006851"],
+            ),
+        ],
+        variants=[
+            (
+                "all-depth Catalan count",
+                "For n pairs, return Binomial[2 n,n]/(n+1).",
+                ["U006850"],
+            ),
+            (
+                "exact-depth recurrence count",
+                "For n pairs and exact depth d, return c[{n,n},d]-c[{n,n},d-1].",
+                ["U006850", "U006851"],
+            ),
         ],
     ),
     C(
@@ -2021,8 +2167,6 @@ HISTORICAL = {
 }
 
 REPRESENTATION = {
-    "U006604",
-    "U006605",
     "U006621",
     "U006630",
     "U006679",
@@ -2055,7 +2199,6 @@ REPRESENTATION = {
     "U006818",
     "U006819",
     "U006845",
-    "U006846",
     "U006868",
     "U006869",
 }
@@ -2244,6 +2387,13 @@ def field_template(spec: dict[str, Any]) -> dict[str, tuple[str, str | None, str
             None,
             spec["uncertainties"][0],
         )
+    for field, reason in spec["unknown_fields"].items():
+        assert field in values
+        values[field] = (
+            "UNKNOWN_FROM_SOURCE",
+            None,
+            reason,
+        )
     for field, (status, value, reason) in list(values.items()):
         if status == "SUPPORTED":
             values[field] = (status, value, "")
@@ -2265,7 +2415,7 @@ def main() -> int:
     asset_by_id = {row["asset_id"]: row for row in asset_rows}
     assert len(reading_rows) == 278
     assert len(asset_rows) == 102
-    assert len(CANDIDATES) == 65
+    assert len(CANDIDATES) == 69
 
     # Candidate IDs follow first canonical source occurrence, with list order
     # breaking the intentional same-unit ties.
@@ -2432,11 +2582,7 @@ def main() -> int:
         evidence: list[dict[str, Any]] = []
         for source in spec["sources"]:
             evidence_id = evidence_id_by_ref[(spec["id"], source)]
-            strength = (
-                "DIRECT_PARTIAL_MECHANICS"
-                if source in spec["law_sources"] or source == spec["anchor"]
-                else "CORROBORATING"
-            )
+            strength = "DIRECT_PARTIAL_MECHANICS"
             evidence.append(
                 {
                     "evidence_id": evidence_id,
@@ -2749,9 +2895,9 @@ def main() -> int:
 
     assert len(output["reading_updates"]) == 278
     assert len(output["asset_updates"]) == 102
-    assert len(output["candidate_proposals"]) == 65
+    assert len(output["candidate_proposals"]) == 69
     assert len({e["evidence_id"] for c in candidate_proposals for e in c["source_evidence"]}) == len(evidence_refs)
-    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 65
+    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 69
     assert all(
         c["fingerprint"]["evidence_limit"]["evidence_ids"]
         == [c["source_evidence"][0]["evidence_id"]]
@@ -2768,7 +2914,7 @@ def main() -> int:
                     "assets": len(asset_updates),
                     "candidates": len(candidate_proposals),
                     "evidence": len(evidence_refs),
-                    "groups": 65,
+                    "groups": 69,
                     "routes": len(route_proposals),
                     "bytes": len(payload.encode("utf-8")),
                 },
@@ -2780,8 +2926,8 @@ def main() -> int:
     temporary.write_text(payload, encoding="utf-8")
     os.replace(temporary, output_path)
     print(
-        f"authored {output_path}: readings=278 assets=102 candidates=65 "
-        f"evidence={len(evidence_refs)} groups=65 routes={len(route_proposals)}"
+        f"authored {output_path}: readings=278 assets=102 candidates=69 "
+        f"evidence={len(evidence_refs)} groups=69 routes={len(route_proposals)}"
     )
     return 0
 

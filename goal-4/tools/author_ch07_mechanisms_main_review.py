@@ -553,7 +553,6 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="multipliers 3, 37, and 65539 in the displayed generator comparison",
         ),
         units=["U001720", "U001726", "U001727"],
-        mechanics="U001727",
         aliases=["linear congruential random number generator"],
         parameters=["31-bit width", "multiplier"],
         variants=["multiplier 3", "multiplier 37", "multiplier 65539"],
@@ -573,6 +572,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             variants="two-dimensional and three-dimensional coordinate plots",
         ),
         units=["U001726", "U001727"],
+        mechanics="U001727",
         parameters=["coordinate dimension"],
         variants=["successive pairs", "successive triples"],
     )
@@ -886,6 +886,14 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "U001932",
             "U001933",
         ],
+        mechanics="U001825",
+        field_units={
+            "rule_relation_constraint_function_or_probability_law": [
+                "U001825",
+                "U001933",
+            ],
+            "parameters_and_variants": ["U001825", "U001933"],
+        },
         aliases=["binary phase-selecting cellular automaton from page 339"],
         parameters=["initial condition and its total quantity"],
         variants=["gray-interface expansion", "uniform-white or uniform-black phase selection"],
@@ -926,7 +934,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             result="continuous trajectories and eventual discrete-looking positions",
             variants="the four displayed double-well examples",
         ),
-        units=["U001832", "U001833", "U001834", "U001835", "U001836", "U001837", "U001838"],
+        units=["U001831", "U001832", "U001833", "U001834", "U001835", "U001836", "U001837", "U001838"],
         uncertainty="The force law, potential, damping, boundary, and numerical parameters are not stated.",
     )
     add(
