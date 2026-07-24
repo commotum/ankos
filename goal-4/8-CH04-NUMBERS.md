@@ -375,8 +375,9 @@ the `B0428` law in `U000860`.
 
 The ordinary and optimized Stage 8 gates, corpus verification, corpus
 mutation checks, audit mutation/history self-tests, byte compilation, and
-whitespace checks pass. The ordinary full Goal 4 suite passes all 94 tests;
-the optimized aggregate result is recorded after its concurrent terminal run.
+whitespace checks pass. The ordinary and optimized full Goal 4 suites each
+pass all 94 tests; optimized Python emits only pytest's expected warning that
+assertions in test modules are disabled under `-O`.
 
 Stage 9 may now open without reading any Chapter 5 source beforehand. Its
 exact input is the six terminal hashes in **Current Facts**, active global
