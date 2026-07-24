@@ -1553,14 +1553,13 @@ RECOVERED_SPECS = [
         related=["B0954"],
         evidence_scopes={
             "U006314": [
-                "object_kind",
                 "carrier",
-                "law_kind",
                 "parameters_and_variants",
-                "evidence_limit",
             ],
             "U006316": [
+                "object_kind",
                 "input",
+                "law_kind",
                 "rule_relation_constraint_function_or_probability_law",
                 "result_kind",
                 "successor_cardinality",
@@ -1573,7 +1572,7 @@ RECOVERED_SPECS = [
             ],
         },
         discovery_unit="U006316",
-        identity_unit="U006314",
+        identity_unit="U006316",
     ),
     _spec(
         "square-free sequence enumerator",
@@ -2676,9 +2675,9 @@ EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
 EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
 EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 214
 EXPECTED_NEW_ROUTE_COUNT = 151
-EXPECTED_READING_UPDATE_COUNT = 154
+EXPECTED_READING_UPDATE_COUNT = 163
 EXPECTED_NEW_CANDIDATE_COUNT = 88
-EXPECTED_NEW_EVIDENCE_COUNT = 202
+EXPECTED_NEW_EVIDENCE_COUNT = 211
 EXPECTED_RESULT_PAIR_COUNT = 1553
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 524
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -2719,7 +2718,7 @@ EXPECTED_ROUTE_AUDIT_DIGEST = (
     "ea4c7b2e9af1a762c6448f3314d196baaa9e515ce6904f65a7bce7234f207682"
 )
 EXPECTED_TRIAGE_DIGEST = (
-    "1d2d0c50a27a20dd283952077f73d6fc71057ffdfa3b062a9a082ceefb33c06f"
+    "badcd2eb9c53c029e17357198f4e97cb2ddacffe76d72cf5f3d70ce1ea1527bd"
 )
 EXPECTED_ACTIVE_SEMANTIC_DIGESTS = {
     "S013": (
@@ -2727,15 +2726,28 @@ EXPECTED_ACTIVE_SEMANTIC_DIGESTS = {
     ),
     "S014": "",
 }
-EXPECTED_CANDIDATE_COVERAGE_DIGEST = ""
-EXPECTED_ROUTE_COVERAGE_DIGEST = ""
-EXPECTED_OMISSION_CHALLENGE_COUNT = 0
-EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
+EXPECTED_CANDIDATE_COVERAGE_DIGEST = (
+    "59a465d47d6f1a9e07f2d290418a4c2908f127ec62119192a13c3d234020564a"
+)
+EXPECTED_ROUTE_COVERAGE_DIGEST = (
+    "f1385621619fbe2747aacfc85c40a609ae897d9a0c57ae5a09d645223355ec13"
+)
+EXPECTED_OMISSION_CHALLENGE_COUNT = 78
+EXPECTED_OMISSION_CHALLENGE_DIGEST = (
+    "06c2daa57628b1ce0fb054d22b606bcacf4ac67b32299cf0ec9d17ac638d35e2"
+)
 EXPECTED_NEW_VOCABULARY_DIGEST = (
     "f2bb0778817ace90ee9f3e4b0d9c3a9a246f704ef77859368a2888bdfb9a115a"
 )
-EXPECTED_DISPOSITION_COUNTS: dict[str, int] = {}
-EXPECTED_ROUND_DIGESTS: dict[str, str] = {}
+EXPECTED_DISPOSITION_COUNTS = {
+    "EXCLUSION": 56,
+    "GOVERNED_CANDIDATE_OR_SUPPORT": 1412,
+    "CONTROL_OR_RELATIONSHIP": 68,
+    "CROSS_REFERENCE": 17,
+}
+EXPECTED_ROUND_DIGESTS = {
+    "S013": "fe56fc243c6bf2732f7c839c0a92fec399a835d7a159ba7c43aab872944c196e",
+}
 
 DIRECT_STRENGTHS = {
     "DIRECT_IDENTITY",
