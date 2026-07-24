@@ -612,7 +612,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca2d",
             [
                 ev("U006351", "PROSE", "DIRECT_IDENTITY", "The Life two-dimensional cellular automaton is named and its step implementation introduced.", ["object_kind", "carrier", "topology", "alphabet_or_value_schema", "complete_state"]),
-                ev("U006352", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep counts the 3x3 neighborhood including self and returns black for a live cell at total 4 or any cell at total 3.", ["frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
+                ev("U006352", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep counts the 3x3 neighborhood including self and returns black for a live cell at total 4 or any cell at total 3.", ["frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"]),
                 ev("U006353", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The same Life state can be represented sparsely as the list of live-cell positions.", ["complete_state", "parameters_and_variants"]),
                 ev("U006354", "CODE", "CORROBORATING", "The sparse implementation produces births at multiplicity 3 and retains live positions at multiplicity 4.", ["rule_relation_constraint_function_or_probability_law"]),
                 ev("U006355", "PROSE", "CORROBORATING", "A further implementation variant finds runs of length 3 and 4 in the sorted sparse-neighborhood list.", ["parameters_and_variants"]),
@@ -626,9 +626,9 @@ def candidate_specs() -> list[dict[str, Any]]:
             },
             aliases=["Life", "code 224"],
             variants=[
-                ("dense array", "count the 3x3 neighborhood at every array position"),
-                ("sparse live-position list", "count coincident translated live positions"),
-                ("sorted-run optimization", "find runs of multiplicity 3 and 4 in the sorted sparse list"),
+                ("dense array", "count the 3x3 neighborhood at every array position", "U006352"),
+                ("sparse live-position list", "count coincident translated live positions", "U006353"),
+                ("sorted-run optimization", "find runs of multiplicity 3 and 4 in the sorted sparse list", "U006355"),
             ],
         ),
         spec(
@@ -638,7 +638,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca2d",
             [
                 ev("U006356", "PROSE", "DIRECT_IDENTITY", "A cubic-lattice three-dimensional Life-like family is introduced.", ["object_kind", "carrier", "topology"]),
-                ev("U006357", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep3D counts the 26 neighboring cells and applies survival interval p..q or birth count r synchronously.", ["alphabet_or_value_schema", "complete_state", "schedule", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind"]),
+                ev("U006357", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep3D counts the 26 neighboring cells and applies survival interval p..q or birth count r synchronously.", ["alphabet_or_value_schema", "complete_state", "schedule", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "parameters_and_variants"]),
                 ev("U006358", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source enumerates {5,7,6}, {4,5,5}, and {5,6,5}, and identifies the pictured moving structure with the second preset.", ["parameters_and_variants"]),
             ],
             values={
@@ -651,14 +651,14 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "{p,q,r}, including {5,7,6}, {4,5,5}, and {5,6,5}",
             },
             parameters=[
-                ("p", "minimum neighbor count for survival"),
-                ("q", "maximum neighbor count for survival"),
-                ("r", "neighbor count for birth"),
+                ("p", "minimum neighbor count for survival", "U006357"),
+                ("q", "maximum neighbor count for survival", "U006357"),
+                ("r", "neighbor count for birth", "U006357"),
             ],
             variants=[
-                ("{5,7,6}", "source-enumerated three-dimensional Life-like preset"),
-                ("{4,5,5}", "source-enumerated preset used by the pictured moving structure"),
-                ("{5,6,5}", "source-enumerated three-dimensional Life-like preset"),
+                ("{5,7,6}", "source-enumerated three-dimensional Life-like preset", "U006358"),
+                ("{4,5,5}", "source-enumerated preset used by the pictured moving structure", "U006358"),
+                ("{5,6,5}", "source-enumerated three-dimensional Life-like preset", "U006358"),
             ],
             image_witnesses=[p + "_page_964_Picture_11.jpeg"],
         ),
@@ -836,6 +836,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             [
                 ev("U006378", "PROSE", "DIRECT_IDENTITY", "Finite cyclic rule 60 is represented by binary state polynomials.", ["object_kind", "topology", "alphabet_or_value_schema", "boundary", "read_dependencies_or_neighborhood"]),
                 ev("U006379", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The t-step state is PolynomialMod[(1+x)^t z,{x^n-1,2}], fixing binary cyclic evolution.", ["native_time", "complete_state", "seed", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"]),
+                ev("U006380", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source specifies z=1 as the single-black-cell initial-state polynomial.", ["seed", "parameters_and_variants"]),
             ],
             values={
                 "topology": "a cyclic one-dimensional lattice of n cells",
@@ -850,7 +851,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("n", "number of cells on the cyclic ring"),
                 ("z", "binary polynomial representing the initial state"),
             ],
-            variants=[("single-black-cell preset", "z=1 places one black cell in the first position")],
+            variants=[("single-black-cell preset", "z=1 places one black cell in the first position", "U006380")],
             aliases=["rule 60 with cyclic boundary conditions"],
         ),
         spec(
@@ -859,7 +860,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006380", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "For odd n the repetition period divides p[n]=2^MultiplicativeOrder[2,n]-1, which is at most 2^(n-1)-1.", OBS_FIELDS + ["structural_invariants"]),
+                ev("U006380", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "For odd n the repetition period divides p[n]=2^MultiplicativeOrder[2,n]-1, which is at most 2^(n-1)-1.", OBS_FIELDS + ["structural_invariants", "parameters_and_variants"]),
                 ev("U006381", "TABLE", "DIRECT_PARTIAL_MECHANICS", "The table gives ratios by which actual periods fall below p[n] for ten stated sizes.", ["parameters_and_variants", "result_kind"]),
                 ev("U006382", "PROSE", "CORROBORATING", "The note reports no n>5 case attaining the absolute maximum 2^(n-1)-1.", ["structural_invariants"]),
             ],
@@ -870,7 +871,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a source-stated divisibility bound for the repetition period",
                 "parameters_and_variants": "the source table records actual-period divisors for n=11,13,19,25,27,29,37,41,43,53",
             },
-            parameters=[("n", "odd cyclic ring size")],
+            parameters=[("n", "odd cyclic ring size", "U006380")],
             related=["finite cyclic rule-60 polynomial cellular automaton"],
         ),
         spec(
@@ -901,7 +902,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006383", "PROSE", "DIRECT_IDENTITY", "The cyclic rule-90 period analysis replaces the rule-60 factor 1+x by 1/x+x.", ["object_kind", "input"]),
-                ev("U006384", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "For odd n the rule-90 repetition period divides q[n]=2^MultiplicativeOrder[2,n,{1,-1}]-1.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants"]),
+                ev("U006384", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "For odd n the rule-90 repetition period divides q[n]=2^MultiplicativeOrder[2,n,{1,-1}]-1.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants", "parameters_and_variants"]),
                 ev("U006385", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The exponent is bounded above by (n-1)/2, and the period usually equals q[n], with the first stated exception at n=37.", ["structural_invariants", "parameters_and_variants"]),
             ],
             values={
@@ -911,7 +912,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a source-stated divisibility bound and typical period prediction",
                 "parameters_and_variants": "period usually equals q[n]; the first stated exception is n=37",
             },
-            parameters=[("n", "odd cyclic ring size")],
+            parameters=[("n", "odd cyclic ring size", "U006384")],
             related=["finite cyclic rule-90 polynomial cellular automaton"],
         ),
         spec(
@@ -1064,11 +1065,11 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "alphabet size k, range r, and weights w in 0..k-1",
             },
             parameters=[
-                ("k", "number of cell colors and modulus"),
-                ("r", "cellular-automaton range"),
-                ("w", "the 2r+1 position weights, each in 0..k-1"),
+                ("k", "number of cell colors and modulus", "U006395"),
+                ("r", "cellular-automaton range", "U006395"),
+                ("w", "the 2r+1 position weights, each in 0..k-1", "U006395"),
             ],
-            variants=[("additive elementary rules", "{0,60,90,102,150,170,204,240}")],
+            variants=[("additive elementary rules", "{0,60,90,102,150,170,204,240}", "U006394")],
             image_witnesses=[p + "_page_967_Picture_4.jpeg"],
         ),
         spec(
@@ -1077,7 +1078,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [
-                ev("U006400", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Generalized additivity combines evolution histories using an operation ⊕.", ["object_kind", "law_kind"]),
+                ev("U006400", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Generalized additivity combines evolution histories using an operation ⊕.", ["object_kind", "law_kind", "parameters_and_variants"]),
                 ev("U006401", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Generalized additivity requires phi[u⊕v] == phi[u]⊕phi[v].", ["rule_relation_constraint_function_or_probability_law"]),
                 ev("U006402", "PROSE", "CORROBORATING", "The property is a homomorphism condition and ordinary Mod[u+v,k] supplies the modular-addition example, coinciding with Xor only for k=2.", ["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
                 ev("U006404", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule 250 supplies the Max/Or generalized-additive variant.", ["parameters_and_variants"]),
@@ -1093,14 +1094,14 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "phi combines sigma_i[cell_i] using ⊕ and obeys phi[u⊕v]=phi[u]⊕phi[v]",
             },
             parameters=[
-                ("k", "number of monoid elements or cell colors"),
-                ("r", "cellular-automaton range"),
-                ("⊕", "commutative-monoid operation"),
-                ("σ", "position-specific monoid endomorphisms"),
+                ("k", "number of monoid elements or cell colors", "U006409"),
+                ("r", "cellular-automaton range", "U006409"),
+                ("⊕", "commutative-monoid operation", "U006400"),
+                ("σ", "position-specific monoid endomorphisms", "U006410"),
             ],
             variants=[
-                ("modular-additive", "Mod[u+v,k], which is Xor only in the binary k=2 case"),
-                ("Or-additive", "Max/Or, exemplified by rule 250"),
+                ("modular-additive", "Mod[u+v,k], which is Xor only in the binary k=2 case", "U006402"),
+                ("Or-additive", "Max/Or, exemplified by rule 250", "U006404"),
             ],
             image_witnesses=[
                 p + "_page_967_Rule_90_Generalized_Additivity_Four_Panel_Row.jpeg",
@@ -1373,8 +1374,8 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "ten period-indexed presets for p=1 through 10, with multiple examples explicitly stated for p=1 and p=2",
             },
             parameters=[
-                ("p", "requested period, from 1 through 10 in the listed survey"),
-                ("integer block encoding", "one source-listed integer whose binary digits represent a repeating block"),
+                ("p", "requested period, from 1 through 10 in the listed survey", "U006435"),
+                ("integer block encoding", "one source-listed integer whose binary digits represent a repeating block", "U006436"),
             ],
             missing=["The list does not state the block width or leading-zero convention needed to decode each integer unambiguously."],
             related=["exact-period-p repeating-configuration constraint for one-dimensional cellular automata"],
@@ -1610,11 +1611,12 @@ def candidate_specs() -> list[dict[str, Any]]:
             2,
             "observer",
             [
-                ev("U006452", "CODE", "DIRECT_PARTIAL_MECHANICS", "g[w,k,t] counts nonzero cells in the first t rows generated from one initial 1.", OBS_FIELDS),
+                ev("U006452", "CODE", "DIRECT_PARTIAL_MECHANICS", "g[w,k,t] counts nonzero cells in the first t rows generated from one initial 1.", OBS_FIELDS + ["parameters_and_variants"]),
                 ev("U006453", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The fractal dimension is introduced as a large-m scaling limit of the nonzero-cell count.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
                 ev("U006454", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The dimension is the large-m limit Log[k,g(w,k,k^(m+1))/g(w,k,k^m)].", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
                 ev("U006455", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For prime k, the source introduces an exact eigenvalue computation of the dimension.", ["parameters_and_variants", "result_kind"]),
                 ev("U006456", "CODE", "DIRECT_COMPLETE_MECHANICS", "d[w,k] computes the prime-modulus dimension from the largest absolute eigenvalue of the constructed finite matrix.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+                ev("U006457", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The source gives the exact rule-90 and rule-150 binary fractal dimensions.", ["parameters_and_variants", "result_kind"]),
                 ev("U006458", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The source supplies exact algebraic dimensions for two additional binary weight vectors.", ["parameters_and_variants", "result_kind"]),
                 ev("U006460", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The source supplies a general rule-90 formula in k and exact rule-150 examples for k=3,5,7.", ["parameters_and_variants", "result_kind"]),
             ],
@@ -1624,11 +1626,14 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "the fractal dimension of the generated spacetime pattern",
                 "parameters_and_variants": "weights w and modulus k; the exact eigenvalue implementation is stated for prime k, with explicit rule-90, rule-150, and longer-weight examples",
             },
-            parameters=[("w", "additive cellular-automaton weight vector"), ("k", "cell-color modulus, prime for the exact eigenvalue implementation")],
+            parameters=[
+                ("w", "additive cellular-automaton weight vector", "U006452"),
+                ("k", "cell-color modulus, prime for the exact eigenvalue implementation", "U006452"),
+            ],
             variants=[
-                ("rule 90", "w={1,0,1}, including d=Log[2,3] for k=2"),
-                ("rule 150", "w={1,1,1}, with explicit k=2,3,5,7 values"),
-                ("longer binary weights", "explicit values for {1,1,0,1,0} and {1,1,0,1,1}"),
+                ("rule 90", "w={1,0,1}, including d=Log[2,3] for k=2", "U006457"),
+                ("rule 150", "w={1,1,1}, with explicit k=2,3,5,7 values", "U006460"),
+                ("longer binary weights", "explicit values for {1,1,0,1,0} and {1,1,0,1,1}", "U006458"),
             ],
         ),
         spec(
@@ -1659,14 +1664,14 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "operation f, initial element a, and optional finite carrier size k; associative-commutative operations yield nested behavior while noncommutative associative operations can yield non-nested behavior",
             },
             parameters=[
-                ("f", "associative binary operation defining the local rule"),
-                ("a", "nonzero initial element in the singleton seed {a}"),
-                ("k", "size of the finite value set when a finite carrier is used"),
+                ("f", "associative binary operation defining the local rule", "U006461"),
+                ("a", "nonzero initial element in the singleton seed {a}", "U006462"),
+                ("k", "size of the finite value set when a finite carrier is used", "U006461"),
             ],
             variants=[
-                ("associative and commutative", "multiple nonzero initial elements still yield nested behavior"),
-                ("associative noncommutative", "non-nested behavior can occur"),
-                ("identity-zero case", "f[0,a]=a and f[a,0]=a supplies the stated reduction even without commutativity"),
+                ("associative and commutative", "multiple nonzero initial elements still yield nested behavior", "U006468"),
+                ("associative noncommutative", "non-nested behavior can occur", "U006468"),
+                ("identity-zero case", "f[0,a]=a and f[a,0]=a supplies the stated reduction even without commutativity", "U006467"),
             ],
         ),
         spec(
@@ -1809,8 +1814,9 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("rtab", "transition table", "U006481"),
             ],
             variants=[
-                ("all-sequences input", "AllNet[k] is the one-node source network accepting every k-symbol sequence"),
-                ("rule-126 example", "{2,1,Reverse[IntegerDigits[126,2,8]]} yields the printed four-node network"),
+                ("all-sequences input", "AllNet[k] is the one-node source network accepting every k-symbol sequence", "U006482"),
+                ("rule-126 specification", "{2,1,Reverse[IntegerDigits[126,2,8]]}", "U006481"),
+                ("rule-126 output network", "the printed four-node image network", "U006484"),
             ],
             aliases=["NetCAStep", "NDFA image-network transform"],
         ),
@@ -2111,7 +2117,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             },
             aliases=["entropy", "information", "information entropy", "information dimension"],
             parameters=[("k", "alphabet size"), ("n", "block length")],
-            variants=[("sampled plug-in estimate", "estimate block probabilities from samples; direct substitution is systematically biased downward")],
+            variants=[("sampled plug-in estimate", "estimate block probabilities from samples; direct substitution is systematically biased downward", "U006518")],
         ),
         spec(
             "set/topological entropy from block-support growth",
@@ -2141,7 +2147,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006516", "FORMULA", "DEFECT_LIMITED", "The source prints h[q,n]=Log_k Sum_i p_i^q /(n(q-1)); for the stated uniform distribution this evaluates to -1, not the +1 maximum asserted next.", OBS_FIELDS),
+                ev("U006516", "FORMULA", "DEFECT_LIMITED", "The source prints h[q,n]=Log_k Sum_i p_i^q /(n(q-1)); for the stated uniform distribution this evaluates to -1, not the +1 maximum asserted next.", OBS_FIELDS + ["parameters_and_variants"]),
                 ev("U006517", "PROSE", "DEFECT_LIMITED", "The prose asserts maximum h[q,n]=1 for uniform probabilities, names the q=0, q→1, and q=2 cases, and states monotonicity, contradicting the sign of the printed denominator.", ["result_kind", "parameters_and_variants", "structural_invariants"]),
             ],
             values={
@@ -2152,11 +2158,15 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "q=0 set entropy; q->1 measure entropy; q=2 correlation entropy",
             },
             aliases=["Rényi entropy family", "generalized dimensions"],
-            parameters=[("k", "alphabet size"), ("n", "block length"), ("q", "generalized-entropy order")],
+            parameters=[
+                ("k", "alphabet size", "U006516"),
+                ("n", "block length", "U006516"),
+                ("q", "generalized-entropy order", "U006516"),
+            ],
             variants=[
-                ("q=0", "set/topological entropy specialization"),
-                ("q→1", "measure-entropy specialization"),
-                ("q=2", "correlation entropy"),
+                ("q=0", "set/topological entropy specialization", "U006517"),
+                ("q→1", "measure-entropy specialization", "U006517"),
+                ("q=2", "correlation entropy", "U006517"),
             ],
             status="DEFECTIVE",
             uncertainties=["U006516's denominator q-1 reverses the sign relative to U006517's stated uniform-distribution maximum +1."],
@@ -2442,9 +2452,9 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("system size", "finite lattice or other size parameter controlling the state space", "U006536"),
             ],
             variants=[
-                ("rule 254", "class-1 convergence to one all-black fixed point"),
-                ("rule 132", "class-2 graphs with more cycles at larger sizes"),
-                ("rules 60 and 90", "regular additive-rule cycle trees"),
+                ("rule 254", "class-1 convergence to one all-black fixed point", "U006536"),
+                ("rule 132", "class-2 graphs with more cycles at larger sizes", "U006540"),
+                ("rules 60 and 90", "regular additive-rule cycle trees", "U006552"),
             ],
             image_witnesses=[
                 p + "_page_976_Figure_10.jpeg",
@@ -2607,7 +2617,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "seed",
             [
-                ev("U006562", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Each pictured persistent structure is encoded by inserting IntegerDigits[n,2,w] between repetitions of the rule-110 background block.", SEED_FIELDS),
+                ev("U006562", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Each pictured persistent structure is encoded by inserting IntegerDigits[n,2,w] between repetitions of the rule-110 background block.", SEED_FIELDS + ["parameters_and_variants"]),
                 ev("U006563", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Fifteen {n,w} seed encodings are enumerated.", ["parameters_and_variants"]),
                 ev("U006564", "PROSE", "CONTEXTUAL", "The source introduces the ordered repetition-period and displacement data for those same fifteen presets.", ["parameters_and_variants", "structural_invariants"]),
                 ev("U006565", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The corresponding fifteen period/displacement pairs are enumerated in the same order.", ["parameters_and_variants", "structural_invariants"]),
@@ -2622,8 +2632,8 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "the fifteen ordered {n,w} encodings and period/displacement pairs printed in the note",
             },
             parameters=[
-                ("n", "integer whose binary digits form the inserted structure word"),
-                ("w", "fixed width of the binary insertion"),
+                ("n", "integer whose binary digits form the inserted structure word", "U006562"),
+                ("w", "fixed width of the binary insertion", "U006562"),
             ],
             related=["rule-110 periodic background field", "rule-110 period/displacement semigroup constraint", "rule-110 extended b/c structure seed generator"],
         ),
@@ -2674,7 +2684,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ("target (g)", "extend structure (g) by collision with structure (a)"),
                 ("target (h)", "extend structure (h) by collision with structure (a)"),
                 ("target (i)", "extend structure (i) by collision with structure (a)"),
-                ("adjacent multiple copies", "most persistent structures can travel in adjacent multiple-copy arrangements"),
+                ("adjacent multiple copies", "most persistent structures can travel in adjacent multiple-copy arrangements", "U006569"),
             ],
             missing=["The source does not specify collision phases, separations, or a direct finite seed formula for this transform."],
             related=["rule-110 persistent-structure seed preset survey", "rule-110 collision width-conservation modulo-14 relation"],
@@ -2710,7 +2720,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "seed",
             [
                 ev("U006562", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule-110 insertion seeds place IntegerDigits[n,2,w] between repetitions of the periodic background.", ["carrier", "support", "alphabet_or_value_schema", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
-                ev("U006570", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The shown rule-110 glider-gun initial condition is encoded by {n,w}={1339191737336,41}.", ["object_kind", "complete_state", "seed", "law_kind", "result_kind", "determinism_branching_or_measure"]),
+                ev("U006570", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The shown rule-110 glider-gun initial condition is encoded by {n,w}={1339191737336,41}.", ["object_kind", "complete_state", "seed", "law_kind", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"]),
             ],
             values={
                 "carrier": "a one-dimensional binary rule-110 configuration",
@@ -2720,7 +2730,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "insert the 41-bit IntegerDigits representation of 1339191737336 into the rule-110 background",
                 "parameters_and_variants": "{n,w}={1339191737336,41}",
             },
-            parameters=[("n", "1339191737336"), ("w", "41-bit insertion width")],
+            parameters=[("n", "1339191737336", "U006570"), ("w", "41-bit insertion width", "U006570")],
             related=["rule-110 periodic background field", "rule-110 persistent-structure seed preset survey", "rule-110 collision width-conservation modulo-14 relation"],
         ),
         spec(
