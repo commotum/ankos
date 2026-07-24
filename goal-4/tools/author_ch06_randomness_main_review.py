@@ -4167,6 +4167,1449 @@ def candidate_definitions() -> list[dict[str, Any]]:
     for name, parameters in parameter_specs.items():
         candidate(name)["parameters"] = parameters
 
+    # Exact-hash audit repair.  Reset the affected records after all earlier
+    # incremental repairs so stale generic-template fields and evidence joins
+    # cannot survive into the final proposal.
+    def reset_record(
+        name: str,
+        *,
+        values: dict[str, str],
+        semantic_units: list[str],
+        parameters: list[str] | None = None,
+        variants: list[str] | None = None,
+        variant_units: dict[str, list[str]] | None = None,
+        related_names: list[str] | None = None,
+        related_evidence_units: dict[str, list[str]] | None = None,
+        na_fields: list[str] | None = None,
+        uncertainties: list[str] | None = None,
+        role: str | None = None,
+    ) -> dict[str, Any]:
+        row = candidate(name)
+        row["values"] = values
+        row["semantic_units"] = semantic_units
+        row["mechanics_units"] = []
+        row["field_units"] = {}
+        row["evidence_overrides"] = {}
+        row["parameters"] = parameters or []
+        row["variants"] = variants or []
+        row["variant_units"] = variant_units or {}
+        row["related_names"] = related_names or []
+        row["related_evidence_units"] = related_evidence_units or {}
+        row["na_fields"] = na_fields or []
+        row["uncertainties"] = uncertainties or []
+        if role is not None:
+            row["role"] = role
+        return row
+
+    def binary_native_values(
+        code: str,
+        table: str,
+        *,
+        neighborhood: str = "the left neighbor, cell itself, and right neighbor",
+    ) -> dict[str, str]:
+        return {
+            "object_kind": "one-dimensional binary nearest-neighbor cellular-automaton preset",
+            "native_time": "successive discrete cellular-automaton steps",
+            "carrier": "a one-dimensional row of cells",
+            "alphabet_or_value_schema": "black and white",
+            "complete_state": "one black-or-white value for every cell in the row",
+            "frontier_or_activation": "every cell on each step",
+            "schedule": "synchronous cellular-automaton update",
+            "read_dependencies_or_neighborhood": neighborhood,
+            "law_kind": "deterministic local transition table",
+            "rule_relation_constraint_function_or_probability_law": table,
+            "write_replacement_assembly_or_commit": (
+                "write the table-selected next color at each cell and commit all cell writes simultaneously"
+            ),
+            "result_kind": "one next binary configuration",
+            "successor_cardinality": "exactly one successor configuration",
+            "determinism_branching_or_measure": "deterministic",
+            "parameters_and_variants": code,
+        }
+
+    native_fields = [
+        "object_kind",
+        "native_time",
+        "carrier",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+    ]
+
+    rule254_name = "elementary cellular automaton rule 254"
+    rule254 = reset_record(
+        rule254_name,
+        values=binary_native_values(
+            "rule 254",
+            (
+                "for neighborhoods BBB, BBW, BWB, BWW, WBB, WBW, WWB, WWW respectively, "
+                "the outputs are B, B, B, B, B, B, B, W"
+            ),
+            neighborhood=(
+                "the left neighbor, cell itself, and right neighbor; the exact table is black "
+                "unless all three cells are white"
+            ),
+        ),
+        semantic_units=["U001229", "U001231", "U001233"],
+        related_names=["random cellular-automaton initial-field generator family"],
+        related_evidence_units={
+            "random cellular-automaton initial-field generator family": [
+                "U001229",
+                "U001233",
+            ]
+        },
+        na_fields=["seed"],
+    )
+    rule254["values"]["witness_semantics"] = (
+        "the random-initial-condition evolution is a behavior witness, not an intrinsic seed of rule 254"
+    )
+    evidence(
+        rule254_name,
+        "U001229",
+        fields=[
+            "object_kind",
+            "native_time",
+            "carrier",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "witness_semantics",
+        ],
+        claim=(
+            "U001229 states the stepwise rule-254 example and the sufficient neighbor condition for "
+            "black output; A000924 supplies the complete three-cell table."
+        ),
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        rule254_name,
+        "U001231",
+        fields=[
+            field
+            for field in native_fields
+            if field != "parameters_and_variants"
+        ],
+        claim=(
+            "A000924 was checked at original resolution: in BBB, BBW, BWB, BWW, WBB, WBW, "
+            "WWB, WWW order, rule 254 outputs B,B,B,B,B,B,B,W."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+        allow_direct_image=True,
+    )
+    evidence(
+        rule254_name,
+        "U001232",
+        fields=["witness_semantics"],
+        claim="A000925 is the random-start evolution witness and does not define rule 254's seed.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        rule254_name,
+        "U001233",
+        fields=["object_kind", "parameters_and_variants", "witness_semantics"],
+        claim="U001233 identifies the displayed preset as rule 254 and labels the random-start outcome.",
+        strength="DIRECT_IDENTITY",
+    )
+
+    panel_table_specs = {
+        "uniform-attractor elementary cellular-automaton preset panel": {
+            "unit_image": "U001235",
+            "unit_caption": "U001236",
+            "codes": ["rule 0", "rule 32", "rule 160", "rule 250"],
+            "law": (
+                "selected code to table mapping in BBB, BBW, BWB, BWW, WBB, WBW, WWB, WWW order: "
+                "rule 0 -> W,W,W,W,W,W,W,W; "
+                "rule 32 -> W,W,B,W,W,W,W,W; "
+                "rule 160 -> B,W,B,W,W,W,W,W; "
+                "rule 250 -> B,B,B,B,B,W,B,W"
+            ),
+            "witness": "the displayed random-start runs evolve to uniform states",
+        },
+        "fixed-or-periodic-structure elementary cellular-automaton preset panel": {
+            "unit_image": "U001239",
+            "unit_caption": "U001240",
+            "codes": ["rule 4", "rule 108", "rule 218", "rule 232"],
+            "law": (
+                "selected code to table mapping in BBB, BBW, BWB, BWW, WBB, WBW, WWB, WWW order: "
+                "rule 4 -> W,W,W,W,W,B,W,W; "
+                "rule 108 -> W,B,B,W,B,B,W,W; "
+                "rule 218 -> B,B,W,B,B,W,B,W; "
+                "rule 232 -> B,B,B,W,B,W,W,W"
+            ),
+            "witness": (
+                "the displayed random-start runs evolve to fixed or periodically repeating simple structures"
+            ),
+        },
+    }
+    for name, spec in panel_table_specs.items():
+        values = {
+            "object_kind": "finite family of four elementary binary cellular-automaton presets",
+            "native_time": "successive discrete cellular-automaton steps",
+            "carrier": "a one-dimensional row of cells",
+            "alphabet_or_value_schema": "black and white",
+            "complete_state": "one black-or-white value for every cell in the row",
+            "frontier_or_activation": "every cell on each step",
+            "schedule": "synchronous cellular-automaton update",
+            "read_dependencies_or_neighborhood": "the left neighbor, cell itself, and right neighbor",
+            "law_kind": "code-selected deterministic local transition table",
+            "rule_relation_constraint_function_or_probability_law": spec["law"],
+            "write_replacement_assembly_or_commit": (
+                "write the selected table's next color at each cell and commit all writes simultaneously"
+            ),
+            "result_kind": "one next binary configuration under the selected preset",
+            "successor_cardinality": "exactly one successor configuration for a selected code",
+            "determinism_branching_or_measure": "deterministic after the rule code is selected",
+            "witness_semantics": spec["witness"],
+            "parameters_and_variants": ", ".join(spec["codes"]),
+        }
+        row = reset_record(
+            name,
+            values=values,
+            semantic_units=[spec["unit_image"], spec["unit_caption"]],
+            parameters=["selected rule code"],
+            variants=spec["codes"],
+            variant_units={
+                code: [spec["unit_image"], spec["unit_caption"]]
+                for code in spec["codes"]
+            },
+            related_names=["random cellular-automaton initial-field generator family"],
+            related_evidence_units={
+                "random cellular-automaton initial-field generator family": [
+                    spec["unit_caption"]
+                ]
+            },
+            na_fields=["seed"],
+            role="FAMILY",
+        )
+        evidence(
+            name,
+            spec["unit_image"],
+            fields=[
+                "object_kind",
+                "native_time",
+                "carrier",
+                "alphabet_or_value_schema",
+                "complete_state",
+                "frontier_or_activation",
+                "schedule",
+                "read_dependencies_or_neighborhood",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "witness_semantics",
+                "parameters_and_variants",
+            ],
+            claim=(
+                f"{spec['unit_image']} was checked at original resolution and transcribed as the four "
+                "ordered BBB-through-WWW transition tables; the same panel supplies finite outcome witnesses."
+            ),
+            strength="DIRECT_COMPLETE_MECHANICS",
+            allow_direct_image=True,
+        )
+        evidence(
+            name,
+            spec["unit_caption"],
+            fields=[
+                "object_kind",
+                "parameters_and_variants",
+                "witness_semantics",
+            ],
+            claim=(
+                f"{spec['unit_caption']} fixes the top-to-bottom rule-code ordering and describes the "
+                "random-start outcomes without making random initialization part of the native family."
+            ),
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+
+    rule126_name = "elementary cellular automaton rule 126"
+    rule126 = reset_record(
+        rule126_name,
+        values=binary_native_values(
+            "rule 126",
+            (
+                "for neighborhoods BBB, BBW, BWB, BWW, WBB, WBW, WWB, WWW respectively, "
+                "the outputs are W, B, B, B, B, B, B, W"
+            ),
+        ),
+        semantic_units=["U001243", "U001244"],
+        related_names=[
+            "random cellular-automaton initial-field generator family",
+            "rule-126 random two-block initial-condition ensemble",
+            "rule-126 to rule-90 pair-block emulation",
+        ],
+        related_evidence_units={
+            "random cellular-automaton initial-field generator family": ["U001244"],
+            "rule-126 random two-block initial-condition ensemble": ["U001439"],
+            "rule-126 to rule-90 pair-block emulation": ["U001439"],
+        },
+        na_fields=["seed"],
+    )
+    rule126["values"]["witness_semantics"] = (
+        "the random-start evolution and special-seed experiments witness behavior but do not define the native seed"
+    )
+    evidence(
+        rule126_name,
+        "U001242",
+        fields=["witness_semantics"],
+        claim="A000928 is a random-start evolution witness, not native transition-table evidence.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        rule126_name,
+        "U001243",
+        fields=[
+            field
+            for field in native_fields
+            if field != "parameters_and_variants"
+        ],
+        claim=(
+            "A000929 was checked at original resolution: in BBB, BBW, BWB, BWW, WBB, WBW, "
+            "WWB, WWW order, rule 126 outputs W,B,B,B,B,B,B,W."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+        allow_direct_image=True,
+    )
+    evidence(
+        rule126_name,
+        "U001244",
+        fields=["object_kind", "parameters_and_variants", "witness_semantics"],
+        claim="U001244 identifies the displayed preset as rule 126 and describes its random-start behavior.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id in ("U001437", "U001438", "U001439"):
+        evidence(
+            rule126_name,
+            unit_id,
+            fields=["witness_semantics"] if unit_id == "U001439" else [],
+            claim=(
+                f"{unit_id} belongs to the separately modeled special two-block seed experiment and "
+                "does not supply rule-126 transition entries."
+            ),
+            strength="CORROBORATING" if unit_id == "U001439" else "CONTEXTUAL",
+        )
+
+    rule30_name = "elementary cellular automaton rule 30"
+    rule30 = reset_record(
+        rule30_name,
+        values={
+            **binary_native_values(
+                "rule 30",
+                (
+                    "for neighborhoods BBB, BBW, BWB, BWW, WBB, WBW, WWB, WWW respectively, "
+                    "the outputs are W, W, W, B, B, B, B, W"
+                ),
+            ),
+            "structural_invariants": (
+                "for rule 30, repetitive behavior can arise only from an initial condition formed by "
+                "one fixed finite block repeated forever"
+            ),
+            "witness_semantics": (
+                "random-start, simple-start, and special periodic-start runs are behavior witnesses"
+            ),
+        },
+        semantic_units=["U001246", "U001430", "U001431", "U001435"],
+        related_names=[
+            "random cellular-automaton initial-field generator family",
+            "periodic-block cellular-automaton initial-condition generator",
+        ],
+        related_evidence_units={
+            "random cellular-automaton initial-field generator family": ["U001246"],
+            "periodic-block cellular-automaton initial-condition generator": [
+                "U001431",
+                "U001435",
+            ],
+        },
+        na_fields=["seed"],
+    )
+    evidence(
+        rule30_name,
+        "U001246",
+        fields=["object_kind", "parameters_and_variants", "witness_semantics"],
+        claim="A000933 identifies rule 30 and is a random-start behavior witness, not its native seed.",
+        strength="DIRECT_IDENTITY",
+        allow_direct_image=True,
+    )
+    evidence(
+        rule30_name,
+        "U001430",
+        fields=[
+            field
+            for field in native_fields
+            if field != "parameters_and_variants"
+        ],
+        claim=(
+            "A000986 was checked at original resolution: in BBB, BBW, BWB, BWW, WBB, WBW, "
+            "WWB, WWW order, rule 30 outputs W,W,W,B,B,B,B,W."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+        allow_direct_image=True,
+    )
+    evidence(
+        rule30_name,
+        "U001431",
+        fields=["object_kind", "parameters_and_variants", "witness_semantics"],
+        claim="U001431 identifies the table strip as rule 30 and the adjacent panels as special periodic-start witnesses.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        rule30_name,
+        "U001435",
+        fields=["structural_invariants", "witness_semantics"],
+        claim=(
+            "U001435 directly states that no rule-30 initial condition other than a single fixed block "
+            "repeated forever can yield repetitive behavior."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+
+    classifier_name = "four-class cellular-automaton behavior classification"
+    classifier = reset_record(
+        classifier_name,
+        values={
+            "object_kind": "qualitative four-class cellular-automaton behavior classifier",
+            "carrier": "cellular-automaton space-time evolution histories",
+            "visible_history": "the overall long-run appearance and correlated detailed properties of an evolution",
+            "input": "an observed cellular-automaton evolution and a chosen reasonable class definition",
+            "law_kind": "qualitative behavior classification",
+            "rule_relation_constraint_function_or_probability_law": (
+                "class 1: almost all initial conditions reach the same uniform final state; "
+                "class 2: final behavior consists of simple fixed or short-period structures; "
+                "class 3: behavior appears random while retaining small-scale structures; "
+                "class 4: localized structures mix order and randomness by moving and interacting; "
+                "rare borderline systems may receive different labels under different reasonable definitions"
+            ),
+            "result_kind": "one class label from 1 through 4, or the stated set of plausible labels for a borderline rule",
+            "determinism_branching_or_measure": (
+                "normally stable across reasonable definitions, but explicitly definition-dependent for rare borderline cases"
+            ),
+            "witness_semantics": (
+                "ordinary panels exemplify the four classes; the four labeled borderline panels witness the stated alternative assignments"
+            ),
+            "parameters_and_variants": (
+                "chosen reasonable class definition or correlated property; borderline codes 219, 438, 1380, and 1632"
+            ),
+        },
+        semantic_units=[
+            "U001264",
+            "U001269",
+            "U001270",
+            "U001271",
+            "U001278",
+            "U001279",
+            "U001280",
+            "U001293",
+            "U001294",
+            "U001295",
+            "U001296",
+            "U001297",
+            "U001298",
+        ],
+        parameters=["chosen reasonable class definition or correlated property"],
+        variants=[
+            "class 1",
+            "class 2",
+            "class 3",
+            "class 4",
+            "code 219: class 2 or 4",
+            "code 438: class 3 or 4",
+            "code 1380: class 2 or 3",
+            "code 1632: class 1, 2, or 3",
+        ],
+        variant_units={
+            "class 1": ["U001271"],
+            "class 2": ["U001278"],
+            "class 3": ["U001279"],
+            "class 4": ["U001280"],
+            "code 219: class 2 or 4": ["U001294", "U001298"],
+            "code 438: class 3 or 4": ["U001295", "U001298"],
+            "code 1380: class 2 or 3": ["U001296", "U001298"],
+            "code 1632: class 1, 2, or 3": ["U001297", "U001298"],
+        },
+        na_fields=[
+            "native_time",
+            "complete_state",
+            "termination_completion_failure",
+        ],
+        uncertainties=[
+            "The source deliberately leaves the precise class definition selectable and records rare definition-dependent borderline cases."
+        ],
+    )
+    evidence(
+        classifier_name,
+        "U001264",
+        fields=["object_kind", "carrier", "result_kind"],
+        claim="U001264 establishes only the four-class scope and the assignment of evolution patterns to four labels.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id in ("U001265", "U001266", "U001267", "U001268"):
+        evidence(
+            classifier_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is one of the four ordinary class-example panels.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        classifier_name,
+        "U001269",
+        fields=["witness_semantics"],
+        claim="U001269 identifies the four preceding panels as examples of the four basic classes.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        classifier_name,
+        "U001270",
+        fields=["parameters_and_variants"],
+        claim="U001270 fixes the class labels 1 through 4 and orders them by increasing complexity.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id, class_label, definition in [
+        (
+            "U001271",
+            "class 1",
+            "almost all initial conditions lead to the same uniform final state",
+        ),
+        (
+            "U001278",
+            "class 2",
+            "many final states consist of simple structures that remain fixed or repeat every few steps",
+        ),
+        (
+            "U001279",
+            "class 3",
+            "behavior seems random while triangles and other small-scale structures remain visible",
+        ),
+        (
+            "U001280",
+            "class 4",
+            "localized structures mix order and randomness by moving and interacting",
+        ),
+    ]:
+        evidence(
+            classifier_name,
+            unit_id,
+            fields=[
+                "visible_history",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            claim=f"{unit_id} directly defines {class_label}: {definition}.",
+            strength="DIRECT_COMPLETE_MECHANICS",
+        )
+    evidence(
+        classifier_name,
+        "U001293",
+        fields=[
+            "input",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "determinism_branching_or_measure",
+            "parameters_and_variants",
+        ],
+        claim=(
+            "U001293 states that detailed properties can furnish more precise definitions and that "
+            "reasonable definitions normally agree."
+        ),
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id, code in [
+        ("U001294", "219"),
+        ("U001295", "438"),
+        ("U001296", "1380"),
+        ("U001297", "1632"),
+    ]:
+        evidence(
+            classifier_name,
+            unit_id,
+            fields=["witness_semantics", "parameters_and_variants"],
+            claim=f"{unit_id} is the original-resolution borderline panel labeled totalistic code {code}.",
+            strength="DIRECT_IDENTITY",
+            allow_direct_image=True,
+        )
+    evidence(
+        classifier_name,
+        "U001298",
+        fields=[
+            "input",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "determinism_branching_or_measure",
+            "witness_semantics",
+            "parameters_and_variants",
+        ],
+        claim=(
+            "U001298 gives the exact alternatives: code 219 class 2/4, 438 class 3/4, "
+            "1380 class 2/3, and 1632 class 1/2/3 under different definitions."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+
+    class4_code_specs = {
+        "three-color nearest-neighbor totalistic cellular automaton code 1815": (
+            "1815",
+            ["U001285", "U001286", "U001287"],
+            "U001286",
+            "U001287",
+        ),
+        "three-color nearest-neighbor totalistic cellular automaton code 2007": (
+            "2007",
+            ["U001285", "U001288", "U001289"],
+            "U001288",
+            "U001289",
+        ),
+        "three-color nearest-neighbor totalistic cellular automaton code 1659": (
+            "1659",
+            ["U001285", "U001290"],
+            "U001290",
+            "U001290",
+        ),
+        "three-color nearest-neighbor totalistic cellular automaton code 2043": (
+            "2043",
+            ["U001285", "U001291", "U001292"],
+            "U001291",
+            "U001292",
+        ),
+    }
+    for name, (code, units, image_unit, identity_unit) in class4_code_specs.items():
+        row = candidate(name)
+        row["units"] = units
+        values = {
+            "object_kind": "three-color nearest-neighbor totalistic cellular-automaton preset",
+            "native_time": "successive cellular-automaton steps",
+            "carrier": "a one-dimensional row of cells",
+            "alphabet_or_value_schema": "three cell colors",
+            "complete_state": "one three-color value for every cell in the row",
+            "frontier_or_activation": "every cell on each step",
+            "schedule": "synchronous cellular-automaton update",
+            "read_dependencies_or_neighborhood": "the cell and its nearest neighbors, read totalistically",
+            "law_kind": "deterministic code-identified totalistic transition table",
+            "rule_relation_constraint_function_or_probability_law": (
+                f"code {code} under the source's three-color nearest-neighbor totalistic code scheme; "
+                "the full table is not transcribed in this range"
+            ),
+            "write_replacement_assembly_or_commit": (
+                "write the code-selected next color at every cell and commit synchronously"
+            ),
+            "result_kind": "one next three-color configuration",
+            "successor_cardinality": "exactly one successor configuration",
+            "determinism_branching_or_measure": "deterministic",
+            "witness_semantics": (
+                "the displayed 1500-step random-start run witnesses class-4 behavior and is not a native seed or parameter"
+            ),
+            "parameters_and_variants": f"fixed preset code {code}",
+        }
+        reset_record(
+            name,
+            values=values,
+            semantic_units=["U001285", identity_unit],
+            related_names=["random cellular-automaton initial-field generator family"],
+            related_evidence_units={
+                "random cellular-automaton initial-field generator family": [
+                    "U001285",
+                    image_unit,
+                ]
+            },
+            na_fields=["seed"],
+        )
+        evidence(
+            name,
+            "U001285",
+            fields=[
+                "object_kind",
+                "native_time",
+                "carrier",
+                "alphabet_or_value_schema",
+                "complete_state",
+                "frontier_or_activation",
+                "schedule",
+                "read_dependencies_or_neighborhood",
+                "law_kind",
+                "write_replacement_assembly_or_commit",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "witness_semantics",
+            ],
+            claim=(
+                "U001285 defines the shared native scope—three colors, nearest-neighbor totalistic "
+                "cellular automata—and separately describes the 1500-step random-start witnesses."
+            ),
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+        if identity_unit == image_unit:
+            evidence(
+                name,
+                image_unit,
+                fields=[
+                    "rule_relation_constraint_function_or_probability_law",
+                    "parameters_and_variants",
+                    "witness_semantics",
+                ],
+                claim=(
+                    f"{image_unit} was checked at original resolution: it identifies code {code} and "
+                    "supplies its finite random-start evolution witness, not a transition-table transcription."
+                ),
+                strength="DIRECT_IDENTITY",
+                allow_direct_image=True,
+            )
+        else:
+            evidence(
+                name,
+                image_unit,
+                fields=["witness_semantics"],
+                claim=f"{image_unit} is the finite 1500-step random-start witness for code {code}.",
+                strength="CONTEXTUAL",
+            )
+            evidence(
+                name,
+                identity_unit,
+                fields=[
+                    "rule_relation_constraint_function_or_probability_law",
+                    "parameters_and_variants",
+                ],
+                claim=f"{identity_unit} identifies the fixed native preset as code {code}.",
+                strength="DIRECT_IDENTITY",
+            )
+
+    rule110_name = "elementary cellular automaton rule 110"
+    rule110 = candidate(rule110_name)
+    rule110["units"] = [
+        "U001254",
+        "U001255",
+        "U001256",
+        "U001257",
+        "U001359",
+        "U001360",
+        "U001361",
+        "U001362",
+        "U001557",
+        "U001558",
+        "U001560",
+        "U001561",
+        "U001564",
+        "U001571",
+        "U001572",
+        "U001573",
+        "U001574",
+        "U001575",
+        "U001576",
+    ]
+    reset_record(
+        rule110_name,
+        values={
+            "object_kind": "one-dimensional cellular-automaton preset",
+            "carrier": "a one-dimensional array of cells",
+            "alphabet_or_value_schema": "two cell colors",
+            "read_dependencies_or_neighborhood": "nearest neighbors in one dimension",
+            "law_kind": "simple nearest-neighbor cellular-automaton rule",
+            "rule_relation_constraint_function_or_probability_law": (
+                "rule 110; the complete transition table is outside this reviewed range"
+            ),
+            "witness_semantics": (
+                "random-start evolutions, one-cell perturbation comparisons, and collision experiments "
+                "witness rule-110 behavior without supplying transition entries"
+            ),
+            "parameters_and_variants": "fixed rule code 110",
+        },
+        semantic_units=[
+            "U001256",
+            "U001359",
+            "U001362",
+            "U001558",
+            "U001560",
+            "U001561",
+            "U001564",
+            "U001572",
+            "U001574",
+            "U001576",
+        ],
+        parameters=["rule code"],
+        related_names=[
+            "single-cell initial-perturbation difference observer",
+            "periodic-block cellular-automaton initial-condition generator",
+        ],
+        related_evidence_units={
+            "single-cell initial-perturbation difference observer": [
+                "U001359",
+                "U001360",
+                "U001361",
+                "U001362",
+            ],
+            "periodic-block cellular-automaton initial-condition generator": [
+                "U001557",
+                "U001558",
+                "U001561",
+            ],
+        },
+        na_fields=["seed"],
+        uncertainties=[
+            "The reviewed range identifies rule 110's two-color nearest-neighbor scope but does not transcribe its transition table."
+        ],
+    )
+    for unit_id in ("U001255", "U001257", "U001360", "U001361", "U001557"):
+        evidence(
+            rule110_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is a finite rule-110 behavior witness and supplies no transition entries.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        rule110_name,
+        "U001256",
+        fields=[
+            "object_kind",
+            "witness_semantics",
+            "parameters_and_variants",
+        ],
+        claim="U001256 identifies the random-start class-4 evolution as rule 110.",
+        strength="DIRECT_IDENTITY",
+    )
+    for unit_id in ("U001359", "U001362"):
+        evidence(
+            rule110_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} links rule 110 to the separately modeled one-cell perturbation comparison.",
+            strength="CORROBORATING",
+        )
+    evidence(
+        rule110_name,
+        "U001558",
+        fields=["witness_semantics", "parameters_and_variants"],
+        claim=(
+            "U001558 identifies rule 110's random-start witness and 14-cell/7-step background; "
+            "the background itself belongs to the periodic-seed record."
+        ),
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        rule110_name,
+        "U001560",
+        fields=[
+            "object_kind",
+            "carrier",
+            "alphabet_or_value_schema",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        ],
+        claim=(
+            "U001560 identifies rule 110 as a simple one-dimensional nearest-neighbor rule with two "
+            "cell colors; no transition entries are inferred."
+        ),
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        rule110_name,
+        "U001561",
+        fields=["witness_semantics"],
+        claim="U001561 links rule-110 structures to disruptions in the separately modeled periodic background.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        rule110_name,
+        "U001564",
+        fields=["witness_semantics"],
+        claim="U001564 introduces rule-110 collision experiments as behavior witnesses.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id in ("U001571", "U001573", "U001575"):
+        evidence(
+            rule110_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is an original-resolution rule-110 collision witness.",
+            strength="CONTEXTUAL",
+        )
+    for unit_id in ("U001572", "U001574", "U001576"):
+        evidence(
+            rule110_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} directly describes a source-delimited rule-110 collision outcome.",
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+
+    random_name = "random cellular-automaton initial-field generator family"
+    random_field = reset_record(
+        random_name,
+        values={
+            "object_kind": "carrier- and value-domain-parameterized stochastic initial-field generator",
+            "carrier": (
+                "the selected cellular automaton's field: a one-dimensional row or two-dimensional grid "
+                "in the stated examples"
+            ),
+            "alphabet_or_value_schema": (
+                "the selected cell-value domain: black/white or a continuous gray level in [0,1]"
+            ),
+            "complete_state": "one complete initial field on the selected carrier",
+            "input": (
+                "target carrier, target value domain, and binary black-cell density when the source states one"
+            ),
+            "law_kind": "stochastic initial-field generation law",
+            "rule_relation_constraint_function_or_probability_law": (
+                "choose field values at random in the selected value domain; binary examples may specify "
+                "a black-cell density, while the exact probability measure and independence assumptions remain unstated"
+            ),
+            "result_kind": "one random initial field for the selected cellular automaton",
+            "determinism_branching_or_measure": (
+                "stochastic; the source does not fully specify the sampling measure or independence convention"
+            ),
+            "parameters_and_variants": (
+                "target carrier, target value domain, and stated black-cell density"
+            ),
+        },
+        semantic_units=[
+            "U001227",
+            "U001316",
+            "U001324",
+            "U001331",
+            "U001333",
+            "U001416",
+            "U001421",
+        ],
+        parameters=[
+            "target carrier",
+            "target value domain",
+            "stated black-cell density",
+        ],
+        variants=[
+            "one-dimensional random black-or-white field",
+            "one-dimensional random continuous gray field",
+            "two-dimensional random black-or-white field",
+            "low-density random binary field",
+        ],
+        variant_units={
+            "one-dimensional random black-or-white field": ["U001227"],
+            "one-dimensional random continuous gray field": ["U001316"],
+            "two-dimensional random black-or-white field": [
+                "U001324",
+                "U001331",
+                "U001333",
+            ],
+            "low-density random binary field": ["U001421"],
+        },
+        na_fields=[
+            "native_time",
+            "seed",
+            "termination_completion_failure",
+        ],
+        uncertainties=[
+            "Exact probability measures, independence assumptions, spatial extent, and random-bit sources are not stated."
+        ],
+        role="SEED",
+    )
+    evidence(
+        random_name,
+        "U001227",
+        fields=[
+            "object_kind",
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "input",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "determinism_branching_or_measure",
+            "parameters_and_variants",
+        ],
+        claim="U001227 defines the binary random field by choosing every cell black or white at random.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id, claim in [
+        (
+            "U001316",
+            "U001316 supplies the one-dimensional continuous gray-field random-start variant.",
+        ),
+        (
+            "U001324",
+            "U001324 directly identifies two-dimensional cellular-automaton random initial fields.",
+        ),
+        (
+            "U001331",
+            "U001331 supplies the two-dimensional binary random-field variant.",
+        ),
+        (
+            "U001333",
+            "U001333 corroborates the broader two-dimensional random-start survey.",
+        ),
+        (
+            "U001416",
+            "U001416 states the infinite random placement required for rule-90 random behavior.",
+        ),
+        (
+            "U001421",
+            "U001421 supplies the low-black-density random-field parameter variant.",
+        ),
+    ]:
+        evidence(
+            random_name,
+            unit_id,
+            fields=[
+                "carrier",
+                "alphabet_or_value_schema",
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+            ],
+            claim=claim,
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+
+    continuous_name = "fractional-average continuous cellular automaton"
+    continuous = reset_record(
+        continuous_name,
+        values={
+            "object_kind": "one-dimensional continuous cellular automaton",
+            "native_time": "successive discrete steps",
+            "carrier": "a one-dimensional row of cells",
+            "alphabet_or_value_schema": "one gray level in [0,1] per cell",
+            "complete_state": "the complete gray-level field at one step",
+            "frontier_or_activation": "every cell on each step",
+            "schedule": "synchronous cellular-automaton update",
+            "read_dependencies_or_neighborhood": "the cell and its two adjacent neighbors",
+            "law_kind": "deterministic local fractional-average transition law",
+            "rule_relation_constraint_function_or_probability_law": (
+                "average the three gray levels, add the selected constant, and keep only the fractional part"
+            ),
+            "write_replacement_assembly_or_commit": (
+                "write the resulting fractional part as each cell's next gray level and commit synchronously"
+            ),
+            "result_kind": "one next complete gray-level field",
+            "successor_cardinality": "exactly one successor field",
+            "determinism_branching_or_measure": "deterministic for a selected additive constant",
+            "witness_semantics": (
+                "the random-start evolutions witness behavior; random initialization is supplied by the separate stochastic generator"
+            ),
+            "parameters_and_variants": "additive constant in [0,1], including displayed values 0.398 and 0.4",
+            "excluded_observers_and_representations": (
+                "the page-259 neighbor-difference gray values are observer output, not native cell state"
+            ),
+        },
+        semantic_units=["U001311", "U001316", "U001318", "U001320", "U001323"],
+        parameters=["additive constant"],
+        related_names=[
+            "random cellular-automaton initial-field generator family",
+            "neighbor-difference gray-field display transformation",
+        ],
+        related_evidence_units={
+            "random cellular-automaton initial-field generator family": [
+                "U001315",
+                "U001316",
+                "U001317",
+                "U001319",
+            ],
+            "neighbor-difference gray-field display transformation": [
+                "U001317",
+                "U001319",
+                "U001323",
+            ],
+        },
+        na_fields=["seed"],
+    )
+    evidence(
+        continuous_name,
+        "U001311",
+        fields=["object_kind", "parameters_and_variants"],
+        claim="U001311 identifies the continuous-cellular-automaton family and its smoothly varying parameter in [0,1].",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        continuous_name,
+        "U001315",
+        fields=["witness_semantics"],
+        claim="A000953 is a finite random-start evolution witness, not native-law or intrinsic-seed evidence.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        continuous_name,
+        "U001316",
+        fields=[
+            "object_kind",
+            "native_time",
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "witness_semantics",
+        ],
+        claim=(
+            "U001316 completely states the gray-field update and separately identifies the displayed "
+            "run as starting from a random field."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    for unit_id in ("U001317", "U001319"):
+        evidence(
+            continuous_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is a finite parameterized evolution witness rendered by the separate difference observer.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        continuous_name,
+        "U001318",
+        fields=["parameters_and_variants"],
+        claim="U001318 directly labels the displayed additive constant as 0.398.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        continuous_name,
+        "U001320",
+        fields=["parameters_and_variants"],
+        claim="U001320 directly labels the displayed additive constant as 0.4.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        continuous_name,
+        "U001323",
+        fields=["excluded_observers_and_representations"],
+        claim="U001323 explicitly says all three page-259 pictures display neighbor differences rather than native gray levels.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+
+    difference_name = "neighbor-difference gray-field display transformation"
+    difference = candidate(difference_name)
+    difference["parameters"] = []
+    difference["values"].pop("parameters_and_variants", None)
+
+    life_name = "Game of Life cellular automaton"
+    life = reset_record(
+        life_name,
+        values={
+            "object_kind": "two-dimensional binary outer-totalistic cellular automaton",
+            "native_time": "successive discrete steps",
+            "carrier": "a two-dimensional square grid",
+            "topology": "orthogonal and diagonal square-grid adjacency",
+            "alphabet_or_value_schema": "black and white",
+            "complete_state": "one black-or-white value for every grid cell",
+            "frontier_or_activation": "every cell on each step",
+            "schedule": "synchronous cellular-automaton update",
+            "read_dependencies_or_neighborhood": "the eight orthogonal and diagonal neighbors",
+            "law_kind": "deterministic outer-totalistic transition table",
+            "rule_relation_constraint_function_or_probability_law": (
+                "with two black neighbors retain the cell's previous color; with three become black; "
+                "with any other count become white"
+            ),
+            "write_replacement_assembly_or_commit": (
+                "write the rule-selected next color at every grid cell and commit synchronously"
+            ),
+            "result_kind": "one next complete binary grid",
+            "successor_cardinality": "exactly one successor grid",
+            "determinism_branching_or_measure": "deterministic",
+            "parameters_and_variants": "fixed outer-totalistic 9-neighbor code 224",
+            "excluded_observers_and_representations": (
+                "one-dimensional slices and prior-time gray trails are observer renderings, not native states"
+            ),
+        },
+        semantic_units=["U001329", "U001341"],
+        related_names=[
+            "one-dimensional slice-through-time and spatial-depth-fog observer",
+            "prior-time gray-trail rendering observer",
+        ],
+        related_evidence_units={
+            "one-dimensional slice-through-time and spatial-depth-fog observer": ["U001329"],
+            "prior-time gray-trail rendering observer": [
+                "U001336",
+                "U001338",
+                "U001339",
+                "U001340",
+                "U001341",
+            ],
+        },
+        na_fields=["seed"],
+    )
+    evidence(
+        life_name,
+        "U001329",
+        fields=[
+            field
+            for field in life["values"]
+            if field != "excluded_observers_and_representations"
+        ],
+        claim=(
+            "U001329 gives the complete Game of Life update over eight neighbors, identifies code 224, "
+            "and thereby determines one successor grid."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    for unit_id in ("U001336", "U001338", "U001339", "U001340"):
+        evidence(
+            life_name,
+            unit_id,
+            fields=[],
+            claim=f"{unit_id} is observer-rendered Game of Life output and supplies no native transition mechanics.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        life_name,
+        "U001341",
+        fields=["excluded_observers_and_representations"],
+        claim="U001341 explicitly defines the prior-time gray-trail rendering as a display of preceding black cells.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+
+    family_2d_name = "binary two-dimensional von-Neumann-totalistic cellular-automaton family"
+    family_2d = reset_record(
+        family_2d_name,
+        values={
+            "object_kind": "parameterized two-dimensional binary totalistic cellular-automaton family",
+            "native_time": "successive discrete steps",
+            "carrier": "a two-dimensional square grid",
+            "topology": "four-neighbor orthogonal square-grid adjacency",
+            "alphabet_or_value_schema": "black and white",
+            "complete_state": "one black-or-white value for every grid cell",
+            "frontier_or_activation": "every cell on each step",
+            "schedule": "synchronous cellular-automaton update",
+            "read_dependencies_or_neighborhood": "the cell and its four immediate orthogonal neighbors",
+            "law_kind": "code-selected deterministic totalistic transition table",
+            "rule_relation_constraint_function_or_probability_law": (
+                "successive base-2 digits in the selected six-bit code give the next color for totals 5 down to 0"
+            ),
+            "write_replacement_assembly_or_commit": (
+                "write the code-selected next color at every grid cell and commit synchronously"
+            ),
+            "result_kind": "one next complete binary grid under the selected code",
+            "successor_cardinality": "exactly one successor grid for a selected code",
+            "determinism_branching_or_measure": "deterministic after code selection",
+            "witness_semantics": (
+                "the random-start grids are experimental runs supplied by the separate stochastic field generator"
+            ),
+            "structural_invariants": "the surveyed family includes most of the 64 rules that leave all-white unchanged",
+            "parameters_and_variants": "selected six-bit totalistic code; displayed even codes 2 through 60",
+            "excluded_observers_and_representations": (
+                "one-dimensional slice and spatial-depth-fog panels are observer outputs"
+            ),
+        },
+        semantic_units=["U001330", "U001331", "U001332", "U001333", "U001335"],
+        parameters=["six-bit totalistic rule code"],
+        variants=[f"code {code}" for code in range(2, 61, 2)],
+        variant_units={
+            f"code {code}": ["U001332", "U001333"]
+            for code in range(2, 61, 2)
+        },
+        related_names=[
+            "random cellular-automaton initial-field generator family",
+            "one-dimensional slice-through-time and spatial-depth-fog observer",
+        ],
+        related_evidence_units={
+            "random cellular-automaton initial-field generator family": [
+                "U001331",
+                "U001332",
+                "U001333",
+            ],
+            "one-dimensional slice-through-time and spatial-depth-fog observer": [
+                "U001334",
+                "U001335",
+            ],
+        },
+        na_fields=["seed"],
+        role="FAMILY",
+    )
+    evidence(
+        family_2d_name,
+        "U001330",
+        fields=["witness_semantics", "parameters_and_variants"],
+        claim="A000957 is a labeled finite-step random-start family witness, not an intrinsic seed.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        family_2d_name,
+        "U001331",
+        fields=[
+            "object_kind",
+            "native_time",
+            "carrier",
+            "topology",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "witness_semantics",
+            "parameters_and_variants",
+        ],
+        claim=(
+            "U001331 completely defines the binary five-cell totalistic code scheme and separately "
+            "describes random-start experimental runs."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    evidence(
+        family_2d_name,
+        "U001332",
+        fields=["witness_semantics", "parameters_and_variants"],
+        claim="A000958 is the original-resolution labeled even-code random-start survey.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        family_2d_name,
+        "U001333",
+        fields=["structural_invariants", "parameters_and_variants", "witness_semantics"],
+        claim="U001333 identifies the surveyed even-code inventory and the all-white-preserving family restriction.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        family_2d_name,
+        "U001334",
+        fields=[],
+        claim="A000959 is a separate slice/depth-fog observer output.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        family_2d_name,
+        "U001335",
+        fields=["excluded_observers_and_representations"],
+        claim="U001335 explicitly defines the one-dimensional slice and spatial-depth-fog rendering.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+
+    perturb_name = "single-cell initial-perturbation difference observer"
+    perturb = reset_record(
+        perturb_name,
+        values={
+            "object_kind": "paired-run one-cell-perturbation difference observer",
+            "carrier": "two aligned cellular-automaton space-time histories",
+            "visible_history": "corresponding cells over the aligned evolution histories",
+            "input": (
+                "two runs under the same cellular-automaton rule and base initial condition, differing only "
+                "in the initial color of one selected cell"
+            ),
+            "read_dependencies_or_neighborhood": (
+                "the pair of corresponding cell values at each aligned space-time coordinate"
+            ),
+            "law_kind": "deterministic aligned comparative difference",
+            "rule_relation_constraint_function_or_probability_law": (
+                "place a black dot exactly where the corresponding cells in the two runs have different colors"
+            ),
+            "result_kind": "an aligned black-dot space-time difference history",
+            "determinism_branching_or_measure": "deterministic for the supplied pair of histories",
+            "witness_semantics": (
+                "black dots denote all changed cells; class-specific panels witness dying, localized, uniform-spreading, or sporadic-spreading differences"
+            ),
+            "parameters_and_variants": (
+                "cellular-automaton rule, base initial condition, and selected changed cell"
+            ),
+        },
+        semantic_units=[
+            "U001344",
+            "U001346",
+            "U001348",
+            "U001352",
+            "U001359",
+            "U001362",
+        ],
+        parameters=[
+            "cellular-automaton rule",
+            "base initial condition",
+            "selected changed cell",
+        ],
+        related_names=["elementary cellular automaton rule 110"],
+        related_evidence_units={
+            "elementary cellular automaton rule 110": [
+                "U001359",
+                "U001360",
+                "U001361",
+                "U001362",
+            ]
+        },
+        na_fields=["native_time"],
+        uncertainties=[
+            "The source does not state a completion or stopping criterion for an unbounded comparison."
+        ],
+    )
+    evidence(
+        perturb_name,
+        "U001344",
+        fields=["input", "parameters_and_variants"],
+        claim="U001344 defines the paired input by changing the initial color of exactly one cell.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    for unit_id in ("U001345", "U001349", "U001350", "U001351", "U001360", "U001361"):
+        evidence(
+            perturb_name,
+            unit_id,
+            fields=["witness_semantics"],
+            claim=f"{unit_id} is a finite aligned perturbation-difference witness.",
+            strength="CONTEXTUAL",
+        )
+    evidence(
+        perturb_name,
+        "U001346",
+        fields=[
+            "object_kind",
+            "carrier",
+            "visible_history",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "determinism_branching_or_measure",
+            "witness_semantics",
+        ],
+        claim="U001346 defines the aligned comparison and states that black dots mark every cell that changes.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    evidence(
+        perturb_name,
+        "U001348",
+        fields=["result_kind", "witness_semantics"],
+        claim="U001348 directly states the class-specific fates of a one-cell perturbation.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        perturb_name,
+        "U001352",
+        fields=["parameters_and_variants", "witness_semantics"],
+        claim="U001352 identifies the three class-3 rule instances in the one-cell-change comparison.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        perturb_name,
+        "U001359",
+        fields=["parameters_and_variants", "result_kind", "witness_semantics"],
+        claim="U001359 identifies rule 110 and states that differences spread when carried by localized structures.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        perturb_name,
+        "U001362",
+        fields=["input", "parameters_and_variants"],
+        claim="U001362 labels the rule-110 experiment as one changed initial cell.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+
     # Remove inherited per-unit evidence-limit declarations. build_output()
     # assigns the record boundary once to the strongest identity/law anchor.
     for row in defs:
