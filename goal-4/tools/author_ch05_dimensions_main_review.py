@@ -292,6 +292,41 @@ def profile_blueprint(
             "write_replacement_assembly_or_commit",
             "termination_completion_failure",
         }
+    elif kind == "NETWORK_GENERAL":
+        supported = {
+            "object_kind": "network evolution system",
+            "native_time": "discrete successive network states",
+            "carrier": "nodes and connections between nodes",
+            "topology": "connection incidence independent of drawing layout",
+            "structural_invariants": "node coordinates and drawn wire geometry are non-semantic",
+            "alphabet_or_value_schema": "nodes and connection identities; connection arity is not fixed by the general family",
+            "complete_state": "the nodes and complete connection relation at one step",
+            "law_kind": "network connection-update rule",
+            "rule_relation_constraint_function_or_probability_law": "a supplied rule specifying how connections change from one step to the next",
+            "write_replacement_assembly_or_commit": "update the network connection relation as specified by the rule",
+            "result_kind": "a successor network",
+            "parameters_and_variants": "connection arity and connection-update rule",
+            "excluded_observers_and_representations": "node positions and wire layout in a drawing are representations",
+            "evidence_limit": "the introductory family does not yet fix arity, seed, local dependency, schedule, or determinism",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "input",
+            "boundary",
+            "external_data",
+            "termination_completion_failure",
+            "witness_semantics",
+        }
+        unknown = {
+            "support",
+            "seed",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        }
     elif kind == "NETWORK":
         supported = {
             "object_kind": "network evolution system",
@@ -342,7 +377,7 @@ def profile_blueprint(
             "law_kind": "nondeterministic replacement relation with exhaustive branching",
             "rule_relation_constraint_function_or_probability_law": name,
             "write_replacement_assembly_or_commit": "replace one matched block; union and deduplicate all resulting sequences",
-            "result_kind": "set of successor sequences and induced state-transition graph",
+            "result_kind": "set of distinct successor sequences",
             "successor_cardinality": "zero, one, or multiple distinct successors per state",
             "determinism_branching_or_measure": "exhaustive branching without a probability measure",
             "parameters_and_variants": "replacement set and initial sequence",
@@ -453,6 +488,39 @@ def profile_blueprint(
             "read_dependencies_or_neighborhood",
             "write_replacement_assembly_or_commit",
         }
+    elif kind == "SOLVER_ENUMERATION":
+        supported = {
+            "object_kind": "exhaustive complete-pattern constraint solver",
+            "native_time": "successive complete-pattern trials",
+            "carrier": "complete finite cell assignments over a fixed region",
+            "support": "the fixed finite region being tested",
+            "topology": "the constraint carrier's local grid",
+            "structural_invariants": "every trial assigns every cell in the same finite region",
+            "alphabet_or_value_schema": "black/white cell values",
+            "complete_state": "the current complete candidate pattern and enumeration position",
+            "input": "a local constraint specification and finite region",
+            "frontier_or_activation": "the next complete candidate pattern in the enumeration",
+            "schedule": "enumerate every complete pattern and test each against the constraint",
+            "read_dependencies_or_neighborhood": "all local constraint checks across the complete candidate",
+            "law_kind": "exhaustive enumerate-and-test search",
+            "rule_relation_constraint_function_or_probability_law": name,
+            "write_replacement_assembly_or_commit": "advance to another complete candidate; retain candidates that satisfy the constraint",
+            "result_kind": "one or more satisfying complete patterns, or exhaustion with none",
+            "successor_cardinality": "one next trial for a chosen enumeration order",
+            "determinism_branching_or_measure": "exhaustive coverage; enumeration order is unspecified",
+            "termination_completion_failure": "finite exhaustion establishes that no assignment over the tested region satisfies the constraint",
+            "witness_semantics": "a satisfying complete pattern is a positive witness; exhaustive failure is a finite negative result",
+            "parameters_and_variants": "finite region size and enumeration order",
+            "excluded_observers_and_representations": "the astronomical search cost is a performance property, not a native transition",
+            "evidence_limit": "the source gives no enumeration order, pruning rule, region-growth step, or backtracking mechanic",
+        }
+        na = {
+            "visible_history",
+            "control_state",
+            "boundary",
+            "external_data",
+        }
+        unknown = {"seed"}
     elif kind == "SOLVER":
         supported = {
             "object_kind": "constraint-satisfaction search procedure",
@@ -729,7 +797,18 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         parent_index=ca3,
     )
 
-    tm2 = add(
+    tm2_family = add(
+        "two-dimensional Turing-machine family",
+        "TM2",
+        "SOURCE_UNIT",
+        "U001010",
+        1,
+        ["U001010"],
+        ["A000865"],
+        parameters={"movement carrier": "two-dimensional grid"},
+        overrides={"seed": ("UNKNOWN_FROM_SOURCE", None)},
+    )
+    add(
         "illustrated three-state two-dimensional Turing machine",
         "TM2",
         "IMAGE",
@@ -738,6 +817,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["U001010", "U001012"],
         ["A000865"],
         parameters={"head states": "three", "movement directions": "four"},
+        parent_index=tm2_family,
     )
     tm_output_assets = ["A000866", "A000867", "A000868", "A000869", "A000871"]
     for ordinal, (label, output_asset) in enumerate(
@@ -758,7 +838,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             assets,
             aliases=[f"rule ({label})"],
             parameters={"head states": "four", "rule panel": label},
-            parent_index=tm2,
+            parent_index=tm2_family,
             route_keys=["page-186-turing-rule"] if label == "e" else [],
         )
 
@@ -797,7 +877,19 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             parent_index=sub2,
             route_keys=["page-83-substitution"],
         )
-    geom = add(
+    geom_family = add(
+        "geometrical replacement and fractal-system family",
+        "SUB_GEOM",
+        "SOURCE_UNIT",
+        "U001042",
+        1,
+        ["U001042", "U001050", "U001051", "U001053"],
+        [],
+        parameters={
+            "replacement domain": "oriented geometrical square elements without a fixed grid"
+        },
+    )
+    add(
         "orientation-sensitive two-square geometrical replacement preset",
         "SUB_GEOM",
         "SOURCE_UNIT",
@@ -806,6 +898,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["U001042", "U001045", "U001053"],
         ["A000877", "A000878"],
         parameters={"replacement count": "two smaller black squares", "orientation": "carried by each square"},
+        parent_index=geom_family,
     )
     add(
         "overlap-producing geometrical replacement preset",
@@ -816,7 +909,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         ["U001046", "U001049"],
         ["A000879", "A000880"],
         parameters={"replacement count": "two smaller black squares", "overlap": "arises in later stages"},
-        parent_index=geom,
+        parent_index=geom_family,
     )
     for ordinal, label in enumerate("abcd", 1):
         add(
@@ -829,7 +922,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             ["A000881"],
             aliases=[f"fractal preset ({label})"],
             parameters={"panel": label, "horizon": "12 steps"},
-            parent_index=geom,
+            parent_index=geom_family,
         )
     neighbor_sub = add(
         "two-dimensional neighbor-dependent substitution-system family",
@@ -872,9 +965,9 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             parent_index=neighbor_sub,
         )
 
-    network = add(
-        "binary-outdegree network-system family",
-        "NETWORK",
+    network_family = add(
+        "network-system family",
+        "NETWORK_GENERAL",
         "SOURCE_UNIT",
         "U001067",
         1,
@@ -883,12 +976,24 @@ def build_candidate_specs() -> list[dict[str, Any]]:
             "U001067",
             "U001069",
             "U001070",
+        ],
+        [],
+    )
+    network = add(
+        "binary-outdegree network-system restriction",
+        "NETWORK",
+        "SOURCE_UNIT",
+        "U001071",
+        1,
+        [
             "U001071",
             "U001090",
             "U001094",
         ],
         [],
         parameters={"outgoing connections per node": "two"},
+        overrides={"seed": ("UNKNOWN_FROM_SOURCE", None)},
+        parent_index=network_family,
     )
     add(
         "unlabelled reachable binary-outdegree graphs on one to three nodes",
@@ -1208,12 +1313,15 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         parent_index=constraint_family,
     )
     for row_black_neighbors in range(5):
-        for col_white_neighbors in range(5):
+        for visual_column in range(5):
+            # The checked panel runs from 4 white neighbors at the left to 0
+            # at the right; black-neighbor counts run 0→4 top-to-bottom.
+            col_white_neighbors = 4 - visual_column
             # The row/column matching the previously introduced prose preset is
             # linked as evidence there instead of duplicated.
             if row_black_neighbors == 1 and col_white_neighbors == 2:
                 continue
-            ordinal = row_black_neighbors * 5 + col_white_neighbors + 1
+            ordinal = row_black_neighbors * 5 + visual_column + 1
             add(
                 "two-dimensional neighbor-count preset "
                 f"(black-center black={row_black_neighbors}, "
@@ -1316,7 +1424,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         )
     enumeration_solver = add(
         "exhaustive complete-pattern enumeration constraint solver",
-        "SOLVER",
+        "SOLVER_ENUMERATION",
         "SOURCE_UNIT",
         "U001197",
         1,
@@ -1418,7 +1526,7 @@ def build_candidate_specs() -> list[dict[str, Any]]:
         parent_index=template3,
     )
 
-    assert len(specs) == 192, len(specs)
+    assert len(specs) == 195, len(specs)
     return specs
 
 
@@ -2261,7 +2369,7 @@ def validate_output(
     assets = output["asset_updates"]
     candidates = output["candidate_proposals"]
     routes = output["route_proposals"]
-    if len(readings) != 276 or len(assets) != 80 or len(candidates) != 192:
+    if len(readings) != 276 or len(assets) != 80 or len(candidates) != 195:
         raise ValueError("unexpected output row count")
     if len(routes) != 22:
         raise ValueError("unexpected route count")
@@ -2274,7 +2382,7 @@ def validate_output(
     ]:
         raise ValueError("asset order changed")
     if [row["id"] for row in candidates] != [
-        f"W{i:04d}" for i in range(1, 193)
+        f"W{i:04d}" for i in range(1, 196)
     ]:
         raise ValueError("candidate sequence is not contiguous")
     if [row["route_id"] for row in routes] != [
