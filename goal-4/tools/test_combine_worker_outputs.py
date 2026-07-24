@@ -86,6 +86,12 @@ def _candidate(
     stage: int,
     epoch: int,
     name: str,
+    candidate_id: str,
+    evidence_id: str,
+    evidence_group_id: str,
+    discovery_ordinal: int,
+    related_candidate_id: str,
+    route_ids: list[str],
 ) -> dict[str, Any]:
     missing = "The test evidence does not state further native mechanics."
     field_support = {
@@ -104,11 +110,11 @@ def _candidate(
     fingerprint["object_kind"] = {
         "status": "SUPPORTED",
         "value": "test construction",
-        "evidence_ids": ["WE000001"],
-        "reason": "The assigned source identifies a construction.",
+        "evidence_ids": [evidence_id],
+        "reason": "",
     }
     values: dict[str, Any] = {
-        "id": "W0001",
+        "id": candidate_id,
         "record_status": "ACTIVE",
         "provisional_name": name,
         "aliases": [],
@@ -117,18 +123,18 @@ def _candidate(
             "epoch": epoch,
             "kind": "SOURCE_UNIT",
             "id": source_unit_id,
-            "ordinal": 1,
+            "ordinal": discovery_ordinal,
         },
         "source_unit_ids": [source_unit_id],
         "source_evidence": [
             {
-                "evidence_id": "WE000001",
-                "evidence_group_id": "WG000001",
+                "evidence_id": evidence_id,
+                "evidence_group_id": evidence_group_id,
                 "discovery_anchor": {
                     "epoch": epoch,
                     "kind": "SOURCE_UNIT",
                     "id": source_unit_id,
-                    "ordinal": 1,
+                    "ordinal": discovery_ordinal,
                 },
                 "source_unit_id": source_unit_id,
                 "image_path": None,
@@ -147,30 +153,30 @@ def _candidate(
             {
                 "name": "test parameter",
                 "source_description": "The source supplies a test parameter.",
-                "evidence_ids": ["WE000001"],
+                "evidence_ids": [evidence_id],
             }
         ],
         "variants": [
             {
                 "name": "test variant",
                 "source_description": "The source supplies a test variant.",
-                "evidence_ids": ["WE000001"],
+                "evidence_ids": [evidence_id],
             }
         ],
         "missing_mechanics": [missing],
         "uncertainties": [],
         "related_candidate_ids": [
             {
-                "candidate_id": "W0001",
+                "candidate_id": related_candidate_id,
                 "relation": "SOURCE_COMPARE",
                 "proof_kind": "PROVISIONAL_COMPARISON",
-                "evidence_ids": ["WE000001"],
-                "before_rationale": "The worker retained the source comparison.",
-                "after_rationale": "The union must retain the source comparison.",
+                "evidence_ids": [evidence_id],
+                "before_rationale": "",
+                "after_rationale": "",
                 "uncertainty": "The comparison remains provisional.",
             }
         ],
-        "cross_reference_ids": ["WR0001"],
+        "cross_reference_ids": route_ids,
         "evidence_reassignments": [],
     }
     return {field: values[field] for field in CANDIDATE_FIELDS}
@@ -235,7 +241,9 @@ def _complete_sub_bundle(
                 "source_status": "CLEAR",
                 "uncertainty": "",
                 "secondary_roles": "[]",
-                "candidate_ids": '["W0001"]' if is_anchor else "[]",
+                "candidate_ids": (
+                    '["W0001","W0002"]' if is_anchor else "[]"
+                ),
                 "route_ids": '["WR0001"]' if is_anchor else "[]",
                 "evidence_statement": "Test source unit was explicitly reviewed.",
                 "review_stage": str(stage),
@@ -278,7 +286,25 @@ def _complete_sub_bundle(
                     stage=stage,
                     epoch=epoch,
                     name=candidate_name,
-                )
+                    candidate_id="W0001",
+                    evidence_id="WE000001",
+                    evidence_group_id="WG000001",
+                    discovery_ordinal=1,
+                    related_candidate_id="W0002",
+                    route_ids=["WR0001"],
+                ),
+                _candidate(
+                    source_unit_id,
+                    stage=stage,
+                    epoch=epoch,
+                    name=f"Comparison target for {candidate_name}",
+                    candidate_id="W0002",
+                    evidence_id="WE000002",
+                    evidence_group_id="WG000002",
+                    discovery_ordinal=2,
+                    related_candidate_id="W0001",
+                    route_ids=[],
+                ),
             ],
             "asset_updates": asset_updates,
             "route_proposals": [
@@ -364,9 +390,9 @@ def test_combines_completed_disjoint_outputs_and_rewrites_every_join(
     )
 
     assert summary.sub_bundle_count == 2
-    assert summary.candidate_count == 2
-    assert summary.evidence_count == 2
-    assert summary.evidence_group_count == 2
+    assert summary.candidate_count == 4
+    assert summary.evidence_count == 4
+    assert summary.evidence_group_count == 4
     assert summary.route_count == 2
 
     output = _json(fixture["union"] / "output" / "output.json")
@@ -374,15 +400,17 @@ def test_combines_completed_disjoint_outputs_and_rewrites_every_join(
     assert [row["id"] for row in output["candidate_proposals"]] == [
         "W0001",
         "W0002",
+        "W0003",
+        "W0004",
     ]
     assert [
         row["source_evidence"][0]["evidence_id"]
         for row in output["candidate_proposals"]
-    ] == ["WE000001", "WE000002"]
+    ] == ["WE000001", "WE000002", "WE000003", "WE000004"]
     assert [
         row["source_evidence"][0]["evidence_group_id"]
         for row in output["candidate_proposals"]
-    ] == ["WG000001", "WG000002"]
+    ] == ["WG000001", "WG000002", "WG000003", "WG000004"]
     assert [row["route_id"] for row in output["route_proposals"]] == [
         "WR0001",
         "WR0002",
@@ -390,34 +418,40 @@ def test_combines_completed_disjoint_outputs_and_rewrites_every_join(
     assert [
         row["cross_reference_ids"]
         for row in output["candidate_proposals"]
-    ] == [["WR0001"], ["WR0002"]]
+    ] == [["WR0001"], [], ["WR0002"], []]
     assert [
         row["fingerprint"]["object_kind"]["evidence_ids"]
         for row in output["candidate_proposals"]
-    ] == [["WE000001"], ["WE000002"]]
+    ] == [["WE000001"], ["WE000002"], ["WE000003"], ["WE000004"]]
     assert [
         row["parameters"][0]["evidence_ids"]
         for row in output["candidate_proposals"]
-    ] == [["WE000001"], ["WE000002"]]
+    ] == [["WE000001"], ["WE000002"], ["WE000003"], ["WE000004"]]
     assert [
         row["variants"][0]["evidence_ids"]
         for row in output["candidate_proposals"]
-    ] == [["WE000001"], ["WE000002"]]
+    ] == [["WE000001"], ["WE000002"], ["WE000003"], ["WE000004"]]
     assert [
         row["related_candidate_ids"][0]["candidate_id"]
         for row in output["candidate_proposals"]
-    ] == ["W0001", "W0002"]
+    ] == ["W0002", "W0001", "W0004", "W0003"]
     assert [
         row["related_candidate_ids"][0]["evidence_ids"]
         for row in output["candidate_proposals"]
-    ] == [["WE000001"], ["WE000002"]]
+    ] == [["WE000001"], ["WE000002"], ["WE000003"], ["WE000004"]]
 
     reading_by_id = {
         row["source_unit_id"]: row for row in output["reading_updates"]
     }
-    assert reading_by_id[fixture["first_source"]]["candidate_ids"] == '["W0001"]'
+    assert (
+        reading_by_id[fixture["first_source"]]["candidate_ids"]
+        == '["W0001","W0002"]'
+    )
     assert reading_by_id[fixture["first_source"]]["route_ids"] == '["WR0001"]'
-    assert reading_by_id[fixture["second_source"]]["candidate_ids"] == '["W0002"]'
+    assert (
+        reading_by_id[fixture["second_source"]]["candidate_ids"]
+        == '["W0003","W0004"]'
+    )
     assert reading_by_id[fixture["second_source"]]["route_ids"] == '["WR0002"]'
     assert {
         row["reviewer"] for row in output["reading_updates"]
@@ -570,11 +604,16 @@ def test_reconstructs_interleaved_assets_in_combined_canonical_order(
     assert [row["asset_id"] for row in output["asset_updates"]] == union_ids
     assert [
         row["provisional_name"] for row in output["candidate_proposals"]
-    ] == ["Preface construction", "General-notes construction"]
+    ] == [
+        "Preface construction",
+        "Comparison target for Preface construction",
+        "General-notes construction",
+        "Comparison target for General-notes construction",
+    ]
     assert [
         row["cross_reference_ids"]
         for row in output["candidate_proposals"]
-    ] == [["WR0001"], ["WR0002"]]
+    ] == [["WR0001"], [], ["WR0002"], []]
 
 
 def test_rejects_incomplete_input_and_nonpristine_union(

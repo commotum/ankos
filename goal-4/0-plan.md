@@ -148,7 +148,7 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current facts after completion of Stages 1–8:
+These are current facts after completion of Stages 1–9:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   that pre-execution state is retained only as historical provenance in
@@ -220,6 +220,19 @@ These are current facts after completion of Stages 1–8:
   routes, and 12 LOCAL rounds and is resumable at Stage 9. Stage 8 also
   records an explicit append-only Stage 18 evidence-strength correction
   obligation for 47 candidates; it must not be silently applied earlier.
+- Stage 9 is complete in `9-CH05-DIMENSIONS.md`: all 539 paired Chapter 5
+  units and 150 images are reviewed at the required depth; sequential review
+  and omission search add 413 blind candidates, `B0657..B1069`, while three
+  source-grounded relinks make the Stage 9 relationship set 416 candidates.
+  The stage owns 200 routes—109 resolved within-stage routes and 91 pending
+  cross-range obligations—and its complete active relationship set contains
+  217 routes. `S013` records 1,553 dispositioned hits across 524 unique units,
+  adds 170 vocabulary terms, 89 candidates, 438 evidence groups, and 154
+  routes; `S014` repeats the same normalized hit projection with zero semantic
+  delta. The valid live state is terminal at `V000026`, epoch 2, with 2,725
+  reviewed units, 511 screened images, 1,069 active candidates, 402 routes
+  (200 resolved and 202 pending), and 14 LOCAL rounds, and is resumable at
+  Stage 10.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -516,6 +529,8 @@ Blindly audit Chapter 4 main text and Chapter 4 Notes.
 
 ### 9-CH05-DIMENSIONS
 
+Status: **COMPLETE** in `goal-4/9-CH05-DIMENSIONS.md`.
+
 #### Big Picture Objective
 
 Blindly audit Chapter 5 main text and Chapter 5 Notes.
@@ -533,6 +548,25 @@ Blindly audit Chapter 5 main text and Chapter 5 Notes.
 - Structural variants have complete fingerprints or explicit missing-mechanics fields.
 - Constraints, solvers, networks, multiway histories, and renderings remain distinct.
 - All relevant outgoing references are queued.
+
+#### Stage Results And Handoff
+
+All 276 main-text and 263 Notes units are reviewed, and all 80 main-text and
+70 Notes images are screened. Stage 9 added 413 candidates and ended with 416
+candidate relationships after relinking `B0032`, `B0094`, and `B0595`. It
+owns 109 resolved `WITHIN_STAGE` routes and 91 pending `CROSS_RANGE` routes;
+all 16 reachable incoming routes are resolved. `S013` and `S014` each
+disposition 1,553 query/unit hits across the exact paired scope, and `S014`
+adds no vocabulary, candidate, evidence, route, or ledger delta.
+
+The exact Stage 10 starting state is `V000026`, epoch 2: 14,311 units with
+2,725 reviewed, 1,069 active candidates, 402 routes (200 resolved and 202
+pending), 1,607 assets with 511 screened, and 14 LOCAL rounds. Stage 10 owns
+607 pending units (`U001223..U001576` and `U006339..U006591`) and 177 pending
+images (`A000923..A001027` and `A000589..A000660`). Its two sealed assignments
+must be built from the six terminal hashes recorded in
+`9-CH05-DIMENSIONS.md`; no future source was opened to derive this ledger-only
+handoff.
 
 ### 10-CH06-RANDOMNESS
 
