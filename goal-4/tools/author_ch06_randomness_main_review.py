@@ -20,7 +20,7 @@ WORKER_ID = "ch06-main"
 STAGE = 10
 EPOCH = 2
 SOURCE_PATH = "CHAPTERS/06-Starting-from-Randomness.md"
-EXPECTED_CANDIDATE_COUNT = 58
+EXPECTED_CANDIDATE_COUNT = 60
 
 FIELDS = [
     "object_kind",
@@ -821,18 +821,34 @@ def candidate_definitions() -> list[dict[str, Any]]:
         strength="DIRECT_COMPLETE_MECHANICS",
     )
     add(
-        "rule-4 isolated-black attractor and basin relation",
-        ["U001485", "U001486", "U001488", "U001489", "U001490", "U001491"],
-        ["U001485", "U001486", "U001488", "U001489", "U001491"],
+        "rule-4 isolated-black attractor-set constraint",
+        ["U001486", "U001488"],
+        ["U001486", "U001488"],
         relation_values(
-            "attractor-set and basin relation",
+            "attractor-set membership constraint",
             carrier="binary cellular-automaton configurations",
-            input_value="a rule-4 initial configuration",
+            input_value="a proposed rule-4 attractor configuration",
             law=(
-                "after one step the attractor consists of configurations in which every black cell has at least "
-                "one white cell on each side; multiple initial configurations can map to the same attractor state"
+                "accept exactly configurations in which every black cell has at least one white cell on each side"
             ),
-            result="an allowed attractor configuration together with its basin membership",
+            result="membership in the rule-4 attractor set",
+        ),
+        role="CONSTRAINT",
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    add(
+        "rule-4 many-to-one basin-of-attraction relation",
+        ["U001489", "U001490", "U001491"],
+        ["U001489", "U001491"],
+        relation_values(
+            "many-to-one basin/preimage relation",
+            carrier="pairs of rule-4 initial and final configurations",
+            input_value="a rule-4 final attractor configuration",
+            law=(
+                "collect the distinct initial configurations that evolve to the selected final attractor state"
+            ),
+            result="the basin or preimage set of initial configurations for that final state",
+            determinism="the forward rule is deterministic, while the inverse basin relation can have many members",
         ),
         role="CONSTRAINT",
         strength="DIRECT_COMPLETE_MECHANICS",
@@ -1144,6 +1160,16 @@ def candidate_definitions() -> list[dict[str, Any]]:
         mechanics_units=["U001486"],
         anchor_priority=-1,
         uncertainties=["The local rule table is image-borne or delegated to the rule-number scheme; this range directly identifies the preset and its outcome."],
+    )
+    add(
+        "elementary cellular automaton rule 4",
+        ["U001485", "U001486"],
+        ["U001485", "U001486"],
+        ca_values("rule 4"),
+        aliases=["rule 4"],
+        strength="DIRECT_COMPLETE_MECHANICS",
+        mechanics_units=[],
+        uncertainties=[],
     )
     add(
         "localized finite-seed integer codec family",
@@ -2847,6 +2873,168 @@ def candidate_definitions() -> list[dict[str, Any]]:
         claim="U001486 associates rule 255 with the one-step all-black allowed-sequence result.",
     )
 
+    # The lower A001005 transition table defines native rule 4. Keep its
+    # attractor-set restriction and inverse basin relation as distinct objects.
+    rule4_name = "elementary cellular automaton rule 4"
+    rule4 = candidate(rule4_name)
+    rule4["mechanics_units"] = []
+    rule4["values"] = {
+        "object_kind": "one-dimensional binary nearest-neighbor cellular-automaton preset",
+        "native_time": "discrete successive steps",
+        "carrier": "a one-dimensional row of binary cells",
+        "alphabet_or_value_schema": "black and white",
+        "complete_state": "the color of every cell at one step",
+        "read_dependencies_or_neighborhood": "the left neighbor, cell itself, and right neighbor",
+        "law_kind": "deterministic local transition table",
+        "rule_relation_constraint_function_or_probability_law": (
+            "write black only for the white-black-white neighborhood; write white for the other seven binary triples"
+        ),
+        "write_replacement_assembly_or_commit": "write the table-selected next color for each cell",
+        "result_kind": "one next binary configuration",
+        "successor_cardinality": "one table-selected output for each neighborhood",
+        "determinism_branching_or_measure": "deterministic",
+        "witness_semantics": "the lower original-resolution table in A001005 transcribes the complete native rule",
+        "parameters_and_variants": "rule 4",
+    }
+    rule4["related_names"] = [
+        "rule-4 isolated-black attractor-set constraint",
+        "rule-4 many-to-one basin-of-attraction relation",
+    ]
+    evidence(
+        rule4_name,
+        "U001485",
+        fields=[
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "witness_semantics",
+        ],
+        claim=(
+            "A001005's lower original-resolution transition table maps only white-black-white to black "
+            "and maps the other seven binary nearest-neighbor triples to white."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+        allow_direct_image=True,
+    )
+    evidence(
+        rule4_name,
+        "U001486",
+        fields=[
+            "object_kind",
+            "native_time",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+        ],
+        claim="U001486 identifies the second displayed preset as rule 4 and states its one-step attractor outcome.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+
+    attractor4_name = "rule-4 isolated-black attractor-set constraint"
+    attractor4 = candidate(attractor4_name)
+    attractor4["mechanics_units"] = []
+    attractor4["values"] = {
+        "object_kind": "rule-4 attractor-set membership constraint",
+        "carrier": "one-dimensional binary configurations",
+        "input": "a proposed final rule-4 configuration",
+        "law_kind": "declarative configuration-membership constraint",
+        "rule_relation_constraint_function_or_probability_law": (
+            "accept exactly configurations in which every black cell has at least one white cell on each side"
+        ),
+        "result_kind": "membership in the rule-4 one-step attractor set",
+        "determinism_branching_or_measure": "deterministic membership relation",
+        "termination_completion_failure": "membership is decided by checking the stated adjacency restriction",
+        "witness_semantics": "an accepted configuration has no adjacent black cells",
+        "parameters_and_variants": "rule 4 one-step attractor",
+    }
+    attractor4["related_names"] = [rule4_name, "rule-4 many-to-one basin-of-attraction relation"]
+    evidence(
+        attractor4_name,
+        "U001486",
+        fields=[
+            "object_kind",
+            "carrier",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+        ],
+        claim="U001486 identifies rule 4's one-step attractor as configurations with every black cell surrounded by white cells.",
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+    evidence(
+        attractor4_name,
+        "U001488",
+        fields=list(attractor4["values"]),
+        claim=(
+            "U001488 directly defines the complete rule-4 attractor set as all configurations whose black "
+            "cells have at least one white cell on both sides."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+
+    basin4_name = "rule-4 many-to-one basin-of-attraction relation"
+    basin4 = candidate(basin4_name)
+    basin4["mechanics_units"] = []
+    basin4["values"] = {
+        "object_kind": "rule-4 inverse basin/preimage relation",
+        "carrier": "pairs of initial and final binary configurations",
+        "input": "a selected final rule-4 attractor configuration",
+        "law_kind": "inverse-image relation under deterministic rule-4 evolution",
+        "rule_relation_constraint_function_or_probability_law": (
+            "collect all initial configurations that evolve to the selected final attractor state"
+        ),
+        "result_kind": "the basin or preimage set for that final configuration",
+        "successor_cardinality": "many initial configurations may share one final state",
+        "determinism_branching_or_measure": (
+            "the forward rule is deterministic; the inverse basin relation can have many members"
+        ),
+        "termination_completion_failure": "a proposed initial/final pair is checked by rule-4 evolution",
+        "witness_semantics": "the source exhibits four distinct initial conditions with the same final state",
+        "parameters_and_variants": "rule 4 and the selected final attractor configuration",
+    }
+    basin4["related_names"] = [rule4_name, attractor4_name]
+    evidence(
+        basin4_name,
+        "U001489",
+        fields=[
+            "object_kind",
+            "carrier",
+            "input",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        ],
+        claim="U001489 directly states that many different initial configurations can lead to one selected attractor configuration.",
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+    evidence(
+        basin4_name,
+        "U001490",
+        fields=["witness_semantics"],
+        claim="A001006 is the finite four-input/one-output basin witness; the basin relation is stated in prose.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        basin4_name,
+        "U001491",
+        fields=list(basin4["values"]),
+        claim=(
+            "U001491 identifies four distinct rule-4 initial conditions that share one final state and names "
+            "those initial conditions as elements of its basin of attraction."
+        ),
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
+
     panel4_name = "fixed-or-periodic-structure elementary cellular-automaton preset panel"
     evidence(
         panel4_name,
@@ -2858,7 +3046,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
     evidence(
         panel4_name,
         "U001486",
-        fields=["parameters_and_variants"],
+        fields=[],
         claim="U001486 identifies only the rule-4 member's isolated-black attractor behavior; it does not support the whole four-rule panel.",
         strength="CORROBORATING",
     )
@@ -3759,6 +3947,81 @@ def build_output(bundle: Path) -> dict[str, Any]:
     asset_by_unit = {row["source_unit_id"]: row for row in data["assets"]}
     candidates = candidate_definitions()
 
+    common_na = {"control_state", "external_data"}
+    role_na = {
+        "NATIVE": {
+            "input",
+            "visible_history",
+            "witness_semantics",
+            "excluded_observers_and_representations",
+        },
+        "FAMILY": {
+            "input",
+            "visible_history",
+            "witness_semantics",
+            "excluded_observers_and_representations",
+        },
+        "OBSERVER": {
+            "boundary",
+            "frontier_or_activation",
+            "schedule",
+            "seed",
+            "successor_cardinality",
+            "write_replacement_assembly_or_commit",
+        },
+        "CONSTRAINT": {
+            "boundary",
+            "frontier_or_activation",
+            "read_dependencies_or_neighborhood",
+            "schedule",
+            "seed",
+            "successor_cardinality",
+            "visible_history",
+            "write_replacement_assembly_or_commit",
+        },
+        "EMULATION": {
+            "boundary",
+            "complete_state",
+            "frontier_or_activation",
+            "native_time",
+            "read_dependencies_or_neighborhood",
+            "schedule",
+            "seed",
+            "successor_cardinality",
+            "termination_completion_failure",
+            "visible_history",
+            "witness_semantics",
+            "write_replacement_assembly_or_commit",
+        },
+        "SEED": {
+            "control_state",
+            "external_data",
+            "visible_history",
+            "witness_semantics",
+        },
+    }
+    noniterative_seed_na = {
+        "frontier_or_activation",
+        "read_dependencies_or_neighborhood",
+        "schedule",
+        "write_replacement_assembly_or_commit",
+    }
+    for candidate in candidates:
+        profile_na = common_na | role_na[candidate["role"]]
+        if (
+            candidate["role"] == "SEED"
+            and candidate["name"] != "nested substitution initial condition for rule 184"
+        ):
+            profile_na |= noniterative_seed_na
+        candidate["na_fields"] = [
+            field
+            for field in FIELDS
+            if field in (set(candidate["na_fields"]) | profile_na)
+            and field not in candidate["values"]
+            and field not in candidate["conflicting_fields"]
+            and field != "evidence_limit"
+        ]
+
     for index, candidate in enumerate(candidates, 1):
         candidate["id"] = f"W{index:04d}"
         candidate["units"] = sorted(set(candidate["units"]), key=ordinal.__getitem__)
@@ -3942,8 +4205,50 @@ def build_output(bundle: Path) -> dict[str, Any]:
 
     candidate_records: list[dict[str, Any]] = []
     candidate_id_by_name = {candidate["name"]: candidate["id"] for candidate in candidates}
+    strength_rank = {
+        "DIRECT_COMPLETE_MECHANICS": 6,
+        "DIRECT_PARTIAL_MECHANICS": 5,
+        "DIRECT_IDENTITY": 4,
+        "DEFECT_LIMITED": 3,
+        "CORROBORATING": 2,
+        "CONTEXTUAL": 1,
+        "LEAD_ONLY": 0,
+    }
     for candidate in candidates:
         evidence = sorted(evidence_by_candidate[candidate["id"]], key=lambda row: int(row["evidence_id"][2:]))
+        profile_anchor = max(
+            evidence,
+            key=lambda row: (
+                strength_rank[row["strength"]],
+                bool(
+                    {
+                        "object_kind",
+                        "law_kind",
+                        "rule_relation_constraint_function_or_probability_law",
+                    }
+                    & set(row["fingerprint_fields"])
+                ),
+                len(row["fingerprint_fields"]),
+                -int(row["evidence_id"][2:]),
+            ),
+        )
+        candidate["values"]["evidence_limit"] = (
+            "Review-record boundary: only mechanics stated or directly transcribed in the sealed Chapter 6 "
+            "main-text bundle are supported; absent profile mechanics remain unknown, and profile-irrelevant "
+            "fields are explicitly not applicable."
+        )
+        profile_fields = [
+            field
+            for field in FIELDS
+            if field == "evidence_limit" or field in candidate["na_fields"]
+        ]
+        for field in profile_fields:
+            if field not in profile_anchor["fingerprint_fields"]:
+                profile_anchor["fingerprint_fields"].append(field)
+        profile_anchor["claim"] += (
+            " This strongest identity/law anchor also fixes the review-record evidence boundary and "
+            "justifies the candidate profile's explicit not-applicable fields."
+        )
         evidence_by_unit = {row["source_unit_id"]: row["evidence_id"] for row in evidence}
         evidence_for_field = {
             field: [row["evidence_id"] for row in evidence if field in row["fingerprint_fields"]]
@@ -3966,8 +4271,12 @@ def build_output(bundle: Path) -> dict[str, Any]:
             elif field in candidate["na_fields"]:
                 status = "NOT_APPLICABLE"
                 value = None
-                reason = f"The {field} field is not applicable to this source-defined object."
-                ids = []
+                reason = (
+                    f"The {candidate['role'].lower()} profile for {candidate['name']} has no independent "
+                    f"{field.replace('_', ' ')} mechanic beyond its supported identity, input, or law semantics."
+                )
+                ids = evidence_for_field[field]
+                check(len(ids) == 1, f"{candidate['id']} not-applicable field requires one profile anchor: {field}")
             else:
                 status = "UNKNOWN_FROM_SOURCE"
                 value = None
@@ -4477,16 +4786,24 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         key=lambda row: int(row["evidence_id"][2:]),
     )
     check(
-        all("evidence_limit" not in row["fingerprint_fields"] for row in evidence),
-        "record-level evidence_limit must not be attributed to source units",
+        sum("evidence_limit" in row["fingerprint_fields"] for row in evidence)
+        == EXPECTED_CANDIDATE_COUNT,
+        "record-level evidence_limit must use exactly one profile anchor per candidate",
     )
     check(
         all(
-            candidate["fingerprint"]["evidence_limit"]["status"] == "UNKNOWN_FROM_SOURCE"
-            and not candidate["fingerprint"]["evidence_limit"]["evidence_ids"]
+            candidate["fingerprint"]["evidence_limit"]["status"] == "SUPPORTED"
+            and len(candidate["fingerprint"]["evidence_limit"]["evidence_ids"]) == 1
             for candidate in output["candidate_proposals"]
         ),
-        "record-level evidence_limit must remain outside source-supported fingerprints",
+        "record-level evidence_limit must be supported by one strongest identity/law anchor",
+    )
+    check(
+        all(
+            any(value["status"] == "NOT_APPLICABLE" for value in candidate["fingerprint"].values())
+            for candidate in output["candidate_proposals"]
+        ),
+        "every candidate profile must adjudicate at least one not-applicable field",
     )
     check(
         [row["evidence_id"] for row in evidence] == [f"WE{i:06d}" for i in range(1, len(evidence) + 1)],

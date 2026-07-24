@@ -3275,6 +3275,57 @@ def main() -> None:
             key=lambda status: (status_order.get(status, 99), status),
         )
 
+    # Freeze the semantic repairs that motivated this pass.  These checks are
+    # deliberately phrased over the completed worker records so a later edit
+    # cannot silently reintroduce candidate-wide evidence stamping, weak-only
+    # native support, or observer images promoted to native evidence.
+    asset_update_by_path = {
+        row["physical_path"]: row for row in asset_updates
+    }
+    assert {
+        role: sum(row["visual_role"] == role for row in asset_updates)
+        for role in {"NATIVE_EVIDENCE", "OBSERVER", "RELATION", "SOURCE_DEFECT"}
+    } == {
+        "NATIVE_EVIDENCE": 5,
+        "OBSERVER": 23,
+        "RELATION": 14,
+        "SOURCE_DEFECT": 30,
+    }
+    a642 = next(row for row in asset_updates if row["asset_id"] == "A000642")
+    assert a642["visual_role"] == "OBSERVER"
+    assert json.loads(a642["candidate_ids"]) == []
+    weak_strengths = {"CONTEXTUAL", "CORROBORATING", "LEAD_ONLY"}
+    for candidate in candidates:
+        evidence_by_id = {
+            row["evidence_id"]: row for row in candidate["source_evidence"]
+        }
+        boundary = candidate["fingerprint"]["evidence_limit"]
+        assert boundary["status"] == "SUPPORTED"
+        assert len(boundary["evidence_ids"]) == 1
+        assert sum(
+            "evidence_limit" in row["fingerprint_fields"]
+            for row in candidate["source_evidence"]
+        ) == 1
+        for field, value in candidate["fingerprint"].items():
+            if value["status"] == "SUPPORTED":
+                assert value["evidence_ids"]
+                assert not all(
+                    evidence_by_id[evidence_id]["strength"] in weak_strengths
+                    for evidence_id in value["evidence_ids"]
+                ), (candidate["id"], field)
+            elif value["status"] == "NOT_APPLICABLE":
+                assert len(value["evidence_ids"]) == 1
+        for row in candidate["source_evidence"]:
+            if row["strength"] == "LEAD_ONLY":
+                assert row["fingerprint_fields"] == []
+            if row["strength"] == "CONTEXTUAL":
+                assert len(row["fingerprint_fields"]) <= 2
+            if row["image_path"] and row["strength"].startswith("DIRECT"):
+                asset = asset_update_by_path[row["image_path"]]
+                assert asset["visual_role"] == "NATIVE_EVIDENCE"
+                assert asset["original_resolution_status"] == "REVIEWED"
+                assert asset["transcription_status"] == "CHECKED"
+
     manifest = bundle / "allowed-manifest.json"
     prompt = bundle / "input/brief.md"
     output_schema = bundle / "input/schemas/worker-output.schema.json"
