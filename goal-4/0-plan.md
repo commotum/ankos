@@ -148,7 +148,7 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current facts after completion of Stages 1–7:
+These are current facts after completion of Stages 1–8:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   that pre-execution state is retained only as historical provenance in
@@ -205,8 +205,21 @@ These are current facts after completion of Stages 1–7:
   16 within-stage routes are resolved; 61 new cross-range obligations remain
   queued; and `S007`/`S008` record 2,496 total fully dispositioned hits—1,248
   across 595 unique units in each round—with a zero-delta rerun. The valid live
-  state contains 1,441 reviewed units, 216 screened images, 320 candidates,
-  178 routes, and 8 LOCAL rounds and is resumable at Stage 8.
+  state contained 1,441 reviewed units, 216 screened images, 320 candidates,
+  178 routes, and 8 LOCAL rounds and became the verified Stage 8 input.
+- Stage 8 is complete in `8-CH04-NUMBERS.md`: all 745 paired Chapter 4 units
+  and 145 images are reviewed at the required depth; `B0321..B0656`
+  preserve 336 deliberately uncollapsed blind coverage candidates;
+  `R000179..R000202` add 24 routes, all 15 within-stage routes are resolved,
+  and 9 cross-range obligations remain queued. `S009`/`S010` close the paired
+  epoch-1 scope with 2,192 fully dispositioned hits per round. A governed
+  main-only epoch-2 reopen corrects eleven image roles without changing any
+  candidate or route link; `S011`/`S012` then close that exact one-path scope
+  with 856 hits per round and zero semantic delta. The valid live state
+  contains 2,186 reviewed units, 361 screened images, 656 candidates, 202
+  routes, and 12 LOCAL rounds and is resumable at Stage 9. Stage 8 also
+  records an explicit append-only Stage 18 evidence-strength correction
+  obligation for 47 candidates; it must not be silently applied earlier.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.

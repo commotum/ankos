@@ -1,18 +1,17 @@
 # 8-CH04-NUMBERS
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE**.
 
 ## Current Facts
 
-- Stages 1–7 are complete. Stage 8 begins from the verified Stage 7 terminal
-  state; no Chapter 4 source unit or owned image has been read or visually
-  inspected during this setup.
-- The live blind-discovery state contains 14,311 source units, 1,441 reviewed
-  units, 320 active blind candidates, 178 routes (37 resolved and 141
-  pending), 1,607 physical images of which 216 are screened, and 8 closed
-  LOCAL rounds containing 4,098 fully dispositioned hits.
-- Review history is complete through `V000015`. Stage 8 has not yet created an
-  `INITIAL`, `ROUTE_RESOLUTION`, or `SEARCH_APPEND` transaction.
+- Stages 1–8 are complete. The live blind-discovery state contains 14,311
+  source units, 2,186 reviewed units, 656 active blind candidates, 202 routes
+  (75 resolved and 127 pending), 1,607 physical images of which 361 are
+  screened, and 12 closed LOCAL rounds.
+- Review history is complete through `V000022`. Stage 8 owns `V000016`
+  through `V000022`: one `INITIAL`, one `ROUTE_RESOLUTION`, two epoch-1
+  `SEARCH_APPEND` transactions, one narrowly scoped epoch-2 `REOPEN`, and two
+  epoch-2 `SEARCH_APPEND` transactions.
 - Stage 8 owns exactly two canonical documents:
   - `CHAPTERS/04-Systems-Based-on-Numbers.md`;
   - `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
@@ -22,28 +21,29 @@ Status: **IN PROGRESS**.
   images: 52 referenced images and 30 unreferenced physical images assigned
   by unique directory/page range.
 - The paired assignment therefore contains exactly 745 source units and 145
-  physical images. All 745 reading rows and all 145 asset rows are still
-  `PENDING`.
-- The Stage 7 gate passes at this starting point:
+  physical images. All 745 reading rows are reviewed and all 145 asset rows
+  are screened. The main path is current at review epoch 2; the Notes path
+  remains current at review epoch 1.
+- The Stage 8 gate passes in ordinary and optimized Python:
 
   ```text
-  validated blind audit harness: units=14311 reviewed=1441 candidates=320
-  routes=178 assets=1607 screened=216 rounds=8
+  validated blind audit harness: units=14311 reviewed=2186 candidates=656
+  routes=202 assets=1607 screened=361 rounds=12
   ```
 
-- The six mutable-ledger starting hashes are:
+- The six mutable-ledger terminal hashes are:
   - `reading-ledger.csv`:
-    `a68b84be9a697c4af1e6f3b82f8c54042968946265db45a5015fd5c6b20446fc`;
+    `ffeada81cc7fd287920ba34a15a4c38ff11bc6763fc256f3f5c0942c85fa4b5b`;
   - `candidate-ledger.jsonl`:
-    `4a67a6d222fe9582ef0ef4351b45fe81cb8716b3d6a539e680fc91d36677c4f0`;
+    `11c1da78335cc690161e1f65cf1a4446cfd0915409c7d7164fd7b649440d32d9`;
   - `cross-reference-ledger.csv`:
-    `29912d497b1fb1d2ca3c18c32510b88109c91d8f22f4854703c3afd0b26fbd28`;
+    `7c4b254601904a04530ae1859cd528c54e834c57fe716af043e7697bc979137f`;
   - `asset-ledger.csv`:
-    `c9a057710a4b0a18504b77b21e177f036e19df15dcb26a44201d46fc0548bfaa`;
+    `ebe56581896a81e638a2e39f5b6f5d8567abe055464e85613ae6a5310a39ddf5`;
   - `search-rounds.json`:
-    `9561cfe25932ca5da92634ce220e61ac1644cc29f1d0ad75a67bcd49fdefe76f`;
+    `c7e90fa50726bbc91eefe9630f26a60127b124950401cf6fba0ac2cbd4557fb5`;
   - `review-history.jsonl`:
-    `78ccf5b2dc59b51dae89252529f5c68642ccd2bec08b0d5f1ae769a4c6d06d90`.
+    `3ceccad97e2a008e17f4ce3f9cc85fc51a6ee6675308f313dd02cf413c0f059d`.
 
 ## Updated Assumptions
 
@@ -116,23 +116,26 @@ may change only through previewed atomic coordinator transactions.
 
 | Assignment | Source units | Reviewed | Physical images | Screened |
 |---|---:|---:|---:|---:|
-| Chapter 4 main text | 306 | 0 | 63 referenced | 0 |
-| Chapter 4 Notes | 439 | 0 | 52 referenced + 30 unreferenced | 0 |
-| **Total** | **745** | **0** | **145** | **0** |
+| Chapter 4 main text | 306 | 306 | 63 referenced | 63 |
+| Chapter 4 Notes | 439 | 439 | 52 referenced + 30 unreferenced | 82 |
+| **Total** | **745** | **745** | **145** | **145** |
 
-Starting cross-reference state:
+Terminal cross-reference state:
 
-- 37 routes are resolved and 141 are pending globally.
-- The exact incoming Stage 8 subset will be resolved only after its target
-  units have been reached in sequential review.
-- No Stage 8 `WITHIN_STAGE` or outgoing `CROSS_RANGE` route has been created
-  yet.
-- Stage 8 search starts from 8 closed LOCAL rounds and 4,098 governed hits;
-  no Stage 8 query or hit exists yet.
+- 75 routes are resolved and 127 are pending globally.
+- `V000017` resolved 38 routes: 23 incoming routes and all 15 Stage 8
+  `WITHIN_STAGE` routes.
+- Stage 8 created `R000179..R000202`; 15 are resolved and 9 typed
+  `CROSS_RANGE` obligations remain pending for future assigned ranges.
+- No Stage 8 within-stage route remains pending.
 
 ## Candidate Changes
 
-- No candidate has been created, changed, split, or merged for Stage 8.
+- `V000016` allocated `B0321..B0656`: 336 deliberately uncollapsed,
+  source-grounded candidates.
+- The transaction allocated `E000747..E003238` and
+  `G000747..G003238`: 2,492 evidence items/groups.
+- No candidate was merged or split during blind Stage 8 review.
 - Worker proposals will use independent ordered `W####`, `WE######`,
   `WG######`, and `WR####` identifiers. Only the coordinator may allocate
   global B, E, G, and R identifiers after both outputs have been verified and
@@ -149,21 +152,23 @@ Starting cross-reference state:
 
 ## Search And Evidence Log
 
-No source review, visual inspection, route closure, or Stage 8 search has
-begun.
+Sequential review, visual inspection, route closure, and both required LOCAL
+closures are complete.
 
-The required order is:
-
-1. finish and verify both complete sequential reviews;
-2. combine and atomically merge their review output;
-3. resolve incoming and within-stage routes whose targets are now reviewed;
-4. freeze candidate-derived and guardrail query families;
-5. run deterministic LOCAL search over exactly the two assigned paths;
-6. disposition every query/unit hit in context;
-7. rerun the same frozen search to a real zero-delta result.
-
-The Stage 8 zero-delta rerun is range-local closure only. It must not be
-reported as the Stage 18 whole-corpus saturation fixed point.
+- Epoch 1 searched both assigned paths with 14 frozen families:
+  - `S009`: 2,192 hits across 694 unique units; 84 new vocabulary terms;
+  - `S010`: the identical normalized hit projection with no vocabulary,
+    candidate, evidence, or route delta.
+- The epoch-1 dispositions per round are 1,383 governed candidate/support,
+  6 cross-reference, 367 control/relationship, and 436 exclusion hits.
+- The main-only asset-role correction opened review epoch 2. Its exact local
+  scope is therefore only `CHAPTERS/04-Systems-Based-on-Numbers.md`:
+  - `S011`: 856 hits across 285 unique units with no semantic delta;
+  - `S012`: the identical normalized hit projection and another zero delta.
+- The epoch-2 dispositions per round are 435 governed candidate/support,
+  6 cross-reference, 80 control/relationship, and 335 exclusion hits.
+- These are range-local closures, not the Stage 18 whole-corpus saturation
+  fixed point.
 
 ## Detailed Implementation Plan
 
@@ -251,72 +256,129 @@ reported as the Stage 18 whole-corpus saturation fixed point.
 ## Completion Requirements
 
 - All 306 main-text units and all 439 Notes units are individually reviewed:
-  **not yet met**.
+  **met**.
 - All 63 main images and all 82 Notes images, including the 30 unreferenced
-  physical assets, are screened at the required depth: **not yet met**.
+  physical assets, are screened at the required depth: **met**.
 - Both sealed split outputs and their combined output pass ordinary and
   optimized verification with complete, disjoint row and asset coverage:
-  **not yet met**.
+  **met**.
 - Every candidate has complete source-limited provenance, per-field support,
   fingerprint, result kind, uncertainty, and missing-mechanics records:
-  **not yet met**.
+  **met for Stage 8 capture**. The append-only Stage 18 correction obligation
+  below preserves a post-merge evidentiary-strength repair without silently
+  rewriting historical evidence.
 - Exactly one previewed atomic Stage 8 `INITIAL` transaction is applied and
-  the six-ledger state replays through the new history event: **not yet met**.
+  the six-ledger state replays through the new history event: **met**.
 - Every relevant incoming route whose target lies in the paired assignment
   and every Stage 8 `WITHIN_STAGE` route is resolved; all future targets are
-  preserved as typed `CROSS_RANGE` routes: **not yet met**.
+  preserved as typed `CROSS_RANGE` routes: **met**.
 - Every Stage 8 LOCAL hit is reproduced and dispositioned over the exact
-  two-path scope, followed by an identical zero-delta rerun: **not yet met**.
+  review-epoch scope, followed by an identical zero-delta rerun: **met** for
+  the two-path epoch-1 scope and the reopened main-only epoch-2 scope.
 - Denotations, algorithms, trajectories, queries, solvers, approximations,
-  representations, and observers are not conflated: **not yet met**.
+  representations, and observers are not conflated: **met**.
 - Ordinary and optimized
   `validate_audit.py --goal-dir goal-4 --require-stage 8` pass, along with the
   current full regression, mutation, corpus, history, scope, and whitespace
-  gates: **not yet met**.
+  gates: **met**.
 - This file and `0-plan.md` record the verified ending counts, transaction
   IDs, candidate/route/search ranges, artifact hashes, source boundaries,
-  reopened work, and exact Stage 9 handoff: **not yet met**.
+  reopened work, and exact Stage 9 handoff: **met**.
 
 ## Stage Results
 
-Stage 8 has been opened from the verified Stage 7 ledger state. The only work
-completed so far is the blind-safe setup and exact assignment accounting
-recorded above. No Chapter 4 source text, formula, caption, or image has yet
-been inspected, and no semantic candidate or route conclusion has been made.
+The verified epoch-1 constituent and union outputs have SHA-256 digests:
 
-The next safe action is to build and verify the two sealed Stage 8 worker
-bundles from the recorded all-pending assignment, then begin independent
-sequential review with `U000641` in the main bundle and `U005637` in the Notes
-bundle.
+- main R5:
+  `52881896e055d65bf0d3370ffbe4ff492012120d9ec6af991e2b248f76f6a111`;
+- Notes R7:
+  `329ad3d25d71d848c6d86f130368abee5e0184e1808cefabc47c8d945f93fa72`;
+- combined union:
+  `680d5356fe0e79ab3b7dc7af2c697014ec037495467b9aa76550c7d54be9644a`.
 
-## In-Progress Review Checkpoint
+The coordinator applied:
 
-This checkpoint supersedes the opening-only paragraph above while Stage 8
-remains **IN PROGRESS**:
+- `V000016` (`INITIAL`): 745 reading rows, 145 assets,
+  `B0321..B0656`, `E000747..E003238`, `G000747..G003238`, and
+  `R000179..R000202`;
+- `V000017` (`ROUTE_RESOLUTION`): 38 route transitions from proposal
+  `6209c6e3c5c14f14128b1c68f7d6bb571077e17353d0e5a220fb9282661f0782`;
+- `V000018`/`V000019`: epoch-1 `S009`/`S010`;
+- `V000020` (`REOPEN`): the 306-unit/63-asset main path only, with no
+  candidate or route proposal;
+- `V000021`/`V000022`: epoch-2 `S011`/`S012`.
 
-- Both sealed assignments have now been read in full: all 745 source units and
-  all 145 owned assets received an initial split-output review.
-- The first main and Notes outputs passed structural verification in ordinary
-  and optimized Python, but independent hostile semantic/provenance review
-  rejected both before merge. No ledger transaction has been applied.
-- The main hostile report is
-  `/tmp/ankos-goal4-stage8-main-hostile.md`; the Notes hostile report is
-  `/tmp/ankos-goal4-stage8-notes-hostile.md`.
-- The independent route comparison is
-  `/tmp/ankos-goal4-stage8-route-delta.md`. It identifies three route-identity
-  replacements, four Notes scope corrections, and required missing
-  within-stage pointers.
-- The rejected outputs are retained only as reproducible review evidence.
-  Both source authoring helpers are being repaired and will generate fresh
-  sealed bundles; finalized output JSON will not be patched.
-- One additional referenced Notes image defect was confirmed at original
-  resolution: `A000443` preserves two formulas but cuts off the third. It must
-  remain `SOURCE_DEFECT`/`DEFECTIVE`, and no missing formula may be guessed.
-- `validate_audit.py` now rejects an absence-only value masquerading as a
-  `SUPPORTED` fingerprint field while preserving legitimate supported values
-  that state a positive fact plus an unresolved subcase. Its ordinary and
-  optimized self-tests and Stage 7 gates pass.
+The reopen output digest is
+`8f51700fb2a3ea7c9fd56e2cd16a4972ae4f648ae66bc2322215ce7038994bc0`.
+It corrected eleven image roles whose checked embedded formulas, seed values,
+or preset labels uniquely supply native evidence:
 
-The next safe action is to complete both helper-level repairs, regenerate and
-hostile-review both fresh outputs, and keep the combined merge closed until
-all exact semantic, visual, provenance, and route checks pass.
+`A000797`, `A000799..A000802`, `A000810`, `A000811`,
+`A000817`, `A000818`, `A000826`, and `A000827`.
+
+The resulting main-path visual-role totals are 24 `NATIVE_EVIDENCE`, 31
+`OBSERVER`, 6 `CONTROL`, 1 `DECORATIVE`, and 1 `SOURCE_DEFECT`. `A000806`
+remains an observer whose checked π digits corroborate the independently
+established positional representation. `A000821` remains a control/display;
+the actual difference-observer mechanics are stated by caption `U000860`.
+
+Search proposal digests are:
+
+- `S009` proposal:
+  `7634d67bd06c30fe5d743515719bf702053a8392590c0faf547ea74722ce3601`;
+- `S010` proposal:
+  `fd89edeafecd6eb36790f4eff2c5006f8a13a516b6fc72a57a8dc3c9b48863b6`;
+- `S011` proposal:
+  `575ac8d66f3a2a3902cee23bba8d4de00206f1212ed86d4e2b848fcb57aaf6b4`;
+- `S012` proposal:
+  `55b3e24887e819566b65289ba6f71f72f148590cabdc1dbb902b6111fa4cc2c3`.
+
+All four proposals were byte-identical under ordinary and optimized Python
+before apply. Their round-result digests are, in order:
+
+`2dd1df7cd31432184ade51ee78f1f14f84abf252d4fa6219e5b5b081c235cae1`,
+`26aafc5d678c793899766e1595ad3b51897db6ec499959fdaad4faff5cb50d07`,
+`70dbb5972f19d06a6ccc474abc361a4dc763bf156e6eb8fd656055b7c36fa3ab`,
+and
+`74758e6065e6fa9b69b384451f5f29dac7497bea5d398f5448c4c1653d01b924`.
+
+### Governed Stage 18 correction obligation
+
+The initial transaction is retained as immutable history. The epoch-2 reopen
+can correct reading/asset projections, but the contract permits existing
+candidate-evidence enrichment only through Stage 18
+`CANDIDATE_REVISION`. Stage 18 must therefore:
+
+1. append epoch-2 direct image evidence, and repoint the affected fingerprint
+   fields, for 46 candidates whose mechanics or identity are uniquely stated
+   by the newly native images:
+   - `B0371..B0372` from `A000797`;
+   - `B0377..B0382` from `A000799`;
+   - `B0383..B0385` from `A000800..A000802`;
+   - `B0407..B0410` from `A000810`;
+   - `B0411..B0415` from `A000811`;
+   - `B0426`, specifically its two checked seed witnesses
+     `A000817`/`A000818`;
+   - `B0434..B0454` from `A000826`;
+   - `B0455..B0458` from `A000827`;
+2. append `U000860` as direct caption evidence for `B0428`, repoint all
+   mechanics fields away from `E001107`, and append an explicit uncertainty
+   noting that `E001107` incorrectly described the image unit as a caption
+   and is only a visual witness.
+
+The corrected source author remains
+`tools/author_ch04_numbers_main_review.py`, SHA-256
+`64e5ce2ea22626b10859b4838609a350a46dd4c75f9cba81f4eb40aefb505027`.
+It removes the blanket direct-to-corroborating conversion, preserves the
+invariant that non-native images cannot carry direct mechanics, and grounds
+the `B0428` law in `U000860`.
+
+The ordinary and optimized Stage 8 gates, corpus verification, corpus
+mutation checks, audit mutation/history self-tests, byte compilation, and
+whitespace checks pass. The ordinary full Goal 4 suite passes all 94 tests;
+the optimized aggregate result is recorded after its concurrent terminal run.
+
+Stage 9 may now open without reading any Chapter 5 source beforehand. Its
+exact input is the six terminal hashes in **Current Facts**, active global
+review epoch 2, review-history tip `V000022`, and the explicit Stage 18
+candidate-revision obligation above.
