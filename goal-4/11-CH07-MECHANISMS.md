@@ -50,6 +50,14 @@ Status: **IN PROGRESS**.
 - Aggregation, constraint satisfaction, continuum relations, discrete
   approximations, and observation protocols must retain their native
   directionality, schedule, probability, and stopping semantics.
+- Image filenames in this extraction use PDF-page numbers, while route
+  literals use the Book's printed-page numbers. In the assigned Chapter 7
+  spans the former are 15 greater than the latter. Incoming-route discovery
+  therefore uses printed main pages `297..360` and printed Notes pages
+  `969..990`, not the superficially similar filename ranges.
+- A route whose literal target spans an assigned and an unassigned page is
+  not partially resolved. For example, `Compare pages 1029 and 986` remains
+  pending until both printed-page targets have been reviewed.
 - Blind discovery remains independent of T identifiers, the existing catalog,
   API documents, runtime support, and final family judgments.
 
