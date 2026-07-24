@@ -2,7 +2,7 @@
 """Frozen Stage 9 Chapter 5 local-search route authoring specification.
 
 This module is data only.  It does not read or write any audit ledger.
-`ROUTE_SPECS` materializes the 151 new route rows in immutable final-F15
+`ROUTE_SPECS` materializes the 154 new route rows in immutable final-F15
 SEARCH_HIT order and within-hit locator order.  Existing-route uses and
 rejected/non-bearing locators are frozen separately so every one of the 144
 final F15 hit units has an explicit disposition.
@@ -58,11 +58,13 @@ def route(
     recovered_candidate_names: tuple[str, ...] = (),
     vocabulary_terms: tuple[str, ...] = (),
     defect_boundary: str = "",
+    status: str | None = None,
     attempts: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     """Construct one route row before immutable route-ID allocation."""
 
-    status = "RESOLVED" if closure_scope == "WITHIN_STAGE" else "PENDING"
+    if status is None:
+        status = "RESOLVED" if closure_scope == "WITHIN_STAGE" else "PENDING"
     if attempts is None:
         if status == "RESOLVED":
             unit_boundary = ", ".join(target_unit_ids) or "none"
@@ -1119,10 +1121,6 @@ _ROUTES = (
             "bounded-length multiway reachability observer",
         ),
         vocabulary_terms=("bounded length", "multiway reachability", "strings"),
-        defect_boundary=(
-            "The source reads “shows wh different strings”; the missing OCR "
-            "word and the plotted axis/string encoding are not inferred."
-        ),
         attempts=(
             "Queued literal target 'In analogy with page 796' for the "
             "bounded-length reachability display outside the assigned "
@@ -1166,25 +1164,33 @@ _ROUTES = (
     route(
         "U006265", "H011718", 1,
         "See also pages 945 and 1032",
-        "Monster Group finite-group denotation and referenced omitted presentation",
-        CROSS,
+        "page-945 finite-group count and classification context for the Monster Group",
+        WITHIN,
         target_unit_ids=uids(6336, 6337), target_asset_ids=aids(585),
         recovered_candidate_names=(
             "Monster Group finite-group denotation with source-omitted presentation",
         ),
-        vocabulary_terms=("finite group", "Monster Group", "order", "presentation"),
-        defect_boundary=(
-            "The source gives the exact group order but only says that a "
-            "dozen rules yield the group; it omits the generators, relations, "
-            "rule list, and quotient reconstruction."
-        ),
+        vocabulary_terms=("finite group", "Monster Group", "order"),
         attempts=(
             "Resolved the page-945 half of literal target 'See also pages "
             "945 and 1032' to U006336-U006337/A000585, which supplies the "
-            "finite-group and finite-semigroup count/classification context. "
-            "Page 1032 lies outside the assigned Chapter 5 range and was "
-            "not opened; no generators, relations, rule list, or quotient "
-            "mechanics were inferred.",
+            "finite-group and finite-semigroup count/classification context.",
+        ),
+    ),
+    route(
+        "U006265", "H011718", 2,
+        "See also pages 945 and 1032",
+        "page-1032 Monster Group presentation and quotient reconstruction",
+        CROSS,
+        recovered_candidate_names=(
+            "Monster Group finite-group denotation with source-omitted presentation",
+        ),
+        vocabulary_terms=("Monster Group", "presentation", "quotient"),
+        attempts=(
+            "Queued the page-1032 half of literal target 'See also pages "
+            "945 and 1032' outside the assigned Chapter 5 range. The target "
+            "was not opened; the generators, relations, dozen-rule list, "
+            "and quotient reconstruction remain unresolved.",
         ),
     ),
     route(
@@ -1224,11 +1230,6 @@ _ROUTES = (
         WITHIN,
         target_unit_ids=uids(6323),
         vocabulary_terms=("formal languages", "one-dimensional constraints", "page 944"),
-        defect_boundary=(
-            "The source gives only a bare cross-reference. The target states "
-            "that formal languages can define one-dimensional constraints "
-            "but does not assert grammar-family identity or equivalence."
-        ),
         attempts=(
             "Resolved literal target 'See also page 944' to U006323, the "
             "direct formal-language paragraph on that printed page. It "
@@ -1424,21 +1425,33 @@ _ROUTES = (
     route(
         "U006305", "H011735", 1,
         "pages 941 and 954",
-        "constraint-number decoding and cellular-automaton correspondence",
-        CROSS,
-        target_unit_ids=uids(6286, 6289), target_asset_ids=aids(572),
+        "page-941 one-dimensional cellular-automaton fixed configurations as finite-block constraints",
+        WITHIN,
+        target_unit_ids=uids(6285),
         candidate_ids=bids(949),
-        vocabulary_terms=("cellular automaton", "constraint numbering", "nested pattern"),
+        vocabulary_terms=("cellular automaton", "fixed configuration", "finite-block constraint"),
         attempts=(
             "Resolved the page-941 half of literal target 'pages 941 and "
-            "954' to U006286-U006289/A000572, which supplies the canonical "
-            "constraint-number decoder and satisfaction check. Page 954 "
-            "lies outside the assigned Chapter 5 range and was not opened; "
-            "no cellular-automaton correspondence mechanics were inferred.",
+            "954' to U006285, which explicitly identifies one-dimensional "
+            "cellular-automaton fixed configurations with finite-block "
+            "constraints.",
         ),
     ),
     route(
         "U006305", "H011735", 2,
+        "pages 941 and 954",
+        "page-954 cellular-automaton correspondence for two-dimensional constraints",
+        CROSS,
+        candidate_ids=bids(949),
+        vocabulary_terms=("cellular automaton", "constraint correspondence", "page 954"),
+        attempts=(
+            "Queued the page-954 half of literal target 'pages 941 and 954' "
+            "outside the assigned Chapter 5 range. The target was not opened "
+            "and no cellular-automaton correspondence mechanics were inferred.",
+        ),
+    ),
+    route(
+        "U006305", "H011735", 3,
         "page 170",
         "main-text five-site cellular-automaton family used in the constraint correspondence",
         WITHIN,
@@ -1522,16 +1535,17 @@ _ROUTES = (
     route(
         "U006323", "H011742", 3,
         "page 940",
-        "equations, PDE, and linear-system discussion at printed page 940",
+        "regular-language special case for one-dimensional constraints claimed at printed page 940",
         WITHIN,
-        target_unit_ids=uids(6277, 6281),
-        vocabulary_terms=("equations", "linear systems", "partial differential equations"),
-        defect_boundary=(
-            "The literal printed-page-940 target resolves within Stage 9 to "
-            "U006277-U006281, whose inspected equations/PDE/linear-system "
-            "discussion does not state finite-complement-language or "
-            "subshift-of-finite-type terminology; no such terminology or "
-            "candidate mechanics are inferred from the pointer."
+        status="PENDING",
+        vocabulary_terms=("finite complement language", "regular language", "subshift of finite type"),
+        attempts=(
+            "Inspected the physical printed-page-940 units U006277-U006281; "
+            "they contain equations, PDE, and linear-system discussion but "
+            "lack the claimed regular-language, finite-complement-language, "
+            "or subshift-of-finite-type terminology. The semantic target is "
+            "therefore left pending for Stage 18 finalization after full-corpus "
+            "saturation, and no candidate mechanics are inferred.",
         ),
     ),
     route(
@@ -1584,20 +1598,33 @@ _ROUTES = (
     route(
         "U006336", "H011746", 3,
         "See also pages 938 and 1032",
-        "finite-group classification and enumeration boundary",
-        CROSS,
+        "page-938 finite-group classification context",
+        WITHIN,
         target_unit_ids=uids(6264, 6266),
         recovered_candidate_names=(
             "finite group-and-semigroup count-by-order observer",
         ),
-        vocabulary_terms=("enumeration", "finite groups", "simple groups"),
+        vocabulary_terms=("classification", "finite groups", "page 938"),
         attempts=(
             "Resolved the page-938 half of literal target 'See also pages "
             "938 and 1032' to U006264-U006266, which supplies finite-group "
-            "examples and the classification context. Page 1032 lies "
-            "outside the assigned Chapter 5 range and was not opened; no "
-            "practical enumeration algorithm or omitted mechanics were "
-            "inferred.",
+            "examples and the classification context.",
+        ),
+    ),
+    route(
+        "U006336", "H011746", 4,
+        "See also pages 938 and 1032",
+        "page-1032 finite-group enumeration and classification boundary",
+        CROSS,
+        recovered_candidate_names=(
+            "finite group-and-semigroup count-by-order observer",
+        ),
+        vocabulary_terms=("enumeration", "finite groups", "page 1032"),
+        attempts=(
+            "Queued the page-1032 half of literal target 'See also pages 938 "
+            "and 1032' outside the assigned Chapter 5 range. The target was "
+            "not opened; no practical enumeration algorithm or omitted "
+            "mechanics were inferred.",
         ),
     ),
 )
@@ -2009,16 +2036,16 @@ LOCATOR_DISPOSITIONS = (
 
 EXPECTED_COUNTS = {
     "f15_hit_units": 144,
-    "new_routes": 151,
+    "new_routes": 154,
     "new_route_source_units": 117,
-    "within_stage_routes": 86,
+    "within_stage_routes": 89,
     "cross_range_routes": 65,
     "stage_existing_routes": 46,
     "f15_existing_route_uses": 45,
     "f15_existing_route_source_units": 37,
     "non_bearing_locators": 17,
     "non_bearing_source_units": 6,
-    "locator_dispositions": 213,
+    "locator_dispositions": 216,
 }
 
 
@@ -2046,7 +2073,7 @@ def _canonical_json_bytes(value: Any) -> bytes:
 
 
 def route_spec_digest() -> str:
-    """Return the canonical digest of only the 151 authored route rows."""
+    """Return the canonical digest of only the 154 authored route rows."""
 
     return hashlib.sha256(_canonical_json_bytes(list(ROUTE_SPECS))).hexdigest()
 
@@ -2081,7 +2108,7 @@ def assert_frozen_spec() -> str:
     if len(ROUTE_SPECS) != EXPECTED_COUNTS["new_routes"]:
         raise AssertionError("new route count drifted")
     expected_route_ids = tuple(
-        f"R{number:06d}" for number in range(249, 400)
+        f"R{number:06d}" for number in range(249, 403)
     )
     route_ids = tuple(spec["route_id"] for spec in ROUTE_SPECS)
     if route_ids != expected_route_ids:

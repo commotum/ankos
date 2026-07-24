@@ -1333,6 +1333,7 @@ def _validate_candidate_enrichment_update(
     trigger_unit_ids: set[str],
     trigger_candidate_ids: set[str],
     trigger_route_ids: set[str],
+    trigger_route_candidate_pairs: set[tuple[str, str]],
     snapshot: dict[str, Any] | None,
     errors: list[str],
     prefix: str,
@@ -1420,7 +1421,22 @@ def _validate_candidate_enrichment_update(
         errors.append(f"{prefix} rewrites prior candidate evidence")
     appended_evidence = new_evidence[len(old_evidence) :]
     if not appended_evidence:
-        errors.append(f"{prefix} candidate UPDATE appends no evidence")
+        changed_fields = {
+            field
+            for field in CANDIDATE_FIELDS
+            if after.get(field) != before.get(field)
+        }
+        route_only_authorized = (
+            changed_fields == {"cross_reference_ids"}
+            and bool(added_routes)
+            and all(
+                (route_id, after.get("id"))
+                in trigger_route_candidate_pairs
+                for route_id in added_routes
+            )
+        )
+        if not route_only_authorized:
+            errors.append(f"{prefix} candidate UPDATE appends no evidence")
         return
     appended_evidence_ids: set[str] = set()
     for evidence in appended_evidence:
@@ -2426,6 +2442,7 @@ def validate_review_history(
         trigger_unit_ids: set[str] = set()
         trigger_candidate_ids: set[str] = set()
         trigger_route_ids: set[str] = set()
+        trigger_route_candidate_pairs: set[tuple[str, str]] = set()
         trigger_candidate_ids_by_unit: dict[str, set[str]] = {}
         trigger_route_ids_by_unit: dict[str, set[str]] = {}
         trigger_candidate_ids_by_path: dict[str, set[str]] = {}
@@ -2563,6 +2580,11 @@ def validate_review_history(
                 }
                 trigger_candidate_ids.update(hit_candidates)
                 trigger_route_ids.update(hit_routes)
+                trigger_route_candidate_pairs.update(
+                    (route_id, candidate_id)
+                    for route_id in hit_routes
+                    for candidate_id in hit_candidates
+                )
                 trigger_candidate_ids_by_unit.setdefault(
                     unit_id, set()
                 ).update(hit_candidates)
@@ -2970,6 +2992,7 @@ def validate_review_history(
                         trigger_unit_ids,
                         trigger_candidate_ids,
                         trigger_route_ids,
+                        trigger_route_candidate_pairs,
                         event_snapshot,
                         errors,
                         change_prefix,
