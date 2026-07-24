@@ -148,7 +148,7 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current facts after completion of Stages 1–10:
+These are current facts after completion of Stages 1–11:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   that pre-execution state is retained only as historical provenance in
@@ -244,6 +244,11 @@ These are current facts after completion of Stages 1–10:
   reviewed units, 688 screened images, 1,250 active candidates, 567 routes
   (272 resolved and 295 pending), and 16 LOCAL rounds, and is resumable at
   Stage 11.
+- Stage 11 is complete in `11-CH07-MECHANISMS.md`: all 713 paired Chapter 7
+  units and 194 images are reviewed at the required depth. The valid live
+  state is terminal at `V000034`, epoch 2, with 4,045 reviewed units, 882
+  screened images, 1,413 active candidates, 708 routes (335 resolved and 373
+  pending), and 18 LOCAL rounds, and is resumable at Stage 12.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
