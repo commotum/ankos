@@ -1366,7 +1366,7 @@ _ROUTES = (
         WITHIN,
         target_unit_ids=uids(1182, 1184), target_asset_ids=aids(912),
         recovered_candidate_names=(
-            "overlapping-corner tessellation descriptor and Fill generator",
+            "overlapping-corner tessellation descriptor",
         ),
         vocabulary_terms=("Fill", "overlapping corners", "periodic tessellation"),
     ),
@@ -1375,7 +1375,6 @@ _ROUTES = (
         "page 1139",
         "undecidability of infinite-pattern constraint satisfaction",
         CROSS,
-        candidate_ids=bids(945),
         vocabulary_terms=("constraint satisfaction", "infinite pattern", "undecidability"),
     ),
     route(
@@ -1383,7 +1382,6 @@ _ROUTES = (
         "page 1145",
         "NP-completeness of finite-region constraint satisfaction",
         CROSS,
-        candidate_ids=bids(945),
         vocabulary_terms=("finite region", "NP-complete", "satisfaction"),
     ),
     route(
@@ -1391,7 +1389,6 @@ _ROUTES = (
         "Compare page 959",
         "enumeration and solver comparison for two-dimensional constraints",
         CROSS,
-        candidate_ids=bids(945),
         vocabulary_terms=("constraint solver", "enumeration", "two-dimensional constraints"),
     ),
     route(
@@ -1452,10 +1449,9 @@ _ROUTES = (
     route(
         "U006310", "H011736", 1,
         "page 1139",
-        "undecidability boundary for determining whether a tiling exists",
+        "halting-problem noncomputability boundary for constraint-forced cell colors",
         CROSS,
-        candidate_ids=bids(951, 952),
-        vocabulary_terms=("tiling existence", "undecidability"),
+        vocabulary_terms=("constraint-forced pattern", "halting problem", "noncomputability"),
     ),
     route(
         "U006310", "H011736", 2,
@@ -1485,10 +1481,10 @@ _ROUTES = (
     route(
         "U006318", "H011739", 1,
         "page 1141",
-        "enumeration complexity for square-free sequences",
+        "complexity limits for list-valued sequence-equation constraints",
         CROSS,
         candidate_ids=bids(958),
-        vocabulary_terms=("enumeration", "square-free sequence"),
+        vocabulary_terms=("complexity limit", "list-valued sequence equation"),
     ),
     route(
         "U006321", "H011740", 1,
@@ -1572,7 +1568,6 @@ _ROUTES = (
         "See also page 805",
         "matrix-power pattern constraints",
         CROSS,
-        candidate_ids=bids(979),
         vocabulary_terms=("matrix powers", "pattern constraints"),
     ),
     route(
@@ -2067,7 +2062,7 @@ def canonical_spec_digest() -> str:
 ROUTE_SPEC_DIGEST = route_spec_digest()
 CANONICAL_SPEC_DIGEST = canonical_spec_digest()
 EXPECTED_CANONICAL_SPEC_DIGEST = (
-    "ea4c7b2e9af1a762c6448f3314d196baaa9e515ce6904f65a7bce7234f207682"
+    "b1920fc62d8a7256e01a1990ad47120a4aa216be066eaea7a4c8ea6917615930"
 )
 
 

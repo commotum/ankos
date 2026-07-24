@@ -1186,7 +1186,7 @@ RECOVERED_SPECS = [
         "polynomial-growth string-multiway preset",
         ["U006240", "U006243", "U006252"],
         "multiway-system preset",
-        "strings rewritten by three bidirectional-availability replacement rules",
+        "strings rewritten by the displayed three replacement rules",
         "the displayed rule and an initial string containing n B symbols",
         "apply all replacements and merge equal successor strings",
         "a multiway evolution whose state count grows as t^(n+1)",
@@ -1886,13 +1886,54 @@ RECOVERED_SPECS = [
         "equal-sized square cells carrying four color/orientation labels",
         "the displayed four-color rule and singleton initial array {{3}}",
         "replace every color by its displayed rectangular block",
-        "a successor square-array pattern reproducing the geometric system's behavior",
+        (
+            "the source-attributed trajectory from {{3}} that reproduces the "
+            "geometric system's behavior under unstated valid assembly and "
+            "alignment conventions"
+        ),
         related=["B0903"],
         limit=(
             "The source asserts behavioral reproduction after encoding shape "
-            "and orientation as colors; it does not identify the square-array "
-            "state with the geometric native state."
+            "and orientation as colors, but the heterogeneous 2 by 2, 2 by 1, "
+            "1 by 2, and 1 by 1 replacement blocks leave the valid current-"
+            "state domain, block alignment/assembly, and failure behavior "
+            "unstated. It does not identify the square-array state with the "
+            "geometric native state."
         ),
+        missing_mechanics=[
+            "The valid current-state domain for the heterogeneous replacement "
+            "blocks is unspecified.",
+            "Block alignment, global assembly/commit, and invalid-state failure "
+            "behavior are unspecified.",
+            "A total successor function, successor cardinality, and "
+            "determinism outside the source-attributed {{3}} trajectory are "
+            "not established.",
+        ],
+        evidence_scopes={
+            "U006177": [
+                "object_kind",
+                "native_time",
+                "carrier",
+                "support",
+                "alphabet_or_value_schema",
+                "seed",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+        suppress_supported_fields={
+            "complete_state",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "write_replacement_assembly_or_commit",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+        },
     ),
     _spec(
         "random-Boolean-network node-rule cardinality",
@@ -2920,10 +2961,10 @@ EXPECTED_NORMALIZED_RESULT_DIGEST = (
     "14af3dc4c5d59f050f1dd1c05fd691d7307f6d58a78ce592b0de40e1eb5e952f"
 )
 EXPECTED_ROUTE_SPEC_DIGEST = (
-    "bd46f6219ec51c9f9077448cfee5ff2a263882cca3d63fbe4cdd8c4116938ea0"
+    "e4be3e76099a8d7db759733a5b4290bcf69cf9bb994616a3ec9d73d4f6811b1a"
 )
 EXPECTED_ROUTE_AUDIT_DIGEST = (
-    "ea4c7b2e9af1a762c6448f3314d196baaa9e515ce6904f65a7bce7234f207682"
+    "b1920fc62d8a7256e01a1990ad47120a4aa216be066eaea7a4c8ea6917615930"
 )
 EXPECTED_TRIAGE_DIGEST = (
     "badcd2eb9c53c029e17357198f4e97cb2ddacffe76d72cf5f3d70ce1ea1527bd"
