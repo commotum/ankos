@@ -2609,6 +2609,34 @@ def test_search_append_accepts_globally_interleaved_existing_and_new_evidence(
     ]
 
 
+def test_route_only_candidate_enrichment_rejects_cross_hit_mismatch() -> None:
+    old = _search_candidate("U000001", "H000001")
+    new = copy.deepcopy(old)
+    new["cross_reference_ids"].append("R000001")
+    trigger_hits = {
+        "H000010": {
+            "candidate_ids": ["B0001"],
+            "route_ids": [],
+        },
+        "H000011": {
+            "candidate_ids": ["B0002"],
+            "route_ids": ["R000001"],
+        },
+    }
+    with pytest.raises(
+        merge.MergeError,
+        match="exact same-hit candidate/route authorization",
+    ):
+        merge._validate_enrichment_candidate_update(
+            old,
+            new,
+            trigger_hits=trigger_hits,
+            round_evidence_groups=set(),
+            round_route_ids={"R000001"},
+            route_candidate_authorizations={("R000001", "B0002")},
+        )
+
+
 def test_route_resolution_default_dry_run_then_transactional_apply(
     tmp_path: Path,
 ) -> None:

@@ -1232,6 +1232,7 @@ def _candidate_new_evidence(
     *,
     trigger_hits: dict[str, dict[str, Any]],
     round_evidence_groups: set[str],
+    allow_empty: bool = False,
 ) -> set[str]:
     candidate_id = new.get("id", "<unknown>")
     evidence = new.get("source_evidence")
@@ -1256,6 +1257,8 @@ def _candidate_new_evidence(
             )
     appended = evidence[len(prior_evidence) :]
     if not appended:
+        if allow_empty:
+            return set()
         raise MergeError(
             f"candidate {candidate_id} update lacks appended search evidence"
         )
@@ -1348,6 +1351,8 @@ def _validate_enrichment_candidate_update(
     *,
     trigger_hits: dict[str, dict[str, Any]],
     round_evidence_groups: set[str],
+    round_route_ids: set[str],
+    route_candidate_authorizations: set[tuple[str, str]],
 ) -> None:
     candidate_id = new.get("id")
     if not isinstance(candidate_id, str):
@@ -1375,8 +1380,13 @@ def _validate_enrichment_candidate_update(
         new,
         trigger_hits=trigger_hits,
         round_evidence_groups=round_evidence_groups,
+        allow_empty=old is not None,
     )
     if old is None:
+        if not new_evidence_ids:
+            raise MergeError(
+                f"new search candidate {candidate_id} lacks search evidence"
+            )
         if new.get("record_status") != "ACTIVE":
             raise MergeError(
                 f"new search candidate {candidate_id} must be ACTIVE"
@@ -1411,6 +1421,34 @@ def _validate_enrichment_candidate_update(
                 f"candidate {candidate_id}.{field} deletes or rewrites "
                 "prior provenance"
             )
+    if not new_evidence_ids:
+        changed_fields = {
+            field
+            for field in CANDIDATE_FIELDS
+            if new.get(field) != old.get(field)
+        }
+        if changed_fields != {"cross_reference_ids"}:
+            raise MergeError(
+                f"candidate {candidate_id} route-only enrichment changes "
+                f"non-route fields {sorted(changed_fields)}"
+            )
+        old_routes = old["cross_reference_ids"]
+        new_routes = new["cross_reference_ids"]
+        additions = new_routes[len(old_routes) :]
+        if not additions or not set(additions).issubset(round_route_ids):
+            raise MergeError(
+                f"candidate {candidate_id} route-only enrichment is not tied "
+                "to the new route delta"
+            )
+        if not all(
+            (route_id, candidate_id) in route_candidate_authorizations
+            for route_id in additions
+        ):
+            raise MergeError(
+                f"candidate {candidate_id} route-only enrichment lacks an "
+                "exact same-hit candidate/route authorization"
+            )
+        return
     _mechanics_changes_use_new_evidence(old, new, new_evidence_ids)
 
 
@@ -2848,6 +2886,21 @@ def _prepare_search_append_locked(
     appended_candidates: list[dict[str, Any]] = []
     appended_evidence: list[dict[str, Any]] = []
     round_evidence_groups = set(new_round.get("new_evidence_groups", []))
+    round_route_ids = set(new_round.get("new_routes", []))
+    route_candidate_authorizations: set[tuple[str, str]] = set()
+    for route in proposal["route_appends"]:
+        route_id = route.get("route_id")
+        hit = authorizing_hits.get(route.get("discovery_id"))
+        if (
+            isinstance(route_id, str)
+            and route_id in round_route_ids
+            and hit is not None
+            and route_id in hit.get("route_ids", [])
+        ):
+            route_candidate_authorizations.update(
+                (route_id, candidate_id)
+                for candidate_id in hit.get("candidate_ids", [])
+            )
     for raw_update in candidate_updates:
         update = {
             field: raw_update[field] for field in CANDIDATE_FIELDS
@@ -2867,12 +2920,26 @@ def _prepare_search_append_locked(
             update,
             trigger_hits=authorizing_hits,
             round_evidence_groups=round_evidence_groups,
+            round_route_ids=round_route_ids,
+            route_candidate_authorizations=route_candidate_authorizations,
         )
-        if candidate_id not in {
+        candidate_hit_authorized = candidate_id in {
             value
             for hit in authorizing_hits.values()
             for value in hit.get("candidate_ids", [])
-        }:
+        }
+        route_additions = (
+            update["cross_reference_ids"][
+                len(old["cross_reference_ids"]) :
+            ]
+            if old is not None
+            else []
+        )
+        route_hit_authorized = bool(route_additions) and all(
+            (route_id, candidate_id) in route_candidate_authorizations
+            for route_id in route_additions
+        )
+        if not candidate_hit_authorized and not route_hit_authorized:
             raise MergeError(
                 f"candidate {candidate_id} update is absent from trigger hits"
             )

@@ -207,7 +207,13 @@ def _spec(
             profile = "RELATION"
         else:
             profile = "FUNCTION"
-    if profile not in {"FUNCTION", "RELATION", "ITERATED", "REPRESENTATION"}:
+    if profile not in {
+        "FUNCTION",
+        "RELATION",
+        "ITERATED",
+        "REPRESENTATION",
+        "DENOTATION",
+    }:
         raise ValueError(f"unsupported candidate profile {profile}")
     discovery_unit = discovery_unit or units[0]
     identity_unit = identity_unit or discovery_unit
@@ -777,6 +783,58 @@ RECOVERED_SPECS = [
         measure="deterministic declarative denotation",
     ),
     _spec(
+        "Monster Group finite-group denotation with source-omitted presentation",
+        ["U006264", "U006265"],
+        "source-limited finite-group denotation",
+        "the named finite simple Monster Group",
+        "the source-omitted set of about a dozen defining rules",
+        (
+            "take the finite group that the source says is obtained from the "
+            "unstated presentation"
+        ),
+        (
+            "the named Monster Group with the exact finite order stated in "
+            "the continuation"
+        ),
+        profile="DENOTATION",
+        cardinality="one named finite group",
+        measure="deterministic named denotation",
+        limit=(
+            "The source names the group and gives its exact order but omits "
+            "the generators, relations, rule list, and quotient construction."
+        ),
+        uncertainties=[
+            "The actual dozen-or-so rules, generators, relations, quotient "
+            "mechanics, and reconstruction procedure are "
+            "UNKNOWN_FROM_SOURCE."
+        ],
+        missing_mechanics=[
+            "No executable or declaratively complete presentation is supplied; "
+            "only the named denotation and exact order are recoverable."
+        ],
+        discovery_unit="U006264",
+        identity_unit="U006264",
+        evidence_scopes={
+            "U006264": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006265": [
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+    ),
+    _spec(
         "finite group-and-semigroup count-by-order observer",
         ["U006336", "U006337"],
         "size-indexed finite-structure count observer",
@@ -891,7 +949,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Cook-polyomino stage type-count observer",
-        ["U006316"],
+        ["U006316", "U006317"],
         "stage-indexed count-vector observer",
         "the stated Cook aperiodic polyomino construction",
         "construction stage n",
@@ -911,7 +969,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "Pell least-x continued-fraction solver",
-        ["U006326", "U006327"],
+        ["U006326", "U006327", "U006328", "U006329"],
         "Diophantine least-solution solver",
         "positive integer solutions of x^2 = a y^2 + 1",
         "positive nonsquare integer a",
@@ -921,7 +979,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "primitive Pythagorean-triple parameterization",
-        ["U006330"],
+        ["U006330", "U006331"],
         "Diophantine solution generator",
         "integer triples satisfying x^2 + y^2 = z^2",
         "integer parameters r and s under the unstated primitive-case restrictions",
@@ -1775,11 +1833,11 @@ EXPECTED_STAGE_UNIT_COUNT = 539
 EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
-EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 414
+EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 415
 EXPECTED_STAGE_ROUTE_COUNT = 62
-EXPECTED_READING_UPDATE_COUNT = 149
-EXPECTED_NEW_CANDIDATE_COUNT = 87
-EXPECTED_NEW_EVIDENCE_COUNT = 196
+EXPECTED_READING_UPDATE_COUNT = 155
+EXPECTED_NEW_CANDIDATE_COUNT = 88
+EXPECTED_NEW_EVIDENCE_COUNT = 203
 EXPECTED_RESULT_PAIR_COUNT = 1552
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -1824,7 +1882,7 @@ EXPECTED_ROUTE_COVERAGE_DIGEST = ""
 EXPECTED_OMISSION_CHALLENGE_COUNT = 0
 EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
 EXPECTED_NEW_VOCABULARY_DIGEST = (
-    "bfae17f67971652ea57204b563ccbee728661b62fe6c636735a707129766fe2a"
+    "947cb8a7ec2ab54b4548b5e861467ec997b1ca7c9f6515bf70eafb43e8bd8960"
 )
 EXPECTED_DISPOSITION_COUNTS: dict[str, int] = {}
 EXPECTED_ROUND_DIGESTS: dict[str, str] = {}
@@ -2723,6 +2781,18 @@ RELATION_NA = {
     "termination_completion_failure",
 }
 
+DENOTATION_NA = {
+    "native_time",
+    "visible_history",
+    "control_state",
+    "seed",
+    "frontier_or_activation",
+    "schedule",
+    "read_dependencies_or_neighborhood",
+    "write_replacement_assembly_or_commit",
+    "witness_semantics",
+}
+
 ITERATED_NA = {
     "visible_history",
     "control_state",
@@ -2810,6 +2880,18 @@ def _typed_semantics(
             }
         )
         return finalize(set(RELATION_NA))
+    if profile == "DENOTATION":
+        values.update(
+            {
+                "successor_cardinality": (
+                    spec["cardinality"] or "one denoted mathematical object"
+                ),
+                "determinism_branching_or_measure": (
+                    spec["measure"] or "deterministic declarative denotation"
+                ),
+            }
+        )
+        return finalize(set(DENOTATION_NA))
     if profile != "ITERATED":
         raise AuthoringError(f"unsupported typed profile {profile}")
 
