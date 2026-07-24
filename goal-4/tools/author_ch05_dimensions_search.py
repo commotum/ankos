@@ -169,6 +169,8 @@ def _spec(
     missing_mechanics: list[str] | None = None,
     discovery_unit: str | None = None,
     identity_unit: str | None = None,
+    semantic_values: dict[str, Any] | None = None,
+    not_applicable_exclusions: set[str] | None = None,
 ) -> dict[str, Any]:
     if profile is None:
         lowered = object_kind.lower()
@@ -230,6 +232,8 @@ def _spec(
         "missing_mechanics": missing_mechanics or [],
         "discovery_unit": discovery_unit,
         "identity_unit": identity_unit,
+        "semantic_values": semantic_values or {},
+        "not_applicable_exclusions": not_applicable_exclusions or set(),
     }
 
 
@@ -310,6 +314,70 @@ RECOVERED_SPECS = [
         "count the total nodes in every retained network state",
         "a node-count time series",
         aliases=["network size trajectory"],
+    ),
+    _spec(
+        "uniform linear binary-outdegree-network layout representation",
+        ["U001091", "U001092", "U001093", "U001094", "U006225"],
+        "network-layout representation function",
+        "directed networks with two distinguished outgoing connections per node",
+        (
+            "one network plus retained node-origin/order metadata when the "
+            "successive-line order must be recovered"
+        ),
+        (
+            "arrange all nodes on one line, draw one distinguished outgoing "
+            "connection above and the other below, and preserve incidence"
+        ),
+        "one uniform comparison diagram of the input network",
+        related=["B0676"],
+        profile="REPRESENTATION",
+        limit=(
+            "The representation identity and above/below connection convention "
+            "are explicit, but node ordering is not recoverable from network "
+            "numbering alone and the source gives no complete layout algorithm."
+        ),
+        uncertainties=[
+            "The node-order algorithm, origin-record schema, arc geometry, "
+            "crossing policy, and uniqueness/determinism are "
+            "UNKNOWN_FROM_SOURCE."
+        ],
+        missing_mechanics=[
+            "Node ordering requires retained new-node-origin metadata whose "
+            "schema and update law are not supplied.",
+            "Arc routing, crossing, spacing, tie breaking, and uniqueness of "
+            "the final diagram are not specified.",
+        ],
+        semantic_values={
+            "external_data": (
+                "retained origin information for each new node, required when "
+                "recovering the order shown on successive picture lines"
+            )
+        },
+        not_applicable_exclusions={"external_data"},
+        evidence_scopes={
+            "U001091": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U001092": ["result_kind"],
+            "U001093": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+            ],
+            "U001094": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+            ],
+            "U006225": ["external_data", "evidence_limit"],
+        },
+        discovery_unit="U001091",
+        identity_unit="U001091",
     ),
     _spec(
         "multiway state-count and first-difference observer",
@@ -1570,11 +1638,11 @@ EXPECTED_STAGE_UNIT_COUNT = 539
 EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
-EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 413
+EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 414
 EXPECTED_STAGE_ROUTE_COUNT = 62
-EXPECTED_READING_UPDATE_COUNT = 137
-EXPECTED_NEW_CANDIDATE_COUNT = 86
-EXPECTED_NEW_EVIDENCE_COUNT = 181
+EXPECTED_READING_UPDATE_COUNT = 142
+EXPECTED_NEW_CANDIDATE_COUNT = 87
+EXPECTED_NEW_EVIDENCE_COUNT = 186
 EXPECTED_RESULT_PAIR_COUNT = 1552
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -1619,7 +1687,7 @@ EXPECTED_ROUTE_COVERAGE_DIGEST = ""
 EXPECTED_OMISSION_CHALLENGE_COUNT = 0
 EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
 EXPECTED_NEW_VOCABULARY_DIGEST = (
-    "81aaaa3068297d2c408f399e71e89caf697adb6d0e2c955cdc6585a9baddf50f"
+    "bfae17f67971652ea57204b563ccbee728661b62fe6c636735a707129766fe2a"
 )
 EXPECTED_DISPOSITION_COUNTS: dict[str, int] = {}
 EXPECTED_ROUND_DIGESTS: dict[str, str] = {}
@@ -2541,6 +2609,19 @@ def _typed_semantics(
         "parameters_and_variants": spec["input"],
         "evidence_limit": spec["limit"],
     }
+
+    def finalize(not_applicable: set[str]) -> tuple[dict[str, Any], set[str]]:
+        values.update(spec["semantic_values"])
+        not_applicable = (
+            set(not_applicable) - set(spec["not_applicable_exclusions"])
+        )
+        overlap = set(values) & not_applicable
+        if overlap:
+            raise AuthoringError(
+                f"{spec['name']} supports and excludes fields {sorted(overlap)}"
+            )
+        return values, not_applicable
+
     if profile == "FUNCTION":
         values.update(
             {
@@ -2555,7 +2636,7 @@ def _typed_semantics(
         )
         if spec["completion"] is not None:
             values["termination_completion_failure"] = spec["completion"]
-        return values, set(DIRECT_FUNCTION_NA)
+        return finalize(set(DIRECT_FUNCTION_NA))
     if profile == "REPRESENTATION":
         values.update(
             {
@@ -2571,7 +2652,7 @@ def _typed_semantics(
         )
         if spec["completion"] is not None:
             values["termination_completion_failure"] = spec["completion"]
-        return values, set(DIRECT_FUNCTION_NA)
+        return finalize(set(DIRECT_FUNCTION_NA))
     if profile == "RELATION":
         values.update(
             {
@@ -2588,7 +2669,7 @@ def _typed_semantics(
                 ),
             }
         )
-        return values, set(RELATION_NA)
+        return finalize(set(RELATION_NA))
     if profile != "ITERATED":
         raise AuthoringError(f"unsupported typed profile {profile}")
 
@@ -2634,7 +2715,7 @@ def _typed_semantics(
     )
     if "seed" in spec["input"].lower() or "initial" in spec["input"].lower():
         values["seed"] = spec["input"]
-    return values, set(ITERATED_NA)
+    return finalize(set(ITERATED_NA))
 
 
 def _typed_evidence_scopes(
