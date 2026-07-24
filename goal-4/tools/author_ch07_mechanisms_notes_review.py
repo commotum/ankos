@@ -1353,20 +1353,20 @@ CANDIDATES = [
     C(
         "tensor and multipole isotropy analyzer",
         "U006744",
-        ["U006744", "U006745", "U006746", "U006747", "U006748", "U006749", "U006750"],
+        ["U006744", "U006745", "U006746", "U006747", "U006748", "U006749"],
         template="declarative",
-        carrier="a finite point set or a continuous-system expression whose directional symmetry is to be tested",
+        carrier="a finite point set whose directional symmetry is to be tested",
         state="N/A",
-        law="for a point list v, sum rank-n outer products of each position, compare the result with the displayed ideal d-dimensional isotropic tensor, and optionally test rank-4 beta ratios or multipole sums; for a continuous PDE expression, require coordinates to appear only through nabla",
+        law="for a point list v, sum rank-n outer products of each position, compare the result with the displayed ideal d-dimensional isotropic tensor, and optionally test rank-4 beta ratios or multipole sums",
         support="Euclidean coordinate space in dimension d and tensor or multipole orders n",
         topology="Euclidean geometry with rotations and the symmetry group of any underlying lattice",
         alphabet="real coordinate vectors, tensor components, complex multipole values, and Boolean or numeric anisotropy results",
-        input_value="point positions v with dimension d and rank/order n, or a continuous PDE expression for the stated criterion",
-        boundary="the complete supplied point set or expression",
+        input_value="point positions v with dimension d and rank or multipole order n",
+        boundary="the complete supplied point set",
         external="none",
-        result="a point-set moment tensor and isotropy comparison, a beta/multipole anisotropy test, or the stated continuous-expression criterion",
+        result="a point-set moment tensor and isotropy comparison or a beta/multipole anisotropy test",
         determinism="deterministic for fixed inputs",
-        witness="proportionality to the ideal isotropic tensor, beta=3 for the stated rank-4 2D ratio, vanishing nonzero-order multipoles, or coordinate occurrence only through nabla",
+        witness="proportionality to the ideal isotropic tensor, beta=3 for the stated rank-4 2D ratio, or vanishing nonzero-order multipoles",
         params=[
             (
                 "dimension d",
@@ -1405,14 +1405,30 @@ CANDIDATES = [
                 "Sum r_i Exp[i n theta_i] in 2D, or the stated higher-dimensional harmonic analogs; only order zero may remain nonzero for isotropy.",
                 ["U006748"],
             ),
-            (
-                "continuous-PDE coordinate criterion",
-                "Require coordinates to occur only through nabla in the continuous expression.",
-                ["U006750"],
-            ),
         ],
         uncertainties=[
             "The source supplies exact point-set tensor formulas and criteria but does not prescribe a tolerance for approximate numerical isotropy."
+        ],
+    ),
+    C(
+        "continuous-PDE isotropy criterion",
+        "U006750",
+        ["U006750"],
+        template="declarative",
+        carrier="a continuous partial-differential-equation expression",
+        state="N/A",
+        law="require coordinates to appear in effect only through nabla for the continuous system to be isotropic",
+        support="continuous spatial coordinates",
+        topology="Euclidean space under rotations",
+        alphabet="symbolic PDE expressions and a Boolean isotropy judgment",
+        input_value="a continuous PDE expression",
+        boundary="the complete supplied expression",
+        external="none",
+        result="whether the expression satisfies the stated coordinate-occurrence isotropy criterion",
+        determinism="deterministic once the source's 'in effect' equivalence convention is fixed",
+        witness="all effective coordinate dependence occurs through nabla",
+        uncertainties=[
+            "The phrase 'in effect' is not formalized, so the source does not specify expression equivalences or a concrete symbolic decision procedure."
         ],
     ),
     C(
@@ -1667,11 +1683,11 @@ CANDIDATES = [
         boundary=None,
         external="random spin choices and random heat-bath decisions",
         frontier="the spin selected for the next proposal",
-        schedule="repeated random spin-flip proposals; the sweep convention is not stated",
+        schedule="repeated random spin-flip operations; the sweep convention is not stated",
         read=None,
-        write="flip the selected spin when the unspecified heat-bath procedure accepts the proposal",
+        write=None,
         result="a stochastic trajectory of spin configurations intended to sample the canonical measure",
-        successor="a probability measure over an unchanged or spin-flipped next configuration",
+        successor="an unspecified probability measure over next spin configurations",
         determinism="stochastic",
         termination=None,
         witness="empirical configuration frequencies approaching the target canonical probabilities",
@@ -1688,6 +1704,7 @@ CANDIDATES = [
         unknown_fields={
             "rule_relation_constraint_function_or_probability_law": "The in-scope source does not supply the heat-bath spin-flip acceptance law.",
             "read_dependencies_or_neighborhood": "The in-scope source does not state which local or global quantities the heat-bath decision reads.",
+            "write_replacement_assembly_or_commit": "The in-scope source does not state the exact spin-flip replacement or acceptance/commit operation.",
         },
     ),
     C(
@@ -2320,7 +2337,7 @@ CANDIDATES = [
         law=None,
         support="a d-dimensional lattice",
         topology=None,
-        alphabet="integer values with 2d final values",
+        alphabet="k=4d cell values, of which 2d are final values",
         seed="an initial d-dimensional configuration",
         boundary=None,
         external="none",
@@ -2341,8 +2358,8 @@ CANDIDATES = [
                 ["U006863", "U006867"],
             ),
             (
-                "cellular-automaton count k=4d",
-                "The source identifies the d-dimensional family as k=4d.",
+                "state count k=4d",
+                "The source identifies the d-dimensional family as a k=4d cellular automaton.",
                 ["U006863"],
             ),
             (
@@ -2786,7 +2803,7 @@ def main() -> int:
     asset_by_id = {row["asset_id"]: row for row in asset_rows}
     assert len(reading_rows) == 278
     assert len(asset_rows) == 102
-    assert len(CANDIDATES) == 78
+    assert len(CANDIDATES) == 79
 
     # Candidate IDs follow first canonical source occurrence, with list order
     # breaking the intentional same-unit ties.
@@ -3278,9 +3295,9 @@ def main() -> int:
 
     assert len(output["reading_updates"]) == 278
     assert len(output["asset_updates"]) == 102
-    assert len(output["candidate_proposals"]) == 78
+    assert len(output["candidate_proposals"]) == 79
     assert len({e["evidence_id"] for c in candidate_proposals for e in c["source_evidence"]}) == len(evidence_refs)
-    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 78
+    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 79
     assert all(
         c["fingerprint"]["evidence_limit"]["evidence_ids"]
         == [c["source_evidence"][0]["evidence_id"]]
@@ -3297,7 +3314,7 @@ def main() -> int:
                     "assets": len(asset_updates),
                     "candidates": len(candidate_proposals),
                     "evidence": len(evidence_refs),
-                    "groups": 78,
+                    "groups": 79,
                     "routes": len(route_proposals),
                     "bytes": len(payload.encode("utf-8")),
                 },
@@ -3309,8 +3326,8 @@ def main() -> int:
     temporary.write_text(payload, encoding="utf-8")
     os.replace(temporary, output_path)
     print(
-        f"authored {output_path}: readings=278 assets=102 candidates=78 "
-        f"evidence={len(evidence_refs)} groups=78 routes={len(route_proposals)}"
+        f"authored {output_path}: readings=278 assets=102 candidates=79 "
+        f"evidence={len(evidence_refs)} groups=79 routes={len(route_proposals)}"
     )
     return 0
 
