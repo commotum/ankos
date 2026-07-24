@@ -50,7 +50,7 @@ EXPECTED_SPEC_COUNTS = {"incoming": 14, "within": 58}
 EXPECTED_UPDATE_COUNT = 72
 EXPECTED_UNTOUCHED_CROSS_RANGE_COUNT = 107
 EXPECTED_SPEC_SHA256 = (
-    "573fec5c905eb951887419b361dee0c767dee0671db33129b292ba52c3678a82"
+    "3c28e187c3952982c7d9f7486623e25bdd78ff3d0c4e2a64653975031596cb4c"
 )
 EXPECTED_CROSS_RANGE_SHA256 = (
     "d6ae9a4090e14a8a2035a99f07ce1445f158c0ec4fda8f87937593d6f0683034"
@@ -582,7 +582,7 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "A001013",
         (
             "Resolved printed page 282 to the code-357 identity and witness "
-            "at U001517/U001525/U001527-U001528/U001531/A001013. The later "
+            "at U001517/U001527-U001528/U001531/A001013. The later "
             "seed survey in U001544 is therefore joined to the correct "
             "preset without treating the survey as rule mechanics."
         ),
@@ -614,7 +614,7 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "A001014",
         (
             "Resolved printed page 282 to the code-1329 identity and witness "
-            "at U001517/U001525/U001529-U001531/A001014. U001550's later "
+            "at U001517/U001529-U001531/A001014. U001550's later "
             "structure survey is thus tied to the right preset without "
             "promoting a visual behavior panel into an update table."
         ),
