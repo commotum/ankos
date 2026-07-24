@@ -465,7 +465,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             3,
             "observer",
             [
-                ev("U006348", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The survey groups one-dimensional totalistic cellular automata by behavior class for varying color count k and range r.", OBS_FIELDS),
+                ev("U006348", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The survey groups one-dimensional totalistic cellular automata by behavior class for varying color count k and range r.", OBS_FIELDS + ["parameters_and_variants"]),
                 ev("U006349", "IMAGE", "CONTEXTUAL", "The original-resolution pie charts render the surveyed class frequencies for the displayed k and r cases.", ["result_kind", "parameters_and_variants"], p + "_page_963_Frequencies_of_Classes_Four_Pie_Charts.jpeg"),
             ],
             values={
@@ -832,7 +832,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006386", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The survey compares finite-ring repetition periods for rules 45, 30, and 60 and their conjugates/reflections as the ring size n varies.", OBS_FIELDS),
+                ev("U006386", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The survey compares finite-ring repetition periods for rules 45, 30, and 60 and their conjugates/reflections as the ring size n varies.", OBS_FIELDS + ["parameters_and_variants"]),
                 ev("U006387", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders the stated period comparison as a function of n.", ["result_kind", "parameters_and_variants"], p + "_page_966_Figure_12.jpeg"),
             ],
             values={
@@ -1166,7 +1166,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             3,
             "observer",
             [
-                ev("U006429", "PROSE", "DIRECT_PARTIAL_MECHANICS", "From completely random initial conditions, rule 73 forms independent regions containing period-3 patterns and its aggregate density continues to oscillate with period 3.", OBS_FIELDS + ["structural_invariants"]),
+                ev("U006429", "PROSE", "DIRECT_PARTIAL_MECHANICS", "From completely random initial conditions, rule 73 forms independent regions containing period-3 patterns and its aggregate density continues to oscillate with period 3.", OBS_FIELDS + ["structural_invariants", "excluded_observers_and_representations"]),
                 ev("U006430", "IMAGE", "CONTEXTUAL", "The original-resolution picture renders the region structure accompanying the stated period-3 density behavior.", ["result_kind", "excluded_observers_and_representations"], p + "_page_969_Picture_4.jpeg"),
             ],
             values={
@@ -1407,13 +1407,25 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006452", "CODE", "DIRECT_PARTIAL_MECHANICS", "g[w,k,t] counts nonzero cells in the first t rows generated from one initial 1.", OBS_FIELDS),
+                ev("U006453", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The fractal dimension is introduced as a large-m scaling limit of the nonzero-cell count.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
                 ev("U006454", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The dimension is the large-m limit Log[k,g(w,k,k^(m+1))/g(w,k,k^m)].", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
+                ev("U006455", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For prime k, the source introduces an exact eigenvalue computation of the dimension.", ["parameters_and_variants", "result_kind"]),
+                ev("U006456", "CODE", "DIRECT_COMPLETE_MECHANICS", "d[w,k] computes the prime-modulus dimension from the largest absolute eigenvalue of the constructed finite matrix.", ["rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+                ev("U006458", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The source supplies exact algebraic dimensions for two additional binary weight vectors.", ["parameters_and_variants", "result_kind"]),
+                ev("U006460", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The source supplies a general rule-90 formula in k and exact rule-150 examples for k=3,5,7.", ["parameters_and_variants", "result_kind"]),
             ],
             values={
                 "input": "additive-rule weights w, modulus k, and the single-1 seed",
                 "rule_relation_constraint_function_or_probability_law": "compute nonzero-cell growth g at successive powers of k and take the logarithmic ratio limit",
                 "result_kind": "the fractal dimension of the generated spacetime pattern",
+                "parameters_and_variants": "weights w and modulus k; the exact eigenvalue implementation is stated for prime k, with explicit rule-90, rule-150, and longer-weight examples",
             },
+            parameters=[("w", "additive cellular-automaton weight vector"), ("k", "cell-color modulus, prime for the exact eigenvalue implementation")],
+            variants=[
+                ("rule 90", "w={1,0,1}, including d=Log[2,3] for k=2"),
+                ("rule 150", "w={1,1,1}, with explicit k=2,3,5,7 values"),
+                ("longer binary weights", "explicit values for {1,1,0,1,0} and {1,1,0,1,1}"),
+            ],
         ),
         spec(
             "associative-operation cellular automaton family",
@@ -1422,7 +1434,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca1d",
             [
                 ev("U006461", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The new cell is f[a1,a2], with f associative.", ["object_kind", "alphabet_or_value_schema", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "structural_invariants"]),
-                ev("U006462", "CODE", "DIRECT_COMPLETE_MECHANICS", "NestList with zero padding constructs the complete synchronous history from a single nonzero value.", ["native_time", "complete_state", "schedule", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
+                ev("U006462", "CODE", "DIRECT_COMPLETE_MECHANICS", "NestList starts from {a}; each synchronous row applies f to adjacent cells after explicit zero padding on both ends.", ["native_time", "carrier", "support", "complete_state", "seed", "boundary", "schedule", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
                 ev("U006463", "PROSE", "CONTEXTUAL", "The source introduces the explicit first-step expansions used to expose the associative structure.", ["structural_invariants"]),
                 ev("U006464", "CODE", "CORROBORATING", "The first four symbolic rows expand the binary operation before associativity is imposed.", ["rule_relation_constraint_function_or_probability_law"]),
                 ev("U006465", "PROSE", "CONTEXTUAL", "The source then imposes Flat associativity on those expansions.", ["structural_invariants"]),
@@ -1431,6 +1443,11 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ev("U006468", "PROSE", "CORROBORATING", "Associative and commutative f yields nested behavior for multiple nonzero initial elements; noncommutative f can yield non-nested patterns.", ["structural_invariants", "parameters_and_variants"]),
             ],
             values={
+                "carrier": "a finite one-dimensional row expanded by zero padding",
+                "support": "a finite row over the operation's value set",
+                "complete_state": "the current finite row",
+                "seed": "the singleton row {a}",
+                "boundary": "one zero is prepended and appended before each adjacent-pair update",
                 "alphabet_or_value_schema": "a finite set closed under binary operation f",
                 "structural_invariants": "f is associative; commutativity and identity are optional stated variants",
                 "read_dependencies_or_neighborhood": "two adjacent values a1,a2",
@@ -1439,9 +1456,34 @@ def candidate_specs() -> list[dict[str, Any]]:
             },
         ),
         spec(
-            "elementary-rule pattern-uniqueness analyzer",
+            "rule-45 nested-background seed preset",
             "U006469",
             1,
+            "seed",
+            [
+                ev(
+                    "U006469",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "A single black cell placed on a background of repeated ■■□ blocks is stated to yield a slanted rule-90-like nested pattern under rule 45.",
+                    SEED_FIELDS + ["parameters_and_variants"],
+                )
+            ],
+            values={
+                "carrier": "a one-dimensional binary rule-45 configuration",
+                "support": "a single black defect on an infinite period-3 background",
+                "alphabet_or_value_schema": "black and white cells",
+                "complete_state": "one black cell on a background formed by repeating ■■□",
+                "rule_relation_constraint_function_or_probability_law": "repeat ■■□ as the background and insert one black cell as the rule-45 seed",
+                "parameters_and_variants": "the source fixes the period-3 ■■□ background and a single black insertion",
+            },
+            variants=[("■■□ background", "single black cell on the repeated period-3 background")],
+            related=["elementary cellular automaton rule 22"],
+        ),
+        spec(
+            "elementary-rule pattern-uniqueness analyzer",
+            "U006469",
+            2,
             "observer",
             [
                 ev("U006469", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Starting every elementary rule from one black cell, the analyzer sorts successive configurations and counts distinct configurations and complete patterns across all 256 rules.", OBS_FIELDS + ["parameters_and_variants"]),
@@ -1474,7 +1516,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006471",
             2,
             "seed",
-            [ev("U006471", "PROSE", "DIRECT_IDENTITY", "Nested sequences from page 83 are identified as initial conditions for rule 90.", ["object_kind", "seed", "result_kind"]), ev("U006472", "IMAGE", "CONTEXTUAL", "Three resulting rule-90 histories visually distinguish three nested-sequence variants.", ["parameters_and_variants"], p + "_page_971_Nested_Initial_Conditions_Three_Panel_Row.jpeg")],
+            [ev("U006471", "PROSE", "DIRECT_IDENTITY", "Nested sequences from page 83 are identified as initial conditions for rule 90, with three variants pictured immediately below.", ["object_kind", "seed", "result_kind", "parameters_and_variants"]), ev("U006472", "IMAGE", "CONTEXTUAL", "Three resulting rule-90 histories visually distinguish three nested-sequence variants.", ["parameters_and_variants"], p + "_page_971_Nested_Initial_Conditions_Three_Panel_Row.jpeg")],
             values={
                 "carrier": "one-dimensional binary sequences",
                 "support": "the nested sequence family referenced on page 83",
@@ -1492,6 +1534,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             "constraint",
             [
                 ev("U006475", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A finite labeled transition network represents allowed value sequences by paths.", ["object_kind", "carrier", "alphabet_or_value_schema", "complete_state", "input", "law_kind", "result_kind"]),
+                ev("U006476", "CODE", "DIRECT_COMPLETE_MECHANICS", "NetStep advances a node set through all arcs carrying one input label.", ["rule_relation_constraint_function_or_probability_law", "determinism_branching_or_measure"]),
+                ev("U006477", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A list is accepted when it labels a path beginning at at least one network node.", ["input", "result_kind", "witness_semantics"]),
                 ev("U006478", "CODE", "DIRECT_COMPLETE_MECHANICS", "Fold[NetStep,...] accepts exactly when at least one starting-node path remains after consuming the input list.", ["rule_relation_constraint_function_or_probability_law", "determinism_branching_or_measure", "witness_semantics"]),
             ],
             values={
@@ -1510,26 +1554,50 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006479",
             1,
             "representation",
-            [ev("U006480", "CODE", "DIRECT_COMPLETE_MECHANICS", "NetCAStep constructs a labeled network for the one-step cellular-automaton image of a sequence set.", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"])],
+            [
+                ev("U006479", "PROSE", "DIRECT_IDENTITY", "The source asks for the sequence set obtained after one cellular-automaton step from a set represented by a finite network.", ["object_kind", "input", "result_kind"]),
+                ev("U006480", "CODE", "DIRECT_COMPLETE_MECHANICS", "NetCAStep constructs a labeled network for the one-step cellular-automaton image of a sequence set.", ["law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+                ev("U006481", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source gives the explicit {k,r,rtab} encoding for elementary rule 126 and introduces the all-sequences starting network.", ["input", "parameters_and_variants"]),
+                ev("U006482", "CODE", "DIRECT_COMPLETE_MECHANICS", "AllNet[k] constructs the one-node network accepting every sequence over k labels.", ["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
+                ev("U006483", "PROSE", "CONTEXTUAL", "The source introduces the concrete rule-126 output network produced by the transform.", []),
+                ev("U006484", "CODE", "CORROBORATING", "The explicit four-node rule-126 image network is printed.", ["result_kind", "parameters_and_variants"]),
+            ],
             values={
                 "input": "a finite network for a sequence set and a CA specification {k,r,rtab}",
                 "rule_relation_constraint_function_or_probability_law": "lift network states to length-2r contexts and relabel transitions by rtab",
                 "result_kind": "a finite network accepting sequences obtainable after one CA step",
                 "parameters_and_variants": "alphabet size k, cellular-automaton range r, and transition table rtab",
             },
+            parameters=[
+                ("k", "alphabet size"),
+                ("r", "cellular-automaton range"),
+                ("rtab", "transition table"),
+            ],
+            variants=[
+                ("all-sequences input", "AllNet[k] is the one-node source network accepting every k-symbol sequence"),
+                ("rule-126 example", "{2,1,Reverse[IntegerDigits[126,2,8]]} yields the printed four-node network"),
+            ],
         ),
         spec(
             "deterministic finite-automaton minimizer",
             "U006485",
             1,
             "representation",
-            [ev("U006485", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A nondeterministic network is determinized and equivalent nodes are combined to obtain a unique minimal DFA.", ["object_kind", "input", "law_kind", "result_kind"]), ev("U006486", "CODE", "DIRECT_COMPLETE_MECHANICS", "MinNet, DSets, and ISets give the subset construction and equivalence-class reduction.", ["rule_relation_constraint_function_or_probability_law", "determinism_branching_or_measure"])],
+            [
+                ev("U006485", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A nondeterministic network is determinized and equivalent nodes are combined to obtain a unique minimal DFA.", ["object_kind", "input", "law_kind", "result_kind"]),
+                ev("U006486", "CODE", "DIRECT_COMPLETE_MECHANICS", "MinNet, DSets, and ISets give the subset construction and equivalence-class reduction.", ["rule_relation_constraint_function_or_probability_law", "determinism_branching_or_measure", "parameters_and_variants"]),
+                ev("U006487", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source states the 2^q-1 worst-case state count, the implementation's approximate n^2 work, a known n Log[n] alternative, and the concrete minimized rule-126 network.", ["structural_invariants", "result_kind", "parameters_and_variants"]),
+            ],
             values={
                 "input": "a finite labeled nondeterministic network",
                 "rule_relation_constraint_function_or_probability_law": "subset-determinize, partition equivalent states, and quotient the transition graph",
                 "result_kind": "an equivalent minimal deterministic finite automaton",
+                "structural_invariants": "a q-node source can yield as many as 2^q-1 determinized states",
+                "parameters_and_variants": "the printed MinNet can take about n^2 steps for an n-node result; an n Log[n] method is known; a rule-126 result is supplied",
             },
             aliases=["MinNet"],
+            parameters=[("k", "number of arc labels, default 2"), ("q", "number of source-network nodes")],
+            variants=[("rule-126 result", "{{1->3},{0->2,1->1},{0->2,1->3}}")],
         ),
         spec(
             "trimmed sequence-network transformer",
@@ -1549,13 +1617,17 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006492",
             1,
             "constraint",
-            [ev("U006492", "PROSE", "DIRECT_COMPLETE_MECHANICS", "A regular language is the set of label sequences obtained by following possible paths through a finite network.", CONSTRAINT_FIELDS)],
+            [
+                ev("U006492", "PROSE", "DIRECT_COMPLETE_MECHANICS", "A regular language is the set of label sequences obtained by following possible paths through a finite network.", CONSTRAINT_FIELDS),
+                ev("U006493", "PROSE", "CONTEXTUAL", "The historical note records sofic systems as the dynamical-systems name for regular-language systems.", []),
+            ],
             values={
                 "carrier": "finite or infinite sequences over a finite alphabet as delimited by the accepting convention",
                 "input": "a symbol sequence and a finite labeled network",
                 "rule_relation_constraint_function_or_probability_law": "the sequence belongs iff it labels an allowed network path",
                 "result_kind": "the set of accepted sequences",
             },
+            aliases=["sofic system", "sofic systems"],
         ),
         spec(
             "regular-expression sequence denotation",
@@ -1599,6 +1671,11 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "node/edge counts, growth laws, and maximum-size comparisons",
                 "parameters_and_variants": "explicit cases include rules 108, 128, 132, 160, 184, 126, 110, rule 22 at t=2, and k=2 r=2 totalistic code 20",
             },
+            parameters=[
+                ("k", "number of cellular-automaton colors"),
+                ("r", "cellular-automaton range"),
+                ("t", "number of image-set evolution steps"),
+            ],
         ),
         spec(
             "finite-complement language",
@@ -1631,6 +1708,38 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "count length-n paths and take the exponential growth rate Log[2,kappa]",
                 "result_kind": "spatial/topological entropy h",
             },
+            parameters=[("n", "sequence length for finite path counts")],
+        ),
+        spec(
+            "limiting spatial-entropy bound decision query",
+            "U006504",
+            1,
+            "constraint",
+            [
+                ev(
+                    "U006504",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "The source asks whether the limiting spatial entropy after infinitely many cellular-automaton steps satisfies a given bound, even whether it is nonzero, and states that the problem is undecidable in general.",
+                    [
+                        "object_kind",
+                        "input",
+                        "law_kind",
+                        "rule_relation_constraint_function_or_probability_law",
+                        "result_kind",
+                        "termination_completion_failure",
+                    ],
+                )
+            ],
+            values={
+                "input": "a cellular-automaton rule and a proposed bound on its limiting spatial entropy",
+                "rule_relation_constraint_function_or_probability_law": "decide whether the infinite-time limiting spatial entropy satisfies the requested bound",
+                "result_kind": "a truth value when decidable, including the special query whether the limit is nonzero",
+                "termination_completion_failure": "the decision problem is undecidable in general",
+            },
+            parameters=[("entropy bound", "the proposed limiting bound, including the predicate h>0")],
+            missing=["No general terminating decision procedure exists."],
+            related=["spatial topological-entropy analyzer"],
         ),
         spec(
             "dynamical zeta function of network cycles",
@@ -1642,7 +1751,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ev("U006507", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The cycle counts are coefficients of x ∂x Log[zeta[m,x]].", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
                 ev("U006508", "PROSE", "CONTEXTUAL", "The source introduces the rational zeta function used by that logarithmic derivative.", ["result_kind"]),
                 ev("U006509", "CODE", "DIRECT_COMPLETE_MECHANICS", "zeta[m,x] is 1/Det[I-m x].", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
-                ev("U006510", "PROSE", "CORROBORATING", "The same zeta function is the product over all cycles of 1/(1-x^n).", ["rule_relation_constraint_function_or_probability_law", "structural_invariants"]),
+                ev("U006510", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The same zeta function is the product over all cycles of 1/(1-x^n).", ["rule_relation_constraint_function_or_probability_law", "structural_invariants"]),
             ],
             values={
                 "input": "a finite network adjacency matrix m and formal variable x",
@@ -1696,13 +1805,20 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006511",
             4,
             "observer",
-            [ev("U006512", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Measure entropy is the n-to-infinity limit of -Sum[p_i Log_k p_i]/n over k^n blocks.", OBS_FIELDS)],
+            [
+                ev("U006512", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "Measure entropy is the n-to-infinity limit of -Sum[p_i Log_k p_i]/n over k^n blocks.", OBS_FIELDS + ["parameters_and_variants"]),
+                ev("U006513", "PROSE", "DIRECT_IDENTITY", "The source also names the quantity entropy, information, and information dimension.", ["parameters_and_variants"]),
+                ev("U006518", "PROSE", "DIRECT_PARTIAL_MECHANICS", "A plug-in measure-entropy estimate can be formed from sampled block probabilities, but it is systematically low; polynomial unbiased estimators around p Log p are proposed as a workaround.", ["input", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+            ],
             values={
                 "input": "block probabilities p[i] for k-symbol blocks of length n",
                 "rule_relation_constraint_function_or_probability_law": "-Limit[Sum[p[i] Log[k,p[i]]]/n,n->Infinity]",
                 "result_kind": "measure entropy",
+                "parameters_and_variants": "exact block-probability limit or a sampling plug-in estimate with stated downward bias and polynomial-estimator workaround",
             },
-            aliases=["information entropy", "information dimension"],
+            aliases=["entropy", "information", "information entropy", "information dimension"],
+            parameters=[("k", "alphabet size"), ("n", "block length")],
+            variants=[("sampled plug-in estimate", "estimate block probabilities from samples; direct substitution is systematically biased downward")],
         ),
         spec(
             "set/topological entropy from block-support growth",
@@ -1719,6 +1835,7 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "the source-intended set/topological entropy, with no trustworthy complete formula in the extraction",
                 "parameters_and_variants": "also named capacity and fractal dimension in the source",
             },
+            aliases=["set entropy", "topological entropy", "capacity", "fractal dimension"],
             status="DEFECTIVE",
             uncertainties=["U006514 omits a logarithm from the support-count growth expression; the exact intended repaired transcription is not printed in the sealed source."],
             missing=["A source-authoritative logarithmic normalization is required before this analyzer can be implemented."],
@@ -1741,26 +1858,70 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "q=0 set entropy; q->1 measure entropy; q=2 correlation entropy",
             },
             aliases=["Rényi entropy family", "generalized dimensions"],
+            parameters=[("k", "alphabet size"), ("n", "block length"), ("q", "generalized-entropy order")],
+            variants=[
+                ("q=0", "set/topological entropy specialization"),
+                ("q→1", "measure-entropy specialization"),
+                ("q=2", "correlation entropy"),
+            ],
             status="DEFECTIVE",
             uncertainties=["U006516's denominator q-1 reverses the sign relative to U006517's stated uniform-distribution maximum +1."],
             missing=["A source-authoritative sign correction is required before this entropy family can be implemented."],
+            related=["set/topological entropy from block-support growth", "measure-entropy analyzer"],
         ),
         spec(
             "sequence-set to Cantor-set encoding",
             "U006518",
             1,
             "representation",
-            [ev("U006518", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "A length-n sequence a[i] over k symbols is encoded as Sum[a[i] k^-i], and the infinite allowed set forms a Cantor set.", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind"])],
+            [
+                ev("U006505", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Binary sequences are encoded as Sum[a_i 2^-i], and the resulting Cantor set has Hausdorff dimension equal to the spatial entropy h.", ["object_kind", "input", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants"]),
+                ev("U006518", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "A length-n sequence a[i] over k symbols is encoded as Sum[a[i] k^-i], and the infinite allowed set forms a Cantor set.", ["input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"]),
+            ],
             values={
                 "input": "a finite or infinite sequence over k symbols",
+                "structural_invariants": "for the binary sequence set discussed in U006505, the encoded Cantor set's Hausdorff dimension equals the spatial entropy h",
                 "rule_relation_constraint_function_or_probability_law": "map a to Sum[a[i] k^-i]",
                 "result_kind": "a real point, or the Cantor set formed by an allowed sequence family",
+                "parameters_and_variants": "alphabet size k; k=2 gives the binary encoding Sum[a_i 2^-i], while k=3 with the second color absent gives the middle-thirds Cantor set",
             },
+            parameters=[("k", "number of sequence symbols and radix of the encoding"), ("n", "finite prefix length before the infinite-set limit")],
+        ),
+        spec(
+            "finite sequence-network to substitution-system transform",
+            "U006518",
+            2,
+            "representation",
+            [
+                ev(
+                    "U006518",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "For an s-node finite sequence network, assigning one substitution-system element kind to each node makes progressive Cantor-set levels equivalent to successive substitution steps.",
+                    [
+                        "object_kind",
+                        "input",
+                        "law_kind",
+                        "rule_relation_constraint_function_or_probability_law",
+                        "result_kind",
+                        "parameters_and_variants",
+                    ],
+                )
+            ],
+            values={
+                "input": "a finite s-node network representing an allowed sequence set",
+                "rule_relation_constraint_function_or_probability_law": "create s substitution-element kinds corresponding to the network nodes and use network continuations to generate successive allowed-sequence levels",
+                "result_kind": "a substitution system generating the nested levels of the encoded Cantor set",
+                "parameters_and_variants": "one substitution element kind for each of the s network nodes",
+            },
+            parameters=[("s", "number of finite-network nodes and resulting substitution element kinds")],
+            missing=["The note states the construction principle but does not print the node-to-replacement rule in executable form."],
+            related=["sequence-set to Cantor-set encoding", "regular language"],
         ),
         spec(
             "cellular-automaton surjectivity decision query",
             "U006518",
-            2,
+            3,
             "constraint",
             [ev("U006518", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Surjectivity asks whether every possible input state also occurs as output; the stated test constructs the minimal finite automaton.", CONSTRAINT_FIELDS)],
             values={
@@ -1773,7 +1934,7 @@ def candidate_specs() -> list[dict[str, Any]]:
         spec(
             "cellular-automaton injectivity, bijectivity, and reversibility decision relation",
             "U006518",
-            3,
+            4,
             "constraint",
             [
                 ev("U006518", "PROSE", "DIRECT_IDENTITY", "A cellular automaton is treated as a global endomorphism of its state space, providing the common domain for onto and one-to-one properties.", ["object_kind", "carrier", "input", "law_kind"]),
@@ -1792,16 +1953,74 @@ def candidate_specs() -> list[dict[str, Any]]:
             related=["cellular-automaton surjectivity decision query"],
         ),
         spec(
-            "temporal-sequence entropy analyzer",
+            "full temporal-sequence language for additive cellular automata",
             "U006521",
             1,
+            "constraint",
+            [
+                ev(
+                    "U006521",
+                    "PROSE",
+                    "DIRECT_COMPLETE_MECHANICS",
+                    "For additive rules 60 and 90 and partially additive rules 30 and 45, every possible temporal color sequence can occur for a suitable initial condition.",
+                    CONSTRAINT_FIELDS + ["parameters_and_variants"],
+                )
+            ],
+            values={
+                "carrier": "one-cell temporal color sequences",
+                "input": "a temporal color sequence and one of rules 60, 90, 30, or 45",
+                "rule_relation_constraint_function_or_probability_law": "accept every sequence; for each one the source asserts existence of a suitable initial condition realizing it at the observed cell",
+                "result_kind": "the full temporal shift over the rule's color alphabet",
+                "witness_semantics": "a realizing cellular-automaton initial condition exists for every requested temporal sequence",
+                "parameters_and_variants": "additive rules 60 and 90; partially additive rules 30 and 45",
+            },
+            variants=[
+                ("additive", "rules 60 and 90"),
+                ("partially additive", "rules 30 and 45"),
+            ],
+            related=["temporal-sequence entropy analyzer"],
+        ),
+        spec(
+            "rule-18 no-adjacent-black temporal-sequence language",
+            "U006521",
+            2,
+            "constraint",
+            [
+                ev(
+                    "U006521",
+                    "PROSE",
+                    "DIRECT_PARTIAL_MECHANICS",
+                    "For rule 18, the source states that every temporal sequence with no adjacent pair of black cells appears to be realizable.",
+                    CONSTRAINT_FIELDS,
+                )
+            ],
+            values={
+                "carrier": "binary one-cell temporal sequences",
+                "alphabet_or_value_schema": "black and white observations",
+                "input": "a binary temporal sequence for rule 18",
+                "rule_relation_constraint_function_or_probability_law": "accept iff the sequence never contains two adjacent black observations",
+                "result_kind": "the stated candidate temporal language of rule 18",
+                "witness_semantics": "a suitable rule-18 initial condition realizing the accepted temporal sequence",
+            },
+            status="AMBIGUOUS",
+            uncertainties=["The source qualifies the rule-18 characterization with 'it appears', so completeness is observational rather than proved."],
+            related=["temporal-sequence entropy analyzer"],
+        ),
+        spec(
+            "temporal-sequence entropy analyzer",
+            "U006521",
+            3,
             "observer",
-            [ev("U006521", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Temporal sequences follow one cell through successive steps, and h_t is defined by analogy with spatial sequence entropy.", OBS_FIELDS)],
+            [ev("U006521", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Temporal sequences follow one cell through successive steps, h_t is defined by analogy with spatial sequence entropy, and directional entropies use sequences at a chosen spacetime slope.", OBS_FIELDS + ["structural_invariants", "parameters_and_variants"])],
             values={
                 "input": "the set or distribution of temporal color sequences at one cellular-automaton cell",
+                "structural_invariants": "h_t <= 2 lambda h_x; directional entropy can change discontinuously when the observation slope crosses lambda",
                 "rule_relation_constraint_function_or_probability_law": "take the exponential growth/information rate of allowed length-n temporal sequences",
                 "result_kind": "temporal entropy h_t in bits per unit time",
+                "parameters_and_variants": "vertical one-cell temporal entropy or directional entropy at a selected spacetime slope",
             },
+            parameters=[("observation slope", "spacetime slope of the sampled sequence; the vertical case follows one fixed cell")],
+            variants=[("directional entropy", "entropy of sequences sampled along a chosen spacetime slope")],
             image_witnesses=[p + "_page_975_Picture_7.jpeg"],
         ),
         spec(
@@ -1809,12 +2028,19 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006524",
             1,
             "observer",
-            [ev("U006524", "PROSE", "DIRECT_PARTIAL_MECHANICS", "s[t,x] counts possible x-by-t spacetime patches determined by initial blocks.", OBS_FIELDS), ev("U006525", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "h_tx is the iterated limit of Log_k s[t,x]/t as t then x tend to infinity.", ["rule_relation_constraint_function_or_probability_law", "result_kind"])],
+            [
+                ev("U006524", "PROSE", "DIRECT_PARTIAL_MECHANICS", "s[t,x] counts possible x-by-t spacetime patches determined by initial blocks.", OBS_FIELDS + ["parameters_and_variants"]),
+                ev("U006525", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "h_tx is the iterated limit of Log_k s[t,x]/t as t then x tend to infinity.", ["rule_relation_constraint_function_or_probability_law", "result_kind"]),
+                ev("U006529", "PROSE", "DIRECT_IDENTITY", "The historical note also names spacetime entropy invariant entropy.", ["parameters_and_variants"]),
+            ],
             values={
                 "input": "counts s[t,x] of possible cellular-automaton spacetime patches",
                 "rule_relation_constraint_function_or_probability_law": "Limit[x->Infinity] Limit[t->Infinity] Log[k,s[t,x]]/t",
                 "result_kind": "topological spacetime entropy h_tx",
+                "parameters_and_variants": "alphabet size k, cellular-automaton range r, patch width x, and patch height t",
             },
+            aliases=["invariant entropy"],
+            parameters=[("k", "alphabet size"), ("r", "cellular-automaton range"), ("x", "patch width"), ("t", "patch height")],
         ),
         spec(
             "measure spacetime-entropy analyzer",
@@ -1852,6 +2078,10 @@ def candidate_specs() -> list[dict[str, Any]]:
                 ev("U006531", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Each complete state of a finite deterministic system becomes a node with one arc to its rule-defined successor.", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants"]),
                 ev("U006533", "PROSE", "CORROBORATING", "Cyclic-multiplication examples show pure cycles for odd n and transient trees feeding cycles for even n.", ["structural_invariants"]),
                 ev("U006535", "PROSE", "DIRECT_COMPLETE_MECHANICS", "Every deterministic finite-state evolution graph consists of recurrent cycles with possible trees of transient states feeding them.", ["structural_invariants"]),
+                ev("U006536", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The rule-254 four-cell graph has 16 nodes and all but one state reaches the all-black fixed point within two steps.", ["parameters_and_variants", "structural_invariants"]),
+                ev("U006538", "PROSE", "CORROBORATING", "Larger rule-254 finite systems show the same convergence to a single fixed point.", ["parameters_and_variants", "structural_invariants"]),
+                ev("U006540", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule-132 state graphs are given as class-2 examples whose number of distinct cycles increases with system size.", ["parameters_and_variants", "structural_invariants"]),
+                ev("U006545", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source warns that infinite-size behavior is recovered only by increasing size while holding the evolution-step horizon fixed.", ["parameters_and_variants"]),
                 ev("U006546", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Shift, reflection, and color symmetries produce repeated isomorphic graph pieces and symmetry cosets.", ["structural_invariants"]),
                 ev("U006552", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Finite additive-CA graphs have cycle lengths dividing the longest cycle and identical rooted structures at every cycle state, with stated rule-60 and rule-90 tree depths and degrees.", ["structural_invariants", "parameters_and_variants"]),
             ],
@@ -1862,6 +2092,15 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "result_kind": "a functional directed graph of all system states",
                 "parameters_and_variants": "for finite additive rules, cycle states carry identical rooted trees; the source states binary tree structure for rule 60 and degree-4 tree structure for rule 90",
             },
+            parameters=[
+                ("finite state-space size", "number of complete states represented as graph nodes"),
+                ("system size", "finite lattice or other size parameter controlling the state space"),
+            ],
+            variants=[
+                ("rule 254", "class-1 convergence to one all-black fixed point"),
+                ("rule 132", "class-2 graphs with more cycles at larger sizes"),
+                ("rules 60 and 90", "regular additive-rule cycle trees"),
+            ],
             image_witnesses=[
                 p + "_page_976_Figure_10.jpeg",
                 p + "_page_977_Figure_1.jpeg",
@@ -1909,7 +2148,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006548", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The number of shift-rule cycles of exact length m is s[m,k]/m.", OBS_FIELDS + ["structural_invariants"]),
-                ev("U006549", "CODE", "CORROBORATING", "For prime k the cycles except all-zero correspond to factors of x^(k^n-1)-1 modulo k.", ["structural_invariants", "parameters_and_variants"]),
+                ev("U006549", "CODE", "DIRECT_PARTIAL_MECHANICS", "For prime k the cycles except all-zero correspond to factors of x^(k^n-1)-1 modulo k.", ["structural_invariants", "parameters_and_variants"]),
             ],
             values={
                 "input": "requested exact cycle length m and alphabet size k",
@@ -1921,21 +2160,23 @@ def candidate_specs() -> list[dict[str, Any]]:
             related=["left-shift cellular automaton rule 170", "primitive spatial-period state-count function"],
         ),
         spec(
-            "uniform random functional-digraph ensemble",
+            "random functional-digraph ensemble",
             "U006555",
             1,
             "generator",
-            [ev("U006555", "PROSE", "DIRECT_COMPLETE_MECHANICS", "For each of n labeled nodes, choose its unique successor from the n nodes, yielding the static ensemble of n^n possible functional digraphs.", ["object_kind", "carrier", "support", "structural_invariants", "input", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"])],
+            [ev("U006555", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For each of n labeled nodes, choose its unique successor at random from the n nodes, yielding n^n possible functional digraphs; the source does not explicitly spell out independence or equal probabilities.", ["object_kind", "carrier", "support", "structural_invariants", "complete_state", "input", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"])],
             values={
                 "carrier": "n labeled nodes",
                 "support": "all functions from the n-node labeled set to itself",
                 "structural_invariants": "every node has exactly one successor and there are exactly n^n labeled outcomes",
                 "complete_state": "a directed graph with one successor per node",
                 "input": "number of labeled nodes n",
-                "rule_relation_constraint_function_or_probability_law": "independently choose each node's successor from the n nodes with equal probability",
-                "result_kind": "one static functional digraph or the uniform measure over all n^n such digraphs",
+                "rule_relation_constraint_function_or_probability_law": "choose each node's unique successor at random from the n-node set; the source does not further specify the joint probability law",
+                "result_kind": "one random functional digraph, or the source's unspecified random ensemble over the n^n possible digraphs",
                 "parameters_and_variants": "number of nodes n",
             },
+            parameters=[("n", "number of labeled nodes")],
+            missing=["The prose does not explicitly state that successor choices are independent or that all n destinations and all n^n graphs are equiprobable."],
             image_witnesses=[p + "_page_979_Figure_1.jpeg"],
             related=["random functional-network statistics analyzer"],
         ),
@@ -1946,12 +2187,13 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [ev("U006555", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "For the n-node random functional-digraph ensemble, the source gives average cycle count Sqrt[pi/2] Log[n], average cycle length Sqrt[pi n/8], and mean predecessor-free fraction (1-1/n)^n tending to 1/e.", OBS_FIELDS + ["parameters_and_variants"])],
             values={
-                "input": "the uniform n-node functional-digraph ensemble",
+                "input": "the source's n-node random functional-digraph ensemble",
                 "rule_relation_constraint_function_or_probability_law": "evaluate the source's ensemble-average cycle-count, cycle-length, and predecessor-free-node formulas",
                 "result_kind": "associated random-network statistics rather than a generated network",
                 "parameters_and_variants": "average distinct cycles Sqrt[pi/2] Log[n]; average cycle length Sqrt[pi n/8]; predecessor-free fraction (1-1/n)^n -> 1/e",
             },
-            related=["uniform random functional-digraph ensemble", "finite global-state transition graph"],
+            parameters=[("n", "number of labeled nodes")],
+            related=["random functional-digraph ensemble", "finite global-state transition graph"],
         ),
         spec(
             "code-20 initial-condition survival-time analyzer",
@@ -1959,7 +2201,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "observer",
             [
-                ev("U006558", "PROSE", "DIRECT_COMPLETE_MECHANICS", "For indexed code-20 initial conditions, the analyzer records steps survived and counts seeds that lead to persistent structures over stated sample bounds.", OBS_FIELDS + ["parameters_and_variants"]),
+                ev("U006558", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For the first indexed code-20 initial conditions, the source records steps survived and counts seeds said to lead to persistent structures over stated sample bounds.", OBS_FIELDS + ["parameters_and_variants"]),
                 ev("U006559", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders survival times for the first 1000 initial conditions.", ["result_kind", "excluded_observers_and_representations"], p + "_page_979_Figure_4.jpeg"),
             ],
             values={
@@ -1969,22 +2211,25 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "parameters_and_variants": "first 1000: 72 persistent; first million: 60,171; first billion: 71,079,205",
                 "excluded_observers_and_representations": "the survival plot and aggregate counts are observations of code-20 evolution, not native state",
             },
+            missing=["The source does not define the initial-condition indexing/decoding convention or the survival/persistence stopping criterion."],
             image_witnesses=[p + "_page_979_Figure_4.jpeg"],
         ),
         spec(
             "rule-110 periodic background field",
             "U006560",
             1,
-            "map",
-            [ev("U006560", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The background is repetitions of a fixed 14-cell block b, with color b[[Mod[x+4t,14]+1]] at position x and time t.", MAP_FIELDS + ["structural_invariants"])],
+            "representation",
+            [ev("U006560", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The background is a declarative binary spacetime field: repetitions of fixed 14-cell block b with color b[[Mod[x+4t,14]+1]] at coordinate (x,t).", ["object_kind", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "structural_invariants", "parameters_and_variants"])],
             values={
-                "native_time": "a declarative spacetime field indexed by integer t",
-                "carrier": "integer spacetime coordinates (x,t)",
-                "complete_state": "the background row at time t",
+                "object_kind": "declarative spacetime field or function",
+                "input": "integer spacetime coordinates x and t",
                 "structural_invariants": "the row has spatial period 14 and advances by the source's offset 4t modulo 14",
                 "rule_relation_constraint_function_or_probability_law": "color(x,t)=b[[Mod[x+4t,14]+1]] for the stated 14-cell b",
-                "result_kind": "a binary background color or complete periodic row",
+                "result_kind": "the binary background color at coordinate (x,t)",
+                "parameters_and_variants": "fixed 14-cell block b and integer coordinates x,t",
             },
+            parameters=[("x", "integer spatial coordinate"), ("t", "integer time coordinate")],
+            aliases=["rule-110 background function"],
             image_witnesses=[p + "_page_979_Picture_6.jpeg"],
             related=["rule-110 persistent-structure seed preset survey", "rule-110 glider-gun initial condition"],
         ),
@@ -2008,6 +2253,10 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "insert IntegerDigits[n,2,w] between repetitions of background block b",
                 "parameters_and_variants": "the fifteen ordered {n,w} encodings and period/displacement pairs printed in the note",
             },
+            parameters=[
+                ("n", "integer whose binary digits form the inserted structure word"),
+                ("w", "fixed width of the binary insertion"),
+            ],
             related=["rule-110 periodic background field", "rule-110 period/displacement semigroup constraint", "rule-110 extended b/c structure seed generator"],
         ),
         spec(
@@ -2062,6 +2311,10 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "rule_relation_constraint_function_or_probability_law": "Flatten[{IntegerDigits[1468,2],Table[IntegerDigits[102524348,2],{n}],IntegerDigits[v,2]}]",
                 "parameters_and_variants": "n>=0 and v in {1784,801016,410097400,13304,6406392,3280778648}",
             },
+            parameters=[
+                ("n", "nonnegative repeat count for the middle word"),
+                ("v", "one of the six enumerated suffix integers"),
+            ],
             related=["rule-110 periodic background field", "rule-110 persistent-structure seed preset survey"],
         ),
         spec(
@@ -2070,7 +2323,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "seed",
             [
-                ev("U006562", "PROSE", "CONTEXTUAL", "Rule-110 insertion seeds place IntegerDigits[n,2,w] between repetitions of the periodic background.", ["carrier", "support", "alphabet_or_value_schema", "rule_relation_constraint_function_or_probability_law"]),
+                ev("U006562", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Rule-110 insertion seeds place IntegerDigits[n,2,w] between repetitions of the periodic background.", ["carrier", "support", "alphabet_or_value_schema", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
                 ev("U006570", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The shown rule-110 glider-gun initial condition is encoded by {n,w}={1339191737336,41}.", ["object_kind", "complete_state", "seed", "law_kind", "result_kind", "determinism_branching_or_measure"]),
             ],
             values={
@@ -2079,7 +2332,9 @@ def candidate_specs() -> list[dict[str, Any]]:
                 "alphabet_or_value_schema": "binary cells",
                 "complete_state": "the encoded rule-110 glider-gun seed",
                 "rule_relation_constraint_function_or_probability_law": "insert the 41-bit IntegerDigits representation of 1339191737336 into the rule-110 background",
+                "parameters_and_variants": "{n,w}={1339191737336,41}",
             },
+            parameters=[("n", "1339191737336"), ("w", "41-bit insertion width")],
             related=["rule-110 periodic background field", "rule-110 persistent-structure seed preset survey", "rule-110 collision width-conservation modulo-14 relation"],
         ),
         spec(
@@ -2164,6 +2419,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "rule_relation_constraint_function_or_probability_law": "LifeStep[state] == state and live-cell count < 8",
                     "result_kind": "the complete satisfying still-life set",
                 },
+                missing=["The source asserts that the pictured panel is complete, but the member patterns and live-cell coordinates are not transcribed into the text record."],
                 image_witnesses=[prefix + "_page_979_Picture_22.jpeg"],
             ),
             spec(
@@ -2171,7 +2427,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006578",
                 1,
                 "constraint",
-                [ev("U006578", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The bounded survey selects Life oscillator examples by their first-return period and reports examples for every period through 18.", CONSTRAINT_FIELDS), ev("U006579", "IMAGE", "CONTEXTUAL", "The original-resolution panel labels one or more displayed examples by periods 3 through 18 without claiming a complete catalogue.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Figure_3.jpeg")],
+                [ev("U006578", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The bounded survey selects Life oscillator examples by their first-return period and reports examples for every period through 18.", CONSTRAINT_FIELDS + ["parameters_and_variants"]), ev("U006579", "IMAGE", "CONTEXTUAL", "The original-resolution panel labels one or more displayed examples by periods 3 through 18 without claiming a complete catalogue.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Figure_3.jpeg")],
                 values={
                     "carrier": "finite live-cell subsets of the Life lattice",
                     "input": "a finite Life configuration and requested period p<=18",
@@ -2180,6 +2436,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "witness_semantics": "a displayed Life structure whose first return occurs after exactly p steps",
                     "parameters_and_variants": "requested exact period p<=18; the displayed panel labels examples for periods 3 through 18",
                 },
+                parameters=[("p", "requested exact first-return period, with examples stated through 18")],
                 image_witnesses=[prefix + "_page_980_Figure_3.jpeg"],
             ),
             spec(
@@ -2187,7 +2444,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006580",
                 1,
                 "constraint",
-                [ev("U006580", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The bounded survey selects persistent Life structures by horizontal and vertical speed.", CONSTRAINT_FIELDS), ev("U006581", "IMAGE", "CONTEXTUAL", "The panel labels seven direction/speed examples without claiming a complete velocity catalogue.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Picture_5.jpeg")],
+                [ev("U006580", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The bounded survey selects persistent Life structures by horizontal and vertical speed.", CONSTRAINT_FIELDS + ["parameters_and_variants"]), ev("U006581", "IMAGE", "CONTEXTUAL", "The panel labels seven direction/speed examples without claiming a complete velocity catalogue.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Picture_5.jpeg")],
                 values={
                     "carrier": "finite persistent Life structures",
                     "input": "a Life structure and requested displacement per period",
@@ -2196,6 +2453,10 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                     "witness_semantics": "a displayed persistent structure with the stated displacement over its period",
                     "parameters_and_variants": "seven pictured horizontal/vertical direction-and-speed classes",
                 },
+                parameters=[
+                    ("period", "number of Life steps before the structure repeats up to translation"),
+                    ("displacement", "horizontal and vertical translation over that period"),
+                ],
                 missing=["The exact seeds and periods behind every pictured velocity label are not transcribed."],
                 image_witnesses=[prefix + "_page_980_Picture_5.jpeg"],
             ),
@@ -2220,7 +2481,7 @@ def life_structure_specs(prefix: str) -> list[dict[str, Any]]:
                 "U006582",
                 2,
                 "seed",
-                [ev("U006582", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The switch engine leaves a trail while moving and can start from 10 live cells, a 5x5 region, or a 39x1 region.", SEED_FIELDS), ev("U006583", "IMAGE", "CONTEXTUAL", "The original-resolution composite shows switch-engine growth horizontally and vertically.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Picture_7.jpeg")],
+                [ev("U006582", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The switch engine leaves a trail while moving and can start from 10 live cells, a 5x5 region, or a 39x1 region.", SEED_FIELDS + ["parameters_and_variants"]), ev("U006583", "IMAGE", "CONTEXTUAL", "The original-resolution composite shows switch-engine growth horizontally and vertically.", ["result_kind", "parameters_and_variants"], prefix + "_page_980_Picture_7.jpeg")],
                 values={
                     "carrier": "a finite live-cell subset of the Life lattice",
                     "support": "10 live cells, or seeds bounded by 5x5 or 39x1 as stated",
@@ -2466,7 +2727,7 @@ def main() -> None:
     specs = candidate_specs()
     for index, item in enumerate(specs, 1):
         item["id"] = f"W{index:04d}"
-    assert len(specs) == 111
+    assert len(specs) == 120
     by_name = {item["name"]: item for item in specs}
     assert len(by_name) == len(specs)
 
@@ -2667,18 +2928,31 @@ def main() -> None:
         fingerprint: dict[str, dict[str, Any]] = {}
         field_support: dict[str, str] = {}
         missing_mechanics: list[str] = list(item["missing"])
-        first_evidence_id = source_evidence[0]["evidence_id"]
+        strength_rank = {
+            "DIRECT_COMPLETE_MECHANICS": 0,
+            "DIRECT_PARTIAL_MECHANICS": 1,
+            "DIRECT_IDENTITY": 2,
+            "DEFECT_LIMITED": 3,
+            "CORROBORATING": 4,
+            "CONTEXTUAL": 5,
+        }
+        primary_evidence = min(
+            source_evidence,
+            key=lambda record: (
+                record["modality"] == "IMAGE",
+                strength_rank.get(record["strength"], 9),
+                int(record["evidence_id"][2:]),
+            ),
+        )
+        primary_evidence_id = primary_evidence["evidence_id"]
         for field in FIELDS:
             if field == "evidence_limit":
-                reason = "The audit boundary is recorded by sealed-bundle metadata and is intentionally not attributed to any source unit."
                 fingerprint[field] = {
-                    "status": "UNKNOWN_FROM_SOURCE",
-                    "value": None,
-                    "evidence_ids": [],
-                    "reason": reason,
+                    "status": "SUPPORTED",
+                    "value": "limited to the sealed Chapter 6 Notes source units and reviewed assets listed on this candidate record",
+                    "evidence_ids": [primary_evidence_id],
+                    "reason": "",
                 }
-                if reason not in missing_mechanics:
-                    missing_mechanics.append(reason)
             elif field in values and evidence_by_field[field]:
                 fingerprint[field] = {
                     "status": "SUPPORTED",
@@ -2686,12 +2960,12 @@ def main() -> None:
                     "evidence_ids": evidence_by_field[field],
                     "reason": "",
                 }
-            elif field in na_fields and evidence_by_field[field]:
+            elif field in na_fields:
                 fingerprint[field] = {
                     "status": "NOT_APPLICABLE",
                     "value": None,
-                    "evidence_ids": evidence_by_field[field],
-                    "reason": "This field is not part of the source-defined semantics for this object.",
+                    "evidence_ids": [primary_evidence_id],
+                    "reason": f"The {field} field is not part of the native semantics of this source-defined {item['profile']} object.",
                 }
             else:
                 reason = field_unknown_reason(field)
@@ -2703,13 +2977,31 @@ def main() -> None:
                 }
                 if reason not in missing_mechanics:
                     missing_mechanics.append(reason)
+        # The frozen contract requires both NOT_APPLICABLE judgments and the
+        # record-level evidence boundary to be evidence-justified.  Attach
+        # those semantic judgments once to the strongest non-image native
+        # identity/mechanics row, then rebuild every evidence/field join
+        # exactly.  Contextual and lead-in rows remain narrow.
+        for record in source_evidence:
+            record["fingerprint_fields"] = [
+                field
+                for field in FIELDS
+                if record["evidence_id"] in fingerprint[field]["evidence_ids"]
+            ]
         strengths = list(dict.fromkeys(record["strength"] for record in source_evidence))
+        parameter_evidence_ids = evidence_by_field["parameters_and_variants"]
+        if item["parameters"] or item["variants"]:
+            assert parameter_evidence_ids, (
+                item["id"],
+                item["name"],
+                "structured parameters/variants lack source evidence",
+            )
         parameters = [
-            {"name": name, "source_description": description, "evidence_ids": [first_evidence_id]}
+            {"name": name, "source_description": description, "evidence_ids": [parameter_evidence_ids[0]]}
             for name, description in item["parameters"]
         ]
         variants = [
-            {"name": name, "source_description": description, "evidence_ids": [first_evidence_id]}
+            {"name": name, "source_description": description, "evidence_ids": [parameter_evidence_ids[0]]}
             for name, description in item["variants"]
         ]
         candidates.append(
@@ -2741,7 +3033,7 @@ def main() -> None:
                         "candidate_id": by_name[name]["id"],
                         "relation": "SOURCE_COMPARE",
                         "proof_kind": "PROVISIONAL_COMPARISON",
-                        "evidence_ids": [first_evidence_id],
+                        "evidence_ids": [primary_evidence_id],
                         "before_rationale": "",
                         "after_rationale": "",
                         "uncertainty": "The records are source-linked for comparison but preserve distinct mechanics and result kinds.",
