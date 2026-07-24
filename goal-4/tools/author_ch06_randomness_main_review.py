@@ -1207,6 +1207,405 @@ def candidate_definitions() -> list[dict[str, Any]]:
         mechanics_units=["U001537", "U001540"],
     )
 
+    by_name = {candidate["name"]: candidate for candidate in defs}
+
+    def candidate(name: str) -> dict[str, Any]:
+        return by_name[name]
+
+    def evidence(
+        name: str,
+        unit_id: str,
+        *,
+        fields: list[str],
+        claim: str,
+        strength: str = "DIRECT_PARTIAL_MECHANICS",
+        allow_direct_image: bool = False,
+    ) -> None:
+        candidate(name)["evidence_overrides"][unit_id] = {
+            "fields": fields,
+            "claim": claim,
+            "strength": strength,
+            "allow_direct_image": allow_direct_image,
+        }
+
+    def configure_family(
+        name: str,
+        *,
+        object_kind: str,
+        law: str,
+        parameters: str,
+        variants: list[str],
+        image_unit: str,
+        caption_unit: str,
+    ) -> None:
+        row = candidate(name)
+        row["values"].update(
+            {
+                "object_kind": object_kind,
+                "law_kind": "parametric family of deterministic local transition laws",
+                "rule_relation_constraint_function_or_probability_law": law,
+                "result_kind": "one successor configuration after a family member is selected",
+                "successor_cardinality": "one successor for each complete state and selected rule",
+                "determinism_branching_or_measure": "deterministic conditional on the selected rule parameter",
+                "parameters_and_variants": parameters,
+            }
+        )
+        row["mechanics_units"] = [caption_unit]
+        row["variants"] = variants
+        row["variant_units"] = {variant: [image_unit, caption_unit] for variant in variants}
+        evidence(
+            name,
+            image_unit,
+            fields=["parameters_and_variants"],
+            claim=f"Original-resolution survey image preserves the complete labeled inventory for {name}: {parameters}.",
+            strength="DIRECT_PARTIAL_MECHANICS",
+            allow_direct_image=True,
+        )
+
+    # Exact image-borne survey inventories and family semantics.
+    configure_family(
+        "symmetric quiescent-white binary nearest-neighbor cellular-automaton family",
+        object_kind="parameterized one-dimensional binary nearest-neighbor cellular-automaton family",
+        law=(
+            "choose one of the 32 symmetric nearest-neighbor binary rule tables that leave the all-white state unchanged"
+        ),
+        parameters=(
+            "rule code in {0,4,18,22,32,36,50,54,72,76,90,94,104,108,122,126,"
+            "128,132,146,150,160,164,178,182,200,204,218,222,232,236,250,254}"
+        ),
+        variants=[
+            f"rule {code}"
+            for code in (
+                0,
+                4,
+                18,
+                22,
+                32,
+                36,
+                50,
+                54,
+                72,
+                76,
+                90,
+                94,
+                104,
+                108,
+                122,
+                126,
+                128,
+                132,
+                146,
+                150,
+                160,
+                164,
+                178,
+                182,
+                200,
+                204,
+                218,
+                222,
+                232,
+                236,
+                250,
+                254,
+            )
+        ],
+        image_unit="U001272",
+        caption_unit="U001273",
+    )
+    configure_family(
+        "binary next-nearest-neighbor totalistic cellular-automaton family",
+        object_kind="parameterized binary next-nearest-neighbor totalistic cellular-automaton family",
+        law="choose a binary totalistic nearest-and-next-nearest-neighbor code from the displayed even-code survey",
+        parameters="even totalistic code from 0 through 62",
+        variants=[f"code {code}" for code in range(0, 63, 2)],
+        image_unit="U001274",
+        caption_unit="U001275",
+    )
+    configure_family(
+        "three-color nearest-neighbor totalistic cellular-automaton family",
+        object_kind="parameterized three-color nearest-neighbor totalistic cellular-automaton family",
+        law="choose a three-color nearest-neighbor totalistic rule from the displayed code sequence",
+        parameters="totalistic code from 1002 through 1095 in increments of 3",
+        variants=[f"code {code}" for code in range(1002, 1096, 3)],
+        image_unit="U001276",
+        caption_unit="U001277",
+    )
+    configure_family(
+        "four-color nearest-neighbor totalistic cellular-automaton sequence",
+        object_kind="parameterized four-color nearest-neighbor totalistic cellular-automaton survey",
+        law="choose a four-color nearest-neighbor totalistic rule from the displayed transition survey",
+        parameters="totalistic code from 1000816 through 1000940 in increments of 4",
+        variants=[f"code {code}" for code in range(1000816, 1000941, 4)],
+        image_unit="U001305",
+        caption_unit="U001306",
+    )
+
+    # General random-field variants: every unit supports only the carrier/domain it actually states.
+    random_name = "random cellular-automaton initial-field generator family"
+    candidate(random_name)["values"]["topology"] = "one-dimensional row or two-dimensional square grid selected by the target system"
+    candidate(random_name)["field_units"]["topology"] = ["U001227", "U001324", "U001331"]
+    evidence(
+        random_name,
+        "U001227",
+        fields=[
+            "object_kind",
+            "native_time",
+            "carrier",
+            "topology",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "input",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "termination_completion_failure",
+            "parameters_and_variants",
+            "evidence_limit",
+        ],
+        claim="U001227 defines the one-dimensional binary variant by choosing every cell black or white at random.",
+    )
+    evidence(
+        random_name,
+        "U001316",
+        fields=[
+            "carrier",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+        ],
+        claim="U001316 states a random continuous initial field whose cells take gray levels in [0,1].",
+    )
+    evidence(
+        random_name,
+        "U001324",
+        fields=["carrier", "topology", "complete_state", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
+        claim="U001324 identifies a two-dimensional cellular-automaton random-initial-field variant without specifying its measure.",
+        strength="DIRECT_IDENTITY",
+    )
+    evidence(
+        random_name,
+        "U001331",
+        fields=[
+            "carrier",
+            "topology",
+            "alphabet_or_value_schema",
+            "complete_state",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+        ],
+        claim="U001331 states that the displayed two-dimensional binary totalistic systems start from random initial fields.",
+    )
+    evidence(
+        random_name,
+        "U001333",
+        fields=["carrier", "complete_state", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
+        claim="U001333 corroborates the two-dimensional random-field variant in a 500-step rule survey.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        random_name,
+        "U001416",
+        fields=["rule_relation_constraint_function_or_probability_law", "parameters_and_variants"],
+        claim="U001416 states that rule 90 needs infinitely many randomly placed black cells to obtain a random pattern.",
+    )
+    evidence(
+        random_name,
+        "U001421",
+        fields=["parameters_and_variants"],
+        claim="U001421 supplies the low-black-density binary random-field variant.",
+        strength="CORROBORATING",
+    )
+
+    # Code-specific panel evidence: one row supports one displayed code, never the whole panel.
+    panel_name = "three-color class-4 totalistic cellular-automaton preset panel"
+    candidate(panel_name)["mechanics_units"] = ["U001285"]
+    code_claims = {
+        "U001286": ("1815", "CONTEXTUAL"),
+        "U001287": ("1815", "DIRECT_IDENTITY"),
+        "U001288": ("2007", "CONTEXTUAL"),
+        "U001289": ("2007", "DIRECT_IDENTITY"),
+        "U001290": ("1659", "DIRECT_IDENTITY"),
+        "U001291": ("2043", "CONTEXTUAL"),
+        "U001292": ("2043", "DIRECT_IDENTITY"),
+    }
+    for unit_id, (code, strength) in code_claims.items():
+        fields = ["parameters_and_variants"]
+        if strength == "DIRECT_IDENTITY":
+            fields.insert(0, "rule_relation_constraint_function_or_probability_law")
+        evidence(
+            panel_name,
+            unit_id,
+            fields=fields,
+            claim=(
+                f"{unit_id} is the {'labeled identity' if strength == 'DIRECT_IDENTITY' else 'finite evolution witness'} "
+                f"for displayed code {code}; it supports no other panel code."
+            ),
+            strength=strength,
+            allow_direct_image=strength == "DIRECT_IDENTITY",
+        )
+    candidate(panel_name)["variant_units"] = {
+        "code 1815": ["U001286", "U001287"],
+        "code 2007": ["U001288", "U001289"],
+        "code 1659 (transcribed from the owned image)": ["U001290"],
+        "code 2043": ["U001291", "U001292"],
+    }
+
+    # Borderline classifier panels retain their exact image-borne code identities.
+    classifier_name = "four-class cellular-automaton behavior classification"
+    classifier = candidate(classifier_name)
+    classifier["units"].extend(["U001294", "U001295", "U001296", "U001297"])
+    classifier["variants"] = [
+        "code 219: class 2 or 4",
+        "code 438: class 3 or 4",
+        "code 1380: class 2 or 3",
+        "code 1632: class 1, 2, or 3",
+    ]
+    classifier["variant_units"] = {
+        "code 219: class 2 or 4": ["U001294", "U001298"],
+        "code 438: class 3 or 4": ["U001295", "U001298"],
+        "code 1380: class 2 or 3": ["U001296", "U001298"],
+        "code 1632: class 1, 2, or 3": ["U001297", "U001298"],
+    }
+    for unit_id, code in zip(
+        ["U001294", "U001295", "U001296", "U001297"],
+        ["219", "438", "1380", "1632"],
+    ):
+        evidence(
+            classifier_name,
+            unit_id,
+            fields=["rule_relation_constraint_function_or_probability_law"],
+            claim=f"Original-resolution borderline-case panel identifies totalistic code {code}; the class ambiguity is transcribed by U001298.",
+            strength="CONTEXTUAL",
+        )
+
+    # Continuous native laws explicitly exclude the neighbor-difference display.
+    continuous_name = "fractional-average continuous cellular automaton"
+    continuous = candidate(continuous_name)
+    continuous["units"].append("U001323")
+    continuous["mechanics_units"] = ["U001316"]
+    continuous["values"]["excluded_observers_and_representations"] = (
+        "the neighbor-difference gray rendering in U001323 is derived display data, not the automaton's native gray-level state"
+    )
+    continuous["field_units"]["excluded_observers_and_representations"] = ["U001323"]
+    evidence(
+        continuous_name,
+        "U001323",
+        fields=["excluded_observers_and_representations"],
+        claim="U001323 explicitly distinguishes actual continuous-CA gray levels from the neighbor-difference values used for display.",
+        strength="CORROBORATING",
+    )
+    weighted_name = "neighbor-weighted fractional-average continuous cellular automaton"
+    weighted = candidate(weighted_name)
+    weighted["mechanics_units"] = ["U001323"]
+    weighted["values"]["rule_relation_constraint_function_or_probability_law"] = (
+        "multiply the two neighboring gray levels by 1.13 while leaving the central cell unweighted, average the three values, "
+        "add the stated 0.5 constant, and retain the fractional part"
+    )
+    weighted["values"]["excluded_observers_and_representations"] = (
+        "the neighbor-difference gray rendering is a post-evolution display and is not part of this native update law"
+    )
+    weighted["uncertainties"] = []
+    evidence(
+        weighted_name,
+        "U001321",
+        fields=[],
+        claim="A000956 is the displayed class-4 evolution witness; its differenced rendering does not independently establish the native weighted update.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        weighted_name,
+        "U001322",
+        fields=["parameters_and_variants"],
+        claim="U001322 supplies only the displayed parameter pair {0.5, 1.13}.",
+        strength="DIRECT_IDENTITY",
+    )
+
+    # New display observers use distinct spatial-depth and prior-time fog variants.
+    difference_name = "neighbor-difference gray-field display transformation"
+    candidate(difference_name)["uncertainties"] = [
+        "The source does not state which neighbor is selected, whether the difference is signed or absolute, or how it is remapped to display gray."
+    ]
+    evidence(
+        difference_name,
+        "U001321",
+        fields=[],
+        claim="A000956 is a finite output witness for the differenced-gray display; the transformation itself is stated in U001323.",
+        strength="CONTEXTUAL",
+    )
+    slice_name = "one-dimensional slice-through-time and temporal-fog observer"
+    slice_candidate = candidate(slice_name)
+    slice_candidate["mechanics_units"] = ["U001325"]
+    slice_candidate["values"]["rule_relation_constraint_function_or_probability_law"] = (
+        "extract one spatial line through successive two-dimensional states; as separate display variants, shade cells "
+        "spatially farther behind the slice or shade cells black at preceding times in progressively lighter gray"
+    )
+    slice_candidate["values"]["visible_history"] = (
+        "either spatial depth behind the selected slice or preceding time layers, kept distinct as source variants"
+    )
+    slice_candidate["variants"].extend(["spatial-depth fog", "prior-time trail fog"])
+    slice_candidate["variant_units"].update(
+        {
+            "spatial-depth fog": ["U001334", "U001335"],
+            "prior-time trail fog": ["U001341"],
+        }
+    )
+    evidence(
+        slice_name,
+        "U001326",
+        fields=["result_kind", "parameters_and_variants"],
+        claim="U001326 states that one-dimensional slice histories expose the same four behavioral classes.",
+        strength="CORROBORATING",
+    )
+    evidence(
+        slice_name,
+        "U001327",
+        fields=["parameters_and_variants"],
+        claim="U001327 identifies the class-4 repetitive-background slice comparison and routes its examples.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        slice_name,
+        "U001334",
+        fields=["result_kind", "parameters_and_variants"],
+        claim="A000959 is the original-resolution slice-history survey labeled with codes 4, 12, 24, 30, 38, and 52.",
+        strength="CONTEXTUAL",
+    )
+    evidence(
+        slice_name,
+        "U001335",
+        fields=[
+            "carrier",
+            "input",
+            "visible_history",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+        ],
+        claim="U001335 defines the spatial-depth fog variant: cells farther behind the slice are shown progressively lighter.",
+    )
+    evidence(
+        slice_name,
+        "U001341",
+        fields=[
+            "input",
+            "visible_history",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+        ],
+        claim="U001341 defines the distinct prior-time trail variant for Game of Life by fading cells black on preceding steps.",
+    )
+
     defs.sort(
         key=lambda candidate: (
             int(candidate["units"][0][1:]),
@@ -1317,9 +1716,21 @@ def build_output(bundle: Path) -> dict[str, Any]:
         candidate["id"] = f"W{index:04d}"
         candidate["units"] = sorted(set(candidate["units"]), key=ordinal.__getitem__)
         candidate["semantic_units"] = set(candidate["semantic_units"])
+        candidate["mechanics_units"] = set(candidate["mechanics_units"])
+        candidate["route_units"] = set(candidate["route_units"])
         check(candidate["units"][0] in candidate["semantic_units"], f"{candidate['id']} anchor lacks semantic evidence")
         check(all(unit in unit_by_id for unit in candidate["units"]), f"{candidate['id']} unknown unit")
         check(set(candidate["semantic_units"]) <= set(candidate["units"]), f"{candidate['id']} semantic unit outside units")
+        check(candidate["mechanics_units"] <= set(candidate["units"]), f"{candidate['id']} mechanics unit outside units")
+        check(candidate["route_units"] <= set(candidate["units"]), f"{candidate['id']} route unit outside units")
+        check(
+            all(set(units_for_field) <= set(candidate["units"]) for units_for_field in candidate["field_units"].values()),
+            f"{candidate['id']} field evidence unit outside units",
+        )
+        check(
+            set(candidate["evidence_overrides"]) <= set(candidate["units"]),
+            f"{candidate['id']} evidence override outside units",
+        )
     check(
         [ordinal[c["units"][0]] for c in candidates] == sorted(ordinal[c["units"][0]] for c in candidates),
         "candidate definitions are not in canonical discovery order",
@@ -1391,10 +1802,33 @@ def build_output(bundle: Path) -> dict[str, Any]:
         asset = asset_by_unit.get(unit_id)
         semantic = unit_id in candidate["semantic_units"]
         evidence_anchor_counts[unit_id] = evidence_anchor_counts.get(unit_id, 0) + 1
+        override = candidate["evidence_overrides"].get(unit_id, {})
+        fields = list(candidate["values"]) if unit_id in candidate["mechanics_units"] else []
+        for field, field_unit_ids in candidate["field_units"].items():
+            if field not in candidate["values"]:
+                continue
+            if field in fields and unit_id not in field_unit_ids:
+                fields.remove(field)
+            if unit_id in field_unit_ids and field not in fields:
+                fields.append(field)
+        for field in candidate["conflicting_fields"]:
+            if unit_id in candidate["semantic_units"] and field not in fields:
+                fields.append(field)
+        if "fields" in override:
+            fields = list(override["fields"])
+        check(set(fields) <= set(FIELDS), f"{candidate['id']} evidence uses unknown field")
+        check(
+            set(fields) <= (set(candidate["values"]) | set(candidate["conflicting_fields"])),
+            f"{candidate['id']} evidence supports an undeclared field",
+        )
         if candidate["source_status"] == "CONFLICTING":
             strength = "DEFECT_LIMITED"
-        elif semantic:
+        elif "strength" in override:
+            strength = override["strength"]
+        elif unit_id in candidate["mechanics_units"]:
             strength = candidate["strength"]
+        elif fields:
+            strength = "DIRECT_PARTIAL_MECHANICS"
         elif unit["block_kind"] == "image":
             strength = "CONTEXTUAL"
         else:
@@ -1402,6 +1836,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
         if (
             unit["block_kind"] == "image"
             and strength in {"DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
+            and not override.get("allow_direct_image", False)
             and any(
                 candidate_by_id[candidate_id]["role"] in {"OBSERVER", "EMULATION", "CONSTRAINT"}
                 for candidate_id in candidate_ids_by_unit[unit_id]
@@ -1417,15 +1852,28 @@ def build_output(bundle: Path) -> dict[str, Any]:
             else:
                 raw = data["source_bytes"][unit["byte_start"] : unit["byte_end"]]
                 modality = "FORMULA" if b"$" in raw else "PROSE"
-        fields = list(candidate["values"]) if semantic else []
-        for field in candidate["conflicting_fields"]:
-            if field not in fields:
-                fields.append(field)
-        if "evidence_limit" not in fields:
-            fields.append("evidence_limit")
-        claim_prefix = "Direct source evidence" if semantic else "Corroborating source context"
-        if unit["block_kind"] == "image":
-            claim_prefix = "Original-resolution image evidence"
+        if "claim" in override:
+            claim = override["claim"]
+        elif unit_id in candidate["mechanics_units"]:
+            claim = (
+                f"{unit_id} supplies the source-scoped mechanics attributed to {candidate['name']}; "
+                "no mechanics outside its listed fingerprint fields are inferred."
+            )
+        elif fields:
+            claim = (
+                f"{unit_id} directly supports the listed identity, parameter, structural, or witness fields for "
+                f"{candidate['name']}; no unlisted mechanics are inferred."
+            )
+        elif unit["block_kind"] == "image":
+            claim = (
+                f"Original-resolution image {asset['physical_path'] if asset else unit_id} is a finite or labeled "
+                f"witness for {candidate['name']}; it is not used to infer unlisted mechanics."
+            )
+        else:
+            claim = (
+                f"{unit_id} supplies contextual behavior or provenance for {candidate['name']}; "
+                "no fingerprint field is attributed to this row."
+            )
         evidence_by_candidate[candidate["id"]].append(
             {
                 "evidence_id": f"WE{evidence_number:06d}",
@@ -1440,14 +1888,16 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 "image_path": asset["physical_path"] if asset else None,
                 "strength": strength,
                 "modality": modality,
-                "claim": f"{claim_prefix} for {candidate['name']}: {candidate['values']['rule_relation_constraint_function_or_probability_law']}",
+                "claim": claim,
                 "fingerprint_fields": fields,
             }
         )
 
     candidate_records: list[dict[str, Any]] = []
+    candidate_id_by_name = {candidate["name"]: candidate["id"] for candidate in candidates}
     for candidate in candidates:
         evidence = sorted(evidence_by_candidate[candidate["id"]], key=lambda row: int(row["evidence_id"][2:]))
+        evidence_by_unit = {row["source_unit_id"]: row["evidence_id"] for row in evidence}
         evidence_for_field = {
             field: [row["evidence_id"] for row in evidence if field in row["fingerprint_fields"]]
             for field in FIELDS
@@ -1484,6 +1934,10 @@ def build_output(bundle: Path) -> dict[str, Any]:
                 if route_id not in route_ids:
                     route_ids.append(route_id)
         all_evidence_ids = [row["evidence_id"] for row in evidence]
+        supporting_evidence_ids = [
+            row["evidence_id"] for row in evidence if row["fingerprint_fields"]
+        ]
+        check(supporting_evidence_ids, f"{candidate['id']} has no field-supporting evidence")
         image_witnesses = [
             asset_by_unit[unit_id]["physical_path"]
             for unit_id in candidate["units"]
@@ -1513,7 +1967,7 @@ def build_output(bundle: Path) -> dict[str, Any]:
                     {
                         "name": name,
                         "source_description": f"Source parameter for {candidate['name']}.",
-                        "evidence_ids": all_evidence_ids,
+                        "evidence_ids": supporting_evidence_ids,
                     }
                     for name in candidate["parameters"]
                 ],
@@ -1521,13 +1975,31 @@ def build_output(bundle: Path) -> dict[str, Any]:
                     {
                         "name": name,
                         "source_description": f"Source-delimited variant of {candidate['name']}.",
-                        "evidence_ids": all_evidence_ids,
+                        "evidence_ids": [
+                            evidence_by_unit[unit_id]
+                            for unit_id in candidate["variant_units"].get(name, [])
+                        ]
+                        or supporting_evidence_ids,
                     }
                     for name in candidate["variants"]
                 ],
                 "missing_mechanics": missing,
                 "uncertainties": candidate["uncertainties"],
-                "related_candidate_ids": [],
+                "related_candidate_ids": [
+                    {
+                        "candidate_id": candidate_id_by_name[name],
+                        "relation": "SOURCE_COMPARE",
+                        "proof_kind": "PROVISIONAL_COMPARISON",
+                        "evidence_ids": supporting_evidence_ids,
+                        "before_rationale": "",
+                        "after_rationale": "",
+                        "uncertainty": (
+                            "The source states this semantic connection, but the blind review does not assert "
+                            "identity or equivalence beyond the cited mechanics."
+                        ),
+                    }
+                    for name in candidate["related_names"]
+                ],
                 "cross_reference_ids": route_ids,
                 "evidence_reassignments": [],
             }

@@ -108,6 +108,17 @@ PROFILES: dict[str, dict[str, str]] = {
         "determinism_branching_or_measure": "stochastic measure",
         "termination_completion_failure": "unbounded iteration unless an external observation horizon is chosen",
     },
+    "generator": {
+        "object_kind": "one-shot generator or static ensemble",
+        "native_time": "not applicable to one-shot generation",
+        "input": "generation parameters",
+        "law_kind": "deterministic or probabilistic generation law",
+        "result_kind": "a generated object or probability measure over generated objects",
+        "successor_cardinality": "not applicable",
+        "determinism_branching_or_measure": "fixed, parameterized, or probabilistic as stated",
+        "termination_completion_failure": "generation completes when an object or ensemble measure is produced",
+        "excluded_observers_and_representations": "statistics and rendered samples are not part of the generated object's native state",
+    },
     "seed": {
         "object_kind": "initial-condition generator or preset family",
         "native_time": "not applicable to seed generation",
@@ -155,6 +166,18 @@ PROFILES: dict[str, dict[str, str]] = {
 }
 
 PROFILE_NA: dict[str, set[str]] = {
+    "generator": {
+        "visible_history",
+        "control_state",
+        "seed",
+        "boundary",
+        "external_data",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "write_replacement_assembly_or_commit",
+        "witness_semantics",
+    },
     "seed": {
         "visible_history",
         "control_state",
@@ -249,6 +272,7 @@ def spec(
     status: str = "CLEAR",
     uncertainties: list[str] | None = None,
     image_witnesses: list[str] | None = None,
+    related: list[str] | None = None,
 ) -> dict[str, Any]:
     return {
         "name": name,
@@ -264,6 +288,7 @@ def spec(
         "status": status,
         "uncertainties": uncertainties or [],
         "image_witnesses": image_witnesses or [],
+        "related": related or [],
     }
 
 
