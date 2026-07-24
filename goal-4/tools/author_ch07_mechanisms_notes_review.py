@@ -294,7 +294,7 @@ CANDIDATES = [
     C(
         "discrete power-spectrum analyzer",
         "U006604",
-        ["U006604", "U006605"],
+        ["U006604", "U006605", "U006704"],
         template="declarative",
         carrier="a finite numerical data sequence and its discrete Fourier-frequency bins",
         state="N/A",
@@ -313,6 +313,13 @@ CANDIDATES = [
                 "spectral exponent alpha",
                 "The displayed output families are alpha=0, 1/2, 1, 3/2, and 2; alpha describes a spectrum and does not define a generating dynamics.",
                 ["U006604", "U006605"],
+            )
+        ],
+        variants=[
+            (
+                "one-dimensional random-walk spectrum",
+                "Applying Abs[Fourier[list]]^2 to a 1D random walk gives a spectrum proportional to 1/omega^2.",
+                ["U006704"],
             )
         ],
         images=[
@@ -530,6 +537,41 @@ CANDIDATES = [
             ("working precision", "The illustrated numerical results use 40 decimal digits.", ["U006628"]),
         ],
         images=[("A000681", "CONTEXTUAL", "The surface plots show z(t) versus t and z(0), exposing sensitive dependence.")],
+    ),
+    C(
+        "successive-new-moon interval observer",
+        "U006630",
+        ["U006630", "U006631"],
+        template="declarative",
+        carrier="a chronologically ordered sequence of new-moon event times",
+        state="N/A",
+        law="subtract each new-moon event time from the next and express the successive intervals as numbers of days",
+        support="an ordered lunar-event time series",
+        topology="chronological sequence order",
+        alphabet="event times and real-valued day intervals",
+        input_value="successive new-moon event times",
+        boundary="the complete supplied event-time sequence",
+        external="none beyond the supplied astronomical event times",
+        result="the sequence of day counts between successive new moons",
+        determinism="deterministic for fixed event times and a fixed day/time convention",
+        witness="the plotted sequence of successive lunar intervals",
+        params=[
+            (
+                "time unit",
+                "The output intervals are expressed as numbers of days.",
+                ["U006630", "U006631"],
+            )
+        ],
+        images=[
+            (
+                "A000679",
+                "DIRECT_PARTIAL_MECHANICS",
+                "The original-resolution plot witnesses roughly 29.3-29.8 day intervals over successive lunar events.",
+            )
+        ],
+        uncertainties=[
+            "The astronomical event-time source, day convention, rounding, and exact plotted sample range are not specified."
+        ],
     ),
     C(
         "perfect riffle-shuffle permutation",
@@ -954,6 +996,48 @@ CANDIDATES = [
         ],
     ),
     C(
+        "random-walk displacement probability law",
+        "U006701",
+        ["U006701", "U006702", "U006703"],
+        template="stochastic_declarative",
+        carrier="the displacement r of a random walker after t steps",
+        state="N/A",
+        law="assign displacement density (d/(2 pi sigma t))^(d/2) Exp[-d r^2/(2 sigma t)] and root-mean-square displacement proportional to sqrt(t)",
+        support="d-dimensional displacement space",
+        topology="Euclidean distance from the walk's starting position",
+        alphabet="real displacement coordinates or radius and nonnegative density values",
+        input_value="step count t, dimension d, variance parameter sigma, and a bounded-variance microscopic step law",
+        boundary="exactly t steps from the starting position",
+        external="the microscopic random-step law whose endpoint distribution is modeled",
+        result="a Gaussian displacement probability density and its sqrt(t) root-mean-square scaling",
+        determinism="a probability measure fixed by t, d, sigma, and the step law",
+        witness="the displayed density formula and root-mean-square displacement scaling",
+        params=[
+            (
+                "step count t",
+                "Sets the distribution width and sqrt(t) root-mean-square displacement.",
+                ["U006701", "U006702"],
+            ),
+            (
+                "dimension d",
+                "Appears in both the normalization and exponential.",
+                ["U006701", "U006702"],
+            ),
+            (
+                "variance parameter sigma",
+                "The displayed formula sets sigma=1; other bounded-variance microscopic laws change its value.",
+                ["U006702", "U006703"],
+            ),
+        ],
+        variants=[
+            (
+                "other bounded-variance microscopic step laws",
+                "They yield the same Gaussian form with a different sigma.",
+                ["U006703"],
+            )
+        ],
+    ),
+    C(
         "random-walk extreme-position distribution analyzer",
         "U006713",
         ["U006713", "U006714"],
@@ -1353,7 +1437,7 @@ CANDIDATES = [
     C(
         "tensor and multipole isotropy analyzer",
         "U006744",
-        ["U006744", "U006745", "U006746", "U006747", "U006748", "U006749"],
+        ["U006710", "U006711", "U006744", "U006745", "U006746", "U006747", "U006748", "U006749"],
         template="declarative",
         carrier="a finite point set whose directional symmetry is to be tested",
         state="N/A",
@@ -1385,6 +1469,11 @@ CANDIDATES = [
             ),
         ],
         variants=[
+            (
+                "random-walk direction second-moment tensor",
+                "Sum Outer[Times,e[[s]],e[[s]]] over the walk's direction vectors to obtain the tensor on which average isotropy depends.",
+                ["U006710", "U006711"],
+            ),
             (
                 "point-set tensor transform",
                 "Sum the rank-n outer product of every position vector.",
@@ -2565,11 +2654,7 @@ HISTORICAL = {
 
 REPRESENTATION = {
     "U006621",
-    "U006630",
     "U006679",
-    "U006704",
-    "U006710",
-    "U006711",
     "U006712",
     "U006782",
     "U006783",
@@ -2803,7 +2888,7 @@ def main() -> int:
     asset_by_id = {row["asset_id"]: row for row in asset_rows}
     assert len(reading_rows) == 278
     assert len(asset_rows) == 102
-    assert len(CANDIDATES) == 79
+    assert len(CANDIDATES) == 81
 
     # Candidate IDs follow first canonical source occurrence, with list order
     # breaking the intentional same-unit ties.
@@ -2814,11 +2899,23 @@ def main() -> int:
     for index, (_, spec) in enumerate(indexed_specs, 1):
         value = dict(spec)
         value["id"] = f"W{index:04d}"
-        value["group_id"] = f"WG{index:06d}"
         candidate_anchor_counts[value["anchor"]] += 1
         value["anchor_ordinal"] = candidate_anchor_counts[value["anchor"]]
         value["field_defs"] = field_template(value)
         candidate_specs.append(value)
+
+    # Evidence groups follow first evidence occurrence, which can precede a
+    # candidate's identity anchor when an earlier observer/formula is linked
+    # during the completed sequential review.
+    group_specs = list(enumerate(candidate_specs))
+    group_specs.sort(
+        key=lambda pair: (
+            min(unit_order[source] for source in pair[1]["sources"]),
+            pair[0],
+        )
+    )
+    for group_index, (_candidate_index, spec) in enumerate(group_specs, 1):
+        spec["group_id"] = f"WG{group_index:06d}"
 
     # Allocate one evidence group per candidate and WE identifiers in exact
     # source encounter order.  Referenced images occur at their source unit.
@@ -3295,9 +3392,9 @@ def main() -> int:
 
     assert len(output["reading_updates"]) == 278
     assert len(output["asset_updates"]) == 102
-    assert len(output["candidate_proposals"]) == 79
+    assert len(output["candidate_proposals"]) == 81
     assert len({e["evidence_id"] for c in candidate_proposals for e in c["source_evidence"]}) == len(evidence_refs)
-    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 79
+    assert len({e["evidence_group_id"] for c in candidate_proposals for e in c["source_evidence"]}) == 81
     assert all(
         c["fingerprint"]["evidence_limit"]["evidence_ids"]
         == [c["source_evidence"][0]["evidence_id"]]
@@ -3314,7 +3411,7 @@ def main() -> int:
                     "assets": len(asset_updates),
                     "candidates": len(candidate_proposals),
                     "evidence": len(evidence_refs),
-                    "groups": 79,
+                    "groups": 81,
                     "routes": len(route_proposals),
                     "bytes": len(payload.encode("utf-8")),
                 },
@@ -3326,8 +3423,8 @@ def main() -> int:
     temporary.write_text(payload, encoding="utf-8")
     os.replace(temporary, output_path)
     print(
-        f"authored {output_path}: readings=278 assets=102 candidates=79 "
-        f"evidence={len(evidence_refs)} groups=79 routes={len(route_proposals)}"
+        f"authored {output_path}: readings=278 assets=102 candidates=81 "
+        f"evidence={len(evidence_refs)} groups=81 routes={len(route_proposals)}"
     )
     return 0
 
