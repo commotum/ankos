@@ -2089,7 +2089,7 @@ def canonical_spec_digest() -> str:
 ROUTE_SPEC_DIGEST = route_spec_digest()
 CANONICAL_SPEC_DIGEST = canonical_spec_digest()
 EXPECTED_CANONICAL_SPEC_DIGEST = (
-    "b1920fc62d8a7256e01a1990ad47120a4aa216be066eaea7a4c8ea6917615930"
+    "fe5d6d54cb3b52f71081a812191d46b4bb7bd0b24e517c5be91ac970a7ccd52b"
 )
 
 
@@ -2178,17 +2178,52 @@ def assert_frozen_spec() -> str:
                 f"route kind drifted: {spec['route_id']}"
             )
         if spec["closure_scope"] == WITHIN:
-            if spec["status"] != "RESOLVED":
+            if spec["status"] == "RESOLVED":
+                if (
+                    not spec["target_unit_ids"]
+                    and not spec["target_asset_ids"]
+                ):
+                    raise AssertionError(
+                        f"resolved route has no target: {spec['route_id']}"
+                    )
+                if spec["defect_boundary"]:
+                    raise AssertionError(
+                        f"resolved route claims a defect: {spec['route_id']}"
+                    )
+            elif spec["status"] == "PENDING":
+                if (
+                    spec["route_id"] != "R000395"
+                    or spec["target_unit_ids"]
+                    or spec["target_asset_ids"]
+                    or spec["defect_boundary"]
+                ):
+                    raise AssertionError(
+                        "unexpected within-stage pending obligation: "
+                        f"{spec['route_id']}"
+                    )
+            else:
                 raise AssertionError(
-                    f"within-stage route is not resolved: {spec['route_id']}"
+                    f"within-stage route status drifted: {spec['route_id']}"
                 )
-            if not spec["target_unit_ids"] and not spec["target_asset_ids"]:
-                raise AssertionError(
-                    f"resolved route has no target: {spec['route_id']}"
-                )
-        elif spec["status"] != "PENDING":
+        elif (
+            spec["status"] != "PENDING"
+            or spec["target_unit_ids"]
+            or spec["target_asset_ids"]
+            or spec["defect_boundary"]
+        ):
             raise AssertionError(
-                f"cross-range route is not pending: {spec['route_id']}"
+                f"cross-range route carries final data: {spec['route_id']}"
+            )
+        if (
+            sum(
+                route["closure_scope"] == WITHIN
+                and route["status"] == "PENDING"
+                for route in ROUTE_SPECS
+            )
+            != 1
+        ):
+            raise AssertionError(
+                "within-stage pending route count drifted"
             )
         if len(spec["candidate_ids"]) != len(set(spec["candidate_ids"])):
             raise AssertionError(

@@ -2922,11 +2922,11 @@ EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
 EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
 EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 416
 EXPECTED_INITIAL_STAGE_ROUTE_COUNT = 62
-EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 214
-EXPECTED_NEW_ROUTE_COUNT = 151
+EXPECTED_ENRICHED_STAGE_ROUTE_COUNT = 217
+EXPECTED_NEW_ROUTE_COUNT = 154
 EXPECTED_READING_UPDATE_COUNT = 163
 EXPECTED_NEW_CANDIDATE_COUNT = 89
-EXPECTED_NEW_EVIDENCE_COUNT = 211
+EXPECTED_NEW_EVIDENCE_COUNT = 438
 EXPECTED_RESULT_PAIR_COUNT = 1553
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 524
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -2961,13 +2961,13 @@ EXPECTED_NORMALIZED_RESULT_DIGEST = (
     "14af3dc4c5d59f050f1dd1c05fd691d7307f6d58a78ce592b0de40e1eb5e952f"
 )
 EXPECTED_ROUTE_SPEC_DIGEST = (
-    "e4be3e76099a8d7db759733a5b4290bcf69cf9bb994616a3ec9d73d4f6811b1a"
+    "e86c989f316fea24114fcff4f0755aa05d6a0bf7b86fe3d9a0137b381fe9700d"
 )
 EXPECTED_ROUTE_AUDIT_DIGEST = (
-    "b1920fc62d8a7256e01a1990ad47120a4aa216be066eaea7a4c8ea6917615930"
+    "fe5d6d54cb3b52f71081a812191d46b4bb7bd0b24e517c5be91ac970a7ccd52b"
 )
 EXPECTED_TRIAGE_DIGEST = (
-    "7f97d3ea4bbfc0d75826ea947c58b53db98ccd4275fd00297d4f127bca5632bd"
+    "cdaa2fddd9c556bec48b03f1e79dd0696e0a1e32499f26cfce35994c2a32d88d"
 )
 EXPECTED_ACTIVE_SEMANTIC_DIGESTS = {
     "S013": (
@@ -2979,7 +2979,7 @@ EXPECTED_CANDIDATE_COVERAGE_DIGEST = (
     "d5d40f1751d6088d57bafdb2776e78bb5717e13ab4303f3cc663af03e1290f21"
 )
 EXPECTED_ROUTE_COVERAGE_DIGEST = (
-    "3d9a0851254f1c27e19b2bea0ea2359cf3675c507836489c68cb6f4b9186c4bb"
+    "9411d0fd928b4455877977964bfa582344be3c150c6b0af53293f83d0988c5fd"
 )
 EXPECTED_OMISSION_CHALLENGE_COUNT = 78
 EXPECTED_OMISSION_CHALLENGE_DIGEST = (
@@ -4374,6 +4374,7 @@ def _enrich_existing_candidate(
 
 def _build_final_enrichment(
     *,
+    route_specs: list[dict[str, Any]],
     reading_by_id: dict[str, dict[str, str]],
     asset_by_unit: dict[str, dict[str, str]],
     candidates_by_id: dict[str, dict[str, Any]],
@@ -4555,11 +4556,78 @@ def _build_final_enrichment(
                     "hit_id": hit_by_pair[(ordinal, unit_id)],
                 }
             )
+
+    candidate_units: dict[str, set[str]] = {
+        candidate_id: set(candidate["source_unit_ids"])
+        for candidate_id, candidate in candidates_by_id.items()
+    }
+    candidate_units.update(
+        {
+            spec["_candidate_id"]: set(spec["units"])
+            for spec in annotated
+        }
+    )
+    for relink in RELINK_SPECS:
+        candidate_units[relink["candidate_id"]].update(relink["units"])
+
+    planned_route_contexts: set[tuple[str, str]] = set()
+    for route_index, route_spec in enumerate(route_specs):
+        source_unit_id = route_spec["source_unit_id"]
+        if source_unit_id not in reading_by_id:
+            raise AuthoringError(
+                f"route context reaches unknown unit {source_unit_id}"
+            )
+        route_candidate_ids = [
+            *route_spec["candidate_ids"],
+            *[
+                recovered_candidate_ids_by_name[name]
+                for name in route_spec["recovered_candidate_names"]
+            ],
+        ]
+        for candidate_id in route_candidate_ids:
+            if candidate_id not in candidate_units:
+                raise AuthoringError(
+                    f"route context reaches unknown candidate {candidate_id}"
+                )
+            context_key = (source_unit_id, candidate_id)
+            if (
+                source_unit_id in candidate_units[candidate_id]
+                or context_key in planned_route_contexts
+            ):
+                continue
+            try:
+                rank = hit_number[(15, source_unit_id)]
+                hit_id = hit_by_pair[(15, source_unit_id)]
+            except KeyError as exc:
+                raise AuthoringError(
+                    f"route context {source_unit_id} lacks its F15 hit"
+                ) from exc
+            evidence_plans.append(
+                {
+                    "plan_kind": "ROUTE_CONTEXT",
+                    "candidate_id": candidate_id,
+                    "unit_id": source_unit_id,
+                    "fields": [],
+                    "source_index": route_index,
+                    "rank": rank,
+                    "query_ordinal": 15,
+                    "hit_id": hit_id,
+                }
+            )
+            planned_route_contexts.add(context_key)
+            candidate_units[candidate_id].add(source_unit_id)
+
+    plan_kind_order = {
+        "NEW_CANDIDATE": 0,
+        "EXISTING_RELINK": 1,
+        "ROUTE_CONTEXT": 2,
+    }
     evidence_plans.sort(
         key=lambda plan: (
             plan["rank"],
             int(plan["candidate_id"][1:]),
             plan["source_index"],
+            plan_kind_order[plan["plan_kind"]],
         )
     )
     evidence_anchor_counts: dict[str, int] = {}
@@ -4567,10 +4635,7 @@ def _build_final_enrichment(
         spec["_candidate_id"]: [] for spec in annotated
     }
     evidence_by_candidate.update(
-        {
-            relink["candidate_id"]: []
-            for relink in RELINK_SPECS
-        }
+        {plan["candidate_id"]: [] for plan in evidence_plans}
     )
     block_modality = {
         "fenced_code": "CODE",
@@ -4588,7 +4653,9 @@ def _build_final_enrichment(
             evidence_anchor_counts.get(hit_id, 0) + 1
         )
         source_status = row["source_status"]
-        if source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"}:
+        if plan["plan_kind"] == "ROUTE_CONTEXT":
+            strength = "CONTEXTUAL"
+        elif source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"}:
             strength = "DEFECT_LIMITED"
         elif row["block_kind"] == "image":
             strength = "CORROBORATING"
@@ -4607,7 +4674,13 @@ def _build_final_enrichment(
                     f"image evidence {plan['unit_id']} lacks an asset row"
                 )
             image_path = asset["physical_path"]
-            if plan["plan_kind"] == "NEW_CANDIDATE":
+            if plan["plan_kind"] == "ROUTE_CONTEXT":
+                claim = (
+                    "The literal F15 locator contextually ties this source "
+                    "unit to the route-linked candidate; original-resolution "
+                    "pixels supply no additional native mechanics."
+                )
+            elif plan["plan_kind"] == "NEW_CANDIDATE":
                 claim = (
                     f"Original-resolution inspection corroborates the stated "
                     f"result/history representation for {spec['name']}; "
@@ -4621,23 +4694,29 @@ def _build_final_enrichment(
         elif plan["plan_kind"] == "EXISTING_RELINK":
             image_path = None
             claim = plan["claim"]
+        elif plan["plan_kind"] == "ROUTE_CONTEXT":
+            image_path = None
+            claim = (
+                "The literal F15 locator contextually ties this source unit "
+                "to the route-linked candidate; it supplies no additional "
+                "native mechanics."
+            )
         elif row["block_kind"] in {"fenced_code", "list", "table"}:
             image_path = None
             claim = (
-                f"The exact formula, code, or table supplies the scoped law "
-                f"and result evidence for {spec['name']}."
+                f"The formula, code, or table supplies the listed scoped "
+                f"evidence for {spec['name']}."
             )
         elif plan["source_index"] == 0:
             image_path = None
             claim = (
-                f"The source unit identifies {spec['name']} and delimits only "
-                f"the scoped carrier, input, law class, and evidence boundary."
+                f"The source unit identifies or contextually delimits the "
+                f"listed fingerprint fields for {spec['name']}."
             )
         else:
             image_path = None
             claim = (
-                f"The source unit supplies scoped corroborating result, "
-                f"parameter, witness, or evidence-limit context for "
+                f"The source unit supplies the listed scoped evidence for "
                 f"{spec['name']}."
             )
         fields = (
@@ -4666,7 +4745,15 @@ def _build_final_enrichment(
             evidence_by_candidate[candidate_id],
             key=lambda item: int(item["evidence_id"][1:]),
         )
-        evidence_ids = [item["evidence_id"] for item in evidence]
+        relation_evidence_ids = [
+            item["evidence_id"]
+            for item in evidence
+            if item["strength"] in DIRECT_STRENGTHS
+        ][:1]
+        if not relation_evidence_ids:
+            raise AuthoringError(
+                f"{candidate_id} lacks direct relation evidence"
+            )
         relations = [
             {
                 "candidate_id": related_id,
@@ -4674,7 +4761,7 @@ def _build_final_enrichment(
                 "proof_kind": "PROVISIONAL_COMPARISON",
                 "before_rationale": "",
                 "after_rationale": "",
-                "evidence_ids": evidence_ids[:1],
+                "evidence_ids": relation_evidence_ids,
                 "uncertainty": (
                     "The source makes these objects related in role or output "
                     "without establishing native-law identity."
@@ -4682,10 +4769,14 @@ def _build_final_enrichment(
             }
             for related_id in spec["_resolved_related"]
         ]
+        source_unit_ids = list(spec["units"])
+        for item in evidence:
+            if item["source_unit_id"] not in source_unit_ids:
+                source_unit_ids.append(item["source_unit_id"])
         source_status = list(
             dict.fromkeys(
                 reading_by_id[unit_id]["source_status"]
-                for unit_id in spec["units"]
+                for unit_id in source_unit_ids
             )
         )
         parameter_evidence_ids = [
@@ -4709,7 +4800,7 @@ def _build_final_enrichment(
                 aliases=spec["aliases"],
                 discovery_hit_id=spec["_discovery_hit"],
                 discovery_ordinal=spec["_discovery_ordinal"],
-                source_unit_ids=spec["units"],
+                source_unit_ids=source_unit_ids,
                 evidence=evidence,
                 supported_values=spec["_supported_values"],
                 not_applicable_fields=spec["_not_applicable_fields"],
@@ -4727,15 +4818,22 @@ def _build_final_enrichment(
                 image_witnesses=image_witnesses,
             )
         )
-    for relink in RELINK_SPECS:
-        candidate_id = relink["candidate_id"]
-        relink_evidence = evidence_by_candidate[candidate_id]
-        if not relink_evidence:
-            raise AuthoringError(f"{candidate_id} has no relink evidence")
+    new_candidate_ids = {
+        spec["_candidate_id"] for spec in annotated
+    }
+    for candidate_id in sorted(
+        set(evidence_by_candidate) - new_candidate_ids,
+        key=lambda value: int(value[1:]),
+    ):
+        appended_evidence = evidence_by_candidate[candidate_id]
+        if not appended_evidence:
+            raise AuthoringError(
+                f"{candidate_id} has no enrichment evidence"
+            )
         candidates.append(
             _enrich_existing_candidate(
                 old=candidates_by_id[candidate_id],
-                evidence=relink_evidence,
+                evidence=appended_evidence,
                 reading_by_id=reading_by_id,
             )
         )
@@ -5004,93 +5102,6 @@ def _materialize_route_delta(
             key=lambda value: int(value[1:]),
         )
 
-    evidence_anchor_counts: dict[str, int] = {}
-    for candidate in update_by_id.values():
-        for evidence in candidate["source_evidence"]:
-            anchor = evidence["discovery_anchor"]
-            if anchor["kind"] == "SEARCH_HIT":
-                evidence_anchor_counts[anchor["id"]] = max(
-                    evidence_anchor_counts.get(anchor["id"], 0),
-                    int(anchor["ordinal"]),
-                )
-    route_evidence_plans: list[tuple[str, str]] = []
-    for unit_id in route_ids_by_source:
-        for candidate_id in route_candidates_by_source[unit_id]:
-            candidate = update_by_id.get(candidate_id)
-            if candidate is None:
-                candidate = candidates_by_id.get(candidate_id)
-            if candidate is None:
-                raise AuthoringError(
-                    f"route provenance reaches unknown {candidate_id}"
-                )
-            if unit_id not in candidate["source_unit_ids"]:
-                route_evidence_plans.append((unit_id, candidate_id))
-
-    next_evidence_number = 4049 + len(new_evidence_group_ids)
-    modality_by_block = {
-        "fenced_code": "CODE",
-        "list": "FORMULA",
-        "table": "TABLE",
-        "paragraph": "PROSE",
-        "heading": "PROSE",
-        "image": "IMAGE",
-    }
-    appended_route_group_ids: list[str] = []
-    for offset, (unit_id, candidate_id) in enumerate(route_evidence_plans):
-        candidate = update_by_id.get(candidate_id)
-        if candidate is None:
-            candidate = candidates_by_id.get(candidate_id)
-        if candidate is None:
-            raise AuthoringError(
-                f"route evidence reaches unknown {candidate_id}"
-            )
-        candidate = deepcopy(candidate)
-        hit_id = _hit_for(hit_by_pair, 15, unit_id)
-        evidence_anchor_counts[hit_id] = (
-            evidence_anchor_counts.get(hit_id, 0) + 1
-        )
-        row = reading_by_id[unit_id]
-        modality = modality_by_block.get(row["block_kind"])
-        if modality is None:
-            raise AuthoringError(
-                f"unsupported route-evidence block {row['block_kind']}"
-            )
-        evidence_number = next_evidence_number + offset
-        evidence = _evidence(
-            evidence_number=evidence_number,
-            hit_id=hit_id,
-            hit_ordinal=evidence_anchor_counts[hit_id],
-            unit_id=unit_id,
-            strength="CONTEXTUAL",
-            modality=modality,
-            claim=(
-                "The literal F15 locator ties this already delimited "
-                "candidate to the appended typed route; it supplies no "
-                "additional native mechanics."
-            ),
-            fields=[],
-        )
-        candidate["source_unit_ids"] = [
-            *candidate["source_unit_ids"],
-            unit_id,
-        ]
-        candidate["source_evidence"] = [
-            *candidate["source_evidence"],
-            evidence,
-        ]
-        candidate["source_status"] = _append_novel(
-            candidate["source_status"],
-            [row["source_status"]],
-        )
-        candidate["evidence_strength"] = _append_novel(
-            candidate["evidence_strength"],
-            ["CONTEXTUAL"],
-        )
-        update_by_id[candidate_id] = {
-            field: candidate[field] for field in CANDIDATE_FIELDS
-        }
-        appended_route_group_ids.append(f"G{evidence_number:06d}")
-
     for candidate_id, additions in candidate_route_additions.items():
         if candidate_id in update_by_id:
             candidate = update_by_id[candidate_id]
@@ -5194,7 +5205,7 @@ def _materialize_route_delta(
         ordered_candidate_updates,
         route_rows,
         route_candidates_by_source,
-        [*new_evidence_group_ids, *appended_route_group_ids],
+        new_evidence_group_ids,
     )
 
 
@@ -5292,14 +5303,14 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         "f15_hit_units": 144,
         "new_routes": EXPECTED_NEW_ROUTE_COUNT,
         "new_route_source_units": 117,
-        "within_stage_routes": 86,
+        "within_stage_routes": 89,
         "cross_range_routes": 65,
         "stage_existing_routes": 46,
         "f15_existing_route_uses": 45,
         "f15_existing_route_source_units": 37,
         "non_bearing_locators": 17,
         "non_bearing_source_units": 6,
-        "locator_dispositions": 213,
+        "locator_dispositions": 216,
     }:
         raise AuthoringError("frozen F15 route inventory counts drifted")
 
@@ -5690,17 +5701,6 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         for offset, (ordinal, unit_id) in enumerate(normalized_pairs)
     }
     if first_pass:
-        (
-            reading_updates,
-            asset_updates,
-            candidate_updates,
-            new_evidence_group_ids,
-        ) = _build_final_enrichment(
-            reading_by_id=reading_by_id,
-            asset_by_unit=asset_by_unit,
-            candidates_by_id=candidates_by_id,
-            hit_by_pair=hit_by_pair,
-        )
         route_specs = [
             deepcopy(spec)
             for spec in ch05_dimensions_search_route_specs.ROUTE_SPECS
@@ -5710,6 +5710,18 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
                 "frozen F15 route-spec count drifted: "
                 f"{len(route_specs)}"
             )
+        (
+            reading_updates,
+            asset_updates,
+            candidate_updates,
+            new_evidence_group_ids,
+        ) = _build_final_enrichment(
+            route_specs=route_specs,
+            reading_by_id=reading_by_id,
+            asset_by_unit=asset_by_unit,
+            candidates_by_id=candidates_by_id,
+            hit_by_pair=hit_by_pair,
+        )
         (
             reading_updates,
             candidate_updates,
