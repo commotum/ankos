@@ -1774,6 +1774,154 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         for a in asset_updates
     )
 
+    # Freeze the hostile semantic dispositions that motivated the e3 rewrite.
+    by_name = {p["provisional_name"]: p for p in proposals}
+    assert len(proposals) == 128
+    assert len(all_evidence) == 265
+    assert len(route_proposals) == 22
+    assert proposals.index(by_name["two-dimensional totalistic cellular-automaton family"]) < proposals.index(
+        by_name["two-dimensional outer-totalistic cellular-automaton family"]
+    )
+    assert proposals.index(by_name["one-dimensional allowed-block constraint system"]) < proposals.index(
+        by_name["binary de Bruijn allowed-block path/cycle decision"]
+    )
+    assert by_name["Ulam history-dependent two-dimensional growth system"]["fingerprint"]["object_kind"]["value"] == (
+        "history-dependent lattice-growth construction"
+    )
+    assert by_name["Ulam history-dependent two-dimensional growth system"]["fingerprint"]["complete_state"]["value"].startswith(
+        "a pair {a,b}"
+    )
+    assert by_name["Ulam component-filter ablation family"]["fingerprint"][
+        "rule_relation_constraint_function_or_probability_law"
+    ]["status"] == CONFLICT
+    assert {
+        f"Ulam history-growth ablation {label}"
+        for label in ["r[]", "q[]", "p[]", "p[q[]]", "p[q[r[]]]"]
+    } <= set(by_name)
+    assert by_name["undirected network rewriting system"]["fingerprint"][
+        "rule_relation_constraint_function_or_probability_law"
+    ]["status"] == UNK
+    assert by_name["undirected network rewriting system"]["cross_reference_ids"] == [
+        route_ids_by_target["Chapter 9"]
+    ]
+    assert "finite de Bruijn graph" in by_name[
+        "binary de Bruijn allowed-block path/cycle decision"
+    ]["fingerprint"]["object_kind"]["value"]
+    assert by_name["square-spiral backtracking constraint solver"]["evidence_strength"] == [
+        "DIRECT_PARTIAL_MECHANICS"
+    ]
+    assert {
+        "one-dimensional cellular-automaton fixed-point allowed-block relation",
+        "two-dimensional cellular-automaton fixed-point allowed-template relation",
+        "generic two-dimensional block substitution system",
+        "page-187 Sierpiński block-substitution preset",
+        "L-shaped geometric substitution system",
+        "square-and-golden-rectangle geometric substitution",
+        "sequential directed network-system family",
+        "final sequential-network six-case preset",
+    } <= set(by_name)
+    assert {"vants", "turmites", "turning machines"} <= set(
+        by_name["two-dimensional Turing machine"]["aliases"]
+    )
+    assert {
+        "semi-Thue systems",
+        "string rewrite systems",
+        "term rewrite systems",
+        "production systems",
+        "associative calculi",
+    } <= set(by_name["string multiway system"]["aliases"])
+    assert any(
+        v["name"] == "canonical pattern-variable system"
+        for v in by_name["string multiway system"]["variants"]
+    )
+    assert {"finite complement language", "subshift of finite type"} <= set(
+        by_name["one-dimensional allowed-block constraint system"]["aliases"]
+    )
+    for name, exact_law in {
+        "linear vector relation u == m.v": "u == m . v",
+        "quadratic vector relation u == m1.v + m2.v^2": "u == m1 . v + m2 . v^2",
+        "list-valued sequence equation constraint": "Flatten[{x,1,x,0,y}] === Flatten[{0,y,0,y,x}]",
+        "linear Diophantine relation a x == b y + c": "a x == b y + c",
+        "Pell equation x^2 == a y^2 + 1": "x^2 == a y^2 + 1",
+        "Pythagorean-triple relation x^2 + y^2 == z^2": "x^2 + y^2 == z^2",
+        "Fermat relation x^n + y^n == z^n for n > 2": "x^n + y^n == z^n",
+    }.items():
+        assert exact_law in by_name[name]["fingerprint"][
+            "rule_relation_constraint_function_or_probability_law"
+        ]["value"]
+    assert "initial-time" in by_name["partial-differential-equation initial-value relation"][
+        "fingerprint"
+    ]["boundary"]["value"]
+    assert "domain boundary" in by_name["partial-differential-equation boundary-value relation"][
+        "fingerprint"
+    ]["boundary"]["value"]
+
+    routes_by_target = {r["literal_target"]: r for r in route_proposals}
+    for target, unit in {
+        "page 171": "U006112",
+        "page 177": "U006121",
+        "page 178": "U006121",
+        "page 181": "U006121",
+        "page 183": "U006123",
+        "page 185": "U006139",
+        "main-text rules underlying the non-white-background panels": "U006168",
+    }.items():
+        route = routes_by_target[target]
+        assert route["discovery_kind"] == "SOURCE_UNIT"
+        assert route["discovery_id"] == unit
+        assert route["closure_scope"] == "WITHIN_STAGE"
+    assert route_proposals.index(routes_by_target["page 1073"]) < route_proposals.index(
+        routes_by_target["page 887"]
+    )
+    for name, targets in CANDIDATE_ROUTE_TARGETS.items():
+        assert by_name[name]["cross_reference_ids"] == [
+            routes_by_target[target]["route_id"] for target in targets
+        ]
+    assert by_name["three-dimensional exact-3-of-26 growth cellular automaton"][
+        "cross_reference_ids"
+    ] == []
+    assert by_name["cyclic limited-size multiway system"]["cross_reference_ids"] == []
+    assert by_name["numeric multiway system n -> {n+1,2n}"]["cross_reference_ids"] == []
+    assert by_name["normal-play nim"]["cross_reference_ids"] == []
+    assert by_name["plane-tiling constraint system"]["cross_reference_ids"] == []
+    assert by_name["list-valued sequence equation constraint"]["cross_reference_ids"] == []
+    assert by_name["adjacent-square-free sequence constraint"]["cross_reference_ids"] == []
+
+    limited_image_fields = {
+        ("Ulam history-dependent two-dimensional growth system", "BACK-MATTER/NOTES/_page_943_Picture_21.jpeg"):
+            {"carrier", "support", "result_kind"},
+        ("three-dimensional exact-3-of-26 growth cellular automaton", "BACK-MATTER/NOTES/_page_944_3D_Projections_Four_Panel_Row.jpeg"):
+            {"excluded_observers_and_representations"},
+        ("outer-totalistic cellular automaton code 12", "BACK-MATTER/NOTES/_page_944_Picture_9.jpeg"):
+            {"seed", "parameters_and_variants", "excluded_observers_and_representations"},
+        ("non-white-background two-dimensional substitution-system family", "BACK-MATTER/NOTES/_page_947_Figure_4.jpeg"):
+            {"excluded_observers_and_representations"},
+        ("smaller-template local constraint family", "BACK-MATTER/NOTES/_page_957_Constraint_Template_Icons_and_Ratios.jpeg"):
+            {"read_dependencies_or_neighborhood", "parameters_and_variants"},
+        ("Ammann-derived 16-color nested-pattern constraint", "BACK-MATTER/NOTES/_page_957_Picture_14.jpeg"):
+            {"witness_semantics", "excluded_observers_and_representations"},
+        ("Pell equation x^2 == a y^2 + 1", "BACK-MATTER/NOTES/_page_960_Figure_3.jpeg"):
+            {"excluded_observers_and_representations"},
+        ("Pythagorean-triple relation x^2 + y^2 == z^2", "BACK-MATTER/NOTES/_page_960_Figure_5.jpeg"):
+            {"witness_semantics", "excluded_observers_and_representations"},
+    }
+    for (name, image_path), fields in limited_image_fields.items():
+        record = next(
+            e for e in by_name[name]["source_evidence"] if e["image_path"] == image_path
+        )
+        assert set(record["fingerprint_fields"]) == fields
+    for name, unit, strength in [
+        ("pictographic 3-state two-dimensional Turing-machine rule", "U006141", "DIRECT_IDENTITY"),
+        ("three-dimensional two-color substitution preset", "U006172", "DIRECT_IDENTITY"),
+        ("dragon-curve geometric substitution", "U006184", "DIRECT_IDENTITY"),
+        ("Mandelbrot-set bounded-orbit relation", "U006198", "CONTEXTUAL"),
+        ("page-206 three-rule multiway preset", "U006248", "DIRECT_IDENTITY"),
+    ]:
+        record = next(
+            e for e in by_name[name]["source_evidence"] if e["source_unit_id"] == unit
+        )
+        assert record["strength"] == strength
+
     if check_spec:
         print(
             json.dumps(
