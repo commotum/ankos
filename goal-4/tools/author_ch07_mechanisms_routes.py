@@ -59,7 +59,7 @@ EXPECTED_STAGE_ROUTE_COUNT = 141
 EXPECTED_UNTOUCHED_CROSS_RANGE_COUNT = 100
 EXPECTED_DEFERRED_MIXED_COUNT = 1
 EXPECTED_SPEC_SHA256 = (
-    "267bd69cc01365feeda3970ae48dfd3ef4071291948e09dc1c9e835f19330ee1"
+    "b302292926ebba64e44857aa9b5481d5308713d846d1af5bb4eed9fc480cc8a2"
 )
 EXPECTED_PRESERVATION_SHA256 = (
     "c2d2b5eed2f0a19fe1072cbfd32dd0ee78e79058d4ba5a5164196a6fb0d897ac"
@@ -251,7 +251,7 @@ _ROUTE_DATA: tuple[tuple[str, ...], ...] = (
         "incoming", "U006121", "", "PAGE",
         "discussed on page 979",
         "fixed-interior and cycling-region behavior of cellular automaton code 746",
-        "U006740-U006741 U001798-U001803", "A000701 A001056",
+        "U006740-U006743 U001798-U001803", "A000701 A000728 A001056",
         "The Notes and main landing identify code 746 and the fixed/cycling regions; the zero-neighbor case remains unstated.",
     ),
     (
@@ -286,7 +286,7 @@ _ROUTE_DATA: tuple[tuple[str, ...], ...] = (
         "incoming", "U006427", "", "PAGE",
         "page 339",
         "contrasting cellular-automaton density response",
-        "U001822 U001824-U001825", "A001061",
+        "U001822 U001824-U001826", "A001061",
         "The landing gives the density-response transition; its exact numeric code appears only in Notes U006757/A000733 and no decoded table is printed.",
     ),
     (
@@ -1440,15 +1440,14 @@ def main() -> int:
 
     output_path = Path(sys.argv[1])
     try:
-        audit_transaction.assert_read_guard(GOAL_DIR)
-        proposal = build_proposal(GOAL_DIR)
-        payload = canonical_json_bytes(proposal) + b"\n"
-        atomic_create(output_path, payload)
+        with audit_transaction.read_guard(GOAL_DIR):
+            proposal = build_proposal(GOAL_DIR)
+            atomic_create(output_path, canonical_json_bytes(proposal))
     except (
         OSError,
         json.JSONDecodeError,
         AuthoringError,
-        audit_transaction.TransactionError,
+        ValueError,
     ) as exc:
         print(f"Chapter 7 route authoring failed: {exc}", file=sys.stderr)
         return 1
