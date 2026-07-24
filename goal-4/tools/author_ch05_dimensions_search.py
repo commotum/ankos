@@ -167,6 +167,8 @@ def _spec(
     completion: str | None = None,
     evidence_scopes: dict[str, list[str]] | None = None,
     missing_mechanics: list[str] | None = None,
+    discovery_unit: str | None = None,
+    identity_unit: str | None = None,
 ) -> dict[str, Any]:
     if profile is None:
         lowered = object_kind.lower()
@@ -204,6 +206,10 @@ def _spec(
             profile = "FUNCTION"
     if profile not in {"FUNCTION", "RELATION", "ITERATED", "REPRESENTATION"}:
         raise ValueError(f"unsupported candidate profile {profile}")
+    discovery_unit = discovery_unit or units[0]
+    identity_unit = identity_unit or discovery_unit
+    if discovery_unit not in units or identity_unit not in units:
+        raise ValueError(f"{name} identity/discovery unit is outside its sources")
     return {
         "name": name,
         "units": units,
@@ -222,6 +228,8 @@ def _spec(
         "completion": completion,
         "evidence_scopes": evidence_scopes or {},
         "missing_mechanics": missing_mechanics or [],
+        "discovery_unit": discovery_unit,
+        "identity_unit": identity_unit,
     }
 
 
@@ -236,6 +244,8 @@ RECOVERED_SPECS = [
         "one centered-singleton binary array",
         aliases=["2D single-black-square seed"],
         related=["B0014"],
+        discovery_unit="U006081",
+        identity_unit="U006081",
     ),
     _spec(
         "outer-totalistic cellular automaton code 686",
@@ -259,6 +269,8 @@ RECOVERED_SPECS = [
             "The component ablation associated with the defective phrase "
             "“s alone” is unresolved; only the code-686 identity is retained."
         ],
+        discovery_unit="U006117",
+        identity_unit="U006117",
     ),
     _spec(
         "stacked two-dimensional-cellular-automaton history embedding",
@@ -829,33 +841,39 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "no-adjacent-B regular-grammar preset",
-        ["U006268"],
+        ["U006267", "U006268"],
         "regular generative-grammar preset",
         "strings over terminals A/B and nonterminals x/y",
         "the displayed three productions with initial symbol x",
         "apply the regular productions in all possible ways",
         "sequences in which no pair of B symbols appears together",
         related=["B0926"],
+        discovery_unit="U006268",
+        identity_unit="U006268",
     ),
     _spec(
         "AxA-or-B context-free-grammar preset",
-        ["U006269"],
+        ["U006267", "U006269"],
         "context-free generative-grammar preset",
         "strings over terminal symbols A/B and nonterminal x",
         "rules x→AxA and x→B with initial x",
         "replace any occurrence of x by AxA or B",
         "the generated context-free language",
         related=["B0927"],
+        discovery_unit="U006269",
+        identity_unit="U006269",
     ),
     _spec(
         "equal-count ABA context-sensitive-grammar preset",
-        ["U006270"],
+        ["U006267", "U006270"],
         "context-sensitive generative-grammar preset",
         "strings over A, B, and nonterminal x",
         "the displayed three rules with initial string AAxBA",
         "apply all permitted context-sensitive replacements",
         "strings A^n B^n A^n in the source's stated form",
         related=["B0928"],
+        discovery_unit="U006270",
+        identity_unit="U006270",
     ),
     _spec(
         "numeric-multiway Fibonacci state-count function",
@@ -1086,6 +1104,8 @@ for unit_id, name, expression, result_kind in SIERPINSKI_SPECS:
                 "The source states output equivalence up to orientation; it "
                 "does not collapse the independently delimited native formula."
             ),
+            discovery_unit=unit_id,
+            identity_unit=unit_id,
         )
     )
 
@@ -1549,11 +1569,12 @@ QUERY_SPECS = [
 EXPECTED_STAGE_UNIT_COUNT = 539
 EXPECTED_STAGE_ASSET_COUNT = 150
 EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT = 324
-EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 410
+EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT = 3
+EXPECTED_ENRICHED_STAGE_CANDIDATE_COUNT = 413
 EXPECTED_STAGE_ROUTE_COUNT = 62
-EXPECTED_READING_UPDATE_COUNT = 96
+EXPECTED_READING_UPDATE_COUNT = 137
 EXPECTED_NEW_CANDIDATE_COUNT = 86
-EXPECTED_NEW_EVIDENCE_COUNT = 0
+EXPECTED_NEW_EVIDENCE_COUNT = 181
 EXPECTED_RESULT_PAIR_COUNT = 1552
 EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 523
 EXPECTED_PATH_PAIR_COUNTS = {
@@ -1587,7 +1608,9 @@ EXPECTED_QUERY_SPEC_DIGEST = (
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
     "97d4f2ffa3322834e9a1ef7d9c9fd1327bf718420af7c91967e02d96c551a5e0"
 )
-EXPECTED_TRIAGE_DIGEST = ""
+EXPECTED_TRIAGE_DIGEST = (
+    "1d2d0c50a27a20dd283952077f73d6fc71057ffdfa3b062a9a082ceefb33c06f"
+)
 EXPECTED_ACTIVE_SEMANTIC_DIGEST = (
     "d80973df9e95c8fac4b32183fac377c039eb1dab3ab69af86f9f35b5151bac90"
 )
@@ -2629,7 +2652,13 @@ def _typed_evidence_scopes(
     ]
     if not non_image:
         raise AuthoringError(f"{spec['name']} has no non-image identity source")
-    primary_id = non_image[0]["source_unit_id"]
+    primary_id = spec["identity_unit"]
+    if primary_id not in {
+        row["source_unit_id"] for row in non_image
+    }:
+        raise AuthoringError(
+            f"{spec['name']} identity unit is absent or image-only"
+        )
     identity_fields = {
         "object_kind",
         "native_time",
@@ -2676,10 +2705,12 @@ def _typed_evidence_scopes(
             chosen = set(explicit[unit_id])
         elif row["block_kind"] == "image":
             chosen = image_fields
+        elif unit_id == primary_id:
+            chosen = identity_fields | context_fields
+            if row["block_kind"] in {"fenced_code", "list", "table"}:
+                chosen |= exact_fields
         elif row["block_kind"] in {"fenced_code", "list", "table"}:
             chosen = exact_fields
-        elif unit_id == primary_id:
-            chosen = identity_fields
         else:
             chosen = context_fields
         scopes[unit_id] = sorted(
@@ -2699,6 +2730,14 @@ def _typed_evidence_scopes(
             "witness_semantics",
         }
     )
+    if spec["profile"] == "ITERATED":
+        primary_fields.update(
+            supported_fields
+            & {
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+            }
+        )
     if len(non_image) == 1:
         primary_fields.update(
             supported_fields
@@ -2789,8 +2828,9 @@ def _enrich_existing_candidate(
     evidence_by_unit = {
         item["source_unit_id"]: item["evidence_id"] for item in evidence
     }
-    semantic_appends: dict[str, dict[str, list[dict[str, Any]]]] = {
-        "B0032": {
+    semantic_appends: dict[str, list[dict[str, Any]]] = {}
+    if candidate_id == "B0032":
+        semantic_appends = {
             "parameters": [
                 {
                     "name": "spatial slice selector",
@@ -2822,8 +2862,9 @@ def _enrich_existing_candidate(
                     "evidence_ids": [evidence_by_unit["U006112"]],
                 },
             ],
-        },
-        "B0595": {
+        }
+    elif candidate_id == "B0595":
+        semantic_appends = {
             "variants": [
                 {
                     "name": "GoldenRatio square-lattice line cut",
@@ -2835,8 +2876,9 @@ def _enrich_existing_candidate(
                     "evidence_ids": [evidence_by_unit["U006182"]],
                 }
             ],
-        },
-        "B0922": {
+        }
+    elif candidate_id == "B0922":
+        semantic_appends = {
             "parameters": [
                 {
                     "name": "alternate initial string",
@@ -2857,12 +2899,8 @@ def _enrich_existing_candidate(
                     "evidence_ids": [evidence_by_unit["U006260"]],
                 }
             ],
-        },
-    }
-    for collection, additions in semantic_appends.get(
-        candidate_id,
-        {},
-    ).items():
+        }
+    for collection, additions in semantic_appends.items():
         candidate[collection] = [*candidate[collection], *additions]
 
     if candidate_id == "B0094":
@@ -2923,7 +2961,10 @@ def _build_final_enrichment(
         candidate_pairs = [
             (rank, ordinal, unit_id)
             for (ordinal, unit_id), rank in hit_number.items()
-            if ordinal <= 10 and unit_id in spec["units"]
+            if (
+                ordinal <= 10
+                and unit_id == spec["discovery_unit"]
+            )
         ]
         if not candidate_pairs:
             raise AuthoringError(
@@ -3550,7 +3591,15 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     base_stage_candidates = (
         initial_stage_candidates - recovered_candidate_ids
     )
-    if len(base_stage_candidates) != EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT:
+    expected_base_stage_candidate_count = (
+        EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT
+        if first_pass
+        else (
+            EXPECTED_INITIAL_STAGE_CANDIDATE_COUNT
+            + EXPECTED_RELINKED_EXISTING_STAGE_CANDIDATE_COUNT
+        )
+    )
+    if len(base_stage_candidates) != expected_base_stage_candidate_count:
         raise AuthoringError("pre-search Stage 9 candidate set drifted")
     if not first_pass and not (
         recovered_candidate_ids <= initial_stage_candidates
