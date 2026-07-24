@@ -289,6 +289,29 @@ RECOVERED_SPECS = [
         "one centered-singleton binary array",
         aliases=["2D single-black-square seed"],
         related=["B0014"],
+        evidence_scopes={
+            "U006080": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006081": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
         discovery_unit="U006081",
         identity_unit="U006081",
     ),
@@ -355,6 +378,23 @@ RECOVERED_SPECS = [
         "stack each successive 2D state along a third axis in time order",
         "one three-dimensional space-time object",
         aliases=["3D stack of 2D CA states"],
+        limit=(
+            "The source fixes the abstract alignment of successive 2D states "
+            "along a time axis; camera orientation, scale, spacing, and pixel "
+            "rendering remain representational choices."
+        ),
+        missing_mechanics=[
+            "Rendered camera orientation, scale, layer spacing, and pixel "
+            "style are not part of the stated abstract stack."
+        ],
+        cardinality=(
+            "one abstract aligned space-time stack per ordered 2D history; "
+            "rendered views can vary"
+        ),
+        measure=(
+            "deterministic at the abstract cell-coordinate/time-layer level, "
+            "not as a unique rendered picture"
+        ),
     ),
     _spec(
         "two-dimensional-grid total-order linearization scan",
@@ -475,6 +515,39 @@ RECOVERED_SPECS = [
         "the distinct state collection at each retained step",
         "count distinct states per step and take successive count differences",
         "a state-count series and its first-difference series",
+        evidence_scopes={
+            "U001130": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U001134": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            "U001135": [
+                "result_kind",
+                "parameters_and_variants",
+            ],
+            "U001138": [
+                "result_kind",
+            ],
+            "U001139": [
+                "object_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+        identity_unit="U001139",
     ),
     _spec(
         "arbitrary-offset neighborhood-configuration enumerator",
@@ -767,6 +840,28 @@ RECOVERED_SPECS = [
         "evaluate every t-digit binary integer in complex base i-1",
         "the finite step-t dragon-curve point set",
         related=["B0905"],
+        evidence_scopes={
+            "U006187": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006188": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U006189": [
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
     ),
     _spec(
         "box-counting fractal-dimension observer",
@@ -871,6 +966,24 @@ RECOVERED_SPECS = [
         "one directed cyclic network represented as n connection pairs",
         aliases=["CyclicNet"],
         related=["B0789", "B0916"],
+        evidence_scopes={
+            "U006211": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006212": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "directed-network connection-path follower",
@@ -884,13 +997,16 @@ RECOVERED_SPECS = [
         related=["B0916"],
     ),
     _spec(
-        "directed-network radius-layer node-count observer",
+        "directed-network cumulative-radius node-count observer",
         ["U006215", "U006216"],
         "graph neighborhood observer",
         "directed above/below connection-list network",
         "network list, start node i, and depth d",
-        "repeatedly union reachable nodes and count each distance layer",
-        "a list of distinct-node counts through depth d",
+        (
+            "repeatedly expand and union reachable nodes, then count each "
+            "cumulative reachable set"
+        ),
+        "counts of distinct nodes reachable within radii 1 through d",
         aliases=["NeighborNumbers"],
         related=["B0916"],
     ),
@@ -906,15 +1022,39 @@ RECOVERED_SPECS = [
         related=["B0916"],
     ),
     _spec(
-        "directed-network induced-subgraph renumbering transform",
+        "directed-network closed-retained-sequence renumbering transform",
         ["U006221", "U006222"],
         "graph relabelling transform",
         "directed connection-list network",
-        "network list and retained node sequence",
+        (
+            "network list and a retained node sequence closed under every "
+            "endpoint referenced by its selected rows"
+        ),
         "select retained rows and replace every endpoint by its position in the retained sequence",
-        "one compactly renumbered induced network",
+        "one compactly renumbered closed retained network",
         aliases=["RenumberNodes"],
         related=["B0916"],
+        limit=(
+            "The code assumes that every endpoint in the selected rows occurs "
+            "in seq; the source does not state behavior when this closure "
+            "precondition fails."
+        ),
+        missing_mechanics=[
+            "Failure behavior for a retained sequence that omits a referenced "
+            "endpoint is not specified."
+        ],
+        cardinality=(
+            "one renumbered network for each valid endpoint-closed retained "
+            "sequence"
+        ),
+        measure=(
+            "deterministic on endpoint-closed inputs; behavior outside that "
+            "source-unstated domain is unknown"
+        ),
+        completion=(
+            "returns the compact renumbering when every selected endpoint is "
+            "present in seq; failure behavior otherwise is unknown"
+        ),
     ),
     _spec(
         "page-202(c) network node-count sequence generator",
@@ -924,6 +1064,24 @@ RECOVERED_SPECS = [
         "maximum step t",
         "evaluate the supplied FoldList and binary-digit recurrence d",
         "the list of node counts through step t",
+        evidence_scopes={
+            "U006227": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006228": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "network dimensionality observer",
@@ -933,6 +1091,11 @@ RECOVERED_SPECS = [
         "network, reference node, and connection radius r",
         "count distinct nodes reachable within r connections and compare with r^d",
         "a dimension estimate or reachable-volume growth curve",
+        limit=(
+            "The source supplies the reachable-volume scaling criterion and "
+            "plots but does not fix a fitting range, estimator, root-node "
+            "aggregation, or nonconvergence convention."
+        ),
         missing_mechanics=[
             "The fitting range, estimator, root-node aggregation, and behavior "
             "when the r^d exponent does not converge are not specified."
@@ -948,13 +1111,48 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "polynomial-growth string-multiway preset",
-        ["U006252"],
+        ["U006240", "U006243", "U006252"],
         "multiway-system preset",
         "strings rewritten by three bidirectional-availability replacement rules",
         "the displayed rule and an initial string containing n B symbols",
         "apply all replacements and merge equal successor strings",
         "a multiway evolution whose state count grows as t^(n+1)",
         related=["B0921"],
+        evidence_scopes={
+            "U006240": [
+                "carrier",
+                "support",
+                "alphabet_or_value_schema",
+                "complete_state",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006243": [
+                "native_time",
+                "frontier_or_activation",
+                "schedule",
+                "read_dependencies_or_neighborhood",
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U006252": [
+                "object_kind",
+                "carrier",
+                "complete_state",
+                "seed",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+        discovery_unit="U006252",
+        identity_unit="U006252",
     ),
     _spec(
         "bounded-length multiway reachability observer",
@@ -999,6 +1197,24 @@ RECOVERED_SPECS = [
         "a presentation and its generator symbols",
         "connect each element to the element obtained by appending each generator",
         "the presentation's Cayley graph",
+        profile="DENOTATION",
+        limit=(
+            "The source defines the Cayley graph declaratively but gives no "
+            "general algorithm for enumerating quotient elements, deciding "
+            "word equality, or completing an infinite presentation."
+        ),
+        missing_mechanics=[
+            "General quotient-element enumeration, word-equality decisions, "
+            "and finite/infinite completion behavior are unspecified."
+        ],
+        cardinality=(
+            "one declarative Cayley graph for each fully specified quotient "
+            "element set and generator action"
+        ),
+        measure=(
+            "deterministic mathematical denotation, not a claimed terminating "
+            "graph-enumeration procedure"
+        ),
     ),
     _spec(
         "free-semigroup Cayley-tree preset",
@@ -1060,15 +1276,23 @@ RECOVERED_SPECS = [
             "No executable or declaratively complete presentation is supplied; "
             "only the named denotation and exact order are recoverable."
         ],
+        semantic_values={
+            "parameters_and_variants": (
+                "about a dozen source-omitted defining rules; no generators "
+                "or relations are supplied"
+            )
+        },
+        suppress_supported_fields={
+            "input",
+            "rule_relation_constraint_function_or_probability_law",
+        },
         discovery_unit="U006264",
         identity_unit="U006264",
         evidence_scopes={
             "U006264": [
                 "object_kind",
                 "carrier",
-                "input",
                 "law_kind",
-                "rule_relation_constraint_function_or_probability_law",
                 "result_kind",
                 "successor_cardinality",
                 "determinism_branching_or_measure",
@@ -1152,14 +1376,37 @@ RECOVERED_SPECS = [
         ["U006281"],
         "uniterated equation solver",
         "continuous-number vectors and matrices",
-        "matrix m and target vector u",
+        (
+            "matrix m and target vector u under source-unstated rank and "
+            "consistency conditions"
+        ),
         "evaluate LinearSolve[m,u] to find v satisfying u = m.v",
-        "a solution vector v",
+        "a solution vector v when the system is in the method's valid domain",
         aliases=["LinearSolve inverse"],
         related=["B0937"],
         limit=(
             "The source does not state singular, inconsistent, or "
             "underdetermined-system behavior."
+        ),
+        uncertainties=[
+            "The source does not say which solution is selected for an "
+            "underdetermined system or how inconsistent/singular cases fail."
+        ],
+        missing_mechanics=[
+            "Rank, consistency, solution-selection, singularity, and failure "
+            "conventions are unspecified."
+        ],
+        cardinality=(
+            "zero, one, or many mathematical solutions depending on rank and "
+            "consistency; the source does not state LinearSolve selection"
+        ),
+        measure=(
+            "deterministic only on the unstated domain where the implementation "
+            "selects one solution; other cases are unknown"
+        ),
+        completion=(
+            "returns a solution on an unstated valid domain; singular, "
+            "inconsistent, and underdetermined completion behavior is unknown"
         ),
     ),
     _spec(
@@ -1171,6 +1418,28 @@ RECOVERED_SPECS = [
         "select template positions where IntegerDigits[n,2,32] has value 1",
         "the allowed-template set encoded by n",
         related=["B0943"],
+        evidence_scopes={
+            "U006286": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006287": [
+                "result_kind",
+            ],
+            "U006288": [
+                "carrier",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
     ),
     _spec(
         "allowed-template satisfaction predicate",
@@ -1182,6 +1451,7 @@ RECOVERED_SPECS = [
         "one Boolean satisfaction judgment",
         aliases=["SatisfiedQ"],
         related=["B0943"],
+        profile="FUNCTION",
     ),
     _spec(
         "overlapping-corner tessellation descriptor and Fill generator",
@@ -1202,16 +1472,70 @@ RECOVERED_SPECS = [
         "replace every symbol by its displayed block at each step",
         "one successor nested-pattern array",
         related=["B0948"],
+        evidence_scopes={
+            "U006301": [
+                "object_kind",
+                "carrier",
+                "support",
+                "alphabet_or_value_schema",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006302": [
+                "complete_state",
+                "frontier_or_activation",
+                "schedule",
+                "read_dependencies_or_neighborhood",
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U006303": [
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006304": [
+                "result_kind",
+            ],
+        },
     ),
     _spec(
         "Cook-polyomino stage type-count observer",
-        ["U006316", "U006317"],
+        ["U006314", "U006316", "U006317"],
         "stage-indexed count-vector observer",
         "the stated Cook aperiodic polyomino construction",
         "construction stage n",
         "evaluate Fibonacci[2 n - {2,0,1}] / {1,2,1}",
         "the three polyomino-type counts at stage n",
         related=["B0954"],
+        evidence_scopes={
+            "U006314": [
+                "object_kind",
+                "carrier",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006316": [
+                "input",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006317": [
+                "result_kind",
+            ],
+        },
+        discovery_unit="U006316",
+        identity_unit="U006314",
     ),
     _spec(
         "square-free sequence enumerator",
@@ -1222,6 +1546,24 @@ RECOVERED_SPECS = [
         "extend every surviving sequence by each symbol and delete any containing adjacent identical blocks",
         "all length-n square-free sequences",
         related=["B0959"],
+        evidence_scopes={
+            "U006318": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006319": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+        },
     ),
     _spec(
         "Pell least-x continued-fraction solver",
@@ -1232,6 +1574,32 @@ RECOVERED_SPECS = [
         "evaluate the stated continued-fraction convergent numerator",
         "the least positive solution value x",
         related=["B0968"],
+        evidence_scopes={
+            "U006326": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006327": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+            ],
+            "U006328": [
+                "result_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006329": [
+                "result_kind",
+            ],
+        },
     ),
     _spec(
         "primitive Pythagorean-triple parameterization",
@@ -1309,6 +1677,22 @@ RECOVERED_SPECS = [
         "apply the regular productions in all possible ways",
         "sequences in which no pair of B symbols appears together",
         related=["B0926"],
+        limit=(
+            "The source asserts the no-adjacent-B language, but every displayed "
+            "production retains x or y even though U006267 defines final "
+            "expressions as containing no nonterminal."
+        ),
+        uncertainties=[
+            "The asserted terminal A/B language conflicts with the displayed "
+            "rules, which never eliminate their sole x/y nonterminal."
+        ],
+        missing_mechanics=[
+            "A terminalization or projection convention that removes the "
+            "remaining x/y nonterminal is not supplied."
+        ],
+        suppress_supported_fields={
+            "result_kind",
+        },
         evidence_scopes=_grammar_example_scopes("U006268"),
         discovery_unit="U006268",
         identity_unit="U006268",
@@ -1341,13 +1725,39 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "numeric-multiway Fibonacci state-count function",
-        ["U006275"],
+        ["U006273", "U006274", "U006275"],
         "exact trajectory count function",
         "distinct numbers in the n→{n+1,2n} multiway evolution",
         "step t",
         "evaluate Fibonacci[t+2]",
         "the number of distinct numeric states at step t",
         related=["B0932"],
+        evidence_scopes={
+            "U006273": [
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006274": [
+                "carrier",
+                "parameters_and_variants",
+            ],
+            "U006275": [
+                "object_kind",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
+        discovery_unit="U006275",
+        identity_unit="U006275",
     ),
     _spec(
         "quadratic-vector forward-map evaluator",
@@ -1364,10 +1774,47 @@ RECOVERED_SPECS = [
         ["U006301", "U006302", "U006303"],
         "finite local-pattern-set observer",
         "a generated two-dimensional substitution pattern",
-        "substitution rule, retained evolution region, and 2 by 2 window shape",
-        "collect the distinct 2 by 2 blocks that actually occur in the generated pattern",
-        "the finite occurring-template set (51 blocks for the stated preset)",
+        "a supplied finite pattern region and 2 by 2 window shape",
+        (
+            "collect the distinct 2 by 2 blocks observed in the supplied "
+            "pattern region"
+        ),
+        (
+            "the finite observed-template set; the source states 51 blocks "
+            "for the displayed Ammann pattern"
+        ),
         related=["B0948"],
+        limit=(
+            "The source states that the displayed nested pattern contains 51 "
+            "distinct 2 by 2 blocks but gives no finite window or completion "
+            "bound guaranteed to recover every block of the infinite pattern."
+        ),
+        missing_mechanics=[
+            "No retained-region size, completeness test, or stopping bound is "
+            "given for proving that all eventual 2 by 2 blocks were observed."
+        ],
+        evidence_scopes={
+            "U006301": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+            "U006302": [
+                "carrier",
+                "parameters_and_variants",
+            ],
+            "U006303": [
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "parameters_and_variants",
+                "evidence_limit",
+            ],
+        },
     ),
     _spec(
         "ternary square-free substitution preset",
@@ -1509,6 +1956,23 @@ RECOVERED_SPECS = [
         "stack every step's generated sequences in retained step order",
         "one layered history representation of all retained states",
         related=["B0921"],
+        limit=(
+            "The source identifies a stacked display of all sequences by "
+            "evolution step but does not give a within-layer order, string "
+            "alignment, spacing, duplicate-display, or rendering convention."
+        ),
+        missing_mechanics=[
+            "Within-layer sequence order, string alignment, inter-item and "
+            "inter-layer spacing, duplicate display, and rendering are omitted."
+        ],
+        cardinality=(
+            "one layered display only after the omitted within-layer ordering, "
+            "alignment, spacing, duplicate, and rendering choices are supplied"
+        ),
+        measure=(
+            "the source does not select a unique or deterministic rendered "
+            "stack from the time-indexed state collections alone"
+        ),
     ),
     _spec(
         "Ceiling[t/2] multiway state-count function",
@@ -1594,11 +2058,11 @@ RECOVERED_SPECS = [
                 "carrier",
                 "input",
                 "law_kind",
-                "rule_relation_constraint_function_or_probability_law",
                 "parameters_and_variants",
                 "evidence_limit",
             ],
             "U001185": [
+                "rule_relation_constraint_function_or_probability_law",
                 "result_kind",
                 "successor_cardinality",
                 "determinism_branching_or_measure",
@@ -1643,6 +2107,39 @@ for unit_id, name, expression, result_kind in SIERPINSKI_SPECS:
                 "The source states output equivalence up to orientation; it "
                 "does not collapse the independently delimited native formula."
             ),
+            evidence_scopes={
+                "U006150": [
+                    "input",
+                    "result_kind",
+                    "parameters_and_variants",
+                    "evidence_limit",
+                ],
+                **(
+                    {
+                        "U006160": [
+                            "carrier",
+                            "law_kind",
+                            "result_kind",
+                            "parameters_and_variants",
+                            "evidence_limit",
+                        ]
+                    }
+                    if "coordinate" in name
+                    else {}
+                ),
+                unit_id: [
+                    "object_kind",
+                    "carrier",
+                    "input",
+                    "law_kind",
+                    "rule_relation_constraint_function_or_probability_law",
+                    "result_kind",
+                    "successor_cardinality",
+                    "determinism_branching_or_measure",
+                    "parameters_and_variants",
+                    "evidence_limit",
+                ],
+            },
             discovery_unit=unit_id,
             identity_unit=unit_id,
         )
