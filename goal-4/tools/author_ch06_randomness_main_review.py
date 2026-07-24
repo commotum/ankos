@@ -1797,7 +1797,10 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "slice-history projection",
         "spatial-depth fog display",
     ]
-    slice_candidate["parameters"] = ["slice location", "spatial-depth fog enabled"]
+    slice_candidate["parameters"] = [
+        "selected one-dimensional slice",
+        "spatial-depth fog enabled",
+    ]
     slice_candidate["mechanics_units"] = []
     slice_candidate["values"] = {
         "object_kind": "one-dimensional slice-through-time observer with an optional spatial-depth display",
@@ -1816,7 +1819,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "result_kind": "a one-dimensional slice history, optionally with spatial-depth fog",
         "determinism_branching_or_measure": "deterministic once the slice and display convention are selected",
         "witness_semantics": "the projected history exposes behavioral classes without changing the native evolution",
-        "parameters_and_variants": "slice location and optional spatial-depth fog",
+        "parameters_and_variants": "selected one-dimensional slice and optional spatial-depth fog",
         "excluded_observers_and_representations": (
             "the slice and depth fog are observer projections, not native two-dimensional states"
         ),
@@ -6025,7 +6028,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         evidence(
             periodic_name,
             unit_id,
-            fields=["witness_semantics", "parameters_and_variants"],
+            fields=["witness_semantics"],
             claim=f"{unit_id} identifies rule 110's repeated 14-cell spatial background and 7-step evolution period.",
             strength="DIRECT_PARTIAL_MECHANICS",
         )
@@ -6205,6 +6208,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "apply rule 255 once; every cell becomes black"
             ),
             "result_kind": "the unique all-black configuration",
+            "successor_cardinality": "exactly one all-black result configuration",
             "determinism_branching_or_measure": "deterministic",
             "termination_completion_failure": "the attractor result is reached after exactly one step",
             "witness_semantics": (
@@ -6236,6 +6240,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "law_kind",
             "rule_relation_constraint_function_or_probability_law",
             "result_kind",
+            "successor_cardinality",
             "determinism_branching_or_measure",
             "termination_completion_failure",
         ],
@@ -6259,6 +6264,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "input",
             "rule_relation_constraint_function_or_probability_law",
             "result_kind",
+            "successor_cardinality",
             "termination_completion_failure",
             "witness_semantics",
         ],
@@ -7232,7 +7238,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
             "neighbor multiplier": ["U001322", "U001323"],
         },
         "one-dimensional slice-through-time and spatial-depth-fog observer": {
-            "slice location": ["U001325"],
+            "selected one-dimensional slice": ["U001325"],
             "spatial-depth fog enabled": ["U001335"],
         },
         "binary two-dimensional von-Neumann-totalistic cellular-automaton family": {
@@ -7316,11 +7322,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "U001457",
                 "U001458",
             ],
-            "temporal sampling interval": [
-                "U001455",
-                "U001456",
-                "U001457",
-            ],
+            "temporal sampling interval": ["U001457"],
         },
         "rule-150 block self-emulation": {
             "cellular-automaton rule": [
@@ -7334,11 +7336,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "U001462",
                 "U001463",
             ],
-            "temporal sampling interval": [
-                "U001460",
-                "U001461",
-                "U001462",
-            ],
+            "temporal sampling interval": ["U001462"],
         },
         "rule-184 three-cell-block self-emulation": {
             "cellular-automaton rule": ["U001465"],
@@ -7349,11 +7347,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
                 "U001468",
                 "U001469",
             ],
-            "temporal sampling interval": [
-                "U001466",
-                "U001467",
-                "U001468",
-            ],
+            "temporal sampling interval": ["U001468"],
         },
         "allowed-sequence path-network observer": {
             "allowed sequence language": [
@@ -7447,15 +7441,46 @@ def candidate_definitions() -> list[dict[str, Any]]:
             f"{row['name']} parameter evidence unit outside candidate",
         )
         row["parameter_units"] = exact
-        row["field_units"]["parameters_and_variants"] = list(exact_units)
+        row["field_units"]["parameters_and_variants"] = list(
+            set(row["field_units"].get("parameters_and_variants", []))
+            | exact_units
+        )
         for unit_id, override in row["evidence_overrides"].items():
-            override["fields"] = [
-                field
-                for field in override.get("fields", [])
-                if field != "parameters_and_variants"
-            ]
-            if unit_id in exact_units:
+            if (
+                unit_id in exact_units
+                and "parameters_and_variants"
+                not in override.get("fields", [])
+            ):
                 override["fields"].append("parameters_and_variants")
+
+    direct_codec_keys = {
+        (
+            "rule-90 pair-block self-emulation",
+            "U001457",
+        ): (
+            "A000994 directly transcribes the rule-90 emulation codec: a two-by-two "
+            "space-time block maps to one black or white coarse cell."
+        ),
+        (
+            "rule-150 block self-emulation",
+            "U001462",
+        ): (
+            "A000998 directly transcribes the rule-150 emulation codec: a two-by-two "
+            "space-time block maps to one black or white coarse cell."
+        ),
+        (
+            "rule-184 three-cell-block self-emulation",
+            "U001468",
+        ): (
+            "A000995 directly transcribes the rule-184 emulation codec: a three-by-three "
+            "space-time block maps to one black or white coarse cell."
+        ),
+    }
+    for (name, unit_id), claim in direct_codec_keys.items():
+        override = candidate(name)["evidence_overrides"][unit_id]
+        override["claim"] = claim
+        override["strength"] = "DIRECT_PARTIAL_MECHANICS"
+        override["allow_direct_image"] = True
 
     # Remove inherited per-unit evidence-limit declarations. build_output()
     # assigns the record boundary once to the strongest identity/law anchor.
@@ -8209,10 +8234,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
             ),
         },
         "A000994": {
-            "visual_role": "RELATION",
+            "visual_role": "NATIVE_EVIDENCE",
             "evidence_statement": (
-                "Original-resolution rule-90 codec key checked: a two-by-two space-time block maps to "
-                "one black or white coarse cell."
+                "Original-resolution emulation-native rule-90 codec key checked: a two-by-two "
+                "space-time block maps to one black or white coarse cell; this is not rule-90 "
+                "transition-table evidence."
             ),
         },
         "A000996": {
@@ -8230,10 +8256,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
             ),
         },
         "A000998": {
-            "visual_role": "RELATION",
+            "visual_role": "NATIVE_EVIDENCE",
             "evidence_statement": (
-                "Original-resolution rule-150 codec key checked: a two-by-two space-time block maps to "
-                "one black or white coarse cell."
+                "Original-resolution emulation-native rule-150 codec key checked: a two-by-two "
+                "space-time block maps to one black or white coarse cell; this is not rule-150 "
+                "transition-table evidence."
             ),
         },
         "A000999": {
@@ -8251,10 +8278,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
             ),
         },
         "A000995": {
-            "visual_role": "RELATION",
+            "visual_role": "NATIVE_EVIDENCE",
             "evidence_statement": (
-                "Original-resolution rule-184 codec key checked: a three-by-three space-time block maps "
-                "to one black or white coarse cell."
+                "Original-resolution emulation-native rule-184 codec key checked: a three-by-three "
+                "space-time block maps to one black or white coarse cell; this is not rule-184 "
+                "transition-table evidence."
             ),
         },
         "A000986": {

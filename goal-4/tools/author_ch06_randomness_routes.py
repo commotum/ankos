@@ -50,7 +50,7 @@ EXPECTED_SPEC_COUNTS = {"incoming": 14, "within": 58}
 EXPECTED_UPDATE_COUNT = 72
 EXPECTED_UNTOUCHED_CROSS_RANGE_COUNT = 107
 EXPECTED_SPEC_SHA256 = (
-    "17c340e52471357e5bbc1c26d9579312aea0b2c015a0bb3dacb451ab006ee5cf"
+    "573fec5c905eb951887419b361dee0c767dee0671db33129b292ba52c3678a82"
 )
 EXPECTED_CROSS_RANGE_SHA256 = (
     "d6ae9a4090e14a8a2035a99f07ce1445f158c0ec4fda8f87937593d6f0683034"
@@ -561,10 +561,10 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "PAGE",
         "page 282",
         "code-357 cellular automaton",
-        "U001517 U001525 U001527 U001528 U001531",
+        "U001517 U001527 U001528 U001531",
         "A001013",
         (
-            "Resolved printed page 282 to U001517/U001525/U001527-"
+            "Resolved printed page 282 to U001517/U001527-"
             "U001528/U001531 and A001013. The target identifies the "
             "three-color nearest-neighbor code-357 class-4 preset and its "
             "persistent-structure behavior; it does not give a full rule "
@@ -578,7 +578,7 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "PAGE",
         "page 282",
         "code-357 cellular automaton",
-        "U001517 U001525 U001527 U001528 U001531",
+        "U001517 U001527 U001528 U001531",
         "A001013",
         (
             "Resolved printed page 282 to the code-357 identity and witness "
@@ -594,10 +594,10 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "PAGE",
         "page 282",
         "code-1329 cellular automaton",
-        "U001517 U001525 U001529 U001530 U001531",
+        "U001517 U001529 U001530 U001531",
         "A001014",
         (
-            "Resolved printed page 282 to U001517/U001525/U001529-"
+            "Resolved printed page 282 to U001517/U001529-"
             "U001531/A001014, which identify the three-color nearest-"
             "neighbor code-1329 class-4 preset and show its persistent "
             "structures. The full lookup table is not printed there."
@@ -610,7 +610,7 @@ ROUTE_SPECS: tuple[RouteSpec, ...] = (
         "PAGE",
         "page 282",
         "code-1329 cellular automaton",
-        "U001517 U001525 U001529 U001530 U001531",
+        "U001517 U001529 U001530 U001531",
         "A001014",
         (
             "Resolved printed page 282 to the code-1329 identity and witness "
