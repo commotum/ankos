@@ -161,7 +161,44 @@ def _spec(
         "units are asserted."
     ),
     uncertainties: list[str] | None = None,
+    profile: str | None = None,
+    cardinality: str | None = None,
+    measure: str | None = None,
+    completion: str | None = None,
+    evidence_scopes: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
+    if profile is None:
+        lowered = object_kind.lower()
+        if any(
+            marker in lowered
+            for marker in (
+                "substitution-system preset",
+                "substitution system",
+                "cellular-automaton rule preset",
+                "multiway-system preset",
+                "generative-grammar preset",
+                "generative grammar preset",
+            )
+        ):
+            profile = "ITERATED"
+        elif any(
+            marker in lowered
+            for marker in (
+                "predicate",
+                "relation",
+                "presentation",
+                "quotient representation",
+            )
+        ):
+            profile = "RELATION"
+        elif "history embedding" in lowered:
+            profile = "REPRESENTATION"
+        elif "representation function" in lowered:
+            profile = "REPRESENTATION"
+        else:
+            profile = "FUNCTION"
+    if profile not in {"FUNCTION", "RELATION", "ITERATED", "REPRESENTATION"}:
+        raise ValueError(f"unsupported candidate profile {profile}")
     return {
         "name": name,
         "units": units,
@@ -174,6 +211,11 @@ def _spec(
         "related": related or [],
         "limit": limit,
         "uncertainties": uncertainties or [],
+        "profile": profile,
+        "cardinality": cardinality,
+        "measure": measure,
+        "completion": completion,
+        "evidence_scopes": evidence_scopes or {},
     }
 
 
@@ -210,7 +252,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "stacked two-dimensional-cellular-automaton history embedding",
-        ["U000969", "U000970", "U000971"],
+        ["U000969", "U000970", "U000971", "U000996", "U000997"],
         "history embedding/representation function",
         "successive two-dimensional cellular-automaton states",
         "an ordered cellular-automaton evolution history",
@@ -657,7 +699,7 @@ RECOVERED_SPECS = [
     ),
     _spec(
         "square-free sequence enumerator",
-        ["U006318", "U006319", "U006320"],
+        ["U006318", "U006319"],
         "finite solution enumerator",
         "length-n sequences over k symbols",
         "alphabet size k and target length n",
@@ -767,7 +809,7 @@ RECOVERED_SPECS = [
     _spec(
         "numeric-multiway Fibonacci state-count function",
         ["U006275"],
-        "exact trajectory count function",
+        "asymptotic trajectory growth-profile observer",
         "distinct numbers in the n→{n+1,2n} multiway evolution",
         "step t",
         "evaluate Fibonacci[t+2]",
@@ -826,7 +868,12 @@ RECOVERED_SPECS = [
         "integer triples (a,x,y)",
         "integers a, x, and y",
         "accept exactly when x^2 = a y^2",
-        "the integer solution set, nontrivial only for square a as stated",
+        "the integer solution set; nonzero solutions require square a as stated",
+        limit=(
+            "The source's “no solution” wording omits the universal trivial "
+            "solution x=y=0; the square-a characterization is retained only "
+            "for nonzero/nontrivial solutions."
+        ),
     ),
     _spec(
         "odd-binomial-coefficient parity relation",
@@ -844,10 +891,12 @@ RECOVERED_SPECS = [
         "integer triples (x,y,z)",
         "integers x, y, and z",
         "accept exactly when (2 x + 1) y = z",
-        "solutions precisely for z outside the stated power-of-two obstruction",
+        "solutions outside the stated power-of-two obstruction under the intended positive/nontrivial domain",
         limit=(
-            "The source states the obstruction but does not delimit positivity "
-            "or zero conventions for x, y, and z."
+            "The source does not delimit positivity or zero conventions. The "
+            "non-power-of-two characterization is therefore recorded only as "
+            "a positive/nontrivial-domain statement, with the exact domain "
+            "UNKNOWN_FROM_SOURCE."
         ),
     ),
     _spec(
@@ -877,7 +926,7 @@ RECOVERED_SPECS = [
         "step t",
         "evaluate Ceiling[t/2]",
         "the number of distinct sequences at step t",
-        related=["B0801", "B0803", "B0804"],
+        related=["B0803"],
     ),
     _spec(
         "linear-t multiway state-count function",
@@ -887,7 +936,7 @@ RECOVERED_SPECS = [
         "step t",
         "evaluate t",
         "the number of distinct sequences at step t",
-        related=["B0801", "B0803", "B0804"],
+        related=["B0804"],
     ),
     _spec(
         "Fibonacci[t+1] simple-multiway state-count function",
@@ -897,7 +946,7 @@ RECOVERED_SPECS = [
         "step t",
         "evaluate Fibonacci[t+1]",
         "the number of distinct sequences at step t",
-        related=["B0801", "B0803", "B0804"],
+        related=["B0801"],
     ),
     _spec(
         "rapid-growth multiway Fibonacci state-count function",
@@ -920,13 +969,17 @@ RECOVERED_SPECS = [
         related=["B0692"],
     ),
     _spec(
-        "polynomial-growth multiway state-count function",
+        "polynomial-growth multiway state-count asymptotic profile",
         ["U006252"],
         "exact trajectory count function",
         "the displayed three-rule string multiway preset",
         "step t and number n of B symbols in the initial condition",
-        "evaluate t^(n+1)",
-        "the number/growth count of distinct states at step t",
+        "the displayed rule's state count grows at rate t^(n+1)",
+        "the stated polynomial growth-rate profile",
+        limit=(
+            "The source states a growth rate, not exact equality of the state "
+            "count with t^(n+1)."
+        ),
     ),
     _spec(
         "two-dimensional local-template constraint census",
@@ -946,7 +999,7 @@ RECOVERED_SPECS = [
         "the fixed constraint-family definition",
         "return the stated complete family size 137438953472",
         "one exact finite cardinality",
-        related=["B0703", "B0709"],
+        related=["B0703"],
     ),
 ]
 
@@ -2145,11 +2198,285 @@ def _build_enrichment(
     return updated, candidates
 
 
+DIRECT_FUNCTION_NA = {
+    "native_time",
+    "topology",
+    "complete_state",
+    "visible_history",
+    "control_state",
+    "seed",
+    "boundary",
+    "external_data",
+    "frontier_or_activation",
+    "schedule",
+    "read_dependencies_or_neighborhood",
+    "write_replacement_assembly_or_commit",
+    "witness_semantics",
+}
+
+RELATION_NA = {
+    "native_time",
+    "topology",
+    "complete_state",
+    "visible_history",
+    "control_state",
+    "seed",
+    "boundary",
+    "external_data",
+    "frontier_or_activation",
+    "schedule",
+    "write_replacement_assembly_or_commit",
+    "successor_cardinality",
+    "termination_completion_failure",
+}
+
+ITERATED_NA = {
+    "visible_history",
+    "control_state",
+    "external_data",
+    "witness_semantics",
+}
+
+
+def _typed_semantics(
+    spec: dict[str, Any],
+) -> tuple[dict[str, Any], set[str]]:
+    """Return candidate-specific values and obvious N/A fields."""
+
+    profile = spec["profile"]
+    values: dict[str, Any] = {
+        "object_kind": spec["object_kind"],
+        "carrier": spec["carrier"],
+        "input": spec["input"],
+        "law_kind": spec["object_kind"],
+        "rule_relation_constraint_function_or_probability_law": spec["law"],
+        "result_kind": spec["result"],
+        "parameters_and_variants": spec["input"],
+        "excluded_observers_and_representations": (
+            "Page layout, plotting, rasterization, and implementation "
+            "notation are non-semantic except where this candidate is "
+            "explicitly the stated representation or observer."
+        ),
+        "evidence_limit": spec["limit"],
+    }
+    if profile == "FUNCTION":
+        values.update(
+            {
+                "successor_cardinality": (
+                    spec["cardinality"]
+                    or "one returned value or collection per valid input"
+                ),
+                "determinism_branching_or_measure": (
+                    spec["measure"] or "deterministic direct evaluation"
+                ),
+                "termination_completion_failure": (
+                    spec["completion"]
+                    or (
+                        "Direct evaluation is defined for the stated valid "
+                        "inputs; invalid-input and implementation-failure "
+                        "behavior is not stated."
+                    )
+                ),
+            }
+        )
+        return values, set(DIRECT_FUNCTION_NA)
+    if profile == "REPRESENTATION":
+        values.update(
+            {
+                "successor_cardinality": (
+                    spec["cardinality"]
+                    or "one representation per supplied retained history"
+                ),
+                "determinism_branching_or_measure": (
+                    spec["measure"]
+                    or "deterministic ordering/embedding of supplied states"
+                ),
+                "termination_completion_failure": (
+                    spec["completion"]
+                    or "finite assembly for a finite retained history"
+                ),
+                "witness_semantics": (
+                    "The inspected stacked image corroborates the ordered "
+                    "history output but does not define native update mechanics."
+                ),
+            }
+        )
+        na = set(DIRECT_FUNCTION_NA)
+        na.remove("witness_semantics")
+        return values, na
+    if profile == "RELATION":
+        values.update(
+            {
+                "read_dependencies_or_neighborhood": (
+                    "all variables and parameters named in the stated relation"
+                ),
+                "determinism_branching_or_measure": (
+                    spec["measure"]
+                    or (
+                        "declarative satisfaction semantics with zero, one, "
+                        "or many witnesses"
+                    )
+                ),
+                "witness_semantics": (
+                    "a witness is any supplied value tuple satisfying the "
+                    "stated relation or predicate"
+                ),
+            }
+        )
+        return values, set(RELATION_NA)
+    if profile != "ITERATED":
+        raise AuthoringError(f"unsupported typed profile {profile}")
+
+    lowered = spec["object_kind"].lower()
+    if "grammar" in lowered or "multiway" in lowered:
+        frontier = "every applicable rule occurrence in every current state"
+        schedule = "retain all possible rewrites as the next aggregate state"
+        dependencies = "the left-hand side and local matching context of each rule"
+        write = "assemble every rewritten string and merge equal aggregate states"
+        cardinality = (
+            "one aggregate successor collection, with native branching inside it"
+        )
+        measure = "deterministic aggregate evolution with native branching"
+    elif "cellular-automaton" in lowered:
+        frontier = "all cells in the current configuration"
+        schedule = "parallel synchronous update"
+        dependencies = "the center cell and stated outer-totalistic neighborhood count"
+        write = "replace every cell simultaneously by the rule result"
+        cardinality = "one successor configuration"
+        measure = "deterministic"
+    else:
+        frontier = "every symbol or element in the current substitution state"
+        schedule = "parallel substitution of all current elements"
+        dependencies = "the current symbol/color matched by the replacement table"
+        write = "assemble the replacement blocks into the successor state"
+        cardinality = "one successor substitution state"
+        measure = "deterministic"
+    values.update(
+        {
+            "native_time": "discrete successive update steps",
+            "support": spec["carrier"],
+            "alphabet_or_value_schema": (
+                "the symbols, colors, or values explicitly fixed by the rule"
+            ),
+            "complete_state": "the complete current carrier configuration",
+            "frontier_or_activation": frontier,
+            "schedule": schedule,
+            "read_dependencies_or_neighborhood": dependencies,
+            "write_replacement_assembly_or_commit": write,
+            "successor_cardinality": spec["cardinality"] or cardinality,
+            "determinism_branching_or_measure": spec["measure"] or measure,
+        }
+    )
+    if "seed" in spec["input"].lower() or "initial" in spec["input"].lower():
+        values["seed"] = spec["input"]
+    return values, set(ITERATED_NA)
+
+
+def _typed_evidence_scopes(
+    spec: dict[str, Any],
+    rows: list[dict[str, str]],
+    supported_fields: set[str],
+    not_applicable_fields: set[str],
+) -> dict[str, list[str]]:
+    """Assign conservative, unit-specific fingerprint scopes."""
+
+    explicit = spec["evidence_scopes"]
+    scopes: dict[str, list[str]] = {}
+    non_image = [
+        row for row in rows if row["block_kind"] != "image"
+    ]
+    if not non_image:
+        raise AuthoringError(f"{spec['name']} has no non-image identity source")
+    primary_id = non_image[0]["source_unit_id"]
+    identity_fields = {
+        "object_kind",
+        "native_time",
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "input",
+        "seed",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "parameters_and_variants",
+        "evidence_limit",
+    }
+    exact_fields = {
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "termination_completion_failure",
+        "parameters_and_variants",
+        "evidence_limit",
+    }
+    context_fields = {
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "witness_semantics",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    }
+    image_fields = {
+        "carrier",
+        "support",
+        "visible_history",
+        "result_kind",
+        "witness_semantics",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    }
+    for row in rows:
+        unit_id = row["source_unit_id"]
+        if unit_id in explicit:
+            chosen = set(explicit[unit_id])
+        elif row["block_kind"] == "image":
+            chosen = image_fields
+        elif row["block_kind"] in {"fenced_code", "list", "table"}:
+            chosen = exact_fields
+        elif unit_id == primary_id:
+            chosen = identity_fields
+        else:
+            chosen = context_fields
+        scopes[unit_id] = sorted(
+            chosen & (supported_fields | not_applicable_fields),
+            key=FINGERPRINT_FIELDS.index,
+        )
+
+    covered = {
+        field for fields in scopes.values() for field in fields
+    }
+    primary_fields = set(scopes[primary_id])
+    primary_fields.update(not_applicable_fields)
+    primary_fields.update(supported_fields - covered)
+    scopes[primary_id] = sorted(
+        primary_fields,
+        key=FINGERPRINT_FIELDS.index,
+    )
+    for field in supported_fields | not_applicable_fields:
+        if not any(field in fields for fields in scopes.values()):
+            raise AuthoringError(
+                f"{spec['name']} has no evidence scope for {field}"
+            )
+    return scopes
+
+
 def _build_final_enrichment(
     *,
     reading_by_id: dict[str, dict[str, str]],
+    asset_by_unit: dict[str, dict[str, str]],
     hit_by_pair: dict[tuple[int, str], str],
-) -> tuple[list[dict[str, str]], list[dict[str, Any]], list[str]]:
+) -> tuple[
+    list[dict[str, str]],
+    list[dict[str, str]],
+    list[dict[str, Any]],
+    list[str],
+]:
     """Build the final omission delta in immutable search-hit order."""
 
     if len(RECOVERED_SPECS) != EXPECTED_NEW_CANDIDATE_COUNT:
@@ -2211,6 +2538,19 @@ def _build_final_enrichment(
     if [spec["_candidate_id"] for spec in annotated] != expected_ids:
         raise AuthoringError("search candidate-ID allocation drifted")
 
+    for spec in annotated:
+        values, not_applicable = _typed_semantics(spec)
+        source_rows = [reading_by_id[unit_id] for unit_id in spec["units"]]
+        scopes = _typed_evidence_scopes(
+            spec,
+            source_rows,
+            set(values),
+            not_applicable,
+        )
+        spec["_supported_values"] = values
+        spec["_not_applicable_fields"] = not_applicable
+        spec["_evidence_scopes"] = scopes
+
     evidence_plans: list[dict[str, Any]] = []
     for spec in annotated:
         for source_index, unit_id in enumerate(spec["units"]):
@@ -2251,44 +2591,60 @@ def _build_final_enrichment(
         "table": "TABLE",
         "paragraph": "PROSE",
         "heading": "PROSE",
+        "image": "IMAGE",
     }
-    supported_fields = [
-        "object_kind",
-        "native_time",
-        "carrier",
-        "input",
-        "law_kind",
-        "rule_relation_constraint_function_or_probability_law",
-        "result_kind",
-        "successor_cardinality",
-        "determinism_branching_or_measure",
-        "parameters_and_variants",
-        "excluded_observers_and_representations",
-        "evidence_limit",
-    ]
     for offset, plan in enumerate(evidence_plans):
         row = reading_by_id[plan["unit_id"]]
+        spec = plan["spec"]
         hit_id = plan["hit_id"]
         evidence_anchor_counts[hit_id] = (
             evidence_anchor_counts.get(hit_id, 0) + 1
         )
         source_status = row["source_status"]
-        strength = (
-            "DEFECT_LIMITED"
-            if source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"}
-            else (
-                "DIRECT_COMPLETE_MECHANICS"
-                if row["block_kind"] in {"fenced_code", "list", "table"}
-                else "DIRECT_PARTIAL_MECHANICS"
-            )
-        )
+        if source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"}:
+            strength = "DEFECT_LIMITED"
+        elif row["block_kind"] == "image":
+            strength = "CORROBORATING"
+        else:
+            strength = "DIRECT_PARTIAL_MECHANICS"
         modality = block_modality.get(row["block_kind"])
         if modality is None:
             raise AuthoringError(
                 f"unsupported evidence block kind {row['block_kind']} "
                 f"at {plan['unit_id']}"
             )
-        evidence_by_candidate[plan["spec"]["_candidate_id"]].append(
+        if row["block_kind"] == "image":
+            asset = asset_by_unit.get(plan["unit_id"])
+            if asset is None:
+                raise AuthoringError(
+                    f"image evidence {plan['unit_id']} lacks an asset row"
+                )
+            image_path = asset["physical_path"]
+            claim = (
+                f"Original-resolution inspection corroborates the stated "
+                f"result/history representation for {spec['name']}; pixels "
+                f"do not supply additional native law mechanics."
+            )
+        elif row["block_kind"] in {"fenced_code", "list", "table"}:
+            image_path = None
+            claim = (
+                f"The exact formula, code, or table supplies the scoped law "
+                f"and result evidence for {spec['name']}."
+            )
+        elif plan["source_index"] == 0:
+            image_path = None
+            claim = (
+                f"The source unit identifies {spec['name']} and delimits only "
+                f"the scoped carrier, input, law class, and evidence boundary."
+            )
+        else:
+            image_path = None
+            claim = (
+                f"The source unit supplies scoped corroborating result, "
+                f"parameter, witness, or evidence-limit context for "
+                f"{spec['name']}."
+            )
+        evidence_by_candidate[spec["_candidate_id"]].append(
             _evidence(
                 evidence_number=4049 + offset,
                 hit_id=hit_id,
@@ -2296,12 +2652,9 @@ def _build_final_enrichment(
                 unit_id=plan["unit_id"],
                 strength=strength,
                 modality=modality,
-                claim=(
-                    f"This source unit supplies identity, mechanics, or an "
-                    f"explicit evidence limit for "
-                    f"{plan['spec']['name']}: {plan['spec']['law']}."
-                ),
-                fields=supported_fields,
+                claim=claim,
+                fields=spec["_evidence_scopes"][plan["unit_id"]],
+                image_path=image_path,
             )
         )
 
@@ -2334,16 +2687,20 @@ def _build_final_enrichment(
                 for unit_id in spec["units"]
             )
         )
-        native_time = (
-            "discrete successive update steps"
-            if spec["object_kind"]
-            in {
-                "cellular-automaton rule preset",
-                "multiway-system preset",
-                "two-dimensional substitution system",
-            }
-            else "direct uniterated evaluation over the supplied input"
-        )
+        parameter_evidence_ids = [
+            item["evidence_id"]
+            for item in evidence
+            if "parameters_and_variants" in item["fingerprint_fields"]
+        ]
+        if not parameter_evidence_ids:
+            raise AuthoringError(
+                f"{candidate_id} lacks parameter evidence"
+            )
+        image_witnesses = [
+            item["image_path"]
+            for item in evidence
+            if item["image_path"] is not None
+        ]
         candidates.append(
             _new_candidate(
                 candidate_id=candidate_id,
@@ -2353,33 +2710,19 @@ def _build_final_enrichment(
                 discovery_ordinal=spec["_discovery_ordinal"],
                 source_unit_ids=spec["units"],
                 evidence=evidence,
-                supported_values={
-                    "object_kind": spec["object_kind"],
-                    "native_time": native_time,
-                    "carrier": spec["carrier"],
-                    "input": spec["input"],
-                    "law_kind": spec["object_kind"],
-                    "rule_relation_constraint_function_or_probability_law": (
-                        spec["law"]
-                    ),
-                    "result_kind": spec["result"],
-                    "successor_cardinality": (
-                        "exactly one result for each valid supplied input"
-                    ),
-                    "determinism_branching_or_measure": "deterministic",
-                    "parameters_and_variants": spec["input"],
-                    "excluded_observers_and_representations": (
-                        "page layout, plotting, rasterization, and "
-                        "implementation notation are non-semantic unless "
-                        "explicitly included in the stated law"
-                    ),
-                    "evidence_limit": spec["limit"],
-                },
-                not_applicable_fields=set(),
-                parameters=[],
+                supported_values=spec["_supported_values"],
+                not_applicable_fields=spec["_not_applicable_fields"],
+                parameters=[
+                    {
+                        "name": "input/parameter tuple",
+                        "source_description": spec["input"],
+                        "evidence_ids": parameter_evidence_ids,
+                    }
+                ],
                 uncertainties=spec["uncertainties"],
                 related_candidate_ids=relations,
                 source_status=source_status,
+                image_witnesses=image_witnesses,
             )
         )
 
@@ -2425,6 +2768,33 @@ def _build_final_enrichment(
         )
         updated.append(row)
 
+    asset_updates: list[dict[str, str]] = []
+    for unit_id in sorted(reading_additions):
+        if reading_by_id[unit_id]["block_kind"] != "image":
+            continue
+        old_asset = asset_by_unit.get(unit_id)
+        if old_asset is None:
+            raise AuthoringError(
+                f"promoted image unit {unit_id} lacks an asset row"
+            )
+        asset = dict(old_asset)
+        additions = sorted(
+            reading_additions[unit_id],
+            key=lambda candidate_id: int(candidate_id[1:]),
+        )
+        asset["candidate_ids"] = _append_links(
+            old_asset["candidate_ids"],
+            additions,
+            f"{old_asset['asset_id']}.candidate_ids",
+        )
+        asset["evidence_statement"] = (
+            f"Original-resolution image review corroborates the result, "
+            f"history, or witness representation for "
+            f"{'; '.join(names_by_unit[unit_id])}; it supplies no additional "
+            f"native update mechanics."
+        )
+        asset_updates.append(asset)
+
     new_group_ids = [
         f"G{4049 + offset:06d}" for offset in range(len(evidence_plans))
     ]
@@ -2436,7 +2806,7 @@ def _build_final_enrichment(
         raise AuthoringError(
             f"new evidence count drifted: {len(new_group_ids)}"
         )
-    return updated, candidates, new_group_ids
+    return updated, asset_updates, candidates, new_group_ids
 
 
 def _normalized_hit_projection(
@@ -2587,11 +2957,18 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
 
     unit_by_id = {unit["id"]: unit for unit in units}
     reading_by_id = {row["source_unit_id"]: row for row in reading}
+    asset_by_unit = {
+        row["source_unit_id"]: row
+        for row in assets
+        if row["source_unit_id"]
+    }
     candidates_by_id = {candidate["id"]: candidate for candidate in candidates}
     routes_by_id = {route["route_id"]: route for route in routes}
     if (
         len(unit_by_id) != len(units)
         or len(reading_by_id) != len(reading)
+        or len(asset_by_unit)
+        != sum(bool(row["source_unit_id"]) for row in assets)
         or len(candidates_by_id) != len(candidates)
         or len(routes_by_id) != len(routes)
     ):
@@ -2860,14 +3237,17 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     if first_pass:
         (
             reading_updates,
+            asset_updates,
             candidate_updates,
             new_evidence_group_ids,
         ) = _build_final_enrichment(
             reading_by_id=reading_by_id,
+            asset_by_unit=asset_by_unit,
             hit_by_pair=hit_by_pair,
         )
     else:
         reading_updates = []
+        asset_updates = []
         candidate_updates = []
         new_evidence_group_ids = []
     update_by_id = {
@@ -3190,7 +3570,7 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             for name in merge_worker_output.WRITE_NAMES
         },
         "reading_updates": reading_updates,
-        "asset_updates": [],
+        "asset_updates": asset_updates,
         "candidate_updates": candidate_updates,
         "route_appends": [],
         "proposed_search": proposed_search,
