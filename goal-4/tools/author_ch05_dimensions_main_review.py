@@ -118,6 +118,8 @@ def load_bundle(bundle: Path) -> dict[str, Any]:
     assert all(as_json_array(row["route_ids"]) == [] for row in readings)
     assert all(as_json_array(row["candidate_ids"]) == [] for row in assets)
     assert all(as_json_array(row["route_ids"]) == [] for row in assets)
+    asset_by_path = {a["physical_path"]: a for a in assets}
+    assert len(asset_by_path) == len(assets)
     return {
         "manifest": manifest,
         "readings": readings,
@@ -126,6 +128,7 @@ def load_bundle(bundle: Path) -> dict[str, Any]:
         "source": source,
         "unit_by_id": {u["id"]: u for u in units},
         "asset_by_id": {a["asset_id"]: a for a in assets},
+        "asset_by_path": asset_by_path,
     }
 
 
@@ -1471,12 +1474,17 @@ def build_route_specs() -> list[dict[str, str]]:
                 "status": "PENDING",
                 "target_unit_ids": "[]",
                 "target_asset_ids": "[]",
-                "attempts": "Sequential blind review recorded the literal route; resolution is reserved for the coordinator.",
+                "attempts": json.dumps(
+                    [
+                        "Sequential blind review recorded the literal route; resolution is reserved for the coordinator."
+                    ],
+                    separators=(",", ":"),
+                ),
                 "vocabulary_terms": json.dumps(
                     sorted(set(re.findall(r"[A-Za-z0-9]+", topic.lower()))),
                     separators=(",", ":"),
                 ),
-                "defect_boundary": "No source defect; the target is intentionally unresolved in the isolated worker.",
+                "defect_boundary": "",
             }
         )
     assert [r["route_id"] for r in result] == [f"WR{i:04d}" for i in range(1, 23)]
@@ -1599,9 +1607,43 @@ def candidate_records(
     route_specs: list[dict[str, str]],
     asset_specs: dict[str, dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], dict[str, list[str]], dict[str, list[str]], int]:
-    specs = build_candidate_specs()
+    raw_specs = build_candidate_specs()
+    unit_anchor_order = {
+        unit["id"]: ordinal for ordinal, unit in enumerate(state["units"], 1)
+    }
+    asset_anchor_order = {
+        asset["asset_id"]: len(state["units"]) + ordinal
+        for ordinal, asset in enumerate(state["assets"], 1)
+    }
+    specs = []
+    for original_index, raw_spec in enumerate(raw_specs, 1):
+        spec = dict(raw_spec)
+        spec["_original_index"] = original_index
+        spec["_anchor_order"] = (
+            unit_anchor_order[spec["anchor_id"]]
+            if spec["anchor_kind"] == "SOURCE_UNIT"
+            else asset_anchor_order[spec["anchor_id"]]
+        )
+        specs.append(spec)
+    specs.sort(
+        key=lambda spec: (
+            spec["_anchor_order"],
+            spec["ordinal"],
+            spec["_original_index"],
+        )
+    )
+    candidate_anchor_counts: dict[tuple[str, str], int] = defaultdict(int)
+    for spec in specs:
+        anchor_key = (spec["anchor_kind"], spec["anchor_id"])
+        candidate_anchor_counts[anchor_key] += 1
+        spec["_anchor_ordinal"] = candidate_anchor_counts[anchor_key]
+
     route_by_key = {row["key"]: row["route_id"] for row in route_specs}
     candidate_ids = [f"W{i:04d}" for i in range(1, len(specs) + 1)]
+    candidate_id_by_original_index = {
+        spec["_original_index"]: candidate_ids[index]
+        for index, spec in enumerate(specs)
+    }
     evidence_counter = 0
     group_counter = 0
     unit_links: dict[str, list[str]] = defaultdict(list)
@@ -1665,14 +1707,16 @@ def candidate_records(
             nonlocal evidence_counter, group_counter
             evidence_counter += 1
             group_counter += 1
-            evidence_anchor_counts[(kind, source_id)] += 1
-            anchor_ordinal = evidence_anchor_counts[(kind, source_id)]
             if kind == "SOURCE_UNIT":
+                anchor_id = source_id
                 source_unit_id: str | None = source_id
                 image_path: str | None = None
             else:
+                anchor_id = state["asset_by_id"][source_id]["physical_path"]
                 source_unit_id = state["asset_by_id"][source_id]["source_unit_id"]
-                image_path = state["asset_by_id"][source_id]["physical_path"]
+                image_path = anchor_id
+            evidence_anchor_counts[(kind, anchor_id)] += 1
+            anchor_ordinal = evidence_anchor_counts[(kind, anchor_id)]
             evidence.append(
                 {
                     "evidence_id": f"WE{evidence_counter:06d}",
@@ -1680,7 +1724,7 @@ def candidate_records(
                     "discovery_anchor": {
                         "epoch": 2,
                         "kind": kind,
-                        "id": source_id,
+                        "id": anchor_id,
                         "ordinal": anchor_ordinal,
                     },
                     "source_unit_id": source_unit_id,
@@ -1852,7 +1896,7 @@ def candidate_records(
         ]
         related = []
         if spec["parent_index"] is not None:
-            parent_id = candidate_ids[spec["parent_index"] - 1]
+            parent_id = candidate_id_by_original_index[spec["parent_index"]]
             related.append(
                 {
                     "candidate_id": parent_id,
@@ -1890,8 +1934,12 @@ def candidate_records(
             "discovery_anchor": {
                 "epoch": 2,
                 "kind": spec["anchor_kind"],
-                "id": spec["anchor_id"],
-                "ordinal": spec["ordinal"],
+                "id": (
+                    state["asset_by_id"][spec["anchor_id"]]["physical_path"]
+                    if spec["anchor_kind"] == "IMAGE"
+                    else spec["anchor_id"]
+                ),
+                "ordinal": spec["_anchor_ordinal"],
             },
             "source_unit_ids": record_source_units,
             "source_evidence": evidence,
@@ -1926,8 +1974,48 @@ def candidate_records(
             if candidate_id not in unit_links[image_unit_id]:
                 unit_links[image_unit_id].append(candidate_id)
 
+    # WE/WG identifiers follow the frozen document-first discovery traversal,
+    # independently of candidate grouping.  IMAGE anchors occur after all
+    # source-unit anchors in the bundle's authoritative ordering.
+    evidence_rows = [
+        evidence
+        for record in records
+        for evidence in record["source_evidence"]
+    ]
+
+    def evidence_sort_key(evidence: dict[str, Any]) -> tuple[int, int]:
+        anchor = evidence["discovery_anchor"]
+        if anchor["kind"] == "SOURCE_UNIT":
+            order = unit_anchor_order[anchor["id"]]
+        else:
+            asset_id = state["asset_by_path"][anchor["id"]]["asset_id"]
+            order = asset_anchor_order[asset_id]
+        return order, anchor["ordinal"]
+
+    ordered_evidence = sorted(evidence_rows, key=evidence_sort_key)
+    evidence_id_map = {
+        evidence["evidence_id"]: f"WE{ordinal:06d}"
+        for ordinal, evidence in enumerate(ordered_evidence, 1)
+    }
+    for ordinal, evidence in enumerate(ordered_evidence, 1):
+        evidence["evidence_id"] = f"WE{ordinal:06d}"
+        evidence["evidence_group_id"] = f"WG{ordinal:06d}"
+
+    def remap_ids(values: list[str]) -> list[str]:
+        return [evidence_id_map[value] for value in values]
+
+    for record in records:
+        for field in FIELDS:
+            record["fingerprint"][field]["evidence_ids"] = remap_ids(
+                record["fingerprint"][field]["evidence_ids"]
+            )
+        for collection_name in ("parameters", "variants", "related_candidate_ids"):
+            for item in record[collection_name]:
+                item["evidence_ids"] = remap_ids(item["evidence_ids"])
+
     assert [row["id"] for row in records] == candidate_ids
     assert evidence_counter == group_counter
+    assert evidence_counter == len(ordered_evidence)
     return records, unit_links, asset_links, evidence_counter
 
 
@@ -2000,7 +2088,9 @@ def reading_records(
         if anchor["kind"] == "SOURCE_UNIT":
             anchor_units.add(anchor["id"])
         elif anchor["kind"] == "IMAGE":
-            anchor_units.add(state["asset_by_id"][anchor["id"]]["source_unit_id"])
+            anchor_units.add(
+                state["asset_by_path"][anchor["id"]]["source_unit_id"]
+            )
         else:
             raise ValueError(f"disallowed sequential anchor: {anchor}")
 
@@ -2236,6 +2326,7 @@ def validate_output(
         "reference_status",
     ]
     asset_by_id: dict[str, dict[str, str]] = {}
+    asset_by_path: dict[str, dict[str, str]] = {}
     for base, row in zip(state["assets"], assets, strict=True):
         for field in immutable_asset_fields:
             if row[field] != base[field]:
@@ -2261,6 +2352,7 @@ def validate_output(
         ):
             raise ValueError(f"native asset lacks construction risk: {row['asset_id']}")
         asset_by_id[row["asset_id"]] = row
+        asset_by_path[row["physical_path"]] = row
 
     evidence_ids: list[str] = []
     group_ids: list[str] = []
@@ -2285,7 +2377,7 @@ def validate_output(
             if anchor["id"] not in reading_by_id:
                 raise ValueError(f"foreign source anchor: {candidate['id']}")
         elif anchor["kind"] == "IMAGE":
-            if anchor["id"] not in asset_by_id:
+            if anchor["id"] not in asset_by_path:
                 raise ValueError(f"foreign image anchor: {candidate['id']}")
         else:
             raise ValueError(f"search anchor in sequential review: {candidate['id']}")
@@ -2303,7 +2395,7 @@ def validate_output(
                     f"evidence unit omitted from candidate: {evidence['evidence_id']}"
                 )
             if evidence_anchor["kind"] == "IMAGE":
-                asset = asset_by_id[evidence_anchor["id"]]
+                asset = asset_by_path[evidence_anchor["id"]]
                 if (
                     evidence["strength"]
                     in {"DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
@@ -2354,9 +2446,13 @@ def validate_output(
             if route_id not in {row["route_id"] for row in routes}:
                 raise ValueError(f"foreign candidate route: {candidate['id']}")
 
-    if evidence_ids != [f"WE{i:06d}" for i in range(1, len(evidence_ids) + 1)]:
+    if sorted(evidence_ids) != [
+        f"WE{i:06d}" for i in range(1, len(evidence_ids) + 1)
+    ]:
         raise ValueError("evidence sequence is not contiguous")
-    if group_ids != [f"WG{i:06d}" for i in range(1, len(group_ids) + 1)]:
+    if sorted(group_ids) != [
+        f"WG{i:06d}" for i in range(1, len(group_ids) + 1)
+    ]:
         raise ValueError("evidence-group sequence is not contiguous")
     if len(set(evidence_ids)) != len(evidence_ids) or len(set(group_ids)) != len(group_ids):
         raise ValueError("duplicate evidence identifiers")
@@ -2408,7 +2504,7 @@ def validate_output(
         for candidate_id in as_json_array(reading["candidate_ids"]):
             candidate = candidate_by_id[candidate_id]
             image_units = {
-                asset_by_id[evidence["discovery_anchor"]["id"]]["source_unit_id"]
+                asset_by_path[evidence["discovery_anchor"]["id"]]["source_unit_id"]
                 for evidence in candidate["source_evidence"]
                 if evidence["discovery_anchor"]["kind"] == "IMAGE"
             }
