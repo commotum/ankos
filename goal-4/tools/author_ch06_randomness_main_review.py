@@ -1843,7 +1843,7 @@ def candidate_definitions() -> list[dict[str, Any]]:
         "U001341",
         fields=list(trail["values"]),
         claim="U001341 defines the distinct prior-time trail variant for Game of Life by fading cells black on preceding steps.",
-        strength="DIRECT_COMPLETE_MECHANICS",
+        strength="DIRECT_PARTIAL_MECHANICS",
     )
 
     # Life and two-dimensional-family records distinguish native laws from
@@ -2538,6 +2538,137 @@ def candidate_definitions() -> list[dict[str, Any]]:
                         "strength": "DIRECT_PARTIAL_MECHANICS",
                     },
                 )
+
+    # The emulation passages define block relations, not free-standing
+    # time-evolving programs with generic completion semantics.
+    emulation_specs = {
+        "rule-126 to rule-90 pair-block emulation": {
+            "values": {
+                "object_kind": "block encoding and temporal-subsampling emulation relation",
+                "carrier": "rule-126 configurations tiled by uniform two-cell blocks and decoded rule-90 cells",
+                "input": "a rule-126 initial condition composed only of BB or WW pairs",
+                "law_kind": "cellular-automaton block-emulation relation",
+                "rule_relation_constraint_function_or_probability_law": (
+                    "evolve rule 126 and inspect alternate steps; each uniform pair then behaves as one rule-90 cell"
+                ),
+                "result_kind": "the corresponding decoded rule-90 evolution",
+                "parameters_and_variants": "source rule 126, target rule 90, two-cell blocks, alternate-step sampling",
+            },
+            "anchor": "U001444",
+            "anchor_fields": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "structural_invariants",
+            ],
+            "detail": "U001445",
+        },
+        "rule-90 pair-block self-emulation": {
+            "values": {
+                "object_kind": "rule-90 block self-emulation relation",
+                "carrier": "rule-90 configurations grouped into adjacent two-cell blocks",
+                "input": "a rule-90 configuration encoded using an appropriate two-cell block form",
+                "law_kind": "cellular-automaton block self-emulation relation",
+                "rule_relation_constraint_function_or_probability_law": (
+                    "the two-cell block configuration evolves according to rule 90 as individual rule-90 cells do"
+                ),
+                "result_kind": "a decoded rule-90 evolution at block scale",
+                "parameters_and_variants": "rule 90 and an image-borne two-cell/two-step block codec",
+            },
+            "anchor": "U001452",
+            "anchor_fields": [
+                "object_kind",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+            ],
+            "detail": "U001453",
+        },
+        "rule-150 block self-emulation": {
+            "values": {
+                "object_kind": "rule-150 block self-emulation relation",
+                "carrier": "rule-150 configurations partitioned into the displayed blocks",
+                "input": "a rule-150 configuration encoded using the displayed block form",
+                "law_kind": "cellular-automaton block self-emulation relation",
+                "rule_relation_constraint_function_or_probability_law": (
+                    "the displayed blocks behave like individual cells under rule 150"
+                ),
+                "result_kind": "a decoded rule-150 evolution at block scale",
+                "parameters_and_variants": "rule 150 and an image-borne two-cell/two-step block codec",
+            },
+            "anchor": "U001459",
+            "anchor_fields": [
+                "object_kind",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "parameters_and_variants",
+            ],
+            "detail": "U001463",
+        },
+        "rule-184 three-cell-block self-emulation": {
+            "values": {
+                "object_kind": "rule-184 three-cell-block self-emulation relation",
+                "carrier": "rule-184 configurations partitioned into three-cell blocks",
+                "input": "a rule-184 configuration encoded using the displayed three-cell blocks",
+                "law_kind": "cellular-automaton block self-emulation relation",
+                "rule_relation_constraint_function_or_probability_law": (
+                    "each allowed three-cell block acts like one cell under rule 184"
+                ),
+                "result_kind": "a decoded rule-184 evolution at block scale",
+                "parameters_and_variants": "rule 184 and an image-borne three-cell/three-step block codec",
+            },
+            "anchor": "U001465",
+            "anchor_fields": [
+                "object_kind",
+                "carrier",
+                "input",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "result_kind",
+                "parameters_and_variants",
+                "structural_invariants",
+            ],
+            "detail": None,
+        },
+    }
+    for name, spec in emulation_specs.items():
+        row = candidate(name)
+        invariant = row["values"]["structural_invariants"]
+        row["values"] = {
+            **spec["values"],
+            "structural_invariants": invariant,
+        }
+        row["mechanics_units"] = []
+        evidence(
+            name,
+            spec["anchor"],
+            fields=spec["anchor_fields"],
+            claim=(
+                f"{spec['anchor']} establishes the source/target block-emulation identity and the "
+                "listed prose-level relation; image-borne codec details remain bounded by the record uncertainty."
+            ),
+            strength="DIRECT_PARTIAL_MECHANICS",
+        )
+        if spec["detail"] is not None:
+            evidence(
+                name,
+                spec["detail"],
+                fields=[
+                    "carrier",
+                    "input",
+                    "law_kind",
+                    "rule_relation_constraint_function_or_probability_law",
+                    "result_kind",
+                    "structural_invariants",
+                    "parameters_and_variants",
+                ],
+                claim=f"{spec['detail']} supplies the prose-level block scale, decoding, or resampling relation for {name}.",
+                strength="DIRECT_PARTIAL_MECHANICS",
+            )
 
     # Nested rule-184 seed is a deterministic iterative substitution generator.
     nested_name = "nested substitution initial condition for rule 184"
@@ -4221,6 +4352,11 @@ def build_output(bundle: Path) -> dict[str, Any]:
             "The Chapter 6 main text does not state exact probabilities or independence for its random initial-condition generators.",
             "U001513 and U001515 give contradictory adjacent-black constraints; the owned image does not resolve them.",
             "Several cellular-automaton presets are code-identified or image-transcribed while their complete code scheme is cross-referenced.",
+            "The neighbor-difference display omits neighbor direction, difference convention, and gray remapping; the prior-time trail omits retained depth and its age-to-shade map.",
+            "Several self-emulation block codecs are image-borne, and their prose supplies only the stated block widths or qualitative correspondence.",
+            "The source states rule-90 superposition consequences but does not define the algebraic superposition operator in this range.",
+            "The finite-period discussion gives bounds and measurements but no general computation algorithm; brute-force persistent-structure searches omit a universal stopping or equivalence-deduplication rule.",
+            "The localized integer seed codec leaves digit orientation, leading zeros, and surrounding blank-background conventions unresolved.",
             "The general allowed-sequence network construction and systematic fixed-period structure procedure are not fully stated in this range.",
         ],
     }
@@ -4290,12 +4426,67 @@ def verify_output(bundle: Path, output: dict[str, Any]) -> None:
         candidate_ids == [f"W{i:04d}" for i in range(1, EXPECTED_CANDIDATE_COUNT + 1)],
         "candidate ID sequence",
     )
+    candidate_by_id = {row["id"]: row for row in output["candidate_proposals"]}
+    rule110_unit = next(
+        row
+        for row in candidate_by_id["W0012"]["source_evidence"]
+        if row["source_unit_id"] == "U001560"
+    )
+    check(
+        set(rule110_unit["fingerprint_fields"])
+        == {
+            "object_kind",
+            "carrier",
+            "alphabet_or_value_schema",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        },
+        "rule-110 identity prose must not acquire generic CA mechanics",
+    )
+    for candidate_id in ("W0017", "W0018", "W0019", "W0020"):
+        panel_intro = next(
+            row
+            for row in candidate_by_id[candidate_id]["source_evidence"]
+            if row["source_unit_id"] == "U001285"
+        )
+        check(
+            not {
+                "complete_state",
+                "frontier_or_activation",
+                "schedule",
+                "write_replacement_assembly_or_commit",
+                "successor_cardinality",
+                "determinism_branching_or_measure",
+                "termination_completion_failure",
+            }
+            & set(panel_intro["fingerprint_fields"]),
+            f"{candidate_id} class-4 panel intro overstates generic CA mechanics",
+        )
+    asset_by_id = {row["asset_id"]: row for row in output["asset_updates"]}
+    check(
+        asset_by_id["A000956"]["visual_role"] == "OBSERVER",
+        "A000956 neighbor-difference rendering role",
+    )
     route_ids = [row["route_id"] for row in output["route_proposals"]]
     check(route_ids == [f"WR{i:04d}" for i in range(1, 36)], "route ID sequence")
     check(all(row["status"] == "PENDING" for row in output["route_proposals"]), "worker routes must remain pending")
     evidence = sorted(
         (record for candidate in output["candidate_proposals"] for record in candidate["source_evidence"]),
         key=lambda row: int(row["evidence_id"][2:]),
+    )
+    check(
+        all("evidence_limit" not in row["fingerprint_fields"] for row in evidence),
+        "record-level evidence_limit must not be attributed to source units",
+    )
+    check(
+        all(
+            candidate["fingerprint"]["evidence_limit"]["status"] == "UNKNOWN_FROM_SOURCE"
+            and not candidate["fingerprint"]["evidence_limit"]["evidence_ids"]
+            for candidate in output["candidate_proposals"]
+        ),
+        "record-level evidence_limit must remain outside source-supported fingerprints",
     )
     check(
         [row["evidence_id"] for row in evidence] == [f"WE{i:06d}" for i in range(1, len(evidence) + 1)],

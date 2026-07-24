@@ -329,7 +329,6 @@ MAP_FIELDS = [
     "native_time",
     "carrier",
     "complete_state",
-    "law_kind",
     "rule_relation_constraint_function_or_probability_law",
     "result_kind",
     "determinism_branching_or_measure",
@@ -385,7 +384,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006346",
             1,
             "stochastic",
-            [ev("U006346", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Starting from all white, a definite cellular-automaton step is accompanied at every step by a random change to the center cell.", ["object_kind", "native_time", "carrier", "complete_state", "seed", "frontier_or_activation", "schedule", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "determinism_branching_or_measure"])],
+            [ev("U006346", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Starting from all white, a definite cellular-automaton step is accompanied at every step by a random change to the center cell.", ["object_kind", "native_time", "seed", "frontier_or_activation", "schedule", "law_kind", "rule_relation_constraint_function_or_probability_law", "determinism_branching_or_measure"])],
             values={
                 "carrier": "a cellular-automaton cell array",
                 "seed": "all cells white",
@@ -427,7 +426,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006348", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The survey groups one-dimensional totalistic cellular automata by behavior class for varying color count k and range r.", OBS_FIELDS),
-                ev("U006349", "IMAGE", "DIRECT_IDENTITY", "The original-resolution pie charts render the surveyed class frequencies for the displayed k and r cases.", ["result_kind", "parameters_and_variants"], p + "_page_963_Frequencies_of_Classes_Four_Pie_Charts.jpeg"),
+                ev("U006349", "IMAGE", "CONTEXTUAL", "The original-resolution pie charts render the surveyed class frequencies for the displayed k and r cases.", ["result_kind", "parameters_and_variants"], p + "_page_963_Frequencies_of_Classes_Four_Pie_Charts.jpeg"),
             ],
             values={
                 "input": "the finite one-dimensional totalistic rule space for specified color count k and range r",
@@ -501,7 +500,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca2d",
             [
                 ev("U006351", "PROSE", "DIRECT_IDENTITY", "The Life two-dimensional cellular automaton is named and its step implementation introduced.", ["object_kind", "carrier", "topology", "alphabet_or_value_schema", "complete_state"]),
-                ev("U006352", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep counts the 3x3 neighborhood including self and returns black for a live cell at total 4 or any cell at total 3.", ["frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "successor_cardinality", "determinism_branching_or_measure"]),
+                ev("U006352", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep counts the 3x3 neighborhood including self and returns black for a live cell at total 4 or any cell at total 3.", ["frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
                 ev("U006354", "CODE", "CORROBORATING", "The sparse implementation produces births at multiplicity 3 and retains live positions at multiplicity 4.", ["rule_relation_constraint_function_or_probability_law"]),
             ],
             values={
@@ -518,7 +517,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca2d",
             [
                 ev("U006356", "PROSE", "DIRECT_IDENTITY", "A cubic-lattice three-dimensional Life-like family is introduced.", ["object_kind", "carrier", "topology"]),
-                ev("U006357", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep3D counts the 26 neighboring cells and applies survival interval p..q or birth count r synchronously.", ["alphabet_or_value_schema", "complete_state", "frontier_or_activation", "schedule", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "successor_cardinality", "determinism_branching_or_measure", "parameters_and_variants"]),
+                ev("U006357", "CODE", "DIRECT_COMPLETE_MECHANICS", "LifeStep3D counts the 26 neighboring cells and applies survival interval p..q or birth count r synchronously.", ["alphabet_or_value_schema", "complete_state", "schedule", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind"]),
+                ev("U006358", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The source enumerates {5,7,6}, {4,5,5}, and {5,6,5}, and identifies the pictured moving structure with the second preset.", ["parameters_and_variants"]),
             ],
             values={
                 "object_kind": "three-dimensional cellular automaton",
@@ -637,7 +637,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "ca1d",
             [
                 ev("U006378", "PROSE", "DIRECT_IDENTITY", "Finite cyclic rule 60 is represented by binary state polynomials.", ["object_kind", "topology", "alphabet_or_value_schema", "boundary", "read_dependencies_or_neighborhood"]),
-                ev("U006379", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The t-step state is PolynomialMod[(1+x)^t z,{x^n-1,2}], fixing binary cyclic evolution.", ["native_time", "carrier", "support", "complete_state", "frontier_or_activation", "schedule", "law_kind", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "successor_cardinality", "determinism_branching_or_measure"]),
+                ev("U006379", "FORMULA", "DIRECT_COMPLETE_MECHANICS", "The t-step state is PolynomialMod[(1+x)^t z,{x^n-1,2}], fixing binary cyclic evolution.", ["native_time", "complete_state", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "determinism_branching_or_measure"]),
             ],
             values={
                 "topology": "a cyclic one-dimensional lattice of n cells",
@@ -708,7 +708,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006386", "PROSE", "DIRECT_PARTIAL_MECHANICS", "The survey compares finite-ring repetition periods for rules 45, 30, and 60 and their conjugates/reflections as the ring size n varies.", OBS_FIELDS),
-                ev("U006387", "IMAGE", "DIRECT_IDENTITY", "The original-resolution figure renders the stated period comparison as a function of n.", ["result_kind", "parameters_and_variants"], p + "_page_966_Figure_12.jpeg"),
+                ev("U006387", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders the stated period comparison as a function of n.", ["result_kind", "parameters_and_variants"], p + "_page_966_Figure_12.jpeg"),
             ],
             values={
                 "input": "a selected elementary cellular-automaton rule and finite cyclic size n",
@@ -784,8 +784,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [
-                ev("U006395", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Every k-color range-r additive rule sums neighborhood values modulo k using position weights.", ["object_kind", "carrier", "support", "alphabet_or_value_schema", "read_dependencies_or_neighborhood", "law_kind", "parameters_and_variants"]),
-                ev("U006398", "CODE", "DIRECT_COMPLETE_MECHANICS", "One synchronous step is Mod[ListCorrelate[w,list,Ceiling[Length[w]/2]],k].", ["native_time", "complete_state", "frontier_or_activation", "schedule", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "successor_cardinality", "determinism_branching_or_measure"]),
+                ev("U006395", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Every k-color range-r additive rule sums neighborhood values modulo k using position weights.", ["object_kind", "alphabet_or_value_schema", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "parameters_and_variants"]),
+                ev("U006398", "CODE", "DIRECT_COMPLETE_MECHANICS", "One synchronous step is Mod[ListCorrelate[w,list,Ceiling[Length[w]/2]],k].", ["complete_state", "schedule", "rule_relation_constraint_function_or_probability_law", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
             ],
             values={
                 "alphabet_or_value_schema": "values modulo k",
@@ -902,7 +902,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006426", "PROSE", "DIRECT_PARTIAL_MECHANICS", "For each initial density, the analyzer follows density on successive steps and encodes it by gray level, with initial density across and time down.", OBS_FIELDS + ["parameters_and_variants"]),
-                ev("U006428", "IMAGE", "DIRECT_IDENTITY", "The original-resolution figure renders the stated density-response rasters for rules 236, 126, and 30.", ["result_kind", "parameters_and_variants"], p + "_page_969_Figure_2.jpeg"),
+                ev("U006428", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders the stated density-response rasters for rules 236, 126, and 30.", ["result_kind", "parameters_and_variants"], p + "_page_969_Figure_2.jpeg"),
             ],
             values={
                 "input": "a cellular-automaton rule, a range of initial densities, and an evolution horizon",
@@ -952,7 +952,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006429", "PROSE", "DIRECT_PARTIAL_MECHANICS", "From completely random initial conditions, rule 73 forms independent regions containing period-3 patterns and its aggregate density continues to oscillate with period 3.", OBS_FIELDS + ["structural_invariants"]),
-                ev("U006430", "IMAGE", "DIRECT_IDENTITY", "The original-resolution picture renders the region structure accompanying the stated period-3 density behavior.", ["result_kind", "excluded_observers_and_representations"], p + "_page_969_Picture_4.jpeg"),
+                ev("U006430", "IMAGE", "CONTEXTUAL", "The original-resolution picture renders the region structure accompanying the stated period-3 density behavior.", ["result_kind", "excluded_observers_and_representations"], p + "_page_969_Picture_4.jpeg"),
             ],
             values={
                 "input": "a rule-73 history generated from the stated random initial-condition ensemble",
@@ -1163,8 +1163,8 @@ def candidate_specs() -> list[dict[str, Any]]:
             1,
             "ca1d",
             [
-                ev("U006461", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The new cell is f[a1,a2], with f associative.", ["object_kind", "carrier", "support", "alphabet_or_value_schema", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "structural_invariants"]),
-                ev("U006462", "CODE", "DIRECT_COMPLETE_MECHANICS", "NestList with zero padding constructs the complete synchronous history from a single nonzero value.", ["native_time", "complete_state", "frontier_or_activation", "schedule", "write_replacement_assembly_or_commit", "result_kind", "successor_cardinality", "determinism_branching_or_measure"]),
+                ev("U006461", "FORMULA", "DIRECT_PARTIAL_MECHANICS", "The new cell is f[a1,a2], with f associative.", ["object_kind", "alphabet_or_value_schema", "read_dependencies_or_neighborhood", "law_kind", "rule_relation_constraint_function_or_probability_law", "structural_invariants"]),
+                ev("U006462", "CODE", "DIRECT_COMPLETE_MECHANICS", "NestList with zero padding constructs the complete synchronous history from a single nonzero value.", ["native_time", "complete_state", "schedule", "write_replacement_assembly_or_commit", "result_kind", "determinism_branching_or_measure"]),
                 ev("U006463", "PROSE", "CONTEXTUAL", "The source introduces the explicit first-step expansions used to expose the associative structure.", ["structural_invariants"]),
                 ev("U006464", "CODE", "CORROBORATING", "The first four symbolic rows expand the binary operation before associativity is imposed.", ["rule_relation_constraint_function_or_probability_law"]),
                 ev("U006465", "PROSE", "CONTEXTUAL", "The source then imposes Flat associativity on those expansions.", ["structural_invariants"]),
@@ -1187,7 +1187,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006469", "PROSE", "DIRECT_PARTIAL_MECHANICS", "Starting every elementary rule from one black cell, the analyzer sorts successive configurations and counts distinct configurations and complete patterns across all 256 rules.", OBS_FIELDS + ["parameters_and_variants"]),
-                ev("U006470", "IMAGE", "DIRECT_IDENTITY", "The original-resolution figure renders the sorted configuration comparison across the 256 elementary rules.", ["result_kind", "excluded_observers_and_representations"], p + "_page_971_Figure_11.jpeg"),
+                ev("U006470", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders the sorted configuration comparison across the 256 elementary rules.", ["result_kind", "excluded_observers_and_representations"], p + "_page_971_Figure_11.jpeg"),
             ],
             values={
                 "input": "all 256 elementary cellular-automaton rules, each started from a single black cell, and an observation horizon",
@@ -1667,7 +1667,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "U006555",
             1,
             "generator",
-            [ev("U006555", "PROSE", "DIRECT_COMPLETE_MECHANICS", "For each of n labeled nodes, choose its unique successor from the n nodes, yielding the static ensemble of n^n possible functional digraphs.", ["object_kind", "native_time", "carrier", "support", "structural_invariants", "complete_state", "input", "law_kind", "rule_relation_constraint_function_or_probability_law", "result_kind", "determinism_branching_or_measure", "parameters_and_variants"])],
+            [ev("U006555", "PROSE", "DIRECT_COMPLETE_MECHANICS", "For each of n labeled nodes, choose its unique successor from the n nodes, yielding the static ensemble of n^n possible functional digraphs.", ["object_kind", "carrier", "support", "structural_invariants", "input", "rule_relation_constraint_function_or_probability_law", "result_kind", "parameters_and_variants"])],
             values={
                 "carrier": "n labeled nodes",
                 "support": "all functions from the n-node labeled set to itself",
@@ -1702,7 +1702,7 @@ def candidate_specs() -> list[dict[str, Any]]:
             "observer",
             [
                 ev("U006558", "PROSE", "DIRECT_COMPLETE_MECHANICS", "For indexed code-20 initial conditions, the analyzer records steps survived and counts seeds that lead to persistent structures over stated sample bounds.", OBS_FIELDS + ["parameters_and_variants"]),
-                ev("U006559", "IMAGE", "DIRECT_IDENTITY", "The original-resolution figure renders survival times for the first 1000 initial conditions.", ["result_kind", "excluded_observers_and_representations"], p + "_page_979_Figure_4.jpeg"),
+                ev("U006559", "IMAGE", "CONTEXTUAL", "The original-resolution figure renders survival times for the first 1000 initial conditions.", ["result_kind", "excluded_observers_and_representations"], p + "_page_979_Figure_4.jpeg"),
             ],
             values={
                 "input": "an indexed collection of code-20 initial conditions and an observation horizon",
@@ -2255,7 +2255,9 @@ def main() -> None:
     candidate_ids_by_asset: dict[str, list[str]] = {}
     asset_by_path = {row["physical_path"]: row for row in asset_rows}
     route_by_id = {row["route_id"]: row for row in routes}
-    field_unknown_reason = "Not fixed by the in-scope Chapter 6 Notes evidence."
+    def field_unknown_reason(field: str) -> str:
+        label = field.replace("_", " ")
+        return f"The in-scope source does not fix the candidate's {label}."
 
     # Complete provenance first, then allocate WE/WG IDs in the bundle's
     # frozen document-first traversal. Images follow all source units in the
@@ -2410,7 +2412,7 @@ def main() -> None:
         first_evidence_id = source_evidence[0]["evidence_id"]
         for field in FIELDS:
             if field == "evidence_limit":
-                reason = "The sealed-bundle audit boundary is record metadata, not content established by a source unit."
+                reason = "The audit boundary is recorded by sealed-bundle metadata and is intentionally not attributed to any source unit."
                 fingerprint[field] = {
                     "status": "UNKNOWN_FROM_SOURCE",
                     "value": None,
@@ -2434,14 +2436,15 @@ def main() -> None:
                     "reason": "This field is not part of the source-defined semantics for this object.",
                 }
             else:
+                reason = field_unknown_reason(field)
                 fingerprint[field] = {
                     "status": "UNKNOWN_FROM_SOURCE",
                     "value": None,
                     "evidence_ids": [],
-                    "reason": field_unknown_reason,
+                    "reason": reason,
                 }
-                if field_unknown_reason not in missing_mechanics:
-                    missing_mechanics.append(field_unknown_reason)
+                if reason not in missing_mechanics:
+                    missing_mechanics.append(reason)
         strengths = list(dict.fromkeys(record["strength"] for record in source_evidence))
         parameters = [
             {"name": name, "source_description": description, "evidence_ids": [first_evidence_id]}
@@ -2601,7 +2604,31 @@ def main() -> None:
         "A000649", "A000650", "A000651", "A000652", "A000653", "A000654",
         "A000655", "A000656", "A000657", "A000658", "A000659", "A000660",
     }
-    observer_assets = {"A000590", "A000596", "A000597", "A000612", "A000613", "A000614", "A000617", "A000622", "A000623", "A000624", "A000625", "A000626", "A000627", "A000628", "A000629", "A000630", "A000633", "A000636", "A000637", "A000638"}
+    referenced_visual_roles = {
+        **{
+            asset_id: "NATIVE_EVIDENCE"
+            for asset_id in {"A000608", "A000639", "A000640", "A000643", "A000645"}
+        },
+        **{
+            asset_id: "OBSERVER"
+            for asset_id in {
+                "A000589", "A000590", "A000595", "A000596", "A000597",
+                "A000598", "A000599", "A000609", "A000612", "A000613",
+                "A000614", "A000615", "A000616", "A000617", "A000618",
+                "A000622", "A000638", "A000642", "A000644", "A000646",
+                "A000647", "A000658", "A000659",
+            }
+        },
+        **{
+            asset_id: "RELATION"
+            for asset_id in {
+                "A000610", "A000611", "A000623", "A000624", "A000625",
+                "A000626", "A000627", "A000628", "A000629", "A000630",
+                "A000633", "A000636", "A000637", "A000641",
+            }
+        },
+    }
+    assert len(referenced_visual_roles) == 42
     native_asset_statements = {
         "A000590": "Original-resolution inspection checked the four pie charts as a bounded survey of behavior-class frequencies for the displayed one-dimensional totalistic rule spaces.",
         "A000595": "Original-resolution inspection checked the successive evolution frames of the moving structure under the {4,5,5} three-dimensional Life-like rule described by the adjacent source units.",
@@ -2613,6 +2640,7 @@ def main() -> None:
         "A000617": "Original-resolution inspection checked the sorted configuration comparison across all 256 elementary rules as the visual witness for the pattern-uniqueness analyzer.",
         "A000638": "Original-resolution inspection checked the survival-time display for the first 1000 code-20 initial conditions against the adjacent source description.",
         "A000641": "Original-resolution inspection checked the displayed catalogue against the stated criterion: fewer than eight live cells and no change under a Life step.",
+        "A000642": "Original-resolution inspection checked the labeled Life examples as an observer survey of more complicated repetitive and moving structures; the adjacent prose supplies no coordinate-level seeds or separate mechanics, so the panel remains deliberately noncandidate.",
         "A000643": "Original-resolution inspection checked the pictured rule-110 background against the adjacent source unit's repeated 14-cell block and step-dependent displacement description.",
     }
     asset_updates: list[dict[str, str]] = []
@@ -2628,7 +2656,7 @@ def main() -> None:
             risks = ["AMBIGUOUS", "CAPTION_INCOMPLETE"]
         else:
             status = "CLEAR"
-            role = "OBSERVER" if asset_id in observer_assets and not candidate_ids else "NATIVE_EVIDENCE"
+            role = referenced_visual_roles[asset_id]
             uncertainty = ""
             evidence_statement = native_asset_statements.get(
                 asset_id,
