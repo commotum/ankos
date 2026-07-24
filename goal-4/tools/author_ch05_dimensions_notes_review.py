@@ -716,16 +716,50 @@ def candidate_specs() -> list[dict[str, Any]]:
 
     add("generic two-dimensional block substitution system", "SUB", ("SOURCE_UNIT", "U006145"),
         [ev("U006145", "A rule mapping element labels to rectangular two-dimensional blocks and an initial array parameterize the construction."),
-         ev("U006146", "SS2DEvolve performs parallel replacement and two-dimensional flattening.", modality="CODE")])
+         ev("U006146", "SS2DEvolve performs parallel replacement and two-dimensional flattening.", modality="CODE")],
+        params=[("rule", "element-label to 2D nested-array block lookup"), ("init", "initial 2D nested array"), ("t", "replacement-round count")],
+        overrides={"object_kind": "two-dimensional nested-array block-substitution construction",
+                   "carrier": "a two-dimensional nested array of element labels",
+                   "support": "all elements of the current two-dimensional array",
+                   "topology": "row/column nesting in the two-dimensional array",
+                   "structural_invariants": "each source element contributes one lookup-selected block which Flatten2D assembles in source row/column order",
+                   "alphabet_or_value_schema": "element labels appearing in the replacement lookup and array",
+                   "complete_state": "the complete current two-dimensional nested array",
+                   "seed": "the supplied initial two-dimensional nested array init",
+                   "frontier_or_activation": "all array elements",
+                   "schedule": "parallel element-label lookup followed by one two-dimensional flatten/assembly",
+                   "read_dependencies_or_neighborhood": "the single replaced element label",
+                   "law_kind": "element-label to two-dimensional block replacement lookup",
+                   "rule_relation_constraint_function_or_probability_law": "replace each element independently by the two-dimensional block assigned to its label",
+                   "write_replacement_assembly_or_commit": "Flatten2D assembles replacement blocks in the source array's row/column order",
+                   "result_kind": "a successor two-dimensional nested array",
+                   "parameters_and_variants": "replacement lookup rule, initial array init, and round count t",
+                   "excluded_observers_and_representations": "geometrical assembly, neighborhood-dependent reads, shape types, and orientations are not supported by U006145–U006146",
+                   "evidence_limit": "the Notes fix 2D nested-array lookup, replacement, flattening, rule, init, and t only"})
     add("page-187 Sierpiński block-substitution preset", "SUB", ("SOURCE_UNIT", "U006145"),
         [ev("U006145", "The exact page-187 rule maps 1 to {{1,0},{1,1}}, maps 0 to an all-zero 2x2 block, and starts from {{1}}."),
          ev("U006149", "The resulting page-187 construction is explicitly identified as the Sierpiński pattern.", strength="DIRECT_IDENTITY",
             fields=["object_kind", "parameters_and_variants"])],
         aliases=["page-187 Sierpinski pattern"],
         params=[("rule", "{1 -> {{1,0},{1,1}}, 0 -> {{0,0},{0,0}}}"), ("seed", "{{1}}")],
-        overrides={"rule_relation_constraint_function_or_probability_law": "replace 1 by {{1,0},{1,1}} and 0 by {{0,0},{0,0}} in parallel",
+        overrides={"object_kind": "binary two-dimensional nested-array block-substitution preset",
+                   "carrier": "a two-dimensional nested array of binary element labels",
+                   "support": "all binary elements of the current two-dimensional array",
+                   "topology": "row/column nesting in the two-dimensional array",
+                   "structural_invariants": "each source element contributes one 2x2 lookup-selected block assembled in source row/column order",
+                   "alphabet_or_value_schema": "binary labels 0 and 1",
+                   "complete_state": "the complete current two-dimensional binary nested array",
                    "seed": "{{1}}",
-                   "parameters_and_variants": "the exact page-187 binary 2x2 replacement table and singleton-black seed"})
+                   "frontier_or_activation": "all array elements",
+                   "schedule": "parallel single-element lookup followed by one two-dimensional flatten/assembly",
+                   "read_dependencies_or_neighborhood": "the single replaced element label",
+                   "law_kind": "exact binary element-label to 2x2 block replacement lookup",
+                   "rule_relation_constraint_function_or_probability_law": "replace 1 by {{1,0},{1,1}} and 0 by {{0,0},{0,0}} in parallel",
+                   "write_replacement_assembly_or_commit": "Flatten2D assembles all selected 2x2 blocks in source row/column order",
+                   "result_kind": "a successor two-dimensional binary nested array",
+                   "parameters_and_variants": "the exact page-187 binary 2x2 replacement table, singleton seed {{1}}, and round count",
+                   "excluded_observers_and_representations": "geometrical assembly, neighborhood-dependent reads, shape types, and orientations are not native to this preset",
+                   "evidence_limit": "U006145–U006146 fix an elementwise binary nested-array rule; alternate Sierpiński renderings are representations"})
     add("non-white-background two-dimensional substitution-system family", "SUB", ("SOURCE_UNIT", "U006168"),
         [ev("U006168", "White elements are replaced by blocks that themselves contain black elements."),
          ev("U006169", "The image shows the resulting histories but does not isolate the panel rules.", modality="IMAGE",
@@ -743,14 +777,18 @@ def candidate_specs() -> list[dict[str, Any]]:
          ev("U006174", "At least d+1 black replacements are required to avoid confinement to a hyperplane.")],
         params=[("dimension", "3"), ("colors", "2")])
     add("L-shaped geometric substitution system", "SUB", ("IMAGE", "A000549"),
-        [ev("U006176", "The first row is the first unambiguous L-shaped referent and directly shows successive subdivision/replacement stages.", modality="IMAGE",
+        [ev("U006175", "The prose context identifies the following examples as substitution systems based on subdividing geometrical figures.",
+            strength="CONTEXTUAL", fields=["object_kind", "carrier"]),
+         ev("U006176", "The first row is the first unambiguous L-shaped referent and directly shows successive subdivision/replacement stages.", modality="IMAGE",
             image="BACK-MATTER/NOTES/_page_947_Picture_10.jpeg")],
         missing=["The exact oriented-piece replacement table for the first L-shaped construction is not written textually."],
         overrides={"carrier": "an L-shaped geometric region recursively assembled from typed/oriented subpieces",
                    "alphabet_or_value_schema": "the visually distinguished L-shaped subpiece types and orientations",
                    "parameters_and_variants": "the first displayed L-shaped subdivision system"})
     add("square-and-golden-rectangle geometric substitution", "SUB", ("SOURCE_UNIT", "U006177"),
-        [ev("U006176", "The second row shows the square/GoldenRatio-rectangle replacement history.", modality="IMAGE",
+        [ev("U006175", "The prose context identifies the following examples as substitution systems based on subdividing geometrical figures.",
+            strength="CONTEXTUAL", fields=["object_kind", "carrier"]),
+         ev("U006176", "The second row shows the square/GoldenRatio-rectangle replacement history.", modality="IMAGE",
             image="BACK-MATTER/NOTES/_page_947_Picture_10.jpeg"),
          ev("U006177", "The second system's square/GoldenRatio shapes, orientation labels, exact equal-square rule, and seed are stated.")],
         overrides={"carrier": "a square and a GoldenRatio-aspect rectangle with orientation types",
@@ -823,7 +861,12 @@ def candidate_specs() -> list[dict[str, Any]]:
          ev("U006216", "NeighborNumbers defines bounded local structure.", modality="CODE"),
          ev("U006217", "Rules reroute connections and can insert nodes."),
          ev("U006218", "NetEvolveStep states parallel local rewriting and node insertion.", modality="CODE"),
-         ev("U006224", "NetEvolveList applies rules and removes nodes unreachable from node 1.", modality="CODE")])
+         ev("U006224", "NetEvolveList applies rules and removes nodes unreachable from node 1.", modality="CODE")],
+        overrides={"complete_state": "the complete directed above/below connection list for every current node",
+                   "control_state": None,
+                   "frontier_or_activation": "all current nodes are rule sites each step",
+                   "schedule": "parallel synchronous local rewriting of every current node, followed by global assembly, renumbering, and stated unreachable-node removal",
+                   "result_kind": "one successor directed network with no active-node component"})
     add("undirected network rewriting system", "UNDIRECTED_NETWORK", ("SOURCE_UNIT", "U006226"),
         [ev("U006226", "Undirected-connection networks are independently delimited, but their update rules are routed to Chapter 9.")],
         missing=["The assigned Notes do not state the undirected-network state-transition, frontier, schedule, read, rewrite, commit, branching, or termination mechanics."])
@@ -867,7 +910,18 @@ def candidate_specs() -> list[dict[str, Any]]:
         aliases=["semi-Thue system", "semi-Thue systems", "string rewrite system", "string rewrite systems",
                  "term rewrite system", "term rewrite systems", "production system", "production systems",
                  "associative calculus", "associative calculi"],
-        variants=[("canonical pattern-variable system", "a multiway/string-rewrite system with explicit pattern variables such as s_")])
+        variants=[("canonical pattern-variable system", "a multiway/string-rewrite system with explicit pattern variables such as s_")],
+        overrides={"carrier": "a deduplicated set or list of strings",
+                   "support": "all strings present at the current step",
+                   "topology": "substring replacement occurrences within each current string",
+                   "alphabet_or_value_schema": "the symbols occurring in the string replacement rules and initial string",
+                   "complete_state": "the deduplicated set or list of current strings",
+                   "seed": "the stated initial string or initial set of strings",
+                   "frontier_or_activation": "every applicable substring match in every current string",
+                   "read_dependencies_or_neighborhood": "each string-rule left-hand-side occurrence",
+                   "result_kind": "a deduplicated successor set of strings",
+                   "parameters_and_variants": "string replacement rule set, initial string/seed, and optional explicit pattern variables",
+                   "excluded_observers_and_representations": "array, numeric, sorted-count, and cyclic-boundary multiway constructions are separate candidates, not mechanics of this string system"})
     add("page-206 three-rule multiway preset", "MULTI", ("SOURCE_UNIT", "U006248"),
         [ev("U006248", "The page-206 case is independently identified.",
             strength="DIRECT_IDENTITY", fields=["object_kind", "parameters_and_variants"]),
@@ -1173,7 +1227,7 @@ ROUTES = [
     ("U006121", "", "page 181", "PAGE", "main-text cellular automaton code 174826 construction", "WITHIN_STAGE"),
     ("U006123", "", "page 183", "PAGE", "underlying rules for 3D projection panels (a) and (b)", "WITHIN_STAGE"),
     ("U006139", "", "page 185", "PAGE", "rules for 2D Turing-machine head paths (a) through (e)", "WITHIN_STAGE"),
-    ("U006168", "", "main-text rules underlying the non-white-background panels", "SECTION", "exact replacement tables for the displayed panels", "WITHIN_STAGE"),
+    ("U006168", "", "page 583", "PAGE", "non-white-background substitution systems and their nested structure", "CROSS_RANGE"),
     ("U006192", "", "pages 407 and 1006", "PAGE", "parameter-space sets for geometric substitution systems", "CROSS_RANGE"),
     ("U006208", "", "page 1127", "PAGE", "sigma-function scan of an infinite grid quadrant", "CROSS_RANGE"),
     ("U006226", "", "Chapter 9", "SECTION", "undirected-network update rules", "CROSS_RANGE"),
@@ -1191,7 +1245,7 @@ ROUTES = [
 
 CANDIDATE_ROUTE_TARGETS = {
     "non-white-background two-dimensional substitution-system family": [
-        "main-text rules underlying the non-white-background panels"
+        "page 583"
     ],
     "affine iterated transformation system": ["pages 407 and 1006"],
     "square-spiral enumeration of the integer grid": ["page 1127"],
@@ -1778,10 +1832,10 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         for a in asset_updates
     )
 
-    # Freeze the hostile semantic dispositions that motivated the e3 rewrite.
+    # Freeze the hostile semantic dispositions that motivated the e3–r4 rewrites.
     by_name = {p["provisional_name"]: p for p in proposals}
     assert len(proposals) == 128
-    assert len(all_evidence) == 266
+    assert len(all_evidence) == 268
     assert len(route_proposals) == 22
     assert proposals.index(by_name["two-dimensional totalistic cellular-automaton family"]) < proposals.index(
         by_name["two-dimensional outer-totalistic cellular-automaton family"]
@@ -1825,7 +1879,22 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         "final sequential-network six-case preset",
     } <= set(by_name)
     assert by_name["L-shaped geometric substitution system"]["discovery_anchor"]["id"] == "U006176"
-    assert by_name["L-shaped geometric substitution system"]["source_unit_ids"] == ["U006176"]
+    assert by_name["L-shaped geometric substitution system"]["source_unit_ids"] == [
+        "U006175",
+        "U006176",
+    ]
+    assert any(
+        e["source_unit_id"] == "U006175"
+        and e["strength"] == "CONTEXTUAL"
+        and set(e["fingerprint_fields"]) == {"object_kind", "carrier"}
+        for e in by_name["L-shaped geometric substitution system"]["source_evidence"]
+    )
+    assert any(
+        e["source_unit_id"] == "U006175"
+        and e["strength"] == "CONTEXTUAL"
+        and set(e["fingerprint_fields"]) == {"object_kind", "carrier"}
+        for e in by_name["square-and-golden-rectangle geometric substitution"]["source_evidence"]
+    )
     assert by_name["final sequential-network six-case preset"]["source_unit_ids"] == [
         "U006230",
         "U006231",
@@ -1856,6 +1925,26 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
     assert {"finite complement language", "subshift of finite type"} <= set(
         by_name["one-dimensional allowed-block constraint system"]["aliases"]
     )
+    for name in [
+        "generic two-dimensional block substitution system",
+        "page-187 Sierpiński block-substitution preset",
+    ]:
+        fingerprint = by_name[name]["fingerprint"]
+        assert "nested array" in fingerprint["carrier"]["value"]
+        assert fingerprint["read_dependencies_or_neighborhood"]["value"] == "the single replaced element label"
+        assert "geometrical assembly" in fingerprint["excluded_observers_and_representations"]["value"]
+    parallel = by_name["parallel directed network system"]["fingerprint"]
+    assert parallel["complete_state"]["value"] == (
+        "the complete directed above/below connection list for every current node"
+    )
+    assert parallel["frontier_or_activation"]["value"] == "all current nodes are rule sites each step"
+    assert parallel["schedule"]["value"].startswith("parallel synchronous")
+    assert parallel["result_kind"]["value"] == "one successor directed network with no active-node component"
+    string_multiway = by_name["string multiway system"]["fingerprint"]
+    assert string_multiway["carrier"]["value"] == "a deduplicated set or list of strings"
+    assert string_multiway["parameters_and_variants"]["value"] == (
+        "string replacement rule set, initial string/seed, and optional explicit pattern variables"
+    )
     for name, exact_law in {
         "linear vector relation u == m.v": "u == m . v",
         "quadratic vector relation u == m1.v + m2.v^2": "u == m1 . v + m2 . v^2",
@@ -1883,12 +1972,14 @@ def author(bundle: Path, check_spec: bool) -> dict[str, Any]:
         "page 181": "U006121",
         "page 183": "U006123",
         "page 185": "U006139",
-        "main-text rules underlying the non-white-background panels": "U006168",
     }.items():
         route = routes_by_target[target]
         assert route["discovery_kind"] == "SOURCE_UNIT"
         assert route["discovery_id"] == unit
         assert route["closure_scope"] == "WITHIN_STAGE"
+    assert "main-text rules underlying the non-white-background panels" not in routes_by_target
+    assert routes_by_target["page 583"]["discovery_id"] == "U006168"
+    assert routes_by_target["page 583"]["closure_scope"] == "CROSS_RANGE"
     assert route_proposals.index(routes_by_target["page 1073"]) < route_proposals.index(
         routes_by_target["page 887"]
     )

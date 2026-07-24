@@ -389,7 +389,7 @@ def profile_blueprint(
             "support": "a finite collection of geometrical square elements",
             "topology": "free geometrical placement in the plane rather than a fixed grid",
             "structural_invariants": "the same geometrical replacement rule is reused for every element",
-            "alphabet_or_value_schema": "black square elements; no color or orientation alphabet is established for the family",
+            "alphabet_or_value_schema": "black square elements",
             "complete_state": "the current squares together with their geometrical placement and scale",
             "frontier_or_activation": "all current elements eligible under the repeated replacement rule",
             "schedule": "parallel replacement at each step",
@@ -402,7 +402,7 @@ def profile_blueprint(
             "determinism_branching_or_measure": "deterministic",
             "parameters_and_variants": "number, relative scale, and placement of the smaller black squares",
             "excluded_observers_and_representations": "nested appearance and rendered stages are outcomes; neighbor interaction is explicitly absent",
-            "evidence_limit": "the family passage does not establish a seed, color/orientation types, collision policy, or interacting neighborhood",
+            "evidence_limit": "only the stated black-square, noninteracting geometrical replacement mechanics are asserted; no family seed is established",
         }
         na = {
             "visible_history",
@@ -436,7 +436,7 @@ def profile_blueprint(
             "determinism_branching_or_measure": "deterministic",
             "parameters_and_variants": "local neighborhood, replacement table, and wrapped-grid extent",
             "excluded_observers_and_representations": "rendered stages and sequential scan orders are not native mechanics",
-            "evidence_limit": "the source does not establish a generic seed or any oriented-element or free-geometry semantics",
+            "evidence_limit": "only the wrapped-grid neighbor-dependent mechanics shown by the checked source and rule panels are asserted; no generic seed is established",
         }
         na = {
             "visible_history",
@@ -579,7 +579,7 @@ def profile_blueprint(
             "result_kind": "a successor binary-outdegree network",
             "parameters_and_variants": "the two-outgoing restriction and the supplied local rerouting rule",
             "excluded_observers_and_representations": "node layout and nested drawings are representations, not mechanics",
-            "evidence_limit": "the restriction passage does not establish finite support, a seed, a schedule, determinism, node insertion, or first-component retention",
+            "evidence_limit": "only the two-outgoing restriction and generic local rerouting described here are asserted; support, topology, seed, schedule, successor count, and determinism remain unknown",
         }
         na = {
             "visible_history",
