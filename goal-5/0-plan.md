@@ -641,7 +641,8 @@ names.
 
 ### 12-API-PRESSURE
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/12-API-PRESSURE.md` and
+`goal-5/api-pressure.md`.
 
 #### Big Picture Objective
 
@@ -675,6 +676,8 @@ smallest honest changes where it does not.
 - Goal 2 repair obligations are explicit but not implemented.
 
 ### 13-HOSTILE-REVIEW
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
