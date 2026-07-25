@@ -220,6 +220,10 @@ family membership, and API fit:
   with 28 serious leads, 28 resolved leads, 11 weak leads, and 12 explicit
   later-stage dependencies; these counts are lead dispositions, not type
   counts.
+- Stage 3 is complete. Chapter 9 and its Notes are covered across all 33
+  headings and add 16 compact leads: 11 serious, three resolved, one weak, and
+  one explicit later dependency. Seven mechanics-bearing figures were
+  selectively inspected.
 
 ## Assumptions To Challenge
 
@@ -379,7 +383,7 @@ repairing or reviving prior audit machinery.
 
 ### 3-CH09
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/3-CH09.md`.
 
 #### Big Picture Objective
 
@@ -405,6 +409,8 @@ Discover construction-bearing mechanics in Chapter 9 and its Notes.
 - All serious candidates and unresolved questions are explicit.
 
 ### 4-CH10
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
