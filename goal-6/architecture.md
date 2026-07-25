@@ -149,7 +149,7 @@ obsolete stage machinery.
 | Entropy authority across Seed laws, stochastic Rule laws, replay evidence, and external run requests | Stages 2–3 |
 | Final ownership of helper/result types without public module inflation | Resolved in File and Public Surface Ownership below |
 | Root exports, alias spelling, and `ca.rollout` surface | Resolved in File and Public Surface Ownership below |
-| Stable catalog IDs, canonical constructor names, and six-module placement | Stage 5 |
+| Stable catalog IDs, canonical constructor names, and six-module placement | Resolved in Canonical Catalog Identity and Migration below |
 | Legacy source/capability boundaries for adaptive subdivision, sequential network schedules, weak PDEs, and exact transcendental execution | Stages 5–6 |
 | Pressure fixtures, codec/replay/commutation tests, and hostile review | Stage 6 |
 | Compatibility, the optional `Dynamics` façade, deprecation, serialization cutover, and exact file migration | Stage 7 |
@@ -1749,6 +1749,37 @@ constructor references. Category modules likewise do not import `entries`;
 `catalog/__init__.py` is the one place that may associate and re-export the
 two surfaces. Generic application never queries the entry table and serialized
 programs never require it.
+
+### Canonical catalog identity and migration
+
+The exact implementation-facing matrix is
+[`catalog-migration.md`](catalog-migration.md). It assigns every executable
+Goal 5 family exactly one normalized `SPFnnn` library identity, one canonical
+constructor, and one primary module. Goal 5 `Fnnn` IDs remain audit
+provenance, while `T01`–`T45` remain heterogeneous legacy migration records;
+none of these IDs is a runtime type or execution key.
+
+The matrix contains exactly 60 rows: 19 covered families and 41 additions.
+Primary homes are 11 `automata`, 15 `substitua`, 8 `machina`, 14 `media`,
+9 `criteria`, and 3 `dynamica`. Canonical constructor names are the exact
+Goal 5 family slugs converted to `snake_case`. Every one is available
+category-qualified and explicitly re-exported from `ca.catalog`, but none is
+exported from root `ca`.
+
+F010 and F042 remain metadata-only close roles without `SPF` IDs or
+constructors. T08 is separately a retired Seed role. T40 is a non-callable
+split record targeting F002 and F008 by two explicit branch names, and F055
+receives its own normalized identity without a fabricated T owner. Thus no
+umbrella constructor, `kind=` family dispatcher, or duplicate mechanic is
+needed.
+
+Callable names are classified independently as canonical constructors,
+closed presets, true zero-delta aliases, or total lossless compatibility
+adapters; metadata-only records are never callable. In particular, T32 and
+T44 are family-level aliases whose public functions are presets because they
+bind semantic construction data. Optional construction receipts are verified
+nonsemantic provenance over the expanded five-field payload. They cannot
+affect program equality, decoding, application, or rollout.
 
 ### Current-to-target cutover
 
