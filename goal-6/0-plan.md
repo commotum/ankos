@@ -217,24 +217,32 @@ streams, RNG helpers, or visualization.
 - The Stage 1 runtime baseline is 102 passing tests, `src/ca` tree
   `6e6b34769d60508c03d0a69fad1ede4fef75e217`, and `tests` tree
   `02ad081e039a46efbf61855fdeae60abb7bb70ad`.
-- Stage 2 (`2-CONTRACTS`) is in progress from clean autosave commit
-  `73ab93730681f6f127c904108b669383e01edc00`; the Stage 1 runtime, tests, and
-  Goal 2 tree hashes remain unchanged.
+- Stage 2 is complete. `goal-6/architecture.md` now defines
+  `SimpleProgram[C, V, W, R]`, the five component protocols, configuration
+  ownership, shared loci/region algebra, singular composition, four validation
+  layers, exact fail-closed serialization, and five family-shaped paper
+  type-checks.
+- The full 60-family API mapping yielded no sixth-field counterexample. F010
+  remains a wrapper role and F042 an observer role unless either is explicitly
+  constructed as an ordinary result-writing program.
+- Frontier and Neighborhood resolve independently from the same immutable
+  configuration. They may reuse structural anchors; Frontier grants no read
+  capability and Neighborhood grants no write capability.
+- The canonical Rule signature consumes `R` and `W`, not unrestricted `C`.
+  Exact result variants and atomic commit semantics remain deliberately open
+  for Stage 3.
+- Stage 2 did not alter `api.md`, `simple_programs.md`, or
+  `ref/notes/ca-scaffold.py`; their coherent public/reference cutover remains
+  Stage 4 work after application semantics close.
+- Stage 3 (`3-APPLICATION`) is the first incomplete stage.
 
 ## Assumptions To Challenge
 
 - A single closed result algebra can represent deterministic, branching,
   stochastic, continuous, symbolic, terminal, invalid, and one-shot rules
   without family dispatch.
-- `loci.py` can provide the shared substrate for writable and readable region
-  descriptors without collapsing their distinct capabilities.
-- Configuration ownership can remain with `Seed` outputs and structural types
-  used by the five components; no standalone public configuration axis or
-  module is required.
 - Every executable family has one defensible primary catalog home among the six
   locked modules, with cross-cutting mechanics represented as metadata.
-- The current plural component modules can evolve from primitives to compounds
-  and general constructors without a parallel package of abstract nouns.
 - `program.py`, the plural component modules, and the existing rollout boundary
   can own the necessary concepts without public `replacement.py`, `results.py`,
   `engine.py`, or `run.py` modules.
@@ -349,6 +357,9 @@ repository baseline, and make the Goal 5 → Goal 6 → Goal 7 sequence explicit
 - The next incomplete stage can begin without rediscovering project history.
 
 ### 2-CONTRACTS
+
+Status: **COMPLETE — five protocols, configuration/loci ownership, validation,
+serialization constraints, and paper type-checks recorded**
 
 #### Big Picture Objective
 

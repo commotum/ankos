@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — CUTOVER COMPLETE; CONTRACTS NEXT**
+Status: **IN PROGRESS — CONTRACTS COMPLETE; APPLICATION NEXT**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -207,6 +207,12 @@ relation through a versioned AST whose primitives and binding rules are
 known. It may not contain a Python callback, iterator, generator, opaque
 solver, host CAS object, or executable formula string.
 
+Closed extensibility is also fail-closed. Satisfying a Python protocol is not
+enough to admit a semantic descriptor: every node must be a recognized,
+versioned structural variant, or an explicitly registered extension carrying
+the same schema, codec, validation, and exactness obligations. Duck typing may
+serve implementation internals, but it cannot define program identity.
+
 ## Five-Field Type Algebra
 
 The conceptual signature is:
@@ -265,6 +271,12 @@ and Rule may require their resolved views to have compatible indexing. Neither
 resolver consumes the other resolver's output. This preserves their
 orthogonality: both resolve independently from the same immutable `C`.
 
+Independent resolution is still one typed join. Both resolvers bind to the
+same immutable snapshot identity, and their locus/occurrence references use
+the same canonical identities. Rule declares the required `R`-to-`W`
+join/index shape; construction validates that shape structurally, and
+application validates the resolved binding before Rule evaluation.
+
 Generic parameters, validation evidence, codec versions, digests, catalog
 names, and provenance are not extra `SimpleProgram` fields. Catalog entries and
 serialization envelopes may describe a program externally; the semantic
@@ -286,7 +298,7 @@ its program uses:
 | Values | Exact assignments, fields, symbolic values, or explicit unresolved roles validated by Alphabet |
 | Defaults/boundaries | Total-default laws, exterior values, periodic/reflective identifications, side data, or absence semantics |
 | Invariants | Closed predicates such as exactly-one head, well-formed word/tree/graph, compatible ports, or valid field side data |
-| Visible state | Cursor, phase, time, schedule, program counter, mutable program text, cache, provenance, and replay-relevant draw state when semantic |
+| Visible state | Cursor, phase, time, schedule, program counter, mutable program text, and any cache, provenance, or draw state that the mechanics itself reads or writes |
 | Identity | Stable structural identities and explicit alpha-equivalence/canonicalization rules |
 
 These are semantic obligations, not a required monolithic record layout. A
@@ -311,6 +323,12 @@ Fixed transition data normally belongs to `Rule`. Program text belongs inside
 `C` only when the construction makes it readable or writable state, as in F035
 and F051.
 
+Representation-changing media and transductions still have type `C -> C`.
+Their carrier is a tagged phase state or a product with explicit input,
+workspace, and output slots; Rule changes which slots are populated or
+authoritative. A Rule never escapes the contract by returning an unrelated
+configuration type `C2`.
+
 ## Component Contracts
 
 ### Seed
@@ -334,8 +352,9 @@ For a probability-law Seed:
 
 - the law and its parameters are part of the Seed descriptor;
 - a run supplies a replay key or realization request externally;
-- the resulting configuration or initialization result records draw evidence;
-  and
+- the initialization result or trace records draw evidence; if later Rule
+  applications semantically read that evidence, it is instead visible state
+  inside `C`; and
 - no ambient/global RNG or hidden mutable generator contributes semantics.
 
 Seed must declare enough associated output structure to unify its `C` with the
@@ -344,9 +363,12 @@ separate program axis.
 
 Seed composition returns one Seed:
 
-- products combine independent configuration components;
+- products combine named or provably disjoint structural components and do
+  not imply probabilistic independence;
 - overlays combine disjoint or explicitly resolved assignments;
 - mixtures form an explicit probability law;
+- product-law constructors state independence explicitly, while coupled joint
+  laws remain representable;
 - refinements add closed constraints or invariants; and
 - constructive/intensional combinators preserve exact source and replay
   provenance.
@@ -376,6 +398,14 @@ named represented-number profile; they never impersonate exact reals.
 Alphabet owns value validity and canonical value equality. It does not own
 carrier support, topology, geometry, scheduling, or a program-family name.
 Product/tag/union/refinement constructors yield one composed Alphabet.
+
+Absence and deletion are carrier states unless a construction explicitly
+stores an absence token as a value. Likewise, `Unknown` is admitted only by an
+explicit Alphabet variant; partiality never appears implicitly. Address,
+node, edge, and port records may be values when stored as labels or payloads,
+but actual locus identity and topology remain in `C` and the loci algebra.
+Value-level algebra can support Rule expressions without absorbing the
+transition relation into Alphabet.
 
 ### WritableRegion
 
@@ -894,13 +924,14 @@ This is expected migration evidence, not a defect to repair during Goal 6.
 The final Goal 6 audit compares `src/ca`, `tests`, and Goal 2 against the hashes
 above.
 
-## Remaining Architecture Sections
+## Stage Status
 
-The following sections become authoritative only when their named stage closes:
-
-- Stage 2 — component protocols, shared locus algebra, configuration ownership,
-  structural forms, and serialization constraints;
-- Stage 3 — result algebra, atomic application, and run/tool boundary;
+- Stage 1 is complete: source cutover, Goal 2 disposition, and repository
+  baselines are recorded.
+- Stage 2 is complete: component protocols, shared locus algebra,
+  configuration ownership, structural composition, validation, serialization
+  constraints, and five paper type-checks are authoritative above.
+- Stage 3 is next: result algebra, atomic application, and run/tool boundary;
 - Stage 4 — exact file ownership, public imports, documentation, and reference
   scaffold;
 - Stage 5 — catalog construction and migration;
