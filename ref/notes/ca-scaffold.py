@@ -241,7 +241,7 @@ class SimpleProgram(Generic[C, V, W, R]):
 
 class automata:
     @staticmethod
-    def elementary_cellular_automaton(
+    def eca(
         rule: int = 30,
         width: int = 79,
     ) -> SimpleProgram[BinaryLine, bool, Locus, tuple[bool, bool, bool]]:
@@ -259,27 +259,28 @@ class automata:
         )
 
     @staticmethod
-    def eca(
+    def elementary_cellular_automaton(
         rule: int = 30,
         width: int = 79,
     ) -> SimpleProgram[BinaryLine, bool, Locus, tuple[bool, bool, bool]]:
-        return automata.elementary_cellular_automaton(rule=rule, width=width)
+        """Descriptive compatibility alias; Stage 5 finalizes alias metadata."""
+
+        return automata.eca(rule=rule, width=width)
 
 
 # catalog/entries.py is descriptive provenance/navigation, never dispatch.
 @dataclass(frozen=True)
 class CatalogEntry:
-    stable_id: str
-    module: str
-    canonical_name: str
-    aliases: tuple[str, ...]
+    category: str
+    preferred_export: str
+    compatibility_names: tuple[str, ...]
+    provenance: tuple[str, ...] = ()
 
 class entries:
-    elementary_cellular_automaton = CatalogEntry(
-        stable_id="automata.elementary-cellular-automaton",
-        module="automata",
-        canonical_name="elementary_cellular_automaton",
-        aliases=("eca",),
+    eca = CatalogEntry(
+        category="automata",
+        preferred_export="eca",
+        compatibility_names=("elementary_cellular_automaton",),
     )
 
 
@@ -287,20 +288,15 @@ class entries:
 # own their corresponding whole-program constructors in exactly the same way.
 # catalog/__init__.py re-exports unique names from all six category modules.
 class catalog:
+    automata = automata
+    entries = entries
+    eca = staticmethod(automata.eca)
     elementary_cellular_automaton = staticmethod(
         automata.elementary_cellular_automaton
     )
-    eca = staticmethod(automata.eca)
 
 
 # --- rules.py/program.py: results and one family-blind apply operation ------
-
-class Disposition(Enum):
-    PRESERVE = "preserve"
-    REPLACE = "replace"
-    DELETE = "delete"
-    ABSENT = "absent"
-    CREATE = "create"
 
 class Progress(Enum):
     ADVANCED = "advanced"
@@ -319,43 +315,97 @@ class Cardinality(Enum):
     UNDETERMINED = "undetermined"
 
 @dataclass(frozen=True)
-class Write(Generic[W, V]):
+class CardinalityClaim:
+    kind: Cardinality
+    evidence: Expr
+
+@dataclass(frozen=True)
+class Preserve(Generic[W]):
     target: W
-    disposition: Disposition
-    payload: V | Expr | None
+
+@dataclass(frozen=True)
+class Replace(Generic[W, V]):
+    target: W
+    payload: V | Expr
+
+@dataclass(frozen=True)
+class Delete(Generic[W]):
+    target: W
+
+@dataclass(frozen=True)
+class Absent(Generic[W]):
+    target: W
+
+@dataclass(frozen=True)
+class Create(Generic[W, V]):
+    target: W
+    payload: V | Expr
+
+DispositionAtom: TypeAlias = (
+    Preserve[W] | Replace[W, V] | Delete[W] | Absent[W] | Create[W, V]
+)
+
+@dataclass(frozen=True)
+class FiniteDisposition(Generic[W, V]):
+    atoms: tuple[DispositionAtom[W, V], ...]
+    totality_evidence: Expr
+
+@dataclass(frozen=True)
+class IntensionalDisposition:
+    relation: Expr
+    totality_evidence: Expr
+
+TotalDisposition: TypeAlias = FiniteDisposition[W, V] | IntensionalDisposition
+
+@dataclass(frozen=True)
+class FiniteSupport(Generic[A]):
+    atoms: tuple[A, ...]
+    cardinality: CardinalityClaim
+    soundness_and_coverage: Expr
+
+@dataclass(frozen=True)
+class IntensionalSupport(Generic[A]):
+    relation: Expr
+    cardinality: CardinalityClaim
+    soundness_and_coverage: Expr
+
+SupportSpace: TypeAlias = FiniteSupport[A] | IntensionalSupport[A]
+
+@dataclass(frozen=True)
+class ProbabilityLaw(Generic[A]):
+    descriptor: Expr
+
+@dataclass(frozen=True)
+class OutcomeSpace(Generic[A]):
+    support: SupportSpace[A]
+    probability_law: ProbabilityLaw[A] | None
 
 @dataclass(frozen=True)
 class Continue:
-    """Continue this derivation in rollout."""
+    """Continue this witnessed derivation in rollout."""
 
 @dataclass(frozen=True)
 class Stop:
-    reason: str
+    reason: Expr
 
 Continuation: TypeAlias = Continue | Stop
 
 @dataclass(frozen=True)
 class Derivation(Generic[W, V]):
-    replacement: tuple[Write[W, V], ...]
+    replacement: TotalDisposition[W, V]
     progress: Progress
     continuation: Continuation
-    witness: str
+    witness: Expr
+    provenance: tuple[str, ...]
 
 @dataclass(frozen=True)
 class NoSuccessor:
     outcome: NoSuccessorOutcome
-    reason: str
-    witness: str
+    reason: Expr
+    witness: Expr
+    provenance: tuple[str, ...]
 
 RuleAtom: TypeAlias = Derivation[W, V] | NoSuccessor
-
-@dataclass(frozen=True)
-class OutcomeSpace(Generic[A]):
-    finite: tuple[A, ...] | None
-    intensional: Expr | None
-    cardinality: Cardinality
-    soundness_and_coverage: str
-    probability_law: tuple[Fraction, ...] | None = None
 
 @dataclass(frozen=True)
 class RuleFault:
@@ -369,21 +419,61 @@ class RuleRejected:
 
 @dataclass(frozen=True)
 class RuleComplete(Generic[W, V]):
-    outcomes: OutcomeSpace[RuleAtom[W, V]]
+    outcome_space: OutcomeSpace[RuleAtom[W, V]]
 
 RuleResult: TypeAlias = RuleComplete[W, V] | RuleRejected
 
 @dataclass(frozen=True)
 class ApplicationInput(Generic[C]):
     configuration: C
-    trace_lineage: tuple[str, ...]
+    trace_lineage: tuple[str, ...] = ()
+
+@dataclass(frozen=True)
+class AppliedDerivation(Generic[C, W, V]):
+    successor: C
+    source: Derivation[W, V]
+    fresh_bindings: tuple[Expr, ...]
+    output_trace_lineage: Expr
+    evidence: Expr
+
+@dataclass(frozen=True)
+class AppliedNoSuccessor:
+    source: NoSuccessor
+    output_trace_lineage: Expr
+    evidence: Expr
+
+AppliedAtom: TypeAlias = AppliedDerivation[C, W, V] | AppliedNoSuccessor
+
+@dataclass(frozen=True)
+class SuccessorGroup(Generic[C, W, V]):
+    successor: C
+    derivation_fiber: SupportSpace[AppliedDerivation[C, W, V]]
+
+class MeasureState(Enum):
+    ABSENT = "absent"
+    AVAILABLE = "available"
+    UNAVAILABLE = "unavailable"
+
+@dataclass(frozen=True)
+class MeasureView:
+    state: MeasureState
+    descriptor_or_evidence: Expr | None
 
 @dataclass(frozen=True)
 class ApplicationComplete(Generic[C, W, V]):
-    source: OutcomeSpace[RuleAtom[W, V]]
-    applied_atoms: tuple[tuple[C | None, RuleAtom[W, V], tuple[str, ...]], ...]
-    successor_fibers: tuple[tuple[C, tuple[str, ...]], ...]
-    cardinalities: tuple[Cardinality, Cardinality, Cardinality]
+    source_outcomes: OutcomeSpace[RuleAtom[W, V]]
+    applied_atoms: SupportSpace[AppliedAtom[C, W, V]]
+    no_successor_partition: SupportSpace[AppliedNoSuccessor]
+    outcome_atom_cardinality: CardinalityClaim
+    derivation_cardinality: CardinalityClaim
+    successor_cardinality: CardinalityClaim
+    successor_quotient_with_derivation_fibers: SupportSpace[
+        SuccessorGroup[C, W, V]
+    ]
+    applied_atom_measure: MeasureView
+    successor_submeasure: MeasureView
+    no_successor_submeasure: MeasureView
+    evidence: Expr
 
 @dataclass(frozen=True)
 class ApplicationFault:
@@ -420,7 +510,12 @@ def apply(
         )
 
     # 1. Validate the whole sound-and-covering Rule outcome space.
-    validated = validate_complete_rule_space(rule_result.outcomes, program, readable, writable)
+    validated = validate_complete_rule_space(
+        rule_result.outcome_space,
+        program,
+        readable,
+        writable,
+    )
     # 2. Bind all fresh identities from semantic input, Rule, and witnesses.
     fresh = bind_all_fresh(validated, snapshot, program.rule, writable)
     # 3. Reconstruct every alternative from the same immutable snapshot.
@@ -439,15 +534,27 @@ def apply(
 # is no target public ``ca.rollout`` submodule to shadow the root callable.
 
 @dataclass(frozen=True)
-class TraceLeaf(Generic[C]):
+class ContinuingLeaf(Generic[C]):
     configuration: C
-    trace_lineage: tuple[str, ...]
-    continuing: bool
+    trace_lineage: Expr
+
+@dataclass(frozen=True)
+class ClosedLeaf(Generic[C, W, V]):
+    final_configuration: C | None
+    source: AppliedAtom[C, W, V]
+
+@dataclass(frozen=True)
+class RawTrace(Generic[C, W, V]):
+    roots: SupportSpace[C]
+    applications: SupportSpace[ApplicationComplete[C, W, V]]
+    derivation_edges: SupportSpace[AppliedAtom[C, W, V]]
+    lineage_graph: Expr
+    evidence: Expr
 
 @dataclass(frozen=True)
 class RolloutComplete(Generic[C, W, V]):
-    applications: tuple[ApplicationResult[C, W, V], ...]
-    closed_leaves: tuple[TraceLeaf[C], ...]
+    raw_trace: RawTrace[C, W, V]
+    closed_leaves: SupportSpace[ClosedLeaf[C, W, V]]
 
 class TruncationCause(Enum):
     DEPTH_BOUND = "depth-bound"
@@ -457,8 +564,8 @@ class TruncationCause(Enum):
 
 @dataclass(frozen=True)
 class RolloutTruncated(Generic[C, W, V]):
-    applications: tuple[ApplicationResult[C, W, V], ...]
-    continuing_leaves: tuple[TraceLeaf[C], ...]
+    raw_trace: RawTrace[C, W, V]
+    continuing_leaves: SupportSpace[ContinuingLeaf[C]]
     cause: TruncationCause
 
 @dataclass(frozen=True)
@@ -475,38 +582,35 @@ RolloutResult: TypeAlias = (
     | RolloutRejected
 )
 
+ReplayKey: TypeAlias = Exact | Expr
+
 def rollout(
     program: SimpleProgram[C, V, W, R],
     *,
     steps: int,
     initial: C | None = None,
-    replay_key: str | None = None,
+    replay_key: ReplayKey | None = None,
 ) -> RolloutResult[C, W, V]:
     if steps < 0:
         return RolloutRejected(RolloutFault("steps must be nonnegative"))
-    leaves = normalize_initial_or_realize_seed(
+    initial_space = normalize_initial_or_realize_seed_closed(
         program.seed,
         initial=initial,
         replay_key=replay_key,
     )
-    applications: list[ApplicationResult[C, W, V]] = []
-    for _ in range(steps):
-        next_leaves: list[TraceLeaf[C]] = []
-        for leaf in leaves:
-            if leaf.continuing:
-                result = apply(program, ApplicationInput(leaf.configuration, leaf.trace_lineage))
-                applications.append(result)
-                next_leaves.extend(expand_continuing_derivation_fibers(result))
-            else:
-                next_leaves.append(leaf)
-        leaves = tuple(next_leaves)
-    if any(leaf.continuing for leaf in leaves):
-        return RolloutTruncated(
-            tuple(applications),
-            leaves,
-            TruncationCause.DEPTH_BOUND,
-        )
-    return RolloutComplete(tuple(applications), leaves)
+    if isinstance(initial_space, RolloutRejected):
+        return initial_space
+
+    # This closed traversal's only transition is ``apply(program, input)``.
+    # It lifts apply over finite or intensional continuing fibers without
+    # enumeration, maps ApplicationRejected to RolloutRejected, preserves the
+    # raw graph, and derives replay subkeys for any requested Rule-law draw.
+    return traverse_closed_by_repeated_apply(
+        program,
+        initial_space=initial_space,
+        depth_bound=steps,
+        replay_key=replay_key,
+    )
 
 
 # --- serialization.py and ca.__init__: expanded payload, small root spelling
@@ -539,12 +643,13 @@ DecodeResult: TypeAlias = Decoded[P] | DecodeRejected
 class serialization:
     @staticmethod
     def dumps(program: SimpleProgram[C, V, W, R]) -> bytes:
+        validated_program = require_valid_program_for_encoding(program)
         payload = ProgramPayload(
-            program.seed,
-            program.alphabet,
-            program.frontier,
-            program.neighborhood,
-            program.rule,
+            validated_program.seed,
+            validated_program.alphabet,
+            validated_program.frontier,
+            validated_program.neighborhood,
+            validated_program.rule,
         )
         return encode_closed_versioned_node("ca.simple-program", 1, payload)
 
@@ -563,7 +668,10 @@ class serialization:
             payload.neighborhood,
             payload.rule,
         )
-        return Decoded(require_valid_program(program).program)
+        validated = validate_decoded_program(program)
+        if isinstance(validated, DecodeRejected):
+            return validated
+        return Decoded(validated.value)
 
 
 # ``ca.__init__`` exposes component/catalog namespaces and only the root

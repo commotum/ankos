@@ -1274,7 +1274,7 @@ apply(program, input):
 
     # Phase 1: validate the whole closed Rule outcome space.
     validated := validate_complete_rule_space(
-        rr.payload,
+        rr.outcome_space,
         specialized_denotation=denotation_of(p.rule, r, w),
         require_schema_tag_and_version=True,
         require_soundness_and_coverage=True,
@@ -1522,10 +1522,13 @@ src/ca/
 
 The locked tree deliberately has no public `rollout.py`: a package cannot
 reliably promise both callable `ca.rollout(...)` and a `ca.rollout` submodule
-without attribute shadowing. The target rollout callable, request/result
+without attribute shadowing. The target rollout callable, public result
 records, and traversal contract therefore belong to `program.py`. Goal 7
 folds or privatizes the current tensor-oriented `rollout.py`; no public
-replacement module is added.
+replacement module is added. Privatizing means physically renaming the module
+to a nonconflicting private path; merely omitting `rollout.py` from
+`__all__` is insufficient because `import ca.rollout` can still shadow the
+callable.
 
 ### Cohesive file responsibilities
 
@@ -1538,7 +1541,7 @@ replacement module is added.
 | `frontiers.py` | `WritableRegion`, writable capability resolution, structural write schemas, fresh namespaces, composition, and presets | Firing-site selection, reads, collision resolution, or commit policy |
 | `neighborhoods.py` | `ReadableRegion`, identity-preserving read views, composition, and local/global/structural/differential presets | Writes, update policy, or unrestricted access to the configuration |
 | `rules.py` | `Rule`, `RuleComplete`/`RuleRejected`/`RuleFault`, support/cardinality/law records, total dispositions, Rule atoms, witnesses, provenance, progress, continuation, and closed Rule constructors/combinators | Committing configurations, choosing samples, solver execution, rollout, or catalog dispatch |
-| `program.py` | Exactly-five-field `SimpleProgram`; compatibility evidence; `ApplicationInput`; `ApplicationComplete`/`ApplicationRejected`/`ApplicationFault` and applied records; family-blind `apply`; private reconstruction, validation, commit, and quotient; `RolloutRequest`, `RolloutResult`, raw trace graph, Seed realization request, and callable `rollout` derived only from `apply` | Component catalogs, hidden sampling, solvers, renderers, datasets, or family-specific engines |
+| `program.py` | Exactly-five-field `SimpleProgram`; compatibility evidence; `ApplicationInput`; `ApplicationComplete`/`ApplicationRejected`/`ApplicationFault` and applied records; family-blind `apply`; private reconstruction, validation, commit, and quotient; `RolloutResult`, raw trace graph, and callable `rollout` derived only from `apply` | Component catalogs, hidden sampling, solvers, renderers, datasets, or family-specific engines |
 | `serialization.py` | Versioned fail-closed codecs plus `Decoded`, `DecodeRejected`, and `DecodeFault` for expanded programs, components, results, evidence, traces, and verified receipts | A sixth field, catalog resolution, alias execution, or semantic dispatch |
 | `py.typed` | Empty PEP 561 marker declaring that distributed type information is supported | Runtime symbols or behavior |
 | `catalog/entries.py` | Descriptive entry metadata, stable IDs, provenance, canonical homes, search, and alias/preset/compatibility relations | Program identity or execution dispatch |
@@ -1703,7 +1706,7 @@ not proof of termination. More specialized query, solver, resource, pruning,
 or view requests remain typed tooling over the returned denotation rather than
 extra keywords that silently change the program.
 
-Advanced request/result records are imported from `ca.program`. The package
+Advanced result/trace records are imported from `ca.program`. The package
 attribute `ca.rollout` has only one meaning: the callable above. There is no
 public same-named submodule, synonymous `run`/`step`, or family-specific
 executor.
@@ -1736,9 +1739,11 @@ explicit compatibility name or remain category-qualified. Stage 5 records the
 exact constructor/alias table, but it may not change this collision rule.
 
 `catalog.entries` supports navigation, provenance, lookup, and documentation.
-Looking up an entry may return metadata and its constructor reference; generic
-application never queries the entry table and serialized programs never
-require it.
+It contains metadata values and canonical import/name strings, never callable
+constructor references. Category modules likewise do not import `entries`;
+`catalog/__init__.py` is the one place that may associate and re-export the
+two surfaces. Generic application never queries the entry table and serialized
+programs never require it.
 
 ### Current-to-target cutover
 
@@ -1748,7 +1753,7 @@ The current runtime is migration evidence, not target authority:
 |---|---|
 | `specs.py` and `Dynamics` | Replace with `program.py` and five-field `SimpleProgram`; any temporary compatibility façade must immediately expand and cannot preserve a second executor |
 | Family decoding in `specs.py` | Move construction to closed component/catalog constructors or canonical codecs; remove executor registry behavior |
-| Tensor/family branches and `apply_rule` in `rollout.py` | Move the generic traversal contract, records, and root callable to `program.py`; fold or privatize remaining helpers and retire the public submodule name |
+| Tensor/family branches and `apply_rule` in `rollout.py` | Move the generic traversal contract, records, and root callable to `program.py`; delete the file after folding it or physically rename any remaining helper to a private nonconflicting path |
 | `RawEpisode` and `RawBatch` | Not canonical core records; Stage 7 may adapt them temporarily at the rollout/dataset boundary while downstream consumers migrate |
 | Broad root constructor exports | Narrow to the façade above; any compatibility exports are explicit, deprecated, and unable to shadow canonical spellings |
 | Current loci/Alphabet/Seed/Frontier/Neighborhood/Rule classes | Evolve in place into the closed generalized contracts; do not create a parallel package |

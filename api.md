@@ -371,7 +371,7 @@ One-shot functions, constraint completions, media transforms, and many
 continuous relations are normally consumed with `ca.apply`, not mandatory
 rollout.
 
-The public callable and its `RolloutRequest`/`RolloutResult` records are owned
+The public callable and its `RolloutResult`/trace records are owned
 by `ca.program`; `ca.rollout` is the convenience re-export. Goal 7 folds or
 privatizes the current tensor-oriented `rollout.py`, so no same-named public
 submodule can shadow the callable. There is no `run.py`.

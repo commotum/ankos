@@ -201,12 +201,11 @@ streams, RNG helpers, or visualization.
 - The current repository already has a working `src/ca` package with plural
   component modules and rollout/tooling code. Goal 7 should evolve it in place
   rather than create a second runtime.
-- `ref/notes/ca-scaffold.py` already demonstrates a valuable progression from
-  primitives through compositions and named constructions, but its older
-  ownership and program model need remastering.
-- `api.md` and `simple_programs.md` contain important design reasoning alongside
-  narrower or superseded formulations. A fresh session currently lacks one
-  concise, unambiguous implementation authority.
+- `api.md` now states the settled target public contract,
+  `simple_programs.md` explains the five-field model without a competing
+  executor, and `ref/notes/ca-scaffold.py` walks the same architecture from
+  closed loci through components, catalog construction, application, rollout,
+  and serialization.
 - `GOALS.md` now records Goal 5 as complete, Goal 6 as the active remaster, and
   Goal 7 as future implementation. Goal 4 is explicitly superseded and Goal 2
   remains frozen evidence.
@@ -240,9 +239,10 @@ streams, RNG helpers, or visualization.
 - A hostile recheck and refreshed F001–F063 pressure scan found no
   application-semantic counterexample among all 60 executable families. F010
   and F042 remain close roles rather than executable families.
-- Stage 2 did not alter `api.md`, `simple_programs.md`, or
-  `ref/notes/ca-scaffold.py`; their coherent public/reference cutover remains
-  Stage 4 work now that application semantics are closed.
+- Stage 2 deliberately left `api.md`, `simple_programs.md`, and
+  `ref/notes/ca-scaffold.py` unchanged until application semantics closed;
+  Stage 4 has now replaced all three in place as coherent projections of the
+  canonical architecture.
 - Stage 2 verification passed all 102 runtime tests, whitespace/diff checks,
   frozen Goal 2 hashes, and a hostile recheck of all 15 challenged contract
   points.
@@ -253,12 +253,15 @@ streams, RNG helpers, or visualization.
 - Stage 4 (`4-SURFACE`) is the first incomplete stage and is now in progress.
   Its scoped baseline contains only the completed Stage 3 documentation edits;
   no runtime, frozen Goal 2, or public/reference file is concurrently modified.
-- The three Stage 4 cutover inputs currently conflict with the settled
-  architecture: `api.md` is a raw design transcript, `simple_programs.md`
-  still specifies a fixed `t+N D` trajectory generator with `DOMAIN`, `SHAPE`,
-  and `BOUNDARY` axes, and `ref/notes/ca-scaffold.py` remains a generic
-  `Component`/`Dynamics`-era template rather than the five-field package
-  scaffold.
+- Stage 4 assigns Rule-side sums to `rules.py`, application and rollout sums
+  plus both public operations to `program.py`, codec results to
+  `serialization.py`, component construction to the plural modules, and
+  whole-program construction to the catalog. Distinct result sums avoid a
+  dependency cycle, and retiring the public `rollout.py` module avoids
+  shadowing callable `ca.rollout`.
+- The published/current and retained runtime READMEs are explicitly marked as
+  runtime snapshots with a pointer to the pending target contract; neither can
+  now be mistaken for Goal 7 architecture.
 - Stages 5–7 remain untouched.
 
 ## Assumptions To Challenge
