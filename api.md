@@ -329,6 +329,19 @@ Its minimum target signature is:
 rollout(program, *, steps, initial=None, replay_key=None) -> RolloutResult
 ```
 
+The public result variants are:
+
+```text
+RolloutResult =
+    RolloutComplete(raw_trace, closed_leaves)
+  | RolloutTruncated(raw_trace, continuing_leaves, cause)
+  | RolloutRejected(rollout_fault)
+```
+
+The truncation cause is typed as `DepthBound`, `ResourceExhausted`,
+`Cancelled`, or `Pruned`. A truncated result retains the raw partial trace and
+continuing derivation fibers; it makes no terminal or exact-cardinality claim.
+
 With no explicit `initial`, traversal starts from the Seed result space. With
 no `replay_key`, finite or intensional Seed/Rule laws remain complete
 branching laws; a key authorizes a replayable realization where a draw is

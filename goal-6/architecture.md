@@ -786,7 +786,7 @@ It must support both:
 The intensional AST may discharge coverage by being the specialized Rule
 relation itself together with its closed equivalence and conformance
 contracts. A finite claim such as “the solutions of `x² = 1` are `{+1}`” is
-not `Complete`, even though its sole member is sound. Likewise,
+not `RuleComplete`, even though its sole member is sound. Likewise,
 `Terminal(NoSolution)` requires a closed emptiness/coverage certificate, not
 merely the absence of a found member. If soundness or coverage cannot be
 validated, the boundary returns a typed unsupported/incomplete rejection.
@@ -1539,7 +1539,7 @@ replacement module is added.
 | `neighborhoods.py` | `ReadableRegion`, identity-preserving read views, composition, and local/global/structural/differential presets | Writes, update policy, or unrestricted access to the configuration |
 | `rules.py` | `Rule`, `RuleComplete`/`RuleRejected`/`RuleFault`, support/cardinality/law records, total dispositions, Rule atoms, witnesses, provenance, progress, continuation, and closed Rule constructors/combinators | Committing configurations, choosing samples, solver execution, rollout, or catalog dispatch |
 | `program.py` | Exactly-five-field `SimpleProgram`; compatibility evidence; `ApplicationInput`; `ApplicationComplete`/`ApplicationRejected`/`ApplicationFault` and applied records; family-blind `apply`; private reconstruction, validation, commit, and quotient; `RolloutRequest`, `RolloutResult`, raw trace graph, Seed realization request, and callable `rollout` derived only from `apply` | Component catalogs, hidden sampling, solvers, renderers, datasets, or family-specific engines |
-| `serialization.py` | Versioned fail-closed codecs for expanded programs, components, results, evidence, traces, and verified receipts | A sixth field, catalog resolution, alias execution, or semantic dispatch |
+| `serialization.py` | Versioned fail-closed codecs plus `Decoded`, `DecodeRejected`, and `DecodeFault` for expanded programs, components, results, evidence, traces, and verified receipts | A sixth field, catalog resolution, alias execution, or semantic dispatch |
 | `py.typed` | Empty PEP 561 marker declaring that distributed type information is supported | Runtime symbols or behavior |
 | `catalog/entries.py` | Descriptive entry metadata, stable IDs, provenance, canonical homes, search, and alias/preset/compatibility relations | Program identity or execution dispatch |
 | Six catalog category files | Canonical whole-program constructors for their locked navigation mechanic | Runtime subclasses, alternate engines, or duplicated component primitives |
@@ -1675,6 +1675,25 @@ rollout(
     replay_key: ReplayKey | None = None,
 ) -> RolloutResult[C]
 ```
+
+The owned result sum is:
+
+```text
+RolloutResult[C] =
+    RolloutComplete(raw_trace, closed_leaves)
+  | RolloutTruncated(
+        raw_trace,
+        continuing_leaves,
+        DepthBound | ResourceExhausted | Cancelled | Pruned,
+    )
+  | RolloutRejected(RolloutFault)
+```
+
+`RolloutComplete` claims only that every represented branch closed through its
+own continuation/no-successor semantics. `RolloutTruncated` retains the raw
+partial trace and continuing derivation fibers without changing their
+semantic status. `RolloutRejected` reports an invalid request or boundary
+before an authoritative traversal result exists.
 
 When `initial` is absent, rollout begins from the Seed result space. Without a
 replay key it retains the complete finite or intensional law/branching space;
@@ -1857,7 +1876,7 @@ frontier(c) = w : W
 neighborhood(c) = r : R
 same_snapshot(c, r, w) ∧ valid_join(r, w)
 reconstruction(c, w) = plan : ReconstructionPlan[C, W]
-rule.denote(r, w) = Complete(Q) : RuleResult[C, W]
+rule.denote(r, w) = RuleComplete(Q) : RuleResult[C, W]
 q ∈ support(Q) ∧ q is Derivation
     => targets(q) ⊆ W ∧ total_disposition(q, W)
        ∧ valid_C(commit(plan, c, total_disposition(q), fresh(q)))
@@ -2068,12 +2087,12 @@ categories into the complete conformance plan.
 | Undefined partial function | One `Undefined(reason)` atom | 0 | 0 | Not terminal, invalid, or unsatisfied |
 | Declared construction failure | One `DeclaredFailure(reason)` atom | 0 | 0 | Semantic failure remains typed |
 | Certified divergence | One `Divergent(certificate)` atom | 0 | 0 | Distinct from timeout |
-| Invalid result/input | `Rejected(Invalid(...))` | Not established | Not established | No commit and no exact-zero claim |
-| Bounded external resource exhaustion | External `Rejected(ResourceExhausted(...))` | Not established | Not established | Never a Rule/base-application result; partial observations are diagnostic only |
+| Invalid result/input | `ApplicationRejected(Invalid(...))` | Not established | Not established | No commit and no exact-zero claim |
+| Bounded external resource exhaustion | `RolloutTruncated(..., ResourceExhausted)` | Not established | Not established | Never a Rule/base-application result; partial observations are diagnostic only |
 | Diamond rewrite | Multiple witnessed derivations | Many | One or fewer than derivations | Dedup retains the full fiber |
 | Empty output value | One replacement containing epsilon/empty carrier | 1 | 1 | Empty value is not empty relation |
-| Intensional solution relation | Complete intensional space | Zero/one/many/undetermined | Intensional quotient | No forced enumeration |
-| Possibly empty intensional relation | Complete intensional space with `Undetermined` cardinality | Undetermined | Undetermined | No fabricated terminal atom; unknown is not certified zero |
+| Intensional solution relation | `RuleComplete` intensional space | Zero/one/many/undetermined | Intensional quotient | No forced enumeration |
+| Possibly empty intensional relation | `RuleComplete` intensional space with `Undetermined` cardinality | Undetermined | Undetermined | No fabricated terminal atom; unknown is not certified zero |
 | Stochastic relation | Probability law over typed atoms | Law support | Pushforward support | Law, draw, and successor mass remain distinct |
 
 Every row has a different serialized sum shape or typed field; none relies on

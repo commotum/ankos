@@ -24,10 +24,11 @@ Status: **IN PROGRESS**
 
 - One cohesive `program.py` owns `SimpleProgram`, application-side records,
   family-blind one-step application, and private reconstruction while
-  Rule-side result descriptors remain with `rules.py`. The existing
-  `rollout.py` remains an auxiliary traversal file behind callable
-  `ca.rollout`; separate public `results.py`, `replacement.py`, `engine.py`,
-  or `run.py` modules are unnecessary.
+  Rule-side result descriptors remain with `rules.py`. It also owns callable
+  `ca.rollout` and its public records so a same-named submodule cannot shadow
+  the function. Goal 7 folds or privatizes the existing `rollout.py`;
+  separate public `results.py`, `replacement.py`, `engine.py`, or `run.py`
+  modules are unnecessary.
 - `loci.py` can own common immutable carrier/configuration identity and
   selector structure without creating `configuration.py`; `seeds.py` owns
   initial sources of those configurations.
@@ -53,8 +54,8 @@ sees the five-field architecture without design-history contradictions.
   catalog file, the root namespace, and the public apply/rollout boundary.
 - Assign Rule-side dispositions/outcomes to `rules.py`, application-side
   results and atomic application to `program.py`, repeated traversal to
-  auxiliary `rollout.py`, structural configuration/locus vocabulary to
-  `loci.py`, and codecs to `serialization.py` without creating
+  the same program-level public boundary, structural configuration/locus
+  vocabulary to `loci.py`, and codecs to `serialization.py` without creating
   noun-per-concept modules.
 - Define root imports, module-qualified component constructors, catalog
   re-exports, alias expansion, canonical serialization, and collision rules.
@@ -78,6 +79,8 @@ Files expected to change:
 - `api.md`
 - `simple_programs.md`
 - `ref/notes/ca-scaffold.py`
+- `README-V1.md`
+- `README-V2.md`
 - `goal-6/4-SURFACE.md`
 - `goal-6/0-plan.md`
 
@@ -85,7 +88,8 @@ Files expected to change:
 
 - `SimpleProgram` has exactly five stored fields in every normative example.
 - No `configuration.py`, `replacement.py`, `results.py`, `engine.py`, `run.py`,
-  sixth component, family executor, or catalog dispatch registry is introduced.
+  public `rollout.py`, sixth component, family executor, or catalog dispatch
+  registry is introduced.
 - Rule receives only resolved `R` and writable capability `W`; the scaffold
   does not regress to per-locus proposals or unrestricted configuration reads.
 - Root convenience imports do not duplicate component construction logic or

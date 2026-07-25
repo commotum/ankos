@@ -245,14 +245,15 @@ class automata:
         rule: int = 30,
         width: int = 79,
     ) -> SimpleProgram[BinaryLine, bool, Locus, tuple[bool, bool, bool]]:
+        carrier = f"binary-line:{width}"
         return SimpleProgram(
             seed=seeds.bernoulli(
-                loci.all_support(f"binary-line:{width}"),
+                loci.all_support(carrier),
                 Fraction(1, 2),
                 Boundary("fixed", False),
             ),
             alphabet=alphabets.boolean(),
-            frontier=frontiers.everywhere("binary-line"),
+            frontier=frontiers.everywhere(carrier),
             neighborhood=neighborhoods.eca(),
             rule=rules.elementary(rule),
         )
@@ -444,11 +445,35 @@ class TraceLeaf(Generic[C]):
     continuing: bool
 
 @dataclass(frozen=True)
-class RolloutResult(Generic[C, W, V]):
+class RolloutComplete(Generic[C, W, V]):
     applications: tuple[ApplicationResult[C, W, V], ...]
-    leaves: tuple[TraceLeaf[C], ...]
-    truncated: bool
+    closed_leaves: tuple[TraceLeaf[C], ...]
 
+class TruncationCause(Enum):
+    DEPTH_BOUND = "depth-bound"
+    RESOURCE_EXHAUSTED = "resource-exhausted"
+    CANCELLED = "cancelled"
+    PRUNED = "pruned"
+
+@dataclass(frozen=True)
+class RolloutTruncated(Generic[C, W, V]):
+    applications: tuple[ApplicationResult[C, W, V], ...]
+    continuing_leaves: tuple[TraceLeaf[C], ...]
+    cause: TruncationCause
+
+@dataclass(frozen=True)
+class RolloutFault:
+    reason: str
+
+@dataclass(frozen=True)
+class RolloutRejected:
+    fault: RolloutFault
+
+RolloutResult: TypeAlias = (
+    RolloutComplete[C, W, V]
+    | RolloutTruncated[C, W, V]
+    | RolloutRejected
+)
 
 def rollout(
     program: SimpleProgram[C, V, W, R],
@@ -457,6 +482,8 @@ def rollout(
     initial: C | None = None,
     replay_key: str | None = None,
 ) -> RolloutResult[C, W, V]:
+    if steps < 0:
+        return RolloutRejected(RolloutFault("steps must be nonnegative"))
     leaves = normalize_initial_or_realize_seed(
         program.seed,
         initial=initial,
@@ -473,11 +500,13 @@ def rollout(
             else:
                 next_leaves.append(leaf)
         leaves = tuple(next_leaves)
-    return RolloutResult(
-        tuple(applications),
-        leaves,
-        any(leaf.continuing for leaf in leaves),
-    )
+    if any(leaf.continuing for leaf in leaves):
+        return RolloutTruncated(
+            tuple(applications),
+            leaves,
+            TruncationCause.DEPTH_BOUND,
+        )
+    return RolloutComplete(tuple(applications), leaves)
 
 
 # --- serialization.py and ca.__init__: expanded payload, small root spelling
@@ -509,7 +538,7 @@ DecodeResult: TypeAlias = Decoded[P] | DecodeRejected
 
 class serialization:
     @staticmethod
-    def encode_program(program: SimpleProgram[C, V, W, R]) -> bytes:
+    def dumps(program: SimpleProgram[C, V, W, R]) -> bytes:
         payload = ProgramPayload(
             program.seed,
             program.alphabet,
@@ -520,7 +549,7 @@ class serialization:
         return encode_closed_versioned_node("ca.simple-program", 1, payload)
 
     @staticmethod
-    def decode_program(
+    def loads(
         data: bytes,
     ) -> DecodeResult[SimpleProgram[C, V, W, R]]:
         decoded_payload = decode_closed_versioned_node("ca.simple-program", 1, data)
@@ -537,17 +566,18 @@ class serialization:
         return Decoded(require_valid_program(program).program)
 
 
-# ``ca.__init__`` exposes component/catalog namespaces and re-exports
-# ``SimpleProgram``, ``apply``, ``rollout``, and their public types from
-# ``program.py``.  It does not expose a competing rollout module:
+# ``ca.__init__`` exposes component/catalog namespaces and only the root
+# conveniences ``SimpleProgram``, ``apply``, and ``rollout``.  Detailed public
+# application/rollout records remain under ``ca.program``; there is no
+# competing rollout module:
 #
 #     ca.neighborhoods.eca()  -> ReadableRegion
 #     ca.catalog.eca()        -> SimpleProgram
 
 def public_surface_example() -> RolloutResult[BinaryLine, Locus, bool]:
     program = catalog.eca(rule=30, width=79)
-    encoded = serialization.encode_program(program)
-    decoded = serialization.decode_program(encoded)
+    encoded = serialization.dumps(program)
+    decoded = serialization.loads(encoded)
     if isinstance(decoded, DecodeRejected):
         raise ValueError(decoded.fault.reason)
     return rollout(decoded.value, steps=100, replay_key="example-0001")
