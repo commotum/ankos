@@ -275,7 +275,16 @@ streams, RNG helpers, or visualization.
   count and Goal 5 comparisons, the executable reference scaffold, two
   independent hostile reviews, whitespace, paths, and frozen-tree checks pass.
   Runtime, tests, Goal 2, Goal 5, and Stage 6–7 artifacts remain unchanged.
-- Stage 6 (`6-CONFORMANCE`) is the first incomplete stage and has not begun.
+- Stage 6 (`6-CONFORMANCE`) is the first incomplete stage. It began from clean
+  autosave commit `880e6c72281b1b11dc065a5c635fbf92c86df60e`; the frozen
+  `src/ca`, `tests`, `goal-2`, and `goal-5` trees remain
+  `6e6b34769d60508c03d0a69fad1ede4fef75e217`,
+  `02ad081e039a46efbf61855fdeae60abb7bb70ad`,
+  `48b6309655ec7c1d3aaa1a0ec5dfb700385e16d1`, and
+  `ba62f20b8c620094a0ad683906a803c5404be5f2`.
+- Stage 6 will add only `goal-6/conformance.md`, this plan update, its stage
+  report, and any narrowly required consistency correction found by the single
+  hostile review. It will reuse—not duplicate—the 60-row catalog matrix.
 
 ## Assumptions To Challenge
 
