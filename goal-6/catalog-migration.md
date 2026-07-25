@@ -234,3 +234,202 @@ unlisted configuration structure is preserved.
 | SPF006 | F006 `continuous-event-dynamics` | `dynamica.continuous_event_dynamics` | addition | `seed; geometry; flow_law; reset_law; terminal_condition` | S position/velocity/time + geometry; A real state/boundary labels; F trajectory state + event record; N current state + geometry; R flow to earliest hit then discontinuous reset | Intrinsic event time and hybrid continuous/discrete result | `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L60-61` | — |
 | SPF036 | F037 `ordinary-differential-flow` | `dynamica.ordinary_differential_flow` | addition | `seed; rhs; parameters; duration_or_event` | S time + finite continuous vector; A real/vector/parameter/event; F evolving vector + semantic event/sample slots; N state/time/parameters/events; R maximal or selected ODE flow segment, 0/1/many/I | Nonunique flows, singularities, solver/horizon separation | `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L901-902,L953-980` | — |
 | SPF039 | F041 `partial-differential-relation` | `dynamica.partial_differential_relation` | covered | `domain; coefficients; differential_relation; side_data` | S continuous domain + initial/boundary/partial field; A scalar/vector/tensor/metric fields; F unknown interior/spacetime field; N differential germs + all side dependencies; R 0/1/many/I compatible fields or μ | Nonuniqueness and intensional fields; numerical solver is realization | `CHAPTERS/04-Systems-Based-on-Numbers.md:L625-674; N08:L84-105,L322-328` | T45 `partial_differential_equation_system` compatibility preset |
+
+## Close roles outside the family matrix
+
+| Goal 5 role | Catalog treatment | Boundary |
+|---|---|---|
+| F010 `encode-evolve-decode-interface` | Metadata-only interface role; no SPF ID and no canonical family constructor | A concrete encoder or decoder with its own invariant commit may be an ordinary `media` program, while composition around an unchanged target belongs to run/query tooling |
+| F042 `percolation-connectivity-analysis` | Metadata-only observer role; no SPF ID and no canonical family constructor | Occupation may be a Seed law, but spanning/connectivity over the completed sample is an observer or analysis result |
+
+T08 is separately a retired Seed role from the legacy catalog. It is not one of
+these two Goal 5 close-role groups.
+
+## T01–T45 migration ledger
+
+Goal 5 disposition and end callable kind are independent. `P` means a closed
+parameter preset/refinement, `A` a true alternate spelling with identical
+arguments and expansion, `K` a total lossless legacy argument/name adapter,
+`C` the exact canonical constructor, and `M` metadata-only with no callable.
+A name that binds or validates semantic parameters is `P` even when Goal 5's
+family-level disposition is `alias`.
+
+| Legacy ID | Legacy label | Goal 5 disposition | Normalized target | End callable treatment | Exact migration |
+|---|---|---|---|---|---|
+| T01 | Elementary Cellular Automata | retain-family | SPF050 / F053 | P `eca`; A `elementary_cellular_automaton` | Bind binary 1-D radius-one synchronous feedback; family constructor remains `synchronous_local_state_transform` |
+| T02 | Multi-Color Nearest-Neighbor Cellular Automata | retain-preset | SPF050 / F053 | P `multicolor_cellular_automaton` | Bind finite palette, nearest-neighbor stencil, and feedback |
+| T03 | Totalistic Cellular Automata | retain-preset | SPF050 / F053 | P `totalistic_cellular_automaton` | Bind totalistic quotient Rule |
+| T04 | Three-Color Totalistic Cellular Automata | retain-preset | SPF050 / F053 | P `three_color_totalistic_cellular_automaton` | Bind T03 to three colors and radius one |
+| T05 | Higher-Color Totalistic Cellular Automata | merge | SPF050 / F053 | P `higher_color_totalistic_cellular_automaton` | T03 parameterization with `colors >= 4`; no family entry |
+| T06 | Quiescent-Background-Preserving Cellular Automata | retain-preset | SPF050 / F053 | P `quiescent_cellular_automaton` | Validate the quiescent-background Rule restriction; no executor change |
+| T07 | Left-Right Symmetric Cellular Automata | retain-preset | SPF050 / F053 | P `symmetric_cellular_automaton` | Validate reflection-invariant local Rule data |
+| T08 | Initial-Condition Classes | retire-role | none; `ca.seeds` | M | Permanent tombstone linking exact/constructive/probabilistic Seed constructors and laws |
+| T09 | Mobile Automata | retain-preset | SPF030 / F031 | P `mobile_automaton` | Bind the single tagged-head, center-write profile |
+| T10 | Extended Mobile Automata | repair | SPF030 / F031 | P `neighbor_updating_mobile_automaton`; K `extended_mobile_automaton` | Correctly bind the neighbor-updating fixed-block result; deprecated old name delegates losslessly |
+| T11 | Generalized Mobile Automata | retain-family | SPF032 / F033 | P `generalized_mobile_automaton` | Bind multi-active move/split/delete mechanics; do not route through the single-head family |
+| T12 | Turing Machines | retain-family | SPF030 / F031 | P `turing_machine` | Bind tagged control state, symbol write, and edge movement |
+| T13 | Neighbor-Independent Substitution Systems | retain-family | SPF037 / F038 | P `neighbor_independent_substitution` | Bind independent string items and generation concatenation |
+| T14 | Neighbor-Dependent Substitution Systems | retain-family | SPF005 / F005 | P `neighbor_dependent_substitution` | Bind contextual word neighborhoods |
+| T15 | Creation-Destruction Substitution Systems | merge | SPF037 / F038 | P `creation_destruction_substitution` | Bind empty/nonempty offspring data; no separate family or commit law |
+| T16 | Sequential Substitution Systems | retain-preset | SPF049 / F052 | P `sequential_substitution` | Bind flat string structure, ordered scan, and one nonoverlapping splice |
+| T17 | Tag Systems | retain-family | SPF016 / F017 | P `tag_system` | Bind fixed front deletion and rear production |
+| T18 | Cyclic Tag Systems | retain-preset | SPF016 / F017 | P `cyclic_tag_system` | Add visible cyclic production phase |
+| T19 | Register Machines | retain-family | SPF045 / F048 | C `register_machine` | Exact canonical path `ca.catalog.machina.register_machine` |
+| T20 | Symbolic Systems | retain-family | SPF049 / F052 | P `symbolic_system` | Bind expression-tree patterns, templates, and scan semantics |
+| T21 | Two-Dimensional Cellular Automata | retain-preset | SPF050 / F053 | P `cellular_automaton_2d` | Bind square support and 2-D local stencil |
+| T22 | Moore-Neighborhood Cellular Automata | retain-preset | SPF050 / F053 | P `moore_cellular_automaton` | Bind the 2-D Moore stencil |
+| T23 | Three-Dimensional Cellular Automata | retain-preset | SPF050 / F053 | P `cellular_automaton_3d` | Bind cubic support and 3-D stencil |
+| T24 | Higher-Dimensional Lattice Cellular Automata | retain-preset | SPF050 / F053 | P `lattice_cellular_automaton` | Bind dimension/incidence/stencil descriptors |
+| T25 | Two-Dimensional Turing Machines | retain-preset | SPF030 / F031 | P `turing_machine_2d` | Bind planar topology, headings, and movement ports |
+| T26 | Two-Dimensional Substitution Systems | retain-preset | SPF037 / F038 | P `substitution_system_2d` | Bind compatible 2-D offspring geometry |
+| T27 | Geometric Replacement And Fractal Systems | repair | SPF037 / F038 | P `geometric_substitution`; M old `fractal_system` wording | Construction is posed geometric substitution; “fractal” remains output/property metadata |
+| T28 | Neighbor-Dependent Two-Dimensional Substitution Systems | retain-preset | SPF005 / F005 | P `context_dependent_substitution_2d` | Bind 2-D contextual patterns and compatible mosaic commit |
+| T29 | Network Systems | retain-family | SPF038 / F040 | C `parallel_network_rewrite`; A `network_rewrite` | Restrict to topology rewrite; broad `network_system` is M and cannot also name F055 |
+| T30 | Multiway Systems | retain-family | SPF033 / F034 | A `multiway_system` | Same arguments and expanded fields as canonical `multiway_rewrite` |
+| T31 | Local Constraint Systems | retain-family | SPF029 / F030 | P `local_constraint_system` | Bind local predicates over an unknown completion region |
+| T32 | Template Constraint Systems | alias | SPF029 / F030 | P `template_constraint_system` | Bind allowed-template representation; not a zero-delta callable alias |
+| T33 | Seeded Template Constraint Systems | retain-preset | SPF029 / F030 | P `seeded_template_constraint_system` | Put fixed/required occurrences in Seed and obligations |
+| T34 | Arithmetic Iteration Systems | retain-preset | SPF026 / F027 | P `arithmetic_iteration` | Bind an exact arithmetic map expression |
+| T35 | Piecewise Integer Maps | retain-preset | SPF026 / F027 | P `piecewise_integer_map` | Bind integer domain and guarded/residue clauses |
+| T36 | Digit-Reversal Arithmetic Systems | retain-preset | SPF026 / F027 | P `digit_reversal_map` | Bind positional representation and reversal map |
+| T37 | Recursive Sequences | retain-family | SPF023 / F024 | P `recursive_sequence` | Bind fixed-index recurrence and append state |
+| T38 | Variable-Index Recursive Sequences | retain-preset | SPF023 / F024 | P `variable_index_recursive_sequence` | Bind value-selected history addresses |
+| T39 | Number-Theoretic Filtering Systems | retain-family | SPF025 / F026 | P `number_theoretic_filtering` | Bind divisibility/current-rank erasure criteria |
+| T40 | Mathematical-Constant Digit Systems | split | SPF002 / F002 and SPF008 / F008 | M split record | No umbrella callable or `kind=` dispatch; use `constant_digit_sequence` or `constant_digit_register` explicitly |
+| T41 | Function-Combination Systems | repair | SPF044 / F047 | C `recursive_function_evaluator`; M old wording | Replace role-like combination label with executable recursive reduction; no lossy old callable |
+| T42 | Continued-Fraction-Driven Substitution Systems | retain-preset | SPF037 / F038 | P `continued_fraction_substitution` | Bind a finite visible production schedule obtained from verified continued-fraction data |
+| T43 | Iterated Maps | retain-family | SPF026 / F027 | C `iterated_map` | Exact canonical path `ca.catalog.automata.iterated_map` |
+| T44 | Continuous Cellular Automata | alias | SPF050 / F053 | P `continuous_cellular_automaton` | Bind continuous-valued Alphabet/local law but remain discrete-time F053; not F041 |
+| T45 | Partial Differential Equation Systems | retain-family | SPF039 / F041 | C `partial_differential_relation`; A `pde` | Preserve relation-valued 0/1/many/I signature; neither spelling implies a solver |
+
+## Metadata and implementation contract
+
+The matrix's `Fxxx` cell is the exact lookup key for both the corresponding
+family-definition row in `goal-5/11-FAMILIES.md` and five-field row in
+`goal-5/api-pressure.md`. The direct Book anchors are repeated here because
+they are needed to implement presets without reopening taxonomy. The T ledger
+is the exact API/migration cross-reference to `goal-5/10-RECONCILE.md`.
+
+`catalog/entries.py` should expose frozen values equivalent to:
+
+```python
+FamilyEntry(
+    family_id,             # SPFnnn
+    audit_family_id,       # Fnnn provenance
+    slug,
+    home,
+    constructor_module,    # import-name string
+    constructor_name,      # identifier string
+    coverage,              # covered | addition
+    closed_parameters,
+    source_refs,
+    api_pressure_ref,
+    name_relations,
+)
+
+LegacyEntry(
+    legacy_id,             # Tnn
+    label,
+    disposition,
+    target_family_ids,     # length 0, 1, or 2
+    treatment,
+)
+
+NameEntry(
+    spelling,
+    owner_module,
+    kind,                  # C | P | A | K
+    target_family_id,
+    delegate_import_name,
+    flat_export,
+    closed_binding_summary,
+)
+```
+
+These are illustrative closed record shapes, not authorization to add another
+public module. Their fields contain no callable, `SimpleProgram`, component
+instance, Rule tag, executor key, or dispatch handler.
+
+Category modules explicitly implement their own canonical constructors and
+delegators and never import `entries`. `catalog/__init__.py` explicitly imports
+the six category modules, the selected symbols, and the metadata values; it
+does not synthesize Python functions from the matrix.
+
+### Export and equivalence gates
+
+- All 60 canonical constructors are category-qualified and explicitly flat-
+  exported from `ca.catalog`; none is exported from root `ca`.
+- Every `C`, `A`, and preferred `P` spelling in the T ledger is also an
+  explicit flat catalog export because the names above are unique.
+- Deprecated `K` adapters remain category-qualified and are omitted from flat
+  `catalog.__all__`. `M` entries have no callable anywhere.
+- Reserved flat names are `entries`, `automata`, `substitua`, `machina`,
+  `media`, and `criteria`, `dynamica`, plus the root module/operation names
+  fixed in `api.md`.
+- A canonical constructor wins any future collision. Otherwise no automatic
+  runtime precedence exists: one spelling is selected explicitly or every
+  contender remains category-qualified.
+- For every accepted argument tuple, `A` expansion must equal canonical
+  expansion exactly. `P` expansion must equal canonical expansion after its
+  declared closed binding. `K` must be total and lossless over its advertised
+  legacy domain.
+- Every callable spelling has exactly one SPF target. T40 deliberately has no
+  umbrella callable or family-selection parameter.
+
+### Receipt and serialization gate
+
+A nonsemantic receipt may retain:
+
+```text
+invoked spelling and kind
+SPF family ID
+optional legacy T entry
+normalized closed arguments
+constructor/catalog schema versions
+canonical expanded-payload digest
+```
+
+Decoding may retain the receipt only after verifying both the name-to-SPF
+relation and reconstructed digest. Canonical serialization remains the
+expanded five-field payload and never imports the catalog. SPF, F, T, path,
+category, and receipt do not participate in `SimpleProgram` equality,
+application, or rollout.
+
+## Goal 7 implementation obligations
+
+1. Add the six category modules in dependency order after the five component
+   algebras and `program.py` exist.
+2. Implement reusable component constructors before any whole-program family;
+   a catalog constructor only composes those values.
+3. Implement each canonical exact-slug constructor once in its primary module.
+4. Add presets/aliases/adapters only after canonical expansion is available,
+   with expansion-equivalence tests driven by the T ledger.
+5. Populate callable-free SPF/F/T/name metadata and explicit flat exports
+   without adding discovery registration or ID dispatch.
+6. Test each of the 60 expanded values through the same compatibility
+   validation and family-blind `apply`; Stage 6 defines the representative
+   semantic pressure fixtures rather than creating 60 executor tests.
+7. Verify optional construction receipts independently from canonical codecs.
+8. Remove or adapt current family-string construction only during Goal 7; this
+   Stage 5 plan does not change `src/ca`.
+
+## Exact verification contract
+
+- Canonical research IDs equal exactly:
+  F001–F009, F011–F038, F040–F041, and F043–F063.
+- SPF IDs equal exactly SPF001–SPF060, once each.
+- Canonical constructor identifiers and `home.constructor` pairs are unique.
+- Home counts are exactly 11 automata, 15 substitua, 8 machina, 14 media,
+  9 criteria, and 3 dynamica.
+- Coverage is exactly 19 `covered` and 41 `addition`.
+- Every family row has a nonempty closed-parameter list, all five labeled
+  fields, a pressure/result statement, a direct Book anchor, and its F-keyed
+  Goal 5 family/API references.
+- Legacy IDs equal T01–T45 exactly once. Dispositions count exactly
+  15 retain-family, 21 retain-preset, 2 merge, 3 repair, 2 alias,
+  1 retire-role, and 1 split.
+- T08 alone has zero SPF targets; T40 alone has two; every other T row has one.
+- The close-role table has exactly F010 and F042, with no SPF or constructor.
+- No name maps to multiple SPFs; no `M` entry is callable; no `K` entry is flat.
+- Core/application modules never import `catalog`; `entries` contains no
+  callables; canonical codecs do not require SPF/F/T/name resolution.
