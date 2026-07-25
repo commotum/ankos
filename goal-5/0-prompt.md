@@ -13,9 +13,10 @@ as the sole active completion contract for the unfinished taxonomy audit. Keep
 all predecessor artifacts preserved but inert: do not open or rely on their
 plans, prose, tools, histories, validators, search archives, or generated
 outputs. The only exception is Stage 1's one-time streaming projection of raw
-lead IDs, canonical source anchors, and short surface triggers into a compact
-Goal 5 register; never load the source store wholesale into context or import
-its conclusions.
+lead IDs into a compact Goal 5 register and the data-only source-ID mapping
+needed to derive canonical anchors and short surface triggers directly from the
+Book; never load predecessor data wholesale into context or import its
+conclusions.
 
 Use the repaired canonical Book as discovery authority. Close Chapter 8, then
 read Chapters 9–12 and their Notes sequentially. Record heading-level coverage

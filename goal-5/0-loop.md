@@ -14,8 +14,9 @@ At the beginning of a fresh session:
 4. Do not open predecessor goal folders, their prose, tools, histories,
    validators, search archives, or generated outputs.
 5. The sole predecessor-data exception is the one-time Stage 1 streaming
-   projection defined in the plan. It is mechanical and must not be loaded
-   wholesale into model context.
+   projection defined in the plan, including the data-only source-ID mapping
+   needed to resolve canonical Markdown anchors. It is mechanical and must not
+   be loaded wholesale into model context.
 
 ## Repeatable Loop
 
@@ -150,4 +151,3 @@ Stop a stage and record the next concrete work rather than improvising when:
 An apparent blocker is not a reason to abandon the original objective. It
 becomes an explicit source check, experiment, counterexample, or later-stage
 dependency.
-
