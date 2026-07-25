@@ -231,18 +231,27 @@ streams, RNG helpers, or visualization.
   Neighborhood grants no write capability.
 - The canonical Rule signature consumes `R` and `W`, not unrestricted `C`.
   Every alternative already denotes a total disposition over `W`, and static
-  requirements prove or obligate both read and effect containment. Concrete
-  result variants and atomic commit semantics remain deliberately open for
-  Stage 3.
+  requirements prove or obligate both read and effect containment.
+- Stage 3 is complete. The architecture now fixes sound-and-covering finite or
+  intensional Rule results, typed outcomes and cardinalities, total
+  dispositions, application-private closed reconstruction, phase-wide atomic
+  application, witness-before-quotient semantics, probability/replay/fresh
+  identity, and the application/rollout boundary.
+- A hostile recheck and refreshed F001–F063 pressure scan found no
+  application-semantic counterexample among all 60 executable families. F010
+  and F042 remain close roles rather than executable families.
 - Stage 2 did not alter `api.md`, `simple_programs.md`, or
   `ref/notes/ca-scaffold.py`; their coherent public/reference cutover remains
-  Stage 4 work after application semantics close.
+  Stage 4 work now that application semantics are closed.
 - Stage 2 verification passed all 102 runtime tests, whitespace/diff checks,
   frozen Goal 2 hashes, and a hostile recheck of all 15 challenged contract
   points.
-- Stage 3 (`3-APPLICATION`) is the first incomplete stage and is now in
-  progress from clean autosave commit
-  `96305d362eb5a05e1abb79faf4473c6017566e91`; Stages 4–7 remain untouched.
+- Stage 3 began from clean autosave commit
+  `96305d34cf2fb097e9d45e161375ebd20bf45999` and changed planning
+  documentation only. Runtime/test/Goal 2 trees and frozen hashes remain at
+  their Stage 1 values; the 102-test baseline was not rerun for docs-only work.
+- Stage 4 (`4-SURFACE`) is the first incomplete stage. Stages 5–7 remain
+  untouched.
 
 ## Assumptions To Challenge
 
@@ -412,7 +421,7 @@ before allowing file layout or examples to harden accidental semantics.
 
 ### 3-APPLICATION
 
-Status: **IN PROGRESS — result/application contract under specification**
+Status: **COMPLETE — result/application and run/tool boundaries verified**
 
 #### Big Picture Objective
 
@@ -432,7 +441,7 @@ one-shot programs.
 - Define witness retention before successor deduplication and define what
   equality/canonicalization is allowed to deduplicate.
 - Write family-blind application pseudocode: validate immutable input, resolve
-  writable/readable structures, evaluate the closed relation, reject writes
+  writable/readable structures, denote the closed relation, reject writes
   outside the frontier, atomically commit each complete replacement, preserve
   everything outside it, and retain result evidence.
 - Make clear that Rule data owns firing/applicability, schedules, collision

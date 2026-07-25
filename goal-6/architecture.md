@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — APPLICATION CONTRACT UNDER SPECIFICATION**
+Status: **IN PROGRESS — APPLICATION COMPLETE; SURFACE NEXT**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -2015,9 +2015,11 @@ above.
 - Stage 2 is complete: component protocols, shared locus algebra,
   configuration ownership, structural composition, validation, serialization
   constraints, and five paper type-checks are authoritative above.
-- Stage 3 is next: result algebra, atomic application, and run/tool boundary;
-- Stage 4 — exact file ownership, public imports, documentation, and reference
-  scaffold;
+- Stage 3 is complete: result algebra, closed reconstruction, phase-wide atomic
+  application, witness/measure/lineage semantics, and the run/tool boundary are
+  authoritative above.
+- Stage 4 is next: exact file ownership, public imports, documentation, and
+  reference scaffold;
 - Stage 5 — catalog construction and migration;
 - Stage 6 — pressure fixtures and conformance;
 - Stage 7 — implementation handoff and final reconciliation.
