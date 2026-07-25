@@ -1133,3 +1133,14 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Representative sources: CH10:L539-565,L599-605
 - Distinguishing test: encryption is bitwise XOR with a separately generated aligned stream
 
+## C095 — `fixed-comparison-sorting-network`
+
+- Leads: L1556
+- Carrier/domain: finite ordered values on a fixed set of indexed wires
+- Initialization: input list plus a fixed ordered or layered sequence of index pairs
+- Acting loci and read: each comparator reads exactly its two addressed wires; disjoint comparators in one layer may act in parallel
+- Effect, schedule, commit: replace the pair by its ordered minimum/maximum values and advance to the next comparator or layer
+- Termination/output: after the fixed schedule ends, output the resulting list; a valid sorting network sorts every input ordering
+- Defining variants: transposition, insertion, Batcher, Green, repetitive, nested, and irregular comparator schedules
+- Representative sources: N12:L331-347,L461-476; `BACK-MATTER/NOTES/_page_1157_Figure_7.jpeg`
+- Distinguishing test: comparator locations are fixed independently of input values, and a compare-exchange gate is generally non-injective, unlike a reversible Boolean or unitary gate

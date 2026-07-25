@@ -114,8 +114,8 @@ Retain the stable T01–T45 identifiers while applying these exact actions:
 
 | Action | IDs |
 |---|---|
-| Retain as family | T01, T09, T11–T14, T16–T17, T19–T20, T25, T28–T31, T34, T37, T39, T43, T45 |
-| Retain as preset | T02–T04, T06–T07, T18, T21–T24, T26, T33, T35–T36, T38, T42 |
+| Retain as family | T01, T11–T14, T17, T19–T20, T29–T31, T37, T39, T43, T45 |
+| Retain as preset | T02–T04, T06–T07, T09, T16, T18, T21–T26, T28, T33–T36, T38, T42 |
 | Merge | T05 into F053; T15 into F038 |
 | Repair | T10 as neighbor-updating mobile mechanics; T27 as geometric substitution rather than a “fractal” family |
 | Alias | T32 to F030; T44 to F053 |

@@ -39,8 +39,8 @@ families.
 
 ## Stage Results
 
-- Reconciled all 45 rows exactly once against the frozen 94-candidate
-  inventory. The existing rows yield 20 retained families, 16 retained
+- Reconciled all 45 rows exactly once against the frozen candidate inventory.
+  Final family normalization yields 15 canonical family rows, 21 retained
   presets, two aliases, two merges, two repairs, two retired semantic roles,
   and one split.
 - Current catalog rows directly cover 23 candidates. Of the other 71, 49 are
@@ -63,14 +63,14 @@ families.
 | T06 | Quiescent-Background-Preserving Cellular Automata | retain-preset | C090 |
 | T07 | Left-Right Symmetric Cellular Automata | retain-preset | C090 |
 | T08 | Initial-Condition Classes | retire-role | - |
-| T09 | Mobile Automata | retain-family | C047 |
+| T09 | Mobile Automata | retain-preset | C047 |
 | T10 | Extended Mobile Automata | repair | C056 |
 | T11 | Generalized Mobile Automata | retain-family | C030 |
 | T12 | Turing Machines | retain-family | C049 |
 | T13 | Neighbor-Independent Substitution Systems | retain-family | C061 |
 | T14 | Neighbor-Dependent Substitution Systems | retain-family | C011,C055 |
 | T15 | Creation-Destruction Substitution Systems | merge | C061 |
-| T16 | Sequential Substitution Systems | retain-family | C080 |
+| T16 | Sequential Substitution Systems | retain-preset | C080 |
 | T17 | Tag Systems | retain-family | C091 |
 | T18 | Cyclic Tag Systems | retain-preset | C091 |
 | T19 | Register Machines | retain-family | C073 |
@@ -79,16 +79,16 @@ families.
 | T22 | Moore-Neighborhood Cellular Automata | retain-preset | C090 |
 | T23 | Three-Dimensional Cellular Automata | retain-preset | C090 |
 | T24 | Higher-Dimensional Lattice Cellular Automata | retain-preset | C090 |
-| T25 | Two-Dimensional Turing Machines | retain-family | C049 |
+| T25 | Two-Dimensional Turing Machines | retain-preset | C049 |
 | T26 | Two-Dimensional Substitution Systems | retain-preset | C061 |
 | T27 | Geometric Replacement And Fractal Systems | repair | C061 |
-| T28 | Neighbor-Dependent Two-Dimensional Substitution Systems | retain-family | C055 |
+| T28 | Neighbor-Dependent Two-Dimensional Substitution Systems | retain-preset | C055 |
 | T29 | Network Systems | retain-family | C062 |
 | T30 | Multiway Systems | retain-family | C051 |
 | T31 | Local Constraint Systems | retain-family | C043 |
 | T32 | Template Constraint Systems | alias | C043 |
 | T33 | Seeded Template Constraint Systems | retain-preset | C042,C043 |
-| T34 | Arithmetic Iteration Systems | retain-family | C037 |
+| T34 | Arithmetic Iteration Systems | retain-preset | C037 |
 | T35 | Piecewise Integer Maps | retain-preset | C037 |
 | T36 | Digit-Reversal Arithmetic Systems | retain-preset | C037 |
 | T37 | Recursive Sequences | retain-family | C078 |
