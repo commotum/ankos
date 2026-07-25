@@ -210,6 +210,10 @@ family membership, and API fit:
   analysis, hostile review, and census have not been completed.
 - Goal 2 is frozen for comparison and must not be remastered until Goal 5
   produces its final handoff.
+- Stage 1 is complete. `raw-leads.csv` contains exactly 1,488 unique,
+  source-anchored `UNREVIEWED` leads in approximately 532 KB, and
+  `coverage.md` accounts for all 29 discovery documents without importing
+  predecessor judgments.
 
 ## Assumptions To Challenge
 
@@ -305,7 +309,7 @@ Goal 5 succeeds only when:
 
 ### 1-CUTOVER
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/1-CUTOVER.md`.
 
 #### Big Picture Objective
 
@@ -336,6 +340,8 @@ through a compact, conclusion-free raw-lead projection.
 - Earlier artifacts and all non-Goal-5 files remain unchanged.
 
 ### 2-CH08-CLOSE
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
