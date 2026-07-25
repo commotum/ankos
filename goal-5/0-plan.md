@@ -234,6 +234,10 @@ family membership, and API fit:
   explicit later dependency. Universality, named universal systems, emulations,
   and proofs remain properties, presets, or encodings rather than new
   constructions.
+- Stage 6 is complete. Chapter 12 and its Notes are covered across all 26
+  headings and add 12 compact leads: eight serious, two weak, and two explicit
+  later dependencies. Principles, impossibility results, proof arguments, and
+  named mathematical instances remain outside the construction count.
 
 ## Assumptions To Challenge
 
@@ -467,7 +471,7 @@ Discover construction-bearing mechanics in Chapter 11 and its Notes.
 
 ### 6-CH12
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/6-CH12.md`.
 
 #### Big Picture Objective
 
@@ -489,6 +493,8 @@ Discover construction-bearing mechanics in Chapter 12 and its Notes.
 - Cross-chapter questions needed for consolidation are explicit.
 
 ### 7-INDEX-CHECK
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
