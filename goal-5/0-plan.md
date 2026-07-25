@@ -584,7 +584,7 @@ initial consolidation.
 
 ### 10-RECONCILE
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/10-RECONCILE.md`.
 
 #### Big Picture Objective
 
@@ -611,6 +611,8 @@ Freeze blind discovery and reconcile the serious shortlist against T01–T45.
 - No catalog name is treated as proof of a separate family.
 
 ### 11-FAMILIES
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
