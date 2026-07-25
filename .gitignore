@@ -12,4 +12,5 @@ wheels/
 # Generated source material
 /A New Kind of Science/
 /A New Kind of Science.pdf
+/goal-4/review-history.jsonl
 .DS_Store
