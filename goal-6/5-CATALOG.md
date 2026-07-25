@@ -75,10 +75,11 @@ Files expected to change:
 - `goal-6/0-plan.md`
 - `ref/notes/ca-scaffold.py`
 
-The three non-stage artifacts above receive only hostile-review consistency
-repairs: removal of the unsupported construction-receipt idea and alignment of
-the reference constructor/preset/alias chain. They remain target
-documentation, not runtime implementation.
+The target API, completed Stage 2 report, and reference scaffold receive only
+hostile-review consistency repairs: removal of the unsupported
+construction-receipt idea and alignment of the reference
+constructor/preset/alias chain. They remain documentation, not runtime
+implementation.
 
 ## No-Cheating Checks
 

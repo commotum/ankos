@@ -1734,9 +1734,11 @@ including:
 ca.catalog.eca(rule=30)
 ```
 
-The two spellings call the same constructor. A compatibility alias delegates
-to one canonical constructor; it cannot attach hidden state, supply different
-fields, register an executor, or become semantic identity.
+The two spellings call the same constructor. A true alias delegates with the
+same normalized arguments to its declared canonical or preset callable; a
+compatibility adapter performs only a total lossless legacy argument mapping.
+Neither can attach hidden state, supply different fields, register an executor,
+or become semantic identity.
 
 Flat exports are deny-by-default and explicit in `catalog.__all__`. If two
 category modules would claim the same name, only the canonical owner's
