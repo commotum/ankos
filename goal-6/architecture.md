@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — SURFACE COMPLETE; CATALOG NEXT**
+Status: **IN PROGRESS — CATALOG MAPPING UNDERWAY**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
