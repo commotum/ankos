@@ -240,6 +240,10 @@ The type variables mean:
 
 Locus/key types are associated structural types inside `C`, `W`, and `R`.
 They need not become another public generic parameter or program field.
+For readability, later result notation suppresses associated parameters once
+the program determines them—for example `ApplicationResult[C]`. A concrete
+static type may retain `W` to type nested dispositions or derivation fibers;
+that is not a stored field or additional semantic axis.
 
 The denotational flow is:
 
@@ -1156,13 +1160,14 @@ apply(
 ) -> ApplicationResult[C]
 ```
 
-`ApplicationInput` supplies one immutable configuration snapshot and validated
-trace lineage. Seed realization supplies a root trace lineage; direct
-application of a raw `C` derives one canonically for evidence. The public
-wrapper normalizes both forms to `ApplicationInput` before the normative
-algorithm begins. This lineage scopes raw events and replay subkeys but does
-not alter the semantic configuration, Rule denotation, or fresh component
-identity. It is invocation data, not a sixth program component.
+`ApplicationInput` supplies one immutable configuration snapshot and may
+supply validated trace lineage. Seed realization supplies a root lineage;
+direct application of a raw `C`, or an input record with no lineage, derives
+one canonically for evidence. The public wrapper normalizes both forms to a
+lineage-bearing `ApplicationInput` before the normative algorithm begins. This
+lineage scopes raw events and replay subkeys but does not alter the semantic
+configuration, Rule denotation, or fresh component identity. It is invocation
+data, not a sixth program component.
 
 `require_valid_program` derives an ephemeral compatibility certificate. Among
 its associated evidence is the configuration contract `C` shared by all five
@@ -1268,8 +1273,7 @@ apply(program, input):
 
     if rr is RuleRejected(fault):
         return ApplicationRejected(
-            from_rule_fault(fault),
-            accumulated_evidence,
+            application_fault_from_rule(fault, accumulated_evidence),
         )
 
     # Phase 1: validate the whole closed Rule outcome space.
@@ -1308,7 +1312,7 @@ apply(program, input):
         p.alphabet,
         source=s.configuration,
         output_lineage_from=(
-            input.trace_lineage,
+            a.trace_lineage,
             application_identity,
         ),
     )
@@ -1663,9 +1667,10 @@ apply(
 ) -> ApplicationResult[C]
 ```
 
-Passing `C` derives a canonical direct-application root lineage. Passing
-`ApplicationInput` supplies a validated lineage explicitly. Neither form
-changes program identity or Rule denotation.
+Passing `C` derives a canonical direct-application root lineage.
+`ApplicationInput` may supply a validated lineage explicitly; when it omits
+one, normalization derives the same canonical root. Neither form changes
+program identity or Rule denotation.
 
 The minimum rollout convenience is:
 

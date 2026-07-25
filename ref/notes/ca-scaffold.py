@@ -174,8 +174,8 @@ class seeds:
 
 class frontiers:
     @staticmethod
-    def everywhere(carrier: str) -> WritableRegion[C, Locus]:
-        return WritableRegion(loci.all_support(carrier))
+    def everywhere() -> WritableRegion[C, Locus]:
+        return WritableRegion(loci.all_support("current-carrier"))
 
     @staticmethod
     def union(parts: tuple[WritableRegion[C, W], ...]) -> WritableRegion[C, W]:
@@ -253,7 +253,7 @@ class automata:
                 Boundary("fixed", False),
             ),
             alphabet=alphabets.boolean(),
-            frontier=frontiers.everywhere(carrier),
+            frontier=frontiers.everywhere(),
             neighborhood=neighborhoods.eca(),
             rule=rules.elementary(rule),
         )
@@ -324,9 +324,13 @@ class Preserve(Generic[W]):
     target: W
 
 @dataclass(frozen=True)
-class Replace(Generic[W, V]):
+class ReplacementPayload:
+    descriptor: Expr
+
+@dataclass(frozen=True)
+class Replace(Generic[W]):
     target: W
-    payload: V | Expr
+    payload: ReplacementPayload
 
 @dataclass(frozen=True)
 class Delete(Generic[W]):
@@ -337,17 +341,17 @@ class Absent(Generic[W]):
     target: W
 
 @dataclass(frozen=True)
-class Create(Generic[W, V]):
+class Create(Generic[W]):
     target: W
-    payload: V | Expr
+    payload: ReplacementPayload
 
 DispositionAtom: TypeAlias = (
-    Preserve[W] | Replace[W, V] | Delete[W] | Absent[W] | Create[W, V]
+    Preserve[W] | Replace[W] | Delete[W] | Absent[W] | Create[W]
 )
 
 @dataclass(frozen=True)
-class FiniteDisposition(Generic[W, V]):
-    atoms: tuple[DispositionAtom[W, V], ...]
+class FiniteDisposition(Generic[W]):
+    atoms: tuple[DispositionAtom[W], ...]
     totality_evidence: Expr
 
 @dataclass(frozen=True)
@@ -355,7 +359,7 @@ class IntensionalDisposition:
     relation: Expr
     totality_evidence: Expr
 
-TotalDisposition: TypeAlias = FiniteDisposition[W, V] | IntensionalDisposition
+TotalDisposition: TypeAlias = FiniteDisposition[W] | IntensionalDisposition
 
 @dataclass(frozen=True)
 class FiniteSupport(Generic[A]):
@@ -391,8 +395,8 @@ class Stop:
 Continuation: TypeAlias = Continue | Stop
 
 @dataclass(frozen=True)
-class Derivation(Generic[W, V]):
-    replacement: TotalDisposition[W, V]
+class Derivation(Generic[W]):
+    replacement: TotalDisposition[W]
     progress: Progress
     continuation: Continuation
     witness: Expr
@@ -405,7 +409,7 @@ class NoSuccessor:
     witness: Expr
     provenance: tuple[str, ...]
 
-RuleAtom: TypeAlias = Derivation[W, V] | NoSuccessor
+RuleAtom: TypeAlias = Derivation[W] | NoSuccessor
 
 @dataclass(frozen=True)
 class RuleFault:
@@ -418,36 +422,41 @@ class RuleRejected:
     fault: RuleFault
 
 @dataclass(frozen=True)
-class RuleComplete(Generic[W, V]):
-    outcome_space: OutcomeSpace[RuleAtom[W, V]]
+class RuleComplete(Generic[C, W]):
+    outcome_space: OutcomeSpace[RuleAtom[W]]
 
-RuleResult: TypeAlias = RuleComplete[W, V] | RuleRejected
+RuleResult: TypeAlias = RuleComplete[C, W] | RuleRejected
+
+@dataclass(frozen=True)
+class TraceLineage:
+    identity: str
+    parents: tuple[str, ...] = ()
 
 @dataclass(frozen=True)
 class ApplicationInput(Generic[C]):
     configuration: C
-    trace_lineage: tuple[str, ...] = ()
+    trace_lineage: TraceLineage | None = None
 
 @dataclass(frozen=True)
-class AppliedDerivation(Generic[C, W, V]):
+class AppliedDerivation(Generic[C, W]):
     successor: C
-    source: Derivation[W, V]
+    source: Derivation[W]
     fresh_bindings: tuple[Expr, ...]
-    output_trace_lineage: Expr
+    output_trace_lineage: TraceLineage
     evidence: Expr
 
 @dataclass(frozen=True)
 class AppliedNoSuccessor:
     source: NoSuccessor
-    output_trace_lineage: Expr
+    output_trace_lineage: TraceLineage
     evidence: Expr
 
-AppliedAtom: TypeAlias = AppliedDerivation[C, W, V] | AppliedNoSuccessor
+AppliedAtom: TypeAlias = AppliedDerivation[C, W] | AppliedNoSuccessor
 
 @dataclass(frozen=True)
-class SuccessorGroup(Generic[C, W, V]):
+class SuccessorGroup(Generic[C, W]):
     successor: C
-    derivation_fiber: SupportSpace[AppliedDerivation[C, W, V]]
+    derivation_fiber: SupportSpace[AppliedDerivation[C, W]]
 
 class MeasureState(Enum):
     ABSENT = "absent"
@@ -460,15 +469,15 @@ class MeasureView:
     descriptor_or_evidence: Expr | None
 
 @dataclass(frozen=True)
-class ApplicationComplete(Generic[C, W, V]):
-    source_outcomes: OutcomeSpace[RuleAtom[W, V]]
-    applied_atoms: SupportSpace[AppliedAtom[C, W, V]]
+class ApplicationComplete(Generic[C, W]):
+    source_outcomes: OutcomeSpace[RuleAtom[W]]
+    applied_atoms: SupportSpace[AppliedAtom[C, W]]
     no_successor_partition: SupportSpace[AppliedNoSuccessor]
     outcome_atom_cardinality: CardinalityClaim
     derivation_cardinality: CardinalityClaim
     successor_cardinality: CardinalityClaim
     successor_quotient_with_derivation_fibers: SupportSpace[
-        SuccessorGroup[C, W, V]
+        SuccessorGroup[C, W]
     ]
     applied_atom_measure: MeasureView
     successor_submeasure: MeasureView
@@ -485,13 +494,13 @@ class ApplicationFault:
 class ApplicationRejected:
     fault: ApplicationFault
 
-ApplicationResult: TypeAlias = ApplicationComplete[C, W, V] | ApplicationRejected
+ApplicationResult: TypeAlias = ApplicationComplete[C, W] | ApplicationRejected
 
 
 def apply(
     program: SimpleProgram[C, V, W, R],
     application_input: C | ApplicationInput[C],
-) -> ApplicationResult[C, W, V]:
+) -> ApplicationResult[C, W]:
     normalized_input = normalize_application_input(application_input)
     compatibility = require_valid_program(program)
     snapshot = freeze_and_validate_input(normalized_input, compatibility)
@@ -536,25 +545,25 @@ def apply(
 @dataclass(frozen=True)
 class ContinuingLeaf(Generic[C]):
     configuration: C
-    trace_lineage: Expr
+    trace_lineage: TraceLineage
 
 @dataclass(frozen=True)
-class ClosedLeaf(Generic[C, W, V]):
+class ClosedLeaf(Generic[C, W]):
     final_configuration: C | None
-    source: AppliedAtom[C, W, V]
+    source: AppliedAtom[C, W]
 
 @dataclass(frozen=True)
-class RawTrace(Generic[C, W, V]):
-    roots: SupportSpace[C]
-    applications: SupportSpace[ApplicationComplete[C, W, V]]
-    derivation_edges: SupportSpace[AppliedAtom[C, W, V]]
+class RawTrace(Generic[C, W]):
+    roots: OutcomeSpace[C]
+    applications: SupportSpace[ApplicationComplete[C, W]]
+    derivation_edges: SupportSpace[AppliedAtom[C, W]]
     lineage_graph: Expr
     evidence: Expr
 
 @dataclass(frozen=True)
-class RolloutComplete(Generic[C, W, V]):
-    raw_trace: RawTrace[C, W, V]
-    closed_leaves: SupportSpace[ClosedLeaf[C, W, V]]
+class RolloutComplete(Generic[C, W]):
+    raw_trace: RawTrace[C, W]
+    closed_leaves: SupportSpace[ClosedLeaf[C, W]]
 
 class TruncationCause(Enum):
     DEPTH_BOUND = "depth-bound"
@@ -563,8 +572,8 @@ class TruncationCause(Enum):
     PRUNED = "pruned"
 
 @dataclass(frozen=True)
-class RolloutTruncated(Generic[C, W, V]):
-    raw_trace: RawTrace[C, W, V]
+class RolloutTruncated(Generic[C, W]):
+    raw_trace: RawTrace[C, W]
     continuing_leaves: SupportSpace[ContinuingLeaf[C]]
     cause: TruncationCause
 
@@ -577,8 +586,8 @@ class RolloutRejected:
     fault: RolloutFault
 
 RolloutResult: TypeAlias = (
-    RolloutComplete[C, W, V]
-    | RolloutTruncated[C, W, V]
+    RolloutComplete[C, W]
+    | RolloutTruncated[C, W]
     | RolloutRejected
 )
 
@@ -590,7 +599,7 @@ def rollout(
     steps: int,
     initial: C | None = None,
     replay_key: ReplayKey | None = None,
-) -> RolloutResult[C, W, V]:
+) -> RolloutResult[C, W]:
     if steps < 0:
         return RolloutRejected(RolloutFault("steps must be nonnegative"))
     initial_space = normalize_initial_or_realize_seed_closed(
@@ -682,7 +691,7 @@ class serialization:
 #     ca.neighborhoods.eca()  -> ReadableRegion
 #     ca.catalog.eca()        -> SimpleProgram
 
-def public_surface_example() -> RolloutResult[BinaryLine, Locus, bool]:
+def public_surface_example() -> RolloutResult[BinaryLine, Locus]:
     program = catalog.eca(rule=30, width=79)
     encoded = serialization.dumps(program)
     decoded = serialization.loads(encoded)

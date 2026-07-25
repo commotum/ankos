@@ -373,8 +373,9 @@ rollout.
 
 The public callable and its `RolloutResult`/trace records are owned
 by `ca.program`; `ca.rollout` is the convenience re-export. Goal 7 folds or
-privatizes the current tensor-oriented `rollout.py`, so no same-named public
-submodule can shadow the callable. There is no `run.py`.
+physically renames the current tensor-oriented `rollout.py`, so no same-named
+public submodule can shadow the callable. Omitting it from `__all__` is not
+enough. There is no `run.py`.
 
 ## Serialization
 
@@ -393,7 +394,7 @@ match decoded:
 ```
 
 The exact failure shape is
-`DecodeResult[T] = Decoded[T] | DecodeRejected[DecodeFault]`. Unknown tags,
+`DecodeResult[T] = Decoded[T] | DecodeRejected`. Unknown tags,
 versions, fields, primitives, and lossy migrations are typed decode
 rejections, not partially restored values or implicit defaults.
 
