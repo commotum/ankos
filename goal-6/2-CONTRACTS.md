@@ -104,8 +104,8 @@ Files changed:
 - Lazy and extensible descriptors remain versioned, serializable structural
   forms; Python protocols, generators, callbacks, and opaque implementations
   are not semantic admission.
-- Canonical serialization always expands all five fields; an alias may survive
-  only as a verified construction receipt.
+- Canonical serialization always expands all five fields and never preserves
+  or recovers an invoked catalog alias or its arguments.
 - No runtime or test file, frozen Goal 2 file, root API narrative, or reference
   scaffold was changed.
 - Stage 2 states the minimum Rule result shape but does not preempt Stage 3's

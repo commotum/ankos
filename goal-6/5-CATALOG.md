@@ -56,8 +56,8 @@ construction rather than runtime ontology.
 - Resolve T40's two-family split and any broad legacy-row ambiguity without
   assigning one canonical family row two mechanics.
 - Record how `catalog/entries.py`, category modules, `catalog/__init__.py`,
-  serialization receipts, and Goal 7 tests consume the matrix without engine
-  dispatch.
+  canonical serialization, and Goal 7 tests consume the matrix without engine
+  dispatch or hidden invocation state.
 - Conduct one focused hostile review of row uniqueness, module placement,
   naming, parameters, five-field fit, T actions, additions, roles, stable IDs,
   and public-name collisions.
@@ -104,8 +104,8 @@ Files expected to change:
 - [ ] Every T disposition has a non-conflicting canonical target and exact
       callable, metadata-only, alias, preset, merged, repaired, retired, or
       split treatment.
-- [ ] Stable-ID, collision, re-export, alias, receipt, and metadata policies
-      are implementation-ready and cannot become execution dispatch.
+- [ ] Stable-ID, collision, re-export, alias, serialization, and metadata
+      policies are implementation-ready and cannot become execution dispatch.
 - [ ] Hostile review, exact count checks, link/path checks, terminology,
       whitespace/diff, frozen hashes, and behavioral-tree checks pass.
 - [ ] Stage 6 can pressure-test this matrix without reopening taxonomy,

@@ -277,8 +277,26 @@ class SimpleProgram(Generic[C, V, W, R]):
         require_compatible_five_fields(self)
 
 
-# --- catalog/automata.py: whole-program constructor and explicit alias -----
+# --- catalog/automata.py: canonical family, preset, and explicit alias ------
 class automata:
+    @staticmethod
+    def synchronous_local_state_transform(
+        *,
+        seed: Seed[C],
+        alphabet: Alphabet[V],
+        frontier: WritableRegion[C, W],
+        neighborhood: ReadableRegion[C, R],
+        rule: Rule[R, W, C],
+    ) -> SimpleProgram[C, V, W, R]:
+        """Canonical F053 constructor; production code validates its profile."""
+
+        return SimpleProgram(
+            seed=seed,
+            alphabet=alphabet,
+            frontier=frontier,
+            neighborhood=neighborhood,
+            rule=rule,
+        )
     @staticmethod
     def eca(
         rule: int = 30,
@@ -290,7 +308,7 @@ class automata:
         IndexedView[tuple[bool, bool, bool]],
     ]:
         carrier = f"binary-line:{width}"
-        return SimpleProgram(
+        return automata.synchronous_local_state_transform(
             seed=seeds.bernoulli(
                 loci.all_support(carrier),
                 Fraction(1, 2),
@@ -328,6 +346,9 @@ class entries:
 class catalog:
     automata = automata
     entries = entries
+    synchronous_local_state_transform = staticmethod(
+        automata.synchronous_local_state_transform
+    )
     eca = staticmethod(automata.eca)
     elementary_cellular_automaton = staticmethod(
         automata.elementary_cellular_automaton

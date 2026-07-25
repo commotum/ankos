@@ -114,18 +114,19 @@ constructor ownership, not runtime classes.
 
 Every canonical constructor, parameter preset, compatibility name, and alias
 returns an ordinary five-field `SimpleProgram` and expands through ordinary
-component constructors. Catalog entries and optional verified construction
-receipts record status and provenance outside the five fields. None has a
-privileged executor or influence on `ca.apply`.
+component constructors. Catalog entries record status, sources, and name
+relations outside the five fields. Invoked spelling and arguments are not
+attached to the returned program. None has a privileged executor or influence
+on `ca.apply`.
 
 Reusable pieces remain in the component modules. In particular,
 `ca.neighborhoods.eca()` is a Neighborhood preset, while
 `ca.catalog.eca(...)` is a whole program. There is intentionally no ambiguous
 root-level `ca.eca`.
 
-`ca.catalog.entries` owns descriptive lookup, aliases, sources, and
-construction receipts. It is not an execution registry, and catalog IDs or
-family names never select an application algorithm.
+`ca.catalog.entries` owns descriptive lookup, aliases, and sources. It is not
+an execution registry, and catalog IDs or family names never select an
+application algorithm.
 
 The 60 audited executable semantic families are coverage obligations and
 constructor destinations. They are not 60 subclasses, executor branches, or
@@ -401,10 +402,12 @@ rejections, not partially restored values or implicit defaults.
 The canonical program payload always contains the validated, expanded
 `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule` fields.
 
-A versioned outer envelope may carry provenance, a derived digest, and an
-optional verified catalog construction receipt. An alias-only recipe is never
-the authoritative lossless representation, and execution never dispatches on
-an alias.
+A versioned outer envelope may carry payload provenance and a derived digest.
+Canonical codecs neither preserve nor recover the catalog spelling and
+arguments used to construct a program. Applications that need invocation
+history keep a separate user manifest; an alias-only recipe is never accepted
+as the authoritative lossless representation, and execution never dispatches
+on an alias.
 
 Canonical codecs:
 

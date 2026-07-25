@@ -92,18 +92,19 @@ component instance, registry hook, or executor. Category modules do not import
    presets or aliases. They delegate to category-owned canonical constructors;
    they own no component or execution logic.
 5. Every unique canonical name is explicitly available both category-qualified
-   and flat under `ca.catalog`. Selected unique presets may also be flat.
-   Generic names such as `rewrite`, `network`, `machine`, `relation`,
-   `transform`, `search`, and `flow` are forbidden flat exports.
+   and flat under `ca.catalog`. Every `P` and `A` spelling named by this
+   contract is likewise an explicit flat export. Generic names such as
+   `rewrite`, `network`, `machine`, `relation`, `transform`, `search`, and
+   `flow` are forbidden flat exports.
 6. Any future collision removes the contested flat spelling from all but one
    explicitly preferred owner. Category-qualified paths never collide.
 7. Lookup by SPF, T, or F ID returns metadata only. There is no public
    `construct(id, **kwargs)` dispatcher. Users call the recorded canonical
    path.
-8. Canonical serialization stores the expanded five fields. An optional
-   construction receipt records SPF ID, any invoked T entry, canonical path,
-   normalized closed arguments, and expanded-program digest; decoding verifies
-   it but never executes it or uses it as program identity.
+8. Canonical serialization stores only the expanded five-field semantic
+   payload plus ordinary codec-envelope data. It neither preserves nor
+   recovers SPF/F/T identity, invoked spelling, or constructor arguments.
+   Applications that need invocation history keep a separate user manifest.
 
 ## Home precedence
 
@@ -178,7 +179,7 @@ unlisted configuration structure is preserved.
 | SPF033 | F034 `multiway-rewrite` | `substitua.multiway_rewrite` | covered | `seed; rewrites; match_semantics; quotient` | S initial carrier states; A carrier values + identity; F union of all applicable matches/outputs; N all matches/context; R one witnessed successor per rewrite, then quotient | Witnesses and multiplicity survive before equal-successor deduplication | `CHAPTERS/05-Two-Dimensions-and-Beyond.md:L355-369` | `multiway_system` true alias |
 | SPF037 | F038 `parallel-independent-substitution` | `substitua.parallel_independent_substitution` | covered | `seed; productions; schedule; geometry` | S items + generation phase; A item/phase/offspring; F all old items + possible offspring support; N each old item + phase; R independent 0/1/many/μ offspring assembled atomically | Empty/variable offspring and generation-wide commit | `CH03:L299-307,L343-363` | T15 merge; T26/T27/T42 presets; `neighbor_independent_substitution` |
 | SPF038 | F040 `parallel-network-rewrite` | `substitua.parallel_network_rewrite` | covered | `seed; patches; port_schema; overlap_law` | S labeled graph + ports; A node/edge/port/absence; F all old/constructible elements; N bounded connections/paths; R compatible parallel patches with overlap resolution | Dynamic topology and graph-level atomic commit | `CHAPTERS/05-Two-Dimensions-and-Beyond.md:L241,L287-331` | `network_rewrite`; broad `network_system` is not exported |
-| SPF043 | F046 `random-functional-graph-construction` | `substitua.random_functional_graph_construction` | addition | `nodes; successor_measure` | S labeled node domain + replay law; A node/successor/edge; F every successor slot; N source + complete destination domain; R independently sample one successor each and commit graph | One-shot distributed stochastic structure creation | `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md:L589-590` | — |
+| SPF043 | F046 `random-functional-graph-construction` | `substitua.random_functional_graph_construction` | addition | `nodes; successor_measure` | S labeled node domain + successor law; A node/successor/edge; F every successor slot; N source + complete destination domain; R product μ over complete graph replacements with exactly one successor per node | One-shot distributed stochastic structure creation; external realization performs any draw | `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md:L589-590` | — |
 | SPF049 | F052 `structural-pattern-rewrite` | `substitua.structural_pattern_rewrite` | covered | `expression; patterns; replacements; scan; nonoverlap` | S expression + ordered rewrite data; A operator/atom/variable/binder; F matches + possible replacement nodes; N subtree + structural/scan context; R compatible nonoverlapping forest, 0/1/many | Variable trees, binding context, scan order, and conflicts | `CH03:L531-537; N03:L823-835; CH10:L909-915` | `symbolic_system`; T16 sequential-substitution preset |
 
 ### `machina.py` — 8
@@ -201,10 +202,10 @@ unlisted configuration structure is preserved.
 | SPF004 | F004 `event-provenance-causal-network` | `media.event_provenance_causal_network` | addition | `event_trace; read_sets; initial_provenance` | S ordered events + producer map/cursor; A event IDs/producers/edges; F fresh event/edge slots + producer records; N event reads + current producers; R emit event/direct dependencies + provenance update | Lossless trace-to-causal graph, fresh identity, and provenance | `CH09:L655-707; N09:L347-355,L378-384` | — |
 | SPF008 | F008 `digit-emitting-register-transduction` | `media.digit_emitting_register_transduction` | covered | `seed; register_law; base; digit_projection` | S registers/control/output end; A integers/control/digits/stream markers; F changed registers + next output/end; N complete registers/comparisons; R atomic register update + exactly one digit or terminal | Emission is construction-defining writable state | `CHAPTERS/04-Systems-Based-on-Numbers.md:L303-308,L343-350` | T40 split branch; P `constant_digit_register` |
 | SPF011 | F012 `error-diffusion-transform` | `media.error_diffusion_transform` | addition | `input; palette; diffusion_kernel; scan` | S raster + cursor/error; A intensity/error/palette/control; F pixel + all future error recipients + cursor; N current value/error/future stencil; R quantize + distribute error forward | Ordered causal scan with coupled future writes | `N10:L348-360` | — |
-| SPF012 | F013 `maximal-run-record-transduction` | `media.maximal_run_record_transduction` | addition | `input; record_grammar; direction; scan; feedback` | S input/output/cursor or feedback; A symbol/length/record/end; F record/expanded output + cursor; N maximal homogeneous extent; R emit/expand one self-delimiting run | Variable extents/output, inverse direction, and optional feedback | `CH10:L163-187; N10:L83-85,L171-175` | `look_and_say` is a feedback preset |
+| SPF012 | F013 `maximal-run-record-transduction` | `media.maximal_run_record_transduction` | addition | `input; record_grammar; direction; scan; feedback` | S input/output/cursor or feedback; A symbol/length/record/end; F record/expanded output + cursor; N maximal homogeneous extent; R emit/expand one self-delimiting run | Variable extents/output, inverse direction, and optional feedback | `CH10:L163-187; N10:L83-85,L171-175` | P `look_and_say` feedback preset; flat export |
 | SPF020 | F021 `hash-index-transform` | `media.hash_index_transform` | addition | `key; table; hash_fold; collision; operation` | S table/key/fold/control/result; A keys/hash/buckets/links/results; F control/result + alterable collision path; N input + reachable buckets/chains; R insert/hit/miss then stop | Dynamic address path, exact equality, typed miss | `CH10:L829-839; N10:L976-980` | — |
-| SPF041 | F044 `probabilistic-transition-model-fitting` | `media.probabilistic_transition_model_fitting` | addition | `observations; topology; estimator; sampler; generation_request` | S observations + model/counts + fit/sample phase; A states/probabilities/counts/control; F model + generated slots; N training histories or fitted context; R fit then sample with explicit μ | Lossless two-phase fit/sample state and replayable probability | `CH10:L441-459; N10:L495-501` | — |
-| SPF046 | F049 `sampled-causal-order-network` | `media.sampled_causal_order_network` | addition | `region; causal_order; density; sampler` | S spacetime region + construction phase; A event coordinates/causal edges; F every event/edge; N sampled pairs + reachability/interveners; R sample then replace by causal cover graph | Continuous sampling, global comparisons, transitive reduction | `N09:L816-818` | Distinct from F004 producer-history transform |
+| SPF041 | F044 `probabilistic-transition-model-fitting` | `media.probabilistic_transition_model_fitting` | addition | `observations; topology; estimator; generation_law; generation_request` | S observations + model/counts + fit/generate phase; A states/probabilities/counts/control; F model + generated slots; N training histories or fitted context; R fit parameters then denote explicit μ over generated paths | Lossless two-phase fit/generation state and replayable probability; realization is external | `CH10:L441-459; N10:L495-501` | — |
+| SPF046 | F049 `sampled-causal-order-network` | `media.sampled_causal_order_network` | addition | `region; causal_order; density; event_measure` | S spacetime region + construction phase; A event coordinates/causal edges; F every event/edge; N event-set pairs + reachability/interveners; R μ over event sets mapped deterministically to causal cover replacements | Continuous probability law, global comparisons, and transitive reduction; realization is external | `N09:L816-818` | Distinct from F004 producer-history transform |
 | SPF054 | F057 `weighted-prefix-block-transduction` | `media.weighted_prefix_block_transduction` | addition | `input; block_partition; weights_or_tree; direction` | S input + tree/output/cursor; A blocks/weights/tree/bits; F tree/preamble/output/cursor/decoded blocks; N weighted nodes or block/tree; R build tree, emit leaf word, or parse leaf | Independently decodable prefix boundaries and tree provenance | `CH10:L189-205,L235-249; N10:L87-106` | — |
 | SPF055 | F058 `nested-interval-symbol-transduction` | `media.nested_interval_symbol_transduction` | addition | `input; probability_model; precision; direction` | S input + interval/cursor/tag; A symbols/probabilities/endpoints/digits; F interval/tag/cursor/decoded symbols; N symbol + cumulative partition; R refine shared interval, finalize, or invert | One message-wide interval with exact endpoint semantics | `N10:L108-121` | — |
 | SPF056 | F059 `history-reference-record-transduction` | `media.history_reference_record_transduction` | addition | `input; match_policy; dictionary; record_grammar; direction` | S input + cursor/history/output; A literal/pointer/offset/length; F records/cursor/dictionary/reconstruction; N remaining input + prior matches; R emit literal/reference or copy history | Encoding depends on prior history, not only current symbols | `CH10:L209-267; N10:L123-153` | — |
@@ -239,8 +240,8 @@ unlisted configuration structure is preserved.
 
 | Goal 5 role | Catalog treatment | Boundary |
 |---|---|---|
-| F010 `encode-evolve-decode-interface` | Metadata-only interface role; no SPF ID and no canonical family constructor | A concrete encoder or decoder with its own invariant commit may be an ordinary `media` program, while composition around an unchanged target belongs to run/query tooling |
-| F042 `percolation-connectivity-analysis` | Metadata-only observer role; no SPF ID and no canonical family constructor | Occupation may be a Seed law, but spanning/connectivity over the completed sample is an observer or analysis result |
+| F010 `encode-evolve-decode-interface` | Callable-free `RoleEntry` for an interface role; no SPF ID and no canonical family constructor | A concrete encoder or decoder with its own invariant commit may be an ordinary `media` program, while composition around an unchanged target belongs to run/query tooling |
+| F042 `percolation-connectivity-analysis` | Callable-free `RoleEntry` for an observer role; no SPF ID and no canonical family constructor | Occupation may be a Seed law, but spanning/connectivity over the completed sample is an observer or analysis result |
 
 T08 is separately a retired Seed role from the legacy catalog. It is not one of
 these two Goal 5 close-role groups.
@@ -327,12 +328,26 @@ FamilyEntry(
     name_relations,
 )
 
+RoleEntry(
+    audit_role_id,         # exactly F010 or F042
+    slug,
+    role_kind,             # interface | observer
+    source_refs,
+    boundary,
+)
+
 LegacyEntry(
     legacy_id,             # Tnn
     label,
     disposition,
-    target_family_ids,     # length 0, 1, or 2
-    treatment,
+    targets,               # tuple[LegacyTarget, ...], length 0, 1, or 2
+)
+
+LegacyTarget(
+    branch_name,           # required for a split; absent otherwise
+    target_family_id,
+    callable_spelling,     # absent for metadata-only relations
+    treatment,             # C | P | A | K | M
 )
 
 NameEntry(
@@ -343,6 +358,7 @@ NameEntry(
     delegate_import_name,
     flat_export,
     closed_binding_summary,
+    legacy_entry_ids,
 )
 ```
 
@@ -359,8 +375,8 @@ does not synthesize Python functions from the matrix.
 
 - All 60 canonical constructors are category-qualified and explicitly flat-
   exported from `ca.catalog`; none is exported from root `ca`.
-- Every `C`, `A`, and preferred `P` spelling in the T ledger is also an
-  explicit flat catalog export because the names above are unique.
+- Every `C`, `A`, and `P` spelling named in the family matrix or T ledger is
+  also an explicit flat catalog export because the names above are unique.
 - T40's two explicitly named `P` branch spellings are likewise flat exports;
   the T40 split record itself remains non-callable.
 - Deprecated `K` adapters remain category-qualified and are omitted from flat
@@ -377,25 +393,21 @@ does not synthesize Python functions from the matrix.
   lossless over its advertised legacy domain.
 - Every callable spelling has exactly one SPF target. T40 deliberately has no
   umbrella callable or family-selection parameter.
+- T40 is represented by two typed `LegacyTarget` branches, each joining one
+  callable spelling to one SPF. No relation is left solely in prose.
 
-### Receipt and serialization gate
+### Serialization and invocation-provenance gate
 
-A nonsemantic receipt may retain:
+Canonical serialization remains the expanded five-field payload and never
+imports the catalog. It does not encode or reconstruct SPF, F, T, category,
+invoked spelling, or constructor arguments. Those values remain callable-free
+catalog metadata, not program provenance.
 
-```text
-invoked spelling and kind
-SPF family ID
-optional legacy T entry
-normalized closed arguments
-constructor/catalog schema versions
-canonical expanded-payload digest
-```
-
-Decoding may retain the receipt only after verifying both the name-to-SPF
-relation and reconstructed digest. Canonical serialization remains the
-expanded five-field payload and never imports the catalog. SPF, F, T, path,
-category, and receipt do not participate in `SimpleProgram` equality,
-application, or rollout.
+An application may separately persist a user manifest containing an invoked
+spelling, closed arguments, and the digest of the resulting canonical payload.
+That manifest is outside the `ca` semantic and codec contracts: loading a
+program neither requires nor returns it, and it cannot participate in
+`SimpleProgram` equality, application, or rollout.
 
 ## Goal 7 implementation obligations
 
@@ -411,7 +423,8 @@ application, or rollout.
 6. Test each of the 60 expanded values through the same compatibility
    validation and family-blind `apply`; Stage 6 defines the representative
    semantic pressure fixtures rather than creating 60 executor tests.
-7. Verify optional construction receipts independently from canonical codecs.
+7. Verify canonical codecs contain no catalog identity or invocation history;
+   test callable expansions directly against their declared family delegates.
 8. Remove or adapt current family-string construction only during Goal 7; this
    Stage 5 plan does not change `src/ca`.
 

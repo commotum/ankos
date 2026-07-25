@@ -333,8 +333,9 @@ Goal 6 is complete only when all of the following are true:
    non-conflicting migration actions, canonical homes, stable-ID treatment,
    constructor status, and source/API references.
 8. Closed descriptors, exact values, versioned lossless codecs, unknown-tag
-   failure, fresh identities, alias provenance, expanded five-field forms, and
-   round-trip/one-step commutation are covered by the conformance design.
+   failure, fresh identities, alias-expansion equivalence, expanded five-field
+   forms, and round-trip/one-step commutation are covered by the conformance
+   design.
 9. Every pressure category required by
    `goal-5/integration-handoff.md` is executed on paper, with failures changing
    the architecture rather than being waived.

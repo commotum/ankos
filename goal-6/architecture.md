@@ -1546,7 +1546,7 @@ callable.
 | `neighborhoods.py` | `ReadableRegion`, identity-preserving read views, composition, and local/global/structural/differential presets | Writes, update policy, or unrestricted access to the configuration |
 | `rules.py` | `Rule`, `RuleComplete`/`RuleRejected`/`RuleFault`, support/cardinality/law records, total dispositions, Rule atoms, witnesses, provenance, progress, continuation, and closed Rule constructors/combinators | Committing configurations, choosing samples, solver execution, rollout, or catalog dispatch |
 | `program.py` | Exactly-five-field `SimpleProgram`; compatibility evidence; `ApplicationInput`; `ApplicationComplete`/`ApplicationRejected`/`ApplicationFault` and applied records; family-blind `apply`; private reconstruction, validation, commit, and quotient; `RolloutResult`, raw trace graph, and callable `rollout` derived only from `apply` | Component catalogs, hidden sampling, solvers, renderers, datasets, or family-specific engines |
-| `serialization.py` | Versioned fail-closed codecs plus `Decoded`, `DecodeRejected`, and `DecodeFault` for expanded programs, components, results, evidence, traces, and verified receipts | A sixth field, catalog resolution, alias execution, or semantic dispatch |
+| `serialization.py` | Versioned fail-closed codecs plus `Decoded`, `DecodeRejected`, and `DecodeFault` for expanded programs, components, results, evidence, and traces | A sixth field, catalog resolution, catalog invocation history, alias execution, or semantic dispatch |
 | `py.typed` | Empty PEP 561 marker declaring that distributed type information is supported | Runtime symbols or behavior |
 | `catalog/entries.py` | Descriptive entry metadata, stable IDs, provenance, canonical homes, search, and alias/preset/compatibility relations | Program identity or execution dispatch |
 | Six catalog category files | Canonical whole-program constructors for their locked navigation mechanic | Runtime subclasses, alternate engines, or duplicated component primitives |
@@ -1605,10 +1605,11 @@ are:
 - `__init__.py` is a leaf façade and is never imported by package internals.
 
 `serialization.py` recognizes the closed schemas owned by the semantic
-modules. It does not import the catalog to resolve recipes. Catalog-side
-construction may verify an optional receipt and pass the verified receipt to a
-codec envelope, but the canonical payload and decoder remain expanded and
-alias-independent.
+modules. It does not import the catalog, resolve recipes, or preserve the
+spelling and arguments used to invoke a constructor. The canonical payload and
+decoder are expanded and alias-independent. Applications that need invocation
+history keep a separate user manifest outside the `ca` semantic and codec
+contracts.
 
 There is consequently no public `configuration.py`, `regions.py`,
 `replacement.py`, `results.py`, `engine.py`, `rollout.py`, `run.py`, or
@@ -1733,9 +1734,8 @@ ca.catalog.eca(rule=30)
 ```
 
 The two spellings call the same constructor. A compatibility alias delegates
-to one canonical constructor and may add a verified construction receipt; it
-cannot supply different fields, register an executor, or become semantic
-identity.
+to one canonical constructor; it cannot attach hidden state, supply different
+fields, register an executor, or become semantic identity.
 
 Flat exports are deny-by-default and explicit in `catalog.__all__`. If two
 category modules would claim the same name, only the canonical owner's
@@ -1777,9 +1777,8 @@ Callable names are classified independently as canonical constructors,
 closed presets, true zero-delta aliases, or total lossless compatibility
 adapters; metadata-only records are never callable. In particular, T32 and
 T44 are family-level aliases whose public functions are presets because they
-bind semantic construction data. Optional construction receipts are verified
-nonsemantic provenance over the expanded five-field payload. They cannot
-affect program equality, decoding, application, or rollout.
+bind semantic construction data. Canonical codecs do not preserve or recover
+which callable spelling or arguments produced an expanded five-field value.
 
 ### Current-to-target cutover
 
@@ -1863,13 +1862,12 @@ rule
 ```
 
 Canonical program serialization always contains the validated, expanded five
-fields. An outer envelope may carry schema version, provenance, derived
-digest, and an optional catalog construction receipt, but none changes
-semantic identity or substitutes for that payload. A receipt is retained only
-after verifying that its alias and arguments reconstruct the same canonical
-five-field value. An alias-only recipe may be accepted as noncanonical
-construction input, but it is never an authoritative lossless encoding.
-Execution never dispatches on an alias.
+fields. An outer envelope may carry schema version, payload provenance, and a
+derived digest, but none changes semantic identity or substitutes for that
+payload. Canonical codecs neither preserve nor recover invoked catalog
+spellings or arguments and never accept an alias-only recipe as an
+authoritative lossless encoding. Applications may keep such invocation
+history in a separate user manifest. Execution never dispatches on an alias.
 
 Exact encoding obligations include:
 
