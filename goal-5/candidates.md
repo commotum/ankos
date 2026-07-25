@@ -1144,3 +1144,15 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Defining variants: transposition, insertion, Batcher, Green, repetitive, nested, and irregular comparator schedules
 - Representative sources: N12:L331-347,L461-476; `BACK-MATTER/NOTES/_page_1157_Figure_7.jpeg`
 - Distinguishing test: comparator locations are fixed independently of input values, and a compare-exchange gate is generally non-injective, unlike a reversible Boolean or unitary gate
+
+## C096 — `priority-dovetailed-oracle-construction`
+
+- Leads: L1564
+- Carrier/domain: two monotonically growing Boolean oracle approximations, an enumeration of suspended register-machine work states and outputs, and priority/scheduler state
+- Initialization: all-white bottom rows, enumerated register programs, initial simulations and requirements, and an optional queried row/address
+- Acting loci and read: a fair finite subset of simulations reads private machine state and the complete current shared approximation; the controller reads displayed agreements and requirement state
+- Effect, schedule, commit: dovetail selected simulations, expose outputs, enumerate diagonalizing black cells, and update or invalidate affected lower-priority work in one coupled stage
+- Termination/output: a query halts exactly when its selected bottom cell becomes black; the global construction yields two growing incomparable approximations and their finite-stage trace
+- Defining variants: equivalent universal embedded machines; fair schedules; one-table diagonal variants; priority and injury encodings
+- Representative sources: N12:L80-92; `BACK-MATTER/NOTES/_page_1146_Figure_2.jpeg`
+- Distinguishing test: one shared approximation write can invalidate another suspended computation's displayed agreement, requiring fair later attention and priority injury that no single register-machine state supplies
