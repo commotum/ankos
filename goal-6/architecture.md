@@ -34,6 +34,7 @@ after separate authorization.
 | 2 | `goal-5/api-pressure.md` | Five-field fit and family-by-family pressure |
 | 3 | `goal-5/integration-handoff.md` | Remaster boundary and Goal 2 preserve/replace decisions |
 | 4 | `goal-5/10-RECONCILE.md` | Exact T01–T45 dispositions |
+| 5 | `goal-5/candidates.md` | Candidate-level mechanics and named-construction source anchors |
 | 5 | `goal-5/source-decision-matrix.csv` | Source traceability only when a decision needs it |
 | 6 | `api.md`, `simple_programs.md`, `ref/notes/ca-scaffold.py` | Stage 4 public, conceptual, and code-shaped projections governed by this architecture |
 | 7 | `goal-2/goal-2-handoff.md` | Frozen details for conclusions explicitly preserved by Goal 5 |

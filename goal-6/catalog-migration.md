@@ -68,7 +68,7 @@ metadata with these closed kinds:
 | `family` | Canonical category constructor | Exactly one of the 60 mechanics |
 | `preset` | Delegating constructor | Closed parameter restriction of one family |
 | `alias` | Delegating constructor | Alternate name with the same normalized arguments and expansion as its declared canonical or preset delegate |
-| `compatibility` | Optional delegating constructor | Retained legacy spelling, normally deprecated |
+| `compatibility` | Delegating constructor when named by this migration | Retained legacy spelling, normally deprecated |
 | `merged` | No independent constructor | Former row absorbed as family parameters; a compatibility delegate may remain |
 | `retired` | No | Permanent tombstone for a non-program role |
 | `split` | No | Permanent one-to-many migration record with explicit branch names |
@@ -199,10 +199,10 @@ unlisted configuration structure is preserved.
 
 | ID | Goal 5 family | Canonical constructor | Status | Closed parameters | Five-field skeleton (`S/A/F/N/R`) | Representation/result pressure | Representative sources | Legacy/public relation |
 |---|---|---|---|---|---|---|---|---|
-| SPF004 | F004 `event-provenance-causal-network` | `media.event_provenance_causal_network` | addition | `event_trace; read_sets; initial_provenance` | S ordered events + producer map/cursor; A event IDs/producers/edges; F fresh event/edge slots + producer records; N event reads + current producers; R emit event/direct dependencies + provenance update | Lossless trace-to-causal graph, fresh identity, and provenance | `CH09:L655-707; N09:L347-355,L378-384` | — |
+| SPF004 | F004 `event-provenance-causal-network` | `media.event_provenance_causal_network` | addition | `event_trace; read_sets; initial_provenance` | S ordered events + producer map/cursor; A event IDs/producers/edges/control; F fresh event/edge slots + producer records + cursor/end control; N event reads + current producers; R emit event/direct dependencies, update provenance, and advance or end | Lossless trace-to-causal graph, fresh identity, provenance, and cursor progression | `CH09:L655-707; N09:L347-355,L378-384` | — |
 | SPF008 | F008 `digit-emitting-register-transduction` | `media.digit_emitting_register_transduction` | covered | `seed; register_law; base; digit_projection` | S registers/control/output end; A integers/control/digits/stream markers; F changed registers + next output/end; N complete registers/comparisons; R atomic register update + exactly one digit or terminal | Emission is construction-defining writable state | `CHAPTERS/04-Systems-Based-on-Numbers.md:L303-308,L343-350` | T40 split branch; P `constant_digit_register` |
 | SPF011 | F012 `error-diffusion-transform` | `media.error_diffusion_transform` | addition | `input; palette; diffusion_kernel; scan` | S raster + cursor/error; A intensity/error/palette/control; F pixel + all future error recipients + cursor; N current value/error/future stencil; R quantize + distribute error forward | Ordered causal scan with coupled future writes | `N10:L348-360` | — |
-| SPF012 | F013 `maximal-run-record-transduction` | `media.maximal_run_record_transduction` | addition | `input; record_grammar; direction; scan; feedback` | S input/output/cursor or feedback; A symbol/length/record/end; F record/expanded output + cursor; N maximal homogeneous extent; R emit/expand one self-delimiting run | Variable extents/output, inverse direction, and optional feedback | `CH10:L163-187; N10:L83-85,L171-175` | P `look_and_say` feedback preset; flat export |
+| SPF012 | F013 `maximal-run-record-transduction` | `media.maximal_run_record_transduction` | addition | `input; record_grammar; direction; scan; feedback` | S input/output/cursor or feedback; A symbol/length/record/end; F record/expanded output + cursor; N maximal homogeneous extent; R emit/expand one self-delimiting run | Variable extents/output, inverse direction, and optional feedback | `CH10:L163-187; N10:L83-85,L171-175; N04:L193-202` | P `look_and_say` feedback preset; flat export; preset source `N04:L193-202` |
 | SPF020 | F021 `hash-index-transform` | `media.hash_index_transform` | addition | `key; table; hash_fold; collision; operation` | S table/key/fold/control/result; A keys/hash/buckets/links/results; F control/result + alterable collision path; N input + reachable buckets/chains; R insert/hit/miss then stop | Dynamic address path, exact equality, typed miss | `CH10:L829-839; N10:L976-980` | — |
 | SPF041 | F044 `probabilistic-transition-model-fitting` | `media.probabilistic_transition_model_fitting` | addition | `observations; topology; estimator; generation_law; generation_request` | S observations + model/counts + fit/generate phase; A states/probabilities/counts/control; F model + generated slots; N training histories or fitted context; R fit parameters then denote explicit μ over generated paths | Lossless two-phase fit/generation state and replayable probability; realization is external | `CH10:L441-459; N10:L495-501` | — |
 | SPF046 | F049 `sampled-causal-order-network` | `media.sampled_causal_order_network` | addition | `region; causal_order; density; event_measure` | S spacetime region + construction phase; A event coordinates/causal edges; F every event/edge; N event-set pairs + reachability/interveners; R μ over event sets mapped deterministically to causal cover replacements | Continuous probability law, global comparisons, and transitive reduction; realization is external | `N09:L816-818` | Distinct from F004 producer-history transform |
@@ -303,13 +303,72 @@ family-level disposition is `alias`.
 | T44 | Continuous Cellular Automata | alias | SPF050 / F053 | P `continuous_cellular_automaton` | Bind continuous-valued Alphabet/local law but remain discrete-time F053; not F041 |
 | T45 | Partial Differential Equation Systems | retain-family | SPF039 / F041 | C `partial_differential_relation`; A `pde` | Preserve relation-valued 0/1/many/I signature; neither spelling implies a solver |
 
+### T evidence crosswalk
+
+The migration ledger preserves the exact Goal 5 candidate join and the
+narrowest source needed to justify each named callable. `F`-level family
+sources alone are not presumed to establish a narrower preset. The shorthand
+is the same as Goal 5: `CHnn` is the repaired chapter Markdown and `Nnn` its
+repaired Notes Markdown. T06 uses the already-completed Goal 2 preset evidence
+because Goal 5 retained the preset but intentionally did not promote the
+property-only passages into a mechanics candidate.
+
+| Legacy ID | Goal 5 candidate(s) | Named-construction evidence |
+|---|---|---|
+| T01 | C090 | `CH03:L29-56` |
+| T02 | C090 | `N03:L135-150` |
+| T03 | C090 | `CH03:L91-96` |
+| T04 | C090 | `CH03:L89-96,L109-110` |
+| T05 | C090 | `N03:L164-185` |
+| T06 | C090 | Goal 2-preserved restriction `T(b,…,b)=b`; `CH03:L101,L649; CH06:L101`; `goal-1/25-T06-QUIESCENT.md` |
+| T07 | C090 | `N03:L7-10; N05:L89-100` |
+| T08 | — | Goal 5 Seed-role decision; no executable construction source |
+| T09 | C047 | `CH03:L169-185` |
+| T10 | C056 | `CH03:L197-207` |
+| T11 | C030 | `CH03:L231-247` |
+| T12 | C049 | `N03:L294-333` |
+| T13 | C061 | `CH03:L299-307` |
+| T14 | C011, C055 | `CH03:L333-337; CH05:L211-227; N05:L360-367` |
+| T15 | C061 | `CH03:L343-363` |
+| T16 | C080 | `CH03:L369-379` |
+| T17 | C091 | `CH03:L423-445` |
+| T18 | C091 | `CH03:L447-471` |
+| T19 | C073 | `CH03:L473-509,L519-525` |
+| T20 | C089 | `CH03:L531-537; N03:L823-835; CH10:L909-915` |
+| T21 | C090 | `CH05:L27-34` |
+| T22 | C090 | `CH05:L67-86` |
+| T23 | C090 | `CH05:L95-123; N06:L55-66` |
+| T24 | C090 | `N05:L36-58,L66-88` |
+| T25 | C049 | `CH05:L127-131; N05:L211-217` |
+| T26 | C061 | `CH05:L173-190` |
+| T27 | C061 | `CH05:L191-214; N05:L286-337`; fractality remains observer-side |
+| T28 | C055 | `CH05:L211-227; N05:L360-367` |
+| T29 | C062 | `CH05:L239-248,L287-331` |
+| T30 | C051 | `CH05:L355-369; N05:L527-528,L549-578` |
+| T31 | C043 | `CH05:L433-479; CH09:L595-615; N09:L324-330` |
+| T32 | C043 | `CH05:L475-488` |
+| T33 | C042, C043 | `CH05:L475-498,L535-536` |
+| T34 | C037 | `CH04:L53-54` |
+| T35 | C037 | `CH04:L111-118` |
+| T36 | C037 | `CH04:L153-162; N04:L170-179` |
+| T37 | C078 | `CH04:L169-186` |
+| T38 | C078 | `CH04:L179-186` |
+| T39 | C035 | `CH04:L211-214; N04:L418-430` |
+| T40 | C003, C017 | sequence `N04:L203-210,L569-599`; register `CH04:L303-308,L343-350; N04:L561-562` |
+| T41 | C072 | `N04:L237-268,L316-364` |
+| T42 | C061 | `CH04:L454-461; N04:L753-754` |
+| T43 | C037 | `CH04:L53-54,L111-118,L472-491` |
+| T44 | C090 | `CH04:L546-562,L565-616` |
+| T45 | C063 | `CH04:L625-674; N04:L933-940` |
+
 ## Metadata and implementation contract
 
 The matrix's `Fxxx` cell is the exact lookup key for both the corresponding
 family-definition row in `goal-5/11-FAMILIES.md` and five-field row in
-`goal-5/api-pressure.md`. The direct Book anchors are repeated here because
-they are needed to implement presets without reopening taxonomy. The T ledger
-is the exact API/migration cross-reference to `goal-5/10-RECONCILE.md`.
+`goal-5/api-pressure.md`. Family anchors and narrower named-construction
+anchors are repeated here so Goal 7 can implement presets without reopening
+taxonomy. The T ledger and evidence crosswalk are the exact migration join to
+`goal-5/10-RECONCILE.md` and `goal-5/candidates.md`.
 
 `catalog/entries.py` should expose frozen values equivalent to:
 
@@ -340,6 +399,8 @@ LegacyEntry(
     legacy_id,             # Tnn
     label,
     disposition,
+    candidate_ids,
+    source_refs,
     targets,               # tuple[LegacyTarget, ...], length 0, 1, or 2
 )
 
@@ -348,6 +409,7 @@ LegacyTarget(
     target_family_id,
     callable_spelling,     # absent for metadata-only relations
     treatment,             # C | P | A | K | M
+    source_refs,
 )
 
 NameEntry(
@@ -359,6 +421,7 @@ NameEntry(
     flat_export,
     closed_binding_summary,
     legacy_entry_ids,
+    source_refs,
 )
 ```
 
@@ -443,6 +506,8 @@ program neither requires nor returns it, and it cannot participate in
 - Legacy IDs equal T01–T45 exactly once. Dispositions count exactly
   15 retain-family, 21 retain-preset, 2 merge, 3 repair, 2 alias,
   1 retire-role, and 1 split.
+- Every T row has the exact Goal 5 candidate join and named-construction source
+  evidence; T08 alone has no mechanics candidate or Book construction anchor.
 - T08 alone has zero SPF targets; T40 alone has two; every other T row has one.
 - The close-role table has exactly F010 and F042, with no SPF or constructor.
 - No name maps to multiple SPFs; no `M` entry is callable; no `K` entry is flat.

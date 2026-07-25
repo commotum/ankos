@@ -37,8 +37,9 @@ Use the following source order:
 3. `goal-5/integration-handoff.md` defines how to integrate those results into
    a remastered architecture and what may be recovered from Goal 2.
 4. `goal-5/10-RECONCILE.md` defines the exact T01–T45 migration obligations.
-5. `goal-5/source-decision-matrix.csv` is consulted only when a catalog or
-   conformance decision needs source traceability.
+5. `goal-5/candidates.md` and `goal-5/source-decision-matrix.csv` are consulted
+   only when a catalog or conformance decision needs candidate-level mechanics
+   or source traceability.
 6. `simple_programs.md`, `api.md`, and `ref/notes/ca-scaffold.py` are design
    inputs to be clarified and remastered, not independent authorities over the
    completed Goal 5 findings.
@@ -556,6 +557,9 @@ ontology.
   dispatch registry; define re-export and collision/precedence rules.
 - Specify when a name is a canonical family constructor, parameter preset,
   alias, or compatibility name. All return ordinary five-field programs.
+- Preserve each T row's exact Goal 5 candidate join and named-construction
+  source anchors; do not treat a broad family source as proof of a narrower
+  preset.
 
 #### Completion Requirements
 
@@ -563,6 +567,8 @@ ontology.
   T01–T45 dispositions, and two separately identified close roles.
 - Every family has one canonical module, one valid five-field mapping, closed
   parameters, and the source/pressure evidence needed by Goal 7.
+- Every T row retains its Goal 5 candidate provenance and the source evidence
+  required by its named callable or non-callable role.
 - No family is duplicated to satisfy multiple catalog labels.
 - No catalog category, entry, ID, or alias affects generic application.
 - Constructor and stable-ID collisions are resolved explicitly.

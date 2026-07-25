@@ -53,6 +53,9 @@ construction rather than runtime ontology.
 - Create one T01–T45 migration table preserving every legacy ID and exact Goal
   5 action while resolving it to canonical constructors, presets, aliases,
   metadata tombstones, or split targets.
+- Preserve every T row's Goal 5 candidate join and the narrow source anchors
+  required by its named callable; family-level anchors do not stand in for
+  preset-specific evidence.
 - Resolve T40's two-family split and any broad legacy-row ambiguity without
   assigning one canonical family row two mechanics.
 - Record how `catalog/entries.py`, category modules, `catalog/__init__.py`,
@@ -64,10 +67,18 @@ construction rather than runtime ontology.
 
 Files expected to change:
 
+- `api.md`
+- `goal-6/2-CONTRACTS.md`
 - `goal-6/catalog-migration.md`
 - `goal-6/5-CATALOG.md`
 - `goal-6/architecture.md`
 - `goal-6/0-plan.md`
+- `ref/notes/ca-scaffold.py`
+
+The three non-stage artifacts above receive only hostile-review consistency
+repairs: removal of the unsupported construction-receipt idea and alignment of
+the reference constructor/preset/alias chain. They remain target
+documentation, not runtime implementation.
 
 ## No-Cheating Checks
 
@@ -104,6 +115,8 @@ Files expected to change:
 - [ ] Every T disposition has a non-conflicting canonical target and exact
       callable, metadata-only, alias, preset, merged, repaired, retired, or
       split treatment.
+- [ ] Every T entry preserves its Goal 5 candidate provenance and the source
+      anchors required for the named family, preset, repair, alias, or role.
 - [ ] Stable-ID, collision, re-export, alias, serialization, and metadata
       policies are implementation-ready and cannot become execution dispatch.
 - [ ] Hostile review, exact count checks, link/path checks, terminology,

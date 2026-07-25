@@ -299,6 +299,7 @@ class automata:
         )
     @staticmethod
     def eca(
+        *,
         rule: int = 30,
         width: int = 79,
     ) -> SimpleProgram[
@@ -321,6 +322,7 @@ class automata:
         )
     @staticmethod
     def elementary_cellular_automaton(
+        *,
         rule: int = 30,
         width: int = 79,
     ) -> SimpleProgram[

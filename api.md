@@ -124,8 +124,8 @@ Reusable pieces remain in the component modules. In particular,
 `ca.catalog.eca(...)` is a whole program. There is intentionally no ambiguous
 root-level `ca.eca`.
 
-`ca.catalog.entries` owns descriptive lookup, aliases, and sources. It is not
-an execution registry, and catalog IDs or family names never select an
+`ca.catalog.entries` owns descriptive lookup, alias metadata, and sources. It
+is not an execution registry, and catalog IDs or family names never select an
 application algorithm.
 
 The 60 audited executable semantic families are coverage obligations and
