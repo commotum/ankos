@@ -4,10 +4,15 @@
 
 Blind whole-book discovery is frozen before catalog or design comparison.
 
-- Frozen raw leads: 1,563
-- Frozen terminal statuses: 188 serious, 867 resolved, 508 weak
-- Frozen mechanics candidates: 94
+- Stage 10 freeze: 1,563 raw leads, 188 serious, 867 resolved, 508 weak,
+  and 94 mechanics candidates.
 - Saturation result: zero new or unresolved construction leads
+
+Final hostile review later corrected one existing classification, added one
+source-anchored lead from the existing saturation hit set, and split one
+overpacked fingerprint. The final inventory is 1,564 leads, 190 serious, 867
+resolved, 507 weak, and 102 candidates. This does not rerun or silently rewrite
+the discovery pass.
 
 From this point forward, T01–T45 and design materials may affect catalog
 dispositions and family naming, but they may not retroactively manufacture Book
@@ -43,11 +48,10 @@ families.
   Final family normalization yields 15 canonical family rows, 21 retained
   presets, two aliases, two merges, two repairs, two retired semantic roles,
   and one split.
-- Current catalog rows directly cover 23 candidates. Of the other 71, 49 are
-  source-grounded candidate additions, 14 are mechanically covered by an
-  existing family, and eight are close observer/interface/seed/compiler roles.
-  Candidate additions remain candidates until family consolidation; this is
-  not a proposal for 49 new public classes.
+- Current catalog rows directly cover 23 candidates. Of the other 79, 56 are
+  source-grounded candidate additions, 16 are mechanically covered by an
+  existing family, and seven are close roles. Candidate additions are not a
+  proposal for 56 public classes.
 - Updated every serious row in `source-decision-matrix.csv` with its catalog
   action. Non-serious leads are explicitly outside catalog reconciliation.
 - Discovery remained frozen: no lead, status, candidate, or source count

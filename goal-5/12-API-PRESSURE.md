@@ -2,7 +2,7 @@
 
 ## Current Facts
 
-- Stage 11 retained 52 executable semantic families and three close-exclusion
+- Final family repair retains 60 executable semantic families and two close-exclusion
   mechanics groups.
 - `simple_programs.md`, `api.md`, the completed Goal 1 design conclusions, and
   the frozen Goal 2 handoff were read for this stage.
@@ -11,8 +11,8 @@
 
 ## Result
 
-- All 52 executable families fit the five-component API.
-- The three remaining groups are observers or interfaces rather than new
+- All 60 executable families fit the five-component API.
+- The two remaining groups are analysis or interface roles rather than new
   executable mechanics.
 - No concrete construction requires a sixth top-level field.
 - No construction requires a public `UpdatePolicy`.
@@ -53,10 +53,9 @@ extensions, and Goal 2 consequences are in `api-pressure.md`.
 
 ## Verification
 
-- `F001` through `F055` appear exactly once in the API table.
-- Exactly 52 rows have verdict `fits-five`.
-- Exactly `F004`, `F010`, and `F042` have verdict `close-role`.
+- Every retained family row appears exactly once in the API table.
+- Exactly 60 rows have verdict `fits-five`.
+- Exactly `F010` and `F042` have verdict `close-role`.
 - Every row documents all five component mappings and a residual-pressure
   decision.
 - No unresolved API counterexample remains for hostile review.
-

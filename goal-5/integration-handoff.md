@@ -23,7 +23,7 @@ is the dependency boundary for a separately authorized remaster.
 ## Recommended Goal Sequence
 
 1. **Goal 6 — remaster the Goal 2 design and implementation plan.** Rebuild the
-   target architecture around the five fields, incorporate the 52-family
+   target architecture around the five fields, incorporate the 60-family
    coverage inventory, revise the catalog plan, and define conformance
    obligations. Preserve Goal 2 as historical evidence rather than editing it
    into a different plan.
@@ -135,7 +135,7 @@ Each catalog row should identify:
 - its five-field mapping; and
 - any representation or result requirements.
 
-Do not create 52 public runtime subclasses. Named constructors should return
+Do not create 60 public runtime subclasses. Named constructors should return
 ordinary `SimpleProgram` specifications.
 
 ## Goal 2 Work to Preserve
@@ -195,7 +195,7 @@ fixtures before implementation:
 Goal 6 is ready to hand to implementation only when:
 
 - the five component protocols and their type relationships are explicit;
-- every F001–F055 row still has one valid mapping or a concrete documented
+- every retained family row still has one valid mapping or a concrete documented
   counterexample;
 - atomic replacement, preserve-outside behavior, result cardinality,
   stochastic replay, continuous/intensional objects, and dynamic support are

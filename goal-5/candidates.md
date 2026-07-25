@@ -2,8 +2,8 @@
 
 This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a claim that every row becomes a public type. Catalog and API material remained closed while this inventory was formed.
 
-- Serious candidate clusters: 94
-- Serious source leads represented: 188
+- Serious candidate clusters: 102
+- Serious source leads represented: 190
 
 ## C001 — `active-node-network-rewrite`
 
@@ -305,17 +305,17 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Representative sources: CH08:L623-632
 - Distinguishing test: a diffusing field threshold chooses which local transition program runs
 
-## C026 — `finite-codec-transform`
+## C026 — `maximal-run-record-transduction`
 
-- Leads: L1510, L1511, L1512, L1513, L1514, L1515, L1520
-- Carrier/domain: symbol sequence / fixed-size symbol blocks / symbol sequence with probability model / raster region hierarchy / numeric signal or image block / audio sample sequence
-- Initialization: input sequence and symbol/run-length code convention / input data empirical or supplied block weights and prefix tree / input sequence symbol probabilities and numeric precision / input sequence window or dictionary policy / input image uniformity tolerance and root rectangle / input samples basis transform and coefficient budget / input samples predictor order fitting window and residual codebook
-- Acting loci and read: maximal run of identical symbols / next fixed block or next prefix bits / next symbol and current numeric interval / current position and previous matching substrings / current region pixels / all samples in a transform block / recent samples in each fitting window
-- Effect, schedule, commit: emit symbol and run length records left to right; inverse expands records / build variable-length prefix code then map blocks independently / refine interval by cumulative probability partitions; decoder reverses refinements / emit literal or pointer-length records and extend dictionary sequentially / recursively split nonuniform regions and store uniform leaves / project onto orthogonal basis discard or quantize selected coefficients and invert / fit linear predictor encode residuals and reconstruct from predictor plus residual
-- Termination/output: encoded records or decoded sequence / bitstream or decoded blocks / final interval tag or decoded sequence / record stream or decoded sequence / tree code or reconstructed image / compressed coefficients or reconstruction / codebook indices model coefficients or decoded audio
-- Defining variants: binary images; self-delimiting lengths / block size; adaptive or fixed frequencies / finite precision; maximal-block probabilities / sliding window; Lempel-Ziv dictionary variants / exact uniform; lossy tolerance; split geometries / Walsh; Fourier-like bases; lossy truncation / window sizes; predictor orders; vector codebooks
-- Representative sources: CH10:L163-187;N10:L83-85,L171-175 / CH10:L189-205,L235-249;N10:L87-106 / N10:L108-121 / CH10:L209-267;N10:L123-153 / CH10:L233-239,L269-279;N10:L154-168 / CH10:L281-305;N10:L181-288 / N10:L424
-- Distinguishing test: record boundaries occur exactly when the input symbol changes / shorter codewords are assigned through a prefix tree to higher-weight blocks / the entire message is represented by one nested probability interval / repeated substrings are replaced by backward or dictionary references / the image carrier is partitioned recursively into nested uniform pieces / compression acts by basis coefficients rather than direct spatial records / sample values are coded as residuals from a fitted local linear prediction
+- Leads: L1510
+- Carrier/domain: an ordered finite symbol carrier with a configured scan and homogeneous-extent grammar
+- Initialization: input symbols, scan origin, record convention, and empty encoded carrier; inverse mode starts from records
+- Acting loci and read: the current scan locus and the maximal homogeneous extent beginning there
+- Effect, schedule, commit: emit the extent's symbol/length or another self-delimiting extent record, then advance beyond it; inverse mode expands the record
+- Termination/output: end of input; record stream or reconstructed symbols
+- Defining variants: binary run lengths; explicit symbol-length pairs; self-delimiting integer grammars; row, space-filling, or rectangular scans
+- Representative sources: CH10:L163-187;N10:L83-85,L171-175
+- Distinguishing test: the next record boundary is determined by maximal equality from the current scan locus, not by a fixed block, prior match, recursive parent split, or probability interval
 
 ## C027 — `finite-operator-table-model`
 
@@ -1156,3 +1156,75 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Defining variants: equivalent universal embedded machines; fair schedules; one-table diagonal variants; priority and injury encodings
 - Representative sources: N12:L80-92; `BACK-MATTER/NOTES/_page_1146_Figure_2.jpeg`
 - Distinguishing test: one shared approximation write can invalidate another suspended computation's displayed agreement, requiring fair later attention and priority injury that no single register-machine state supplies
+
+## C097 — `weighted-prefix-block-transduction`
+
+- Leads: L1511
+- Carrier/domain: a finite sequence partitioned into configured fixed blocks plus a binary prefix tree
+- Initialization: input blocks and empirical or supplied weights, with either an existing code tree or tree-building state
+- Acting loci and read: tree construction reads current node weights; encoding reads one fixed block and its codeword
+- Effect, schedule, commit: repeatedly combine least-weight nodes, then map blocks independently to prefix-free leaf codewords; decoding consumes bits to a leaf
+- Termination/output: tree/preamble plus concatenated codewords, or decoded blocks
+- Defining variants: one- or two-dimensional block shape; supplied or empirical weights; fixed or dynamically updated Huffman tree
+- Representative sources: CH10:L189-205,L235-249;N10:L87-106
+- Distinguishing test: every block contributes a separately decodable prefix-tree leaf word rather than refining one interval for the complete message
+
+## C098 — `nested-interval-symbol-transduction`
+
+- Leads: L1512
+- Carrier/domain: a finite symbol sequence, cumulative probability partition, and numeric interval
+- Initialization: input, probabilities, interval `[0,1]`, cursor, and exact or finite-precision convention
+- Acting loci and read: the next symbol, current interval, and probability partition
+- Effect, schedule, commit: replace the current interval by the symbol-selected subinterval and finally emit a shortest tag; decoding reverses refinements
+- Termination/output: final interval tag or decoded sequence
+- Defining variants: fixed or adaptive probabilities; renormalization; block alphabets
+- Representative sources: N10:L108-121
+- Distinguishing test: every symbol refines one interval shared by the entire message, so there are no per-symbol codeword boundaries
+
+## C099 — `history-reference-record-transduction`
+
+- Leads: L1513
+- Carrier/domain: an ordered sequence or scanned region, consumed prefix, dictionary/window state, and literal/reference records
+- Initialization: input, cursor, minimum match, search or dictionary policy, and empty output
+- Acting loci and read: current unconsumed input plus eligible earlier substrings or regions and dictionary state
+- Effect, schedule, commit: append a configured best-match pointer or literal, advance, and update the dictionary; decoding copies from reconstructed history
+- Termination/output: literal/reference stream or reconstructed carrier
+- Defining variants: backward search, sliding window, bounded Lempel–Ziv dictionary, and one- or two-dimensional match geometry
+- Representative sources: CH10:L209-267;N10:L123-153
+- Distinguishing test: equal current symbols can produce different records because the decision depends on already consumed history
+
+## C100 — `recursive-uniform-region-decomposition`
+
+- Leads: L1514
+- Carrier/domain: a finite array and rooted hierarchy of spatial regions
+- Initialization: root region, sample values, split geometry, uniformity tolerance, and optional minimum scale
+- Acting loci and read: one pending region and all samples it contains
+- Effect, schedule, commit: emit a uniform leaf or replace the region by configured children and recurse; inverse mode fills leaves into an output array
+- Termination/output: region tree or reconstructed array
+- Defining variants: dimension, quadtree geometry, equality or lossy tolerance, and minimum feature size
+- Representative sources: CH10:L233-239,L269-279;N10:L154-168
+- Distinguishing test: every decision belongs to a nested containment tree rather than a flat maximal-run scan or global basis projection
+
+## C101 — `orthogonal-basis-coefficient-transform`
+
+- Leads: L1515
+- Carrier/domain: a finite numeric signal or image block, basis operator, coefficient vector, and reconstruction block
+- Initialization: samples, invertible basis, coefficient ordering, retention or quantization policy, and inverse convention
+- Acting loci and read: the complete transform block and basis; selection reads the complete coefficient vector
+- Effect, schedule, commit: project onto basis coefficients, discard or quantize selected coefficients, and optionally invert
+- Termination/output: coefficient representation or reconstructed approximation
+- Defining variants: Walsh, Fourier/cosine, wavelet, basis ordering, coefficient budget, and quantization
+- Representative sources: CH10:L281-305;N10:L181-288
+- Distinguishing test: each coefficient algebraically mixes many samples, and discarding one can change the global reconstruction
+
+## C102 — `predictive-residual-transduction`
+
+- Leads: L1520
+- Carrier/domain: a numeric sample stream, fitted predictor state, and residual/code stream
+- Initialization: samples, predictor order, fitting window/objective, residual quantizer or codebook, and initial history
+- Acting loci and read: the current sample, retained preceding samples, and current or fitted coefficients
+- Effect, schedule, commit: fit or update a predictor, emit the next residual or code index, reconstruct if requested, and advance
+- Termination/output: model parameters plus residual records, or reconstructed samples
+- Defining variants: first differences; window and predictor order; fitted or supplied coefficients; residual vector codebooks
+- Representative sources: N10:L424
+- Distinguishing test: output is error relative to a causal history model, not a fixed global projection or prior-substring pointer

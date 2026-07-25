@@ -90,10 +90,13 @@ candidate clusters.
   automata, independent substitutions, stochastic CA, differential-equation
   variants, local constraints, register-machine variants, tag variants, and
   finite codecs.
-- The terminal register now contains 188 serious source leads, 867 resolved
-  leads, and 508 weak leads. The serious leads form 94 directly reviewable
-  mechanics candidates with complete fingerprints.
-- Created `candidates.md` and `source-decision-matrix.csv`. Every `L0001–L1563`
+- Final hostile review corrected one weak lead (sorting networks) to serious,
+  added one source-anchored priority-construction lead, and split the bundled
+  codec fingerprint along its seven already recorded mechanics. The terminal
+  register now contains 190 serious source leads, 867 resolved leads, and 507
+  weak leads. They form 102 directly reviewable mechanics candidates with
+  complete fingerprints.
+- Created `candidates.md` and `source-decision-matrix.csv`. Every `L0001–L1564`
   row has one terminal status and decision; every serious row maps to exactly
   one candidate; candidate IDs and matrix membership agree.
 - Deleted the four ephemeral batch files after validating exact, disjoint

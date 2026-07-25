@@ -4,8 +4,8 @@
 
 - Sequential reading, the Index challenge, and mechanics consolidation are
   complete.
-- The source-decision matrix contains 1,563 terminal lead decisions and 94
-  serious mechanics candidates.
+- At the time of this pass, the source-decision matrix contained 1,563 terminal
+  lead decisions and 94 mechanics candidates.
 - Blind discovery remains in force until this single saturation pass is closed.
 
 ## Big Picture Objective
@@ -49,9 +49,12 @@ another audit system.
 - The pass found 2,297 query-line matches. Existing source anchors directly
   covered 571; the other 1,726 were grouped by nearby source context and
   inspected against the canonical Book.
-- Every unmatched context was already represented mechanics, an alias, or
-  exposition/property material. No new construction, lead, candidate, or
-  unresolved question resulted.
+- The pass initially classified every unmatched context as represented
+  mechanics, an alias, or exposition/property material. Final hostile review
+  reopened Q037's single unanchored “alias” hit at N12:L80-92 and correctly
+  promoted it to new serious lead L1564 and family F056. No query was rerun.
+- Sorting-network lead L1556 already existed, so its later promotion was a
+  classification repair rather than a saturation-search omission.
 - No query was tuned or rerun after results were visible. The temporary raw hit
   file was deleted after all 40 terminal decisions were validated.
 
@@ -93,7 +96,7 @@ another audit system.
 | Q034 | cryptographic-and-inverse-procedures | 77 | 21 | 56 | represented |
 | Q035 | direct-and-jump-ahead-evaluation | 6 | 2 | 4 | alias |
 | Q036 | memory-retrieval-and-learning | 31 | 5 | 26 | alias |
-| Q037 | interactive-multi-program-systems | 1 | 0 | 1 | alias |
+| Q037 | interactive-multi-program-systems | 1 | 0 | 1 | missed in pass; promoted to L1564/F056 by hostile review |
 | Q038 | aggregation-and-random-growth | 67 | 27 | 40 | alias |
 | Q039 | fracture-flow-and-morphogenesis | 56 | 8 | 48 | alias |
 | Q040 | program-and-rule-mutation | 2 | 0 | 2 | exposition |

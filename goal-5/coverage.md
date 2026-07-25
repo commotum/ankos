@@ -11,7 +11,7 @@ Status meanings preserved from the execution sequence:
 
 Lead counts below count an inherited lead once per document. A lead can cite
 more than one document, so the column does not sum to either the 1,488-lead
-inherited bridge or the 1,563-lead final register. Zero means only that no
+inherited bridge or the 1,564-lead final register. Zero means only that no
 inherited lead cites the document.
 
 | Canonical document | Headings | Goal 5 coverage | Stage | Inherited leads |
