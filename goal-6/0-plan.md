@@ -267,10 +267,15 @@ streams, RNG helpers, or visualization.
 - The final Stage 4 scaffold compiles and executes, whitespace and scoped-diff
   checks pass, and independent API and concept/scaffold hostile reviews report
   no remaining blocker. Runtime, test, Goal 2, and Goal 5 trees are unchanged.
-- Stage 5 (`5-CATALOG`) is the first incomplete stage and is now in progress.
-  It began from clean autosave commit
-  `954a30467eb5e0c3892e5a8c4f920b505b2a16b8`; no runtime, test, Goal 2,
-  Goal 5, or Stage 6–7 artifact was concurrently modified.
+- Stage 5 (`5-CATALOG`) is complete. It began from clean autosave commit
+  `954a30467eb5e0c3892e5a8c4f920b505b2a16b8` and produced the exact
+  60-family/SPF and T01–T45 implementation map, candidate/source crosswalk,
+  callable/export policy, and callable-free metadata contract.
+- Stage 5 changed only the seven expected planning/API/reference files. Exact
+  count and Goal 5 comparisons, the executable reference scaffold, two
+  independent hostile reviews, whitespace, paths, and frozen-tree checks pass.
+  Runtime, tests, Goal 2, Goal 5, and Stage 6–7 artifacts remain unchanged.
+- Stage 6 (`6-CONFORMANCE`) is the first incomplete stage and has not begun.
 
 ## Assumptions To Challenge
 
@@ -530,7 +535,7 @@ and a single code-shaped reference scaffold.
 
 ### 5-CATALOG
 
-Status: **IN PROGRESS — canonical family and T01–T45 mapping underway**
+Status: **COMPLETE — canonical family and T01–T45 mapping verified**
 
 #### Big Picture Objective
 

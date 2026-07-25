@@ -255,111 +255,60 @@ arguments and expansion, `K` a total lossless legacy argument/name adapter,
 A name that binds or validates semantic parameters is `P` even when Goal 5's
 family-level disposition is `alias`.
 
-| Legacy ID | Legacy label | Goal 5 disposition | Normalized target | End callable treatment | Exact migration |
-|---|---|---|---|---|---|
-| T01 | Elementary Cellular Automata | retain-family | SPF050 / F053 | P `eca`; A `elementary_cellular_automaton` | Bind binary 1-D radius-one synchronous feedback; family constructor remains `synchronous_local_state_transform` |
-| T02 | Multi-Color Nearest-Neighbor Cellular Automata | retain-preset | SPF050 / F053 | P `multicolor_cellular_automaton` | Bind finite palette, nearest-neighbor stencil, and feedback |
-| T03 | Totalistic Cellular Automata | retain-preset | SPF050 / F053 | P `totalistic_cellular_automaton` | Bind totalistic quotient Rule |
-| T04 | Three-Color Totalistic Cellular Automata | retain-preset | SPF050 / F053 | P `three_color_totalistic_cellular_automaton` | Bind T03 to three colors and radius one |
-| T05 | Higher-Color Totalistic Cellular Automata | merge | SPF050 / F053 | P `higher_color_totalistic_cellular_automaton` | T03 parameterization with `colors >= 4`; no family entry |
-| T06 | Quiescent-Background-Preserving Cellular Automata | retain-preset | SPF050 / F053 | P `quiescent_cellular_automaton` | Validate the quiescent-background Rule restriction; no executor change |
-| T07 | Left-Right Symmetric Cellular Automata | retain-preset | SPF050 / F053 | P `symmetric_cellular_automaton` | Validate reflection-invariant local Rule data |
-| T08 | Initial-Condition Classes | retire-role | none; `ca.seeds` | M | Permanent tombstone linking exact/constructive/probabilistic Seed constructors and laws |
-| T09 | Mobile Automata | retain-preset | SPF030 / F031 | P `mobile_automaton` | Bind the single tagged-head, center-write profile |
-| T10 | Extended Mobile Automata | repair | SPF030 / F031 | P `neighbor_updating_mobile_automaton`; K `extended_mobile_automaton` | Correctly bind the neighbor-updating fixed-block result; deprecated old name delegates losslessly |
-| T11 | Generalized Mobile Automata | retain-family | SPF032 / F033 | P `generalized_mobile_automaton` | Bind multi-active move/split/delete mechanics; do not route through the single-head family |
-| T12 | Turing Machines | retain-family | SPF030 / F031 | P `turing_machine` | Bind tagged control state, symbol write, and edge movement |
-| T13 | Neighbor-Independent Substitution Systems | retain-family | SPF037 / F038 | P `neighbor_independent_substitution` | Bind independent string items and generation concatenation |
-| T14 | Neighbor-Dependent Substitution Systems | retain-family | SPF005 / F005 | P `neighbor_dependent_substitution` | Bind contextual word neighborhoods |
-| T15 | Creation-Destruction Substitution Systems | merge | SPF037 / F038 | P `creation_destruction_substitution` | Bind empty/nonempty offspring data; no separate family or commit law |
-| T16 | Sequential Substitution Systems | retain-preset | SPF049 / F052 | P `sequential_substitution` | Bind flat string structure, ordered scan, and one nonoverlapping splice |
-| T17 | Tag Systems | retain-family | SPF016 / F017 | P `tag_system` | Bind fixed front deletion and rear production |
-| T18 | Cyclic Tag Systems | retain-preset | SPF016 / F017 | P `cyclic_tag_system` | Add visible cyclic production phase |
-| T19 | Register Machines | retain-family | SPF045 / F048 | C `register_machine` | Exact canonical path `ca.catalog.machina.register_machine` |
-| T20 | Symbolic Systems | retain-family | SPF049 / F052 | P `symbolic_system` | Bind expression-tree patterns, templates, and scan semantics |
-| T21 | Two-Dimensional Cellular Automata | retain-preset | SPF050 / F053 | P `cellular_automaton_2d` | Bind square support and 2-D local stencil |
-| T22 | Moore-Neighborhood Cellular Automata | retain-preset | SPF050 / F053 | P `moore_cellular_automaton` | Bind the 2-D Moore stencil |
-| T23 | Three-Dimensional Cellular Automata | retain-preset | SPF050 / F053 | P `cellular_automaton_3d` | Bind cubic support and 3-D stencil |
-| T24 | Higher-Dimensional Lattice Cellular Automata | retain-preset | SPF050 / F053 | P `lattice_cellular_automaton` | Bind dimension/incidence/stencil descriptors |
-| T25 | Two-Dimensional Turing Machines | retain-preset | SPF030 / F031 | P `turing_machine_2d` | Bind planar topology, headings, and movement ports |
-| T26 | Two-Dimensional Substitution Systems | retain-preset | SPF037 / F038 | P `substitution_system_2d` | Bind compatible 2-D offspring geometry |
-| T27 | Geometric Replacement And Fractal Systems | repair | SPF037 / F038 | P `geometric_substitution`; M old `fractal_system` wording | Construction is posed geometric substitution; “fractal” remains output/property metadata |
-| T28 | Neighbor-Dependent Two-Dimensional Substitution Systems | retain-preset | SPF005 / F005 | P `context_dependent_substitution_2d` | Bind 2-D contextual patterns and compatible mosaic commit |
-| T29 | Network Systems | retain-family | SPF038 / F040 | C `parallel_network_rewrite`; A `network_rewrite` | Restrict to topology rewrite; broad `network_system` is M and cannot also name F055 |
-| T30 | Multiway Systems | retain-family | SPF033 / F034 | A `multiway_system` | Same arguments and expanded fields as canonical `multiway_rewrite` |
-| T31 | Local Constraint Systems | retain-family | SPF029 / F030 | P `local_constraint_system` | Bind local predicates over an unknown completion region |
-| T32 | Template Constraint Systems | alias | SPF029 / F030 | P `template_constraint_system` | Bind allowed-template representation; not a zero-delta callable alias |
-| T33 | Seeded Template Constraint Systems | retain-preset | SPF029 / F030 | P `seeded_template_constraint_system` | Put fixed/required occurrences in Seed and obligations |
-| T34 | Arithmetic Iteration Systems | retain-preset | SPF026 / F027 | P `arithmetic_iteration` | Bind an exact arithmetic map expression |
-| T35 | Piecewise Integer Maps | retain-preset | SPF026 / F027 | P `piecewise_integer_map` | Bind integer domain and guarded/residue clauses |
-| T36 | Digit-Reversal Arithmetic Systems | retain-preset | SPF026 / F027 | P `digit_reversal_map` | Bind positional representation and reversal map |
-| T37 | Recursive Sequences | retain-family | SPF023 / F024 | P `recursive_sequence` | Bind fixed-index recurrence and append state |
-| T38 | Variable-Index Recursive Sequences | retain-preset | SPF023 / F024 | P `variable_index_recursive_sequence` | Bind value-selected history addresses |
-| T39 | Number-Theoretic Filtering Systems | retain-family | SPF025 / F026 | P `number_theoretic_filtering` | Bind divisibility/current-rank erasure criteria |
-| T40 | Mathematical-Constant Digit Systems | split | SPF002 / F002 and SPF008 / F008 | M split record; P `constant_digit_sequence` and P `constant_digit_register` branches | No umbrella callable or `kind=` dispatch; each explicit branch callable has exactly one SPF target |
-| T41 | Function-Combination Systems | repair | SPF044 / F047 | C `recursive_function_evaluator`; M old wording | Replace role-like combination label with executable recursive reduction; no lossy old callable |
-| T42 | Continued-Fraction-Driven Substitution Systems | retain-preset | SPF037 / F038 | P `continued_fraction_substitution` | Bind a finite visible production schedule obtained from verified continued-fraction data |
-| T43 | Iterated Maps | retain-family | SPF026 / F027 | C `iterated_map` | Exact canonical path `ca.catalog.automata.iterated_map` |
-| T44 | Continuous Cellular Automata | alias | SPF050 / F053 | P `continuous_cellular_automaton` | Bind continuous-valued Alphabet/local law but remain discrete-time F053; not F041 |
-| T45 | Partial Differential Equation Systems | retain-family | SPF039 / F041 | C `partial_differential_relation`; A `pde` | Preserve relation-valued 0/1/many/I signature; neither spelling implies a solver |
+The ledger preserves each row's exact Goal 5 candidate join and the narrowest
+source needed to justify its named callable. `F`-level family sources alone are
+not presumed to establish a narrower preset. `CHnn` is the repaired chapter
+Markdown and `Nnn` its repaired Notes Markdown. T06 uses the completed Goal 2
+preset evidence because Goal 5 retained the preset but intentionally did not
+promote the property-only passages into a mechanics candidate.
 
-### T evidence crosswalk
-
-The migration ledger preserves the exact Goal 5 candidate join and the
-narrowest source needed to justify each named callable. `F`-level family
-sources alone are not presumed to establish a narrower preset. The shorthand
-is the same as Goal 5: `CHnn` is the repaired chapter Markdown and `Nnn` its
-repaired Notes Markdown. T06 uses the already-completed Goal 2 preset evidence
-because Goal 5 retained the preset but intentionally did not promote the
-property-only passages into a mechanics candidate.
-
-| Legacy ID | Goal 5 candidate(s) | Named-construction evidence |
-|---|---|---|
-| T01 | C090 | `CH03:L29-56` |
-| T02 | C090 | `N03:L135-150` |
-| T03 | C090 | `CH03:L91-96` |
-| T04 | C090 | `CH03:L89-96,L109-110` |
-| T05 | C090 | `N03:L164-185` |
-| T06 | C090 | Goal 2-preserved restriction `T(b,…,b)=b`; `CH03:L101,L649; CH06:L101`; `goal-1/25-T06-QUIESCENT.md` |
-| T07 | C090 | `N03:L7-10; N05:L89-100` |
-| T08 | — | Goal 5 Seed-role decision; no executable construction source |
-| T09 | C047 | `CH03:L169-185` |
-| T10 | C056 | `CH03:L197-207` |
-| T11 | C030 | `CH03:L231-247` |
-| T12 | C049 | `N03:L294-333` |
-| T13 | C061 | `CH03:L299-307` |
-| T14 | C011, C055 | `CH03:L333-337; CH05:L211-227; N05:L360-367` |
-| T15 | C061 | `CH03:L343-363` |
-| T16 | C080 | `CH03:L369-379` |
-| T17 | C091 | `CH03:L423-445` |
-| T18 | C091 | `CH03:L447-471` |
-| T19 | C073 | `CH03:L473-509,L519-525` |
-| T20 | C089 | `CH03:L531-537; N03:L823-835; CH10:L909-915` |
-| T21 | C090 | `CH05:L27-34` |
-| T22 | C090 | `CH05:L67-86` |
-| T23 | C090 | `CH05:L95-123; N06:L55-66` |
-| T24 | C090 | `N05:L36-58,L66-88` |
-| T25 | C049 | `CH05:L127-131; N05:L211-217` |
-| T26 | C061 | `CH05:L173-190` |
-| T27 | C061 | `CH05:L191-214; N05:L286-337`; fractality remains observer-side |
-| T28 | C055 | `CH05:L211-227; N05:L360-367` |
-| T29 | C062 | `CH05:L239-248,L287-331` |
-| T30 | C051 | `CH05:L355-369; N05:L527-528,L549-578` |
-| T31 | C043 | `CH05:L433-479; CH09:L595-615; N09:L324-330` |
-| T32 | C043 | `CH05:L475-488` |
-| T33 | C042, C043 | `CH05:L475-498,L535-536` |
-| T34 | C037 | `CH04:L53-54` |
-| T35 | C037 | `CH04:L111-118` |
-| T36 | C037 | `CH04:L153-162; N04:L170-179` |
-| T37 | C078 | `CH04:L169-186` |
-| T38 | C078 | `CH04:L179-186` |
-| T39 | C035 | `CH04:L211-214; N04:L418-430` |
-| T40 | C003, C017 | sequence `N04:L203-210,L569-599`; register `CH04:L303-308,L343-350; N04:L561-562` |
-| T41 | C072 | `N04:L237-268,L316-364` |
-| T42 | C061 | `CH04:L454-461; N04:L753-754` |
-| T43 | C037 | `CH04:L53-54,L111-118,L472-491` |
-| T44 | C090 | `CH04:L546-562,L565-616` |
-| T45 | C063 | `CH04:L625-674; N04:L933-940` |
+| Legacy ID | Legacy label | Goal 5 disposition | Candidate(s) | Normalized target | End callable treatment | Named-construction evidence | Exact migration |
+|---|---|---|---|---|---|---|---|
+| T01 | Elementary Cellular Automata | retain-family | C090 | SPF050 / F053 | P `eca`; A `elementary_cellular_automaton` | `CH03:L29-56` | Bind binary 1-D radius-one synchronous feedback; family constructor remains `synchronous_local_state_transform` |
+| T02 | Multi-Color Nearest-Neighbor Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `multicolor_cellular_automaton` | `N03:L135-150` | Bind finite palette, nearest-neighbor stencil, and feedback |
+| T03 | Totalistic Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `totalistic_cellular_automaton` | `CH03:L91-96` | Bind totalistic quotient Rule |
+| T04 | Three-Color Totalistic Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `three_color_totalistic_cellular_automaton` | `CH03:L89-96,L109-110` | Bind T03 to three colors and radius one |
+| T05 | Higher-Color Totalistic Cellular Automata | merge | C090 | SPF050 / F053 | P `higher_color_totalistic_cellular_automaton` | `N03:L164-185` | T03 parameterization with `colors >= 4`; no family entry |
+| T06 | Quiescent-Background-Preserving Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `quiescent_cellular_automaton` | Goal 2-preserved `T(b,…,b)=b`; `CH03:L101,L649; CH06:L101`; `goal-1/25-T06-QUIESCENT.md` | Validate the quiescent-background Rule restriction; no executor change |
+| T07 | Left-Right Symmetric Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `symmetric_cellular_automaton` | `N03:L7-10; N05:L89-100` | Validate reflection-invariant local Rule data |
+| T08 | Initial-Condition Classes | retire-role | — | none; `ca.seeds` | M | Goal 5 Seed-role decision; no executable construction source | Permanent tombstone linking exact/constructive/probabilistic Seed constructors and laws |
+| T09 | Mobile Automata | retain-preset | C047 | SPF030 / F031 | P `mobile_automaton` | `CH03:L169-185` | Bind the single tagged-head, center-write profile |
+| T10 | Extended Mobile Automata | repair | C056 | SPF030 / F031 | P `neighbor_updating_mobile_automaton`; K `extended_mobile_automaton` | `CH03:L197-207` | Correctly bind the neighbor-updating fixed-block result; deprecated old name delegates losslessly |
+| T11 | Generalized Mobile Automata | retain-family | C030 | SPF032 / F033 | P `generalized_mobile_automaton` | `CH03:L231-247` | Bind multi-active move/split/delete mechanics; do not route through the single-head family |
+| T12 | Turing Machines | retain-family | C049 | SPF030 / F031 | P `turing_machine` | `N03:L294-333` | Bind tagged control state, symbol write, and edge movement |
+| T13 | Neighbor-Independent Substitution Systems | retain-family | C061 | SPF037 / F038 | P `neighbor_independent_substitution` | `CH03:L299-307` | Bind independent string items and generation concatenation |
+| T14 | Neighbor-Dependent Substitution Systems | retain-family | C011, C055 | SPF005 / F005 | P `neighbor_dependent_substitution` | `CH03:L333-337; CH05:L211-227; N05:L360-367` | Bind contextual word neighborhoods |
+| T15 | Creation-Destruction Substitution Systems | merge | C061 | SPF037 / F038 | P `creation_destruction_substitution` | `CH03:L343-363` | Bind empty/nonempty offspring data; no separate family or commit law |
+| T16 | Sequential Substitution Systems | retain-preset | C080 | SPF049 / F052 | P `sequential_substitution` | `CH03:L369-379` | Bind flat string structure, ordered scan, and one nonoverlapping splice |
+| T17 | Tag Systems | retain-family | C091 | SPF016 / F017 | P `tag_system` | `CH03:L423-445` | Bind fixed front deletion and rear production |
+| T18 | Cyclic Tag Systems | retain-preset | C091 | SPF016 / F017 | P `cyclic_tag_system` | `CH03:L447-471` | Add visible cyclic production phase |
+| T19 | Register Machines | retain-family | C073 | SPF045 / F048 | C `register_machine` | `CH03:L473-509,L519-525` | Exact canonical path `ca.catalog.machina.register_machine` |
+| T20 | Symbolic Systems | retain-family | C089 | SPF049 / F052 | P `symbolic_system` | `CH03:L531-537; N03:L823-835; CH10:L909-915` | Bind expression-tree patterns, templates, and scan semantics |
+| T21 | Two-Dimensional Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `cellular_automaton_2d` | `CH05:L27-34` | Bind square support and 2-D local stencil |
+| T22 | Moore-Neighborhood Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `moore_cellular_automaton` | `CH05:L67-86` | Bind the 2-D Moore stencil |
+| T23 | Three-Dimensional Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `cellular_automaton_3d` | `CH05:L95-123; N06:L55-66` | Bind cubic support and 3-D stencil |
+| T24 | Higher-Dimensional Lattice Cellular Automata | retain-preset | C090 | SPF050 / F053 | P `lattice_cellular_automaton` | `N05:L36-58,L66-88` | Bind dimension/incidence/stencil descriptors |
+| T25 | Two-Dimensional Turing Machines | retain-preset | C049 | SPF030 / F031 | P `turing_machine_2d` | `CH05:L127-131; N05:L211-217` | Bind planar topology, headings, and movement ports |
+| T26 | Two-Dimensional Substitution Systems | retain-preset | C061 | SPF037 / F038 | P `substitution_system_2d` | `CH05:L173-190` | Bind compatible 2-D offspring geometry |
+| T27 | Geometric Replacement And Fractal Systems | repair | C061 | SPF037 / F038 | P `geometric_substitution`; M old `fractal_system` wording | `CH05:L191-214; N05:L286-337` | Construction is posed geometric substitution; “fractal” remains output/property metadata |
+| T28 | Neighbor-Dependent Two-Dimensional Substitution Systems | retain-preset | C055 | SPF005 / F005 | P `context_dependent_substitution_2d` | `CH05:L211-227; N05:L360-367` | Bind 2-D contextual patterns and compatible mosaic commit |
+| T29 | Network Systems | retain-family | C062 | SPF038 / F040 | C `parallel_network_rewrite`; A `network_rewrite` | `CH05:L239-248,L287-331` | Restrict to topology rewrite; broad `network_system` is M and cannot also name F055 |
+| T30 | Multiway Systems | retain-family | C051 | SPF033 / F034 | A `multiway_system` | `CH05:L355-369; N05:L527-528,L549-578` | Same arguments and expanded fields as canonical `multiway_rewrite` |
+| T31 | Local Constraint Systems | retain-family | C043 | SPF029 / F030 | P `local_constraint_system` | `CH05:L433-479; CH09:L595-615; N09:L324-330` | Bind local predicates over an unknown completion region |
+| T32 | Template Constraint Systems | alias | C043 | SPF029 / F030 | P `template_constraint_system` | `CH05:L475-488` | Bind allowed-template representation; not a zero-delta callable alias |
+| T33 | Seeded Template Constraint Systems | retain-preset | C042, C043 | SPF029 / F030 | P `seeded_template_constraint_system` | `CH05:L475-498,L535-536` | Put fixed/required occurrences in Seed and obligations |
+| T34 | Arithmetic Iteration Systems | retain-preset | C037 | SPF026 / F027 | P `arithmetic_iteration` | `CH04:L53-54` | Bind an exact arithmetic map expression |
+| T35 | Piecewise Integer Maps | retain-preset | C037 | SPF026 / F027 | P `piecewise_integer_map` | `CH04:L111-118` | Bind integer domain and guarded/residue clauses |
+| T36 | Digit-Reversal Arithmetic Systems | retain-preset | C037 | SPF026 / F027 | P `digit_reversal_map` | `CH04:L153-162; N04:L170-179` | Bind positional representation and reversal map |
+| T37 | Recursive Sequences | retain-family | C078 | SPF023 / F024 | P `recursive_sequence` | `CH04:L169-186` | Bind fixed-index recurrence and append state |
+| T38 | Variable-Index Recursive Sequences | retain-preset | C078 | SPF023 / F024 | P `variable_index_recursive_sequence` | `CH04:L179-186` | Bind value-selected history addresses |
+| T39 | Number-Theoretic Filtering Systems | retain-family | C035 | SPF025 / F026 | P `number_theoretic_filtering` | `CH04:L211-214; N04:L418-430` | Bind divisibility/current-rank erasure criteria |
+| T40 | Mathematical-Constant Digit Systems | split | C003, C017 | SPF002 / F002 and SPF008 / F008 | M split record; P `constant_digit_sequence` and P `constant_digit_register` branches | sequence `N04:L203-210,L569-599`; register `CH04:L303-308,L343-350; N04:L561-562` | No umbrella callable or `kind=` dispatch; each explicit branch callable has exactly one SPF target |
+| T41 | Function-Combination Systems | repair | C072 | SPF044 / F047 | C `recursive_function_evaluator`; M old wording | `N04:L237-268,L316-364` | Replace role-like combination label with executable recursive reduction; no lossy old callable |
+| T42 | Continued-Fraction-Driven Substitution Systems | retain-preset | C061 | SPF037 / F038 | P `continued_fraction_substitution` | `CH04:L454-461; N04:L753-754` | Bind a finite visible production schedule obtained from verified continued-fraction data |
+| T43 | Iterated Maps | retain-family | C037 | SPF026 / F027 | C `iterated_map` | `CH04:L53-54,L111-118,L472-491` | Exact canonical path `ca.catalog.automata.iterated_map` |
+| T44 | Continuous Cellular Automata | alias | C090 | SPF050 / F053 | P `continuous_cellular_automaton` | `CH04:L546-562,L565-616` | Bind continuous-valued Alphabet/local law but remain discrete-time F053; not F041 |
+| T45 | Partial Differential Equation Systems | retain-family | C063 | SPF039 / F041 | C `partial_differential_relation`; A `pde` | `CH04:L625-674; N04:L933-940` | Preserve relation-valued 0/1/many/I signature; neither spelling implies a solver |
 
 ## Metadata and implementation contract
 

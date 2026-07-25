@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — CATALOG MAPPING UNDERWAY**
+Status: **IN PROGRESS — CATALOG COMPLETE; CONFORMANCE NEXT**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -1741,8 +1741,9 @@ fields, register an executor, or become semantic identity.
 Flat exports are deny-by-default and explicit in `catalog.__all__`. If two
 category modules would claim the same name, only the canonical owner's
 constructor may receive that flat spelling. The other must use a distinct
-explicit compatibility name or remain category-qualified. Stage 5 records the
-exact constructor/alias table, but it may not change this collision rule.
+explicit compatibility name or remain category-qualified. The exact
+constructor/alias table is recorded in `catalog-migration.md` and does not
+change this collision rule.
 
 `catalog.entries` supports navigation, provenance, lookup, and documentation.
 It contains metadata values and canonical import/name strings, never callable
@@ -1767,12 +1768,13 @@ Goal 5 family slugs converted to `snake_case`. Every one is available
 category-qualified and explicitly re-exported from `ca.catalog`, but none is
 exported from root `ca`.
 
-F010 and F042 remain metadata-only close roles without `SPF` IDs or
+F010 and F042 remain callable-free `RoleEntry` records without `SPF` IDs or
 constructors. T08 is separately a retired Seed role. T40 is a non-callable
 split record targeting F002 and F008 by two explicit branch names, and F055
 receives its own normalized identity without a fabricated T owner. Thus no
 umbrella constructor, `kind=` family dispatcher, or duplicate mechanic is
-needed.
+needed. Every T row also retains its exact Goal 5 candidate join and the
+narrow source anchors needed by its named callable.
 
 Callable names are classified independently as canonical constructors,
 closed presets, true zero-delta aliases, or total lossless compatibility
@@ -2383,6 +2385,9 @@ above.
 - Stage 4 is complete: exact file ownership, public imports, documentation
   roles, runtime cutover dispositions, and the compact reference scaffold are
   verified.
-- Stage 5 is next: catalog construction and migration;
-- Stage 6 — pressure fixtures and conformance;
+- Stage 5 is complete: exact SPF/F/T identities, 60 canonical constructors,
+  six-module homes, legacy migration, named-source evidence, callable kinds,
+  exports, roles, and metadata boundaries are verified in
+  `catalog-migration.md`.
+- Stage 6 is next: pressure fixtures and conformance;
 - Stage 7 — implementation handoff and final reconciliation.

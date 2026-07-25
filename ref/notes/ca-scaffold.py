@@ -331,7 +331,7 @@ class automata:
         WritableEnvelope[Locus],
         IndexedView[tuple[bool, bool, bool]],
     ]:
-        """Descriptive compatibility alias; Stage 5 finalizes alias metadata."""
+        """True alternate spelling of the ``eca`` preset."""
 
         return automata.eca(rule=rule, width=width)
 

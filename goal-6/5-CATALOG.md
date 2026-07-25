@@ -1,6 +1,6 @@
 # 5-CATALOG
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -9,9 +9,9 @@ Status: **IN PROGRESS**
 - Goal 5 fixes the inventory at 60 executable semantic families, 19 with some
   current-catalog coverage, 41 family additions, and two close non-family
   roles. It also gives every T01–T45 row exactly one disposition.
-- `goal-6/catalog-migration.md` does not yet exist. Stage 5 must make it the
-  canonical implementation-facing catalog map without reproducing Goal 5's
-  taxonomy research.
+- At stage entry, `goal-6/catalog-migration.md` did not exist. It is now the
+  canonical implementation-facing catalog map and joins Goal 5 results without
+  reproducing its taxonomy research.
 - The current runtime has no `catalog/` package. Its `specs.py` recognizes six
   Phase 1 family strings and its root broadly re-exports constructors. Those
   are Goal 7 migration inputs, not a surface Stage 5 may change.
@@ -103,28 +103,68 @@ documentation, not runtime implementation.
 
 ## Completion Requirements
 
-- [ ] The canonical matrix has exactly 60 unique executable rows and 60 unique
+- [x] The canonical matrix has exactly 60 unique executable rows and 60 unique
       stable family IDs, research IDs, constructors, and primary homes.
-- [ ] Status counts are exactly 19 covered and 41 additions.
-- [ ] F010 and F042 are recorded as exactly two separate close roles.
-- [ ] Every row has closed parameters, a valid five-field skeleton, pressure
+- [x] Status counts are exactly 19 covered and 41 additions.
+- [x] F010 and F042 are recorded as exactly two separate close roles.
+- [x] Every row has closed parameters, a valid five-field skeleton, pressure
       and result obligations, source anchors, and explicit legacy relations.
-- [ ] T01–T45 appear exactly once with disposition counts
+- [x] T01–T45 appear exactly once with disposition counts
       `15/21/2/3/2/1/1` for retain-family, retain-preset, merge, repair, alias,
       retire-role, and split.
-- [ ] Every T disposition has a non-conflicting canonical target and exact
+- [x] Every T disposition has a non-conflicting canonical target and exact
       callable, metadata-only, alias, preset, merged, repaired, retired, or
       split treatment.
-- [ ] Every T entry preserves its Goal 5 candidate provenance and the source
+- [x] Every T entry preserves its Goal 5 candidate provenance and the source
       anchors required for the named family, preset, repair, alias, or role.
-- [ ] Stable-ID, collision, re-export, alias, serialization, and metadata
+- [x] Stable-ID, collision, re-export, alias, serialization, and metadata
       policies are implementation-ready and cannot become execution dispatch.
-- [ ] Hostile review, exact count checks, link/path checks, terminology,
+- [x] Hostile review, exact count checks, link/path checks, terminology,
       whitespace/diff, frozen hashes, and behavioral-tree checks pass.
-- [ ] Stage 6 can pressure-test this matrix without reopening taxonomy,
+- [x] Stage 6 can pressure-test this matrix without reopening taxonomy,
       catalog ownership, or constructor naming.
 
 ## Stage Results
 
-To be completed after the canonical matrix, reconciliation, hostile review,
-and verification pass.
+- Created `catalog-migration.md` with SPF001–SPF060 assigned once in ascending
+  executable F order. Goal 5 `F` IDs remain audit provenance and T01–T45 remain
+  legacy migration identities; none is a runtime type or dispatch key.
+- Assigned exactly 11 families to `automata`, 15 to `substitua`, 8 to
+  `machina`, 14 to `media`, 9 to `criteria`, and 3 to `dynamica`. Canonical
+  constructors use exact family slugs converted to `snake_case`.
+- Reconciled all 45 T rows once with exact disposition, candidate provenance,
+  named-construction sources, normalized targets, and callable treatment.
+  T40 is a non-callable two-branch record; F055 has SPF052 without a fabricated
+  T owner; T08, F010, and F042 remain callable-free roles.
+- Fixed callable policy at five kinds: canonical `C`, closed preset `P`, true
+  alias `A`, total lossless compatibility adapter `K`, and metadata-only `M`.
+  All named `C`/`P`/`A` callables are explicit flat catalog exports; `K` is
+  category-qualified and `M` is never callable.
+- Defined callable-free `FamilyEntry`, `RoleEntry`, `LegacyEntry`,
+  `LegacyTarget`, and `NameEntry` relations. Category functions are written
+  explicitly; metadata cannot synthesize functions or drive application.
+- Rejected optional construction receipts after hostile review exposed that
+  the five-field API has no honest carrier for invocation history. Canonical
+  codecs contain expanded semantic data only; applications may keep a separate
+  user manifest.
+- Tightened stochastic families to denote explicit probability laws while
+  leaving draws to external realization, repaired F004 cursor writes, added
+  preset-specific evidence, and aligned the reference scaffold to canonical
+  family → `eca` preset → true alternate alias.
+- Independent matrix and API hostile reviews report no remaining blocker. The
+  exact validator reports `60` rows, `19/41` status, home counts
+  `11/15/8/14/9/3`, `45` legacy rows, two close roles, and zero errors.
+- `python3 -B -m py_compile ref/notes/ca-scaffold.py`,
+  `python3 -B ref/notes/ca-scaffold.py`, Markdown fence, exact Goal 5 diff,
+  link/path, and `git diff --check` checks pass. Runtime tests were not rerun
+  because this stage changes planning/API/reference documents only.
+- Against baseline `954a30467eb5e0c3892e5a8c4f920b505b2a16b8`,
+  `src/ca`, `tests`, Goal 2, and Goal 5 retain tree hashes
+  `6e6b34769d60508c03d0a69fad1ede4fef75e217`,
+  `02ad081e039a46efbf61855fdeae60abb7bb70ad`,
+  `48b6309655ec7c1d3aaa1a0ec5dfb700385e16d1`, and
+  `ba62f20b8c620094a0ad683906a803c5404be5f2`.
+
+Stage 6 is now the first incomplete stage. It may pressure-test this settled
+catalog, but it must not reopen family identity, category ownership,
+constructor spelling, or migration policy without a concrete contradiction.
