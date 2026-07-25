@@ -422,7 +422,10 @@ complete capability envelope `W` for one Rule application.
 - stable identity/namespace rules for existing and potential fresh components;
 - ordering, grouping, interface, or multiplicity where replacement meaning
   depends on it; and
-- finite or intensional membership sufficient to reject unauthorized writes.
+- finite or intensional membership sufficient to reject unauthorized writes;
+  and
+- a closed, snapshot-bound reconstruction plan that can rebuild `C` from one
+  normalized total disposition without learning the carrier or family.
 
 Frontier is an envelope, not the actual changed set. It may over-approximate
 which authorized member a Rule selects, but it must not omit any possible
@@ -453,6 +456,10 @@ operation requires pre-existing coordinates for every future component.
 Union, product, relative/dilated, matched-interface, dynamic-address,
 fresh-child, whole-region, and intensional combinators return one composed
 WritableRegion.
+
+The reconstruction plan is derived by the closed configuration/frontier
+contracts during resolution; it is not a sixth field or a user-selected update
+policy. Its exact laws are fixed by the universal application contract below.
 
 ### ReadableRegion
 
@@ -579,11 +586,14 @@ One generic envelope is used before and after commit:
 
 ```text
 ResultEnvelope[P] =
-    Complete(OutcomeSpace[P])
+    Complete(P)
   | Rejected(Fault)
 
-RuleResult[C, W]    = ResultEnvelope[RuleAtom[C, W]]
-ApplicationResult[C] = ResultEnvelope[AppliedAtom[C]]
+RuleResult[C, W] =
+    ResultEnvelope[OutcomeSpace[RuleAtom[C, W]]]
+
+ApplicationResult[C] =
+    ResultEnvelope[ApplicationComplete[C]]
 
 RuleAtom[C, W] =
     Derivation(
@@ -603,17 +613,44 @@ RuleAtom[C, W] =
 AppliedAtom[C] =
     AppliedDerivation(successor: C, source: Derivation, fresh_bindings, evidence)
   | NoSuccessor
+
+ApplicationComplete[C] = {
+    source_outcomes: OutcomeSpace[RuleAtom],
+    applied_atoms: OutcomeSpace[AppliedAtom],
+    no_successor_partition: OutcomeSpace[NoSuccessor],
+    outcome_atom_cardinality: Cardinality,
+    derivation_cardinality: Cardinality,
+    successor_cardinality: Cardinality,
+    successor_quotient_with_derivation_fibers: SuccessorSpace[C],
+    applied_atom_measure: MeasureView[AppliedAtom],
+    successor_submeasure: MeasureView[C],
+    no_successor_submeasure: MeasureView[NoSuccessor],
+    evidence: ApplicationEvidence,
+}
+
+MeasureView[P] =
+    Absent
+  | Available(Measure[P])
+  | Unavailable(reason, retained_source_law_and_mapping_evidence)
 ```
 
-`Complete` means the descriptor denotes the whole outcome space, even when
-that space is intensional or its cardinality is undecidable. `Rejected` means
-there is no authoritative denotation to commit or expose at that boundary.
-`RuleResult` can originate Rule-evaluation/result-schema faults;
-`ApplicationResult` can additionally originate earlier program/input/region
-faults or later fresh/commit/successor/quotient faults. Closed `Fault` variants
-include invalid data/result, unsupported exactness or capability, evaluation
-failure, and resource exhaustion, each with the phase, reason, and evidence
-needed to diagnose it.
+`Complete` means that its payload is authoritative at that boundary.
+For a Rule result, the represented atoms are both sound in and covering of the
+specialized denotation `⟦Rule⟧(R, W)`, up to the descriptor's declared exact
+equivalence. For an application result, every generic phase has completed and
+the payload above retains both the pre-quotient derivations and every derived
+view. An intensional presentation can be complete while its cardinality is
+undecidable; completeness is coverage, not enumerability.
+
+`Rejected` means there is no authoritative denotation or successor space to
+commit or expose at that boundary. `RuleResult` can originate Rule-denotation
+or result-schema faults; `ApplicationResult` can additionally originate
+earlier program/input/region faults or later fresh/commit/successor/quotient
+faults. Denotational Rule/application faults are closed invalid-data/result,
+unsupported-exactness/capability, or evaluation-failure variants with phase,
+reason, and evidence. `ResourceExhausted` belongs only to an explicitly
+bounded external query, realization, or rollout result; it is not a base
+Rule/Application fault.
 
 The successful semantic outcomes are distinct:
 
@@ -646,13 +683,19 @@ second application.
 
 ### Cardinality and presentation
 
-`OutcomeSpace` has closed extensional and intensional presentations:
+`OutcomeSpace[P]` consists of one closed support presentation, its cardinality
+claim, its completeness evidence, and an optional probability law over that
+support. Support and measure are separate:
 
 | Presentation | Contract |
 |---|---|
 | `Finite` | Canonical finite atoms with exact order-insensitive or declared ordered/bag semantics |
 | `Intensional` | A versioned relation AST with binding, membership/construction, validation, and universal conformance obligations |
-| `ProbabilityLaw` | A closed probability measure over a finite or intensional atom space |
+
+An optional `ProbabilityLaw[P]` is a closed normalized measure over either
+support presentation. It changes neither the support presentation nor its
+cardinality and is never inferred from weights, multiplicity, amplitudes, or
+enumeration.
 
 Every support or quotient carries a cardinality claim:
 
@@ -667,10 +710,15 @@ Undetermined(closed_reason_or_obligation)
 exact intensional relation whose emptiness, uniqueness, or multiplicity is not
 established by the descriptor. A finite presentation may not use it.
 
-A complete evaluation with zero replacement derivations still carries a typed
-`NoSuccessor` atom explaining terminality, undefinedness, declared failure, or
-certified divergence. A bare empty outcome container is invalid; zero is never
-left semantically untyped.
+When a complete result **establishes** `ExactlyZero` replacement derivations,
+it still carries a typed `NoSuccessor` atom explaining terminality,
+undefinedness, declared failure, or certified divergence. A bare finite or
+claimed-exact empty outcome container is invalid; certified zero is never left
+semantically untyped. This does not decide the emptiness of an intensional
+relation whose cardinality is `Undetermined`: that relation remains the
+complete result and must not invent `Terminal` or any other `NoSuccessor`
+atom. If emptiness is later certified, coverage evidence and the typed
+no-successor outcome must be supplied together.
 
 Results report three cardinalities rather than conflating them:
 
@@ -686,15 +734,43 @@ or resource-exhausted evaluation, semantic cardinality is **not established**;
 the number of candidates observed so far is only diagnostic evidence.
 
 An intensional space is never a Python generator or an opaque solver result.
-It must support closed member verification and either:
+It must support both:
 
-- a universal proof/conformance contract showing that every denoted
-  derivation is total, authorized, and invariant-preserving; or
-- a typed unsupported/incomplete result until such evidence is supplied.
+- **soundness**: every represented atom belongs to the specialized
+  `⟦Rule⟧(R, W)` relation and satisfies totality, authorization, and invariant
+  obligations; and
+- **coverage**: every atom in that specialized Rule relation is represented,
+  up to its declared exact equivalence.
+
+The intensional AST may discharge coverage by being the specialized Rule
+relation itself together with its closed equivalence and conformance
+contracts. A finite claim such as “the solutions of `x² = 1` are `{+1}`” is
+not `Complete`, even though its sole member is sound. Likewise,
+`Terminal(NoSolution)` requires a closed emptiness/coverage certificate, not
+merely the absence of a found member. If soundness or coverage cannot be
+validated, the boundary returns a typed unsupported/incomplete rejection.
 
 A solver may return verified members, samples, or a certified complete finite
 realization, but a partial enumeration never masquerades as the complete
 outcome space.
+
+### Closed Rule denotation
+
+The core Rule operation is denotational:
+
+```text
+Rule.denote(R, W) -> RuleResult[C, W]
+```
+
+It constructs or interprets only recognized closed structural data. It may
+return a finite support or an intensional relation descriptor, but it does not
+draw randomness, invoke a solver, numerically integrate, conduct partial
+search, consume a resource budget, or consult host callbacks. Those actions
+belong to explicit external realization/query requests over the retained
+denotation. Consequently base `apply` has no resource request and cannot
+originate `ResourceExhausted`; bounded external operations may do so without
+changing the Rule result. A `Divergent` atom is permitted only when the closed
+Rule data itself supplies a valid semantic certificate.
 
 ### Total replacements and outcome invariants
 
@@ -742,10 +818,12 @@ of enumeration:
 Application captures an `AppliedDerivation` before any successor
 canonicalization. It retains the Rule witness, input trace lineage, raw
 replacement, fresh bindings, progress/continuation, source provenance, and
-any realization evidence. Trace lineage is evidence, not hidden configuration:
-it cannot change the denotational Rule result, structural fresh identities, or
-semantic successor equality. If ancestry affects later mechanics, it is
-visible state in `C`.
+any realization evidence. It also carries
+`output_trace_lineage = derive(input_trace_lineage, canonical_program_identity,
+canonical_rule_and_application_identity, witness, outcome)`. Trace lineage is
+evidence, not hidden configuration: it cannot change the denotational Rule
+result, structural fresh identities, or semantic successor equality. If
+ancestry affects later mechanics, it is visible state in `C`.
 
 Only then may successors be grouped. Deduplication uses the configuration
 contract's exact semantic equality or an explicitly declared sound
@@ -765,21 +843,31 @@ branch count.
 ### Probability and replay
 
 A stochastic Rule denotes a probability measure over the complete
-`RuleAtom` space. The measure may include replacement, terminal, undefined, or
-declared-failure atoms. It is normalized with exact/certified evidence; any
-missing mass must be assigned an explicit semantic atom rather than silently
-discarded. Arbitrary scores, complex amplitudes, objective weights, and
-unnormalized factors are distinct value/annotation algebras and grant no
-sampling authority until a Rule explicitly constructs a probability measure.
+`RuleAtom` space. The measure may include replacement, terminal, undefined,
+declared-failure, or divergent atoms. Before commit, application validates the
+law's support, outcome/provenance tags, normalization evidence, and measurable
+atom space. Any missing mass must be assigned an explicit semantic atom rather
+than silently discarded. Arbitrary scores, complex amplitudes, objective
+weights, and unnormalized factors are distinct value/annotation algebras and
+grant no sampling authority until a Rule explicitly constructs a probability
+measure.
 
 Atomic application first pushes the measure to the full tagged
 `AppliedAtom` space, preserving all replacement, terminal, undefined,
 declared-failure, divergence, progress, and continuation mass. Successor
-grouping is a second projection of the replacement-atom portion only. In a
-finite space, equal successor mass is the exact sum of its derivation masses;
-no-successor and mixed-continuation mass remains separately addressable. In an
-intensional space, both are closed pushforward measures with retained
-derivation fibers; no enumeration is required.
+grouping is a second projection of the replacement-atom portion only. It
+produces an **unnormalized successor submeasure** and a separate no-successor
+submeasure; neither is renormalized when the other has positive mass. Mixed
+`Continue`/`Stop` fibers likewise retain their tagged mass. In a finite space,
+equal successor mass is the exact sum of its derivation masses.
+
+For an intensional or continuous law, the atom/configuration spaces and the
+validation, reconstruction, and quotient maps must carry closed measurable
+contracts. If the full applied-atom pushforward is valid but measurability of
+the semantic successor quotient cannot be established, application retains
+the source law and applied mapping, marks `successor_submeasure` as
+`Unavailable`, and never fabricates a pushforward. Finite closed spaces are
+measurable by construction.
 
 A probability law is never a draw. A realization request outside
 `SimpleProgram` supplies a replay key and representation/profile request. A
@@ -791,11 +879,11 @@ realized atom records:
 - the selected witness/atom or represented sample; and
 - enough evidence to replay and revalidate the full application result.
 
-Subkeys derive from root realization evidence, input branch lineage, Rule
-application identity, and semantic draw labels—not loop order or worker
-scheduling. Ambient RNG state is forbidden. Draw evidence remains result/trace
-metadata unless later Rule mechanics reads it, in which case the relevant
-state is explicitly stored in `C`.
+Subkeys derive from root realization evidence, the applied derivation's output
+trace lineage, Rule application identity, and semantic draw labels—not loop
+order or worker scheduling. Ambient RNG state is forbidden. Draw evidence
+remains result/trace metadata unless later Rule mechanics reads it, in which
+case the relevant state is explicitly stored in `C`.
 
 ### Fresh identity binding
 
@@ -805,6 +893,7 @@ application validates and binds them by the semantic structural scope:
 ```text
 FreshIdentity(
     input_configuration_identity,
+    canonical_rule_identity,
     derivation_witness,
     parent_or_interface,
     namespace,
@@ -850,8 +939,9 @@ graphs state alpha-equivalence/canonicalization explicitly.
 Fresh identities are stable semantic local keys, never ambient UUIDs, object
 addresses, global counters, traversal positions, branch-enumeration indices,
 or materialization order. A fresh reference is scoped by the validated input
-configuration's semantic identity, Rule derivation/witness identity, parent or
-interface, and a closed local namespace/key supplied by the replacement.
+configuration's semantic identity, canonical Rule identity,
+derivation/witness identity, parent or interface, and a closed local
+namespace/key supplied by the replacement.
 External trace lineage remains evidence and cannot alter the semantic
 reference. The result/application contract above fixes collision and
 cross-branch rules; codecs must represent the reference losslessly without
@@ -1024,6 +1114,13 @@ application may derive one canonically for evidence. This lineage scopes raw
 events and replay subkeys but does not alter the semantic configuration,
 Rule denotation, or fresh component identity. It is invocation data, not a
 sixth program component.
+
+`require_valid_program` derives an ephemeral compatibility certificate. Among
+its associated evidence is the configuration contract `C` shared by all five
+fields; `C` is not stored as `program.C`. Input and successor validation use
+that contract and the Alphabet. Successors need not belong to the Seed's
+initial support: Seed constrains sources, not the transition codomain.
+
 `ApplicationResult` contains the mapped Rule outcome space, applied
 derivations, semantic successor groups or an intensional successor relation,
 no-successor outcomes, measures, faults, and replay/provenance evidence.
@@ -1033,11 +1130,42 @@ records.
 The internal `commit` operation is a pure, family-blind structural operation:
 
 ```text
-commit(C, W, TotalDisposition[W], FreshBindings) -> C | Fault
+commit(
+    ReconstructionPlan[C, W],
+    C,
+    TotalDisposition[W],
+    FreshBindings,
+) -> C | Fault
 ```
 
 It is not configurable, public policy, proposal arbitration, or a place to
 infer construction mechanics.
+
+### Closed reconstruction plan
+
+Every resolved `W` carries a sealed, versioned
+`ReconstructionPlan[C, W]`: a snapshot-bound structural lens assembled from
+recognized loci, carrier, product, and region primitives. It is serializable
+and contains no host callback, family tag, catalog alias, solver, or semantic
+choice. Given a validated normalized disposition, it:
+
+- identifies the unique inside/outside decomposition induced by `W`;
+- preserves the entire outside projection;
+- covers every existing and fresh target exactly once;
+- applies all replacements, creations, and deletions simultaneously;
+- rebuilds one `C` while preserving occurrence/interface identity rules; and
+- for intensional spaces, denotes the same reconstruction as a closed
+  relation/map without forcing enumeration.
+
+The plan must prove or carry obligations for lens laws, unique target
+normalization, structural closure, and—when a probability law is present—
+measurability of its reconstruction map. It can rebuild a graph reroute,
+ordered insertion, field restriction, or symbolic/intensional overlay because
+those are typed replacement payloads plus structural lenses. It cannot choose
+a match, cascade a deletion, fill an unspecified gap, resolve an overlap, or
+select an endpoint. Those construction decisions already belong to Rule.
+Thus reconstruction supplies the generic meaning of “apply this explicit
+replacement”; it is not `UpdatePolicy`.
 
 ### Application law
 
@@ -1045,74 +1173,128 @@ The normative algorithm is:
 
 ```text
 apply(program, input):
-    p := require_valid_program(program)
-    s := freeze_and_validate(input.configuration, input.lineage, p)
+    p := program
+    compatibility := require_valid_program(p)
+    C_contract := compatibility.configuration_contract
+    s := freeze_and_validate(
+        input.configuration,
+        input.trace_lineage,
+        C_contract,
+        p.alphabet,
+    )
 
     w := validate_writable(
         p.frontier.resolve(s),
         snapshot=s.identity,
-        configuration=p.C,
+        configuration_contract=C_contract,
     )
     r := validate_readable(
         p.neighborhood.resolve(s),
         snapshot=s.identity,
-        configuration=p.C,
+        configuration_contract=C_contract,
     )
-    require_same_snapshot_and_declared_join(s, r, w, p.rule)
+    reconstruction := require_closed_reconstruction_plan(w, C_contract)
+    require_same_snapshot_and_declared_join(
+        s, r, w, reconstruction, compatibility
+    )
 
-    rr := p.rule.evaluate(r, w)
-    require_closed_rule_result(rr)
+    rr := p.rule.denote(r, w)
 
     if rr is Rejected(fault):
         return no_commit_application_result(fault, accumulated_evidence)
 
-    applied_atoms := map_closed(rr.outcome_space, atom ->
-        if atom is NoSuccessor:
-            validate_no_successor_atom(atom)
-            return atom
-
-        require_closed_witness(atom.witness, s, r, w, p.rule)
-        require_total_disposition(atom.replacement, w)
-        require_targets_and_effects_within(atom.replacement, w)
-        require_payloads_conform(atom.replacement, p.C, p.alphabet)
-        require_structural_edit_coherence(atom.replacement, s, w)
-
-        fresh := bind_and_validate_fresh(
-            s.configuration_identity, atom.witness, atom.replacement, w
-        )
-        candidate := commit(s.configuration, w, atom.replacement, fresh)
-        successor := validate_configuration(candidate, p)
-        require_progress_and_continuation_invariants(
-            atom, s.configuration, successor
-        )
-
-        return AppliedDerivation(
-            successor, atom, fresh, accumulated_evidence
-        )
+    # Phase 1: validate the whole closed Rule outcome space.
+    validated := validate_complete_rule_space(
+        rr.payload,
+        specialized_denotation=denotation_of(p.rule, r, w),
+        require_schema_tag_and_version=True,
+        require_soundness_and_coverage=True,
+        require_cardinality_certificate=True,
+        require_witness_provenance_outcome_evidence=True,
+        require_total_dispositions_and_authorized_effects=w,
+        require_payload_contracts=(C_contract, p.alphabet),
+        require_probability_support_normalization_and_measurability=True,
     )
 
-    require_complete_mapping_or_universal_conformance(applied_atoms)
-    groups := semantic_successor_quotient_after_witness_capture(applied_atoms)
-    atom_measure := push_forward_to_applied_atoms(rr, applied_atoms)
-    successor_measure := project_replacement_mass_to_successors(
-        atom_measure, groups
+    # Phase 2: bind fresh identities across every derivation.
+    fresh_space := bind_all_fresh_closed(
+        validated,
+        input_configuration_identity=s.configuration_identity,
+        canonical_rule_identity=identity(p.rule),
+        writable=w,
     )
 
-    return ApplicationResult(
-        rr, applied_atoms, groups, atom_measure, successor_measure, evidence
+    # Phase 3: reconstruct every alternative from the same old snapshot.
+    candidate_space := reconstruct_all_closed(
+        reconstruction,
+        s.configuration,
+        validated,
+        fresh_space,
     )
+
+    # Phase 4: validate every successor and progress/continuation assertion.
+    applied_atoms := validate_all_successors_closed(
+        candidate_space,
+        C_contract,
+        p.alphabet,
+        source=s.configuration,
+        output_lineage_from=(
+            input.trace_lineage,
+            identity(p),
+            identity(p.rule),
+        ),
+    )
+
+    # Phase 5: form exact views only after every witness is retained.
+    groups := semantic_successor_quotient_with_derivation_fibers(applied_atoms)
+    applied_atom_measure := push_forward_to_full_applied_atom_space(
+        validated.optional_probability_law,
+        applied_atoms,
+    )
+    successor_submeasure, no_successor_submeasure := project_submeasures(
+        applied_atom_measure,
+        groups,
+        renormalize=False,
+        retain_unavailable_mapping_evidence=True,
+    )
+
+    return Complete(ApplicationComplete(
+        source_outcomes=validated,
+        applied_atoms=applied_atoms,
+        no_successor_partition=partition_no_successor(applied_atoms),
+        outcome_atom_cardinality=cardinality(validated),
+        derivation_cardinality=derivation_cardinality(applied_atoms),
+        successor_cardinality=cardinality(groups),
+        successor_quotient_with_derivation_fibers=groups,
+        applied_atom_measure=applied_atom_measure,
+        successor_submeasure=successor_submeasure,
+        no_successor_submeasure=no_successor_submeasure,
+        evidence=accumulated_evidence,
+    ))
 ```
 
-`map_closed` enumerates a canonical finite space only when it is finite. For an
-intensional space it constructs a closed composition of verification, fresh
-binding, commit, and successor validation, backed by the Rule result's
-universal conformance evidence. It does not enumerate the relation or call a
-solver. Every realized member is revalidated at the same boundary.
+Each numbered operation is a **phase-wide closed pass**. No later phase runs
+when an earlier phase has any fault, and no successor becomes authoritative
+until its entire phase succeeds. A finite phase reports a canonical nonempty
+set of faults (or its canonical structurally least member), never the
+traversal-first failure. For an intensional space, each pass is a closed
+relation composition with a universal phase conformance obligation; every
+realized member is checked again at that boundary. This defines “the first
+failing phase” without implying enumeration order.
 
-All derivations read the same old snapshot and commit independently as
-alternative possible worlds. No derivation observes another's output. A
-finite result containing any invalid derivation rejects the complete result;
-valid branches are not silently kept while invalid branches are discarded. An
+Result-space validation includes exact schema/tag/version checks;
+soundness-and-coverage equivalence to the specialized Rule denotation;
+cardinality evidence; atom witness, provenance, outcome reason, and certificate
+validation; total disposition/effect/payload conformance; probability support,
+normalization, and measurable-space evidence; and canonical serialized fault
+tags/reasons. `Terminal(NoSolution)` and semantic divergence therefore require
+their own closed evidence. A partial solver enumeration cannot pass this
+phase.
+
+All derivations read the same old snapshot and reconstruct independently as
+alternative possible worlds. No derivation observes another's output. A finite
+result containing any invalid derivation rejects the complete result; valid
+branches are not silently kept while invalid branches are discarded. An
 intensional result without adequate universal obligations is rejected as
 unsupported/incomplete rather than trusted.
 
@@ -1120,14 +1302,17 @@ The semantic commit law for every successful derivation `d` is:
 
 ```text
 successor(d) | outside(W) = input | outside(W)
-successor(d) | inside(W)  = apply_total_disposition(input, d, fresh(d))
+successor(d) | inside(W)  = reconstruction(
+    input,
+    total_disposition(d),
+    fresh(d),
+)
 valid_C(successor(d))
 ```
 
-There is no mutation before all checks for one derivation succeed, and the
-immutable input is never modified. Failure evidence may report a proposed
-target or candidate, but no partial candidate becomes an authoritative
-successor.
+There is no mutation before all checks for the phase succeed, and the immutable
+input is never modified. Failure evidence may report a proposed target or
+candidate, but no partial candidate becomes an authoritative successor.
 
 ### Failure phases and no-commit rule
 
