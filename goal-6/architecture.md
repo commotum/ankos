@@ -443,9 +443,12 @@ Those are Rule semantics. A tagged active cell may help Frontier resolve the
 small complete envelope around it, but the tag and Rule still determine actual
 applicability and choice.
 
-A deletion targets an existing writable structural component and its affected
-interface. A creation targets an authorized fresh capability. Neither requires
-pre-existing coordinates for every future component.
+A deletion targets an existing writable structural component. Every resulting
+incident-edge, interface, default-fill, repair, or rewire effect must also be
+authorized by `W` and stated by the Rule replacement. Generic commit never
+silently cascades a deletion, repairs topology, fills a gap, or rewires an
+interface. A creation targets an authorized fresh capability. Neither
+operation requires pre-existing coordinates for every future component.
 
 Union, product, relative/dilated, matched-interface, dynamic-address,
 fresh-child, whole-region, and intensional combinators return one composed
@@ -485,7 +488,10 @@ grants read capability.
 Product, keyed, relative, path, span, match-context, global, historical,
 metric, differential, and intensional combinators return one composed
 ReadableRegion. Their resolution can remain lazy; neither the contract nor
-generic application requires flattening `R` into a finite list.
+generic application requires flattening `R` into a finite list. Here “lazy”
+means a closed, serializable intensional view or AST with defined membership
+and traversal semantics—not a Python iterator, generator, callback, or
+one-shot host object.
 
 ### Rule
 
@@ -496,19 +502,27 @@ view and writable capability:
 (R, W) -> RuleResult[C, W]
 ```
 
-At the contract level, `RuleResult` must be capable of denoting zero, one, many,
-probability-bearing, continuous, or intensional alternatives. Each alternative
-must contain enough closed replacement information that generic commit makes
-no construction-specific decision.
+At the contract level, `RuleResult` must be capable of denoting zero, one, or
+many alternatives, with finite or intensional presentation. A probability
+measure may weight those alternatives. An alternative's replacement may
+itself contain a continuous field, flow segment, symbolic solution, or other
+intensional structure; “continuous” describes that semantic object or its
+measure, not a separate result cardinality.
 
-The exact result variants, total-versus-explicit-preserve representation,
-witness/deduplication rules, outcomes, failures, fresh allocation, and commit
-algorithm are Stage 3 work. Stage 2 fixes these minimum requirements:
+The exact result variants, compact encodings, witness/deduplication rules,
+outcomes, failures, fresh allocation, and commit algorithm are Stage 3 work.
+Stage 2 fixes this denotational minimum: each alternative is a total
+disposition over `W`. Every existing writable capability is explicitly
+`Preserve`, `Replace`, or `Delete`; every fresh capability is explicitly
+`Absent` or `Create`. A sparse encoding is valid only when it declares one of
+those closed defaults for every omitted capability. Everything outside `W` is
+universally preserved.
 
-- every actual target is authorized by `W`;
+Consequently:
+
+- every actual target is authorized by `W`, and every member of `W` has a
+  disposition;
 - every written semantic value conforms to Alphabet;
-- each alternative denotes a complete atomic result, possibly through a closed
-  structural default such as explicit `Preserve`;
 - Rule declares all read requirements satisfied by `R`;
 - Rule owns applicability, clause priority, match selection, schedule,
   simultaneous/sequential meaning within one application, collision/conflict
@@ -527,6 +541,14 @@ Conditional, ordered-choice, product, parallel, relational-union,
 phase-controlled, and distribution combinators return one Rule. Any ordering,
 priority, overlap, or conflict behavior is explicit in that Rule descriptor;
 combining rules never creates an external update policy.
+
+Composition also cannot conceal a second engine. One Rule application denotes
+one closed macro-relation over the original `(R, W)` binding. A composed Rule
+may calculate intermediate terms from that old view, but it may not commit and
+reread intermediate configurations, consume an unrecorded draw, or expose a
+hidden schedule. If intermediate state, event order, or draw history is
+semantically observable, it appears as visible `C` across applications or as
+an explicit result witness/trace.
 
 Neither the contract nor generic application requires “run the Rule once per
 cell.” A local synchronous transform can contain a closed map-over-region
@@ -559,11 +581,13 @@ Identity is semantic where mechanics require it. Occurrences are not collapsed
 to equal values, bags retain multiplicity, ordered structures retain order, and
 graphs state alpha-equivalence/canonicalization explicitly.
 
-Fresh identities are structural, never ambient UUIDs or object addresses. A
-fresh reference is derived from a validated input identity, Rule/derivation
-slot, parent or interface, and local ordinal/namespace. Stage 3 fixes allocation
-and cross-branch rules; codecs must already be able to represent the reference
-losslessly.
+Fresh identities are stable semantic local keys, never ambient UUIDs, object
+addresses, global counters, traversal positions, branch-enumeration indices,
+or materialization order. A fresh reference is scoped by validated input
+lineage, Rule derivation/witness identity, parent or interface, and a closed
+local namespace/key supplied by the replacement. Stage 3 fixes collision and
+cross-branch rules; codecs must already represent the reference losslessly
+without first enumerating an intensional result set.
 
 ### Selector and region forms
 
@@ -659,13 +683,14 @@ Construction of `SimpleProgram[C, V, W, R]` must verify:
 3. Frontier accepts `C` and resolves a `W` whose existing/fresh target kinds
    are valid for the carrier and Alphabet.
 4. Neighborhood accepts the same `C` and resolves the `R` shape Rule declares;
-   any required anchor/index relationship between `R` and `W` is structurally
-   compatible.
+   both resolutions share a snapshot binding and canonical locus identities,
+   and Rule's declared `R`-to-`W` join/index shape is structurally compatible.
 5. Rule accepts exactly that `R` and `W`, emits replacements of `C`, and
    declares write/value/invariant requirements compatible with Frontier and
    Alphabet.
-6. Every declared Rule read dependency is supplied by Neighborhood; Frontier
-   is never counted as a read.
+6. The closed requirement/effect judgments prove
+   `reads(rule) ⊆ neighborhood` and `effects(rule) ⊆ frontier`; Frontier is
+   never counted as a read, and Neighborhood never authorizes an effect.
 7. Exact, represented, probabilistic, continuous, and symbolic profiles agree
    across all participating descriptors.
 8. Any required initialization or transition entropy interface is explicit
@@ -673,6 +698,11 @@ Construction of `SimpleProgram[C, V, W, R]` must verify:
 
 Compatibility uses structural type unification, capability inclusion, and
 closed requirements/effects—not class-name equality or family dispatch.
+Provable read, effect, or join mismatches are construction errors. When a
+symbolic/intensional inclusion is not decidable, the descriptor must carry a
+closed proof or conformance obligation that the implementation can validate;
+the application boundary still validates every realized target and resolved
+join. “Unknown” never degrades into assumed compatibility.
 
 ### 3. Configuration validity
 
@@ -689,6 +719,8 @@ Every realized Seed output and every proposed successor must validate:
 Stage 3 specifies the algorithm, but its contract must check:
 
 - Frontier and Neighborhood resolve against the same immutable `C`;
+- their snapshot binding, locus identities, and declared `R`-to-`W` join
+  validate;
 - Rule used no undeclared read capability;
 - actual replacements lie within `W`;
 - fresh identities and structural edits are valid;
@@ -732,10 +764,14 @@ neighborhood
 rule
 ```
 
-An outer envelope may carry schema version, provenance, catalog alias, and
-derived digest, but none changes semantic identity or substitutes for the
-expanded five-field payload. Catalog aliases may reconstruct or annotate the
-payload; execution never dispatches on the alias.
+Canonical program serialization always contains the validated, expanded five
+fields. An outer envelope may carry schema version, provenance, derived
+digest, and an optional catalog construction receipt, but none changes
+semantic identity or substitutes for that payload. A receipt is retained only
+after verifying that its alias and arguments reconstruct the same canonical
+five-field value. An alias-only recipe may be accepted as noncanonical
+construction input, but it is never an authoritative lossless encoding.
+Execution never dispatches on an alias.
 
 Exact encoding obligations include:
 
@@ -767,6 +803,21 @@ ID or retaining payload under a forged ID must fail or rederive the ID.
 ## Stage 2 Paper Type-Checks
 
 These examples test the contracts, not final constructor spelling.
+Each fixture must discharge the same judgment:
+
+```text
+seed : Seed[C]
+c ∈ support(seed)  =>  valid_C(c) ∧ values(c) ⊆ V
+frontier(c) = w : W
+neighborhood(c) = r : R
+same_snapshot(c, r, w) ∧ valid_join(r, w)
+rule(r, w) = Q : RuleResult[C, W]
+q ∈ Q  =>  targets(q) ⊆ W ∧ total_disposition(q, W)
+          ∧ valid_C(commit(c, q))
+```
+
+The concrete bindings and representative result obligation are stated for
+every fixture below; a suggestive field mapping alone is not a type-check.
 
 ### Ordinary cellular automaton — F053/T01
 
@@ -785,6 +836,12 @@ These examples test the contracts, not final constructor spelling.
   needs.
 - Rule is one closed local table lifted over `W`, returning one complete shared
   replacement.
+
+Judgment: for every valid seeded lattice `c`, `values(c) ⊆ V`,
+`frontier(c) = w`, and `neighborhood(c) = r` share site identities and the old
+snapshot. `rule(r, w)` returns complete dispositions for all output sites. A
+representative result replaces each site from its corresponding old stencil,
+targets exactly members of `w`, and commits to another valid lattice `C`.
 
 No `Domain`, `Shape`, `Boundary`, `Time`, or `UpdatePolicy` field is required:
 carrier extent and boundary data are in `C`, while synchronous-pass semantics
@@ -806,6 +863,14 @@ are in Rule.
 - Rule selects the applicable transition, explicitly preserves or rewrites
   every relevant member, and returns one coupled source/destination result.
 
+Judgment: for every valid exactly-one-head `c`, `values(c) ⊆ V`,
+`frontier(c) = w` and `neighborhood(c) = r` resolve from the same head and tape
+snapshot, and the transition join maps readable candidate identities to the
+same writable identities. In a representative move, the source and selected
+destination receive explicit dispositions, every other possible destination
+in `w` is explicitly preserved, all targets remain in `w`, and commit restores
+a valid exactly-one-head `C`.
+
 The tagged source determines activity inside Rule. There is no firing
 frontier, active-selector field, movement policy, or separate atomic update.
 
@@ -823,6 +888,15 @@ frontier, active-selector field, movement policy, or separate atomic update.
 - Neighborhood exposes exact match context and dangling interfaces.
 - Rule owns match choice, overlap/order semantics, and the complete
   interface-preserving replacement.
+
+Judgment: for every valid seeded structure `c`, stored labels satisfy `V`;
+`frontier(c) = w` includes the matched occurrences, every incident/interface
+effect, and stable fresh capabilities, while `neighborhood(c) = r` exposes
+those same occurrence identities in the old graph/tree. A representative
+result explicitly deletes matched components and affected incident structure,
+creates replacements under semantic fresh keys, and reconnects each external
+interface. Every delete/create/rewire target is in `w`, the disposition is
+total over `w`, and commit yields a well-formed `C`.
 
 Variable size, deletion, graph birth, and fresh identity fit structural `W`
 and `C`; no shape or graph-update axis is introduced.
@@ -842,32 +916,79 @@ and `C`; no shape or graph-update axis is introduced.
 - Rule denotes zero, one, many, or an intensional set of satisfying complete
   replacements in one application.
 
+Judgment: for every valid partial instance `c`, explicit known, unknown, and
+obligation values conform to `V`; `frontier(c) = w` is the complete unknown
+region and `neighborhood(c) = r` contains every referenced scope under the
+same occurrence identities. `rule(r, w)` denotes an intensional or realized
+set of alternatives. Each representative satisfying alternative replaces
+every unknown in `w`, is total rather than solver-order-dependent, targets
+only `w`, and commits to a valid completed `C`; unsatisfiability is zero
+alternatives, not an invalid sparse successor.
+
 Solver order, resource limit, realization bound, and query policy remain
 external. No Solver, ResultPolicy, or special relation-program class is needed.
 
-### Continuous flow/PDE relation — F037/F041
+### Continuous flow — F037
 
 | Type | Binding |
 |---|---|
-| `C` | Continuous state/field with structural domain, geometry, initial/boundary data, parameters, and explicit time when needed |
-| `V` | Exact, certified, represented-real, vector, tensor, or field values |
-| `W` | Whole evolving state or unknown continuous solution region |
-| `R` | Current state, geometry, boundary/side data, differential germs, and global dependencies |
+| `C` | Continuous state with domain/geometry, parameters, explicit time, and result/event slots |
+| `V` | Exact, certified, or explicitly represented scalar/vector/tensor and flow-segment values |
+| `W` | Evolving state, time, and any event/result slots for one flow application |
+| `R` | Current state/time, geometry, parameters, event surfaces, and required global data |
 
-- Seed supplies the initial/partial continuous object and exactness profile.
+- Seed supplies the initial continuous state, time, side data, and exactness
+  profile.
 - Alphabet prevents represented numerics from impersonating exact values.
-- Frontier denotes the complete continuous writable/unknown region
-  intensionally.
-- Neighborhood exposes the differential and nonlocal data in a closed view.
-- Rule denotes an admissible flow segment, next event, or zero/one/many
-  solution fields.
+- Frontier intensionally denotes every state, time, and event/result slot the
+  flow may update.
+- Neighborhood exposes the vector field inputs and event dependencies in a
+  closed view.
+- Rule denotes zero, one, or many admissible flow-segment/endpoint
+  replacements.
 
-Time is visible state or Rule variable, and a horizon/numerical solver is run
-policy. Continuous support requires neither a finite coordinate universe nor a
+Judgment: for every valid continuous `c`, represented values conform to `V`;
+`frontier(c) = w` and `neighborhood(c) = r` share the same state/time binding.
+A representative alternative writes an exact or qualified flow segment,
+endpoint state, advanced time, and event result into their declared slots,
+targets only `w`, gives every other writable slot an explicit disposition,
+and commits to a valid `C`.
+
+Time is visible state or a Rule variable, while horizon and numerical
+realization strategy are run policy.
+
+### General PDE relation — F041
+
+| Type | Binding |
+|---|---|
+| `C` | Partial continuous field with structural domain, geometry, equations, initial/boundary data, parameters, and explicit unknown roles |
+| `V` | Exact, certified, represented-real, vector, tensor, distribution, symbolic, or field values |
+| `W` | The complete unknown continuous solution field/parameter region |
+| `R` | Geometry, equations, known field restrictions, boundary/side data, differential germs, and global dependencies |
+
+- Seed supplies the partial field problem and exactness profile.
+- Alphabet represents known/unknown field roles and prevents approximation
+  profiles from masquerading as exact solutions.
+- Frontier intensionally denotes the whole unknown solution region.
+- Neighborhood supplies every local differential and global side condition.
+- Rule denotes zero, one, many, or an intensional family of complete solution
+  fields.
+
+Judgment: for every valid PDE instance `c`, all stored data conform to `V`;
+`frontier(c) = w` and `neighborhood(c) = r` share domain and field-component
+identities. A representative intensional alternative assigns the entire
+unknown field region in `w`, satisfies its declared equation and side-data
+obligations, targets no exterior component, and commits to a valid solution
+`C`. A numerical mesh is a qualified realization of that alternative, not the
+denotation silently substituted for it.
+
+Continuous support requires neither a finite coordinate universe nor a
 top-level Time or trajectory field.
 
-All five examples type-check without a sixth component. Together they exercise
-fixed support, coupled writes, dynamic support, global relations,
+All five requested construction classes type-check without a sixth component;
+the continuous class is deliberately split into flow and PDE fixtures because
+their writable/result obligations differ. Together they exercise fixed
+support, coupled writes, dynamic support, global relations,
 continuous/intensional regions, exactness, and one-shot semantics.
 
 ## Stage 1 Repository Baseline

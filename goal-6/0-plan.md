@@ -220,20 +220,26 @@ streams, RNG helpers, or visualization.
 - Stage 2 is complete. `goal-6/architecture.md` now defines
   `SimpleProgram[C, V, W, R]`, the five component protocols, configuration
   ownership, shared loci/region algebra, singular composition, four validation
-  layers, exact fail-closed serialization, and five family-shaped paper
-  type-checks.
+  layers, exact fail-closed serialization, and five construction-class paper
+  type-checks split into six concrete fixtures.
 - The full 60-family API mapping yielded no sixth-field counterexample. F010
   remains a wrapper role and F042 an observer role unless either is explicitly
   constructed as an ordinary result-writing program.
 - Frontier and Neighborhood resolve independently from the same immutable
-  configuration. They may reuse structural anchors; Frontier grants no read
-  capability and Neighborhood grants no write capability.
+  configuration but share its snapshot binding and canonical locus identities.
+  Rule declares their typed join; Frontier grants no read capability and
+  Neighborhood grants no write capability.
 - The canonical Rule signature consumes `R` and `W`, not unrestricted `C`.
-  Exact result variants and atomic commit semantics remain deliberately open
-  for Stage 3.
+  Every alternative already denotes a total disposition over `W`, and static
+  requirements prove or obligate both read and effect containment. Concrete
+  result variants and atomic commit semantics remain deliberately open for
+  Stage 3.
 - Stage 2 did not alter `api.md`, `simple_programs.md`, or
   `ref/notes/ca-scaffold.py`; their coherent public/reference cutover remains
   Stage 4 work after application semantics close.
+- Stage 2 verification passed all 102 runtime tests, whitespace/diff checks,
+  frozen Goal 2 hashes, and a hostile recheck of all 15 challenged contract
+  points.
 - Stage 3 (`3-APPLICATION`) is the first incomplete stage.
 
 ## Assumptions To Challenge

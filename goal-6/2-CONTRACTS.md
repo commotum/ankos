@@ -25,17 +25,18 @@ Status: **COMPLETE**
   Rule results; it does not require a sixth field or a public
   `configuration.py`.
 - Frontier and Neighborhood should resolve independently from the same
-  immutable `C`. They may reuse a closed anchor descriptor, while Rule checks
-  the compatibility of their resolved `W` and `R`.
+  immutable `C`, while retaining a shared snapshot binding and canonical locus
+  identities. Rule declares the required join between their resolved `W` and
+  `R`.
 - Plural component modules can compose primitives into one singular value for
   each stored field; lists of neighborhoods, frontiers, or rules are not
   additional axes.
 - Closed structural and intensional descriptors can cover infinite,
   continuous, stochastic, symbolic, graph, word, and tree semantics without
   callbacks or forced materialization.
-- Sparse-versus-total replacement representation, result variants,
-  witness/deduplication semantics, and exact commit mechanics must remain Stage
-  3 work.
+- Every Rule alternative must already denote a total disposition over `W`;
+  Stage 3 owns the concrete variants and compact encoding, witness and
+  deduplication semantics, outcomes, and exact commit mechanics.
 
 ## Big Picture Objective
 
@@ -85,9 +86,26 @@ Files changed:
   exact writes. Neighborhood remains independent read capability.
 - Rule has no unrestricted access to `C`; every state dependency must be in
   `R`, while `W` grants no implicit read capability.
+- Construction proves or carries a closed conformance obligation for both
+  `reads(rule) ⊆ neighborhood` and `effects(rule) ⊆ frontier`; application
+  still checks every realized join and target.
+- Each alternative is total over `W`: existing capabilities are
+  preserve/replace/delete, fresh capabilities are absent/create, and
+  everything outside `W` is preserved.
+- Structural deletion, creation, repair, and rewiring have explicit
+  capabilities and dispositions; generic commit performs no hidden cascade.
+- Rule composition remains one macro-relation over the old snapshot rather
+  than a concealed sequential executor.
+- Fresh identities do not depend on UUIDs, global counters, traversal,
+  materialization, or branch enumeration.
 - Rule is not assumed to run once per cell or frontier member.
 - Probability laws remain distinct from external realization keys and recorded
   draw evidence.
+- Lazy and extensible descriptors remain versioned, serializable structural
+  forms; Python protocols, generators, callbacks, and opaque implementations
+  are not semantic admission.
+- Canonical serialization always expands all five fields; an alias may survive
+  only as a verified construction receipt.
 - No runtime or test file, frozen Goal 2 file, root API narrative, or reference
   scaffold was changed.
 - Stage 2 states the minimum Rule result shape but does not preempt Stage 3's
@@ -110,12 +128,13 @@ Files changed:
       probability laws, and symbolic/intensional objects have honest closed
       representations.
 - [x] Cross-field validation rejects incompatible types, missing reads,
-      unauthorized write schemas, invalid values/invariants, hidden entropy,
-      and unsupported exactness.
+      unauthorized effect schemas, invalid joins, invalid values/invariants,
+      hidden entropy, and unsupported exactness.
 - [x] Serialization is versioned, canonical, lossless, exact, fail-closed, and
-      cross-cutting rather than a program field.
-- [x] Ordinary CA, mobile, structural rewrite, constraint, and continuous
-      examples type-check without a sixth field.
+      cross-cutting rather than a program field; aliases cannot replace the
+      expanded payload.
+- [x] Ordinary CA, mobile, structural rewrite, constraint, continuous-flow,
+      and PDE fixtures type-check without a sixth field.
 - [x] The next stage can define Rule results and generic application without
       reopening component ownership.
 
@@ -133,9 +152,10 @@ class SimpleProgram(Generic[C, V, W, R]):
     rule: Rule[R, W, C]
 ```
 
-Both region descriptors resolve independently from the same immutable `C`.
-They may share structural anchors, and Rule consumes the resulting `R` and `W`
-without receiving an undeclared state-reading channel.
+Both region descriptors resolve independently from the same immutable `C` but
+share its snapshot binding and canonical locus identities. Rule declares their
+required join and consumes the resulting `R` and `W` without receiving an
+undeclared state-reading channel.
 
 ### Ownership decisions
 
@@ -171,6 +191,23 @@ F010 remains a wrapper role unless given its own explicit state transition.
 F042 remains an observer unless represented as a one-shot result-writing
 transform. Neither requires another component.
 
+### Hostile-review closure
+
+- Seed products compose named structural components without implying
+  independent probability laws; product laws and coupled laws are explicit,
+  and draw evidence lives in initialization results/traces unless mechanics
+  later reads it as visible `C`.
+- Alphabet validates stored values without absorbing carrier absence,
+  deletion, locus identity, topology, or Rule transition semantics.
+- Representation-changing media remain `C -> C` through tagged-phase or
+  product carriers with explicit input/work/output slots.
+- Result cardinality is zero/one/many with finite or intensional presentation;
+  probability measures weight alternatives, while continuous fields, flows,
+  and symbolic solutions are replacement contents rather than a cardinality.
+- The flow fixture writes state/time/event slots and returns a flow
+  segment/endpoint; the PDE fixture writes the whole unknown field and may
+  return an intensional family of complete solutions.
+
 ### Design-input disposition
 
 - Retained from `simple_programs.md`: writable Frontier, readable
@@ -184,8 +221,8 @@ transform. Neither requires another component.
   Frontier, arbitrary Neighborhood, Rule-owned update semantics, and
   zero/one/many relational pressure.
 - Rejected/deferred from it: `UpdatePolicy`, per-frontier-member engine loops,
-  collapsed empty-result meanings, and its unresolved sparse-versus-total
-  replacement sketches.
+  collapsed empty-result meanings, and sparse writes without a total
+  disposition default. Stage 3 chooses the concrete compact representation.
 - Retained from `ref/notes/ca-scaffold.py`: ownership-first documentation,
   frozen inspectable descriptors, normalization, composition, and the
   primitives-to-alias progression.
@@ -194,12 +231,27 @@ transform. Neither requires another component.
 
 ### Verification evidence
 
-- All five required paper type-checks are recorded in
-  `goal-6/architecture.md`.
+- All five required construction classes are type-checked in
+  `goal-6/architecture.md`, with continuous flow and PDE relations separated
+  into six concrete fixtures.
+- A fresh hostile recheck found all 15 challenged points closed and no
+  remaining Stage 2 contradiction or missing component contract.
 - The canonical architecture distinguishes descriptor, denotation, resolution,
   and realization; singular program fields from plural constructor modules;
   and raw selectors from read/write capabilities.
-- Stage 3 is the first incomplete stage. It owns the complete Rule result
-  algebra, atomic application law, outcome/cardinality distinctions,
-  witness/deduplication semantics, probability realization, and run/tool
-  boundary.
+- `PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p
+  no:cacheprovider tests` passed all 102 runtime tests.
+- `git diff --check 318a5383cea0898421db3993257e5aec24b7f7dd --
+  GOALS.md goal-6` passed, and the three inspected Goal 6 documents contain an
+  even 24 Markdown fence lines.
+- Both the baseline-to-worktree and current-worktree scoped diffs for
+  `src/ca`, `tests`, `goal-2`, and `pyproject.toml` are empty.
+- Goal 2's frozen handoff and README retain their Stage 1 SHA-256 values
+  `5792ac1810dafdd0be6343e1d03c4b1ab20c48551efd73400fea5a1812a9f192`
+  and
+  `e063609c7a52d32bd0a4d3bb384cd5da233c34f57a169e2db6cce197c76e0c4d`.
+- Stage 3 is the first incomplete stage. It owns concrete Rule-result variants
+  and encodings, the atomic application law, outcome/cardinality
+  distinctions, witness/deduplication semantics, probability realization, and
+  the run/tool boundary; it may not reopen total dispositions, static
+  read/effect containment, or the snapshot join.
