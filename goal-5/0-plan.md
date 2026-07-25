@@ -556,7 +556,7 @@ serious candidates.
 
 ### 9-SATURATION
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/9-SATURATION.md`.
 
 #### Big Picture Objective
 
@@ -583,6 +583,8 @@ initial consolidation.
 - No identical verification rerun or per-chapter search archive is created.
 
 ### 10-RECONCILE
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
