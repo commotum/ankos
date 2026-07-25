@@ -217,7 +217,9 @@ streams, RNG helpers, or visualization.
 - The Stage 1 runtime baseline is 102 passing tests, `src/ca` tree
   `6e6b34769d60508c03d0a69fad1ede4fef75e217`, and `tests` tree
   `02ad081e039a46efbf61855fdeae60abb7bb70ad`.
-- Stage 2 (`2-CONTRACTS`) is the first incomplete stage.
+- Stage 2 (`2-CONTRACTS`) is in progress from clean autosave commit
+  `73ab93730681f6f127c904108b669383e01edc00`; the Stage 1 runtime, tests, and
+  Goal 2 tree hashes remain unchanged.
 
 ## Assumptions To Challenge
 
