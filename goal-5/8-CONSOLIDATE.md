@@ -74,5 +74,29 @@ candidate clusters.
 
 ## Stage Results
 
-- Pending.
-
+- Classified the 1,413 inherited leads in four disjoint ranges. The raw
+  source-row result was 106 serious, 822 resolved, 485 weak, and zero
+  unreviewed.
+- Resolved all 17 later dependencies after Chapters 8–12 were available:
+  seven remained serious mechanics, eight collapsed into already represented
+  mechanics, and two lacked an executable rule.
+- Split the two overpacked Chapter 8 source groups before final membership.
+  Crystal-growth material became DLA, its conserved-particle CA realization,
+  and a continuous boiling CA; fracture material became a minimum-path
+  relation, spring-failure dynamics, a CA preset, and stochastic binary
+  fragmentation.
+- Merged exact or mechanically parameterized aliases before fingerprinting,
+  including numeric map variants, synchronous local-state automata, block
+  automata, independent substitutions, stochastic CA, differential-equation
+  variants, local constraints, register-machine variants, tag variants, and
+  finite codecs.
+- The terminal register now contains 188 serious source leads, 867 resolved
+  leads, and 508 weak leads. The serious leads form 94 directly reviewable
+  mechanics candidates with complete fingerprints.
+- Created `candidates.md` and `source-decision-matrix.csv`. Every `L0001–L1563`
+  row has one terminal status and decision; every serious row maps to exactly
+  one candidate; candidate IDs and matrix membership agree.
+- Deleted the four ephemeral batch files after validating exact, disjoint
+  coverage. No predecessor taxonomy, catalog, API, or runtime material was
+  opened.
+- Structural checks and `git diff --check` passed.

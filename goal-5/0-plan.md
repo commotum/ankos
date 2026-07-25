@@ -522,7 +522,7 @@ Use the Index as a compact omission and alias challenge.
 
 ### 8-CONSOLIDATE
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/8-CONSOLIDATE.md`.
 
 #### Big Picture Objective
 
@@ -555,6 +555,8 @@ serious candidates.
   because of a Book label.
 
 ### 9-SATURATION
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
