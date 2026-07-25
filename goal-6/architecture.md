@@ -702,10 +702,16 @@ Each `Derivation` contains one already resolved, conflict-free
 `TotalDisposition[W]`:
 
 ```text
-existing capability -> Preserve | Replace(value) | Delete
-fresh capability    -> Absent   | Create(structure)
+existing capability -> Preserve | Replace(payload) | Delete
+fresh capability    -> Absent   | Create(payload)
 outside W           -> Preserve
 ```
+
+The payload is typed by the writable capability. It may be an
+Alphabet-conforming stored value, a whole component, edge/incidence record,
+order relation, span, field restriction, or other closed structural
+replacement validated by `C`. Thus rerouting an existing edge or changing
+stored order is explicit without pretending topology is an Alphabet value.
 
 Sparse wire/storage form is permitted only with a closed default that makes
 this total meaning recoverable. Duplicate or contradictory dispositions,
@@ -734,9 +740,12 @@ of enumeration:
   verify the atom and reproduce its complete disposition.
 
 Application captures an `AppliedDerivation` before any successor
-canonicalization. It retains the Rule witness, input branch lineage, raw
+canonicalization. It retains the Rule witness, input trace lineage, raw
 replacement, fresh bindings, progress/continuation, source provenance, and
-any realization evidence.
+any realization evidence. Trace lineage is evidence, not hidden configuration:
+it cannot change the denotational Rule result, structural fresh identities, or
+semantic successor equality. If ancestry affects later mechanics, it is
+visible state in `C`.
 
 Only then may successors be grouped. Deduplication uses the configuration
 contract's exact semantic equality or an explicitly declared sound
@@ -763,11 +772,14 @@ discarded. Arbitrary scores, complex amplitudes, objective weights, and
 unnormalized factors are distinct value/annotation algebras and grant no
 sampling authority until a Rule explicitly constructs a probability measure.
 
-Atomic application pushes the measure through validated fresh binding,
-commit, and semantic successor grouping. In a finite space, equal successor
-mass is the exact sum of its derivation masses. In an intensional space, the
-result is the closed pushforward measure and retained derivation fibers; no
-enumeration is required.
+Atomic application first pushes the measure to the full tagged
+`AppliedAtom` space, preserving all replacement, terminal, undefined,
+declared-failure, divergence, progress, and continuation mass. Successor
+grouping is a second projection of the replacement-atom portion only. In a
+finite space, equal successor mass is the exact sum of its derivation masses;
+no-successor and mixed-continuation mass remains separately addressable. In an
+intensional space, both are closed pushforward measures with retained
+derivation fibers; no enumeration is required.
 
 A probability law is never a draw. A realization request outside
 `SimpleProgram` supplies a replay key and representation/profile request. A
@@ -788,11 +800,11 @@ state is explicitly stored in `C`.
 ### Fresh identity binding
 
 Rule replacements name fresh components with closed local keys. Generic
-application validates and binds them by the structural scope:
+application validates and binds them by the semantic structural scope:
 
 ```text
 FreshIdentity(
-    input_lineage,
+    input_configuration_identity,
     derivation_witness,
     parent_or_interface,
     namespace,
@@ -806,7 +818,9 @@ counters, branch indices, traversal, or materialization order. The fresh
 component plus every created incident/interface relation must be present in
 `W` and in the total disposition. If `C` declares those identities
 alpha-renamable, canonical successor equality may later quotient the names;
-the raw binding and witness remain available for replay.
+the raw binding, witness, and separate trace lineage remain available for
+replay. Two semantically equal inputs cannot acquire different semantic
+successors merely because they arrived through different external trace paths.
 
 ## Shared Loci and Region Algebra
 
@@ -835,11 +849,13 @@ graphs state alpha-equivalence/canonicalization explicitly.
 
 Fresh identities are stable semantic local keys, never ambient UUIDs, object
 addresses, global counters, traversal positions, branch-enumeration indices,
-or materialization order. A fresh reference is scoped by validated input
-lineage, Rule derivation/witness identity, parent or interface, and a closed
-local namespace/key supplied by the replacement. The result/application
-contract above fixes collision and cross-branch rules; codecs must represent
-the reference losslessly without first enumerating an intensional result set.
+or materialization order. A fresh reference is scoped by the validated input
+configuration's semantic identity, Rule derivation/witness identity, parent or
+interface, and a closed local namespace/key supplied by the replacement.
+External trace lineage remains evidence and cannot alter the semantic
+reference. The result/application contract above fixes collision and
+cross-branch rules; codecs must represent the reference losslessly without
+first enumerating an intensional result set.
 
 ### Selector and region forms
 
@@ -1003,10 +1019,11 @@ apply(
 ```
 
 `ApplicationInput` supplies one immutable configuration snapshot and validated
-branch lineage. Seed realization supplies a root lineage; direct application
-may derive a canonical root from the validated program and configuration when
-no distinct semantic instance identity is requested. It is invocation data,
-not a sixth program component.
+trace lineage. Seed realization supplies a root trace lineage; direct
+application may derive one canonically for evidence. This lineage scopes raw
+events and replay subkeys but does not alter the semantic configuration,
+Rule denotation, or fresh component identity. It is invocation data, not a
+sixth program component.
 `ApplicationResult` contains the mapped Rule outcome space, applied
 derivations, semantic successor groups or an intensional successor relation,
 no-successor outcomes, measures, faults, and replay/provenance evidence.
@@ -1057,11 +1074,11 @@ apply(program, input):
         require_closed_witness(atom.witness, s, r, w, p.rule)
         require_total_disposition(atom.replacement, w)
         require_targets_and_effects_within(atom.replacement, w)
-        require_values_conform(atom.replacement, p.alphabet)
+        require_payloads_conform(atom.replacement, p.C, p.alphabet)
         require_structural_edit_coherence(atom.replacement, s, w)
 
         fresh := bind_and_validate_fresh(
-            s.lineage, atom.witness, atom.replacement, w
+            s.configuration_identity, atom.witness, atom.replacement, w
         )
         candidate := commit(s.configuration, w, atom.replacement, fresh)
         successor := validate_configuration(candidate, p)
@@ -1076,9 +1093,14 @@ apply(program, input):
 
     require_complete_mapping_or_universal_conformance(applied_atoms)
     groups := semantic_successor_quotient_after_witness_capture(applied_atoms)
-    measures := push_forward_any_probability_law(rr, applied_atoms, groups)
+    atom_measure := push_forward_to_applied_atoms(rr, applied_atoms)
+    successor_measure := project_replacement_mass_to_successors(
+        atom_measure, groups
+    )
 
-    return ApplicationResult(rr, applied_atoms, groups, measures, evidence)
+    return ApplicationResult(
+        rr, applied_atoms, groups, atom_measure, successor_measure, evidence
+    )
 ```
 
 `map_closed` enumerates a canonical finite space only when it is finite. For an
@@ -1114,7 +1136,7 @@ Every rejected/incomplete application names the first failing generic phase:
 | Phase | Representative faults |
 |---|---|
 | Program | Unknown descriptor/version, incompatible five-field contracts |
-| Input | Invalid carrier/value/invariant or invalid/forged root lineage |
+| Input | Invalid carrier/value/invariant or invalid/forged trace lineage |
 | Frontier | Invalid capability, target kind, or snapshot binding |
 | Neighborhood | Invalid read view, missing dependency, or snapshot binding |
 | Join | Mismatched identities/index shape or unresolved obligation |
