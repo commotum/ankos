@@ -240,7 +240,9 @@ streams, RNG helpers, or visualization.
 - Stage 2 verification passed all 102 runtime tests, whitespace/diff checks,
   frozen Goal 2 hashes, and a hostile recheck of all 15 challenged contract
   points.
-- Stage 3 (`3-APPLICATION`) is the first incomplete stage.
+- Stage 3 (`3-APPLICATION`) is the first incomplete stage and is now in
+  progress from clean autosave commit
+  `96305d362eb5a05e1abb79faf4473c6017566e91`; Stages 4–7 remain untouched.
 
 ## Assumptions To Challenge
 
@@ -409,6 +411,8 @@ before allowing file layout or examples to harden accidental semantics.
   and continuous example type-checks on paper against the contracts.
 
 ### 3-APPLICATION
+
+Status: **IN PROGRESS — result/application contract under specification**
 
 #### Big Picture Objective
 
