@@ -204,7 +204,9 @@ family membership, and API fit:
   itself contain canonical file and line anchors, so Stage 1 must translate
   those IDs through the data-only source-unit map and derive the corresponding
   source text from canonical Markdown.
-- Chapter 8 still needs a compact, source-grounded Goal 5 closure.
+- Chapter 8 now has a compact, source-grounded Goal 5 closure: all 18 headings
+  are covered, its 75 inherited and four new leads are accounted for, and only
+  two mechanics-bearing figures required original-resolution inspection.
 - Chapters 9–12, their Notes, and the Index still require the lean protocol.
 - The final consolidation, reconciliation, family inventory, API-pressure
   analysis, hostile review, and census have not been completed.
@@ -214,6 +216,10 @@ family membership, and API fit:
   source-anchored `UNREVIEWED` leads in approximately 532 KB, and
   `coverage.md` accounts for all 29 discovery documents without importing
   predecessor judgments.
+- Stage 2 is complete. The register now contains 1,492 leads. Chapter 8 closes
+  with 28 serious leads, 28 resolved leads, 11 weak leads, and 12 explicit
+  later-stage dependencies; these counts are lead dispositions, not type
+  counts.
 
 ## Assumptions To Challenge
 
@@ -341,7 +347,7 @@ through a compact, conclusion-free raw-lead projection.
 
 ### 2-CH08-CLOSE
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/2-CH08-CLOSE.md`.
 
 #### Big Picture Objective
 
@@ -372,6 +378,8 @@ repairing or reviving prior audit machinery.
 - No per-paragraph negative ledger or predecessor transaction repair exists.
 
 ### 3-CH09
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 

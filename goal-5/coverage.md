@@ -33,8 +33,8 @@ that no inherited lead cites the document.
 | `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md` | 9/9 | `INHERITED` | — | 121 |
 | `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` | 10/10 | `INHERITED` | — | 82 |
 | `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 10/10 | `INHERITED` | — | 81 |
-| `CHAPTERS/08-Implications-for-Everyday-Systems.md` | 0/9 | `CLOSE NEXT` | 2 | 24 |
-| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 0/9 | `CLOSE NEXT` | 2 | 51 |
+| `CHAPTERS/08-Implications-for-Everyday-Systems.md` | 9/9 | `COMPLETE` | 2 | 25 |
+| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 9/9 | `COMPLETE` | 2 | 54 |
 | `CHAPTERS/09-Fundamental-Physics.md` | 0/17 | `PENDING` | 3 | 0 |
 | `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md` | 0/16 | `PENDING` | 3 | 0 |
 | `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` | 0/14 | `PENDING` | 4 | 0 |
@@ -48,4 +48,3 @@ that no inherited lead cites the document.
 
 `Contents.md` and `README.md` are navigation documents rather than discovery
 documents and are not part of the 29-document coverage denominator.
-
