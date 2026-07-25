@@ -43,7 +43,7 @@ that no inherited lead cites the document.
 | `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md` | 11/11 | `COMPLETE` | 5 | 6 |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` | 13/13 | `COMPLETE` | 6 | 8 |
 | `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md` | 13/13 | `COMPLETE` | 6 | 12 |
-| `BACK-MATTER/Index.md` | 0/1 | `PENDING CHECKLIST` | 7 | 0 |
+| `BACK-MATTER/Index.md` | 1/1 | `COMPLETE CHECKLIST` | 7 | 0 |
 | `BACK-MATTER/Colophon.md` | 1/1 | `INHERITED` | — | 0 |
 
 `Contents.md` and `README.md` are navigation documents rather than discovery

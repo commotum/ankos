@@ -60,5 +60,67 @@ dispositioning all 5,484 entries.
 
 ## Stage Results
 
-- Pending.
+### Checked families
 
+The bounded checklist covered:
+
+- cellular, block, continuous, probabilistic, reversible, sequential/
+  asynchronous, second-order, totalistic, mobile, fluid, and lattice-gas
+  automata;
+- substitution, sequential substitution, string rewriting, multiway, tag,
+  cyclic-tag, multiway-tag, symbolic, grammar, classifier, Markov, and normal
+  algorithms;
+- network evolution/substitution, graph rewriting, network constraints, causal,
+  random, trivalent, directed, sequential, and mobile-network systems;
+- arithmetic and iterated-map systems, register/program machines, ordered
+  fraction systems/Fractran, recursive/partial functions, minimization,
+  Diophantine relations, and continued fractions;
+- continuous systems/computation, coupled-map lattices, ODE/PDE/continuum
+  equations, Navier–Stokes, Lorenz, reaction–diffusion, Einstein equations,
+  path integrals, and variational principles;
+- random/self-avoiding walks, aggregation/DLA, Eden growth, percolation,
+  deposition, branching, crystal growth, phyllotaxis, fracture, drainage,
+  shells, and curvature;
+- constraints, tilings, PCP/correspondence systems, sequence equations,
+  satisfiability/CNF, axiom/operator systems, word problems, sorting networks,
+  self-assembly, and shortest paths;
+- compression codecs, dithering, linear prediction, hashing, signal/image
+  processing, randomness tests, backtracking, sideways CA evolution,
+  cryptanalysis, and Boolean minimization;
+- matrix/associative memory, neural networks, nearest-neighbor retrieval,
+  Voronoi diagrams, Hamming/error-correcting codes, and memory encodings; and
+- computation interfaces, stored-program machines, Turing/nondeterministic/
+  quantum machines, combinators, lambda calculus, compilers, emulation,
+  halting, and partial functions.
+
+### Alias outcomes
+
+- Asynchronous CA resolves through the Index's sequential-CA terminology.
+- Second-order CA resolves through reversible CA.
+- Graph rewriting resolves through `Networks` → evolution/substitution.
+- Coordinate evaluation resolves through finite automata, formulas for nesting,
+  and substitution systems.
+- Intrinsic synchronization resolves through CA synchronization and dataflow.
+- Inverse CA procedures resolve through backtracking, cryptanalysis, and
+  sideways evolution.
+- Associative retrieval resolves through matrix memories and nearest-neighbor
+  algorithms.
+- Unbounded minimization resolves through general recursive and partial
+  functions.
+- Error diffusion resolves through dithering/halftoning, distinct from ordered
+  threshold dithering.
+
+### Completion
+
+- Every mechanics family retained in Stages 2–6 has an Index entry or explicit
+  broader/alias route.
+- No Index entry established a source-grounded omitted mechanism.
+- No lead or status change was required.
+- Six minor wording choices—coordinate automaton, error diffusion, graph
+  rewriting, intrinsic synchronization, unbounded minimization, and associative
+  memory—remain discoverability aliases for the final handoff, not taxonomy
+  questions.
+- The Index was not read or dispositioned line by line, no hit dump was
+  retained, and the whole-book saturation pass remains reserved for Stage 9.
+- `coverage.md` marks the Index checklist complete.
+- Next: Stage 8, `CONSOLIDATE`.

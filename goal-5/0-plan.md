@@ -238,6 +238,9 @@ family membership, and API fit:
   headings and add 12 compact leads: eight serious, two weak, and two explicit
   later dependencies. Principles, impossibility results, proof arguments, and
   named mathematical instances remain outside the construction count.
+- Stage 7 is complete. A bounded Index checklist covered every discovered
+  mechanics family and its explicit aliases without reviewing 5,484 entries
+  line by line. It found no source-grounded omitted mechanism and added no lead.
 
 ## Assumptions To Challenge
 
@@ -494,7 +497,7 @@ Discover construction-bearing mechanics in Chapter 12 and its Notes.
 
 ### 7-INDEX-CHECK
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/7-INDEX-CHECK.md`.
 
 #### Big Picture Objective
 
@@ -518,6 +521,8 @@ Use the Index as a compact omission and alias challenge.
 - No line-by-line Index ledger is created.
 
 ### 8-CONSOLIDATE
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
