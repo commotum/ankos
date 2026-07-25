@@ -47,7 +47,7 @@ families.
 
 - Reconciled all 45 rows exactly once against the frozen candidate inventory.
   Final family normalization yields 15 canonical family rows, 21 retained
-  presets, two aliases, two merges, two repairs, two retired semantic roles,
+  presets, two aliases, two merges, three repairs, one retired semantic role,
   and one split.
 - Current catalog rows directly cover 23 candidates. Of the other 79, 56 are
   source-grounded candidate additions, 16 are mechanically covered by an
@@ -100,7 +100,7 @@ families.
 | T38 | Variable-Index Recursive Sequences | retain-preset | C078 |
 | T39 | Number-Theoretic Filtering Systems | retain-family | C035 |
 | T40 | Mathematical-Constant Digit Systems | split | C003,C017 |
-| T41 | Function-Combination Systems | retire-role | C072 |
+| T41 | Function-Combination Systems | repair | C072 |
 | T42 | Continued-Fraction-Driven Substitution Systems | retain-preset | C061 |
 | T43 | Iterated Maps | retain-family | C037 |
 | T44 | Continuous Cellular Automata | alias | C090 |

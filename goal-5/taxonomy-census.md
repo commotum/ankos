@@ -122,9 +122,9 @@ Every current catalog row received exactly one disposition:
 | Retain as family | 15 |
 | Retain as preset | 21 |
 | Merge | 2 |
-| Repair | 2 |
+| Repair | 3 |
 | Alias | 2 |
-| Retire semantic role | 2 |
+| Retire semantic role | 1 |
 | Split | 1 |
 
 The changes with architectural consequences are:
@@ -137,8 +137,8 @@ The changes with architectural consequences are:
   output or property;
 - alias T32 to local satisfaction relations and T44 to synchronous local-state
   automata;
-- retire the T41 catalog role name while retaining recursive function
-  evaluation as executable family F047; and
+- repair T41 from the role-like “function combination” label to executable
+  recursive function evaluator F047; and
 - split T40 between append-only generation and digit-emitting register
   transduction.
 

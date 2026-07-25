@@ -705,7 +705,9 @@ conclusions.
 
 ### 14-CENSUS
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/14-CENSUS.md`,
+`goal-5/taxonomy-census.md`, `goal-5/api-pressure.md`, and
+`goal-5/integration-handoff.md`.
 
 #### Big Picture Objective
 

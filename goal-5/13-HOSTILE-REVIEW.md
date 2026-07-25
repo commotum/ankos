@@ -28,7 +28,7 @@ mechanics-bearing reason:
 | ID | Finding | Resolution |
 |---|---|---|
 | G5-HR-01 | L1556 wrongly treated a fully executable fixed comparison network as weak and omitted its mechanics-bearing figure. | Promoted L1556 to serious candidate C095. Broadened F014 to fixed finite-arity gate circuits, explicitly including non-injective compare-exchange, reversible Boolean, and unitary gates. Added the figure and complete five-field mapping. |
-| G5-HR-02 | Five `retain-family` catalog actions contradicted the final family merges. | Normalized T09 and T25 as presets under T12/F031, T16 under T20/F052, T28 under T14/F005, and T34 under T43/F027. Final row dispositions are 15 family, 21 preset, 2 merge, 2 repair, 2 alias, 2 retire-role, and 1 split. Updated every affected matrix action. |
+| G5-HR-02 | Five `retain-family` catalog actions contradicted the final family merges. | Normalized T09 and T25 as presets under T12/F031, T16 under T20/F052, T28 under T14/F005, and T34 under T43/F027. A final consistency check also repaired T41 into executable F047 after its candidate was restored. Final row dispositions are 15 family, 21 preset, 2 merge, 3 repair, 2 alias, 1 retire-role, and 1 split. Updated every affected matrix action. |
 | G5-HR-03 | F004 was excluded merely because its causal network is derived from an event history, despite executable source code and a concrete graph-building commit. | Promoted C010/F004 to executable proposed family `event-provenance-causal-network`. Kept it distinct from F049: F004 consumes ordered producer provenance, while F049 samples spacetime events, derives geometric precedence, and performs transitive reduction. |
 | G5-HR-04 | F039 separated feature extraction and ordered dithering from cellular automata by output purpose rather than mechanics. | Removed F039. Routed C044 and C059 as presets of broadened F053 `synchronous-local-state-transform`: every output locus reads a bounded immutable old-state window plus fixed metadata and commits one shared pass. |
 | G5-HR-05 | F013 combined seven source mechanisms, iterative look-and-say, and XOR encryption under the application label “codec.” | Narrowed F013/C026 to maximal-run record transduction, retained C075 as its feedback preset, split C026's other six already recorded fingerprints into C097–C102/F057–F062, and made C094 the root of F063 aligned-XOR transduction. The eight resulting families have distinct acting loci, readable state, schedules, and write shapes. |
@@ -111,4 +111,3 @@ above.
 - Both suspicious figures have a recorded taxonomy-bearing reason.
 - No second or nested hostile-review framework was created.
 - No serious hostile objection remains unresolved.
-
