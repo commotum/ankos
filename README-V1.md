@@ -1,5 +1,10 @@
 # ankos
 
+> **Status:** This is a retained earlier runtime snapshot, not current package
+> documentation or target architecture. See [`README-V2.md`](README-V2.md)
+> for the implemented 0.1.0 runtime and [`api.md`](api.md) for the five-field
+> target pending Goal 7.
+
 ANKoS ("A New Kind of Science") is a Python project for running
 cellular-automaton experiments inspired by Wolfram's book. Import it as `ca`.
 

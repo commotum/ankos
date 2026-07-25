@@ -87,7 +87,8 @@ Stages 2 and 3.
 | `goal-6/goal-7-handoff.md` | Stage 7 file-level implementation plan |
 | `goal-2/` | Frozen historical comparison baseline; never current instructions |
 | `GOALS.md` | Live status and execution sequence only |
-| `README-V2.md` | Documentation for the currently implemented 0.1 runtime until Goal 7 cutover |
+| `README-V2.md` | Published documentation for the implemented 0.1 runtime, with an explicit pointer to the Goal 7 target |
+| `README-V1.md` | Clearly marked retained earlier runtime snapshot; never current or target instructions |
 
 Stage reports record evidence. They do not become competing specifications.
 
@@ -169,11 +170,11 @@ This table proves that no Goal 2 subsystem is silently unreviewed.
 | `neighborhoods.py` | Preserved file, generalized read contract |
 | `rules.py`, `updates.py` | Rule descriptors preserved; update semantics absorbed into Rule/results and generic commit |
 | `seeds.py` | Preserved and generalized from event-zero data to configuration sources/laws |
-| `outcomes.py`, `traces.py` | Semantics preserved in `rules.py`, `program.py`, and auxiliary `rollout.py`; no public files by these names |
+| `outcomes.py`, `traces.py` | Semantics preserved in `rules.py` and `program.py`; no public files by these names |
 | `expressions.py`, `relations.py`, `queries.py` | Closed data strengths preserved; sibling ontology rejected in favor of five-field programs and external run/query policy |
 | `serialization.py` | Preserved as a root cross-cutting codec boundary |
 | `specs.py` | Replaced by `program.py` and `SimpleProgram` |
-| `rollout.py` | Generic traversal intent preserved; exact file/public ownership settled in Stage 4 |
+| `rollout.py` | Generic traversal moves under the `program.py` public boundary; the conflicting public submodule is retired during Goal 7 |
 | `datasets.py`, `rng.py`, `viz/` | Downstream behavior preserved until Goal 7; internal reorganization deferred |
 | `tests/conformance/` | One-obligation rigor preserved, expanded and reorganized around reusable mechanics and 60-family coverage |
 
@@ -583,18 +584,28 @@ application-side records belong to `program.py`.
 
 ### Conceptual sum
 
-One generic envelope is used before and after commit:
+The two boundaries use parallel but separately owned public sums:
 
 ```text
-ResultEnvelope[P] =
-    Complete(P)
-  | Rejected(Fault)
-
 RuleResult[C, W] =
-    ResultEnvelope[OutcomeSpace[RuleAtom[C, W]]]
+    RuleComplete(OutcomeSpace[RuleAtom[C, W]])
+  | RuleRejected(RuleFault)
 
 ApplicationResult[C] =
-    ResultEnvelope[ApplicationComplete[C]]
+    ApplicationComplete(
+        source_outcomes: OutcomeSpace[RuleAtom],
+        applied_atoms: SupportSpace[AppliedAtom],
+        no_successor_partition: SupportSpace[AppliedNoSuccessor],
+        outcome_atom_cardinality: Cardinality,
+        derivation_cardinality: Cardinality,
+        successor_cardinality: Cardinality,
+        successor_quotient_with_derivation_fibers: SuccessorSpace[C],
+        applied_atom_measure: MeasureView[AppliedAtom],
+        successor_submeasure: MeasureView[SuccessorGroup[C]],
+        no_successor_submeasure: MeasureView[AppliedNoSuccessor],
+        evidence: ApplicationEvidence,
+    )
+  | ApplicationRejected(ApplicationFault)
 
 RuleAtom[C, W] =
     Derivation(
@@ -621,20 +632,6 @@ AppliedAtom[C] =
     )
   | AppliedNoSuccessor(source: NoSuccessor, output_trace_lineage, evidence)
 
-ApplicationComplete[C] = {
-    source_outcomes: OutcomeSpace[RuleAtom],
-    applied_atoms: SupportSpace[AppliedAtom],
-    no_successor_partition: SupportSpace[AppliedNoSuccessor],
-    outcome_atom_cardinality: Cardinality,
-    derivation_cardinality: Cardinality,
-    successor_cardinality: Cardinality,
-    successor_quotient_with_derivation_fibers: SuccessorSpace[C],
-    applied_atom_measure: MeasureView[AppliedAtom],
-    successor_submeasure: MeasureView[SuccessorGroup[C]],
-    no_successor_submeasure: MeasureView[AppliedNoSuccessor],
-    evidence: ApplicationEvidence,
-}
-
 MeasureView[P] =
     Absent
   | Available(Measure[P])
@@ -645,30 +642,38 @@ SuccessorGroup[C] = semantic_equivalence_class_or_intensional_point
                     + complete_applied_derivation_fiber
 ```
 
+The parallel shapes do not imply one public generic envelope.
+`RuleComplete`, `RuleRejected`, and `RuleFault` are owned by `rules.py`;
+`ApplicationComplete`, `ApplicationRejected`, and `ApplicationFault` are
+owned by `program.py`. The latter may retain a source `RuleFault` as evidence,
+but `rules.py` never imports `program.py`.
+
 The derived `no_successor_partition` may of course be empty; it is a typed
 projection of a validated Rule support—possibly intensional and of
 undetermined cardinality—not a standalone claim that an exact empty Rule
 result is meaningful.
 
 `MeasureView` has exact invariants. With no source probability law, all three
-views are `Absent`. With a source law and `Complete` application, the full
+views are `Absent`. With a source law and `ApplicationComplete`, the full
 applied-atom measure and its tagged no-successor submeasure are `Available`.
 The successor-group submeasure is also `Available` when the quotient is
 measurable; only that derived view may be `Unavailable` when quotient
 measurability cannot be established. An invalid source law or applied mapping
 rejects the application rather than producing `Unavailable`.
 
-`Complete` means that its payload is authoritative at that boundary.
-For a Rule result, the represented atoms are both sound in and covering of the
+`RuleComplete` and `ApplicationComplete` mean that their payload is
+authoritative at its boundary. For a Rule result, the represented atoms are
+both sound in and covering of the
 specialized denotation `⟦Rule⟧(R, W)`, up to the descriptor's declared exact
 equivalence. For an application result, every generic phase has completed and
 the payload above retains both the pre-quotient derivations and every derived
 view. An intensional presentation can be complete while its cardinality is
 undecidable; completeness is coverage, not enumerability.
 
-`Rejected` means there is no authoritative denotation or successor space to
-commit or expose at that boundary. `RuleResult` can originate Rule-denotation
-or result-schema faults; `ApplicationResult` can additionally originate
+`RuleRejected` or `ApplicationRejected` means there is no authoritative
+denotation or successor space to commit or expose at that boundary.
+`RuleResult` can originate Rule-denotation or result-schema faults;
+`ApplicationResult` can additionally originate
 earlier program/input/region faults or later fresh/commit/successor/quotient
 faults. Denotational Rule/application faults are closed invalid-data/result,
 unsupported-exactness/capability, or evaluation-failure variants with phase,
@@ -787,8 +792,8 @@ merely the absence of a found member. If soundness or coverage cannot be
 validated, the boundary returns a typed unsupported/incomplete rejection.
 
 A solver may return verified members, samples, or a certified complete finite
-realization, but a partial enumeration never masquerades as the complete
-outcome space.
+realization, but a partial enumeration never masquerades as
+`RuleComplete`.
 
 ### Closed Rule denotation
 
@@ -1147,16 +1152,17 @@ One application is the only semantic execution primitive:
 ```text
 apply(
     program: SimpleProgram[C, V, W, R],
-    input: ApplicationInput[C],
+    input: C | ApplicationInput[C],
 ) -> ApplicationResult[C]
 ```
 
 `ApplicationInput` supplies one immutable configuration snapshot and validated
 trace lineage. Seed realization supplies a root trace lineage; direct
-application may derive one canonically for evidence. This lineage scopes raw
-events and replay subkeys but does not alter the semantic configuration,
-Rule denotation, or fresh component identity. It is invocation data, not a
-sixth program component.
+application of a raw `C` derives one canonically for evidence. The public
+wrapper normalizes both forms to `ApplicationInput` before the normative
+algorithm begins. This lineage scopes raw events and replay subkeys but does
+not alter the semantic configuration, Rule denotation, or fresh component
+identity. It is invocation data, not a sixth program component.
 
 `require_valid_program` derives an ephemeral compatibility certificate. Among
 its associated evidence is the configuration contract `C` shared by all five
@@ -1219,11 +1225,15 @@ The normative algorithm is:
 ```text
 apply(program, input):
     p := program
+    a := normalize_application_input(
+        input,
+        derive_direct_root_lineage_if_absent=True,
+    )
     compatibility := require_valid_program(p)
     C_contract := compatibility.configuration_contract
     s := freeze_and_validate(
-        input.configuration,
-        input.trace_lineage,
+        a.configuration,
+        a.trace_lineage,
         C_contract,
         p.alphabet,
     )
@@ -1256,8 +1266,11 @@ apply(program, input):
 
     rr := p.rule.denote(r, w)
 
-    if rr is Rejected(fault):
-        return no_commit_application_result(fault, accumulated_evidence)
+    if rr is RuleRejected(fault):
+        return ApplicationRejected(
+            from_rule_fault(fault),
+            accumulated_evidence,
+        )
 
     # Phase 1: validate the whole closed Rule outcome space.
     validated := validate_complete_rule_space(
@@ -1313,7 +1326,7 @@ apply(program, input):
         retain_unavailable_mapping_evidence=True,
     )
 
-    return Complete(ApplicationComplete(
+    return ApplicationComplete(
         source_outcomes=validated,
         applied_atoms=applied_atoms,
         no_successor_partition=partition_no_successor(applied_atoms),
@@ -1325,7 +1338,7 @@ apply(program, input):
         successor_submeasure=successor_submeasure,
         no_successor_submeasure=no_successor_submeasure,
         evidence=accumulated_evidence,
-    ))
+    )
 ```
 
 Each numbered operation is a **phase-wide closed pass**. No later phase runs
@@ -1507,9 +1520,12 @@ src/ca/
     └── dynamica.py
 ```
 
-The existing `rollout.py` remains adjacent **tooling** behind the root
-`ca.rollout` callable. Its survival does not add a semantic component, change
-the locked core/catalog tree, or promise a `ca.rollout.*` namespace.
+The locked tree deliberately has no public `rollout.py`: a package cannot
+reliably promise both callable `ca.rollout(...)` and a `ca.rollout` submodule
+without attribute shadowing. The target rollout callable, request/result
+records, and traversal contract therefore belong to `program.py`. Goal 7
+folds or privatizes the current tensor-oriented `rollout.py`; no public
+replacement module is added.
 
 ### Cohesive file responsibilities
 
@@ -1521,14 +1537,13 @@ the locked core/catalog tree, or promise a `ca.rollout.*` namespace.
 | `seeds.py` | `Seed` descriptors for exact, constructive, partial, probabilistic-law, and intensional initial configurations; source composition | Ambient draws, rollout horizons, dataset sampling, or transition behavior |
 | `frontiers.py` | `WritableRegion`, writable capability resolution, structural write schemas, fresh namespaces, composition, and presets | Firing-site selection, reads, collision resolution, or commit policy |
 | `neighborhoods.py` | `ReadableRegion`, identity-preserving read views, composition, and local/global/structural/differential presets | Writes, update policy, or unrestricted access to the configuration |
-| `rules.py` | `Rule`, closed Rule constructors/combinators, `RuleResult`, support/cardinality/law records, total dispositions, Rule atoms, witnesses, provenance, progress, and continuation | Committing configurations, choosing samples, solver execution, rollout, or catalog dispatch |
-| `program.py` | Exactly-five-field `SimpleProgram`, compatibility evidence, `ApplicationInput`, `ApplicationResult` and applied records, family-blind `apply`, private reconstruction plans, validation, atomic commit, and successor quotient | Component catalogs, horizon policy, solvers, renderers, datasets, or family-specific engines |
+| `rules.py` | `Rule`, `RuleComplete`/`RuleRejected`/`RuleFault`, support/cardinality/law records, total dispositions, Rule atoms, witnesses, provenance, progress, continuation, and closed Rule constructors/combinators | Committing configurations, choosing samples, solver execution, rollout, or catalog dispatch |
+| `program.py` | Exactly-five-field `SimpleProgram`; compatibility evidence; `ApplicationInput`; `ApplicationComplete`/`ApplicationRejected`/`ApplicationFault` and applied records; family-blind `apply`; private reconstruction, validation, commit, and quotient; `RolloutRequest`, `RolloutResult`, raw trace graph, Seed realization request, and callable `rollout` derived only from `apply` | Component catalogs, hidden sampling, solvers, renderers, datasets, or family-specific engines |
 | `serialization.py` | Versioned fail-closed codecs for expanded programs, components, results, evidence, traces, and verified receipts | A sixth field, catalog resolution, alias execution, or semantic dispatch |
 | `py.typed` | Empty PEP 561 marker declaring that distributed type information is supported | Runtime symbols or behavior |
 | `catalog/entries.py` | Descriptive entry metadata, stable IDs, provenance, canonical homes, search, and alias/preset/compatibility relations | Program identity or execution dispatch |
 | Six catalog category files | Canonical whole-program constructors for their locked navigation mechanic | Runtime subclasses, alternate engines, or duplicated component primitives |
 | `catalog/__init__.py` | Explicit category namespaces, metadata lookup, and collision-free convenience constructor re-exports | Implicit discovery, wildcard registration, or dispatch |
-| `rollout.py` | `RolloutRequest`, `RolloutResult`, raw trace/application graph records, Seed realization requests, and traversal implemented only by repeated `program.apply` | A program field, one-step semantics, family switches, rendering, or dataset planning |
 
 `WritableRegion` and `ReadableRegion` are the canonical component type names.
 The field names remain `frontier` and `neighborhood`, and the plural modules
@@ -1538,8 +1553,12 @@ do not define competing contracts.
 
 The Rule/application split is intentional: `rules.py` owns everything before
 commit; `program.py` owns validation and the applied result after mapping the
-Rule space through generic reconstruction. That division makes separate public
-`replacement.py`, `results.py`, or `engine.py` modules unnecessary.
+Rule space through generic reconstruction. Each owns its own complete/rejected
+sum so the lower-level Rule module never imports application records. Program
+also owns the small traversal contract because rollout is a public operation
+on programs, not another semantic component. That division makes separate
+public `replacement.py`, `results.py`, `engine.py`, `rollout.py`, or `run.py`
+modules unnecessary.
 
 ### Dependency direction
 
@@ -1552,7 +1571,7 @@ loci + alphabets
 seeds + frontiers + neighborhoods
        |
        v
-rules -> program -> rollout
+rules -> program
 
 semantic owners -------------> serialization
 component modules + program -> catalog category modules
@@ -1570,7 +1589,8 @@ are:
   Rule constructor;
 - `program.py` imports the five component contracts and Rule-side result
   algebra, but never catalog metadata;
-- `rollout.py` calls `program.apply`; `program.py` never calls rollout;
+- `program.rollout` traverses only by calling the same owned `apply`
+  operation; it contains no second one-step path;
 - the catalog imports core constructors, while core application never imports
   the catalog;
 - downstream datasets, RNG helpers, and visualization may consume programs
@@ -1584,11 +1604,13 @@ codec envelope, but the canonical payload and decoder remain expanded and
 alias-independent.
 
 There is consequently no public `configuration.py`, `regions.py`,
-`replacement.py`, `results.py`, `engine.py`, `run.py`, or `updates.py`.
+`replacement.py`, `results.py`, `engine.py`, `rollout.py`, `run.py`, or
+`updates.py`.
 Configuration structure is carried by Seed output and shared loci/Alphabet
 contracts; raw region structure belongs to `loci.py`; Rule-side results belong
 to `rules.py`; application-side results and atomic execution belong to
-`program.py`; repeated traversal belongs behind `ca.rollout`.
+`program.py`; repeated traversal is the owned `program.rollout` function
+re-exported as `ca.rollout`.
 
 ### Root and module-qualified spelling
 
@@ -1613,9 +1635,9 @@ ca.rollout
 ```
 
 Public record types remain importable from their owners—for example,
-`ca.rules.RuleResult` and `ca.program.ApplicationResult`—rather than all being
-duplicated at package root. Component constructors are always module
-qualified:
+`ca.rules.RuleResult`, `ca.program.ApplicationResult`, and
+`ca.program.RolloutResult`—rather than all being duplicated at package root.
+Component constructors are always module qualified:
 
 ```python
 ca.neighborhoods.eca()       # one ReadableRegion component
@@ -1662,10 +1684,10 @@ not proof of termination. More specialized query, solver, resource, pruning,
 or view requests remain typed tooling over the returned denotation rather than
 extra keywords that silently change the program.
 
-Advanced request/result records may be imported from the auxiliary
-`ca.rollout` module path, but the promised everyday package attribute
-`ca.rollout` is the callable above. There is no synonymous `run`, `step`, or
-family-specific executor.
+Advanced request/result records are imported from `ca.program`. The package
+attribute `ca.rollout` has only one meaning: the callable above. There is no
+public same-named submodule, synonymous `run`/`step`, or family-specific
+executor.
 
 ### Catalog construction, aliases, and collisions
 
@@ -1676,7 +1698,8 @@ Category-qualified construction is always available:
 ca.catalog.automata.eca(rule=30)
 ```
 
-`catalog/__init__.py` may explicitly re-export a unique preferred spelling:
+`catalog/__init__.py` explicitly re-exports each unique preferred spelling,
+including:
 
 ```python
 ca.catalog.eca(rule=30)
@@ -1706,7 +1729,7 @@ The current runtime is migration evidence, not target authority:
 |---|---|
 | `specs.py` and `Dynamics` | Replace with `program.py` and five-field `SimpleProgram`; any temporary compatibility façade must immediately expand and cannot preserve a second executor |
 | Family decoding in `specs.py` | Move construction to closed component/catalog constructors or canonical codecs; remove executor registry behavior |
-| Tensor/family branches and `apply_rule` in `rollout.py` | Replace with traversal over `program.apply`; keep only rollout requests/results and generic traversal |
+| Tensor/family branches and `apply_rule` in `rollout.py` | Move the generic traversal contract, records, and root callable to `program.py`; fold or privatize remaining helpers and retire the public submodule name |
 | `RawEpisode` and `RawBatch` | Not canonical core records; Stage 7 may adapt them temporarily at the rollout/dataset boundary while downstream consumers migrate |
 | Broad root constructor exports | Narrow to the façade above; any compatibility exports are explicit, deprecated, and unable to shadow canonical spellings |
 | Current loci/Alphabet/Seed/Frontier/Neighborhood/Rule classes | Evolve in place into the closed generalized contracts; do not create a parallel package |
@@ -1744,6 +1767,20 @@ semantic result type.
 
 Serialization is cross-cutting infrastructure, not a component, semantic axis,
 or execution registry.
+
+Public decoding has one fail-closed shape owned by `serialization.py`:
+
+```text
+DecodeResult[T] =
+    Decoded(value: T)
+  | DecodeRejected(fault: DecodeFault)
+
+serialization.loads(data) -> DecodeResult[T]
+```
+
+`DecodeFault` distinguishes malformed data, unknown tag/version/primitive,
+invalid descriptor, unsupported exactness, and lossy or unavailable migration.
+Decoding never returns a partially initialized semantic object.
 
 Every semantic node must have:
 
@@ -1801,8 +1838,8 @@ ambient locale, NumPy dtype defaults, and machine floating behavior cannot
 enter semantic identity.
 
 Version migration is accepted only when total, validated, and lossless for the
-claimed semantic profile. Otherwise decoding returns a typed unsupported or
-invalid result; it never fills old fields with convenient defaults.
+claimed semantic profile. Otherwise decoding returns `DecodeRejected`; it
+never fills old fields with convenient defaults.
 
 Program IDs and digests are derived from validated canonical structure. They
 are cache/provenance aids, never authority. Mutating payload under a retained

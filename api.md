@@ -108,9 +108,9 @@ constructor has exactly one source owner in one of six navigation modules:
 | `ca.catalog.criteria` | Admissibility, constraints, witnesses, solutions, or weighted alternatives |
 | `ca.catalog.dynamica` | Continuous differential, field, event, or flow laws |
 
-For example, `eca` is owned by `ca.catalog.automata` and may be re-exported as
-`ca.catalog.eca`. These modules are for navigation and constructor ownership,
-not runtime classes.
+For example, `eca` is owned by `ca.catalog.automata` and is explicitly
+re-exported as `ca.catalog.eca`. These modules are for navigation and
+constructor ownership, not runtime classes.
 
 Every canonical constructor, parameter preset, compatibility name, and alias
 returns an ordinary five-field `SimpleProgram` and expands through ordinary
@@ -176,17 +176,25 @@ Rule data and its result relation.
 
 ### Rule results
 
-The public result model distinguishes a complete denotation from a rejected
-boundary:
+Each public boundary distinguishes a complete denotation from a rejected
+boundary with its own owned variants:
 
 ```text
-Complete(payload)
-Rejected(fault)
+RuleResult =
+    RuleComplete(outcome_space)
+  | RuleRejected(rule_fault)
+
+ApplicationResult =
+    ApplicationComplete(applied_result)
+  | ApplicationRejected(application_fault)
 ```
 
-The envelope and application records are owned by `ca.program`; Rule-result
-records and atoms are owned by `ca.rules`. They remain public there rather
-than being flattened into the root namespace.
+`RuleComplete`, `RuleRejected`, `RuleFault`, and Rule atoms are owned by
+`ca.rules`. `ApplicationComplete`, `ApplicationRejected`, `ApplicationFault`,
+and applied records are owned by `ca.program`. The parallel sums deliberately
+do not share a public envelope that would reverse the `rules -> program`
+dependency. They remain public under their owners rather than being flattened
+into the root namespace.
 
 A complete Rule result has finite or intensional support containing:
 
@@ -225,7 +233,8 @@ missing structural effect.
 | Partial mathematical domain | Typed `Undefined` atom |
 | Construction-defined failure | Typed `DeclaredFailure` atom |
 | Proven semantic noncompletion | Typed `Divergent` atom with certificate |
-| Invalid or unsupported boundary | `Rejected(fault)` with no authoritative successors |
+| Invalid or unsupported Rule boundary | `RuleRejected(fault)` with no authoritative denotation |
+| Invalid or unsupported application boundary | `ApplicationRejected(fault)` with no authoritative successors |
 
 An exact zero-replacement result is never a bare empty list. It carries a
 typed `NoSuccessor` atom. An intensional relation may instead be complete with
@@ -349,9 +358,10 @@ One-shot functions, constraint completions, media transforms, and many
 continuous relations are normally consumed with `ca.apply`, not mandatory
 rollout.
 
-The public callable is `ca.rollout`. The existing `rollout.py` remains the
-auxiliary implementation behind that root function, but the target API does
-not promise a `ca.rollout` module namespace or a `run.py`.
+The public callable and its `RolloutRequest`/`RolloutResult` records are owned
+by `ca.program`; `ca.rollout` is the convenience re-export. Goal 7 folds or
+privatizes the current tensor-oriented `rollout.py`, so no same-named public
+submodule can shadow the callable. There is no `run.py`.
 
 ## Serialization
 
@@ -360,8 +370,19 @@ execution registry:
 
 ```python
 payload = ca.serialization.dumps(same_kind_of_program)
-restored = ca.serialization.loads(payload)
+decoded = ca.serialization.loads(payload)
+
+match decoded:
+    case ca.serialization.Decoded(value=restored):
+        ...
+    case ca.serialization.DecodeRejected(fault=fault):
+        ...
 ```
+
+The exact failure shape is
+`DecodeResult[T] = Decoded[T] | DecodeRejected[DecodeFault]`. Unknown tags,
+versions, fields, primitives, and lossy migrations are typed decode
+rejections, not partially restored values or implicit defaults.
 
 The canonical program payload always contains the validated, expanded
 `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule` fields.
@@ -387,8 +408,7 @@ machine floating behavior are never semantic identity.
 
 ## Package and Import Ownership
 
-The target package surface is the locked semantic core/catalog plus one
-adjacent rollout-tooling file:
+The target package surface is the locked semantic core and catalog:
 
 ```text
 src/ca/
@@ -401,7 +421,6 @@ src/ca/
 ├── neighborhoods.py
 ├── rules.py
 ├── serialization.py
-├── rollout.py                  # auxiliary tooling, not a program component
 ├── py.typed
 └── catalog/
     ├── __init__.py
@@ -417,15 +436,14 @@ src/ca/
 | File or namespace | Cohesive responsibility |
 |---|---|
 | `ca.__init__` | Root façade and stable re-exports |
-| `program.py` | `SimpleProgram`, application inputs/results, `apply`, validation, and private family-blind reconstruction/commit |
+| `program.py` | `SimpleProgram`; application and rollout inputs/results; `apply` and `rollout`; validation; private family-blind reconstruction/commit and traversal |
 | `loci.py` | Shared closed locus, identity, selector, and region vocabulary |
 | `alphabets.py` | Alphabet descriptors, composition, and presets |
 | `seeds.py` | Seed descriptors, composition, and presets |
 | `frontiers.py` | WritableRegion descriptors, capability resolution, composition, and presets |
 | `neighborhoods.py` | ReadableRegion descriptors, read resolution, composition, and presets |
 | `rules.py` | Rule descriptors, Rule results/atoms, total dispositions, composition, and presets |
-| `serialization.py` | Versioned canonical codecs and migrations |
-| `rollout.py` | Non-semantic traversal implementation behind the root callable |
+| `serialization.py` | Versioned canonical codecs, typed decode results, and migrations |
 | `py.typed` | Static-typing package marker; no runtime behavior |
 | `catalog/entries.py` | Descriptive constructor/alias/provenance metadata |
 | six catalog modules | Canonical whole-program constructor ownership |
@@ -438,14 +456,13 @@ The root façade re-exports only:
 - the `program`, `loci`, plural component, `serialization`, and `catalog`
   module namespaces.
 
-Application/result records remain under `ca.program`; Rule result records and
+Application/rollout records remain under `ca.program`; Rule result records and
 atoms remain under `ca.rules`. Component constructors remain under their
 plural modules, and whole-program constructors remain under `ca.catalog`.
 
 There is no need for public `configuration.py`, `replacement.py`, `results.py`,
-`engine.py`, or `run.py`. Their legitimate responsibilities are already owned
-by Seed-produced configurations, `rules.py`, `program.py`, and the root
-rollout boundary.
+`engine.py`, `rollout.py`, or `run.py`. Their legitimate responsibilities are
+already owned by Seed-produced configurations, `rules.py`, and `program.py`.
 
 ## Deliberately Deferred Auxiliaries
 

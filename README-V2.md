@@ -1,5 +1,11 @@
 # ankos
 
+> **Runtime status:** This README documents the currently implemented 0.1.0
+> runtime and its tests. The settled five-field target API is specified in
+> [`api.md`](api.md) and remains pending Goal 7 implementation. The runtime
+> axes and examples below are therefore current usage, not target
+> architecture.
+
 ANKoS is a small Python lab for the central experiment in *A New Kind of
 Science*: take a very simple rule, run it for a while, and look at what it
 actually does.
@@ -296,8 +302,8 @@ src/ca
 The shortest path through the code is:
 
 ```text
-README.md -> src/ca/specs.py -> src/ca/neighborhoods.py
-          -> src/ca/rules.py -> src/ca/rollout.py
+README-V2.md -> src/ca/specs.py -> src/ca/neighborhoods.py
+             -> src/ca/rules.py -> src/ca/rollout.py
 ```
 
 For seed experiments, add `src/ca/seeds.py`. For coordinate behavior, start in

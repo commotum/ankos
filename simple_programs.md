@@ -314,11 +314,12 @@ Application denotes one complete transition relation. It does not choose a
 time horizon, solver, sample, numerical method, branch, projection, or
 rendering.
 
-A trajectory is a path through repeated applications. Rollout starts from a
-Seed realization and reapplies the same family-blind operation to continuing
-successor-and-lineage fibers. Deterministic programs produce a path,
-multiway programs produce a branching or intensional path space, and
-stochastic programs additionally carry measures or replayable samples.
+A trajectory is a path through repeated applications. Rollout starts from the
+Seed result space unless the caller supplies an explicit valid initial
+configuration, then reapplies the same family-blind operation to continuing
+successor-and-lineage fibers. Deterministic programs produce a path, multiway
+programs produce a branching or intensional path space, and stochastic
+programs additionally carry measures or replayable samples.
 
 A rollout bound truncates traversal; it does not prove terminality. Likewise,
 an external solver or numerical budget may return partial evidence or resource

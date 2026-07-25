@@ -35,13 +35,11 @@ class LocusKind(Enum):
     FIELD_POINT = "field-point"
     FRESH = "fresh"
 
-
 @dataclass(frozen=True)
 class Locus:
     kind: LocusKind
     scope: str
     path: tuple[Exact, ...]
-
 
 class Primitive(Enum):
     ENUM = "enum"
@@ -53,14 +51,12 @@ class Primitive(Enum):
     DISTRIBUTION = "distribution"
     DIFFERENTIAL = "differential"
 
-
 @dataclass(frozen=True)
 class Expr:
     """One recognized, versioned node in a closed semantic AST."""
 
     primitive: Primitive
     arguments: tuple[Exact | Locus | "Expr", ...]
-
 
 class RegionKind(Enum):
     LITERAL = "literal"
@@ -70,7 +66,6 @@ class RegionKind(Enum):
     UNION = "union"
     FRESH_CHILDREN = "fresh-children"
     INTENSIONAL = "intensional"
-
 
 @dataclass(frozen=True)
 class Region:
@@ -112,12 +107,10 @@ class loci:
 class Alphabet(Generic[V]):
     descriptor: Expr
 
-
 @dataclass(frozen=True)
 class Boundary:
     policy: str
     exterior: Exact | None = None
-
 
 @dataclass(frozen=True)
 class BinaryLine:
@@ -125,11 +118,9 @@ class BinaryLine:
     boundary: Boundary
     support_identity: str
 
-
 @dataclass(frozen=True)
 class ExactSeed(Generic[C]):
     configuration: C
-
 
 @dataclass(frozen=True)
 class SourceExpr:
@@ -137,22 +128,18 @@ class SourceExpr:
     support: Region
     boundary: Boundary | None = None
 
-
 @dataclass(frozen=True)
 class Seed(Generic[C]):
     source: ExactSeed[C] | SourceExpr
-
 
 @dataclass(frozen=True)
 class WritableRegion(Generic[C, W]):
     descriptor: Region
 
-
 @dataclass(frozen=True)
 class ReadableRegion(Generic[C, R]):
     descriptor: Region
     result_shape: tuple[str, ...]
-
 
 @dataclass(frozen=True)
 class Rule(Generic[R, W, C]):
@@ -286,7 +273,6 @@ class CatalogEntry:
     canonical_name: str
     aliases: tuple[str, ...]
 
-
 class entries:
     elementary_cellular_automaton = CatalogEntry(
         stable_id="automata.elementary-cellular-automaton",
@@ -296,7 +282,9 @@ class entries:
     )
 
 
-# catalog/__init__.py re-exports unique names from the six category modules.
+# `substitua.py`, `machina.py`, `media.py`, `criteria.py`, and `dynamica.py`
+# own their corresponding whole-program constructors in exactly the same way.
+# catalog/__init__.py re-exports unique names from all six category modules.
 class catalog:
     elementary_cellular_automaton = staticmethod(
         automata.elementary_cellular_automaton
@@ -313,15 +301,15 @@ class Disposition(Enum):
     ABSENT = "absent"
     CREATE = "create"
 
-
-class Outcome(Enum):
+class Progress(Enum):
     ADVANCED = "advanced"
     QUIESCENT = "quiescent"
+
+class NoSuccessorOutcome(Enum):
     TERMINAL = "terminal"
     UNDEFINED = "undefined"
     DECLARED_FAILURE = "declared-failure"
     DIVERGENT = "divergent"
-
 
 class Cardinality(Enum):
     EXACTLY_ZERO = "exactly-zero"
@@ -329,21 +317,36 @@ class Cardinality(Enum):
     MANY = "many"
     UNDETERMINED = "undetermined"
 
-
 @dataclass(frozen=True)
 class Write(Generic[W, V]):
     target: W
     disposition: Disposition
     payload: V | Expr | None
 
+@dataclass(frozen=True)
+class Continue:
+    """Continue this derivation in rollout."""
 
 @dataclass(frozen=True)
-class RuleAtom(Generic[W, V]):
-    replacement: tuple[Write[W, V], ...] | None
-    outcome: Outcome
-    continues: bool
+class Stop:
+    reason: str
+
+Continuation: TypeAlias = Continue | Stop
+
+@dataclass(frozen=True)
+class Derivation(Generic[W, V]):
+    replacement: tuple[Write[W, V], ...]
+    progress: Progress
+    continuation: Continuation
     witness: str
 
+@dataclass(frozen=True)
+class NoSuccessor:
+    outcome: NoSuccessorOutcome
+    reason: str
+    witness: str
+
+RuleAtom: TypeAlias = Derivation[W, V] | NoSuccessor
 
 @dataclass(frozen=True)
 class OutcomeSpace(Generic[A]):
@@ -353,24 +356,26 @@ class OutcomeSpace(Generic[A]):
     soundness_and_coverage: str
     probability_law: tuple[Fraction, ...] | None = None
 
-
 @dataclass(frozen=True)
-class Rejected:
+class RuleFault:
     phase: str
     reason: str
     evidence: tuple[str, ...]
 
+@dataclass(frozen=True)
+class RuleRejected:
+    fault: RuleFault
 
 @dataclass(frozen=True)
-class Complete(Generic[P]):
-    payload: P
+class RuleComplete(Generic[W, V]):
+    outcomes: OutcomeSpace[RuleAtom[W, V]]
 
+RuleResult: TypeAlias = RuleComplete[W, V] | RuleRejected
 
 @dataclass(frozen=True)
 class ApplicationInput(Generic[C]):
     configuration: C
     trace_lineage: tuple[str, ...]
-
 
 @dataclass(frozen=True)
 class ApplicationComplete(Generic[C, W, V]):
@@ -379,26 +384,42 @@ class ApplicationComplete(Generic[C, W, V]):
     successor_fibers: tuple[tuple[C, tuple[str, ...]], ...]
     cardinalities: tuple[Cardinality, Cardinality, Cardinality]
 
+@dataclass(frozen=True)
+class ApplicationFault:
+    phase: str
+    reason: str
+    evidence: tuple[str, ...]
 
-ApplicationResult: TypeAlias = Complete[ApplicationComplete[C, W, V]] | Rejected
+@dataclass(frozen=True)
+class ApplicationRejected:
+    fault: ApplicationFault
+
+ApplicationResult: TypeAlias = ApplicationComplete[C, W, V] | ApplicationRejected
 
 
 def apply(
     program: SimpleProgram[C, V, W, R],
-    application_input: ApplicationInput[C],
+    application_input: C | ApplicationInput[C],
 ) -> ApplicationResult[C, W, V]:
+    normalized_input = normalize_application_input(application_input)
     compatibility = require_valid_program(program)
-    snapshot = freeze_and_validate_input(application_input, compatibility)
+    snapshot = freeze_and_validate_input(normalized_input, compatibility)
     writable = resolve_writable(program.frontier, snapshot)
     readable = resolve_readable(program.neighborhood, snapshot)
     reconstruction = derive_closed_reconstruction(writable, compatibility)
     require_same_snapshot_and_join(snapshot, readable, writable, compatibility)
     rule_result = denote(program.rule, readable, writable)
-    if isinstance(rule_result, Rejected):
-        return rule_result
+    if isinstance(rule_result, RuleRejected):
+        return ApplicationRejected(
+            ApplicationFault(
+                phase=f"rule:{rule_result.fault.phase}",
+                reason=rule_result.fault.reason,
+                evidence=rule_result.fault.evidence,
+            )
+        )
 
     # 1. Validate the whole sound-and-covering Rule outcome space.
-    validated = validate_complete_rule_space(rule_result.payload, program, readable, writable)
+    validated = validate_complete_rule_space(rule_result.outcomes, program, readable, writable)
     # 2. Bind all fresh identities from semantic input, Rule, and witnesses.
     fresh = bind_all_fresh(validated, snapshot, program.rule, writable)
     # 3. Reconstruct every alternative from the same immutable snapshot.
@@ -411,7 +432,10 @@ def apply(
     return build_complete_application(validated, applied, groups, measures)
 
 
-# --- rollout.py: auxiliary traversal over apply, never a second executor ----
+# --- program.py: public rollout operation and types, derived from apply -----
+
+# Goal 7 folds the current rollout module here or into private helpers.  There
+# is no target public ``ca.rollout`` submodule to shadow the root callable.
 
 @dataclass(frozen=True)
 class TraceLeaf(Generic[C]):
@@ -419,9 +443,8 @@ class TraceLeaf(Generic[C]):
     trace_lineage: tuple[str, ...]
     continuing: bool
 
-
 @dataclass(frozen=True)
-class Episode(Generic[C, W, V]):
+class RolloutResult(Generic[C, W, V]):
     applications: tuple[ApplicationResult[C, W, V], ...]
     leaves: tuple[TraceLeaf[C], ...]
     truncated: bool
@@ -429,11 +452,16 @@ class Episode(Generic[C, W, V]):
 
 def rollout(
     program: SimpleProgram[C, V, W, R],
-    steps: int,
     *,
+    steps: int,
+    initial: C | None = None,
     replay_key: str | None = None,
-) -> Episode[C, W, V]:
-    leaves = realize_seed_with_replay(program.seed, replay_key)
+) -> RolloutResult[C, W, V]:
+    leaves = normalize_initial_or_realize_seed(
+        program.seed,
+        initial=initial,
+        replay_key=replay_key,
+    )
     applications: list[ApplicationResult[C, W, V]] = []
     for _ in range(steps):
         next_leaves: list[TraceLeaf[C]] = []
@@ -445,7 +473,11 @@ def rollout(
             else:
                 next_leaves.append(leaf)
         leaves = tuple(next_leaves)
-    return Episode(tuple(applications), leaves, any(leaf.continuing for leaf in leaves))
+    return RolloutResult(
+        tuple(applications),
+        leaves,
+        any(leaf.continuing for leaf in leaves),
+    )
 
 
 # --- serialization.py and ca.__init__: expanded payload, small root spelling
@@ -457,6 +489,22 @@ class ProgramPayload(Generic[C, V, W, R]):
     frontier: WritableRegion[C, W]
     neighborhood: ReadableRegion[C, R]
     rule: Rule[R, W, C]
+
+@dataclass(frozen=True)
+class DecodeFault:
+    phase: str
+    reason: str
+    evidence: tuple[str, ...]
+
+@dataclass(frozen=True)
+class DecodeRejected:
+    fault: DecodeFault
+
+@dataclass(frozen=True)
+class Decoded(Generic[P]):
+    value: P
+
+DecodeResult: TypeAlias = Decoded[P] | DecodeRejected
 
 
 class serialization:
@@ -472,10 +520,13 @@ class serialization:
         return encode_closed_versioned_node("ca.simple-program", 1, payload)
 
     @staticmethod
-    def decode_program(data: bytes) -> SimpleProgram[C, V, W, R] | Rejected:
-        payload = decode_closed_versioned_node("ca.simple-program", 1, data)
-        if isinstance(payload, Rejected):
-            return payload
+    def decode_program(
+        data: bytes,
+    ) -> DecodeResult[SimpleProgram[C, V, W, R]]:
+        decoded_payload = decode_closed_versioned_node("ca.simple-program", 1, data)
+        if isinstance(decoded_payload, DecodeRejected):
+            return decoded_payload
+        payload = decoded_payload.value
         program = SimpleProgram(
             payload.seed,
             payload.alphabet,
@@ -483,19 +534,20 @@ class serialization:
             payload.neighborhood,
             payload.rule,
         )
-        return require_valid_program(program).program
+        return Decoded(require_valid_program(program).program)
 
 
-# ``ca.__init__`` exposes component/catalog namespaces plus only
-# ``SimpleProgram``, ``apply``, and ``rollout`` at the root:
+# ``ca.__init__`` exposes component/catalog namespaces and re-exports
+# ``SimpleProgram``, ``apply``, ``rollout``, and their public types from
+# ``program.py``.  It does not expose a competing rollout module:
 #
 #     ca.neighborhoods.eca()  -> ReadableRegion
 #     ca.catalog.eca()        -> SimpleProgram
 
-def public_surface_example() -> Episode[BinaryLine, Locus, bool]:
+def public_surface_example() -> RolloutResult[BinaryLine, Locus, bool]:
     program = catalog.eca(rule=30, width=79)
     encoded = serialization.encode_program(program)
     decoded = serialization.decode_program(encoded)
-    if isinstance(decoded, Rejected):
-        raise ValueError(decoded.reason)
-    return rollout(decoded, steps=100, replay_key="example-0001")
+    if isinstance(decoded, DecodeRejected):
+        raise ValueError(decoded.fault.reason)
+    return rollout(decoded.value, steps=100, replay_key="example-0001")
