@@ -224,6 +224,11 @@ family membership, and API fit:
   headings and add 16 compact leads: 11 serious, three resolved, one weak, and
   one explicit later dependency. Seven mechanics-bearing figures were
   selectively inspected.
+- Stage 4 is complete. Chapter 10 and its Notes are covered across all 26
+  headings and add 36 compact procedure leads: 29 serious, two resolved, four
+  weak, and one explicit later dependency. No image required
+  original-resolution inspection because prose supplied the family-defining
+  transformations.
 
 ## Assumptions To Challenge
 
@@ -410,7 +415,7 @@ Discover construction-bearing mechanics in Chapter 9 and its Notes.
 
 ### 4-CH10
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/4-CH10.md`.
 
 #### Big Picture Objective
 
@@ -433,6 +438,8 @@ Discover construction-bearing mechanics in Chapter 10 and its Notes.
 - Relevant figures and unresolved questions are accounted for.
 
 ### 5-CH11
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
