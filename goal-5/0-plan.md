@@ -229,6 +229,11 @@ family membership, and API fit:
   weak, and one explicit later dependency. No image required
   original-resolution inspection because prose supplied the family-defining
   transformations.
+- Stage 5 is complete. Chapter 11 and its Notes are covered across all 24
+  headings and add seven compact leads: five serious, one weak, and one
+  explicit later dependency. Universality, named universal systems, emulations,
+  and proofs remain properties, presets, or encodings rather than new
+  constructions.
 
 ## Assumptions To Challenge
 
@@ -439,7 +444,7 @@ Discover construction-bearing mechanics in Chapter 10 and its Notes.
 
 ### 5-CH11
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/5-CH11.md`.
 
 #### Big Picture Objective
 
@@ -461,6 +466,8 @@ Discover construction-bearing mechanics in Chapter 11 and its Notes.
 - Serious candidates and unresolved equivalence questions are explicit.
 
 ### 6-CH12
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 

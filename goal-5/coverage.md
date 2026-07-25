@@ -39,8 +39,8 @@ that no inherited lead cites the document.
 | `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md` | 16/16 | `COMPLETE` | 3 | 15 |
 | `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` | 14/14 | `COMPLETE` | 4 | 21 |
 | `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md` | 12/12 | `COMPLETE` | 4 | 32 |
-| `CHAPTERS/11-The-Notion-of-Computation.md` | 0/13 | `PENDING` | 5 | 0 |
-| `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md` | 0/11 | `PENDING` | 5 | 0 |
+| `CHAPTERS/11-The-Notion-of-Computation.md` | 13/13 | `COMPLETE` | 5 | 2 |
+| `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md` | 11/11 | `COMPLETE` | 5 | 6 |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` | 0/13 | `PENDING` | 6 | 0 |
 | `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md` | 0/13 | `PENDING` | 6 | 0 |
 | `BACK-MATTER/Index.md` | 0/1 | `PENDING CHECKLIST` | 7 | 0 |
