@@ -612,7 +612,7 @@ Freeze blind discovery and reconcile the serious shortlist against T01–T45.
 
 ### 11-FAMILIES
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/11-FAMILIES.md`.
 
 #### Big Picture Objective
 
@@ -640,6 +640,8 @@ names.
 - The family inventory is complete enough for API analysis.
 
 ### 12-API-PRESSURE
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
