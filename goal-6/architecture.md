@@ -263,8 +263,8 @@ q ∈ ⟦rule⟧(r, w)
 Rule does not receive unrestricted access to `c`. Every semantic state
 dependency it uses must be present in `r`; `w` supplies writable identities and
 capabilities, not an implicit read channel. The generic application operation
-retains `c` only to validate and commit `q`. Stage 3 defines that result and
-commit algebra.
+retains `c` only to validate and commit `q`; the result-and-commit algebra
+below fixes that boundary.
 
 Frontier and Neighborhood may reuse the same closed locus/anchor descriptor,
 and Rule may require their resolved views to have compatible indexing. Neither
@@ -275,7 +275,7 @@ Independent resolution is still one typed join. Both resolvers bind to the
 same immutable snapshot identity, and their locus/occurrence references use
 the same canonical identities. Rule declares the required `R`-to-`W`
 join/index shape; construction validates that shape structurally, and
-application validates the resolved binding before Rule evaluation.
+application validates the resolved binding before Rule denotation.
 
 Generic parameters, validation evidence, codec versions, digests, catalog
 names, and provenance are not extra `SimpleProgram` fields. Catalog entries and
@@ -568,7 +568,7 @@ once to the structured `(R, W)` for the program application.
 The result contract separates four questions that a bare successor list
 collapses:
 
-1. Did evaluation produce a complete semantic outcome space, or was the
+1. Did Rule denotation produce a complete semantic outcome space, or was the
    application rejected/incomplete?
 2. How many derivation atoms does that space denote?
 3. Which atoms produce replacements, and what progress/continuation outcome
@@ -612,19 +612,19 @@ RuleAtom[C, W] =
 
 AppliedAtom[C] =
     AppliedDerivation(successor: C, source: Derivation, fresh_bindings, evidence)
-  | NoSuccessor
+  | AppliedNoSuccessor(source: NoSuccessor, evidence)
 
 ApplicationComplete[C] = {
     source_outcomes: OutcomeSpace[RuleAtom],
-    applied_atoms: OutcomeSpace[AppliedAtom],
-    no_successor_partition: OutcomeSpace[NoSuccessor],
+    applied_atoms: SupportSpace[AppliedAtom],
+    no_successor_partition: SupportSpace[AppliedNoSuccessor],
     outcome_atom_cardinality: Cardinality,
     derivation_cardinality: Cardinality,
     successor_cardinality: Cardinality,
     successor_quotient_with_derivation_fibers: SuccessorSpace[C],
     applied_atom_measure: MeasureView[AppliedAtom],
-    successor_submeasure: MeasureView[C],
-    no_successor_submeasure: MeasureView[NoSuccessor],
+    successor_submeasure: MeasureView[SuccessorGroup[C]],
+    no_successor_submeasure: MeasureView[AppliedNoSuccessor],
     evidence: ApplicationEvidence,
 }
 
@@ -632,7 +632,16 @@ MeasureView[P] =
     Absent
   | Available(Measure[P])
   | Unavailable(reason, retained_source_law_and_mapping_evidence)
+
+SuccessorSpace[C] = SupportSpace[SuccessorGroup[C]]
+SuccessorGroup[C] = semantic_equivalence_class_or_intensional_point
+                    + complete_applied_derivation_fiber
 ```
+
+The derived `no_successor_partition` may of course be empty; it is a typed
+projection of a validated Rule support—possibly intensional and of
+undetermined cardinality—not a standalone claim that an exact empty Rule
+result is meaningful.
 
 `Complete` means that its payload is authoritative at that boundary.
 For a Rule result, the represented atoms are both sound in and covering of the
@@ -670,8 +679,8 @@ bounded attempt did not establish the full result; it cannot be promoted to
 `Divergent`, `Terminal`, or exact zero. An unbounded semidecision that has not
 halted simply remains unevaluated; only a semantic divergence certificate may
 produce `Divergent`. Resource exhaustion originates only from an explicit
-bounded evaluation, realization, query, or rollout request; it is not an atom
-invented by the denotational Rule.
+bounded realization, query, or rollout request; it is not an atom invented by
+the denotational Rule.
 
 `Quiescent` is deliberately an identity derivation rather than an empty
 outcome space. It may retain a witness or external draw evidence without
@@ -683,9 +692,20 @@ second application.
 
 ### Cardinality and presentation
 
-`OutcomeSpace[P]` consists of one closed support presentation, its cardinality
-claim, its completeness evidence, and an optional probability law over that
-support. Support and measure are separate:
+`OutcomeSpace[P]` keeps support and measure separate:
+
+```text
+OutcomeSpace[P] = {
+    support: SupportSpace[P],
+    probability_law: Absent | ProbabilityLaw[P],
+}
+
+SupportSpace[P] = {
+    presentation: Finite[P] | Intensional[P],
+    cardinality: Cardinality,
+    completeness_evidence: CompletenessEvidence,
+}
+```
 
 | Presentation | Contract |
 |---|---|
@@ -730,8 +750,9 @@ Thus an epsilon word is one successor whose value is empty, not zero
 successors; a quiescent identity is one replacement derivation; a terminal
 no-match is zero replacement derivations with a typed terminal atom; and a
 diamond may have many derivations but one distinct successor. For a rejected
-or resource-exhausted evaluation, semantic cardinality is **not established**;
-the number of candidates observed so far is only diagnostic evidence.
+application or resource-exhausted external request, semantic cardinality is
+**not established**; the number of candidates observed so far is only
+diagnostic evidence.
 
 An intensional space is never a Python generator or an opaque solver result.
 It must support both:
@@ -811,7 +832,7 @@ of enumeration:
 - Rule clause, match, addressed occurrence, branch parameter, and semantic
   choice are explicit;
 - its canonical identity is stable across serialization, traversal, parallel
-  evaluation, finite materialization, and presentation order; and
+  realization, finite materialization, and presentation order; and
 - together with the program, old snapshot, `R`, and `W`, it is sufficient to
   verify the atom and reproduce its complete disposition.
 
@@ -1282,6 +1303,11 @@ relation composition with a universal phase conformance obligation; every
 realized member is checked again at that boundary. This defines “the first
 failing phase” without implying enumeration order.
 
+Validated `NoSuccessor` atoms pass through fresh binding and reconstruction
+without allocating or committing anything; the successor-validation phase
+maps them to `AppliedNoSuccessor` while deriving their output trace lineage and
+retaining their witness, reason, provenance, and probability mass.
+
 Result-space validation includes exact schema/tag/version checks;
 soundness-and-coverage equivalence to the specialized Rule denotation;
 cardinality evidence; atom witness, provenance, outcome reason, and certificate
@@ -1325,18 +1351,18 @@ Every rejected/incomplete application names the first failing generic phase:
 | Frontier | Invalid capability, target kind, or snapshot binding |
 | Neighborhood | Invalid read view, missing dependency, or snapshot binding |
 | Join | Mismatched identities/index shape or unresolved obligation |
-| Rule evaluation | Invalid/unsupported Rule result or declared evaluator failure |
-| Result validation | Incomplete disposition, unauthorized effect, invalid value, malformed witness |
+| Rule denotation | Invalid/unsupported closed Rule result or denotation failure |
+| Result validation | Unsound/incomplete support, invalid cardinality/law, incomplete disposition, unauthorized effect, invalid payload, malformed witness/evidence |
 | Fresh binding | Unauthorized namespace, collision, invalid parent/interface |
 | Commit | Structural operation cannot realize the already specified replacement |
 | Successor | Carrier, Alphabet, identity, interface, or invariant violation |
 | Quotient/measure | Unsound canonicalization or invalid probability law/pushforward |
 
-Generic bind stops after the first phase fault; later semantic phases do not
-execute. In particular, resolution failure prevents Rule evaluation, and any
+Application stops after the first failing phase; later semantic phases do not
+execute. In particular, resolution failure prevents Rule denotation, and any
 result/fresh/commit/successor fault yields no authoritative successor space.
-This phase ordering is testable with instrumented structural descriptors and
-does not depend on a family.
+This phase ordering is testable with instrumented closed structural
+descriptors and does not depend on a family or traversal order.
 
 Application may dispatch on the sealed generic sum variants above and invoke
 recognized structural descriptor operations. It may not inspect catalog
@@ -1357,14 +1383,15 @@ External operations have separate responsibilities:
 | Finite/intensional query | Ask a scoped question of an application result and return verified complete, partial, sample, unknown, or resource-limited evidence |
 | Stochastic realization | Draw from the retained probability law with an explicit replay key |
 | Rollout | Reapply the same family-blind `apply` relation to continuing successors |
-| Resource limits | Bound evaluation/realization/traversal and report truncation without changing denotation |
+| Resource limits | Bound query/realization/traversal and report truncation without changing denotation |
 | Trace | Retain raw configurations, application records, edges, witnesses, lineage, outcomes, and draw evidence |
 | Observer/render/export | Produce downstream views that do not redefine configuration or result identity |
 
 Repeated rollout is derived relational traversal:
 
 1. realize or bind the Seed's initial outcome space;
-2. apply the program to each continuing semantic successor;
+2. apply the program to each continuing
+   `(semantic successor C, output trace lineage)` derivation fiber;
 3. retain the raw application graph, including all incoming derivation fibers
    for equal successor configurations;
 4. propagate exact measures or derive replay subkeys structurally for sampled
@@ -1374,10 +1401,18 @@ Repeated rollout is derived relational traversal:
 
 For a many-successor result, an exhaustive rollout yields a branching or
 intensional path space. A request may sample, select, bound, or project it, but
-that request cannot masquerade as the full transition relation. Exact
-relational traversal expands each unique semantic successor while retaining
-all derivation edges; if derivation multiplicity must influence future
-mechanics, it is already in `C` or the measure.
+that request cannot masquerade as the full transition relation. Raw and
+sampled rollout expands every continuing `(C, output trace lineage)` fiber so
+that replay keys and path evidence remain distinct. The unique-`C` successor
+quotient is an aggregation/reporting view, not the default place to erase
+branches.
+
+An executor may memoize or expand one representative of equal `C` values only
+after proving lineage independence of the denotational application, and it
+must reinstantiate each path's output lineage, continuation, evidence, and
+draw coordinates. If multiplicity or ancestry affects future mechanics, that
+information is already semantic state in `C` or an explicit measure rather
+than hidden lineage.
 
 Continuation remains attached to each derivation fiber. If equal successor
 configurations have both `Continue` and `Stop` derivations, rollout records the
@@ -1393,9 +1428,13 @@ cardinality.
 
 One-shot relations normally return an `Advanced + Stop` derivation,
 `Terminal`, `Undefined`, or an intensional answer space from one application.
-They are complete without `rollout`. Continuous flows may return whole
-segments/endpoints and event resets; PDEs may return an intensional solution
-relation. Numerical stepping or solver search is a qualified realization or a
+They are complete without `rollout`. A continuous Rule may commit an endpoint
+only when an endpoint selector is visible in `C`/`R` or an intrinsic event or
+singularity determines it. An event-free ordinary flow instead writes or
+returns its maximal flow/solution object, normally as `Advanced + Stop`, which
+an external horizon can query without changing the denotation. PDEs likewise
+may return an intensional solution relation. Numerical stepping, endpoint
+selection, or solver search is a qualified external realization/query or a
 separately seeded work program, not hidden application semantics.
 
 The intended `ca.rollout` surface is therefore tooling over `apply`, not a
@@ -1446,12 +1485,15 @@ Exact encoding obligations include:
 - graph/tree/word identities, interfaces, alpha-equivalence rules, and fresh
   structural references;
 - continuous/intensional ASTs without forced enumeration;
-- probability laws separately from concrete draw/replay evidence; and
+- probability laws separately from concrete draw/replay evidence;
 - Rule/Application result sum tags, typed reasons/phases, progress,
-  continuation, and all three cardinality claims;
+  continuation, all three cardinality claims, and soundness/coverage evidence;
 - total dispositions, pre-quotient witnesses/derivations, fresh bindings,
-  successor fibers, and intensional conformance obligations;
-- representation relations and provenance needed for inverse-on-image and
+  output trace lineages, successor fibers, and intensional conformance
+  obligations;
+- reconstruction plans/lens obligations and `Absent`/`Available`/`Unavailable`
+  measure views, including unrenormalized successor/no-successor submeasures;
+- and representation relations and provenance needed for inverse-on-image and
   one-step commutation.
 
 Maps, sets, bags, graphs, and symbolic binders require explicit canonical
@@ -1478,9 +1520,12 @@ c ∈ support(seed)  =>  valid_C(c) ∧ values(c) ⊆ V
 frontier(c) = w : W
 neighborhood(c) = r : R
 same_snapshot(c, r, w) ∧ valid_join(r, w)
-rule(r, w) = Q : RuleResult[C, W]
-q ∈ Q  =>  targets(q) ⊆ W ∧ total_disposition(q, W)
-          ∧ valid_C(commit(c, q))
+rule.denote(r, w) = Complete(Q) : RuleResult[C, W]
+q ∈ support(Q) ∧ q is Derivation
+    => targets(q) ⊆ W ∧ total_disposition(q, W)
+       ∧ valid_C(commit(c, q))
+q ∈ support(Q) ∧ q is NoSuccessor
+    => valid_outcome_reason_witness_and_coverage(q) ∧ no_commit(q)
 ```
 
 The concrete bindings and representative result obligation are stated for
@@ -1600,30 +1645,35 @@ external. No Solver, ResultPolicy, or special relation-program class is needed.
 
 | Type | Binding |
 |---|---|
-| `C` | Continuous state with domain/geometry, parameters, explicit time, and result/event slots |
+| `C` | Continuous state with domain/geometry, parameters, explicit time, optional endpoint selector, and result/event slots |
 | `V` | Exact, certified, or explicitly represented scalar/vector/tensor and flow-segment values |
-| `W` | Evolving state, time, and any event/result slots for one flow application |
-| `R` | Current state/time, geometry, parameters, event surfaces, and required global data |
+| `W` | Maximal-flow/result slot, plus state/time/reset slots only when a visible selector or intrinsic event authorizes an endpoint |
+| `R` | Current state/time, geometry, parameters, any visible endpoint selector, event surfaces, and required global data |
 
 - Seed supplies the initial continuous state, time, side data, and exactness
   profile.
 - Alphabet prevents represented numerics from impersonating exact values.
-- Frontier intensionally denotes every state, time, and event/result slot the
-  flow may update.
+- Frontier intensionally denotes the maximal-flow/result slot and every
+  state/time/reset slot an intrinsic event or visible selector may update.
 - Neighborhood exposes the vector field inputs and event dependencies in a
   closed view.
-- Rule denotes zero, one, or many admissible flow-segment/endpoint
-  replacements.
+- Rule denotes zero, one, or many admissible maximal-flow objects or
+  intrinsically/explicitly selected segment-endpoint replacements.
 
 Judgment: for every valid continuous `c`, represented values conform to `V`;
 `frontier(c) = w` and `neighborhood(c) = r` share the same state/time binding.
-A representative alternative writes an exact or qualified flow segment,
-endpoint state, advanced time, and event result into their declared slots,
-targets only `w`, gives every other writable slot an explicit disposition,
-and commits to a valid `C`.
+For an event-free ordinary flow, a representative alternative writes a
+maximal flow/germ/solution object to its declared result slot, preserves
+state/time, and normally returns `Advanced + Stop`; an external horizon may
+query that object but cannot silently select a semantic endpoint. For an
+intrinsic event—or a selector explicitly visible in `C`/`R`—the alternative
+may instead write the selected segment, endpoint state/time, and reset/event
+record atomically. In either case it targets only `w`, gives every other
+writable slot an explicit disposition, and commits to a valid `C`.
 
-Time is visible state or a Rule variable, while horizon and numerical
-realization strategy are run policy.
+Time is visible state or a Rule variable. A run horizon and numerical
+realization strategy are external policy unless the endpoint selector is
+itself visible construction data.
 
 ### General PDE relation — F041
 
@@ -1679,10 +1729,11 @@ categories into the complete conformance plan.
 | Declared construction failure | One `DeclaredFailure(reason)` atom | 0 | 0 | Semantic failure remains typed |
 | Certified divergence | One `Divergent(certificate)` atom | 0 | 0 | Distinct from timeout |
 | Invalid result/input | `Rejected(Invalid(...))` | Not established | Not established | No commit and no exact-zero claim |
-| Resource exhaustion | `Rejected(ResourceExhausted(...))` | Not established | Not established | Partial observations are diagnostic only |
+| Bounded external resource exhaustion | External `Rejected(ResourceExhausted(...))` | Not established | Not established | Never a Rule/base-application result; partial observations are diagnostic only |
 | Diamond rewrite | Multiple witnessed derivations | Many | One or fewer than derivations | Dedup retains the full fiber |
 | Empty output value | One replacement containing epsilon/empty carrier | 1 | 1 | Empty value is not empty relation |
 | Intensional solution relation | Complete intensional space | Zero/one/many/undetermined | Intensional quotient | No forced enumeration |
+| Possibly empty intensional relation | Complete intensional space with `Undetermined` cardinality | Undetermined | Undetermined | No fabricated terminal atom; unknown is not certified zero |
 | Stochastic relation | Probability law over typed atoms | Law support | Pushforward support | Law, draw, and successor mass remain distinct |
 
 Every row has a different serialized sum shape or typed field; none relies on
@@ -1721,8 +1772,9 @@ compatible nonoverlapping patches or resolved their graph-level overlap.
 Every atom explicitly deletes matched nodes/edges, preserves unaffected
 writable interface members, creates fresh components under local semantic
 keys, and reconnects each interface. Application binds fresh identities from
-input lineage plus the match witness, validates collisions and totality,
-commits the whole structural replacement, then validates graph invariants.
+the input configuration's semantic identity, canonical Rule identity, and the
+match witness, validates collisions and totality, commits the whole structural
+replacement, then validates graph invariants.
 
 Commit never deletes an incident edge implicitly, chooses among overlapping
 patches, invents a port repair, projects reachability, or numbers newborns by
@@ -1788,12 +1840,24 @@ returns a law over whole graph replacements, not one engine draw per node in
 traversal order. Its factored product law states independence explicitly;
 ordinary Seed/Rule product composition does not infer it.
 
+A single finite pressure law can assign positive mass to all three of:
+
+1. an `Advanced + Continue` successor;
+2. an `Advanced + Stop(Completed)` successor; and
+3. `NoSuccessor(Terminal(...))`.
+
+The applied-atom law remains normalized across all three. The successor and
+no-successor views are unrenormalized submeasures, and the continuing and
+stopped successor fibers stay distinguishable even if their `C` values are
+equal.
+
 ### Continuous flow and event reset — F006/F037
 
 `R` contains current time/state and the geometry/vector-field/event data; `W`
-contains the continuous state, time, segment/event records, and every reset
-slot. Rule returns a finite or intensional outcome space of complete flow
-segment/endpoint derivations.
+contains a maximal-flow/result slot and, when authorized, the state, time,
+segment/event records, and every reset slot. Rule returns a finite or
+intensional outcome space of complete maximal-flow or selected endpoint
+derivations.
 
 For a boundary collision, one atom contains the segment to the earliest
 verified hit plus a coupled disposition for hit time, position, reflected
@@ -1805,6 +1869,13 @@ tie/reset convention or multiple witnessed atoms; application supplies no
 collision convention. A singularity may be a typed terminal/undefined
 outcome. A numerical segment is a represented realization with method/error
 evidence, not the exact flow silently replaced by floats.
+
+For an event-free ODE such as `dx/dt = 1` with no visible endpoint selector,
+Rule writes the maximal flow/solution object and normally stops after that
+one-shot result. An external rollout horizon may query or realize its value at
+a requested time, but cannot cause base `apply` to commit that endpoint. Only
+a selector visible in `C`/`R`, an intrinsic earliest event, or a singularity
+can determine an endpoint inside the Rule denotation.
 
 ### Intensional PDE and finite completion — F041/F015
 
