@@ -1,200 +1,856 @@
-"""Reference template for CA catalog and pipeline scaffolds.
+"""Code-shaped walkthrough of the remastered five-field architecture.
 
-This file is reference material, not package runtime code. The goal is to make
-future CA catalogs look and read like `alphabets.py`, `neighborhoods.py`,
-`frontiers.py`, and `rules.py` without needing to rediscover the project style.
+This is reference material, not package runtime code.  It shows the intended
+dependency direction and public reading without introducing a second model:
 
-Use this structure when adding a new component catalog:
+    loci -> component algebras -> SimpleProgram -> catalog -> apply -> rollout
 
-- Start with a clear module docstring.
-  - Say what semantic layer the module owns.
-  - Say what the module explicitly does not own.
-  - Name the lower-level modules it builds from.
-  - Name the downstream modules that will consume its output.
-- Keep one frozen dataclass for the primary structured artifact when possible.
-  - Store the real payload first.
-  - Store `family`, `name`, `params`, and `metadata` only when they help rebuild
-    or inspect the artifact.
-  - Avoid dataclasses for tiny transforms when a simple factory function is
-    clearer.
-- Keep the scaffold phase-ordered.
-  - Phase 1 singular primitives come before Phase 1 compounds.
-  - Later general families and aliases stay visibly later.
-- Leave unimplemented phases as docstring-rich stubs.
-  - Do not half-implement future phases.
-  - Do not add clever placeholder behavior.
-  - Use `_not_implemented()` so all unfinished catalog entries fail the same
-    way.
-
-Implementation style once a stub is ready:
-
-- Prefer extremely skimmable code over dense code.
-- Validate arguments early and return early when the branch is done.
-- Normalize input values near the top of the function.
-- Use the project primitives instead of reimplementing lower-level behavior.
-- Build compound families by composing named singular families.
-- Keep comments short and only where they explain a non-obvious decision.
-- Preserve user edits and unrelated work; keep each implementation scoped to
-  the requested phase.
-
-For pipeline modules, use the same ownership-first shape:
-
-- `ca.rollout` rolls one already chosen seed state forward from `Dynamics`.
-- Source preparation freezes deterministic manifests, stream specs, and
-  representation recipes.
-- Downstream representation serializes realized episodes, including times,
-  coordinates, targets, and selection metadata.
-- Batching realizes streams, filters rollouts at runtime, and builds tensors or
-  arrays for consumers.
-
-Those modules should start with a big-picture docstring, define a small public
-stub surface below it, and leave compatibility or migrated legacy code clearly
-below the new scaffold until the implementation catches up.
+Every semantic value below is closed structural data.  There are no callbacks,
+opaque solver objects, ambient randomness sources, family registries, or
+configurable update policies.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Literal
+from enum import Enum
+from fractions import Fraction
+from typing import Generic, TypeAlias, TypeVar
 
 
-CombineMode = Literal["tuple", "merge"]
+C = TypeVar("C")
+V = TypeVar("V")
+W = TypeVar("W")
+R = TypeVar("R")
+A = TypeVar("A")
+P = TypeVar("P")
+
+ExactScalar: TypeAlias = bool | int | Fraction | str
+
+
+# ---------------------------------------------------------------------------
+# loci.py — closed structural identity and region algebra
+# ---------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
-class Component:
-    """Structured artifact produced by this catalog.
-
-    Replace `items` with the real payload for the component. Examples from
-    existing catalogs are neighborhood selectors, frontier selectors, alphabet
-    values, or rule channels.
-
-    Keep the fields boring and inspectable:
-
-    - `items`: the payload consumed by downstream code.
-    - `combine`: explicit composition semantics when the artifact has parts.
-    - `family`: the factory family that produced the artifact.
-    - `params`: normalized parameters needed to rebuild the artifact.
-    - `name`: optional human-readable label for named families.
-
-    Do not add fields just because they might be useful later. Add them when a
-    real downstream consumer needs them.
-    """
-
-    items: tuple[Any, ...]
-    combine: CombineMode = "tuple"
-    family: str | None = None
-    params: Mapping[str, Any] | None = None
-    name: str | None = None
+class Coordinate:
+    axes: tuple[tuple[str, Fraction], ...]
 
 
-def _not_implemented() -> None:
-    """Raise the standard catalog-stub error.
-
-    Every unfinished scaffold function should call this. Keeping a single
-    helper makes placeholder behavior obvious and easy to find.
-    """
-
-    raise NotImplementedError("ca-scaffold.py is a component catalog template")
+@dataclass(frozen=True)
+class NamedLocus:
+    name: str
 
 
-# ---------------------------------------------------------------------------
-# Phase 1.1 Singular Primitives
-# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class Occurrence:
+    sequence: str
+    index: int
 
 
-def singular_primitive(value: int = 0) -> Component:
-    """Build the smallest meaningful artifact owned by this catalog.
-
-    Singular primitives should be built directly from the lower-level module
-    this catalog depends on. For example, `neighborhoods.py` builds singular
-    read loci from `loci.py`; it does not ask source assembly code or
-    `rollout.py` to help.
-
-    Implementation checklist:
-
-    - Normalize inputs first.
-    - Validate obvious invalid values before doing work.
-    - Build exactly one coherent component.
-    - Return a `Component` with normalized `params`.
-    """
-
-    _not_implemented()
+@dataclass(frozen=True)
+class GraphLocus:
+    graph: str
+    element: str
+    port: str | None = None
 
 
-# ---------------------------------------------------------------------------
-# Phase 1.2 Compound Families
-# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class FieldLocus:
+    field: str
+    component: str
+    point: tuple[Fraction, ...]
 
 
-def named_compound(value: int = 0) -> Component:
-    """Build a named compound from singular primitives.
-
-    Compound families should compose existing named families. They should not
-    duplicate the lower-level construction used by their parts.
-
-    A good compound reads like this:
-
-    ```text
-    primitive_a(...)
-    primitive_b(...)
-    compose((a, b))
-    ```
-
-    The final returned object should preserve the semantic name and the
-    normalized parameters for the named family.
-    """
-
-    _not_implemented()
+@dataclass(frozen=True)
+class FreshLocus:
+    namespace: str
+    parent_or_interface: str
+    local_key: str
 
 
-def compose(
-    components: Sequence[Component],
-    combine: CombineMode = "tuple",
-) -> Component:
-    """Compose singular or already-structured components.
-
-    Keep composition explicit. If component boundaries matter downstream, use a
-    tuple-preserving mode. If a future catalog intentionally flattens support,
-    make that choice visible through `combine`.
-
-    Implementation checklist:
-
-    - Validate `combine`.
-    - Reject empty component lists.
-    - Flatten only the payload level that this catalog owns.
-    - Return a new structured object rather than mutating inputs.
-    """
-
-    _not_implemented()
-
-# ---------------------------------------------------------------------------
-# Phase 2 General Families
-# ---------------------------------------------------------------------------
+Locus: TypeAlias = (
+    Coordinate | NamedLocus | Occurrence | GraphLocus | FieldLocus | FreshLocus
+)
 
 
-def general_family(values: Sequence[int]) -> Component:
-    """Build a broader family after Phase 1 behavior is stable.
+class RelationPrimitive(Enum):
+    EQUAL = "equal"
+    TAGGED = "tagged"
+    ADJACENT = "adjacent"
+    INCIDENT = "incident"
+    REACHABLE = "reachable"
+    WITHIN = "within"
+    DERIVATIVE = "derivative"
 
-    Phase 2 functions are for reusable generalizations, not one-off experiment
-    shortcuts. If the function is only an alias over an existing primitive,
-    place it in Phase 3 instead.
-    """
 
-    _not_implemented()
+@dataclass(frozen=True)
+class RelationExpr:
+    primitive: RelationPrimitive
+    operands: tuple[ExactScalar | Locus, ...]
+
+
+@dataclass(frozen=True)
+class LiteralRegion:
+    loci: tuple[Locus, ...]
+
+
+@dataclass(frozen=True)
+class AllSupport:
+    carrier_name: str
+
+
+@dataclass(frozen=True)
+class RelativeRegion:
+    anchors: "Region"
+    offsets: tuple[Coordinate, ...]
+
+
+@dataclass(frozen=True)
+class ProductRegion:
+    fields: tuple[tuple[str, "Region"], ...]
+
+
+@dataclass(frozen=True)
+class UnionRegion:
+    parts: tuple["Region", ...]
+
+
+@dataclass(frozen=True)
+class FreshChildren:
+    parents: "Region"
+    namespace: str
+    slots: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class IntensionalRegion:
+    binder: str
+    relation: RelationExpr
+
+
+Region: TypeAlias = (
+    LiteralRegion
+    | AllSupport
+    | RelativeRegion
+    | ProductRegion
+    | UnionRegion
+    | FreshChildren
+    | IntensionalRegion
+)
 
 
 # ---------------------------------------------------------------------------
-# Phase 3 Aliases
+# alphabets.py — closed value structure
 # ---------------------------------------------------------------------------
 
 
-def alias_family(value: int = 0) -> Component:
-    """Alias for a clearer or more domain-specific family name.
+@dataclass(frozen=True)
+class BooleanValues:
+    values: tuple[bool, bool] = (False, True)
 
-    Aliases should delegate to existing primitives or general families. They
-    should not introduce separate construction logic.
-    """
 
-    _not_implemented()
+@dataclass(frozen=True)
+class FiniteValues:
+    values: tuple[ExactScalar, ...]
+
+
+@dataclass(frozen=True)
+class IntegerValues:
+    minimum: int | None = None
+    maximum: int | None = None
+
+
+@dataclass(frozen=True)
+class RationalValues:
+    minimum: Fraction | None = None
+    maximum: Fraction | None = None
+
+
+@dataclass(frozen=True)
+class TaggedValues:
+    variants: tuple[tuple[str, "ValueSchema"], ...]
+
+
+@dataclass(frozen=True)
+class ProductValues:
+    fields: tuple[tuple[str, "ValueSchema"], ...]
+
+
+@dataclass(frozen=True)
+class SymbolicValues:
+    grammar: RelationExpr
+
+
+ValueSchema: TypeAlias = (
+    BooleanValues
+    | FiniteValues
+    | IntegerValues
+    | RationalValues
+    | TaggedValues
+    | ProductValues
+    | SymbolicValues
+)
+
+
+@dataclass(frozen=True)
+class Alphabet(Generic[V]):
+    schema: ValueSchema
+
+
+class alphabets:
+    """Representative primitive, compound, and general constructors."""
+
+    @staticmethod
+    def boolean() -> Alphabet[bool]:
+        return Alphabet(BooleanValues())
+
+    @staticmethod
+    def finite(values: tuple[ExactScalar, ...]) -> Alphabet[ExactScalar]:
+        return Alphabet(FiniteValues(values))
+
+    @staticmethod
+    def tagged(
+        variants: tuple[tuple[str, ValueSchema], ...],
+    ) -> Alphabet[ExactScalar]:
+        return Alphabet(TaggedValues(variants))
+
+    @staticmethod
+    def product(
+        fields: tuple[tuple[str, ValueSchema], ...],
+    ) -> Alphabet[tuple[ExactScalar, ...]]:
+        return Alphabet(ProductValues(fields))
+
+
+# ---------------------------------------------------------------------------
+# seeds.py — sources of invariant-bearing initial configurations
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Boundary:
+    policy: str
+    exterior: ExactScalar | None = None
+
+
+@dataclass(frozen=True)
+class BinaryLine:
+    values: tuple[bool, ...]
+    boundary: Boundary
+    support_identity: str
+
+
+@dataclass(frozen=True)
+class ExactSource(Generic[C]):
+    configuration: C
+
+
+@dataclass(frozen=True)
+class BernoulliSource:
+    support: Region
+    probability_true: Fraction
+    boundary: Boundary
+
+
+@dataclass(frozen=True)
+class ProductSource(Generic[C]):
+    fields: tuple[tuple[str, "Seed[C]"], ...]
+
+
+@dataclass(frozen=True)
+class IntensionalSource:
+    binder: str
+    construction: RelationExpr
+
+
+@dataclass(frozen=True)
+class Seed(Generic[C]):
+    source: ExactSource[C] | BernoulliSource | ProductSource[C] | IntensionalSource
+
+
+class seeds:
+    @staticmethod
+    def exact(configuration: C) -> Seed[C]:
+        return Seed(ExactSource(configuration))
+
+    @staticmethod
+    def bernoulli(
+        support: Region,
+        probability_true: Fraction,
+        boundary: Boundary,
+    ) -> Seed[BinaryLine]:
+        return Seed(BernoulliSource(support, probability_true, boundary))
+
+    @staticmethod
+    def product(fields: tuple[tuple[str, Seed[C]], ...]) -> Seed[C]:
+        return Seed(ProductSource(fields))
+
+    @staticmethod
+    def intensional(binder: str, construction: RelationExpr) -> Seed[C]:
+        return Seed(IntensionalSource(binder, construction))
+
+
+# ---------------------------------------------------------------------------
+# frontiers.py and neighborhoods.py — write and read capability wrappers
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class WritableRegion(Generic[C, W]):
+    region: Region
+
+
+@dataclass(frozen=True)
+class ReadableRegion(Generic[C, R]):
+    region: Region
+    shape: tuple[str, ...]
+
+
+class frontiers:
+    @staticmethod
+    def literal(loci: tuple[Locus, ...]) -> WritableRegion[C, Locus]:
+        return WritableRegion(LiteralRegion(loci))
+
+    @staticmethod
+    def everywhere(carrier_name: str) -> WritableRegion[C, Locus]:
+        return WritableRegion(AllSupport(carrier_name))
+
+    @staticmethod
+    def union(
+        regions: tuple[WritableRegion[C, W], ...],
+    ) -> WritableRegion[C, W]:
+        return WritableRegion(UnionRegion(tuple(item.region for item in regions)))
+
+    @staticmethod
+    def fresh_children(
+        parents: WritableRegion[C, W],
+        namespace: str,
+        slots: tuple[str, ...],
+    ) -> WritableRegion[C, Locus]:
+        return WritableRegion(FreshChildren(parents.region, namespace, slots))
+
+
+class neighborhoods:
+    @staticmethod
+    def at_self() -> ReadableRegion[C, V]:
+        return ReadableRegion(LiteralRegion((NamedLocus("self"),)), ("self",))
+
+    @staticmethod
+    def product(
+        fields: tuple[tuple[str, ReadableRegion[C, R]], ...],
+    ) -> ReadableRegion[C, tuple[R, ...]]:
+        region = ProductRegion(tuple((name, item.region) for name, item in fields))
+        return ReadableRegion(region, tuple(name for name, _ in fields))
+
+    @staticmethod
+    def global_view(carrier_name: str) -> ReadableRegion[C, tuple[V, ...]]:
+        return ReadableRegion(AllSupport(carrier_name), ("support",))
+
+    @staticmethod
+    def eca() -> ReadableRegion[BinaryLine, tuple[bool, bool, bool]]:
+        offsets = (
+            Coordinate((("x", Fraction(-1)),)),
+            Coordinate((("x", Fraction(0)),)),
+            Coordinate((("x", Fraction(1)),)),
+        )
+        return ReadableRegion(
+            RelativeRegion(LiteralRegion((NamedLocus("active"),)), offsets),
+            ("left", "self", "right"),
+        )
+
+
+# ---------------------------------------------------------------------------
+# rules.py — closed relations and complete atomic replacements
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class LookupRule:
+    input_shape: tuple[int, ...]
+    outputs: tuple[ExactScalar, ...]
+
+
+@dataclass(frozen=True)
+class OrderedClause:
+    condition: RelationExpr
+    replacement: RelationExpr
+
+
+@dataclass(frozen=True)
+class OrderedRule:
+    clauses: tuple[OrderedClause, ...]
+
+
+@dataclass(frozen=True)
+class ParallelRule:
+    parts: tuple["Rule[tuple[ExactScalar, ...], Locus, C]", ...]
+
+
+@dataclass(frozen=True)
+class RelationalRule:
+    relation: RelationExpr
+
+
+@dataclass(frozen=True)
+class DistributionRule:
+    support: RelationExpr
+    exact_weights: tuple[Fraction, ...]
+
+
+@dataclass(frozen=True)
+class DifferentialRule:
+    equation: RelationExpr
+
+
+RuleDescriptor: TypeAlias = (
+    LookupRule
+    | OrderedRule
+    | ParallelRule
+    | RelationalRule
+    | DistributionRule
+    | DifferentialRule
+)
+
+
+@dataclass(frozen=True)
+class Rule(Generic[R, W, C]):
+    descriptor: RuleDescriptor
+
+
+class rules:
+    @staticmethod
+    def table(
+        input_shape: tuple[int, ...],
+        outputs: tuple[ExactScalar, ...],
+    ) -> Rule[R, W, C]:
+        return Rule(LookupRule(input_shape, outputs))
+
+    @staticmethod
+    def parallel(
+        parts: tuple[Rule[tuple[ExactScalar, ...], Locus, C], ...],
+    ) -> Rule[tuple[ExactScalar, ...], Locus, C]:
+        return Rule(ParallelRule(parts))
+
+    @staticmethod
+    def relation(relation: RelationExpr) -> Rule[R, W, C]:
+        return Rule(RelationalRule(relation))
+
+    @staticmethod
+    def elementary(
+        number: int,
+    ) -> Rule[tuple[bool, bool, bool], Locus, BinaryLine]:
+        if not 0 <= number <= 255:
+            raise ValueError("elementary rule number must be in 0..255")
+        outputs = tuple(bool((number >> index) & 1) for index in range(8))
+        return Rule(LookupRule((2, 2, 2), outputs))
+
+
+# ---------------------------------------------------------------------------
+# program.py — exactly five stored fields
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class SimpleProgram(Generic[C, V, W, R]):
+    seed: Seed[C]
+    alphabet: Alphabet[V]
+    frontier: WritableRegion[C, W]
+    neighborhood: ReadableRegion[C, R]
+    rule: Rule[R, W, C]
+
+
+# ---------------------------------------------------------------------------
+# catalog/ — whole-program constructors and explicit aliases
+# ---------------------------------------------------------------------------
+
+
+class catalog:
+    @staticmethod
+    def elementary_cellular_automaton(
+        rule: int = 30,
+        width: int = 79,
+    ) -> SimpleProgram[
+        BinaryLine,
+        bool,
+        Locus,
+        tuple[bool, bool, bool],
+    ]:
+        support = AllSupport(f"binary-line:{width}")
+        return SimpleProgram(
+            seed=seeds.bernoulli(
+                support=support,
+                probability_true=Fraction(1, 2),
+                boundary=Boundary("fixed", False),
+            ),
+            alphabet=alphabets.boolean(),
+            frontier=frontiers.everywhere("binary-line"),
+            neighborhood=neighborhoods.eca(),
+            rule=rules.elementary(rule),
+        )
+
+    @staticmethod
+    def eca(
+        rule: int = 30,
+        width: int = 79,
+    ) -> SimpleProgram[
+        BinaryLine,
+        bool,
+        Locus,
+        tuple[bool, bool, bool],
+    ]:
+        """Explicit alias; it returns the same ordinary five-field value."""
+
+        return catalog.elementary_cellular_automaton(rule=rule, width=width)
+
+
+# ---------------------------------------------------------------------------
+# Rule/Application results used by the one universal application law
+# ---------------------------------------------------------------------------
+
+
+class Progress(Enum):
+    ADVANCED = "advanced"
+    QUIESCENT = "quiescent"
+
+
+class Continuation(Enum):
+    CONTINUE = "continue"
+    STOP = "stop"
+
+
+class NoSuccessorKind(Enum):
+    TERMINAL = "terminal"
+    UNDEFINED = "undefined"
+    DECLARED_FAILURE = "declared-failure"
+    DIVERGENT = "divergent"
+
+
+class Cardinality(Enum):
+    EXACTLY_ZERO = "exactly-zero"
+    EXACTLY_ONE = "exactly-one"
+    MANY = "many"
+    UNDETERMINED = "undetermined"
+
+
+@dataclass(frozen=True)
+class Preserve:
+    """Retain one existing writable capability."""
+
+
+@dataclass(frozen=True)
+class Replace(Generic[V]):
+    payload: V
+
+
+@dataclass(frozen=True)
+class Delete:
+    """Remove one existing writable capability."""
+
+
+@dataclass(frozen=True)
+class Absent:
+    """Do not instantiate one fresh writable capability."""
+
+
+@dataclass(frozen=True)
+class Create(Generic[V]):
+    payload: V
+
+
+@dataclass(frozen=True)
+class ExistingDisposition(Generic[W, V]):
+    target: W
+    disposition: Preserve | Replace[V] | Delete
+
+
+@dataclass(frozen=True)
+class FreshDisposition(Generic[W, V]):
+    target: W
+    disposition: Absent | Create[V]
+
+
+@dataclass(frozen=True)
+class TotalDisposition(Generic[W, V]):
+    existing: tuple[ExistingDisposition[W, V], ...]
+    fresh: tuple[FreshDisposition[W, V], ...]
+
+
+@dataclass(frozen=True)
+class Derivation(Generic[W, V]):
+    replacement: TotalDisposition[W, V]
+    progress: Progress
+    continuation: Continuation
+    witness: str
+    provenance: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class NoSuccessor:
+    outcome: NoSuccessorKind
+    reason: str
+    witness: str
+    provenance: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class FiniteSupport(Generic[A]):
+    atoms: tuple[A, ...]
+    cardinality: Cardinality
+    completeness_certificate: str
+
+
+@dataclass(frozen=True)
+class IntensionalSupport(Generic[A]):
+    relation: RelationExpr
+    cardinality: Cardinality
+    soundness_and_coverage_certificate: str
+
+
+@dataclass(frozen=True)
+class OutcomeSpace(Generic[A]):
+    support: FiniteSupport[A] | IntensionalSupport[A]
+    probability_law: tuple[Fraction, ...] | None = None
+
+
+@dataclass(frozen=True)
+class Complete(Generic[P]):
+    payload: P
+
+
+@dataclass(frozen=True)
+class Fault:
+    phase: str
+    reason: str
+    evidence: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Rejected:
+    fault: Fault
+
+
+@dataclass(frozen=True)
+class ApplicationInput(Generic[C]):
+    configuration: C
+    trace_lineage: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class AppliedDerivation(Generic[C, W, V]):
+    successor: C
+    source: Derivation[W, V]
+    fresh_bindings: tuple[tuple[W, Locus], ...]
+    output_trace_lineage: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class AppliedNoSuccessor:
+    source: NoSuccessor
+    output_trace_lineage: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class SuccessorGroup(Generic[C, W, V]):
+    successor: C
+    derivation_fiber: tuple[AppliedDerivation[C, W, V], ...]
+
+
+@dataclass(frozen=True)
+class ApplicationComplete(Generic[C, W, V]):
+    source_outcomes: OutcomeSpace[Derivation[W, V] | NoSuccessor]
+    applied_atoms: tuple[AppliedDerivation[C, W, V] | AppliedNoSuccessor, ...]
+    successor_groups: tuple[SuccessorGroup[C, W, V], ...]
+    outcome_cardinality: Cardinality
+    derivation_cardinality: Cardinality
+    successor_cardinality: Cardinality
+    evidence: tuple[str, ...]
+
+
+ApplicationResult: TypeAlias = Complete[ApplicationComplete[C, W, V]] | Rejected
+
+
+def apply(
+    program: SimpleProgram[C, V, W, R],
+    application_input: ApplicationInput[C],
+) -> ApplicationResult[C, W, V]:
+    """One family-blind application, shown as the five normative phases."""
+
+    compatibility = require_valid_program(program)
+    snapshot = freeze_and_validate_input(
+        application_input,
+        compatibility.configuration_contract,
+        program.alphabet,
+    )
+    writable = resolve_writable(program.frontier, snapshot)
+    readable = resolve_readable(program.neighborhood, snapshot)
+    reconstruction = derive_closed_reconstruction(writable, compatibility)
+    require_same_snapshot_and_join(snapshot, readable, writable, compatibility)
+
+    rule_result = denote(program.rule, readable, writable)
+    if isinstance(rule_result, Rejected):
+        return rule_result
+
+    # Phase 1: validate the entire sound-and-covering Rule outcome space.
+    validated = validate_complete_rule_space(
+        rule_result.payload,
+        program.rule,
+        readable,
+        writable,
+        compatibility,
+        program.alphabet,
+    )
+
+    # Phase 2: bind every fresh identity from semantic scope and witness.
+    fresh_space = bind_all_fresh(
+        validated,
+        snapshot.configuration_identity,
+        canonical_identity(program.rule),
+        writable,
+    )
+
+    # Phase 3: reconstruct every alternative from the same old snapshot.
+    candidates = reconstruct_all(
+        reconstruction,
+        snapshot.configuration,
+        validated,
+        fresh_space,
+    )
+
+    # Phase 4: validate all successors before any becomes authoritative.
+    applied_atoms = validate_all_successors(
+        candidates,
+        compatibility.configuration_contract,
+        program.alphabet,
+        application_input.trace_lineage,
+    )
+
+    # Phase 5: retain witnesses, then quotient and push measures forward.
+    groups = group_semantically_equal_successors(applied_atoms, compatibility)
+    measures = derive_unrenormalized_measure_views(validated, applied_atoms, groups)
+    return build_complete_application(validated, applied_atoms, groups, measures)
+
+
+# ---------------------------------------------------------------------------
+# rollout.py — auxiliary traversal over apply, never a second executor
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class RolloutRequest:
+    steps: int
+    replay_key: str | None = None
+
+
+@dataclass(frozen=True)
+class TraceLeaf(Generic[C]):
+    configuration: C
+    trace_lineage: tuple[str, ...]
+    continuing: bool
+
+
+@dataclass(frozen=True)
+class Episode(Generic[C, W, V]):
+    applications: tuple[ApplicationResult[C, W, V], ...]
+    leaves: tuple[TraceLeaf[C], ...]
+    truncated: bool
+
+
+def rollout(
+    program: SimpleProgram[C, V, W, R],
+    steps: int,
+    *,
+    replay_key: str | None = None,
+) -> Episode[C, W, V]:
+    """Realize the Seed, then repeatedly traverse only through ``apply``."""
+
+    request = RolloutRequest(steps=steps, replay_key=replay_key)
+    leaves = realize_seed_with_replay(program.seed, request.replay_key)
+    applications: list[ApplicationResult[C, W, V]] = []
+
+    for _ in range(request.steps):
+        next_leaves: list[TraceLeaf[C]] = []
+        for leaf in leaves:
+            if not leaf.continuing:
+                next_leaves.append(leaf)
+                continue
+            result = apply(
+                program,
+                ApplicationInput(leaf.configuration, leaf.trace_lineage),
+            )
+            applications.append(result)
+            next_leaves.extend(expand_continuing_derivation_fibers(result))
+        leaves = tuple(next_leaves)
+
+    return Episode(
+        applications=tuple(applications),
+        leaves=leaves,
+        truncated=any(leaf.continuing for leaf in leaves),
+    )
+
+
+# ---------------------------------------------------------------------------
+# serialization.py and __init__.py — canonical payload and public spelling
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ProgramPayload(Generic[C, V, W, R]):
+    seed: Seed[C]
+    alphabet: Alphabet[V]
+    frontier: WritableRegion[C, W]
+    neighborhood: ReadableRegion[C, R]
+    rule: Rule[R, W, C]
+
+
+class serialization:
+    @staticmethod
+    def encode_program(program: SimpleProgram[C, V, W, R]) -> bytes:
+        payload = ProgramPayload(
+            seed=program.seed,
+            alphabet=program.alphabet,
+            frontier=program.frontier,
+            neighborhood=program.neighborhood,
+            rule=program.rule,
+        )
+        return encode_closed_versioned_node("ca.simple-program", 1, payload)
+
+    @staticmethod
+    def decode_program(data: bytes) -> SimpleProgram[C, V, W, R] | Rejected:
+        payload = decode_closed_versioned_node("ca.simple-program", 1, data)
+        if isinstance(payload, Rejected):
+            return payload
+        return require_valid_program(
+            SimpleProgram(
+                seed=payload.seed,
+                alphabet=payload.alphabet,
+                frontier=payload.frontier,
+                neighborhood=payload.neighborhood,
+                rule=payload.rule,
+            )
+        ).program
+
+
+# ``ca.__init__`` re-exports module namespaces plus only these conveniences:
+# ``SimpleProgram``, ``apply``, and the auxiliary ``rollout`` boundary.
+# Whole-program semantic names remain under ``ca.catalog``.
+
+
+def public_surface_example() -> Episode[BinaryLine, Locus, bool]:
+    program = SimpleProgram(
+        seed=seeds.bernoulli(
+            support=AllSupport("binary-line:79"),
+            probability_true=Fraction(1, 2),
+            boundary=Boundary("fixed", False),
+        ),
+        alphabet=alphabets.boolean(),
+        frontier=frontiers.everywhere("binary-line"),
+        neighborhood=neighborhoods.eca(),
+        rule=rules.elementary(30),
+    )
+
+    same_program = catalog.eca(rule=30, width=79)
+    assert serialization.encode_program(program) == serialization.encode_program(
+        same_program
+    )
+    return rollout(same_program, steps=100, replay_key="example-0001")

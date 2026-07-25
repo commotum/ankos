@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — APPLICATION COMPLETE; SURFACE NEXT**
+Status: **IN PROGRESS — SURFACE CUTOVER UNDERWAY**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -35,7 +35,7 @@ after separate authorization.
 | 3 | `goal-5/integration-handoff.md` | Remaster boundary and Goal 2 preserve/replace decisions |
 | 4 | `goal-5/10-RECONCILE.md` | Exact T01–T45 dispositions |
 | 5 | `goal-5/source-decision-matrix.csv` | Source traceability only when a decision needs it |
-| 6 | `simple_programs.md`, `api.md`, `ref/notes/ca-scaffold.py` | Design inputs to clarify during Goal 6 |
+| 6 | `api.md`, `simple_programs.md`, `ref/notes/ca-scaffold.py` | Stage 4 public, conceptual, and code-shaped projections governed by this architecture |
 | 7 | `goal-2/goal-2-handoff.md` | Frozen details for conclusions explicitly preserved by Goal 5 |
 
 When sources conflict, the more authoritative Goal 5 result wins. A newly
@@ -79,14 +79,15 @@ Stages 2 and 3.
 | `goal-6/0-plan.md` | Completion contract and staged strategy |
 | `goal-6/0-loop.md` | Execution protocol and stage template |
 | `goal-6/architecture.md` | Canonical internal architecture and ownership decisions |
-| `api.md` | Stage 4 target: clean public API contract; currently a design input |
-| `simple_programs.md` | Stage 4 target: conceptual specification/rationale without a competing API |
-| `ref/notes/ca-scaffold.py` | Stage 4 target: one compact code-shaped architecture walkthrough |
+| `api.md` | Normative target public API and import contract; Goal 7 implements it |
+| `simple_programs.md` | Conceptual explanation of the five-field model; never a second API |
+| `ref/notes/ca-scaffold.py` | Non-runtime code-shaped walkthrough of the settled architecture |
 | `goal-6/catalog-migration.md` | Stage 5 canonical 60-family/T01–T45 catalog mapping |
 | `goal-6/conformance.md` | Stage 6 paper fixtures and Goal 7 test obligations |
 | `goal-6/goal-7-handoff.md` | Stage 7 file-level implementation plan |
 | `goal-2/` | Frozen historical comparison baseline; never current instructions |
 | `GOALS.md` | Live status and execution sequence only |
+| `README-V2.md` | Documentation for the currently implemented 0.1 runtime until Goal 7 cutover |
 
 Stage reports record evidence. They do not become competing specifications.
 
@@ -145,8 +146,8 @@ obsolete stage machinery.
 | Complete Rule result algebra and application pseudocode | Stage 3 |
 | Fresh-identity allocation, overlapping-write ordering, and validation before/after commit | Stage 3 |
 | Entropy authority across Seed laws, stochastic Rule laws, replay evidence, and external run requests | Stages 2–3 |
-| Final ownership of helper/result types without public module inflation | Stage 4 |
-| Root exports, alias spelling, and `ca.rollout` surface | Stage 4 |
+| Final ownership of helper/result types without public module inflation | Resolved in File and Public Surface Ownership below |
+| Root exports, alias spelling, and `ca.rollout` surface | Resolved in File and Public Surface Ownership below |
 | Stable catalog IDs, canonical constructor names, and six-module placement | Stage 5 |
 | Legacy source/capability boundaries for adaptive subdivision, sequential network schedules, weak PDEs, and exact transcendental execution | Stages 5–6 |
 | Pressure fixtures, codec/replay/commutation tests, and hostile review | Stage 6 |
@@ -168,7 +169,7 @@ This table proves that no Goal 2 subsystem is silently unreviewed.
 | `neighborhoods.py` | Preserved file, generalized read contract |
 | `rules.py`, `updates.py` | Rule descriptors preserved; update semantics absorbed into Rule/results and generic commit |
 | `seeds.py` | Preserved and generalized from event-zero data to configuration sources/laws |
-| `outcomes.py`, `traces.py` | Semantics preserved; Stage 4 decides minimal ownership without presuming public files |
+| `outcomes.py`, `traces.py` | Semantics preserved in `rules.py`, `program.py`, and auxiliary `rollout.py`; no public files by these names |
 | `expressions.py`, `relations.py`, `queries.py` | Closed data strengths preserved; sibling ontology rejected in favor of five-field programs and external run/query policy |
 | `serialization.py` | Preserved as a root cross-cutting codec boundary |
 | `specs.py` | Replaced by `program.py` and `SimpleProgram` |
@@ -577,8 +578,8 @@ collapses:
    remain?
 
 These are contract terms, not decisions to create public `results.py` or
-`replacement.py` modules. Stage 4 assigns their smallest cohesive code
-ownership.
+`replacement.py` modules. Rule-side records belong to `rules.py`;
+application-side records belong to `program.py`.
 
 ### Conceptual sum
 
@@ -1136,7 +1137,8 @@ Required error categories include invalid/unknown descriptor, incompatible
 configuration type, Alphabet violation, invalid region, missing read
 capability, unauthorized write schema, invariant violation, unsupported
 exactness, and missing entropy/replay evidence. The result algebra integrates
-these with outcomes; Stage 4 assigns their minimal code ownership.
+these with outcomes under `rules.py` before commit and `program.py` during and
+after application.
 
 ## Universal Atomic Application
 
@@ -1165,8 +1167,8 @@ initial support: Seed constrains sources, not the transition codomain.
 `ApplicationResult` contains the mapped Rule outcome space, applied
 derivations, semantic successor groups or an intensional successor relation,
 no-successor outcomes, measures, faults, and replay/provenance evidence.
-Stage 4 decides the smallest public spelling and ownership for these contract
-records.
+These application-side records live in `program.py`; the Rule-side records
+they preserve live in `rules.py`.
 
 The internal `commit` operation is a pure, family-blind structural operation:
 
@@ -1471,8 +1473,272 @@ a qualified external realization/query or a separately seeded work program,
 not hidden application semantics.
 
 The intended `ca.rollout` surface is therefore tooling over `apply`, not a
-stored component and not the definition of a program. Stage 4 settles its
-public request/result spelling without reopening this semantic boundary.
+stored component and not the definition of a program. Its public and file
+ownership is fixed below without reopening this semantic boundary.
+
+## File and Public Surface Ownership
+
+This section defines the target package surface. It is a Goal 7 implementation
+contract, not a claim that the current 0.1 runtime already exposes these
+objects.
+
+The locked semantic core and catalog remain:
+
+```text
+src/ca/
+├── __init__.py
+├── program.py
+├── loci.py
+├── alphabets.py
+├── seeds.py
+├── frontiers.py
+├── neighborhoods.py
+├── rules.py
+├── serialization.py
+├── py.typed
+└── catalog/
+    ├── __init__.py
+    ├── entries.py
+    ├── automata.py
+    ├── substitua.py
+    ├── machina.py
+    ├── media.py
+    ├── criteria.py
+    └── dynamica.py
+```
+
+The existing `rollout.py` remains adjacent **tooling** behind the root
+`ca.rollout` callable. Its survival does not add a semantic component, change
+the locked core/catalog tree, or promise a `ca.rollout.*` namespace.
+
+### Cohesive file responsibilities
+
+| File | Owns | Explicitly does not own |
+|---|---|---|
+| `__init__.py` | Curated façade: module namespaces plus `SimpleProgram`, `apply`, and callable `rollout` | Component factories, catalog constructors, registries, or duplicate implementations |
+| `loci.py` | Closed structural identities, occurrences, paths, spans, ports, interfaces, selectors, region algebra, lenses, and fresh references | Read or write authority, configuration policy, family behavior, or execution |
+| `alphabets.py` | `Alphabet` value schemas, exact equality/representation, primitive and composed structural value constructors | Carrier support, topology, scheduling, or rules |
+| `seeds.py` | `Seed` descriptors for exact, constructive, partial, probabilistic-law, and intensional initial configurations; source composition | Ambient draws, rollout horizons, dataset sampling, or transition behavior |
+| `frontiers.py` | `WritableRegion`, writable capability resolution, structural write schemas, fresh namespaces, composition, and presets | Firing-site selection, reads, collision resolution, or commit policy |
+| `neighborhoods.py` | `ReadableRegion`, identity-preserving read views, composition, and local/global/structural/differential presets | Writes, update policy, or unrestricted access to the configuration |
+| `rules.py` | `Rule`, closed Rule constructors/combinators, `RuleResult`, support/cardinality/law records, total dispositions, Rule atoms, witnesses, provenance, progress, and continuation | Committing configurations, choosing samples, solver execution, rollout, or catalog dispatch |
+| `program.py` | Exactly-five-field `SimpleProgram`, compatibility evidence, `ApplicationInput`, `ApplicationResult` and applied records, family-blind `apply`, private reconstruction plans, validation, atomic commit, and successor quotient | Component catalogs, horizon policy, solvers, renderers, datasets, or family-specific engines |
+| `serialization.py` | Versioned fail-closed codecs for expanded programs, components, results, evidence, traces, and verified receipts | A sixth field, catalog resolution, alias execution, or semantic dispatch |
+| `py.typed` | Empty PEP 561 marker declaring that distributed type information is supported | Runtime symbols or behavior |
+| `catalog/entries.py` | Descriptive entry metadata, stable IDs, provenance, canonical homes, search, and alias/preset/compatibility relations | Program identity or execution dispatch |
+| Six catalog category files | Canonical whole-program constructors for their locked navigation mechanic | Runtime subclasses, alternate engines, or duplicated component primitives |
+| `catalog/__init__.py` | Explicit category namespaces, metadata lookup, and collision-free convenience constructor re-exports | Implicit discovery, wildcard registration, or dispatch |
+| `rollout.py` | `RolloutRequest`, `RolloutResult`, raw trace/application graph records, Seed realization requests, and traversal implemented only by repeated `program.apply` | A program field, one-step semantics, family switches, rendering, or dataset planning |
+
+`WritableRegion` and `ReadableRegion` are the canonical component type names.
+The field names remain `frontier` and `neighborhood`, and the plural modules
+remain `frontiers` and `neighborhoods`. The current `Frontier` and
+`Neighborhood` names may be temporary Goal 7 compatibility aliases, but they
+do not define competing contracts.
+
+The Rule/application split is intentional: `rules.py` owns everything before
+commit; `program.py` owns validation and the applied result after mapping the
+Rule space through generic reconstruction. That division makes separate public
+`replacement.py`, `results.py`, or `engine.py` modules unnecessary.
+
+### Dependency direction
+
+The target dependency graph is one-way:
+
+```text
+loci + alphabets
+       |
+       v
+seeds + frontiers + neighborhoods
+       |
+       v
+rules -> program -> rollout
+
+semantic owners -------------> serialization
+component modules + program -> catalog category modules
+categories + entries --------> catalog.__init__
+selected public owners ------> ca.__init__
+```
+
+This is a semantic dependency ordering, not a requirement that every arrow be
+a direct Python import. Shared protocols may be type-only imports or expressed
+through generic structural contracts where that avoids cycles. The invariants
+are:
+
+- component modules never import `program`, `rollout`, or `catalog`;
+- `rules.py` may depend on component contracts, but no component depends on a
+  Rule constructor;
+- `program.py` imports the five component contracts and Rule-side result
+  algebra, but never catalog metadata;
+- `rollout.py` calls `program.apply`; `program.py` never calls rollout;
+- the catalog imports core constructors, while core application never imports
+  the catalog;
+- downstream datasets, RNG helpers, and visualization may consume programs
+  and results, while no semantic core file imports them; and
+- `__init__.py` is a leaf façade and is never imported by package internals.
+
+`serialization.py` recognizes the closed schemas owned by the semantic
+modules. It does not import the catalog to resolve recipes. Catalog-side
+construction may verify an optional receipt and pass the verified receipt to a
+codec envelope, but the canonical payload and decoder remain expanded and
+alias-independent.
+
+There is consequently no public `configuration.py`, `regions.py`,
+`replacement.py`, `results.py`, `engine.py`, `run.py`, or `updates.py`.
+Configuration structure is carried by Seed output and shared loci/Alphabet
+contracts; raw region structure belongs to `loci.py`; Rule-side results belong
+to `rules.py`; application-side results and atomic execution belong to
+`program.py`; repeated traversal belongs behind `ca.rollout`.
+
+### Root and module-qualified spelling
+
+The canonical surface is deliberately small:
+
+```python
+import ca
+
+ca.program
+ca.loci
+ca.alphabets
+ca.seeds
+ca.frontiers
+ca.neighborhoods
+ca.rules
+ca.serialization
+ca.catalog
+
+ca.SimpleProgram
+ca.apply
+ca.rollout
+```
+
+Public record types remain importable from their owners—for example,
+`ca.rules.RuleResult` and `ca.program.ApplicationResult`—rather than all being
+duplicated at package root. Component constructors are always module
+qualified:
+
+```python
+ca.neighborhoods.eca()       # one ReadableRegion component
+ca.rules.elementary(30)      # one Rule component
+ca.catalog.eca(rule=30)      # one complete SimpleProgram
+```
+
+There is no root `ca.eca`, `ca.boolean`, `ca.bernoulli`, or pile of suffixed
+collision aliases. Whole-program names are under `ca.catalog`; reusable
+component presets remain under their plural module. This gives each spelling
+one level of meaning.
+
+The public one-step convenience accepts a configuration directly while
+retaining the explicit input record for advanced callers:
+
+```text
+apply(
+    program: SimpleProgram[C, V, W, R],
+    input: C | ApplicationInput[C],
+) -> ApplicationResult[C]
+```
+
+Passing `C` derives a canonical direct-application root lineage. Passing
+`ApplicationInput` supplies a validated lineage explicitly. Neither form
+changes program identity or Rule denotation.
+
+The minimum rollout convenience is:
+
+```text
+rollout(
+    program: SimpleProgram[C, V, W, R],
+    *,
+    steps: nonnegative integer,
+    initial: C | None = None,
+    replay_key: ReplayKey | None = None,
+) -> RolloutResult[C]
+```
+
+When `initial` is absent, rollout begins from the Seed result space. Without a
+replay key it retains the complete finite or intensional law/branching space;
+supplying a key authorizes replayable realization where a Seed or Rule law
+requires a draw. `steps` is an application-depth bound, not semantic time and
+not proof of termination. More specialized query, solver, resource, pruning,
+or view requests remain typed tooling over the returned denotation rather than
+extra keywords that silently change the program.
+
+Advanced request/result records may be imported from the auxiliary
+`ca.rollout` module path, but the promised everyday package attribute
+`ca.rollout` is the callable above. There is no synonymous `run`, `step`, or
+family-specific executor.
+
+### Catalog construction, aliases, and collisions
+
+Every category constructor returns a validated, expanded `SimpleProgram`.
+Category-qualified construction is always available:
+
+```python
+ca.catalog.automata.eca(rule=30)
+```
+
+`catalog/__init__.py` may explicitly re-export a unique preferred spelling:
+
+```python
+ca.catalog.eca(rule=30)
+```
+
+The two spellings call the same constructor. A compatibility alias delegates
+to one canonical constructor and may add a verified construction receipt; it
+cannot supply different fields, register an executor, or become semantic
+identity.
+
+Flat exports are deny-by-default and explicit in `catalog.__all__`. If two
+category modules would claim the same name, only the canonical owner's
+constructor may receive that flat spelling. The other must use a distinct
+explicit compatibility name or remain category-qualified. Stage 5 records the
+exact constructor/alias table, but it may not change this collision rule.
+
+`catalog.entries` supports navigation, provenance, lookup, and documentation.
+Looking up an entry may return metadata and its constructor reference; generic
+application never queries the entry table and serialized programs never
+require it.
+
+### Current-to-target cutover
+
+The current runtime is migration evidence, not target authority:
+
+| Current area | Goal 7 target disposition fixed here |
+|---|---|
+| `specs.py` and `Dynamics` | Replace with `program.py` and five-field `SimpleProgram`; any temporary compatibility façade must immediately expand and cannot preserve a second executor |
+| Family decoding in `specs.py` | Move construction to closed component/catalog constructors or canonical codecs; remove executor registry behavior |
+| Tensor/family branches and `apply_rule` in `rollout.py` | Replace with traversal over `program.apply`; keep only rollout requests/results and generic traversal |
+| `RawEpisode` and `RawBatch` | Not canonical core records; Stage 7 may adapt them temporarily at the rollout/dataset boundary while downstream consumers migrate |
+| Broad root constructor exports | Narrow to the façade above; any compatibility exports are explicit, deprecated, and unable to shadow canonical spellings |
+| Current loci/Alphabet/Seed/Frontier/Neighborhood/Rule classes | Evolve in place into the closed generalized contracts; do not create a parallel package |
+| Dataset family switches | Replace downstream with catalog/direct program construction and generic rollout after the core cutover |
+| `rng.py` | Retain only as external realization/dataset support; no semantic authority over Seed or Rule laws |
+| `viz/` | Consume structural rollout/application results through view adapters; never define result identity |
+
+Goal 7 decides the exact deprecation window and file-by-file edit order. It may
+not reverse these ownership decisions.
+
+### Documentation and deferred tooling boundary
+
+The three target documents have deliberately different jobs:
+
+- `api.md` specifies exact Python spelling and public behavior;
+- `simple_programs.md` explains why the five fields cover the audited
+  constructions; and
+- this architecture specifies the closed internals and implementation
+  obligations.
+
+The reference scaffold mirrors those decisions in code order but is never
+imported. `README-V2.md` continues to document the actually shipped 0.1
+runtime until Goal 7 performs the runtime and documentation cutover; its
+current API examples do not override this target contract.
+
+Generation, dataset planning, streams, batching, RNG convenience, rendering,
+visualization, and export organization remain deferred. Whatever later layout
+is chosen must accept ordinary `SimpleProgram` values and/or
+application/rollout results, call only the generic public boundary, preserve
+replay/evidence semantics, and remain downstream of the core and catalog. It
+cannot introduce hidden program fields, family execution branches, or a second
+semantic result type.
 
 ## Serialization Contract
 
