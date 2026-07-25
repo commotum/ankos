@@ -250,8 +250,16 @@ streams, RNG helpers, or visualization.
   `96305d34cf2fb097e9d45e161375ebd20bf45999` and changed planning
   documentation only. Runtime/test/Goal 2 trees and frozen hashes remain at
   their Stage 1 values; the 102-test baseline was not rerun for docs-only work.
-- Stage 4 (`4-SURFACE`) is the first incomplete stage. Stages 5–7 remain
-  untouched.
+- Stage 4 (`4-SURFACE`) is the first incomplete stage and is now in progress.
+  Its scoped baseline contains only the completed Stage 3 documentation edits;
+  no runtime, frozen Goal 2, or public/reference file is concurrently modified.
+- The three Stage 4 cutover inputs currently conflict with the settled
+  architecture: `api.md` is a raw design transcript, `simple_programs.md`
+  still specifies a fixed `t+N D` trajectory generator with `DOMAIN`, `SHAPE`,
+  and `BOUNDARY` axes, and `ref/notes/ca-scaffold.py` remains a generic
+  `Component`/`Dynamics`-era template rather than the five-field package
+  scaffold.
+- Stages 5–7 remain untouched.
 
 ## Assumptions To Challenge
 
@@ -465,6 +473,8 @@ one-shot programs.
   without becoming part of `SimpleProgram`.
 
 ### 4-SURFACE
+
+Status: **IN PROGRESS — ownership and public/reference cutover underway**
 
 #### Big Picture Objective
 
