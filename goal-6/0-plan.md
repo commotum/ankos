@@ -250,9 +250,10 @@ streams, RNG helpers, or visualization.
   `96305d34cf2fb097e9d45e161375ebd20bf45999` and changed planning
   documentation only. Runtime/test/Goal 2 trees and frozen hashes remain at
   their Stage 1 values; the 102-test baseline was not rerun for docs-only work.
-- Stage 4 (`4-SURFACE`) is the first incomplete stage and is now in progress.
-  Its scoped baseline contains only the completed Stage 3 documentation edits;
-  no runtime, frozen Goal 2, or public/reference file is concurrently modified.
+- Stage 4 (`4-SURFACE`) is complete. It began after autosave commit
+  `53e813ddd251541e035b4f3e632133e215a6043b` and changed only the eight
+  expected planning, public-documentation, README, and reference-scaffold
+  files.
 - Stage 4 assigns Rule-side sums to `rules.py`, application and rollout sums
   plus both public operations to `program.py`, codec results to
   `serialization.py`, component construction to the plural modules, and
@@ -262,7 +263,11 @@ streams, RNG helpers, or visualization.
 - The published/current and retained runtime READMEs are explicitly marked as
   runtime snapshots with a pointer to the pending target contract; neither can
   now be mistaken for Goal 7 architecture.
-- Stages 5–7 remain untouched.
+- The final Stage 4 scaffold compiles and executes, whitespace and scoped-diff
+  checks pass, and independent API and concept/scaffold hostile reviews report
+  no remaining blocker. Runtime, test, Goal 2, and Goal 5 trees are unchanged.
+- Stage 5 (`5-CATALOG`) is the first incomplete stage. Stages 5–7 remain
+  untouched.
 
 ## Assumptions To Challenge
 
@@ -477,7 +482,7 @@ one-shot programs.
 
 ### 4-SURFACE
 
-Status: **IN PROGRESS — ownership and public/reference cutover underway**
+Status: **COMPLETE — ownership, public/reference cutover, and hostile review verified**
 
 #### Big Picture Objective
 

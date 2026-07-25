@@ -1,6 +1,6 @@
 # 4-SURFACE
 
-Status: **IN PROGRESS**
+Status: **COMPLETE — ownership, public/reference cutover, and hostile review verified**
 
 ## Current Facts
 
@@ -10,7 +10,9 @@ Status: **IN PROGRESS**
 - The Stage 4 scoped baseline contains only the completed Stage 3 planning
   edits in `goal-6/0-plan.md`, `goal-6/3-APPLICATION.md`, and
   `goal-6/architecture.md`. No runtime file, frozen Goal 2 file, or Stage 4
-  public/reference input is concurrently modified.
+  public/reference input was concurrently modified. The first autosave after
+  Stage 3 completion is commit
+  `53e813ddd251541e035b4f3e632133e215a6043b`.
 - At the start of the stage, `api.md` was a 1,128-line question/answer design
   history, `simple_programs.md` was a 2,199-line fixed `t+N D` cellular-
   automata trajectory schema, and `ref/notes/ca-scaffold.py` was a 200-line
@@ -105,28 +107,76 @@ Files expected to change:
 
 ## Completion Requirements
 
-- [ ] Every locked file and public boundary has one cohesive, nonduplicated
+- [x] Every locked file and public boundary has one cohesive, nonduplicated
       responsibility and an acyclic dependency direction.
-- [ ] The core/catalog tree and six catalog module names match the locked
+- [x] The core/catalog tree and six catalog module names match the locked
       target exactly.
-- [ ] Root, component-module, catalog-module, and alias import conventions are
+- [x] Root, component-module, catalog-module, and alias import conventions are
       explicit and the intended examples have one obvious spelling.
-- [ ] `api.md`, `simple_programs.md`, `goal-6/architecture.md`, and the
+- [x] `api.md`, `simple_programs.md`, `goal-6/architecture.md`, and the
       reference scaffold describe one architecture with distinct document
       roles.
-- [ ] The scaffold is syntactically valid, readable top-to-bottom, and contains
+- [x] The scaffold is syntactically valid, readable top-to-bottom, and contains
       no obsolete program axis, unrestricted callback, family dispatch, or
       alternate executor.
-- [ ] Current runtime migration sources have target dispositions without
+- [x] Current runtime migration sources have target dispositions without
       performing Goal 7 work.
-- [ ] Deferred auxiliary organization has a stable dependency boundary and no
+- [x] Deferred auxiliary organization has a stable dependency boundary and no
       unresolved core/catalog responsibility.
-- [ ] Hostile review, path/link/import examples, syntax, terminology,
+- [x] Hostile review, path/link/import examples, syntax, terminology,
       whitespace/diff, frozen hashes, and behavioral-tree checks pass.
-- [ ] Stage 5 can create the exact 60-family catalog matrix without reopening
+- [x] Stage 5 can create the exact 60-family catalog matrix without reopening
       surface ownership or public naming conventions.
 
 ## Stage Results
 
-To be completed after the ownership, document/scaffold cutover, hostile review,
-and verification pass.
+- The target tree now has one acyclic responsibility split. `loci.py` owns
+  shared identity/region structure; the five plural component modules own
+  their closed descriptor algebras; `rules.py` owns Rule-side outcomes;
+  `program.py` owns the exactly-five-field `SimpleProgram`, application-side
+  outcomes, family-blind `apply`, rollout records, and the root-callable
+  `rollout`; `serialization.py` owns fail-closed codecs; and `catalog/` owns
+  ordinary whole-program constructors plus metadata-only entries.
+- The root exposes the component and catalog namespaces plus only
+  `SimpleProgram`, `apply`, and `rollout` as direct conveniences. Component
+  presets remain module-qualified. Catalog constructors remain category-
+  qualified, with only unique explicit convenience re-exports such as
+  `ca.catalog.eca`; aliases always expand to ordinary five-field values.
+- There is no target public `rollout.py`. Goal 7 must physically fold the
+  current traversal into `program.py` or rename helpers to a private,
+  nonconflicting path; merely excluding the submodule from `__all__` would
+  still allow it to shadow callable `ca.rollout`.
+- `api.md` is now the concise normative target contract,
+  `simple_programs.md` is the conceptual five-field account,
+  `goal-6/architecture.md` is the detailed implementation-planning authority,
+  and both READMEs identify the current and retained runtime accurately
+  without presenting it as the Goal 7 target.
+- `ref/notes/ca-scaffold.py` is one executable, code-shaped walkthrough ordered
+  from loci through component construction, five-field composition, catalog
+  aliases, application, rollout, serialization, and the root surface. It has
+  631 lines / 587 nonblank lines. Independent hostile review judged that to be
+  the upper edge of compact but still one readable progression; further
+  compression would remove contract-bearing distinctions.
+- Hostile review found and resolved the substantive risks: a same-named
+  rollout submodule, a shared result envelope that created an ownership cycle,
+  raw-input normalization drift, optional-lineage and initial-state mismatch,
+  ambiguous catalog exports, callable metadata entries, decode construction
+  before validation, lossy/intentionally finite rollout sketches, and
+  unrepresentable or collapsed owner-specific result records. The final API
+  consistency and concept/scaffold reviews both returned a clean pass.
+- `python3 -m py_compile ref/notes/ca-scaffold.py`,
+  `python3 ref/notes/ca-scaffold.py`, Markdown fence parity, path inspection,
+  import/example inspection, and `git diff --check` pass. No full runtime test
+  run was warranted because Stage 4 changes only documentation and reference
+  material.
+- Relative to the Stage 4 baseline, only the eight expected files changed.
+  `src/ca`, `tests`, `goal-2`, and `goal-5` have no diff. Their frozen tree
+  hashes remain `6e6b34769d60508c03d0a69fad1ede4fef75e217`,
+  `02ad081e039a46efbf61855fdeae60abb7bb70ad`, and
+  `48b6309655ec7c1d3aaa1a0ec5dfb700385e16d1` for the first three
+  respectively. Goal 2 handoff and README SHA-256 values remain
+  `5792ac1810dafdd0be6343e1d03c4b1ab20c48551efd73400fea5a1812a9f192`
+  and `e063609c7a52d32bd0a4d3bb384cd5da233c34f57a169e2db6cce197c76e0c4d`.
+- Stage 5 is now the first incomplete stage. It can map the 60 audited
+  executable families into the six locked catalog modules without reopening
+  core ownership, public naming, or application semantics.

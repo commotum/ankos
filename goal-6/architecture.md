@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — SURFACE CUTOVER UNDERWAY**
+Status: **IN PROGRESS — SURFACE COMPLETE; CATALOG NEXT**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -2350,8 +2350,9 @@ above.
 - Stage 3 is complete: result algebra, closed reconstruction, phase-wide atomic
   application, witness/measure/lineage semantics, and the run/tool boundary are
   authoritative above.
-- Stage 4 is next: exact file ownership, public imports, documentation, and
-  reference scaffold;
-- Stage 5 — catalog construction and migration;
+- Stage 4 is complete: exact file ownership, public imports, documentation
+  roles, runtime cutover dispositions, and the compact reference scaffold are
+  verified.
+- Stage 5 is next: catalog construction and migration;
 - Stage 6 — pressure fixtures and conformance;
 - Stage 7 — implementation handoff and final reconciliation.
