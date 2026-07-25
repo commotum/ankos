@@ -41,23 +41,6 @@ class Locus:
     scope: str
     path: tuple[Exact, ...]
 
-class Primitive(Enum):
-    ENUM = "enum"
-    PRODUCT = "product"
-    BERNOULLI = "bernoulli"
-    LOOKUP = "lookup"
-    PARALLEL = "parallel"
-    RELATION = "relation"
-    DISTRIBUTION = "distribution"
-    DIFFERENTIAL = "differential"
-
-@dataclass(frozen=True)
-class Expr:
-    """One recognized, versioned node in a closed semantic AST."""
-
-    primitive: Primitive
-    arguments: tuple[Exact | Locus | "Expr", ...]
-
 class RegionKind(Enum):
     LITERAL = "literal"
     ALL_SUPPORT = "all-support"
@@ -103,6 +86,31 @@ class loci:
 
 # --- Component modules: primitives -> compounds -> useful presets ----------
 
+# Each sealed node variant is owned by its component module.  `Expr` is only
+# the compact cross-owner wire union used by this walkthrough, not a loci-owned
+# god enum or an execution dispatch registry.
+class AlphabetPrimitive(Enum):
+    ENUM = "alphabet.enum"
+    PRODUCT = "alphabet.product"
+
+class SeedPrimitive(Enum):
+    BERNOULLI = "seed.bernoulli"
+
+class RulePrimitive(Enum):
+    PRODUCT = "rule.product"
+    LOOKUP = "rule.lookup"
+    PARALLEL = "rule.parallel"
+    RELATION = "rule.relation"
+    DISTRIBUTION = "rule.distribution"
+    DIFFERENTIAL = "rule.differential"
+
+SemanticPrimitive: TypeAlias = AlphabetPrimitive | SeedPrimitive | RulePrimitive
+
+@dataclass(frozen=True)
+class Expr:
+    primitive: SemanticPrimitive
+    arguments: tuple[Exact | Locus | "Expr", ...]
+
 @dataclass(frozen=True)
 class Alphabet(Generic[V]):
     descriptor: Expr
@@ -142,6 +150,18 @@ class ReadableRegion(Generic[C, R]):
     result_shape: tuple[str, ...]
 
 @dataclass(frozen=True)
+class WritableEnvelope(Generic[A]):
+    """One resolved envelope whose member capabilities are structurally keyed."""
+
+    descriptor: Region
+
+@dataclass(frozen=True)
+class IndexedView(Generic[A]):
+    """One resolved identity-indexed view whose entries have shape A."""
+
+    descriptor: Region
+
+@dataclass(frozen=True)
 class Rule(Generic[R, W, C]):
     descriptor: Expr
 
@@ -149,12 +169,12 @@ class Rule(Generic[R, W, C]):
 class alphabets:
     @staticmethod
     def boolean() -> Alphabet[bool]:
-        return Alphabet(Expr(Primitive.ENUM, (False, True)))
+        return Alphabet(Expr(AlphabetPrimitive.ENUM, (False, True)))
 
     @staticmethod
     def product(parts: tuple[Alphabet[Exact], ...]) -> Alphabet[tuple[Exact, ...]]:
         descriptors = tuple(part.descriptor for part in parts)
-        return Alphabet(Expr(Primitive.PRODUCT, descriptors))
+        return Alphabet(Expr(AlphabetPrimitive.PRODUCT, descriptors))
 
 
 class seeds:
@@ -168,17 +188,19 @@ class seeds:
         probability_true: Fraction,
         boundary: Boundary,
     ) -> Seed[BinaryLine]:
-        construction = Expr(Primitive.BERNOULLI, (probability_true,))
+        construction = Expr(SeedPrimitive.BERNOULLI, (probability_true,))
         return Seed(SourceExpr(construction, support, boundary))
 
 
 class frontiers:
     @staticmethod
-    def everywhere() -> WritableRegion[C, Locus]:
+    def everywhere() -> WritableRegion[C, WritableEnvelope[Locus]]:
         return WritableRegion(loci.all_support("current-carrier"))
 
     @staticmethod
-    def union(parts: tuple[WritableRegion[C, W], ...]) -> WritableRegion[C, W]:
+    def union(
+        parts: tuple[WritableRegion[C, WritableEnvelope[A]], ...],
+    ) -> WritableRegion[C, WritableEnvelope[A]]:
         descriptors = tuple(part.descriptor for part in parts)
         return WritableRegion(loci.union(descriptors))
 
@@ -198,7 +220,10 @@ class neighborhoods:
         )
 
     @staticmethod
-    def eca() -> ReadableRegion[BinaryLine, tuple[bool, bool, bool]]:
+    def eca() -> ReadableRegion[
+        BinaryLine,
+        IndexedView[tuple[bool, bool, bool]],
+    ]:
         anchor = Region(RegionKind.LITERAL, loci=(loci.named("site"),))
         offsets = tuple(loci.coordinate("x", value) for value in (-1, 0, 1))
         return ReadableRegion(
@@ -210,16 +235,20 @@ class neighborhoods:
 class rules:
     @staticmethod
     def table(input_shape: tuple[int, ...], outputs: tuple[Exact, ...]) -> Rule[R, W, C]:
-        shape = Expr(Primitive.PRODUCT, input_shape)
-        return Rule(Expr(Primitive.LOOKUP, (shape, *outputs)))
+        shape = Expr(RulePrimitive.PRODUCT, input_shape)
+        return Rule(Expr(RulePrimitive.LOOKUP, (shape, *outputs)))
 
     @staticmethod
     def parallel(parts: tuple[Rule[R, W, C], ...]) -> Rule[R, W, C]:
         descriptors = tuple(part.descriptor for part in parts)
-        return Rule(Expr(Primitive.PARALLEL, descriptors))
+        return Rule(Expr(RulePrimitive.PARALLEL, descriptors))
 
     @staticmethod
-    def elementary(number: int) -> Rule[tuple[bool, bool, bool], Locus, BinaryLine]:
+    def elementary(number: int) -> Rule[
+        IndexedView[tuple[bool, bool, bool]],
+        WritableEnvelope[Locus],
+        BinaryLine,
+    ]:
         if not 0 <= number <= 255:
             raise ValueError("elementary rule number must be in 0..255")
         outputs = tuple(bool((number >> index) & 1) for index in range(8))
@@ -236,6 +265,9 @@ class SimpleProgram(Generic[C, V, W, R]):
     neighborhood: ReadableRegion[C, R]
     rule: Rule[R, W, C]
 
+    def __post_init__(self) -> None:
+        require_compatible_five_fields(self)
+
 
 # --- catalog/automata.py: whole-program constructor and explicit alias -----
 
@@ -244,7 +276,12 @@ class automata:
     def eca(
         rule: int = 30,
         width: int = 79,
-    ) -> SimpleProgram[BinaryLine, bool, Locus, tuple[bool, bool, bool]]:
+    ) -> SimpleProgram[
+        BinaryLine,
+        bool,
+        WritableEnvelope[Locus],
+        IndexedView[tuple[bool, bool, bool]],
+    ]:
         carrier = f"binary-line:{width}"
         return SimpleProgram(
             seed=seeds.bernoulli(
@@ -262,7 +299,12 @@ class automata:
     def elementary_cellular_automaton(
         rule: int = 30,
         width: int = 79,
-    ) -> SimpleProgram[BinaryLine, bool, Locus, tuple[bool, bool, bool]]:
+    ) -> SimpleProgram[
+        BinaryLine,
+        bool,
+        WritableEnvelope[Locus],
+        IndexedView[tuple[bool, bool, bool]],
+    ]:
         """Descriptive compatibility alias; Stage 5 finalizes alias metadata."""
 
         return automata.eca(rule=rule, width=width)
@@ -308,81 +350,29 @@ class NoSuccessorOutcome(Enum):
     DECLARED_FAILURE = "declared-failure"
     DIVERGENT = "divergent"
 
-class Cardinality(Enum):
-    EXACTLY_ZERO = "exactly-zero"
-    EXACTLY_ONE = "exactly-one"
-    MANY = "many"
-    UNDETERMINED = "undetermined"
-
 @dataclass(frozen=True)
-class CardinalityClaim:
-    kind: Cardinality
-    evidence: Expr
+class TotalDisposition(Generic[W]):
+    """Closed Preserve/Replace/Delete and Absent/Create meaning over all W."""
 
-@dataclass(frozen=True)
-class Preserve(Generic[W]):
-    target: W
-
-@dataclass(frozen=True)
-class ReplacementPayload:
     descriptor: Expr
-
-@dataclass(frozen=True)
-class Replace(Generic[W]):
-    target: W
-    payload: ReplacementPayload
-
-@dataclass(frozen=True)
-class Delete(Generic[W]):
-    target: W
-
-@dataclass(frozen=True)
-class Absent(Generic[W]):
-    target: W
-
-@dataclass(frozen=True)
-class Create(Generic[W]):
-    target: W
-    payload: ReplacementPayload
-
-DispositionAtom: TypeAlias = (
-    Preserve[W] | Replace[W] | Delete[W] | Absent[W] | Create[W]
-)
-
-@dataclass(frozen=True)
-class FiniteDisposition(Generic[W]):
-    atoms: tuple[DispositionAtom[W], ...]
     totality_evidence: Expr
 
-@dataclass(frozen=True)
-class IntensionalDisposition:
-    relation: Expr
-    totality_evidence: Expr
-
-TotalDisposition: TypeAlias = FiniteDisposition[W] | IntensionalDisposition
+CardinalityClaim: TypeAlias = Expr
+Witness: TypeAlias = Expr
+Provenance: TypeAlias = tuple[str, ...]
 
 @dataclass(frozen=True)
-class FiniteSupport(Generic[A]):
-    atoms: tuple[A, ...]
-    cardinality: CardinalityClaim
-    soundness_and_coverage: Expr
+class SupportSpace(Generic[A]):
+    """Closed tagged Finite[A] | Intensional[A], with cardinality/coverage."""
 
-@dataclass(frozen=True)
-class IntensionalSupport(Generic[A]):
-    relation: Expr
-    cardinality: CardinalityClaim
-    soundness_and_coverage: Expr
-
-SupportSpace: TypeAlias = FiniteSupport[A] | IntensionalSupport[A]
-
-@dataclass(frozen=True)
-class ProbabilityLaw(Generic[A]):
     descriptor: Expr
+
+ProbabilityLaw: TypeAlias = Expr
 
 @dataclass(frozen=True)
 class OutcomeSpace(Generic[A]):
     support: SupportSpace[A]
-    probability_law: ProbabilityLaw[A] | None
+    probability_law: ProbabilityLaw | None
 
 @dataclass(frozen=True)
 class Continue:
@@ -399,15 +389,15 @@ class Derivation(Generic[W]):
     replacement: TotalDisposition[W]
     progress: Progress
     continuation: Continuation
-    witness: Expr
-    provenance: tuple[str, ...]
+    witness: Witness
+    provenance: Provenance
 
 @dataclass(frozen=True)
 class NoSuccessor:
     outcome: NoSuccessorOutcome
     reason: Expr
-    witness: Expr
-    provenance: tuple[str, ...]
+    witness: Witness
+    provenance: Provenance
 
 RuleAtom: TypeAlias = Derivation[W] | NoSuccessor
 
@@ -427,57 +417,45 @@ class RuleComplete(Generic[C, W]):
 
 RuleResult: TypeAlias = RuleComplete[C, W] | RuleRejected
 
-@dataclass(frozen=True)
-class TraceLineage:
-    identity: str
-    parents: tuple[str, ...] = ()
+TraceLineage: TypeAlias = Expr
 
 @dataclass(frozen=True)
 class ApplicationInput(Generic[C]):
     configuration: C
     trace_lineage: TraceLineage | None = None
 
-@dataclass(frozen=True)
-class AppliedDerivation(Generic[C, W]):
-    successor: C
-    source: Derivation[W]
-    fresh_bindings: tuple[Expr, ...]
-    output_trace_lineage: TraceLineage
-    evidence: Expr
+# These names denote the closed applied records defined in architecture.md:
+# successor/source/fresh-bindings/lineage/evidence, and successor plus complete
+# derivation fiber. They are structural AST nodes here, not omitted data.
+AppliedAtom: TypeAlias = Expr
+AppliedNoSuccessor: TypeAlias = Expr
+SuccessorGroup: TypeAlias = Expr
 
 @dataclass(frozen=True)
-class AppliedNoSuccessor:
-    source: NoSuccessor
-    output_trace_lineage: TraceLineage
-    evidence: Expr
-
-AppliedAtom: TypeAlias = AppliedDerivation[C, W] | AppliedNoSuccessor
+class MeasureAbsent:
+    """No source probability law."""
 
 @dataclass(frozen=True)
-class SuccessorGroup(Generic[C, W]):
-    successor: C
-    derivation_fiber: SupportSpace[AppliedDerivation[C, W]]
-
-class MeasureState(Enum):
-    ABSENT = "absent"
-    AVAILABLE = "available"
-    UNAVAILABLE = "unavailable"
+class MeasureAvailable:
+    measure: Expr
 
 @dataclass(frozen=True)
-class MeasureView:
-    state: MeasureState
-    descriptor_or_evidence: Expr | None
+class MeasureUnavailable:
+    reason: Expr
+    retained_source_law_and_mapping_evidence: Expr
+
+MeasureView: TypeAlias = MeasureAbsent | MeasureAvailable | MeasureUnavailable
 
 @dataclass(frozen=True)
 class ApplicationComplete(Generic[C, W]):
     source_outcomes: OutcomeSpace[RuleAtom[W]]
-    applied_atoms: SupportSpace[AppliedAtom[C, W]]
+    applied_atoms: SupportSpace[AppliedAtom]
     no_successor_partition: SupportSpace[AppliedNoSuccessor]
     outcome_atom_cardinality: CardinalityClaim
     derivation_cardinality: CardinalityClaim
     successor_cardinality: CardinalityClaim
     successor_quotient_with_derivation_fibers: SupportSpace[
-        SuccessorGroup[C, W]
+        SuccessorGroup
     ]
     applied_atom_measure: MeasureView
     successor_submeasure: MeasureView
@@ -496,45 +474,36 @@ class ApplicationRejected:
 
 ApplicationResult: TypeAlias = ApplicationComplete[C, W] | ApplicationRejected
 
+APPLICATION_PHASES = (
+    "program",
+    "input",
+    "frontier",
+    "neighborhood",
+    "join",
+    "rule-denotation",
+    "result-validation",
+    "fresh-binding",
+    "commit",
+    "successor",
+    "quotient-measure",
+)
 
 def apply(
     program: SimpleProgram[C, V, W, R],
     application_input: C | ApplicationInput[C],
 ) -> ApplicationResult[C, W]:
     normalized_input = normalize_application_input(application_input)
-    compatibility = require_valid_program(program)
-    snapshot = freeze_and_validate_input(normalized_input, compatibility)
-    writable = resolve_writable(program.frontier, snapshot)
-    readable = resolve_readable(program.neighborhood, snapshot)
-    reconstruction = derive_closed_reconstruction(writable, compatibility)
-    require_same_snapshot_and_join(snapshot, readable, writable, compatibility)
-    rule_result = denote(program.rule, readable, writable)
-    if isinstance(rule_result, RuleRejected):
-        return ApplicationRejected(
-            ApplicationFault(
-                phase=f"rule:{rule_result.fault.phase}",
-                reason=rule_result.fault.reason,
-                evidence=rule_result.fault.evidence,
-            )
-        )
-
-    # 1. Validate the whole sound-and-covering Rule outcome space.
-    validated = validate_complete_rule_space(
-        rule_result.outcome_space,
+    # The closed helper executes APPLICATION_PHASES in order.  Any phase fault
+    # becomes ApplicationRejected and prevents every later phase.  After Rule
+    # denotation its five passes are: validate the complete space, bind fresh
+    # identities, reconstruct all alternatives, validate all successors, then
+    # retain witnesses while forming quotient and measure views.  It never
+    # switches on family, carrier, catalog entry, or Rule tag.
+    return execute_closed_application_phases(
         program,
-        readable,
-        writable,
+        normalized_input,
+        phase_order=APPLICATION_PHASES,
     )
-    # 2. Bind all fresh identities from semantic input, Rule, and witnesses.
-    fresh = bind_all_fresh(validated, snapshot, program.rule, writable)
-    # 3. Reconstruct every alternative from the same immutable snapshot.
-    candidates = reconstruct_all(reconstruction, snapshot, validated, fresh)
-    # 4. Validate all successors before any becomes authoritative.
-    applied = validate_all_successors(candidates, program.alphabet, compatibility)
-    # 5. Retain witnesses, then quotient and push measures forward.
-    groups = group_semantically_equal_successors(applied, compatibility)
-    measures = derive_unrenormalized_measure_views(validated, applied, groups)
-    return build_complete_application(validated, applied, groups, measures)
 
 
 # --- program.py: public rollout operation and types, derived from apply -----
@@ -550,13 +519,13 @@ class ContinuingLeaf(Generic[C]):
 @dataclass(frozen=True)
 class ClosedLeaf(Generic[C, W]):
     final_configuration: C | None
-    source: AppliedAtom[C, W]
+    source: AppliedAtom
 
 @dataclass(frozen=True)
 class RawTrace(Generic[C, W]):
     roots: OutcomeSpace[C]
     applications: SupportSpace[ApplicationComplete[C, W]]
-    derivation_edges: SupportSpace[AppliedAtom[C, W]]
+    derivation_edges: SupportSpace[AppliedAtom]
     lineage_graph: Expr
     evidence: Expr
 
@@ -669,7 +638,12 @@ class serialization:
         decoded_payload = decode_closed_versioned_node("ca.simple-program", 1, data)
         if isinstance(decoded_payload, DecodeRejected):
             return decoded_payload
-        payload = decoded_payload.value
+        validated_payload = validate_decoded_program_payload(
+            decoded_payload.value
+        )
+        if isinstance(validated_payload, DecodeRejected):
+            return validated_payload
+        payload = validated_payload.value
         program = SimpleProgram(
             payload.seed,
             payload.alphabet,
@@ -677,10 +651,7 @@ class serialization:
             payload.neighborhood,
             payload.rule,
         )
-        validated = validate_decoded_program(program)
-        if isinstance(validated, DecodeRejected):
-            return validated
-        return Decoded(validated.value)
+        return Decoded(program)
 
 
 # ``ca.__init__`` exposes component/catalog namespaces and only the root
@@ -691,7 +662,10 @@ class serialization:
 #     ca.neighborhoods.eca()  -> ReadableRegion
 #     ca.catalog.eca()        -> SimpleProgram
 
-def public_surface_example() -> RolloutResult[BinaryLine, Locus]:
+def public_surface_example() -> RolloutResult[
+    BinaryLine,
+    WritableEnvelope[Locus],
+]:
     program = catalog.eca(rule=30, width=79)
     encoded = serialization.dumps(program)
     decoded = serialization.loads(encoded)
