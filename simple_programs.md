@@ -25,11 +25,11 @@ The five stored fields are:
 
 | Field | Conceptual responsibility |
 |---|---|
-| `Seed` | Denote valid initial configurations or a law over them |
-| `Alphabet` | Define the closed universe and equality of semantic values |
-| `Frontier` | Resolve the complete writable capability envelope |
-| `Neighborhood` | Resolve the complete readable view |
-| `Rule` | Denote complete, typed, atomic alternatives over those views |
+| `seed: Seed` | Denote valid initial configurations or a law over them |
+| `alphabet: Alphabet` | Define the closed universe and equality of semantic values |
+| `frontier: WritableRegion` | Resolve the complete writable capability envelope |
+| `neighborhood: ReadableRegion` | Resolve the complete readable view |
+| `rule: Rule` | Denote complete, typed, atomic alternatives over those views |
 
 Four symbols describe relationships among those components:
 
@@ -44,13 +44,16 @@ They are type relationships, not additional program fields. In particular,
 `C` is not a stored configuration-schema axis, and `W` and `R` are not cached
 program state.
 
+In prose, *Frontier* and *Neighborhood* name the two field responsibilities;
+their canonical component types are `WritableRegion` and `ReadableRegion`.
+
 Conceptually:
 
 ```text
 Seed[C]                       denotes initial C values, sets, or laws
 Alphabet[V]                   validates semantic values within C
-Frontier[C, W](C)             resolves W
-Neighborhood[C, R](C)         resolves R
+WritableRegion[C, W](C)       resolves W
+ReadableRegion[C, R](C)       resolves R
 Rule[R, W, C](R, W)           denotes typed replacements or outcomes
 ```
 
@@ -138,8 +141,8 @@ unknown or unresolved variant.
 
 ## Frontier
 
-`Frontier[C, W]` resolves the complete writable capability envelope for one
-application.
+The `frontier` field holds a `WritableRegion[C, W]`, which resolves the
+complete writable capability envelope for one application.
 
 The envelope includes every existing component that any permitted Rule
 alternative may replace, relabel, reroute, or delete, and every fresh
@@ -165,8 +168,8 @@ continuous solution region without first enumerating it.
 
 ## Neighborhood
 
-`Neighborhood[C, R]` resolves the complete readable view from the same
-immutable configuration.
+The `neighborhood` field holds a `ReadableRegion[C, R]`, which resolves the
+complete readable view from the same immutable configuration.
 
 Neighborhood answers:
 

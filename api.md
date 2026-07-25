@@ -113,8 +113,9 @@ For example, `eca` is owned by `ca.catalog.automata` and may be re-exported as
 not runtime classes.
 
 Every canonical constructor, parameter preset, compatibility name, and alias
-returns an ordinary five-field `SimpleProgram`, expands through ordinary
-component constructors, records status and provenance as metadata, and has no
+returns an ordinary five-field `SimpleProgram` and expands through ordinary
+component constructors. Catalog entries and optional verified construction
+receipts record status and provenance outside the five fields. None has a
 privileged executor or influence on `ca.apply`.
 
 Reusable pieces remain in the component modules. In particular,
@@ -133,6 +134,13 @@ top-level fields.
 ## Applying One Program
 
 One family-blind operation is the semantic execution primitive:
+
+```python
+result = ca.apply(program, configuration)
+```
+
+Advanced callers may supply explicit trace lineage through the owned input
+record:
 
 ```python
 application_input = ca.program.ApplicationInput(
@@ -223,9 +231,10 @@ An exact zero-replacement result is never a bare empty list. It carries a
 typed `NoSuccessor` atom. An intensional relation may instead be complete with
 `Undetermined` cardinality; that does not justify inventing a terminal atom.
 
-Support cardinality and probability are separate. A result can have exactly
-zero, exactly one, many, or undetermined derivations, with or without a
-probability law over its typed atoms.
+Application reports outcome-atom, replacement-derivation, and
+distinct-successor cardinality separately. Each may be exactly zero, exactly
+one, many, or undetermined; an optional probability law over typed atoms is
+orthogonal to those claims.
 
 ### Atomic application
 
@@ -305,6 +314,17 @@ episode = ca.rollout(
 )
 ```
 
+Its minimum target signature is:
+
+```text
+rollout(program, *, steps, initial=None, replay_key=None) -> RolloutResult
+```
+
+With no explicit `initial`, traversal starts from the Seed result space. With
+no `replay_key`, finite or intensional Seed/Rule laws remain complete
+branching laws; a key authorizes a replayable realization where a draw is
+requested.
+
 `steps` bounds application depth. It is not necessarily physical time, and
 reaching it produces a typed truncated run with continuing leaves rather than
 a false terminal outcome.
@@ -329,7 +349,7 @@ One-shot functions, constraint completions, media transforms, and many
 continuous relations are normally consumed with `ca.apply`, not mandatory
 rollout.
 
-The public callable is `ca.rollout`. The existing `rollout.py` may remain the
+The public callable is `ca.rollout`. The existing `rollout.py` remains the
 auxiliary implementation behind that root function, but the target API does
 not promise a `ca.rollout` module namespace or a `run.py`.
 
@@ -367,7 +387,8 @@ machine floating behavior are never semantic identity.
 
 ## Package and Import Ownership
 
-The target core is:
+The target package surface is the locked semantic core/catalog plus one
+adjacent rollout-tooling file:
 
 ```text
 src/ca/
@@ -380,7 +401,7 @@ src/ca/
 ├── neighborhoods.py
 ├── rules.py
 ├── serialization.py
-├── rollout.py                  # auxiliary implementation behind ca.rollout
+├── rollout.py                  # auxiliary tooling, not a program component
 ├── py.typed
 └── catalog/
     ├── __init__.py
@@ -447,7 +468,3 @@ in place while preserving the boundaries above.
 canonical internal specification; `simple_programs.md` supplies non-competing
 conceptual rationale; and `ref/notes/ca-scaffold.py` is the compact code-shaped
 walkthrough.
-
-Together they describe one architecture: five stored program fields, closed
-structural data, one family-blind application law, named catalog
-constructions, and tooling outside the semantic program value.

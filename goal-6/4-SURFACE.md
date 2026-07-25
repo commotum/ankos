@@ -11,27 +11,23 @@ Status: **IN PROGRESS**
   edits in `goal-6/0-plan.md`, `goal-6/3-APPLICATION.md`, and
   `goal-6/architecture.md`. No runtime file, frozen Goal 2 file, or Stage 4
   public/reference input is concurrently modified.
-- `api.md` is 1,128 lines of raw question/answer design history. It contains
-  useful conclusions but also superseded `UpdatePolicy`, per-locus proposal,
-  unrestricted-old-state, and stochastic-sampling formulations.
-- `simple_programs.md` is a 2,199-line fixed `t+N D` cellular-automata
-  trajectory schema. Its `DOMAIN`, `SHAPE`, `BOUNDARY`, plural component,
-  per-coordinate Rule, and mandatory trajectory assumptions contradict the
-  settled five-field general model.
-- `ref/notes/ca-scaffold.py` is a syntactically valid 200-line generic
-  component-catalog template. It preserves useful phase ordering, but its
-  generic `Component`, alias phase, `Dynamics`, and pipeline discussion do not
-  demonstrate the locked package or five-field API.
+- At the start of the stage, `api.md` was a 1,128-line question/answer design
+  history, `simple_programs.md` was a 2,199-line fixed `t+N D` cellular-
+  automata trajectory schema, and `ref/notes/ca-scaffold.py` was a 200-line
+  `Component`/`Dynamics`-era template. They have now been replaced in place by
+  target public, conceptual, and code-shaped projections of one architecture.
 - The current runtime still exposes `Dynamics`, `RawEpisode`, `RawBatch`,
   component factories at package root, and a tensor-oriented `rollout.py`.
   Stage 4 may specify their target ownership/cutover but may not implement it.
 
 ## Updated Assumptions
 
-- One cohesive `program.py` can own `SimpleProgram` and the public
-  family-blind apply/rollout boundary while Rule-side result descriptors remain
-  with `rules.py`; separate public `results.py`, `replacement.py`,
-  `engine.py`, or `run.py` modules are unnecessary.
+- One cohesive `program.py` owns `SimpleProgram`, application-side records,
+  family-blind one-step application, and private reconstruction while
+  Rule-side result descriptors remain with `rules.py`. The existing
+  `rollout.py` remains an auxiliary traversal file behind callable
+  `ca.rollout`; separate public `results.py`, `replacement.py`, `engine.py`,
+  or `run.py` modules are unnecessary.
 - `loci.py` can own common immutable carrier/configuration identity and
   selector structure without creating `configuration.py`; `seeds.py` owns
   initial sources of those configurations.
@@ -56,8 +52,9 @@ sees the five-field architecture without design-history contradictions.
 - Define exact ownership and dependency direction for every locked core and
   catalog file, the root namespace, and the public apply/rollout boundary.
 - Assign Rule-side dispositions/outcomes to `rules.py`, application-side
-  results and traversal to `program.py`, structural configuration/locus
-  vocabulary to `loci.py`, and codecs to `serialization.py` without creating
+  results and atomic application to `program.py`, repeated traversal to
+  auxiliary `rollout.py`, structural configuration/locus vocabulary to
+  `loci.py`, and codecs to `serialization.py` without creating
   noun-per-concept modules.
 - Define root imports, module-qualified component constructors, catalog
   re-exports, alias expansion, canonical serialization, and collision rules.
