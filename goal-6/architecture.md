@@ -622,7 +622,9 @@ implemented; it cannot be promoted to `Undefined`. `ResourceExhausted` says a
 bounded attempt did not establish the full result; it cannot be promoted to
 `Divergent`, `Terminal`, or exact zero. An unbounded semidecision that has not
 halted simply remains unevaluated; only a semantic divergence certificate may
-produce `Divergent`.
+produce `Divergent`. Resource exhaustion originates only from an explicit
+bounded evaluation, realization, query, or rollout request; it is not an atom
+invented by the denotational Rule.
 
 `Quiescent` is deliberately an identity derivation rather than an empty
 outcome space. If a same-state branch consumes a meaningful draw, records an
@@ -1151,6 +1153,11 @@ relational traversal expands each unique semantic successor while retaining
 all derivation edges; if derivation multiplicity must influence future
 mechanics, it is already in `C` or the measure.
 
+Continuation remains attached to each derivation fiber. If equal successor
+configurations have both `Continue` and `Stop` derivations, rollout records the
+stopped paths and expands the continuing fiber; grouping equal `C` values
+never selects one continuation for the other.
+
 A horizon is never a terminal reason. Reaching one returns a typed truncated
 run with still-continuing leaves. Likewise, stopping early on a quiescent
 identity is a run choice unless the derivation itself declares `Stop`.
@@ -1420,6 +1427,188 @@ the continuous class is deliberately split into flow and PDE fixtures because
 their writable/result obligations differ. Together they exercise fixed
 support, coupled writes, dynamic support, global relations,
 continuous/intensional regions, exactness, and one-shot semantics.
+
+## Stage 3 Application Pressure Executions
+
+These executions test the result/application law rather than catalog
+constructor spelling. Stage 6 later turns them and the other Goal 5 pressure
+categories into the complete conformance plan.
+
+### Outcome/cardinality distinctions
+
+| Case | Rule result | Replacement derivations | Distinct successors | Required observation |
+|---|---|---:|---:|---|
+| Deterministic change | One `Advanced + Continue` atom | 1 | 1 | Ordinary application |
+| Stable fixed point | One identity `Quiescent` atom | 1 | 1, equal to input | Not an empty result |
+| Eventful identity | One identity `Advanced` atom | 1 | 1, equal to input | Witness/event retained; not quiescent |
+| Completed one-shot | One `Advanced + Stop(Completed)` atom | 1 | 1 | Result exists; no invented next step |
+| No applicable rewrite/halt | One `Terminal(reason)` atom | 0 | 0 | Exact terminal zero |
+| Unsatisfiable completion | One `Terminal(NoSolution)` atom | 0 | 0 | Successful exact negative answer |
+| Undefined partial function | One `Undefined(reason)` atom | 0 | 0 | Not terminal, invalid, or unsatisfied |
+| Declared construction failure | One `DeclaredFailure(reason)` atom | 0 | 0 | Semantic failure remains typed |
+| Certified divergence | One `Divergent(certificate)` atom | 0 | 0 | Distinct from timeout |
+| Invalid result/input | `Rejected(Invalid(...))` | Not established | Not established | No commit and no exact-zero claim |
+| Resource exhaustion | `Rejected(ResourceExhausted(...))` | Not established | Not established | Partial observations are diagnostic only |
+| Diamond rewrite | Multiple witnessed derivations | Many | One or fewer than derivations | Dedup retains the full fiber |
+| Empty output value | One replacement containing epsilon/empty carrier | 1 | 1 | Empty value is not empty relation |
+| Intensional solution relation | Complete intensional space | Zero/one/many/undetermined | Intensional quotient | No forced enumeration |
+| Stochastic relation | Probability law over typed atoms | Law support | Pushforward support | Law, draw, and successor mass remain distinct |
+
+Every row has a different serialized sum shape or typed field; none relies on
+an English message or the length of a returned Python list.
+
+### Coupled source/destination and field writes — F031/F007
+
+For a mobile-head transition, `W` contains the source, complete write stencil,
+and every possible destination. For coupled-field evolution it additionally
+contains the whole field output and destructive marker target. `R` contains
+all old values needed for the joint choice.
+
+Rule returns one `Derivation` whose total disposition:
+
+- rewrites the source and shared field;
+- retags exactly the selected destination while explicitly preserving every
+  unselected possible destination;
+- performs the destructive target write where required; and
+- advances or stops control with one witness naming the transition and chosen
+  destination.
+
+Application validates one snapshot/join and commits the disposition once. It
+does not run a field pass and a mobile pass separately, recover destination
+contents, or merge competing writes. Removing any possible target from `W`,
+omitting an unselected destination's disposition, or returning two conflicting
+values rejects the result before commit.
+
+### Structural birth, deletion, and overlap — F029/F040
+
+`W` contains candidate matched structure, every affected incident/interface
+component, and a closed fresh namespace. `R` exposes old match identities,
+ports, dangling interfaces, and Rule-owned match/schedule data.
+
+Each permitted match set is one witnessed derivation. Rule has already chosen
+compatible nonoverlapping patches or resolved their graph-level overlap.
+Every atom explicitly deletes matched nodes/edges, preserves unaffected
+writable interface members, creates fresh components under local semantic
+keys, and reconnects each interface. Application binds fresh identities from
+input lineage plus the match witness, validates collisions and totality,
+commits the whole structural replacement, then validates graph invariants.
+
+Commit never deletes an incident edge implicitly, chooses among overlapping
+patches, invents a port repair, projects reachability, or numbers newborns by
+traversal. A missing interface effect, unauthorized fresh parent, or one
+invalid alternative rejects the complete extensional Rule result with no
+partial successor set.
+
+For sequence deletion or insertion, semantic occurrence identities persist or
+are created as declared; derived indices and ranks are recomputed views. If an
+index/rank is stored state rather than a view, every induced change belongs in
+`W` and the total disposition.
+
+### Multiway branching and diamond merge — F034
+
+Suppose two distinct `(rule, match, parent)` witnesses produce the same child
+word:
+
+```text
+Rule outcome atoms:       d1 -> replacement1
+                          d2 -> replacement2
+Applied derivations:      a1 -> child C
+                          a2 -> child C
+Successor quotient:       child C -> {a1, a2}
+```
+
+The derivation cardinality is two and the distinct-successor cardinality is
+one. Canonical equality is applied only after both witnesses and replacements
+are recorded. Rule/match iteration order cannot change the quotient or its
+fiber. Any probability mass is pushed forward to the child while the two
+source masses remain recoverable.
+
+An identity rewrite is `Advanced` with successor equal to input because the
+rewrite event occurred. A rewrite to the epsilon word is one successor. No
+applicable match is `Terminal(NoApplicableRewrite)` with zero replacement
+derivations. These four cases cannot be represented by the same empty-list or
+state-equality convention.
+
+### Stochastic accept/reject — F050
+
+The Rule denotes a normalized measure over proposal-and-acceptance atoms. `W`
+is the union of every possible proposal target plus all control/cache slots;
+each atom supplies a total disposition.
+
+- An accepted proposal returns an `Advanced` successor with the incumbent,
+  cache, and control updated atomically.
+- A rejection that advances visible control is `Advanced`.
+- A same-configuration rejection that still consumes a semantic draw is an
+  eventful identity `Advanced`, not `Quiescent`.
+- A genuine no-event fixed point may be identity `Quiescent` and may
+  independently declare `Stop`.
+
+Denotational application returns the complete law and its pushforward to
+successors. A realization request selects an atom with a structurally derived
+subkey and records draw evidence; replay reproduces the same full applied
+derivation. Equal accepted/rejected successors aggregate probability only in
+the successor view—the outcome/witness fiber remains intact. A timeout cannot
+renormalize observed branches or claim that unobserved mass is zero.
+
+The same law/realization split covers F016 random-walk motion, F014 terminal
+measurement, and F046's one-shot complete random functional graph. F046
+returns a law over whole graph replacements, not one engine draw per node in
+traversal order. Its factored product law states independence explicitly;
+ordinary Seed/Rule product composition does not infer it.
+
+### Continuous flow and event reset — F006/F037
+
+`R` contains current time/state and the geometry/vector-field/event data; `W`
+contains the continuous state, time, segment/event records, and every reset
+slot. Rule returns a finite or intensional outcome space of complete flow
+segment/endpoint derivations.
+
+For a boundary collision, one atom contains the segment to the earliest
+verified hit plus a coupled disposition for hit time, position, reflected
+velocity, and event record. Application commits that macro-result atomically.
+It does not choose a time step, numerically integrate inside commit, or expose
+an intermediate state to another derivation. Nonunique flows remain multiple
+or intensional atoms. Simultaneous/corner hits require an explicit Rule
+tie/reset convention or multiple witnessed atoms; application supplies no
+collision convention. A singularity may be a typed terminal/undefined
+outcome. A numerical segment is a represented realization with method/error
+evidence, not the exact flow silently replaced by floats.
+
+### Intensional PDE and finite completion — F041/F015
+
+For F041, Rule may return a closed intensional relation over complete unknown
+fields, with an exact but possibly `Undetermined` cardinality claim. Its
+universal conformance obligation proves that members are total over `W`,
+satisfy the declared differential and side-data relation, and produce valid
+`C`. Application maps commit over that relation intensionally. A solver may
+later provide a certified member or finite characterization; resource-limited
+mesh output cannot claim completeness or change the Rule denotation.
+
+For F015, the same boundary can return a finite exact set of table
+completions. Each satisfying table is an `Advanced + Stop(Completed)`
+derivation; universal satisfaction is in its witness. No model is
+`Terminal(NoSolution)`, not `Undefined` or an implementation failure. A
+partial solver enumeration is neither the finite Rule result nor proof of
+unsatisfiability.
+
+### One-shot transform — F021/F061
+
+Seeded input, table/index state, and result slots form `C`; the hash/index Rule
+reads the complete dynamic lookup path and returns one total insertion, hit,
+or miss replacement. The result atom is `Advanced + Stop`, even when the
+stored table is preserved and only the result slot changes. Direct
+`apply` is the complete use of the program. Feedback or repeated requests can
+be built explicitly, but no trajectory flag, fake second state, or mandatory
+rollout is part of the construction.
+
+F061 applies the same boundary to a global basis projection: one application
+writes the complete coefficient vector and stops. `Stop` therefore cannot mean
+“no replacement”; terminal continuation and successor cardinality are
+independent.
+
+These executions use the same `RuleResult`, validation, commit, quotient, and
+evidence path. None requires application to learn the family, carrier, or
+catalog home.
 
 ## Stage 1 Repository Baseline
 
