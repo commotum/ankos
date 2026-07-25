@@ -207,10 +207,17 @@ streams, RNG helpers, or visualization.
 - `api.md` and `simple_programs.md` contain important design reasoning alongside
   narrower or superseded formulations. A fresh session currently lacks one
   concise, unambiguous implementation authority.
-- `GOALS.md` does not yet reflect Goal 5's completion or the Goal 6 → Goal 7
-  sequence.
-- No `goal-6` execution stage has begun. These three control files only define
-  how it will proceed.
+- `GOALS.md` now records Goal 5 as complete, Goal 6 as the active remaster, and
+  Goal 7 as future implementation. Goal 4 is explicitly superseded and Goal 2
+  remains frozen evidence.
+- Stage 1 is complete. `goal-6/architecture.md` records the source hierarchy,
+  document roles, an exhaustive Goal 2 preserve/replace/defer ledger, and the
+  clean runtime/test/frozen-plan baseline at commit
+  `318a5383cea0898421db3993257e5aec24b7f7dd`.
+- The Stage 1 runtime baseline is 102 passing tests, `src/ca` tree
+  `6e6b34769d60508c03d0a69fad1ede4fef75e217`, and `tests` tree
+  `02ad081e039a46efbf61855fdeae60abb7bb70ad`.
+- Stage 2 (`2-CONTRACTS`) is the first incomplete stage.
 
 ## Assumptions To Challenge
 
@@ -305,6 +312,9 @@ taxonomy audit.
 ## Indexed Stages
 
 ### 1-CUTOVER
+
+Status: **COMPLETE — source authority, live goal index, Goal 2 disposition, and
+runtime baseline recorded**
 
 #### Big Picture Objective
 
