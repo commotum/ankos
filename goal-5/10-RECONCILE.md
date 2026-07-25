@@ -6,7 +6,8 @@ Blind whole-book discovery is frozen before catalog or design comparison.
 
 - Stage 10 freeze: 1,563 raw leads, 188 serious, 867 resolved, 508 weak,
   and 94 mechanics candidates.
-- Saturation result: zero new or unresolved construction leads
+- Stage 9 saturation result at freeze: zero new or unresolved leads; the
+  Stage 13 correction below supersedes one Q037 disposition.
 
 Final hostile review later corrected one existing classification, added one
 source-anchored lead from the existing saturation hit set, and split one

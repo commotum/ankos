@@ -122,7 +122,7 @@ Retain the stable T01–T45 identifiers while applying these exact actions:
 | Retire role | T08 as Seed data/laws; T41 as a misleading catalog role while retaining F047 |
 | Split | T40 between F002 and F008 |
 
-Add the 33 missing family rows listed in `taxonomy-census.md`. Assign fresh
+Add the 41 missing family rows listed in `taxonomy-census.md`. Assign fresh
 stable IDs after the catalog naming and ordering convention is chosen; do not
 recycle retired IDs or make IDs depend on implementation class names.
 
@@ -188,7 +188,10 @@ fixtures before implementation:
 | Stochastic mechanics | F016, F044, F046, F050 | Probability law and replay entropy are explicit and lossless. |
 | Mutable program state | F035, F051 | Program text is ordinary tagged writable state under a closed interpreter Rule. |
 | One-shot evaluation | F011, F013–F015, F021, F025, F036, F045 | A single Rule application is legitimate without inventing repeated dynamics. |
-| Observer boundary | F004, F010, F042 | Useful transforms remain available without inflating the semantic-family catalog. |
+| Fixed gate networks | F014 | Compare-exchange, reversible Boolean, and unitary gates share fixed wiring while preserving their different gate algebras. |
+| Distinct codec mechanics | F013, F057–F063 | Record scans, prefix trees, nested intervals, history pointers, region trees, basis projections, predictors, and aligned XOR remain distinct Rule skeletons rather than one purpose-based class. |
+| Shared priority construction | F056 | Fair dovetailing, shared mutable approximations, and injury fit visible state plus a nonlocal Rule. |
+| Observer boundary | F004, F010, F042, F045 | Derived graph construction and calibrated testing have invariant commits; a pure emulation interface and a property-only observation remain roles. |
 
 ## Goal 6 Completion Contract
 
@@ -200,7 +203,7 @@ Goal 6 is ready to hand to implementation only when:
 - atomic replacement, preserve-outside behavior, result cardinality,
   stochastic replay, continuous/intensional objects, and dynamic support are
   specified;
-- T01–T45 and the 33 additions have an exact catalog migration plan;
+- T01–T45 and the 41 additions have an exact catalog migration plan;
 - no public component or family class exists only for naming convenience;
 - the engine pseudocode contains no catalog/family switch; and
 - the implementation stages are ordered around reusable mechanics, not Book

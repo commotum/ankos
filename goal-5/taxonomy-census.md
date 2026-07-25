@@ -2,9 +2,9 @@
 
 ## Final Count
 
-The Book inventory resolves to **52 executable semantic families**. The current
-45-row catalog covers **19** of those families; **33** source-grounded families
-are absent at the family level. Three additional mechanics groups are retained
+The Book inventory resolves to **60 executable semantic families**. The current
+45-row catalog covers **19** of those families; **41** source-grounded families
+are absent at the family level. Two additional mechanics groups are retained
 as close exclusions because they are observers or interfaces rather than
 distinct transition mechanics.
 
@@ -14,19 +14,19 @@ examples do not inflate the family count.
 
 | Census level | Count | Meaning |
 |---|---:|---|
-| Raw source leads | 1,563 | Cheap inherited and newly recorded pointers |
-| Serious source leads | 188 | Passages requiring mechanics-level resolution |
-| Resolved or weak leads | 1,375 | Aliases, repeated evidence, roles, exposition, or insufficient mechanics |
-| Full mechanics candidates | 94 | Source-grounded constructions and close cases with semantic fingerprints |
-| Executable candidate roots | 52 | Representatives of distinct executable mechanics |
-| Presets or variants | 34 | Runnable differences representable as family data |
-| Close-exclusion candidates | 8 | Non-family roles retained for boundary clarity |
-| Consolidated mechanics groups | 55 | 52 executable families plus three close-only groups |
+| Raw source leads | 1,564 | Cheap inherited and newly recorded pointers |
+| Serious source leads | 190 | Passages requiring mechanics-level resolution |
+| Resolved or weak leads | 1,374 | Aliases, repeated evidence, roles, exposition, or insufficient mechanics |
+| Full mechanics candidates | 102 | Source-grounded constructions and close cases with semantic fingerprints |
+| Executable candidate roots | 60 | Representatives of distinct executable mechanics |
+| Presets or variants | 35 | Runnable differences representable as family data |
+| Close-exclusion candidates | 7 | Non-family roles retained for boundary clarity |
+| Consolidated mechanics groups | 62 | 60 executable families plus two close-only groups |
 | Current-catalog family coverage | 19 | Executable families represented by T01–T45 |
-| Proposed family additions | 33 | Executable families missing from the current catalog |
+| Proposed family additions | 41 | Executable families missing from the current catalog |
 | Unresolved serious questions | 0 | No open lead, family, catalog, or API decision |
 
-The count ladder matters: “188 serious leads,” “94 candidates,” and “52 types”
+The count ladder matters: “190 serious leads,” “102 candidates,” and “60 types”
 are not competing answers. They are successive consolidation levels.
 
 ## Current-Catalog Coverage: 19 Families
@@ -50,21 +50,22 @@ are not competing answers. They are successive consolidation levels.
 | F047 | `recursive-function-evaluator` |
 | F048 | `register-machine` |
 | F052 | `structural-pattern-rewrite` |
-| F053 | `synchronous-local-state-automaton` |
+| F053 | `synchronous-local-state-transform` |
 | F055 | `weighted-network-state-update` |
 
-## Proposed Family Additions: 33
+## Proposed Family Additions: 41
 
 | ID | Semantic family |
 |---|---|
 | F001 | `alternating-partition-local-evolution` |
 | F003 | `asynchronous-local-state-automaton` |
+| F004 | `event-provenance-causal-network` |
 | F006 | `continuous-event-dynamics` |
 | F007 | `coupled-field-mobile-locus-evolution` |
 | F009 | `driven-relaxation` |
 | F011 | `enumerative-semidecision` |
 | F012 | `error-diffusion-transform` |
-| F013 | `finite-codec-transform` |
+| F013 | `maximal-run-record-transduction` |
 | F014 | `finite-gate-circuit` |
 | F015 | `finite-model-satisfaction` |
 | F016 | `first-passage-aggregation` |
@@ -81,7 +82,6 @@ are not competing answers. They are successive consolidation levels.
 | F035 | `mutable-rule-local-automaton` |
 | F036 | `nearest-neighbor-retrieval` |
 | F037 | `ordinary-differential-flow` |
-| F039 | `parallel-local-field-transform` |
 | F043 | `population-evolutionary-search` |
 | F044 | `probabilistic-transition-model-fitting` |
 | F045 | `program-randomization-test` |
@@ -90,15 +90,22 @@ are not competing answers. They are successive consolidation levels.
 | F050 | `stochastic-local-search` |
 | F051 | `stored-program-random-access-machine` |
 | F054 | `weighted-history-sum-relation` |
+| F056 | `priority-dovetailed-oracle-construction` |
+| F057 | `weighted-prefix-block-transduction` |
+| F058 | `nested-interval-symbol-transduction` |
+| F059 | `history-reference-record-transduction` |
+| F060 | `recursive-uniform-region-decomposition` |
+| F061 | `orthogonal-basis-coefficient-transform` |
+| F062 | `predictive-residual-transduction` |
+| F063 | `aligned-xor-stream-transduction` |
 
 “Addition” means the current semantic catalog lacks the mechanics. It does not
 mean the implementation should add one bespoke runtime or public class per row.
 
-## Close Exclusions: 3 Groups
+## Close Exclusions: 2 Groups
 
 | ID | Close group | Why it is not a family |
 |---|---|---|
-| F004 | `causal-network-extraction` | Derives provenance dependencies from an already executed history; it does not define the source transition. |
 | F010 | `encode-evolve-decode-interface` | Wraps an unchanged target construction with an encoder, stop/query, and decoder. |
 | F042 | `percolation-connectivity-analysis` | Observes global connectivity of a sampled configuration rather than defining its evolution. |
 
@@ -112,8 +119,8 @@ Every current catalog row received exactly one disposition:
 
 | Disposition | Count |
 |---|---:|
-| Retain as family | 20 |
-| Retain as preset | 16 |
+| Retain as family | 15 |
+| Retain as preset | 21 |
 | Merge | 2 |
 | Repair | 2 |
 | Alias | 2 |
@@ -135,13 +142,18 @@ The changes with architectural consequences are:
 - split T40 between append-only generation and digit-emitting register
   transduction.
 
+Family normalization also makes T09 and T25 presets under T12's common
+mobile-head family, T16 a flat-string preset under T20's structural rewrite
+family, T28 a dimensional preset under T14, and T34 an arithmetic preset under
+generic iterated-map row T43.
+
 The exact row-by-row mapping is in `10-RECONCILE.md`. Family definitions,
 candidate membership, source anchors, and distinguishing tests are in
 `11-FAMILIES.md`.
 
 ## API Finding
 
-All 52 executable families fit:
+All 60 executable families fit:
 
 ```python
 SimpleProgram(
@@ -163,12 +175,12 @@ stochasticity, and continuous objects. The complete mapping is in
 ## Evidence and Traceability
 
 - `coverage.md` records sequential chapter/Notes and selective-image coverage.
-- `raw-leads.csv` retains all 1,563 source pointers and terminal statuses.
-- `candidates.md` contains the 94 full semantic fingerprints.
+- `raw-leads.csv` retains all 1,564 source pointers and terminal statuses.
+- `candidates.md` contains the 102 full semantic fingerprints.
 - `source-decision-matrix.csv` maps every lead to its final decision, candidate,
   catalog action, and family.
 - `9-SATURATION.md` records the single frozen 40-query whole-book omission
-  challenge, which produced no new lead.
+  challenge and the final correction of its one missed interactive-system hit.
 - `10-RECONCILE.md` and `11-FAMILIES.md` record catalog and family decisions.
 - `13-HOSTILE-REVIEW.md` records the independent final challenge.
 

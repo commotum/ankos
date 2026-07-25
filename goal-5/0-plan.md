@@ -677,7 +677,7 @@ smallest honest changes where it does not.
 
 ### 13-HOSTILE-REVIEW
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-5/13-HOSTILE-REVIEW.md`.
 
 #### Big Picture Objective
 
@@ -704,6 +704,8 @@ conclusions.
 - No serious objection remains unresolved.
 
 ### 14-CENSUS
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
