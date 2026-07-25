@@ -2,17 +2,17 @@
 
 This is a heading-level progress map, not a paragraph ledger.
 
-Status meanings:
+Status meanings preserved from the execution sequence:
 
 - `INHERITED`: earlier blind discovery coverage is accepted as a starting fact;
   Goal 5 does not reread it.
-- `PENDING`: assigned to a later Goal 5 stage.
-- `CLOSE NEXT`: substantively reviewed earlier but must be closed directly from
-  canonical source under the lean Goal 5 protocol.
+- `PENDING` and `CLOSE NEXT`: historical work states; no row remains in either
+  state.
 
-Lead counts below count a lead once per document. A lead can cite more than one
-document, so the column does not sum to the 1,488-lead register. Zero means only
-that no inherited lead cites the document.
+Lead counts below count an inherited lead once per document. A lead can cite
+more than one document, so the column does not sum to either the 1,488-lead
+inherited bridge or the 1,563-lead final register. Zero means only that no
+inherited lead cites the document.
 
 | Canonical document | Headings | Goal 5 coverage | Stage | Inherited leads |
 |---|---:|---|---:|---:|
