@@ -509,9 +509,9 @@ itself contain a continuous field, flow segment, symbolic solution, or other
 intensional structure; “continuous” describes that semantic object or its
 measure, not a separate result cardinality.
 
-The exact result variants, compact encodings, witness/deduplication rules,
-outcomes, failures, fresh allocation, and commit algorithm are Stage 3 work.
-Stage 2 fixes this denotational minimum: each alternative is a total
+The result/application sections below fix the concrete semantic variants,
+witness/deduplication rules, outcomes, failure boundaries, fresh binding, and
+commit law. Stage 2 fixed their denotational minimum: each alternative is a total
 disposition over `W`. Every existing writable capability is explicitly
 `Preserve`, `Replace`, or `Delete`; every fresh capability is explicitly
 `Absent` or `Create`. A sparse encoding is valid only when it declares one of
@@ -575,12 +575,15 @@ ownership.
 
 ### Conceptual sum
 
-The Rule codomain is:
+One generic envelope is used before and after commit:
 
 ```text
-RuleResult[C, W] =
-    Complete(OutcomeSpace[RuleAtom[C, W]])
+ResultEnvelope[P] =
+    Complete(OutcomeSpace[P])
   | Rejected(Fault)
+
+RuleResult[C, W]    = ResultEnvelope[RuleAtom[C, W]]
+ApplicationResult[C] = ResultEnvelope[AppliedAtom[C]]
 
 RuleAtom[C, W] =
     Derivation(
@@ -596,21 +599,28 @@ RuleAtom[C, W] =
         witness: Witness,
         provenance: Provenance,
     )
+
+AppliedAtom[C] =
+    AppliedDerivation(successor: C, source: Derivation, fresh_bindings, evidence)
+  | NoSuccessor
 ```
 
 `Complete` means the descriptor denotes the whole outcome space, even when
 that space is intensional or its cardinality is undecidable. `Rejected` means
-there is no authoritative Rule denotation to commit for this application. Its
-closed `Fault` variants include invalid program/input/result, unsupported
-exactness or capability, evaluation failure, and resource exhaustion, each
-with the phase, reason, and evidence needed to diagnose it.
+there is no authoritative denotation to commit or expose at that boundary.
+`RuleResult` can originate Rule-evaluation/result-schema faults;
+`ApplicationResult` can additionally originate earlier program/input/region
+faults or later fresh/commit/successor/quotient faults. Closed `Fault` variants
+include invalid data/result, unsupported exactness or capability, evaluation
+failure, and resource exhaustion, each with the phase, reason, and evidence
+needed to diagnose it.
 
 The successful semantic outcomes are distinct:
 
 | Outcome | Replacement? | Meaning |
 |---|---:|---|
 | `Advanced` | Yes | A semantic event occurred; the resulting `C` may still equal the input |
-| `Quiescent` | Yes, identity | No semantic state change or event occurred |
+| `Quiescent` | Yes, identity | No configuration change; Rule declares no construction event |
 | `Terminal` | No, or `Stop` after one | The relation completed and declares no continuation |
 | `Undefined` | No | The valid input lies outside the mathematical relation's domain |
 | `DeclaredFailure` | No | The construction itself denotes a typed failure rather than a successor |
@@ -627,9 +637,10 @@ bounded evaluation, realization, query, or rollout request; it is not an atom
 invented by the denotational Rule.
 
 `Quiescent` is deliberately an identity derivation rather than an empty
-outcome space. If a same-state branch consumes a meaningful draw, records an
-event, advances control, or changes future applicability, it is `Advanced`.
-Likewise, a one-shot function can return an `Advanced` derivation with
+outcome space. It may retain a witness or external draw evidence without
+pretending the configuration changed. If a same-state branch records a
+construction event, advances visible control, or changes future applicability,
+it is `Advanced`. Likewise, a one-shot function can return an `Advanced` derivation with
 `Stop(Completed)`: it produces a successor/result once without inventing a
 second application.
 
@@ -643,7 +654,7 @@ second application.
 | `Intensional` | A versioned relation AST with binding, membership/construction, validation, and universal conformance obligations |
 | `ProbabilityLaw` | A closed probability measure over a finite or intensional atom space |
 
-Every complete space carries a cardinality claim:
+Every support or quotient carries a cardinality claim:
 
 ```text
 ExactlyZero
@@ -655,6 +666,11 @@ Undetermined(closed_reason_or_obligation)
 `Undetermined` is not a guessed `Many` and not an operational failure. It is an
 exact intensional relation whose emptiness, uniqueness, or multiplicity is not
 established by the descriptor. A finite presentation may not use it.
+
+A complete evaluation with zero replacement derivations still carries a typed
+`NoSuccessor` atom explaining terminality, undefinedness, declared failure, or
+certified divergence. A bare empty outcome container is invalid; zero is never
+left semantically untyped.
 
 Results report three cardinalities rather than conflating them:
 
@@ -821,9 +837,9 @@ Fresh identities are stable semantic local keys, never ambient UUIDs, object
 addresses, global counters, traversal positions, branch-enumeration indices,
 or materialization order. A fresh reference is scoped by validated input
 lineage, Rule derivation/witness identity, parent or interface, and a closed
-local namespace/key supplied by the replacement. Stage 3 fixes collision and
-cross-branch rules; codecs must already represent the reference losslessly
-without first enumerating an intensional result set.
+local namespace/key supplied by the replacement. The result/application
+contract above fixes collision and cross-branch rules; codecs must represent
+the reference losslessly without first enumerating an intensional result set.
 
 ### Selector and region forms
 
@@ -952,7 +968,7 @@ Every realized Seed output and every proposed successor must validate:
 
 ### 4. Application validity
 
-Stage 3 specifies the algorithm, but its contract must check:
+The universal application law below checks:
 
 - Frontier and Neighborhood resolve against the same immutable `C`;
 - their snapshot binding, locus identities, and declared `R`-to-`W` join
@@ -972,8 +988,8 @@ successor violates its declared contract.
 Required error categories include invalid/unknown descriptor, incompatible
 configuration type, Alphabet violation, invalid region, missing read
 capability, unauthorized write schema, invariant violation, unsupported
-exactness, and missing entropy/replay evidence. Stage 3 integrates these with
-outcomes; Stage 4 assigns their minimal code ownership.
+exactness, and missing entropy/replay evidence. The result algebra integrates
+these with outcomes; Stage 4 assigns their minimal code ownership.
 
 ## Universal Atomic Application
 
@@ -987,7 +1003,10 @@ apply(
 ```
 
 `ApplicationInput` supplies one immutable configuration snapshot and validated
-branch lineage. It is invocation data, not a sixth program component.
+branch lineage. Seed realization supplies a root lineage; direct application
+may derive a canonical root from the validated program and configuration when
+no distinct semantic instance identity is requested. It is invocation data,
+not a sixth program component.
 `ApplicationResult` contains the mapped Rule outcome space, applied
 derivations, semantic successor groups or an intensional successor relation,
 no-successor outcomes, measures, faults, and replay/provenance evidence.
@@ -1095,7 +1114,7 @@ Every rejected/incomplete application names the first failing generic phase:
 | Phase | Representative faults |
 |---|---|
 | Program | Unknown descriptor/version, incompatible five-field contracts |
-| Input | Invalid carrier/value/invariant, missing root lineage |
+| Input | Invalid carrier/value/invariant or invalid/forged root lineage |
 | Frontier | Invalid capability, target kind, or snapshot binding |
 | Neighborhood | Invalid read view, missing dependency, or snapshot binding |
 | Join | Mismatched identities/index shape or unresolved obligation |
@@ -1221,6 +1240,10 @@ Exact encoding obligations include:
   structural references;
 - continuous/intensional ASTs without forced enumeration;
 - probability laws separately from concrete draw/replay evidence; and
+- Rule/Application result sum tags, typed reasons/phases, progress,
+  continuation, and all three cardinality claims;
+- total dispositions, pre-quotient witnesses/derivations, fresh bindings,
+  successor fibers, and intensional conformance obligations;
 - representation relations and provenance needed for inverse-on-image and
   one-step commutation.
 
@@ -1359,8 +1382,9 @@ region and `neighborhood(c) = r` contains every referenced scope under the
 same occurrence identities. `rule(r, w)` denotes an intensional or realized
 set of alternatives. Each representative satisfying alternative replaces
 every unknown in `w`, is total rather than solver-order-dependent, targets
-only `w`, and commits to a valid completed `C`; unsatisfiability is zero
-alternatives, not an invalid sparse successor.
+  only `w`, and commits to a valid completed `C`; unsatisfiability is zero
+  replacement derivations plus `Terminal(NoSolution)`, not an invalid sparse
+  successor or a bare empty container.
 
 Solver order, resource limit, realization bound, and query policy remain
 external. No Solver, ResultPolicy, or special relation-program class is needed.
@@ -1538,8 +1562,9 @@ each atom supplies a total disposition.
 - An accepted proposal returns an `Advanced` successor with the incumbent,
   cache, and control updated atomically.
 - A rejection that advances visible control is `Advanced`.
-- A same-configuration rejection that still consumes a semantic draw is an
-  eventful identity `Advanced`, not `Quiescent`.
+- A same-configuration rejection may be `Quiescent + Continue` while retaining
+  draw evidence; if the Rule treats the proposal attempt as a construction
+  event, it is an eventful identity `Advanced` instead.
 - A genuine no-event fixed point may be identity `Quiescent` and may
   independently declare `Stop`.
 
