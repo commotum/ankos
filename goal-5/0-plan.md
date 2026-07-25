@@ -58,9 +58,9 @@ There is one narrow exception needed to preserve prior discovery work:
   and project only a legacy lead identifier, canonical source anchor, and short
   surface trigger into a compact Goal 5 register.
 - Because the raw store uses opaque source-unit IDs, Stage 1 may also
-  mechanically read the existing corpus manifest only to translate each ID to
-  a canonical document and local unit ordinal. The surface trigger and line
-  range must be derived directly from the canonical Markdown.
+  mechanically read the existing data-only source-unit map solely to translate
+  each ID to a canonical document and line range. The surface trigger must be
+  derived directly from the canonical Markdown.
 - The projection must not copy prior conclusions, semantic fingerprints,
   dispositions, confidence scores, search metadata, verification metadata, or
   surrounding prose.
@@ -202,8 +202,8 @@ family membership, and API fit:
   coverage pointers, not 1,488 types.
 - Each inherited lead has at least one source-unit ID. The raw store does not
   itself contain canonical file and line anchors, so Stage 1 must translate
-  those IDs through the data-only corpus manifest and verify the resulting
-  blank-line-delimited source blocks against canonical Markdown.
+  those IDs through the data-only source-unit map and derive the corresponding
+  source text from canonical Markdown.
 - Chapter 8 still needs a compact, source-grounded Goal 5 closure.
 - Chapters 9–12, their Notes, and the Index still require the lean protocol.
 - The final consolidation, reconciliation, family inventory, API-pressure
