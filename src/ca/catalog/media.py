@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from typing import TypeVar
 
+from .. import alphabets, frontiers, loci, neighborhoods, rules, seeds
 from ..alphabets import Alphabet
 from ..frontiers import WritableRegion
 from ..neighborhoods import ReadableRegion
@@ -305,34 +306,167 @@ def aligned_xor_stream_transduction(
 # Phase 2. Presets
 # ---------------------------------------------------------------------------
 
-# The second spelling is a non-T public preset from the canonical matrix.
-_PENDING_PRESETS: tuple[tuple[str, str], ...] = (
-    ("constant_digit_register", "SPF008"),
-    ("look_and_say", "SPF012"),
-)
+
+def _single_value_components(
+    value: alphabets.SemanticValue,
+    alphabet: alphabets.Alphabet,
+    expression: rules.RuleExpr,
+    *,
+    label: str,
+) -> tuple[
+    seeds.Seed,
+    alphabets.Alphabet,
+    frontiers.WritableRegion,
+    neighborhoods.ReadableRegion,
+    rules.Rule,
+]:
+    """Compile one closed structural-value transduction."""
+
+    if type(expression) is not rules.RuleExpr:
+        raise TypeError(f"{label} expression must be a RuleExpr")
+    source = loci.record_configuration((("state", value),))
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule = rules.expression(
+        rules.ExistingPlan(
+            rules.ExistingPlanKind.BY_INDEX,
+            (expression,),
+        ),
+        contract=rules.RuleContract(
+            source.contract,
+            alphabet.value_profile,
+            readable.result_shape,
+            readable.join_shape,
+            writable.effect_profile,
+        ),
+        witness=rules.literal_expr(label),
+        provenance=(f"catalog:{label}",),
+    )
+    return (
+        seeds.exact(source, value_profile=alphabet.value_profile),
+        alphabet,
+        writable,
+        readable,
+        rule,
+    )
+
+
+def constant_digit_register(
+    *,
+    register: int,
+    register_law: rules.RuleExpr,
+    digit_projection: rules.RuleExpr,
+    base: int = 10,
+) -> SimpleProgram:
+    """Build the T40 register branch from exact closed register expressions.
+
+    Both expressions evaluate over ``observation(0)``, a record with
+    ``register`` and ``digit`` fields.  The transition replaces that record
+    atomically; no draw or host callback participates.
+    """
+
+    if type(register) is not int or register < 0:
+        raise ValueError("constant-digit register must be a nonnegative integer")
+    if type(base) is not int or base < 2:
+        raise ValueError("constant-digit base must be an integer >= 2")
+    if type(register_law) is not rules.RuleExpr:
+        raise TypeError("register_law must be a RuleExpr")
+    if type(digit_projection) is not rules.RuleExpr:
+        raise TypeError("digit_projection must be a RuleExpr")
+    state = alphabets.record_value(
+        (
+            ("register", register),
+            ("digit", register % base),
+        ),
+        tag="constant-digit-register",
+    )
+    alphabet = alphabets.record(
+        (
+            ("register", alphabets.naturals()),
+            ("digit", alphabets.int_range_alphabet(base)),
+        )
+    )
+    updated = rules.record_update(
+        rules.record_update(
+            rules.observation(0),
+            "register",
+            register_law,
+        ),
+        "digit",
+        digit_projection,
+    )
+    seed, alphabet, frontier, neighborhood, rule = _single_value_components(
+        state,
+        alphabet,
+        updated,
+        label="constant-digit-register",
+    )
+    return digit_emitting_register_transduction(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
+
+
+def look_and_say(
+    *,
+    digits: tuple[int, ...],
+) -> SimpleProgram:
+    """Build one exact feedback step over maximal equal digit runs."""
+
+    if type(digits) is not tuple or not digits:
+        raise ValueError("look-and-say digits must be a nonempty tuple")
+    if any(type(digit) is not int or digit < 0 for digit in digits):
+        raise ValueError("look-and-say digits must be nonnegative integers")
+    source = alphabets.word_value(digits, tag="digits")
+    runs = rules.maximal_runs(rules.observation(0))
+    emitted_run = rules.word_value(
+        "digits",
+        rules.record_field(rules.bound_value(), "length"),
+        rules.record_field(rules.bound_value(), "value"),
+    )
+    output = rules.flat_map_items(runs, emitted_run, "digits")
+    alphabet = alphabets.word(alphabets.naturals())
+    seed, alphabet, frontier, neighborhood, rule = _single_value_components(
+        source,
+        alphabet,
+        output,
+        label="look-and-say",
+    )
+    return maximal_run_record_transduction(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Phase 3. True aliases
 # ---------------------------------------------------------------------------
 
-_PENDING_ALIASES: tuple[tuple[str, str], ...] = ()
-
-
 # ---------------------------------------------------------------------------
 # Phase 4. Compatibility adapters
 # ---------------------------------------------------------------------------
 
-_PENDING_COMPATIBILITY: tuple[tuple[str, str], ...] = ()
-
-
 __all__ = (
     "aligned_xor_stream_transduction",
+    "constant_digit_register",
     "digit_emitting_register_transduction",
     "error_diffusion_transform",
     "event_provenance_causal_network",
     "hash_index_transform",
     "history_reference_record_transduction",
+    "look_and_say",
     "maximal_run_record_transduction",
     "nested_interval_symbol_transduction",
     "orthogonal_basis_coefficient_transform",
