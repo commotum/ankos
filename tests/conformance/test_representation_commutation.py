@@ -26,6 +26,143 @@ from g7_mechanics import (
 
 
 PX10_ROWS = tuple(row for row in MECHANICS_ROWS if row.primary == "PX10")
+
+
+def _oracle_word(
+    tag: str,
+    *items: alphabets.SemanticValue,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(alphabets.ValueKind.WORD, tag, items=items)
+
+
+def _oracle_record(
+    tag: str,
+    **values: alphabets.SemanticValue,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(
+        alphabets.ValueKind.RECORD,
+        tag,
+        fields=tuple(values.items()),
+    )
+
+
+def _oracle_product(
+    tag: str,
+    *items: alphabets.SemanticValue,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(alphabets.ValueKind.PRODUCT, tag, items=items)
+
+
+PX10_ORACLE_PAIRS = {
+    "SPF012": (
+        (
+            _oracle_word("source-word", "A", "A", "A", "B", "B"),
+            _oracle_record("run-records", run0="A:3", run1="B:2"),
+        ),
+        (
+            _oracle_word("source-word", "B"),
+            _oracle_record("run-records", run0="B:1"),
+        ),
+    ),
+    "SPF054": (
+        (
+            _oracle_word("prefix-block", "A"),
+            _oracle_word("prefix-bits", 0),
+        ),
+        (
+            _oracle_word("prefix-block", "B"),
+            _oracle_word("prefix-bits", 1, 0),
+        ),
+    ),
+    "SPF055": (
+        (
+            _oracle_word("message", "A", "B"),
+            _oracle_record(
+                "nested-interval",
+                low=Fraction(1, 4),
+                high=Fraction(1, 2),
+            ),
+        ),
+        (
+            _oracle_word("message", "A", "A"),
+            _oracle_record(
+                "nested-interval",
+                low=Fraction(0),
+                high=Fraction(1, 4),
+            ),
+        ),
+    ),
+    "SPF056": (
+        (
+            _oracle_word("history-input", "A", "B", "A", "B"),
+            _oracle_word(
+                "history-records",
+                "literal:A",
+                "literal:B",
+                "ref:offset=2,length=2",
+            ),
+        ),
+        (
+            _oracle_word("history-input", "A", "B", "C"),
+            _oracle_word(
+                "history-records",
+                "literal:A",
+                "literal:B",
+                "literal:C",
+            ),
+        ),
+    ),
+    "SPF057": (
+        (
+            _oracle_product("uniform-grid", 1, 1, 1, 1),
+            _oracle_record("region-leaf", bounds="2x2", value=1),
+        ),
+        (
+            _oracle_product("nonuniform-grid", 1, 0, 0, 1),
+            _oracle_record("region-branch", children=4, bounds="2x2"),
+        ),
+    ),
+    "SPF058": (
+        (
+            _oracle_word("vector", 1, 1),
+            _oracle_word("walsh-coefficients", 1, 0),
+        ),
+        (
+            _oracle_word("vector", 1, -1),
+            _oracle_word("walsh-coefficients", 0, 1),
+        ),
+    ),
+    "SPF059": (
+        (
+            _oracle_word("samples", 1, 2, 3),
+            _oracle_word("residuals", 1, 1, 1),
+        ),
+        (
+            _oracle_word("samples", 2, 4, 6),
+            _oracle_word("residuals", 2, 2, 2),
+        ),
+    ),
+    "SPF060": (
+        (
+            _oracle_product(
+                "xor-operands",
+                _oracle_word("data", 1, 0, 1),
+                _oracle_word("generator", 0, 1, 1),
+            ),
+            _oracle_word("xor-output", 1, 1, 0),
+        ),
+        (
+            _oracle_product(
+                "xor-operands",
+                _oracle_word("data", 1, 1, 0),
+                _oracle_word("generator", 0, 1, 1),
+            ),
+            _oracle_word("xor-output", 1, 0, 1),
+        ),
+    ),
+}
+
+
 def _exact_relation(row) -> alphabets.RepresentationRelation:
     execution = run_mechanics_fixture(row)
     assert_mechanics_run(execution)
@@ -33,24 +170,46 @@ def _exact_relation(row) -> alphabets.RepresentationRelation:
 
     assert relation is not None
     assert relation.profile is alphabets.RepresentationProfile.EXACT
+    oracle_pairs = PX10_ORACLE_PAIRS[row.spf]
+    assert len(relation.relation) == len(oracle_pairs) == 2
+    assert len(relation.inverse_evidence) == len(oracle_pairs)
+    assert len(relation.image_evidence) == len(oracle_pairs)
+    for source, target in oracle_pairs:
+        assert any(
+            alphabets.semantic_equal(pair.source, source)
+            and alphabets.semantic_equal(pair.target, target)
+            for pair in relation.relation
+        )
+        assert any(
+            alphabets.semantic_equal(pair.source, target)
+            and alphabets.semantic_equal(pair.target, source)
+            for pair in relation.inverse_evidence
+        )
+        assert any(
+            alphabets.semantic_equal(image_value, target)
+            for image_value in relation.image_evidence
+        )
     return relation
 
 
 def _transition_pair(
-    relation: alphabets.RepresentationRelation,
+    relation_pairs: tuple[
+        tuple[alphabets.SemanticValue, alphabets.SemanticValue],
+        tuple[alphabets.SemanticValue, alphabets.SemanticValue],
+    ],
     *,
     identity: str,
 ) -> tuple[program.ApplicationComplete, program.ApplicationComplete]:
-    """Build a conjugate state step for one transducer-declared relation.
+    """Build a conjugate state step from a test-owned literal oracle.
 
     The PX10 family fixture itself is a transducer that establishes the
     relation; it is not one side of a native/represented state pair.  This
     separate pair tests the representation claim as a state conjugacy without
-    pretending the transducer and the represented dynamics are the same role.
+    pretending the transducer and the represented dynamics are the same role,
+    or deriving both expected sides from the relation under test.
     """
 
-    assert len(relation.relation) >= 2
-    first, second = relation.relation[:2]
+    first, second = relation_pairs
     stopped = rules.Stop(
         rules.literal_expr(f"{identity}:complete"),
         certificate(
@@ -81,14 +240,14 @@ def _transition_pair(
         )
 
     native_program, native_source = build(
-        first.source,
-        second.source,
-        tuple(pair.source for pair in relation.relation),
+        first[0],
+        second[0],
+        tuple(pair[0] for pair in relation_pairs),
     )
     represented_program, represented_source = build(
-        first.target,
-        second.target,
-        tuple(pair.target for pair in relation.relation),
+        first[1],
+        second[1],
+        tuple(pair[1] for pair in relation_pairs),
     )
     native = ca.apply(native_program, native_source)
     represented = ca.apply(represented_program, represented_source)
@@ -346,13 +505,14 @@ def _normalize_complete_result(
 
 
 def test_exact_representation_is_inverse_on_its_declared_image() -> None:
-    """Every exact PX10 relation decodes its full declared image."""
+    """Every exact PX10 relation agrees with an independent literal oracle."""
 
     assert len(PX10_ROWS) == 8
     for row in PX10_ROWS:
         relation = _exact_relation(row)
-        for pair in relation.relation:
-            assert relation.inverse(relation.forward(pair.source)) == pair.source
+        for source, target in PX10_ORACLE_PAIRS[row.spf]:
+            assert relation.forward(source) == target
+            assert relation.inverse(target) == source
         with pytest.raises(ValueError, match="outside"):
             relation.inverse(
                 alphabets.ValueNode(
@@ -381,7 +541,7 @@ def test_represented_and_native_one_step_results_commute_completely(row) -> None
     assert isinstance(actual_derivation.source.continuation, rules.Stop)
 
     native, represented = _transition_pair(
-        relation,
+        PX10_ORACLE_PAIRS[row.spf],
         identity=row.fixture,
     )
     for result in (native, represented):

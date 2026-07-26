@@ -132,6 +132,7 @@ class MechanicsRun:
     representation: alphabets.RepresentationRelation | None = None
     representation_source: alphabets.SemanticValue | None = None
     representation_target: alphabets.SemanticValue | None = None
+    representation_case_index: int = 0
     trajectory: tuple[
         tuple[Configuration, program.ApplicationComplete],
         ...,
@@ -356,6 +357,7 @@ def _assemble(
     representation: alphabets.RepresentationRelation | None = None,
     representation_source: alphabets.SemanticValue | None = None,
     representation_target: alphabets.SemanticValue | None = None,
+    representation_case_index: int = 0,
 ) -> MechanicsRun:
     simple_program = ca.SimpleProgram(
         seeds.exact(
@@ -376,6 +378,7 @@ def _assemble(
         representation,
         representation_source,
         representation_target,
+        representation_case_index,
     )
 
 
@@ -2168,8 +2171,24 @@ def _closed_enum(
     return alphabets.enum(tuple(distinct))
 
 
-def _px10(row: MechanicsRow) -> MechanicsRun:
-    """Run eight deliberately different exact representation workspaces."""
+def _representation_case(
+    primary_source: alphabets.SemanticValue,
+    primary_target: alphabets.SemanticValue,
+    alternate_source: alphabets.SemanticValue,
+    alternate_target: alphabets.SemanticValue,
+    case_index: int,
+) -> tuple[alphabets.SemanticValue, alphabets.SemanticValue]:
+    """Select one of the two declared PX10 relation pairs exactly."""
+
+    if type(case_index) is not int or case_index not in (0, 1):
+        raise ValueError("PX10 representation case index must be 0 or 1")
+    if case_index == 0:
+        return primary_source, primary_target
+    return alternate_source, alternate_target
+
+
+def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
+    """Run either declared pair through one of eight distinct workspaces."""
 
     unset = _codec_record("unset", status="unset")
     if row.spf == "SPF012":
@@ -2177,13 +2196,20 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         encoded = _codec_record("run-records", run0="A:3", run1="B:2")
         alternate_native = _codec_word("source-word", "B")
         alternate_encoded = _codec_record("run-records", run0="B:1")
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
         source = _record_configuration(
-            (("input", native), ("records", unset), ("phase", "scan"))
+            (("input", selected_native), ("records", unset), ("phase", "scan"))
         )
         targets = _record_targets(source)
         read_targets = (targets["input"], targets["phase"])
         writes = (
-            (targets["records"], rules.literal_expr(encoded)),
+            (targets["records"], rules.literal_expr(selected_encoded)),
             (targets["phase"], rules.literal_expr("done")),
         )
     elif row.spf == "SPF054":
@@ -2191,6 +2217,13 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         encoded = _codec_word("prefix-bits", 0)
         alternate_native = _codec_word("prefix-block", "B")
         alternate_encoded = _codec_word("prefix-bits", 1, 0)
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
         block = loci.path("root", "block", scope="prefix-tree")
         codebook = loci.path("root", "codebook", scope="prefix-tree")
         output = loci.path("root", "output", scope="prefix-tree")
@@ -2198,7 +2231,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         source = _structural_configuration(
             loci.CarrierKind.TREE,
             (
-                (block, native),
+                (block, selected_native),
                 (codebook, _codec_record("prefix-tree", A="0", B="10", C="11")),
                 (output, unset),
                 (cursor, "block-0"),
@@ -2206,7 +2239,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         )
         read_targets = (block, codebook, cursor)
         writes = (
-            (output, rules.literal_expr(encoded)),
+            (output, rules.literal_expr(selected_encoded)),
             (cursor, rules.literal_expr("done")),
         )
     elif row.spf == "SPF055":
@@ -2222,6 +2255,18 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
             low=Fraction(0),
             high=Fraction(1, 4),
         )
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
+        selected_low, selected_high = (
+            (Fraction(1, 4), Fraction(1, 2))
+            if case_index == 0
+            else (Fraction(0), Fraction(1, 4))
+        )
         message = loci.field_point("codec", (0,), component="message")
         low = loci.field_point("codec", (0,), component="low")
         high = loci.field_point("codec", (0,), component="high")
@@ -2230,7 +2275,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         source = _structural_configuration(
             loci.CarrierKind.FIELD,
             (
-                (message, native),
+                (message, selected_native),
                 (low, Fraction(0)),
                 (high, Fraction(1)),
                 (output, unset),
@@ -2241,9 +2286,9 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         )
         read_targets = (message, low, high, cursor)
         writes = (
-            (low, rules.literal_expr(Fraction(1, 4))),
-            (high, rules.literal_expr(Fraction(1, 2))),
-            (output, rules.literal_expr(encoded)),
+            (low, rules.literal_expr(selected_low)),
+            (high, rules.literal_expr(selected_high)),
+            (output, rules.literal_expr(selected_encoded)),
             (cursor, rules.literal_expr("done")),
         )
     elif row.spf == "SPF056":
@@ -2261,23 +2306,38 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
             "literal:B",
             "literal:C",
         )
-        history_targets = tuple(loci.occurrence("history", index) for index in range(6))
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
+        raw_symbols = (
+            ("A", "B", "A", "B")
+            if case_index == 0
+            else ("A", "B", "C")
+        )
+        history_targets = tuple(
+            loci.occurrence("history", index)
+            for index in range(len(raw_symbols) + 2)
+        )
         source = _structural_configuration(
             loci.CarrierKind.HISTORY,
             tuple(
                 zip(
                     history_targets,
-                    ("A", "B", "A", "B", unset, "search"),
+                    (*raw_symbols, unset, "search"),
                     strict=True,
                 )
             ),
             rank=1,
             axes=("history",),
         )
-        read_targets = history_targets[:4]
+        read_targets = history_targets[: len(raw_symbols)]
         writes = (
-            (history_targets[4], rules.literal_expr(encoded)),
-            (history_targets[5], rules.literal_expr("done")),
+            (history_targets[-2], rules.literal_expr(selected_encoded)),
+            (history_targets[-1], rules.literal_expr("done")),
         )
     elif row.spf == "SPF057":
         native = _codec_product("uniform-grid", 1, 1, 1, 1)
@@ -2288,6 +2348,14 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
             children=4,
             bounds="2x2",
         )
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
+        cell_values = (1, 1, 1, 1) if case_index == 0 else (1, 0, 0, 1)
         cells = (
             loci.cell((-1, -1), axes=("x", "y")),
             loci.cell((-1, 0), axes=("x", "y")),
@@ -2299,7 +2367,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         source = _structural_configuration(
             loci.CarrierKind.GRID,
             (
-                *tuple((target, 1) for target in cells),
+                *tuple(zip(cells, cell_values, strict=True)),
                 (result_target, unset),
                 (cursor, "root"),
             ),
@@ -2308,7 +2376,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         )
         read_targets = cells
         writes = (
-            (result_target, rules.literal_expr(encoded)),
+            (result_target, rules.literal_expr(selected_encoded)),
             (cursor, rules.literal_expr("done")),
         )
     elif row.spf == "SPF058":
@@ -2316,6 +2384,14 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         encoded = _codec_word("walsh-coefficients", 1, 0)
         alternate_native = _codec_word("vector", 1, -1)
         alternate_encoded = _codec_word("walsh-coefficients", 0, 1)
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
+        vector_values = (1, 1) if case_index == 0 else (1, -1)
         base = loci.named("basis-workspace", scope="product")
         vector0 = loci.product_locus("vector-0", (base,))
         vector1 = loci.product_locus("vector-1", (base,))
@@ -2325,8 +2401,8 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         source = _structural_configuration(
             loci.CarrierKind.PRODUCT,
             (
-                (vector0, 1),
-                (vector1, 1),
+                (vector0, vector_values[0]),
+                (vector1, vector_values[1]),
                 (coefficient0, -1),
                 (coefficient1, -1),
                 (result_target, unset),
@@ -2334,25 +2410,50 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         )
         read_targets = (vector0, vector1)
         writes = (
-            (coefficient0, rules.observation(0)),
+            (
+                coefficient0,
+                rules.conditional(
+                    rules.equal(rules.observation(0), rules.observation(1)),
+                    rules.literal_expr(1),
+                    rules.literal_expr(0),
+                ),
+            ),
             (
                 coefficient1,
-                rules.subtract(rules.observation(0), rules.observation(1)),
+                rules.conditional(
+                    rules.equal(
+                        rules.observation(0),
+                        rules.multiply(
+                            rules.literal_expr(-1),
+                            rules.observation(1),
+                        ),
+                    ),
+                    rules.literal_expr(1),
+                    rules.literal_expr(0),
+                ),
             ),
-            (result_target, rules.literal_expr(encoded)),
+            (result_target, rules.literal_expr(selected_encoded)),
         )
     elif row.spf == "SPF059":
         native = _codec_word("samples", 1, 2, 3)
         encoded = _codec_word("residuals", 1, 1, 1)
         alternate_native = _codec_word("samples", 2, 4, 6)
         alternate_encoded = _codec_word("residuals", 2, 2, 2)
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
+        samples = (1, 2, 3) if case_index == 0 else (2, 4, 6)
         history_targets = tuple(loci.occurrence("history", index) for index in range(8))
         source = _structural_configuration(
             loci.CarrierKind.HISTORY,
             tuple(
                 zip(
                     history_targets,
-                    (1, 2, 3, 0, 0, 0, unset, "predict"),
+                    (*samples, 0, 0, 0, unset, "predict"),
                     strict=True,
                 )
             ),
@@ -2370,7 +2471,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
                 history_targets[5],
                 rules.subtract(rules.observation(2), rules.observation(1)),
             ),
-            (history_targets[6], rules.literal_expr(encoded)),
+            (history_targets[6], rules.literal_expr(selected_encoded)),
             (history_targets[7], rules.literal_expr("done")),
         )
     elif row.spf == "SPF060":
@@ -2382,17 +2483,36 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         encoded = _codec_word("xor-output", 1, 1, 0)
         alternate_native = _codec_product(
             "xor-operands",
-            _codec_word("data", 0, 0, 0),
-            _codec_word("generator", 1, 1, 1),
+            _codec_word("data", 1, 1, 0),
+            _codec_word("generator", 0, 1, 1),
         )
-        alternate_encoded = _codec_word("xor-output", 1, 1, 1)
+        alternate_encoded = _codec_word("xor-output", 1, 0, 1)
+        selected_native, selected_encoded = _representation_case(
+            native,
+            encoded,
+            alternate_native,
+            alternate_encoded,
+            case_index,
+        )
+        data_bits, generator_bits = (
+            ((1, 0, 1), (0, 1, 1))
+            if case_index == 0
+            else ((1, 1, 0), (0, 1, 1))
+        )
         word_targets = tuple(loci.occurrence("word", index) for index in range(10))
         source = _structural_configuration(
             loci.CarrierKind.WORD,
             tuple(
                 zip(
                     word_targets,
-                    (1, 0, 1, 0, 1, 1, 0, 0, 0, "aligned"),
+                    (
+                        *data_bits,
+                        *generator_bits,
+                        0,
+                        0,
+                        0,
+                        "aligned",
+                    ),
                     strict=True,
                 )
             ),
@@ -2434,6 +2554,7 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         alternate_encoded,
     )
     future_values = (
+        native,
         encoded,
         alternate_native,
         alternate_encoded,
@@ -2485,8 +2606,9 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         readable,
         rule,
         representation=representation,
-        representation_source=native,
-        representation_target=encoded,
+        representation_source=selected_native,
+        representation_target=selected_encoded,
+        representation_case_index=case_index,
     )
 
 
@@ -2893,6 +3015,24 @@ def run_mechanics_fixture(row: MechanicsRow) -> MechanicsRun:
     return execution
 
 
+def run_px10_representation_case(
+    row: MechanicsRow,
+    case_index: int,
+) -> MechanicsRun:
+    """Execute either pair in a PX10 relation through its family mechanics."""
+
+    if row.primary != "PX10":
+        raise ValueError(f"{row.spf} is not a PX10 representation row")
+    execution = _px10(row, case_index=case_index)
+    if not isinstance(execution.result, program.ApplicationComplete):
+        fault = execution.result.fault
+        raise AssertionError(
+            f"{row.spf}/{row.fixture}/case-{case_index} rejected: "
+            f"{fault.reason}; {fault.evidence!r}"
+        )
+    return execution
+
+
 def run_secondary_fixture(row: MechanicsRow, pressure: str) -> MechanicsRun:
     """Re-assert a secondary invariant on the same family construction."""
 
@@ -2919,6 +3059,34 @@ def _finite_successors(
         for group in result.successor_quotient_with_derivation_fibers.atoms
         if isinstance(group.successor, loci.FiniteConfiguration)
     )
+
+
+def _materialized_px10_target(
+    execution: MechanicsRun,
+    successor: loci.FiniteConfiguration,
+) -> alphabets.SemanticValue:
+    """Extract the represented value produced by the family workspace."""
+
+    target = execution.representation_target
+    assert target is not None
+    if execution.row.spf == "SPF060":
+        bits = tuple(
+            successor.value_at(loci.occurrence("word", index))
+            for index in range(6, 9)
+        )
+        return alphabets.ValueNode(
+            alphabets.ValueKind.WORD,
+            "xor-output",
+            items=bits,
+        )
+
+    matches = tuple(
+        value
+        for _, value in successor.entries
+        if alphabets.semantic_equal(value, target)
+    )
+    assert len(matches) == 1
+    return matches[0]
 
 
 def _materialized_read_targets(execution: MechanicsRun) -> tuple[loci.Locus, ...]:
@@ -3817,6 +3985,8 @@ def assert_mechanics_run(
     if pressure == "PX10":
         assert len(derivations) == 1
         assert isinstance(derivations[0].source.continuation, rules.Stop)
+        assert type(execution.representation_case_index) is int
+        assert execution.representation_case_index in (0, 1)
         representation = execution.representation
         assert representation is not None
         assert representation.profile is alphabets.RepresentationProfile.EXACT
@@ -3835,20 +4005,27 @@ def assert_mechanics_run(
             "SPF059": (loci.CarrierKind.HISTORY, 3, 5),
             "SPF060": (loci.CarrierKind.WORD, 6, 4),
         }[row.spf]
+        if row.spf == "SPF056" and execution.representation_case_index == 1:
+            expected_shapes = (loci.CarrierKind.HISTORY, 3, 2)
         carrier, read_count, write_count = expected_shapes
         assert execution.source.contract.kind is carrier
         assert len(_materialized_read_targets(execution)) == read_count
         assert len(_resolved_write_targets(execution)) == write_count
-        successor_values = tuple(value for _, value in successors[0].entries)
+        assert len(successors) == 1
+        materialized_target = _materialized_px10_target(
+            execution,
+            successors[0],
+        )
+        assert alphabets.semantic_equal(
+            materialized_target,
+            execution.representation_target,
+        )
         if row.spf == "SPF060":
-            assert isinstance(encoded, alphabets.ValueNode)
-            assert successor_values[-4:-1] == encoded.items
-            assert successor_values[-1] == "done"
-        else:
-            assert any(
-                alphabets.semantic_equal(value, encoded)
-                for value in successor_values
-            )
+            assert type(materialized_target) is alphabets.ValueNode
+            assert materialized_target.kind is alphabets.ValueKind.WORD
+            assert materialized_target.tag == "xor-output"
+            assert materialized_target.items == encoded.items
+            assert successors[0].value_at(loci.occurrence("word", 9)) == "done"
         return
 
     if pressure == "PX09":
