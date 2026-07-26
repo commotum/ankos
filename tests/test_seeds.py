@@ -154,6 +154,12 @@ def test_seed_descriptors_reject_callbacks_and_malformed_composition() -> None:
             2,
             [[0, 0]],  # type: ignore[arg-type]
         )
+    with pytest.raises(seeds.SeedValidationError, match="empty support"):
+        seeds.UniformTupleLaw(
+            1,
+            2,
+            ((0,), (1,)),
+        )
     with pytest.raises(TypeError):
         seeds.RefinedSource(
             seeds.sequence((True, False)),

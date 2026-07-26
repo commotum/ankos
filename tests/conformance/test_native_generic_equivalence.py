@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import ast
+from collections import Counter
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -24,32 +26,35 @@ NATIVE_CASES = (
     "dyadaxes-3d",
 )
 
-ORACLE_CASES = dict(
-    zip(
-        NATIVE_CASES,
-        test_oracles.CT12_CASES[:6],
-        strict=True,
-    )
-)
+ORACLE_CASE_IDS = {
+    "ar2": "native.scalar.ar2-modular",
+    "dyadlags": "native.temporal.dyadlags-rule-150",
+    "lagcounts": "native.temporal.lagcounts-rule-91",
+    "dyadrads": "native.cellular.dyadrads-rule-30",
+    "dyadaxes-2d": "native.multidimensional.dyadaxes-2d-rule-128",
+    "dyadaxes-3d": "native.multidimensional.dyadaxes-3d-rule-128",
+}
 
-NATIVE_WITNESS_FACTS = {
-    "ar2": ("ar2-modular", 17, 2, 1, 1, 97),
-    "dyadlags": ("dyadlags-0d", 150),
-    "lagcounts": ("lagcounts-0d", 91),
-    "dyadrads": ("dyadrads-1d", 30),
-    "dyadaxes-2d": ("dyadaxes-2d", 128),
-    "dyadaxes-3d": ("dyadaxes-3d", 128),
+_ORACLES_BY_ID = {case.case_id: case for case in test_oracles.CT12_CASES}
+assert len(_ORACLES_BY_ID) == len(test_oracles.CT12_CASES)
+ORACLE_CASES = {
+    case_id: _ORACLES_BY_ID[oracle_id]
+    for case_id, oracle_id in ORACLE_CASE_IDS.items()
 }
 
 
-def _rule_expr_literals(expression: rules.RuleExpr) -> tuple[object, ...]:
-    out: list[object] = []
-    for argument in expression.arguments:
-        if isinstance(argument, rules.RuleExpr):
-            out.extend(_rule_expr_literals(argument))
-        else:
-            out.append(argument)
-    return tuple(out)
+def _term(
+    tag: str,
+    *arguments: test_oracles.OracleValue,
+) -> test_oracles.OracleTerm:
+    return test_oracles.OracleTerm(tag, arguments)
+
+
+def _oracle_scalar(value: object) -> test_oracles.OracleScalar:
+    if type(value) is bool:
+        return int(value)
+    assert value is None or type(value) in (int, Fraction, str)
+    return value
 
 
 def _rule_expr_as_oracle_term(
@@ -59,7 +64,7 @@ def _rule_expr_as_oracle_term(
         assert len(expression.arguments) == 1
         value = expression.arguments[0]
         assert not isinstance(value, rules.RuleExpr)
-        return value
+        return _oracle_scalar(value)
     assert expression.primitive is rules.ExpressionPrimitive.TUPLE
     converted = tuple(
         _rule_expr_as_oracle_term(argument)
@@ -68,7 +73,7 @@ def _rule_expr_as_oracle_term(
     )
     assert len(converted) == len(expression.arguments)
     assert converted and isinstance(converted[0], str)
-    return test_oracles.OracleTerm(converted[0], converted[1:])
+    return _term(converted[0], *converted[1:])
 
 
 def _literal_value(expression: rules.RuleExpr) -> object:
@@ -79,11 +84,32 @@ def _literal_value(expression: rules.RuleExpr) -> object:
     return value
 
 
-def _assert_evaluation_proof(
+EvaluationFact = tuple[
+    str,
+    rules.RuleExpr,
+    test_oracles.OracleValue | tuple[test_oracles.OracleValue, ...],
+    tuple[str, ...],
+]
+
+
+def _evaluated_value(
+    expression: rules.RuleExpr,
+) -> test_oracles.OracleValue | tuple[test_oracles.OracleValue, ...]:
+    if expression.primitive is rules.ExpressionPrimitive.LITERAL:
+        return _oracle_scalar(_literal_value(expression))
+    assert expression.primitive is rules.ExpressionPrimitive.TUPLE
+    return tuple(
+        _evaluated_value(argument)
+        for argument in expression.arguments
+        if isinstance(argument, rules.RuleExpr)
+    )
+
+
+def _evaluation_facts(
     expression: rules.RuleExpr,
     readable: neighborhoods.ReadableView,
     writable_targets: tuple[loci.Locus, ...],
-) -> None:
+) -> tuple[EvaluationFact, ...]:
     assert expression.primitive is rules.ExpressionPrimitive.TUPLE
     assert expression.arguments
     head = expression.arguments[0]
@@ -100,6 +126,7 @@ def _assert_evaluation_proof(
         "none",
         *(loci.canonical_identity(target) for target in writable_targets),
     }
+    facts: list[EvaluationFact] = []
     saw_read = False
     for step in expression.arguments[1:]:
         assert isinstance(step, rules.RuleExpr)
@@ -109,7 +136,9 @@ def _assert_evaluation_proof(
         assert isinstance(tag, rules.RuleExpr)
         assert _literal_value(tag) == "step"
         assert isinstance(anchor, rules.RuleExpr)
-        assert _literal_value(anchor) in allowed_anchors
+        anchor_identity = _literal_value(anchor)
+        assert type(anchor_identity) is str
+        assert anchor_identity in allowed_anchors
         assert isinstance(evaluated_expression, rules.RuleExpr)
         assert isinstance(result, rules.RuleExpr)
         assert isinstance(reads, rules.RuleExpr)
@@ -118,11 +147,73 @@ def _assert_evaluation_proof(
         read_tag = reads.arguments[0]
         assert isinstance(read_tag, rules.RuleExpr)
         assert _literal_value(read_tag) == "read-evidence"
+        read_identities: list[str] = []
         for read in reads.arguments[1:]:
             assert isinstance(read, rules.RuleExpr)
-            assert _literal_value(read) in allowed_reads
+            read_identity = _literal_value(read)
+            assert type(read_identity) is str
+            assert read_identity in allowed_reads
+            read_identities.append(read_identity)
             saw_read = True
+        facts.append(
+            (
+                anchor_identity,
+                evaluated_expression,
+                _evaluated_value(result),
+                tuple(read_identities),
+            )
+        )
     assert saw_read
+    return tuple(facts)
+
+
+def _single_results_by_observation(
+    facts: tuple[EvaluationFact, ...],
+) -> dict[int, test_oracles.OracleValue]:
+    results: dict[int, set[test_oracles.OracleValue]] = {}
+    for _, expression, result, _ in facts:
+        if expression.primitive is not rules.ExpressionPrimitive.OBSERVATION:
+            continue
+        assert len(expression.arguments) == 1
+        index = expression.arguments[0]
+        assert type(index) is int
+        assert not isinstance(result, tuple)
+        results.setdefault(index, set()).add(result)
+    assert all(len(values) == 1 for values in results.values())
+    return {index: next(iter(values)) for index, values in results.items()}
+
+
+def _single_results_by_counted_group(
+    facts: tuple[EvaluationFact, ...],
+) -> dict[int, int]:
+    results: dict[int, set[int]] = {}
+    for _, expression, result, _ in facts:
+        if expression.primitive is not rules.ExpressionPrimitive.COUNT:
+            continue
+        assert len(expression.arguments) == 1
+        group = expression.arguments[0]
+        assert isinstance(group, rules.RuleExpr)
+        assert group.primitive is rules.ExpressionPrimitive.GROUP
+        assert len(group.arguments) == 1
+        channel = group.arguments[0]
+        assert type(channel) is int
+        assert type(result) is int
+        results.setdefault(channel, set()).add(result)
+    assert all(len(values) == 1 for values in results.values())
+    return {channel: next(iter(values)) for channel, values in results.items()}
+
+
+def _results_for_expression(
+    facts: tuple[EvaluationFact, ...],
+    expression: rules.RuleExpr,
+) -> tuple[tuple[str, test_oracles.OracleValue], ...]:
+    selected = {
+        (anchor, result)
+        for anchor, evaluated, result, _ in facts
+        if evaluated == expression and not isinstance(result, tuple)
+    }
+    assert selected
+    return tuple(sorted(selected))
 
 
 def _oracle_sequence_values(term: test_oracles.OracleTerm) -> tuple[object, ...]:

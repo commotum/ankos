@@ -166,10 +166,16 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
         require_index(1)
         return
     if primitive is ExpressionPrimitive.TUPLE:
+        if any(type(argument) is not RuleExpr for argument in arguments):
+            raise TypeError("tuple expressions may contain only RuleExpr children")
         return
     if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):
         if not arguments:
             raise ValueError(f"{primitive.value} requires at least one argument")
+        if any(type(argument) is not RuleExpr for argument in arguments):
+            raise TypeError(
+                f"{primitive.value} may contain only RuleExpr operands"
+            )
         return
     if primitive is ExpressionPrimitive.MODULO:
         require_arity(2)

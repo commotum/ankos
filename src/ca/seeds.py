@@ -299,7 +299,12 @@ class UniformTupleLaw:
                 raise SeedValidationError("excluded tuple value is outside the law")
         if len(set(self.excluded)) != len(self.excluded):
             raise SeedValidationError("excluded tuples must be unique")
-        if self.value_count == 1 and self.excluded:
+        support_size = 1
+        for _ in range(self.length):
+            support_size *= self.value_count
+            if support_size > len(self.excluded):
+                break
+        if support_size == len(self.excluded):
             raise SeedValidationError("uniform tuple law has empty support")
         ordered = tuple(sorted(self.excluded))
         if ordered != self.excluded:

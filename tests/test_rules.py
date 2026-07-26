@@ -74,8 +74,11 @@ def test_rule_expression_ast_is_closed_versioned_and_exact() -> None:
             rules.ExpressionPrimitive.PROJECT,
             (1, 0),
         ),
+        (rules.ExpressionPrimitive.TUPLE, (1,)),
         (rules.ExpressionPrimitive.ADD, ()),
+        (rules.ExpressionPrimitive.ADD, (1,)),
         (rules.ExpressionPrimitive.MULTIPLY, ()),
+        (rules.ExpressionPrimitive.MULTIPLY, (1,)),
         (
             rules.ExpressionPrimitive.MODULO,
             (rules.literal_expr(1), 0),

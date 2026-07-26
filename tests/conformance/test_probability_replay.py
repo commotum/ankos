@@ -243,6 +243,9 @@ def test_large_seed_law_is_retained_without_eager_enumeration_and_draws_directly
         unkeyed.raw_trace.roots.support.presentation
         is rules.SupportPresentation.INTENSIONAL
     )
+    assert rules.cardinality_size(
+        unkeyed.raw_trace.roots.support.cardinality
+    ) == 2**length
     assert unkeyed.cause is program.TruncationCause.INTENSIONAL_SUPPORT
     assert isinstance(keyed, program.RolloutTruncated)
     assert (

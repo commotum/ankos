@@ -1917,6 +1917,7 @@ def _realize_construction(
 def _enumerate_uniform_tuple(
     source: seeds.LawSource,
     contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
 ) -> tuple[
     tuple[loci.FiniteConfiguration[alphabets.SemanticValue], ...],
     tuple[Fraction, ...],
@@ -1931,7 +1932,14 @@ def _enumerate_uniform_tuple(
         _configuration_from_values(
             contract,
             tuple(
-                bool(value) if law.value_count == 2 else value
+                (
+                    bool(value)
+                    if (
+                        law.value_count == 2
+                        and value_profile is alphabets.ValueProfile.BOOLEAN
+                    )
+                    else value
+                )
                 for value in item
             ),
         )
@@ -2009,6 +2017,7 @@ def _enumerate_bernoulli(
 
 
 _MAX_ENUMERATED_SEED_ATOMS = 4096
+_MAX_RETAINED_CARDINALITY_BITS = 1_000_000
 
 
 def _seed_relation(
@@ -2048,42 +2057,25 @@ def _seed_cardinality(
     )
 
 
-def _bounded_power(
-    base: int,
-    exponent: int,
-    *,
-    limit: int,
-) -> int | None:
-    value = 1
-    for _ in range(exponent):
-        value *= base
-        if value > limit:
-            return None
-    return value
-
-
 def _law_support_size(
     law: seeds.ProbabilityLaw,
 ) -> int | None:
     if isinstance(law, seeds.UniformTupleLaw):
-        size = _bounded_power(
-            law.value_count,
-            law.length,
-            limit=_MAX_ENUMERATED_SEED_ATOMS + len(law.excluded),
+        estimated_bits = law.length * max(
+            1,
+            (law.value_count - 1).bit_length(),
         )
-        if size is None:
+        if estimated_bits > _MAX_RETAINED_CARDINALITY_BITS:
             return None
-        return size - len(law.excluded)
+        return law.value_count**law.length - len(law.excluded)
     if isinstance(law, seeds.BernoulliLaw):
         if law.support.kind is not loci.RegionKind.LITERAL:
             return None
         if law.probability_true in (Fraction(0), Fraction(1)):
             return 1
-        return _bounded_power(
-            2,
-            len(law.support.loci),
-            limit=_MAX_ENUMERATED_SEED_ATOMS,
-        )
+        if len(law.support.loci) > _MAX_RETAINED_CARDINALITY_BITS:
+            return None
+        return 1 << len(law.support.loci)
     return None
 
 
@@ -2178,6 +2170,7 @@ def _denote_seed_space(
                 configurations, weights = _enumerate_uniform_tuple(
                     source,
                     seed.configuration_contract,
+                    seed.value_profile,
                 )
                 return (
                     _finite_seed_outcome(
