@@ -37,6 +37,24 @@ RuleRuntimeValue: TypeAlias = (
 )
 
 
+def _require_version_one(version: object, owner: str) -> None:
+    if type(version) is not int:
+        raise TypeError(f"{owner} version must be an integer")
+    if version != 1:
+        raise ValueError(f"unsupported {owner} version {version}")
+
+
+def _is_rule_scalar(value: object) -> bool:
+    return type(value) in (
+        bool,
+        int,
+        Fraction,
+        str,
+        alphabets.RepresentedNumber,
+        alphabets.ValueNode,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Closed Rule syntax and compatibility declarations
 # ---------------------------------------------------------------------------
@@ -92,32 +110,101 @@ class RuleExpr:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported Rule expression version {self.version}")
-        if not isinstance(self.primitive, ExpressionPrimitive):
+        _require_version_one(self.version, "Rule expression")
+        if type(self.primitive) is not ExpressionPrimitive:
             raise TypeError("Rule expression primitive is not recognized")
+        if type(self.arguments) is not tuple:
+            raise TypeError("Rule expression arguments must be an immutable tuple")
         if any(
-            not isinstance(
-                argument,
-                (
-                    bool,
-                    int,
-                    Fraction,
-                    str,
-                    alphabets.RepresentedNumber,
-                    alphabets.ValueNode,
-                    RuleExpr,
-                ),
-            )
+            not (_is_rule_scalar(argument) or type(argument) is RuleExpr)
             for argument in self.arguments
         ):
             raise TypeError(
                 "Rule expression contains an opaque or executable argument"
             )
+        _validate_rule_expr_shape(self)
 
     @property
     def canonical_identity(self) -> str:
         return loci.canonical_identity(self)
+
+
+def _validate_rule_expr_shape(expression: RuleExpr) -> None:
+    primitive = expression.primitive
+    arguments = expression.arguments
+
+    def require_arity(size: int) -> None:
+        if len(arguments) != size:
+            raise ValueError(
+                f"{primitive.value} requires exactly {size} argument"
+                f"{'' if size == 1 else 's'}"
+            )
+
+    def require_expression(index: int) -> None:
+        if type(arguments[index]) is not RuleExpr:
+            raise TypeError(f"{primitive.value} argument {index} must be a RuleExpr")
+
+    def require_index(index: int) -> None:
+        value = arguments[index]
+        if type(value) is not int or value < 0:
+            raise ValueError(
+                f"{primitive.value} argument {index} must be a non-negative integer"
+            )
+
+    if primitive is ExpressionPrimitive.LITERAL:
+        require_arity(1)
+        if not _is_rule_scalar(arguments[0]):
+            raise TypeError("literal expression requires one closed scalar")
+        return
+    if primitive in (ExpressionPrimitive.OBSERVATION, ExpressionPrimitive.GROUP):
+        require_arity(1)
+        require_index(0)
+        return
+    if primitive is ExpressionPrimitive.PROJECT:
+        require_arity(2)
+        require_expression(0)
+        require_index(1)
+        return
+    if primitive is ExpressionPrimitive.TUPLE:
+        return
+    if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):
+        if not arguments:
+            raise ValueError(f"{primitive.value} requires at least one argument")
+        return
+    if primitive is ExpressionPrimitive.MODULO:
+        require_arity(2)
+        require_expression(0)
+        modulus = arguments[1]
+        if type(modulus) is not int or modulus <= 0:
+            raise ValueError("modulo expression requires a positive integer modulus")
+        return
+    if primitive in (
+        ExpressionPrimitive.COUNT,
+        ExpressionPrimitive.ALL,
+        ExpressionPrimitive.ANY,
+    ):
+        require_arity(1)
+        require_expression(0)
+        return
+    if primitive is ExpressionPrimitive.GATE:
+        require_arity(3)
+        require_expression(0)
+        gate_kind = arguments[1]
+        if type(gate_kind) is not str:
+            raise TypeError("gate expression kind must be a string")
+        try:
+            GateKind(gate_kind)
+        except ValueError as error:
+            raise ValueError("gate expression kind is not recognized") from error
+        if type(arguments[2]) is not int:
+            raise TypeError("gate expression threshold must be an integer")
+        return
+    if primitive in (ExpressionPrimitive.LOOKUP, ExpressionPrimitive.EQUAL):
+        require_arity(2)
+        require_expression(0)
+        require_expression(1)
+        return
+    raise TypeError("Rule expression primitive is not recognized")
 
 
 @dataclass(frozen=True)
@@ -276,14 +363,31 @@ def _certificate(kind: CertificateKind, label: str) -> Certificate:
     return Certificate(kind, literal_expr(label))
 
 
+def _require_cardinality_certificate(
+    evidence: object,
+    owner: str,
+) -> None:
+    if (
+        type(evidence) is not Certificate
+        or evidence.kind is not CertificateKind.CARDINALITY
+    ):
+        raise ValueError(f"{owner} needs exact cardinality evidence")
+
+
 @dataclass(frozen=True)
 class ExactlyZero:
     evidence: Certificate
+
+    def __post_init__(self) -> None:
+        _require_cardinality_certificate(self.evidence, "ExactlyZero")
 
 
 @dataclass(frozen=True)
 class ExactlyOne:
     evidence: Certificate
+
+    def __post_init__(self) -> None:
+        _require_cardinality_certificate(self.evidence, "ExactlyOne")
 
 
 class InfiniteCardinality(Enum):
@@ -309,6 +413,9 @@ class Many:
             or finite < 2
         ):
             raise ValueError("finite Many cardinality must be at least two")
+        if self.infinite is not None and type(self.infinite) is not InfiniteCardinality:
+            raise TypeError("Many infinite cardinality is not recognized")
+        _require_cardinality_certificate(self.evidence, "Many")
 
 
 @dataclass(frozen=True)
@@ -317,6 +424,11 @@ class Undetermined:
 
     reason: RuleExpr
     obligation: Certificate
+
+    def __post_init__(self) -> None:
+        if type(self.reason) is not RuleExpr:
+            raise TypeError("Undetermined reason must be a RuleExpr")
+        _require_cardinality_certificate(self.obligation, "Undetermined")
 
 
 Cardinality: TypeAlias = ExactlyZero | ExactlyOne | Many | Undetermined

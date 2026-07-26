@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from fractions import Fraction
 from typing import Generic, TypeVar
 
 from . import alphabets, loci
@@ -23,6 +24,15 @@ V = TypeVar("V")
 
 class ReadableResolutionError(ValueError):
     """A ReadableRegion cannot be resolved against the supplied snapshot."""
+
+
+def _closed_observed_value(value: object) -> bool:
+    """Recognize the exact closed semantic-value variants."""
+
+    return type(value) in (bool, int, Fraction, str) or type(value) in (
+        alphabets.RepresentedNumber,
+        alphabets.ValueNode,
+    )
 
 
 class ReadArity(Enum):
@@ -41,12 +51,20 @@ class ReadField:
     size: int | None = None
 
     def __post_init__(self) -> None:
-        if not self.key:
+        if type(self.key) is not str or not self.key:
             raise ReadableResolutionError("read-field key cannot be empty")
+        if type(self.arity) is not ReadArity:
+            raise TypeError("read-field arity is not recognized")
+        if self.size is not None and (
+            type(self.size) is not int or self.size <= 0
+        ):
+            raise ReadableResolutionError(
+                "read-field size must be a positive integer"
+            )
         if self.arity is ReadArity.ONE and self.size not in (None, 1):
             raise ReadableResolutionError("ONE fields have size one")
         if self.arity is ReadArity.FIXED and (
-            self.size is None or isinstance(self.size, bool) or self.size <= 0
+            self.size is None
         ):
             raise ReadableResolutionError("FIXED fields need a positive size")
         if self.arity in (ReadArity.VARIABLE, ReadArity.INTENSIONAL) and (
@@ -64,6 +82,10 @@ class ResultShape:
     fields: tuple[ReadField, ...]
 
     def __post_init__(self) -> None:
+        if type(self.fields) is not tuple or any(
+            type(field) is not ReadField for field in self.fields
+        ):
+            raise TypeError("result-shape fields must be an immutable tuple")
         if not self.fields:
             raise ReadableResolutionError("result shape cannot be empty")
         keys = tuple(field.key for field in self.fields)
@@ -89,13 +111,24 @@ class JoinShape:
     fields: tuple[str, ...]
 
     def __post_init__(self) -> None:
+        if type(self.mode) is not JoinMode:
+            raise TypeError("join mode is not recognized")
+        if type(self.fields) is not tuple or any(
+            type(field) is not str or not field for field in self.fields
+        ):
+            raise TypeError("join fields must be nonempty strings in a tuple")
         if len(set(self.fields)) != len(self.fields):
             raise ReadableResolutionError("join fields must be unique")
         if self.mode in (JoinMode.TARGET_IDENTITY, JoinMode.ANCHOR_IDENTITY):
             if not self.fields:
                 raise ReadableResolutionError("identity joins need a field")
-        elif self.mode is JoinMode.NONE and self.fields:
-            raise ReadableResolutionError("NONE joins cannot carry fields")
+        elif self.mode is JoinMode.NONE:
+            if self.fields:
+                raise ReadableResolutionError("NONE joins cannot carry fields")
+        elif not self.fields:
+            raise ReadableResolutionError(
+                f"{self.mode.value} joins need at least one field"
+            )
 
 
 @dataclass(frozen=True)
@@ -103,6 +136,10 @@ class Present(Generic[V]):
     """A value stored at an existing resolved locus."""
 
     value: V
+
+    def __post_init__(self) -> None:
+        if not _closed_observed_value(self.value):
+            raise TypeError("present observation contains an opaque value")
 
 
 @dataclass(frozen=True)
@@ -113,12 +150,24 @@ class BoundaryDefault(Generic[V]):
     evidence: loci.SelectorExpr
     boundary: loci.Boundary[V]
 
+    def __post_init__(self) -> None:
+        if not _closed_observed_value(self.value):
+            raise TypeError("boundary observation contains an opaque value")
+        if type(self.evidence) is not loci.SelectorExpr:
+            raise TypeError("boundary evidence is not recognized")
+        if type(self.boundary) is not loci.Boundary:
+            raise TypeError("boundary descriptor is not recognized")
+
 
 @dataclass(frozen=True)
 class Absent:
     """An explicitly absent observation."""
 
     evidence: loci.SelectorExpr
+
+    def __post_init__(self) -> None:
+        if type(self.evidence) is not loci.SelectorExpr:
+            raise TypeError("absence evidence is not recognized")
 
 
 ObservedState = Present[V] | BoundaryDefault[V] | Absent
@@ -131,6 +180,14 @@ class Observation(Generic[V]):
     target: loci.Locus
     state: ObservedState[V]
     anchor: loci.Locus | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.target) is not loci.Locus:
+            raise TypeError("observation target must be a Locus")
+        if type(self.state) not in (Present, BoundaryDefault, Absent):
+            raise TypeError("observation state variant is not recognized")
+        if self.anchor is not None and type(self.anchor) is not loci.Locus:
+            raise TypeError("observation anchor must be a Locus or None")
 
     @property
     def value(self) -> V:
@@ -149,7 +206,9 @@ class GroupKey:
     channel: int
 
     def __post_init__(self) -> None:
-        if isinstance(self.channel, bool) or self.channel < 0:
+        if self.anchor is not None and type(self.anchor) is not loci.Locus:
+            raise TypeError("group-key anchor must be a Locus or None")
+        if type(self.channel) is not int or self.channel < 0:
             raise ReadableResolutionError("group channel cannot be negative")
 
 
@@ -162,14 +221,22 @@ class ObservationGroup:
     anchor: loci.Locus | None = None
 
     def __post_init__(self) -> None:
-        if self.key.anchor is not None and not isinstance(
-            self.key.anchor, loci.Locus
+        if type(self.key) is not GroupKey:
+            raise TypeError("observation-group key is not recognized")
+        if type(self.indices) is not tuple or any(
+            type(index) is not int for index in self.indices
         ):
+            raise TypeError("observation indices must be an immutable integer tuple")
+        if self.anchor is not None and type(self.anchor) is not loci.Locus:
             raise TypeError("group anchor must be a Locus or None")
         if not self.indices:
             raise ReadableResolutionError("observation groups cannot be empty")
         if any(index < 0 for index in self.indices):
             raise ReadableResolutionError("observation indices cannot be negative")
+        if len(set(self.indices)) != len(self.indices):
+            raise ReadableResolutionError("observation indices must be unique")
+        if self.key.anchor != self.anchor:
+            raise ReadableResolutionError("group key and group anchor disagree")
 
 
 @dataclass(frozen=True)
@@ -182,6 +249,20 @@ class ReadableView(Generic[V]):
     join_shape: JoinShape
 
     def __post_init__(self) -> None:
+        if type(self.snapshot_identity) is not str or not self.snapshot_identity:
+            raise ReadableResolutionError(
+                "readable view needs a snapshot identity"
+            )
+        if type(self.observations) is not tuple or any(
+            type(item) is not Observation for item in self.observations
+        ):
+            raise TypeError("view observations must be an immutable tuple")
+        if type(self.groups) is not tuple or any(
+            type(item) is not ObservationGroup for item in self.groups
+        ):
+            raise TypeError("view groups must be an immutable tuple")
+        if type(self.join_shape) is not JoinShape:
+            raise TypeError("view join shape is not recognized")
         covered: list[int] = []
         for group in self.groups:
             covered.extend(group.indices)
@@ -215,13 +296,19 @@ class GroupingPlan:
     chunk_size: int | None = None
 
     def __post_init__(self) -> None:
-        if not self.key:
+        if type(self.kind) is not GroupingKind:
+            raise TypeError("grouping kind is not recognized")
+        if type(self.key) is not str or not self.key:
             raise ReadableResolutionError("grouping key cannot be empty")
+        if self.chunk_size is not None and (
+            type(self.chunk_size) is not int or self.chunk_size <= 0
+        ):
+            raise ReadableResolutionError(
+                "grouping chunk size must be a positive integer"
+            )
         if self.kind is GroupingKind.FIXED_CHUNKS:
             if (
                 self.chunk_size is None
-                or isinstance(self.chunk_size, bool)
-                or self.chunk_size <= 0
             ):
                 raise ReadableResolutionError(
                     "fixed-chunk grouping needs a positive size"
@@ -238,8 +325,10 @@ class ReadableField(Generic[C, R]):
     region: "ReadableRegion[C, R]"
 
     def __post_init__(self) -> None:
-        if not self.key:
+        if type(self.key) is not str or not self.key:
             raise ReadableResolutionError("readable product key cannot be empty")
+        if type(self.region) is not ReadableRegion:
+            raise TypeError("readable product field needs a ReadableRegion")
 
 
 @dataclass(frozen=True)
@@ -256,10 +345,28 @@ class ReadableRegion(Generic[C, R]):
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
 
     def __post_init__(self) -> None:
-        if self.value_profile is not None and not isinstance(
-            self.value_profile, alphabets.ValueProfile
-        ):
+        if type(self.descriptor) is not loci.Region:
+            raise TypeError("readable descriptor is not recognized")
+        if self.configuration_contract is not None and type(
+            self.configuration_contract
+        ) is not loci.CarrierContract:
+            raise TypeError("readable configuration contract is not recognized")
+        if self.value_profile is not None and type(
+            self.value_profile
+        ) is not alphabets.ValueProfile:
             raise TypeError("value_profile must be alphabets.ValueProfile")
+        if type(self.result_shape) is not ResultShape:
+            raise TypeError("readable result shape is not recognized")
+        if type(self.join_shape) is not JoinShape:
+            raise TypeError("readable join shape is not recognized")
+        if type(self.grouping) is not GroupingPlan:
+            raise TypeError("readable grouping plan is not recognized")
+        if type(self.parts) is not tuple or any(
+            type(part) is not ReadableField for part in self.parts
+        ):
+            raise TypeError("readable parts must be an immutable tuple")
+        if type(self.exactness_profile) is not ExactnessProfile:
+            raise TypeError("readable exactness profile is not recognized")
         is_product = self.grouping.kind is GroupingKind.PRODUCT
         if is_product != bool(self.parts):
             raise ReadableResolutionError(
@@ -297,7 +404,7 @@ class ReadableRegion(Generic[C, R]):
             return self._resolve_product(configuration)
 
         try:
-            if not isinstance(configuration, loci.FiniteConfiguration):
+            if type(configuration) is not loci.FiniteConfiguration:
                 raise ReadableResolutionError(
                     "finite ReadableRegion resolution needs FiniteConfiguration"
                 )
@@ -348,12 +455,14 @@ class ReadableRegion(Generic[C, R]):
             observations.append(Observation(target, state, anchor))
 
         groups = _groups_for(self.grouping, tuple(observations))
-        return ReadableView(
+        view = ReadableView(
             snapshot_identity,
             tuple(observations),
             groups,
             self.join_shape,
         )
+        _validate_view_shape(view, self.result_shape)
+        return view
 
     def _resolve_product(self, configuration: C) -> ReadableView[V]:
         views = tuple(field.region.resolve(configuration) for field in self.parts)
@@ -380,12 +489,14 @@ class ReadableRegion(Generic[C, R]):
                         group.anchor,
                     )
                 )
-        return ReadableView(
+        view = ReadableView(
             snapshot_ids[0],
             tuple(observations),
             tuple(groups),
             self.join_shape,
         )
+        _validate_view_shape(view, self.result_shape)
+        return view
 
 
 def _groups_for(
@@ -410,18 +521,41 @@ def _groups_for(
                 "resolved view does not divide into declared fixed groups"
             )
         groups: list[ObservationGroup] = []
+        next_channel: dict[loci.Locus | None, int] = {}
         for start in range(0, len(observations), grouping.chunk_size):
             indices = tuple(range(start, start + grouping.chunk_size))
             anchor = observations[start].anchor
+            channel = next_channel.get(anchor, 0)
+            next_channel[anchor] = channel + 1
             groups.append(
                 ObservationGroup(
-                    GroupKey(anchor, 0),
+                    GroupKey(anchor, channel),
                     indices,
                     anchor,
                 )
             )
         return tuple(groups)
     raise ReadableResolutionError("PRODUCT grouping resolves through its fields")
+
+
+def _validate_view_shape(view: ReadableView[V], shape: ResultShape) -> None:
+    """Prove every materialized anchor has exactly the declared field arities."""
+
+    grouped: dict[loci.Locus | None, list[ObservationGroup]] = {}
+    for group in view.groups:
+        grouped.setdefault(group.anchor, []).append(group)
+    for groups in grouped.values():
+        channels = tuple(group.key.channel for group in groups)
+        if channels != tuple(range(len(shape.fields))):
+            raise ReadableResolutionError(
+                "resolved groups do not match the declared result fields"
+            )
+        for field, group in zip(shape.fields, groups):
+            expected = 1 if field.arity is ReadArity.ONE else field.size
+            if expected is not None and len(group.indices) != expected:
+                raise ReadableResolutionError(
+                    f"resolved group {field.key!r} violates its declared arity"
+                )
 
 
 def literal(
@@ -433,6 +567,8 @@ def literal(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read an explicit ordered set of existing identities."""
 
+    if type(targets) is not tuple or any(type(target) is not loci.Locus for target in targets):
+        raise TypeError("literal targets must be an immutable tuple of Loci")
     if not targets:
         raise ReadableResolutionError("literal targets cannot be empty")
     return ReadableRegion(
@@ -472,6 +608,12 @@ def grid_relative(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read one ordered relative-offset group for every carrier anchor."""
 
+    if type(offsets) is not tuple or any(
+        type(offset) is not tuple
+        or any(type(coordinate) is not int for coordinate in offset)
+        for offset in offsets
+    ):
+        raise TypeError("relative offsets must be immutable integer tuples")
     if not offsets:
         raise ReadableResolutionError("relative offsets cannot be empty")
     rank = len(offsets[0])
@@ -504,6 +646,10 @@ def intensional(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Describe a closed non-enumerated read view."""
 
+    if type(binder) is not str or not binder:
+        raise ReadableResolutionError("intensional binder cannot be empty")
+    if type(relation) is not loci.SelectorExpr:
+        raise TypeError("intensional relation is not recognized")
     return ReadableRegion(
         loci.intensional(binder, relation),
         configuration_contract,
@@ -520,6 +666,16 @@ def product(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Compose named read fields while preserving every group boundary."""
 
+    if type(fields) is not tuple or any(
+        type(field) is not tuple
+        or len(field) != 2
+        or type(field[0]) is not str
+        or type(field[1]) is not ReadableRegion
+        for field in fields
+    ):
+        raise TypeError(
+            "product fields must be immutable (name, ReadableRegion) pairs"
+        )
     if not fields:
         raise ReadableResolutionError("product needs at least one field")
     keys = tuple(key for key, _ in fields)
@@ -542,9 +698,8 @@ def product(
         for field in region.result_shape.fields
     )
     return ReadableRegion(
-        loci.Region(
-            loci.RegionKind.PRODUCT,
-            parts=tuple(region.descriptor for _, region in fields),
+        loci.region_product(
+            tuple((key, region.descriptor) for key, region in fields)
         ),
         first.configuration_contract,
         first.value_profile,
@@ -558,20 +713,46 @@ def product(
 
 def _with_compatibility_shape(
     region: ReadableRegion[C, R],
-    read_fields: tuple[str, ...],
+    read_fields: tuple[tuple[str, int], ...],
     join_fields: tuple[str, ...] = ("target", "channel"),
+    *,
+    split_single_group: bool = False,
 ) -> ReadableRegion[C, R]:
     """Retain mechanics while assigning the exact Rule-facing shape."""
 
+    if type(region) is not ReadableRegion:
+        raise TypeError("compatibility shape needs a ReadableRegion")
+    if type(read_fields) is not tuple or any(
+        type(field) is not tuple
+        or len(field) != 2
+        or type(field[0]) is not str
+        or not field[0]
+        or type(field[1]) is not int
+        or field[1] <= 0
+        for field in read_fields
+    ):
+        raise TypeError("compatibility fields need closed positive arities")
+    grouping = (
+        GroupingPlan(GroupingKind.FIXED_CHUNKS, "compatibility-fields", 1)
+        if split_single_group
+        else region.grouping
+    )
     return ReadableRegion(
         region.descriptor,
         region.configuration_contract,
         region.value_profile,
         ResultShape(
-            tuple(ReadField(key, ReadArity.VARIABLE) for key in read_fields)
+            tuple(
+                ReadField(
+                    key,
+                    ReadArity.ONE if size == 1 else ReadArity.FIXED,
+                    size,
+                )
+                for key, size in read_fields
+            )
         ),
         JoinShape(region.join_shape.mode, join_fields),
-        region.grouping,
+        grouping,
         region.parts,
         region.exactness_profile,
     )
@@ -586,10 +767,10 @@ def self_at(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read the same identity at one current/history offset."""
 
-    if isinstance(history_offset, bool):
+    if type(history_offset) is not int:
         raise TypeError("history_offset must be an integer")
     return grid_relative(
-        ((int(history_offset),),),
+        ((history_offset,),),
         configuration_contract=configuration_contract,
         value_profile=value_profile,
         key=key,
@@ -605,8 +786,10 @@ def history(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read one ordered temporal/history group per anchor."""
 
+    if type(offsets) is not tuple or any(type(offset) is not int for offset in offsets):
+        raise TypeError("history offsets must be an immutable integer tuple")
     return grid_relative(
-        tuple((int(offset),) for offset in offsets),
+        tuple((offset,) for offset in offsets),
         configuration_contract=configuration_contract,
         value_profile=value_profile,
         key=key,
@@ -621,7 +804,7 @@ def eca(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read the ordered one-dimensional ``left .. self .. right`` stencil."""
 
-    if isinstance(radius, bool) or radius <= 0:
+    if type(radius) is not int or radius <= 0:
         raise ReadableResolutionError("ECA radius must be positive")
     carrier = (
         loci.CarrierContract(
@@ -687,7 +870,8 @@ def dyadlags_0d(
     )
     return _with_compatibility_shape(
         region,
-        ("older", "previous", "current"),
+        (("older", 1), ("previous", 1), ("current", 1)),
+        split_single_group=True,
     )
 
 
@@ -700,10 +884,12 @@ def lagcounts_0d(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read current self followed by explicit lag-count bands."""
 
-    if isinstance(band_size, bool) or band_size <= 0:
+    if type(band_size) is not int or band_size <= 0:
         raise ReadableResolutionError("band_size must be positive")
-    if isinstance(band_count, bool) or band_count <= 0:
-        raise ReadableResolutionError("band_count must be positive")
+    if type(band_count) is not int or band_count != 3:
+        raise ReadableResolutionError(
+            "the native lagcounts view requires exactly three bands"
+        )
     carrier = (
         loci.CarrierContract(
             loci.CarrierKind.HISTORY,
@@ -740,7 +926,12 @@ def lagcounts_0d(
         )
     return _with_compatibility_shape(
         product(tuple(fields)),
-        ("history", "recent", "middle", "oldest"),
+        (
+            ("history", 1),
+            ("recent", band_size),
+            ("middle", band_size),
+            ("oldest", band_size),
+        ),
     )
 
 
@@ -793,7 +984,7 @@ def dyadrads_1d(
     )
     return _with_compatibility_shape(
         region,
-        ("self", "primary", "secondary"),
+        (("self", 1), ("primary", 2), ("secondary", 2)),
     )
 
 
@@ -846,7 +1037,7 @@ def dyadaxes_2d(
     )
     return _with_compatibility_shape(
         region,
-        ("self", "primary", "secondary"),
+        (("self", 1), ("primary", 4), ("secondary", 4)),
     )
 
 
@@ -917,5 +1108,5 @@ def dyadaxes_3d(
     )
     return _with_compatibility_shape(
         region,
-        ("self", "primary", "secondary"),
+        (("self", 1), ("primary", 6), ("secondary", 20)),
     )

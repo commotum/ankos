@@ -426,18 +426,39 @@ class MeasureMass:
 @dataclass(frozen=True)
 class ProgramMeasure:
     masses: tuple[MeasureMass, ...]
-    total_mass: Fraction
+    total_mass: Fraction | None
     intensional_descriptor: rules.RuleExpr | None = None
 
     def __post_init__(self) -> None:
-        if self.total_mass < 0 or self.total_mass > 1:
+        if type(self.masses) is not tuple or any(
+            type(item) is not MeasureMass for item in self.masses
+        ):
+            raise TypeError("measure masses must be a tuple of MeasureMass values")
+        if self.total_mass is not None and (
+            isinstance(self.total_mass, bool)
+            or not isinstance(self.total_mass, Fraction)
+        ):
+            raise TypeError("measure total must be an exact Fraction or unknown")
+        if self.total_mass is not None and (
+            self.total_mass < 0 or self.total_mass > 1
+        ):
             raise ValueError("submeasure mass must lie in [0, 1]")
         if self.masses and self.intensional_descriptor is not None:
             raise ValueError("measure cannot be finite and intensional together")
+        if self.intensional_descriptor is not None:
+            if type(self.intensional_descriptor) is not rules.RuleExpr:
+                raise TypeError("intensional measure needs a closed RuleExpr")
+            if self.total_mass is not None:
+                raise ValueError(
+                    "an unenumerated submeasure cannot claim a known total"
+                )
         if self.masses and sum(
             (item.mass for item in self.masses), Fraction(0)
         ) != self.total_mass:
             raise ValueError("finite measure masses do not match total")
+        if not self.masses and self.intensional_descriptor is None:
+            if self.total_mass != Fraction(0):
+                raise ValueError("an empty finite measure has total mass zero")
 
 
 @dataclass(frozen=True)
@@ -634,6 +655,10 @@ def _validate_rule_space(
     if support.presentation is rules.SupportPresentation.INTENSIONAL:
         if support.relation is None:
             raise ValueError("intensional Rule result has no relation")
+        if isinstance(support.cardinality, rules.ExactlyZero):
+            raise ValueError(
+                "exact-zero Rule denotation requires a typed NoSuccessor atom"
+            )
         return outcome_space
     if not support.atoms:
         raise ValueError("bare empty finite Rule result is invalid")
@@ -731,9 +756,22 @@ def _commit(
     configuration: C,
     atom: rules.Derivation[alphabets.SemanticValue],
     bindings: tuple[FreshBinding, ...],
+    writable: frontiers.WritableCapabilities,
 ) -> C:
     if not isinstance(configuration, loci.FiniteConfiguration):
         raise TypeError("finite derivation commit requires FiniteConfiguration")
+    if writable.snapshot_identity != configuration.identity:
+        raise ValueError("reconstruction plan belongs to a different snapshot")
+    disposition_targets = tuple(
+        item.target for item in atom.replacement.entries
+    )
+    lens_targets = tuple(
+        lens.target for lens in writable.reconstruction.lenses
+    )
+    if disposition_targets != lens_targets:
+        raise ValueError(
+            "reconstruction lenses do not cover the total disposition in order"
+        )
     replacement_by_target = {
         disposition.target: disposition
         for disposition in atom.replacement.existing
@@ -757,7 +795,6 @@ def _commit(
     binding_by_reference = {
         binding.reference: binding.identity for binding in bindings
     }
-    structure = list(configuration.structure)
     for disposition in atom.replacement.fresh:
         if disposition.action is rules.DispositionAction.ABSENT:
             continue
@@ -768,25 +805,10 @@ def _commit(
             raise ValueError("fresh creation has no deterministic binding")
         payload = cast(rules.ValuePayload[alphabets.SemanticValue], disposition.payload)
         entries.append((bound, payload.value))
-        reference = cast(loci.FreshReference, disposition.target)
-        if reference.parent is not None:
-            structure.append(
-                loci.StructuralRelation(
-                    "fresh-parent",
-                    (bound, reference.parent),
-                )
-            )
-        structure.extend(
-            loci.StructuralRelation(
-                "fresh-interface",
-                (bound, interface),
-            )
-            for interface in reference.interface
-        )
 
     successor = configuration.with_entries(
         tuple(entries),
-        structure=tuple(structure),
+        structure=configuration.structure,
     )
     return cast(C, successor)
 
@@ -819,13 +841,29 @@ def _finite_measures(
     if law.presentation is not rules.ProbabilityPresentation.FINITE:
         descriptor = law.measure or rules.literal_expr("intensional-rule-law")
         applied_measure = MeasureAvailable(
-            ProgramMeasure((), Fraction(1), descriptor)
+            ProgramMeasure(
+                (),
+                None,
+                rules.RuleExpr(
+                    rules.ExpressionPrimitive.TUPLE,
+                    (
+                        rules.literal_expr("applied-measure-pushforward"),
+                        descriptor,
+                    ),
+                ),
+            )
         )
         no_successor = MeasureAvailable(
             ProgramMeasure(
                 (),
-                Fraction(0),
-                rules.literal_expr("intensional-no-successor-submeasure"),
+                None,
+                rules.RuleExpr(
+                    rules.ExpressionPrimitive.TUPLE,
+                    (
+                        rules.literal_expr("no-successor-measure-restriction"),
+                        descriptor,
+                    ),
+                ),
             )
         )
         successor = MeasureUnavailable(
@@ -902,7 +940,64 @@ def _quotient(
                 break
         else:
             groups.append(SuccessorGroup(derivation.successor, (derivation,)))
-    return tuple(groups)
+    normalized = tuple(
+        SuccessorGroup(
+            group.successor,
+            tuple(
+                sorted(
+                    group.derivations,
+                    key=lambda item: item.canonical_identity,
+                )
+            ),
+        )
+        for group in groups
+    )
+    return tuple(
+        sorted(normalized, key=lambda group: group.canonical_identity)
+    )
+
+
+def _phase_certificate(
+    kind: rules.CertificateKind,
+    phase: str,
+    relation: rules.RuleExpr,
+) -> rules.Certificate:
+    return rules.Certificate(
+        kind,
+        rules.RuleExpr(
+            rules.ExpressionPrimitive.TUPLE,
+            (
+                rules.literal_expr(f"application-phase:{phase}"),
+                relation,
+            ),
+        ),
+    )
+
+
+def _mapped_intensional_support(
+    *,
+    phase: str,
+    relation: rules.RuleExpr,
+    cardinality: rules.Cardinality,
+) -> rules.SupportSpace[object]:
+    mapped_relation = rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (rules.literal_expr(f"application-map:{phase}"), relation),
+    )
+    return rules.intensional_support(
+        mapped_relation,
+        cardinality,
+        completeness_evidence=_phase_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            phase,
+            mapped_relation,
+        ),
+        soundness_evidence=_phase_certificate(
+            rules.CertificateKind.SOUNDNESS,
+            phase,
+            mapped_relation,
+        ),
+    )
 
 
 def _intensional_application(
@@ -920,32 +1015,29 @@ def _intensional_application(
             rules.literal_expr("application-cardinality-obligation"),
         ),
     )
-    applied_support: rules.SupportSpace[AppliedAtom[C]] = rules.intensional_support(
-        rules.RuleExpr(
-            rules.ExpressionPrimitive.TUPLE,
-            (rules.literal_expr("applied-map"), relation),
+    applied_support = cast(
+        rules.SupportSpace[AppliedAtom[C]],
+        _mapped_intensional_support(
+            phase="validated-application",
+            relation=relation,
+            cardinality=unknown,
         ),
-        unknown,
-        completeness_evidence=support.completeness_evidence,
-        soundness_evidence=support.soundness_evidence,
     )
-    no_successor: rules.SupportSpace[AppliedNoSuccessor] = rules.intensional_support(
-        rules.RuleExpr(
-            rules.ExpressionPrimitive.TUPLE,
-            (rules.literal_expr("no-successor-partition"), relation),
+    no_successor = cast(
+        rules.SupportSpace[AppliedNoSuccessor],
+        _mapped_intensional_support(
+            phase="no-successor-partition",
+            relation=relation,
+            cardinality=unknown,
         ),
-        unknown,
-        completeness_evidence=support.completeness_evidence,
-        soundness_evidence=support.soundness_evidence,
     )
-    successors: rules.SupportSpace[SuccessorGroup[C]] = rules.intensional_support(
-        rules.RuleExpr(
-            rules.ExpressionPrimitive.TUPLE,
-            (rules.literal_expr("successor-quotient"), relation),
+    successors = cast(
+        rules.SupportSpace[SuccessorGroup[C]],
+        _mapped_intensional_support(
+            phase="successor-quotient",
+            relation=relation,
+            cardinality=unknown,
         ),
-        unknown,
-        completeness_evidence=support.completeness_evidence,
-        soundness_evidence=support.soundness_evidence,
     )
     applied_measure, successor_measure, no_successor_measure = _finite_measures(
         outcome_space.probability_law,
@@ -1148,7 +1240,7 @@ def apply(
     try:
         for atom, bindings in bindings_by_atom:
             successor = (
-                _commit(configuration, atom, bindings)
+                _commit(configuration, atom, bindings, writable)
                 if isinstance(atom, rules.Derivation)
                 else None
             )
@@ -1280,11 +1372,92 @@ def apply(
 # ---------------------------------------------------------------------------
 
 
+class SamplerProfile(Enum):
+    """Closed deterministic sampler used only after an explicit replay key."""
+
+    SHA256_REJECTION_V1 = "sha256-rejection-v1"
+
+
+class NumericProfile(Enum):
+    """Closed exact arithmetic profile for probability-law realization."""
+
+    FRACTION_TICKETS_V1 = "fraction-tickets-v1"
+
+
 @dataclass(frozen=True)
-class SeedRealizationEvidence:
+class DrawEvidence:
+    """Complete replay coordinates for one law realization."""
+
+    law_identity: str
+    application_identity: str
+    replay_key_identity: str
+    subkey_identity: str
+    coordinate: tuple[str, ...]
+    sampler_profile: SamplerProfile
+    numeric_profile: NumericProfile
+    selected_witness_identity: str
+    rejection_rounds: int
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported draw-evidence version {self.version}")
+        strings = (
+            self.law_identity,
+            self.application_identity,
+            self.replay_key_identity,
+            self.subkey_identity,
+            self.selected_witness_identity,
+        )
+        if any(not isinstance(item, str) or not item for item in strings):
+            raise ValueError("draw evidence identities must be nonempty strings")
+        if type(self.coordinate) is not tuple or any(
+            not isinstance(item, str) or not item for item in self.coordinate
+        ):
+            raise TypeError("draw coordinates must be immutable nonempty strings")
+        if not isinstance(self.sampler_profile, SamplerProfile):
+            raise TypeError("draw sampler profile is not recognized")
+        if not isinstance(self.numeric_profile, NumericProfile):
+            raise TypeError("draw numeric profile is not recognized")
+        if (
+            isinstance(self.rejection_rounds, bool)
+            or not isinstance(self.rejection_rounds, int)
+            or self.rejection_rounds < 0
+        ):
+            raise ValueError("draw rejection count must be a nonnegative integer")
+
+
+@dataclass(frozen=True)
+class SeedRealizationEvidence(Generic[C]):
     source_identity: str
     replay_key_identity: str | None
     selected_identity: str | None
+    denotation: seeds.SeedDenotation[C] | None = None
+    draws: tuple[DrawEvidence, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.source_identity, str) or not self.source_identity:
+            raise ValueError("Seed evidence needs a source identity")
+        if self.replay_key_identity is not None and (
+            not isinstance(self.replay_key_identity, str)
+            or not self.replay_key_identity
+        ):
+            raise ValueError("Seed replay-key identity cannot be empty")
+        if self.selected_identity is not None and (
+            not isinstance(self.selected_identity, str)
+            or not self.selected_identity
+        ):
+            raise ValueError("selected Seed identity cannot be empty")
+        if self.denotation is not None and type(
+            self.denotation
+        ) is not seeds.SeedDenotation:
+            raise TypeError("Seed evidence denotation is not recognized")
+        if type(self.draws) is not tuple or any(
+            type(item) is not DrawEvidence for item in self.draws
+        ):
+            raise TypeError("Seed draw evidence must be an immutable tuple")
+        if self.selected_identity is None and self.draws:
+            raise ValueError("Seed draws require a selected realization")
 
 
 @dataclass(frozen=True)
@@ -1329,7 +1502,26 @@ class RawTrace(Generic[C]):
     applications: rules.SupportSpace[ApplicationComplete[C]]
     derivation_edges: rules.SupportSpace[AppliedAtom[C]]
     lineage_graph: tuple[TraceEdge, ...]
-    seed_evidence: SeedRealizationEvidence
+    seed_evidence: SeedRealizationEvidence[C]
+    draw_evidence: tuple[DrawEvidence, ...] = ()
+
+    def __post_init__(self) -> None:
+        if type(self.roots) is not rules.OutcomeSpace:
+            raise TypeError("raw trace roots are not recognized")
+        if type(self.applications) is not rules.SupportSpace:
+            raise TypeError("raw trace application space is not recognized")
+        if type(self.derivation_edges) is not rules.SupportSpace:
+            raise TypeError("raw trace edge space is not recognized")
+        if type(self.lineage_graph) is not tuple or any(
+            type(item) is not TraceEdge for item in self.lineage_graph
+        ):
+            raise TypeError("raw lineage graph is not recognized")
+        if type(self.seed_evidence) is not SeedRealizationEvidence:
+            raise TypeError("raw trace Seed evidence is not recognized")
+        if type(self.draw_evidence) is not tuple or any(
+            type(item) is not DrawEvidence for item in self.draw_evidence
+        ):
+            raise TypeError("raw trace draw evidence is not recognized")
 
 
 @dataclass(frozen=True)
@@ -1340,6 +1532,7 @@ class RolloutComplete(Generic[C]):
 
 class TruncationCause(Enum):
     DEPTH_BOUND = "depth-bound"
+    INTENSIONAL_SUPPORT = "intensional-support"
     RESOURCE_EXHAUSTED = "resource-exhausted"
     CANCELLED = "cancelled"
     PRUNED = "pruned"
@@ -1506,48 +1699,302 @@ def _enumerate_bernoulli(
     return tuple(configurations), tuple(weights)
 
 
-def _finite_seed_space(
-    seed: seeds.Seed[C],
-) -> tuple[
-    tuple[C, ...],
-    tuple[Fraction, ...] | None,
-]:
-    source = seed.denote().source
-    if isinstance(source, seeds.ExactSource):
-        return (source.configuration,), None
-    if isinstance(source, seeds.ConstructiveSource):
-        configuration = _realize_construction(
-            source.construction,
-            seed.configuration_contract,
+_MAX_ENUMERATED_SEED_ATOMS = 4096
+
+
+def _seed_relation(
+    denotation: seeds.SeedDenotation[object],
+    label: str,
+) -> rules.RuleExpr:
+    """Reference a retained closed Seed denotation from a support relation."""
+
+    return rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (
+            rules.literal_expr(label),
+            rules.literal_expr(loci.canonical_identity(denotation)),
+        ),
+    )
+
+
+def _seed_cardinality(
+    denotation: seeds.SeedDenotation[object],
+    exact_size: int | None,
+) -> rules.Cardinality:
+    if exact_size is not None:
+        return rules.finite_cardinality(exact_size)
+    relation = _seed_relation(denotation, "seed-cardinality")
+    return rules.Undetermined(
+        relation,
+        rules.Certificate(
+            rules.CertificateKind.CARDINALITY,
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (
+                    rules.literal_expr("seed-cardinality-obligation"),
+                    relation,
+                ),
+            ),
+        ),
+    )
+
+
+def _bounded_power(
+    base: int,
+    exponent: int,
+    *,
+    limit: int,
+) -> int | None:
+    value = 1
+    for _ in range(exponent):
+        value *= base
+        if value > limit:
+            return None
+    return value
+
+
+def _law_support_size(
+    law: seeds.ProbabilityLaw,
+) -> int | None:
+    if isinstance(law, seeds.UniformTupleLaw):
+        size = _bounded_power(
+            law.value_count,
+            law.length,
+            limit=_MAX_ENUMERATED_SEED_ATOMS + len(law.excluded),
         )
-        return (cast(C, configuration),), None
+        if size is None:
+            return None
+        return size - len(law.excluded)
+    if isinstance(law, seeds.BernoulliLaw):
+        if law.support.kind is not loci.RegionKind.LITERAL:
+            return None
+        if law.probability_true in (Fraction(0), Fraction(1)):
+            return 1
+        return _bounded_power(
+            2,
+            len(law.support.loci),
+            limit=_MAX_ENUMERATED_SEED_ATOMS,
+        )
+    return None
+
+
+def _intensional_seed_law(
+    denotation: seeds.SeedDenotation[object],
+) -> rules.ProbabilityLaw:
+    measure = _seed_relation(denotation, "seed-probability-law")
+    return rules.ProbabilityLaw(
+        rules.ProbabilityPresentation.INTENSIONAL,
+        (),
+        measure,
+        rules.Certificate(
+            rules.CertificateKind.NORMALIZATION,
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (rules.literal_expr("seed-law-normalized"), measure),
+            ),
+        ),
+        rules.Certificate(
+            rules.CertificateKind.MEASURABILITY,
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (rules.literal_expr("seed-law-measurable"), measure),
+            ),
+        ),
+    )
+
+
+def _finite_seed_outcome(
+    configurations: tuple[C, ...],
+    weights: tuple[Fraction, ...] | None,
+) -> rules.OutcomeSpace[C]:
+    support = rules.finite_support(configurations, label="seed-roots")
+    law: rules.ProbabilityLaw | None = None
+    if weights is not None:
+        law = rules.ProbabilityLaw(
+            rules.ProbabilityPresentation.FINITE,
+            tuple(
+                rules.AtomMass(
+                    loci.configuration_identity(configuration),
+                    weight,
+                )
+                for configuration, weight in zip(
+                    configurations,
+                    weights,
+                    strict=True,
+                )
+                if weight > 0
+            ),
+            None,
+            rules.Certificate(
+                rules.CertificateKind.NORMALIZATION,
+                rules.literal_expr("seed-law:normalized"),
+            ),
+            rules.Certificate(
+                rules.CertificateKind.MEASURABILITY,
+                rules.literal_expr("seed-law:measurable"),
+            ),
+        )
+    return rules.OutcomeSpace(support, law)
+
+
+def _denote_seed_space(
+    seed: seeds.Seed[C],
+) -> tuple[rules.OutcomeSpace[C], seeds.SeedDenotation[C]]:
+    """Retain the complete Seed space, enumerating only bounded finite laws."""
+
+    denotation = seed.denote()
+    source = denotation.source
+    if isinstance(source, seeds.ExactSource):
+        return _finite_seed_outcome((source.configuration,), None), denotation
+    if isinstance(source, seeds.ConstructiveSource):
+        configuration = cast(
+            C,
+            _realize_construction(
+                source.construction,
+                seed.configuration_contract,
+            ),
+        )
+        return _finite_seed_outcome((configuration,), None), denotation
     if isinstance(source, seeds.PartialSource):
-        # Partiality is semantic data, not a request for generic filling.  It
-        # may advance when its explicit unresolved values are admitted by the
-        # Alphabet and the Rule reads/completes them.
-        return (source.configuration,), None
+        # Partiality remains explicit semantic data. Generic realization does
+        # not fill unresolved roles.
+        return _finite_seed_outcome((source.configuration,), None), denotation
     if isinstance(source, seeds.LawSource):
-        if isinstance(source.law, seeds.UniformTupleLaw):
-            configurations, weights = _enumerate_uniform_tuple(
-                source,
-                seed.configuration_contract,
+        support_size = _law_support_size(source.law)
+        if (
+            support_size is not None
+            and support_size <= _MAX_ENUMERATED_SEED_ATOMS
+        ):
+            if isinstance(source.law, seeds.UniformTupleLaw):
+                configurations, weights = _enumerate_uniform_tuple(
+                    source,
+                    seed.configuration_contract,
+                )
+                return (
+                    _finite_seed_outcome(
+                        cast(tuple[C, ...], configurations),
+                        weights,
+                    ),
+                    denotation,
+                )
+            if isinstance(source.law, seeds.BernoulliLaw):
+                configurations, weights = _enumerate_bernoulli(
+                    source,
+                    seed.configuration_contract,
+                )
+                return (
+                    _finite_seed_outcome(
+                        cast(tuple[C, ...], configurations),
+                        weights,
+                    ),
+                    denotation,
+                )
+
+    relation = _seed_relation(
+        cast(seeds.SeedDenotation[object], denotation),
+        "seed-source-space",
+    )
+    support = rules.intensional_support(
+        relation,
+        _seed_cardinality(
+            cast(seeds.SeedDenotation[object], denotation),
+            (
+                _law_support_size(source.law)
+                if isinstance(source, seeds.LawSource)
+                else None
+            ),
+        ),
+        completeness_evidence=rules.Certificate(
+            rules.CertificateKind.COMPLETENESS,
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (rules.literal_expr("seed-space-complete"), relation),
+            ),
+        ),
+        soundness_evidence=rules.Certificate(
+            rules.CertificateKind.SOUNDNESS,
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (rules.literal_expr("seed-space-sound"), relation),
+            ),
+        ),
+    )
+    law = (
+        _intensional_seed_law(
+            cast(seeds.SeedDenotation[object], denotation)
+        )
+        if seed.entropy_interface is seeds.EntropyInterface.REPLAY_KEY
+        else None
+    )
+    return (
+        rules.OutcomeSpace(cast(rules.SupportSpace[C], support), law),
+        denotation,
+    )
+
+
+def _point_identity(value: object) -> str:
+    canonical = getattr(value, "canonical_identity", None)
+    if isinstance(canonical, str) and canonical:
+        return canonical
+    if isinstance(value, (loci.FiniteConfiguration, loci.IntensionalConfiguration)):
+        return loci.configuration_identity(value)
+    return loci.canonical_identity(value)
+
+
+def _uniform_index(
+    total: int,
+    *,
+    subkey_identity: str,
+) -> tuple[int, int]:
+    """Map one replay subkey exactly to ``range(total)`` without modulo bias."""
+
+    if isinstance(total, bool) or not isinstance(total, int) or total <= 0:
+        raise ValueError("uniform draw range must be a positive integer")
+    bit_count = max(1, (total - 1).bit_length())
+    block_count = (bit_count + 255) // 256
+    mask = (1 << bit_count) - 1
+    rejection_round = 0
+    while True:
+        candidate = 0
+        for block in range(block_count):
+            material = loci.canonical_identity(
+                (
+                    SamplerProfile.SHA256_REJECTION_V1.value,
+                    subkey_identity,
+                    rejection_round,
+                    block,
+                )
             )
-            return cast(tuple[C, ...], configurations), weights
-        if isinstance(source.law, seeds.BernoulliLaw):
-            configurations, weights = _enumerate_bernoulli(
-                source,
-                seed.configuration_contract,
+            candidate = (
+                candidate << 256
+            ) | int.from_bytes(
+                hashlib.sha256(material.encode("utf-8")).digest(),
+                "big",
             )
-            return cast(tuple[C, ...], configurations), weights
-    raise ValueError("Seed has a complete non-finite source presentation")
+        candidate &= mask
+        if candidate < total:
+            return candidate, rejection_round
+        rejection_round += 1
 
 
 def _select_weighted(
     values: tuple[C, ...],
     weights: tuple[Fraction, ...],
     *,
-    key_material: str,
-) -> C:
+    law_identity: str,
+    application_identity: str,
+    replay_key_identity: str,
+    coordinate: tuple[str, ...],
+) -> tuple[C, DrawEvidence]:
+    if not values or len(values) != len(weights):
+        raise ValueError("weighted draw needs aligned nonempty values and weights")
+    if any(
+        isinstance(weight, bool)
+        or not isinstance(weight, Fraction)
+        or weight < 0
+        for weight in weights
+    ):
+        raise TypeError("weighted draw requires nonnegative exact Fractions")
     denominator = 1
     for weight in weights:
         denominator = lcm(denominator, weight.denominator)
@@ -1556,14 +2003,195 @@ def _select_weighted(
         for weight in weights
     )
     total = sum(tickets)
-    digest = hashlib.sha256(key_material.encode("utf-8")).digest()
-    draw = int.from_bytes(digest, "big") % total
+    if total <= 0:
+        raise ValueError("weighted draw has zero total mass")
+    subkey_identity = loci.canonical_identity(
+        (
+            replay_key_identity,
+            application_identity,
+            law_identity,
+            coordinate,
+            SamplerProfile.SHA256_REJECTION_V1.value,
+            NumericProfile.FRACTION_TICKETS_V1.value,
+        )
+    )
+    draw, rejection_rounds = _uniform_index(
+        total,
+        subkey_identity=subkey_identity,
+    )
     cumulative = 0
     for value, tickets_for_value in zip(values, tickets, strict=True):
         cumulative += tickets_for_value
         if draw < cumulative:
-            return value
+            selected_identity = _point_identity(value)
+            return (
+                value,
+                DrawEvidence(
+                    law_identity,
+                    application_identity,
+                    replay_key_identity,
+                    subkey_identity,
+                    coordinate,
+                    SamplerProfile.SHA256_REJECTION_V1,
+                    NumericProfile.FRACTION_TICKETS_V1,
+                    selected_identity,
+                    rejection_rounds,
+                ),
+            )
     raise AssertionError("weighted selection failed")
+
+
+def _realize_uniform_tuple(
+    seed: seeds.Seed[C],
+    source: seeds.LawSource,
+    *,
+    replay_key_identity: str,
+    application_identity: str,
+) -> tuple[C, tuple[DrawEvidence, ...]]:
+    law = cast(seeds.UniformTupleLaw, source.law)
+    law_identity = loci.canonical_identity(law)
+    excluded = set(law.excluded)
+    attempt = 0
+    all_draws: list[DrawEvidence] = []
+    while True:
+        digits: list[int] = []
+        attempt_draws: list[DrawEvidence] = []
+        for position in range(law.length):
+            values = tuple(range(law.value_count))
+            selected, evidence = _select_weighted(
+                values,
+                (Fraction(1, law.value_count),) * law.value_count,
+                law_identity=law_identity,
+                application_identity=application_identity,
+                replay_key_identity=replay_key_identity,
+                coordinate=(
+                    "seed",
+                    "uniform-tuple",
+                    f"attempt:{attempt}",
+                    f"position:{position}",
+                ),
+            )
+            digits.append(selected)
+            attempt_draws.append(evidence)
+        all_draws.extend(attempt_draws)
+        selected_tuple = tuple(digits)
+        if selected_tuple not in excluded:
+            values = tuple(
+                bool(value)
+                if (
+                    law.value_count == 2
+                    and seed.value_profile is alphabets.ValueProfile.BOOLEAN
+                )
+                else value
+                for value in selected_tuple
+            )
+            configuration = _configuration_from_values(
+                seed.configuration_contract,
+                cast(tuple[alphabets.SemanticValue, ...], values),
+            )
+            return cast(C, configuration), tuple(all_draws)
+        attempt += 1
+
+
+def _realize_bernoulli(
+    seed: seeds.Seed[C],
+    source: seeds.LawSource,
+    *,
+    replay_key_identity: str,
+    application_identity: str,
+) -> tuple[C, tuple[DrawEvidence, ...]]:
+    law = cast(seeds.BernoulliLaw, source.law)
+    if law.support.kind is not loci.RegionKind.LITERAL or not law.support.loci:
+        raise ValueError("keyed Bernoulli realization requires literal support")
+    law_identity = loci.canonical_identity(law)
+    values: list[alphabets.SemanticValue] = []
+    draws: list[DrawEvidence] = []
+    for target in law.support.loci:
+        selected, evidence = _select_weighted(
+            (law.false_value, law.true_value),
+            (Fraction(1) - law.probability_true, law.probability_true),
+            law_identity=law_identity,
+            application_identity=application_identity,
+            replay_key_identity=replay_key_identity,
+            coordinate=(
+                "seed",
+                "bernoulli",
+                loci.canonical_identity(target),
+            ),
+        )
+        values.append(selected)
+        draws.append(evidence)
+    configuration = loci.FiniteConfiguration(
+        loci.Carrier(seed.configuration_contract, law.boundary),
+        tuple(zip(law.support.loci, values, strict=True)),
+    )
+    return cast(C, configuration), tuple(draws)
+
+
+def _realize_seed_with_key(
+    seed: seeds.Seed[C],
+    *,
+    replay_key_identity: str,
+    application_identity: str,
+) -> tuple[C, tuple[DrawEvidence, ...]]:
+    source = seed.denote().source
+    if isinstance(source, seeds.ExactSource):
+        return source.configuration, ()
+    if isinstance(source, seeds.ConstructiveSource):
+        return (
+            cast(
+                C,
+                _realize_construction(
+                    source.construction,
+                    seed.configuration_contract,
+                ),
+            ),
+            (),
+        )
+    if isinstance(source, seeds.PartialSource):
+        return source.configuration, ()
+    if isinstance(source, seeds.LawSource):
+        if isinstance(source.law, seeds.UniformTupleLaw):
+            return _realize_uniform_tuple(
+                seed,
+                source,
+                replay_key_identity=replay_key_identity,
+                application_identity=application_identity,
+            )
+        if isinstance(source.law, seeds.BernoulliLaw):
+            return _realize_bernoulli(
+                seed,
+                source,
+                replay_key_identity=replay_key_identity,
+                application_identity=application_identity,
+            )
+        raise ValueError(
+            "this closed intensional Seed law has no finite realization profile"
+        )
+    if isinstance(source, seeds.MixtureSource):
+        selected_part, choice = _select_weighted(
+            tuple(part.seed for part in source.parts),
+            tuple(part.weight for part in source.parts),
+            law_identity=loci.canonical_identity(source),
+            application_identity=application_identity,
+            replay_key_identity=replay_key_identity,
+            coordinate=("seed", "mixture-choice"),
+        )
+        realized, nested = _realize_seed_with_key(
+            cast(seeds.Seed[C], selected_part),
+            replay_key_identity=replay_key_identity,
+            application_identity=loci.canonical_identity(
+                (
+                    application_identity,
+                    choice.subkey_identity,
+                    "mixture-part",
+                )
+            ),
+        )
+        return realized, (choice, *nested)
+    raise ValueError(
+        "this closed Seed composition has no generic finite realization profile"
+    )
 
 
 def _root_space(
@@ -1573,86 +2201,128 @@ def _root_space(
     replay_key: ReplayKey | None,
 ) -> tuple[
     rules.OutcomeSpace[C],
-    tuple[ContinuingLeaf[C], ...],
-    SeedRealizationEvidence,
+    rules.SupportSpace[ContinuingLeaf[C]],
+    SeedRealizationEvidence[C],
 ] | RolloutRejected:
     try:
+        denotation: seeds.SeedDenotation[C] | None
+        draws: tuple[DrawEvidence, ...] = ()
         if initial is not None:
             _validate_configuration(initial, program)
-            configurations = (initial,)
-            weights = None
+            roots = _finite_seed_outcome((initial,), None)
             source_identity = "explicit-initial"
+            denotation = None
         else:
-            configurations, weights = _finite_seed_space(program.seed)
-            for configuration in configurations:
-                _validate_configuration(configuration, program)
-            source_identity = loci.canonical_identity(program.seed)
+            roots, denotation = _denote_seed_space(program.seed)
+            source_identity = loci.canonical_identity(denotation)
+            if roots.support.presentation is rules.SupportPresentation.FINITE:
+                for configuration in roots.support.atoms:
+                    _validate_configuration(configuration, program)
 
         replay_identity = (
             None if replay_key is None else loci.canonical_identity(replay_key)
         )
         selected_identity: str | None = None
-        realized_configurations = configurations
-        if replay_key is not None and weights is not None:
-            selected = _select_weighted(
-                configurations,
-                weights,
-                key_material=loci.canonical_identity(
+        if (
+            initial is None
+            and replay_identity is not None
+            and program.seed.entropy_interface
+            is seeds.EntropyInterface.REPLAY_KEY
+        ):
+            selected, draws = _realize_seed_with_key(
+                program.seed,
+                replay_key_identity=replay_identity,
+                application_identity=loci.canonical_identity(
                     (
+                        "seed-realization",
                         program.canonical_identity,
                         source_identity,
-                        replay_key,
                     )
                 ),
             )
-            realized_configurations = (selected,)
+            _validate_configuration(selected, program)
             selected_identity = loci.configuration_identity(selected)
-
-        support = rules.finite_support(configurations, label="seed-roots")
-        probability_law: rules.ProbabilityLaw | None = None
-        if weights is not None:
-            probability_law = rules.ProbabilityLaw(
-                rules.ProbabilityPresentation.FINITE,
+            realized_support: rules.SupportSpace[ContinuingLeaf[C]] = (
+                rules.finite_support(
+                    (
+                        ContinuingLeaf(
+                            selected,
+                            TraceLineage(
+                                loci.canonical_identity(
+                                    (
+                                        "seed-root",
+                                        loci.configuration_identity(selected),
+                                    )
+                                )
+                            ),
+                        ),
+                    ),
+                    label="realized-seed-root",
+                )
+            )
+        elif roots.support.presentation is rules.SupportPresentation.FINITE:
+            realized_support = rules.finite_support(
                 tuple(
-                    rules.AtomMass(
-                        loci.configuration_identity(configuration),
-                        weight,
+                    ContinuingLeaf(
+                        configuration,
+                        TraceLineage(
+                            loci.canonical_identity(
+                                (
+                                    "seed-root",
+                                    loci.configuration_identity(configuration),
+                                )
+                            )
+                        ),
                     )
-                    for configuration, weight in zip(
-                        configurations,
-                        weights,
-                        strict=True,
-                    )
-                    if weight > 0
+                    for configuration in roots.support.atoms
                 ),
-                None,
-                rules.Certificate(
-                    rules.CertificateKind.NORMALIZATION,
-                    rules.literal_expr("seed-law:normalized"),
-                ),
-                rules.Certificate(
-                    rules.CertificateKind.MEASURABILITY,
-                    rules.literal_expr("seed-law:measurable"),
+                label="realized-seed-roots",
+            )
+        else:
+            relation = cast(rules.RuleExpr, roots.support.relation)
+            continuing_relation = rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (
+                    rules.literal_expr("continuing-seed-roots"),
+                    relation,
                 ),
             )
-        roots = rules.OutcomeSpace(support, probability_law)
-        leaves = tuple(
-            ContinuingLeaf(
-                configuration,
-                TraceLineage(
-                    loci.canonical_identity(
-                        ("seed-root", loci.configuration_identity(configuration))
-                    )
+            realized_support = rules.intensional_support(
+                continuing_relation,
+                roots.support.cardinality,
+                completeness_evidence=rules.Certificate(
+                    rules.CertificateKind.COMPLETENESS,
+                    rules.RuleExpr(
+                        rules.ExpressionPrimitive.TUPLE,
+                        (
+                            rules.literal_expr(
+                                "continuing-seed-roots-complete"
+                            ),
+                            continuing_relation,
+                        ),
+                    ),
+                ),
+                soundness_evidence=rules.Certificate(
+                    rules.CertificateKind.SOUNDNESS,
+                    rules.RuleExpr(
+                        rules.ExpressionPrimitive.TUPLE,
+                        (
+                            rules.literal_expr(
+                                "continuing-seed-roots-sound"
+                            ),
+                            continuing_relation,
+                        ),
+                    ),
                 ),
             )
-            for configuration in realized_configurations
-        )
         evidence = SeedRealizationEvidence(
             source_identity,
             replay_identity,
             selected_identity,
+            denotation,
+            draws,
         )
-        return roots, leaves, evidence
+        return roots, realized_support, evidence
     except (TypeError, ValueError) as error:
         return RolloutRejected(
             RolloutFault(str(error), (type(error).__name__,))
@@ -1662,8 +2332,8 @@ def _root_space(
 def _select_applied_atom(
     result: ApplicationComplete[C],
     lineage: TraceLineage,
-    replay_key: ReplayKey,
-) -> AppliedAtom[C]:
+    replay_key_identity: str,
+) -> tuple[AppliedAtom[C], DrawEvidence]:
     atoms = result.applied_atoms.atoms
     law = result.source_outcomes.probability_law
     if law is None or law.presentation is not rules.ProbabilityPresentation.FINITE:
@@ -1675,13 +2345,13 @@ def _select_applied_atom(
     return _select_weighted(
         atoms,
         weights,
-        key_material=loci.canonical_identity(
-            (
-                replay_key,
-                lineage.canonical_identity,
-                result.evidence.application_identity,
-                "rule-law-draw",
-            )
+        law_identity=loci.canonical_identity(law),
+        application_identity=result.evidence.application_identity,
+        replay_key_identity=replay_key_identity,
+        coordinate=(
+            "rule",
+            "outcome",
+            lineage.canonical_identity,
         ),
     )
 
@@ -1691,7 +2361,8 @@ def _raw_trace(
     applications: list[ApplicationComplete[C]],
     edges: list[AppliedAtom[C]],
     lineage_edges: list[TraceEdge],
-    seed_evidence: SeedRealizationEvidence,
+    seed_evidence: SeedRealizationEvidence[C],
+    rule_draws: list[DrawEvidence],
 ) -> RawTrace[C]:
     return RawTrace(
         roots,
@@ -1699,6 +2370,7 @@ def _raw_trace(
         rules.finite_support(tuple(edges), label="rollout-edges"),
         tuple(lineage_edges),
         seed_evidence,
+        (*seed_evidence.draws, *rule_draws),
     )
 
 
@@ -1722,9 +2394,28 @@ def rollout(
     )
     if isinstance(roots_result, RolloutRejected):
         return roots_result
-    roots, initial_leaves, seed_evidence = roots_result
+    roots, initial_leaf_space, seed_evidence = roots_result
 
-    continuing = list(initial_leaves)
+    rule_draws: list[DrawEvidence] = []
+    if (
+        initial_leaf_space.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    ):
+        trace = _raw_trace(
+            roots,
+            [],
+            [],
+            [],
+            seed_evidence,
+            rule_draws,
+        )
+        return RolloutTruncated(
+            trace,
+            initial_leaf_space,
+            TruncationCause.INTENSIONAL_SUPPORT,
+        )
+
+    continuing = list(initial_leaf_space.atoms)
     closed: list[ClosedLeaf[C]] = []
     applications: list[ApplicationComplete[C]] = []
     edges: list[AppliedAtom[C]] = []
@@ -1750,12 +2441,14 @@ def rollout(
                     )
                 )
             if result.applied_atoms.presentation is not rules.SupportPresentation.FINITE:
+                applications.append(result)
                 trace = _raw_trace(
                     roots,
                     applications,
                     edges,
                     lineage_edges,
                     seed_evidence,
+                    rule_draws,
                 )
                 relation = cast(rules.RuleExpr, result.applied_atoms.relation)
                 continuing_space: rules.SupportSpace[
@@ -1778,7 +2471,7 @@ def rollout(
                 return RolloutTruncated(
                     trace,
                     continuing_space,
-                    TruncationCause.DEPTH_BOUND,
+                    TruncationCause.INTENSIONAL_SUPPORT,
                 )
 
             chosen_atoms: tuple[AppliedAtom[C], ...]
@@ -1786,9 +2479,14 @@ def rollout(
                 replay_key is not None
                 and result.source_outcomes.probability_law is not None
             ):
-                chosen_atoms = (
-                    _select_applied_atom(result, leaf.trace_lineage, replay_key),
+                replay_identity = loci.canonical_identity(replay_key)
+                chosen, draw = _select_applied_atom(
+                    result,
+                    leaf.trace_lineage,
+                    replay_identity,
                 )
+                chosen_atoms = (chosen,)
+                rule_draws.append(draw)
             else:
                 chosen_atoms = result.applied_atoms.atoms
 
@@ -1821,6 +2519,7 @@ def rollout(
         edges,
         lineage_edges,
         seed_evidence,
+        rule_draws,
     )
     if continuing:
         return RolloutTruncated(

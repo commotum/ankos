@@ -49,7 +49,7 @@ class EffectProfile:
     def __post_init__(self) -> None:
         if type(self.existing) is not tuple or type(self.fresh) is not tuple:
             raise TypeError("effect profiles must use immutable tuples")
-        if any(not isinstance(effect, Effect) for effect in (*self.existing, *self.fresh)):
+        if any(type(effect) is not Effect for effect in (*self.existing, *self.fresh)):
             raise TypeError("effect profile contains an unknown effect")
         if len(set(self.existing)) != len(self.existing):
             raise WritableResolutionError("existing effects must be unique")
@@ -70,15 +70,14 @@ class TargetContract:
     frame: WriteFrame = WriteFrame.SUCCESSOR
 
     def __post_init__(self) -> None:
-        if self.locus_kind is not None and not isinstance(
-            self.locus_kind, loci.LocusKind
-        ):
+        if self.locus_kind is not None and type(self.locus_kind) is not loci.LocusKind:
             raise TypeError("target locus kind is not recognized")
-        if self.value_profile is not None and not isinstance(
-            self.value_profile, alphabets.ValueProfile
+        if (
+            self.value_profile is not None
+            and type(self.value_profile) is not alphabets.ValueProfile
         ):
             raise TypeError("value_profile must be alphabets.ValueProfile")
-        if not isinstance(self.frame, WriteFrame):
+        if type(self.frame) is not WriteFrame:
             raise TypeError("target write frame is not recognized")
 
 
@@ -90,7 +89,7 @@ class FreshNamespace:
     parent: loci.Locus | None = None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.namespace, str) or not self.namespace:
+        if type(self.namespace) is not str or not self.namespace:
             raise WritableResolutionError("fresh namespace cannot be empty")
         if self.parent is not None and type(self.parent) is not loci.Locus:
             raise TypeError("fresh namespace parent must be a Locus")
@@ -106,7 +105,7 @@ class ReconstructionLens:
     def __post_init__(self) -> None:
         if type(self.target) not in (loci.Locus, loci.FreshReference):
             raise TypeError("reconstruction target is not recognized")
-        if not isinstance(self.frame, WriteFrame):
+        if type(self.frame) is not WriteFrame:
             raise TypeError("reconstruction frame is not recognized")
 
 
@@ -120,7 +119,7 @@ class ReconstructionEvidence:
     complete: bool = True
 
     def __post_init__(self) -> None:
-        if not isinstance(self.snapshot_identity, str) or not self.snapshot_identity:
+        if type(self.snapshot_identity) is not str or not self.snapshot_identity:
             raise WritableResolutionError(
                 "reconstruction needs a snapshot identity"
             )
@@ -128,6 +127,8 @@ class ReconstructionEvidence:
             type(item) is not ReconstructionLens for item in self.lenses
         ):
             raise TypeError("reconstruction lenses are not recognized")
+        if type(self.preserves_outside) is not bool or type(self.complete) is not bool:
+            raise TypeError("reconstruction proof flags must be booleans")
         if not self.preserves_outside or not self.complete:
             raise WritableResolutionError(
                 "writable reconstruction must be complete and preserve outside"
@@ -148,13 +149,22 @@ class ExistingCapability:
         if type(self.contract) is not TargetContract:
             raise TypeError("existing capability contract is not recognized")
         if type(self.effects) is not tuple or any(
-            not isinstance(effect, Effect) for effect in self.effects
+            type(effect) is not Effect for effect in self.effects
         ):
             raise TypeError("existing capability effects are not recognized")
         if not self.effects:
             raise WritableResolutionError("existing capability needs an effect")
         if any(effect is Effect.CREATE for effect in self.effects):
             raise WritableResolutionError("existing capability cannot CREATE")
+        if len(set(self.effects)) != len(self.effects):
+            raise WritableResolutionError("existing capability effects must be unique")
+        if (
+            self.contract.locus_kind is not None
+            and self.target.kind is not self.contract.locus_kind
+        ):
+            raise WritableResolutionError(
+                "existing target kind violates its target contract"
+            )
 
 
 @dataclass(frozen=True)
@@ -166,7 +176,7 @@ class FreshCapability:
     namespace: FreshNamespace
 
     def __post_init__(self) -> None:
-        if not isinstance(self.target, loci.FreshReference):
+        if type(self.target) is not loci.FreshReference:
             raise WritableResolutionError(
                 "fresh capability target must be a FreshReference"
             )
@@ -174,6 +184,21 @@ class FreshCapability:
             raise TypeError("fresh capability contract is not recognized")
         if type(self.namespace) is not FreshNamespace:
             raise TypeError("fresh capability namespace is not recognized")
+        if self.contract.locus_kind not in (None, loci.LocusKind.FRESH):
+            raise WritableResolutionError(
+                "fresh capability target contract cannot name a non-fresh kind"
+            )
+        if self.target.namespace != self.namespace.namespace:
+            raise WritableResolutionError(
+                "fresh capability lies outside its declared namespace"
+            )
+        if (
+            self.namespace.parent is not None
+            and self.target.parent != self.namespace.parent
+        ):
+            raise WritableResolutionError(
+                "fresh capability parent violates its namespace"
+            )
 
 
 @dataclass(frozen=True)
@@ -186,7 +211,7 @@ class WritableCapabilities:
     reconstruction: ReconstructionEvidence
 
     def __post_init__(self) -> None:
-        if not isinstance(self.snapshot_identity, str) or not self.snapshot_identity:
+        if type(self.snapshot_identity) is not str or not self.snapshot_identity:
             raise WritableResolutionError(
                 "writable capabilities need a snapshot identity"
             )
@@ -239,6 +264,10 @@ class WritableRegion(Generic[C, W]):
             self.configuration_contract
         ) is not loci.CarrierContract:
             raise TypeError("writable configuration contract is not recognized")
+        if self.value_profile is not None and type(
+            self.value_profile
+        ) is not alphabets.ValueProfile:
+            raise TypeError("writable value profile is not recognized")
         if type(self.effect_profile) is not EffectProfile:
             raise TypeError("writable effect profile is not recognized")
         if type(self.target_contract) is not TargetContract:
@@ -247,7 +276,7 @@ class WritableRegion(Generic[C, W]):
             self.fresh_namespace
         ) is not FreshNamespace:
             raise TypeError("writable fresh namespace is not recognized")
-        if not isinstance(self.exactness_profile, ExactnessProfile):
+        if type(self.exactness_profile) is not ExactnessProfile:
             raise TypeError("writable exactness profile is not recognized")
         if self.value_profile != self.target_contract.value_profile:
             raise WritableResolutionError(
@@ -267,7 +296,7 @@ class WritableRegion(Generic[C, W]):
         """Resolve independently against one immutable configuration."""
 
         try:
-            if not isinstance(configuration, loci.FiniteConfiguration):
+            if type(configuration) is not loci.FiniteConfiguration:
                 raise WritableResolutionError(
                     "finite WritableRegion resolution needs FiniteConfiguration"
                 )
@@ -294,6 +323,13 @@ class WritableRegion(Generic[C, W]):
         fresh: list[FreshCapability] = []
         lenses: list[ReconstructionLens] = []
         for target in targets:
+            if (
+                self.target_contract.locus_kind is not None
+                and target.kind is not self.target_contract.locus_kind
+            ):
+                raise WritableResolutionError(
+                    "resolved target kind violates the target contract"
+                )
             existing.append(
                 ExistingCapability(
                     target, self.target_contract, self.effect_profile.existing
@@ -407,6 +443,8 @@ def literal(
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize a literal ordered set of existing targets."""
 
+    if type(targets) is not tuple or any(type(target) is not loci.Locus for target in targets):
+        raise TypeError("literal targets must be an immutable tuple of Loci")
     if not targets:
         raise WritableResolutionError("literal targets cannot be empty")
     return WritableRegion(
@@ -460,6 +498,10 @@ def fresh(
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize a closed region of potential fresh structural targets."""
 
+    if type(region) is not loci.Region:
+        raise TypeError("fresh writable region descriptor is not recognized")
+    if type(namespace) is not FreshNamespace:
+        raise TypeError("fresh writable namespace is not recognized")
     return WritableRegion(
         region,
         configuration_contract,
@@ -480,6 +522,10 @@ def intensional(
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize a closed non-enumerated existing-target region."""
 
+    if type(binder) is not str or not binder:
+        raise WritableResolutionError("intensional binder cannot be empty")
+    if type(relation) is not loci.SelectorExpr:
+        raise TypeError("intensional relation is not recognized")
     return WritableRegion(
         loci.intensional(binder, relation),
         configuration_contract,
@@ -494,6 +540,8 @@ def union(
 ) -> WritableRegion[C, WritableCapabilities]:
     """Union envelopes after proving their local declarations agree."""
 
+    if type(parts) is not tuple or any(type(part) is not WritableRegion for part in parts):
+        raise TypeError("union parts must be an immutable tuple of WritableRegions")
     if not parts:
         raise WritableResolutionError("union needs at least one region")
     first = parts[0]
@@ -550,6 +598,16 @@ def product(
 ) -> WritableRegion[C, WritableCapabilities]:
     """Compose disjoint named envelopes without flattening their identity."""
 
+    if type(fields) is not tuple or any(
+        type(field) is not tuple
+        or len(field) != 2
+        or type(field[0]) is not str
+        or type(field[1]) is not WritableRegion
+        for field in fields
+    ):
+        raise TypeError(
+            "product fields must be immutable (name, WritableRegion) pairs"
+        )
     if not fields:
         raise WritableResolutionError("product needs at least one field")
     keys = tuple(key for key, _ in fields)
