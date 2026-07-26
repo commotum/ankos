@@ -1200,7 +1200,10 @@ def _quotient(
     derivations: tuple[AppliedDerivation[C], ...],
 ) -> tuple[SuccessorGroup[C], ...]:
     groups: list[SuccessorGroup[C]] = []
-    for derivation in derivations:
+    for derivation in sorted(
+        derivations,
+        key=lambda item: item.canonical_identity,
+    ):
         for index, group in enumerate(groups):
             if loci.configuration_equal(group.successor, derivation.successor):
                 groups[index] = SuccessorGroup(

@@ -3,12 +3,13 @@
 from fractions import Fraction
 
 import ca
-from ca import alphabets, loci, program, rules
+from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
 from g7_fixtures import (
     derivation,
     diamond_program,
     finite_record_program,
+    rule_contract,
 )
 
 
@@ -104,3 +105,74 @@ def test_equal_successor_mass_aggregates_without_erasing_source_atoms() -> None:
     assert sorted(
         item.mass for item in result.applied_atom_measure.measure.masses
     ) == [Fraction(1, 3), Fraction(2, 3)]
+
+
+def test_fresh_witness_scope_is_quotiented_by_declared_alpha_identity() -> None:
+    contract = loci.CarrierContract(
+        loci.CarrierKind.RECORD,
+        rank=0,
+        shape=(),
+        identity_law=loci.ConfigurationIdentityLaw.BOUND_FRESH_ALPHA,
+    )
+    carrier = loci.Carrier(
+        contract,
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    parent = loci.named("parent", scope="record")
+    source = loci.FiniteConfiguration(carrier, ((parent, False),))
+    reference = loci.fresh_reference(
+        "children",
+        "child",
+        parent=parent,
+    )
+    writable = frontiers.fresh(
+        loci.literal(fresh=(reference,)),
+        namespace=frontiers.FreshNamespace("children", parent),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    atoms = tuple(
+        derivation(
+            witness,
+            existing=(),
+            fresh=(rules.create(reference, True),),
+        )
+        for witness in ("alpha-left", "alpha-right")
+    )
+    alphabet = alphabets.boolean()
+    simple_program = ca.SimpleProgram(
+        seeds.exact(source),
+        alphabet,
+        writable,
+        readable,
+        rules.finite_rule(
+            atoms,
+            contract=rule_contract(
+                source,
+                alphabet,
+                writable,
+                readable,
+            ),
+        ),
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    applied = result.applied_atoms.atoms
+    assert len(applied) == 2
+    assert all(isinstance(item, program.AppliedDerivation) for item in applied)
+    left, right = applied
+    assert isinstance(left, program.AppliedDerivation)
+    assert isinstance(right, program.AppliedDerivation)
+    assert left.fresh_bindings[0].identity != right.fresh_bindings[0].identity
+    assert loci.configuration_equal(left.successor, right.successor)
+    quotient = result.successor_quotient_with_derivation_fibers.atoms
+    assert len(quotient) == 1
+    assert {
+        item.source.witness.identity for item in quotient[0].derivations
+    } == {"alpha-left", "alpha-right"}

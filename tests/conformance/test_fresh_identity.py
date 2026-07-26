@@ -5,7 +5,7 @@ import pytest
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
-from g7_fixtures import derivation, rule_contract
+from g7_fixtures import certificate, derivation, rule_contract
 
 
 def _binding(reference: loci.FreshReference) -> loci.Locus:
@@ -206,3 +206,159 @@ def test_created_values_bind_same_derivation_structural_references() -> None:
         isinstance(item, alphabets.StructuralReference) and item.is_bound
         for item in edge_value.items
     )
+
+
+def test_unbound_structural_reference_rejects_at_commit() -> None:
+    target = loci.named("root", scope="record")
+    carrier = loci.Carrier(
+        loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=()),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    source = loci.FiniteConfiguration(
+        carrier,
+        ((target, alphabets.StructuralReference(target)),),
+    )
+    unbound = loci.fresh_reference("missing", "child")
+    alphabet = alphabets.structural_references()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.STRUCTURAL,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.STRUCTURAL,
+    )
+    atom = derivation(
+        "unbound-value-reference",
+        existing=(
+            rules.replace(
+                target,
+                alphabets.StructuralReference(unbound),
+            ),
+        ),
+    )
+    simple_program = ca.SimpleProgram(
+        seeds.exact(
+            source,
+            value_profile=alphabets.ValueProfile.STRUCTURAL,
+        ),
+        alphabet,
+        writable,
+        readable,
+        rules.finite_rule(
+            (atom,),
+            contract=rule_contract(
+                source,
+                alphabet,
+                writable,
+                readable,
+            ),
+        ),
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.COMMIT
+    assert result.fault.attempted_phases[-1] is program.ApplicationPhase.COMMIT
+    assert "unbound fresh reference" in result.fault.reason
+    assert source.entries == (
+        (target, alphabets.StructuralReference(target)),
+    )
+
+
+def test_dynamic_fresh_frontier_is_resolved_for_each_application_input() -> None:
+    carrier = loci.Carrier(
+        loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=()),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+
+    def configuration(*names: str) -> loci.FiniteConfiguration[bool]:
+        return loci.FiniteConfiguration(
+            carrier,
+            tuple(
+                (loci.named(name, scope="record"), False)
+                for name in names
+            ),
+        )
+
+    first_source = configuration("a")
+    second_source = configuration("a", "b")
+    alphabet = alphabets.boolean()
+    writable = frontiers.dynamic_fresh(
+        loci.fresh_children_dynamic(
+            loci.all_support(),
+            "children",
+            ("child",),
+        ),
+        namespace=frontiers.FreshNamespace("children"),
+        configuration_contract=first_source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=first_source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    clause_result = rules.DerivationClauseResult(
+        existing_plans=(),
+        fresh_plans=(
+            rules.FreshDispositionPlan(
+                rules.every_capability(),
+                rules.DispositionAction.CREATE,
+                rules.literal_expr(True),
+            ),
+        ),
+        progress=rules.Progress.ADVANCED,
+        continuation=rules.Continue(),
+        witness=rules.literal_expr("dynamic-fresh"),
+        provenance=("test:dynamic-fresh",),
+        certificate=certificate(
+            rules.CertificateKind.DERIVATION,
+            "dynamic-fresh",
+        ),
+    )
+    rule = rules.clause_kernel(
+        (
+            rules.RuleClause(
+                rules.literal_expr(1),
+                clause_result,
+            ),
+        ),
+        contract=rule_contract(
+            first_source,
+            alphabet,
+            writable,
+            readable,
+        ),
+        completeness_evidence=certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "dynamic-fresh",
+        ),
+    )
+    simple_program = ca.SimpleProgram(
+        seeds.exact(first_source),
+        alphabet,
+        writable,
+        readable,
+        rule,
+    )
+
+    first = ca.apply(simple_program, first_source)
+    second = ca.apply(simple_program, second_source)
+
+    assert isinstance(first, program.ApplicationComplete)
+    assert isinstance(second, program.ApplicationComplete)
+    first_applied = first.applied_atoms.atoms[0]
+    second_applied = second.applied_atoms.atoms[0]
+    assert isinstance(first_applied, program.AppliedDerivation)
+    assert isinstance(second_applied, program.AppliedDerivation)
+    assert len(first_applied.fresh_bindings) == 1
+    assert len(second_applied.fresh_bindings) == 2
+    assert {
+        binding.reference.parent for binding in first_applied.fresh_bindings
+    } == {first_source.entries[0][0]}
+    assert {
+        binding.reference.parent for binding in second_applied.fresh_bindings
+    } == {target for target, _ in second_source.entries}
+    assert len(first_applied.successor.entries) == 2
+    assert len(second_applied.successor.entries) == 4

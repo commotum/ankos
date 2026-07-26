@@ -12,12 +12,12 @@ import pytest
 
 
 pytestmark = pytest.mark.skip(
-    reason="Goal 7 catalog contract skeleton; implementation is pending"
+    reason="G7-04 owns the whole-program catalog unit contract"
 )
 
 
 def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 catalog tests are not implemented")
+    raise NotImplementedError("G7-04 catalog tests are not implemented")
 
 
 def test_catalog_has_six_explicit_navigation_namespaces() -> None:

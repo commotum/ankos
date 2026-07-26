@@ -12,12 +12,12 @@ import pytest
 
 
 pytestmark = pytest.mark.skip(
-    reason="Goal 7 serialization contract skeleton; implementation is pending"
+    reason="G7-03 owns the canonical serialization unit contract"
 )
 
 
 def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 serialization tests are not implemented")
+    raise NotImplementedError("G7-03 serialization tests are not implemented")
 
 
 def test_decode_result_is_decoded_or_typed_rejection() -> None:

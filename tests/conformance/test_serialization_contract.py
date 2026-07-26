@@ -11,12 +11,12 @@ import pytest
 
 
 pytestmark = pytest.mark.skip(
-    reason="Goal 7 CT09 serialization skeleton; implementation is pending"
+    reason="G7-03 owns the CT09 canonical serialization contract"
 )
 
 
 def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 CT09 tests are not implemented")
+    raise NotImplementedError("G7-03 CT09 tests are not implemented")
 
 
 def test_every_public_semantic_value_round_trips_and_reencodes_identically() -> None:

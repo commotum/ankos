@@ -12,12 +12,12 @@ import pytest
 
 
 pytestmark = pytest.mark.skip(
-    reason="Goal 7 CT11 catalog-expansion skeleton; implementation is pending"
+    reason="G7-04 owns the CT11 catalog-expansion contract"
 )
 
 
 def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 CT11 tests are not implemented")
+    raise NotImplementedError("G7-04 CT11 tests are not implemented")
 
 
 def test_sixty_canonical_constructors_have_exact_metadata_and_one_home() -> None:
