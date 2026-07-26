@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Generic, TypeVar
 
-from . import loci
+from . import alphabets, loci
 from .seeds import ExactnessProfile
 
 
@@ -62,13 +62,14 @@ class TargetContract:
     """Value/structure contract attached to each writable capability."""
 
     locus_kind: loci.LocusKind | None
-    value_profile: tuple[str, ...] | None
+    value_profile: alphabets.ValueProfile | None
     frame: WriteFrame = WriteFrame.SUCCESSOR
 
     def __post_init__(self) -> None:
-        if self.value_profile is not None:
-            if not self.value_profile or any(not item for item in self.value_profile):
-                raise WritableResolutionError("value_profile cannot be empty")
+        if self.value_profile is not None and not isinstance(
+            self.value_profile, alphabets.ValueProfile
+        ):
+            raise TypeError("value_profile must be alphabets.ValueProfile")
 
 
 @dataclass(frozen=True)
@@ -87,7 +88,7 @@ class FreshNamespace:
 class ReconstructionLens:
     """Closed path used by generic commit; never a host callback."""
 
-    target: loci.Locus
+    target: loci.Locus | loci.FreshReference
     frame: WriteFrame
 
 
@@ -95,7 +96,7 @@ class ReconstructionLens:
 class ReconstructionEvidence:
     """Application-private proof that all target lenses are reconstructible."""
 
-    snapshot_identity: loci.ConfigurationIdentity
+    snapshot_identity: str
     lenses: tuple[ReconstructionLens, ...]
     preserves_outside: bool = True
     complete: bool = True
@@ -128,20 +129,22 @@ class ExistingCapability:
 class FreshCapability:
     """One potential target that may be absent or created."""
 
-    target: loci.Locus
+    target: loci.FreshReference
     contract: TargetContract
     namespace: FreshNamespace
 
     def __post_init__(self) -> None:
-        if self.target.kind is not loci.LocusKind.FRESH:
-            raise WritableResolutionError("fresh capability target must be FRESH")
+        if not isinstance(self.target, loci.FreshReference):
+            raise WritableResolutionError(
+                "fresh capability target must be a FreshReference"
+            )
 
 
 @dataclass(frozen=True)
 class WritableCapabilities:
     """Resolved complete writable envelope for one snapshot."""
 
-    snapshot_identity: loci.ConfigurationIdentity
+    snapshot_identity: str
     existing: tuple[ExistingCapability, ...]
     fresh: tuple[FreshCapability, ...]
     reconstruction: ReconstructionEvidence
@@ -163,7 +166,7 @@ class WritableCapabilities:
             )
 
     @property
-    def targets(self) -> tuple[loci.Locus, ...]:
+    def targets(self) -> tuple[loci.Locus | loci.FreshReference, ...]:
         return tuple(item.target for item in (*self.existing, *self.fresh))
 
 
@@ -173,7 +176,7 @@ class WritableRegion(Generic[C, W]):
 
     descriptor: loci.Region
     configuration_contract: loci.CarrierContract | None = None
-    value_profile: tuple[str, ...] | None = None
+    value_profile: alphabets.ValueProfile | None = None
     effect_profile: EffectProfile = EffectProfile()
     target_contract: TargetContract = TargetContract(
         None, None, WriteFrame.SUCCESSOR
@@ -200,33 +203,52 @@ class WritableRegion(Generic[C, W]):
         """Resolve independently against one immutable configuration."""
 
         try:
-            snapshot_identity = loci.configuration_identity(configuration)
-            targets = loci.resolve_region(self.descriptor, configuration)
-        except loci.LociResolutionError as error:
+            if not isinstance(configuration, loci.FiniteConfiguration):
+                raise WritableResolutionError(
+                    "finite WritableRegion resolution needs FiniteConfiguration"
+                )
+            snapshot_identity = configuration.identity
+            if (
+                self.configuration_contract is not None
+                and not self.configuration_contract.accepts(configuration.contract)
+            ):
+                raise WritableResolutionError(
+                    "WritableRegion does not accept this carrier contract"
+                )
+            targets, fresh_targets = _resolve_targets(
+                self.descriptor, configuration
+            )
+        except (TypeError, ValueError) as error:
             raise WritableResolutionError(str(error)) from error
 
-        if len(set(targets)) != len(targets):
+        if len(set(targets)) != len(targets) or len(set(fresh_targets)) != len(
+            fresh_targets
+        ):
             raise WritableResolutionError("resolved region contains duplicate targets")
 
         existing: list[ExistingCapability] = []
         fresh: list[FreshCapability] = []
         lenses: list[ReconstructionLens] = []
         for target in targets:
-            if target.kind is loci.LocusKind.FRESH:
-                if self.fresh_namespace is None:
-                    raise WritableResolutionError(
-                        "region resolved a fresh target without a namespace"
-                    )
-                capability = FreshCapability(
-                    target, self.target_contract, self.fresh_namespace
+            existing.append(
+                ExistingCapability(
+                    target, self.target_contract, self.effect_profile.existing
                 )
-                fresh.append(capability)
-            else:
-                existing.append(
-                    ExistingCapability(
-                        target, self.target_contract, self.effect_profile.existing
-                    )
+            )
+            lenses.append(ReconstructionLens(target, self.target_contract.frame))
+        for target in fresh_targets:
+            if self.fresh_namespace is None:
+                raise WritableResolutionError(
+                    "region resolved a fresh target without a namespace"
                 )
+            if target.namespace != self.fresh_namespace.namespace:
+                raise WritableResolutionError(
+                    "fresh target lies outside the declared namespace"
+                )
+            capability = FreshCapability(
+                target, self.target_contract, self.fresh_namespace
+            )
+            fresh.append(capability)
             lenses.append(ReconstructionLens(target, self.target_contract.frame))
 
         if self.effect_profile.fresh and not fresh:
@@ -246,11 +268,58 @@ class WritableRegion(Generic[C, W]):
         )
 
 
+def _resolve_targets(
+    region: loci.Region,
+    configuration: loci.FiniteConfiguration[object],
+) -> tuple[tuple[loci.Locus, ...], tuple[loci.FreshReference, ...]]:
+    """Resolve existing and local-fresh identities without binding births."""
+
+    if region.kind is loci.RegionKind.LITERAL:
+        existing = tuple(
+            target for target in region.loci if configuration.contains(target)
+        )
+        return existing, region.fresh
+    if region.kind in (
+        loci.RegionKind.ALL_SUPPORT,
+        loci.RegionKind.CURRENT_SUPPORT,
+    ):
+        return tuple(target for target, _ in configuration.entries), ()
+    if region.kind in (loci.RegionKind.UNION, loci.RegionKind.PRODUCT):
+        existing: list[loci.Locus] = []
+        fresh_targets: list[loci.FreshReference] = []
+        seen_existing: set[loci.Locus] = set()
+        seen_fresh: set[loci.FreshReference] = set()
+        for part in region.parts:
+            part_existing, part_fresh = _resolve_targets(part, configuration)
+            for target in part_existing:
+                if target not in seen_existing:
+                    seen_existing.add(target)
+                    existing.append(target)
+            for target in part_fresh:
+                if target not in seen_fresh:
+                    seen_fresh.add(target)
+                    fresh_targets.append(target)
+        return tuple(existing), tuple(fresh_targets)
+    if region.kind in (
+        loci.RegionKind.FRESH_CHILDREN,
+        loci.RegionKind.FRESH_EDGES,
+    ):
+        return (), region.fresh
+    if region.kind is loci.RegionKind.INTENSIONAL:
+        raise WritableResolutionError(
+            "finite application cannot materialize an intensional writable region"
+        )
+    try:
+        return loci.resolve_region(region, configuration), ()
+    except ValueError as error:
+        raise WritableResolutionError(str(error)) from error
+
+
 def literal(
     targets: tuple[loci.Locus, ...],
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     effects: tuple[Effect, ...] = (Effect.REPLACE,),
     frame: WriteFrame = WriteFrame.SUCCESSOR,
 ) -> WritableRegion[C, WritableCapabilities]:
@@ -270,7 +339,7 @@ def literal(
 def everywhere(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     effects: tuple[Effect, ...] = (Effect.REPLACE,),
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize every existing locus in the current carrier."""
@@ -287,7 +356,7 @@ def everywhere(
 def next_grid(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize the complete grid-shaped successor frame."""
 
@@ -305,7 +374,7 @@ def fresh(
     *,
     namespace: FreshNamespace,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize a closed region of potential fresh structural targets."""
 
@@ -324,7 +393,7 @@ def intensional(
     relation: loci.SelectorExpr,
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     effects: tuple[Effect, ...] = (Effect.REPLACE,),
 ) -> WritableRegion[C, WritableCapabilities]:
     """Authorize a closed non-enumerated existing-target region."""

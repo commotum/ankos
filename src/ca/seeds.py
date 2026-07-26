@@ -81,30 +81,6 @@ class Construction:
     arguments: tuple[ConstructionArgument, ...] = ()
 
 
-class BoundaryPolicy(Enum):
-    """Closed finite-grid boundary policies."""
-
-    FIXED = "fixed"
-    PERIODIC = "periodic"
-    REFLECTIVE = "reflective"
-
-
-@dataclass(frozen=True)
-class GridBoundary:
-    """Boundary data carried by a finite-grid construction."""
-
-    policy: BoundaryPolicy
-    exterior: ExactSeedValue | None = None
-
-    def __post_init__(self) -> None:
-        if self.policy is BoundaryPolicy.FIXED and self.exterior is None:
-            raise SeedValidationError("a fixed boundary requires an exterior value")
-        if self.policy is not BoundaryPolicy.FIXED and self.exterior is not None:
-            raise SeedValidationError(
-                "only a fixed boundary may carry an exterior value"
-            )
-
-
 @dataclass(frozen=True)
 class ExactSource(Generic[C]):
     """One fully specified initial configuration."""
@@ -435,12 +411,24 @@ def _contract(
 def exact(
     configuration: C,
     *,
-    configuration_contract: loci.CarrierContract,
-    value_profile: alphabets.ValueProfile,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
 ) -> Seed[C]:
     """Describe one fully specified configuration."""
 
+    if not isinstance(
+        configuration, (loci.FiniteConfiguration, loci.IntensionalConfiguration)
+    ):
+        raise TypeError("exact Seeds require a recognized loci configuration")
+    if configuration_contract is None:
+        configuration_contract = configuration.contract
+    elif not configuration_contract.accepts(configuration.contract):
+        raise SeedValidationError(
+            "declared configuration contract does not accept the configuration"
+        )
+    if value_profile is None:
+        value_profile = _infer_value_profile(configuration)
     return Seed(
         ExactSource(configuration),
         _contract(
@@ -606,16 +594,14 @@ def bernoulli(
 def sequence(
     values: tuple[ExactSeedValue, ...],
     *,
-    configuration_contract: loci.CarrierContract,
-    value_profile: alphabets.ValueProfile,
-) -> Seed[C]:
+    value_profile: alphabets.ValueProfile | None = None,
+) -> Seed[loci.FiniteConfiguration[ExactSeedValue]]:
     """Construct one exact ordered history/word configuration."""
 
     if not values:
         raise SeedValidationError("sequence values cannot be empty")
-    return constructive(
-        Construction(ConstructionOp.SEQUENCE, (values,)),
-        configuration_contract=configuration_contract,
+    return exact(
+        loci.history_configuration(values),
         value_profile=value_profile,
     )
 
@@ -624,14 +610,12 @@ def pair(
     previous: ExactSeedValue,
     current: ExactSeedValue,
     *,
-    configuration_contract: loci.CarrierContract,
-    value_profile: alphabets.ValueProfile,
-) -> Seed[C]:
+    value_profile: alphabets.ValueProfile | None = None,
+) -> Seed[loci.FiniteConfiguration[ExactSeedValue]]:
     """Construct the two-value history used by second-order recurrences."""
 
     return sequence(
         (previous, current),
-        configuration_contract=configuration_contract,
         value_profile=value_profile,
     )
 
@@ -676,10 +660,9 @@ def finite_grid(
     shape: tuple[int, ...],
     values: tuple[ExactSeedValue, ...],
     *,
-    boundary: GridBoundary,
-    configuration_contract: loci.CarrierContract,
-    value_profile: alphabets.ValueProfile,
-) -> Seed[C]:
+    boundary: loci.Boundary[ExactSeedValue],
+    value_profile: alphabets.ValueProfile | None = None,
+) -> Seed[loci.FiniteConfiguration[ExactSeedValue]]:
     """Construct a rank-1/2/3 finite grid without rendering machinery."""
 
     if not 1 <= len(shape) <= 3:
@@ -693,15 +676,46 @@ def finite_grid(
         raise SeedValidationError(
             f"finite-grid needs {cell_count} values, got {len(values)}"
         )
-    boundary_atom: tuple[tuple[str, ExactSeedValue], ...] = (
-        ("policy", boundary.policy.value),
-        *((("exterior", boundary.exterior),) if boundary.exterior is not None else ()),
-    )
-    return constructive(
-        Construction(ConstructionOp.GRID, (shape, values, boundary_atom)),
-        configuration_contract=configuration_contract,
+    return exact(
+        loci.grid_configuration(shape, values, boundary=boundary),
         value_profile=value_profile,
     )
+
+
+def record(
+    fields: tuple[tuple[str, ExactSeedValue], ...],
+    *,
+    value_profile: alphabets.ValueProfile | None = None,
+) -> Seed[loci.FiniteConfiguration[ExactSeedValue]]:
+    """Construct one exact named-record configuration."""
+
+    return exact(
+        loci.record_configuration(fields),
+        value_profile=value_profile,
+    )
+
+
+def _infer_value_profile(
+    configuration: loci.FiniteConfiguration[ExactSeedValue]
+    | loci.IntensionalConfiguration,
+) -> alphabets.ValueProfile:
+    if isinstance(configuration, loci.IntensionalConfiguration):
+        return alphabets.ValueProfile.SYMBOLIC
+    values = tuple(value for _, value in configuration.entries)
+    if values and all(isinstance(value, bool) for value in values):
+        return alphabets.ValueProfile.BOOLEAN
+    if values and all(
+        isinstance(value, int) and not isinstance(value, bool) for value in values
+    ):
+        return alphabets.ValueProfile.INTEGER
+    if values and all(
+        isinstance(value, (int, Fraction)) and not isinstance(value, bool)
+        for value in values
+    ):
+        return alphabets.ValueProfile.RATIONAL
+    if values and all(isinstance(value, (int, str)) for value in values):
+        return alphabets.ValueProfile.SYMBOLIC
+    return alphabets.ValueProfile.STRUCTURAL
 
 
 def _common_contract(seeds: tuple[Seed[C], ...]) -> SeedOutputContract:

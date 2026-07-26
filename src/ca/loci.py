@@ -17,6 +17,15 @@ from typing import Generic, TypeAlias, TypeVar
 
 V = TypeVar("V")
 ClosedScalar: TypeAlias = bool | int | Fraction | str
+ConfigurationIdentity: TypeAlias = str
+
+
+class LociResolutionError(ValueError):
+    """A closed structural region cannot resolve against a configuration."""
+
+
+class LocusAbsentError(KeyError):
+    """A requested locus is absent under the configuration's boundary law."""
 
 
 class LocusKind(Enum):
@@ -581,11 +590,7 @@ def resolve_region(
     """Resolve the finite existing-locus portion of a raw region."""
 
     if region.kind is RegionKind.LITERAL:
-        return tuple(
-            target
-            for target in region.loci
-            if configuration.contains(target)
-        )
+        return region.loci
     if region.kind in (RegionKind.ALL_SUPPORT, RegionKind.CURRENT_SUPPORT):
         return tuple(target for target, _ in configuration.entries)
     if region.kind is RegionKind.UNION:
@@ -602,7 +607,99 @@ def resolve_region(
         for part in region.parts:
             out.extend(resolve_region(part, configuration))
         return tuple(out)
-    raise ValueError(f"region {region.kind.value} is not finitely resolvable here")
+    if region.kind is RegionKind.RELATIVE:
+        anchors = resolve_relative_anchors(region, configuration)
+        resolved: list[Locus] = []
+        for anchor in anchors:
+            for offset in region.offsets:
+                resolved.append(_relative_target(configuration, anchor, offset))
+        return tuple(resolved)
+    raise LociResolutionError(
+        f"region {region.kind.value} is not finitely resolvable"
+    )
+
+
+def resolve_fresh_references(region: Region) -> tuple[FreshReference, ...]:
+    """Resolve the structurally declared fresh portion without binding it."""
+
+    if region.kind in (
+        RegionKind.LITERAL,
+        RegionKind.FRESH_CHILDREN,
+        RegionKind.FRESH_EDGES,
+    ):
+        return region.fresh
+    if region.kind in (RegionKind.UNION, RegionKind.PRODUCT):
+        out: list[FreshReference] = []
+        for part in region.parts:
+            out.extend(resolve_fresh_references(part))
+        if len(out) != len(set(out)):
+            raise LociResolutionError("fresh region contains duplicate local keys")
+        return tuple(out)
+    return ()
+
+
+def resolve_relative_anchors(
+    region: Region,
+    configuration: FiniteConfiguration[V],
+) -> tuple[Locus, ...]:
+    """Resolve the anchor identities of one relative region."""
+
+    if region.kind is not RegionKind.RELATIVE or len(region.parts) != 1:
+        raise LociResolutionError("relative region needs one anchor part")
+    anchors = resolve_region(region.parts[0], configuration)
+    if configuration.contract.kind is CarrierKind.HISTORY:
+        if not anchors:
+            raise LociResolutionError("history has no relative anchor")
+        return (max(anchors, key=_history_index),)
+    return anchors
+
+
+def _history_index(target: Locus) -> int:
+    if target.kind is not LocusKind.OCCURRENCE or len(target.path) < 2:
+        raise LociResolutionError("history anchor is not an occurrence")
+    return int(target.path[-1])
+
+
+def _offset_values(
+    offset: Locus,
+    axes: tuple[str, ...],
+) -> tuple[int, ...]:
+    if offset.kind is not LocusKind.COORDINATE:
+        raise LociResolutionError("relative offset must be a coordinate locus")
+    if offset.scope == "relative":
+        if len(offset.path) != len(axes):
+            raise LociResolutionError("relative offset rank disagrees with carrier")
+        return tuple(int(value) for value in offset.path)
+    if len(offset.path) == 2 and isinstance(offset.path[0], str):
+        values = [0] * len(axes)
+        try:
+            index = axes.index(offset.path[0])
+        except ValueError as error:
+            raise LociResolutionError("offset axis is absent from carrier") from error
+        values[index] = int(offset.path[1])
+        return tuple(values)
+    raise LociResolutionError("malformed relative coordinate offset")
+
+
+def _relative_target(
+    configuration: FiniteConfiguration[V],
+    anchor: Locus,
+    offset: Locus,
+) -> Locus:
+    contract = configuration.contract
+    if contract.kind is CarrierKind.HISTORY:
+        delta = _offset_values(offset, ("history",))[0]
+        return occurrence("history", _history_index(anchor) + delta)
+    if contract.kind is CarrierKind.GRID:
+        coordinates = grid_coordinates(anchor)
+        deltas = _offset_values(offset, contract.axes)
+        return cell(
+            tuple(value + delta for value, delta in zip(coordinates, deltas)),
+            axes=contract.axes,
+        )
+    raise LociResolutionError(
+        f"relative selection is unsupported for {contract.kind.value}"
+    )
 
 
 def grid_coordinates(target: Locus) -> tuple[int, ...]:
@@ -652,6 +749,35 @@ def read_grid_value(
     if outside and configuration.carrier.boundary.policy is BoundaryPolicy.FIXED:
         return configuration.carrier.boundary.exterior
     return configuration.value_at(cell(tuple(adjusted), axes=axes))
+
+
+def configuration_identity(configuration: object) -> ConfigurationIdentity:
+    """Validate and return the canonical identity of a recognized snapshot."""
+
+    if not isinstance(configuration, (FiniteConfiguration, IntensionalConfiguration)):
+        raise LociResolutionError(
+            f"unknown configuration variant {type(configuration).__name__}"
+        )
+    return configuration.identity
+
+
+def read_locus(
+    configuration: FiniteConfiguration[V],
+    target: Locus,
+) -> V:
+    """Read one locus using only configuration-owned absence/boundary data."""
+
+    if configuration.contains(target):
+        return configuration.value_at(target)
+    if configuration.contract.kind is CarrierKind.GRID:
+        try:
+            coordinates = grid_coordinates(target)
+        except ValueError as error:
+            raise LocusAbsentError(target) from error
+        value = read_grid_value(configuration, coordinates)
+        if value is not None:
+            return value
+    raise LocusAbsentError(target)
 
 
 def canonical_order_key(value: Locus | FreshReference) -> tuple[str, ...]:
@@ -749,11 +875,14 @@ __all__ = [
     "CarrierKind",
     "ClosedScalar",
     "Configuration",
+    "ConfigurationIdentity",
     "FiniteConfiguration",
     "FreshReference",
     "IntensionalConfiguration",
     "Locus",
+    "LocusAbsentError",
     "LocusKind",
+    "LociResolutionError",
     "Region",
     "RegionKind",
     "SelectorExpr",
@@ -766,6 +895,7 @@ __all__ = [
     "cell",
     "centered_axis_values",
     "continuous_region",
+    "configuration_identity",
     "coordinate",
     "current_support",
     "field_point",
@@ -786,10 +916,13 @@ __all__ = [
     "port",
     "product_locus",
     "read_grid_value",
+    "read_locus",
     "record_configuration",
     "region_product",
     "relative",
     "resolve_region",
+    "resolve_fresh_references",
+    "resolve_relative_anchors",
     "semantic_equal",
     "span",
     "union",

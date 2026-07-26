@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Generic, TypeVar
+from typing import Generic, TypeAlias, TypeVar
 
-from . import loci
+from . import alphabets, loci
 from .seeds import ExactnessProfile
 
 
@@ -140,17 +140,25 @@ class Observation(Generic[V]):
         return self.state.value
 
 
+GroupKey: TypeAlias = tuple[loci.Locus | None, int]
+
+
 @dataclass(frozen=True)
 class ObservationGroup:
     """An ordered semantic group within ``ReadableView.observations``."""
 
-    key: str
+    key: GroupKey
     indices: tuple[int, ...]
     anchor: loci.Locus | None = None
 
     def __post_init__(self) -> None:
-        if not self.key:
-            raise ReadableResolutionError("observation-group key cannot be empty")
+        if len(self.key) != 2:
+            raise ReadableResolutionError("group key must be (anchor, channel)")
+        anchor, channel = self.key
+        if anchor is not None and not isinstance(anchor, loci.Locus):
+            raise TypeError("group anchor must be a Locus or None")
+        if isinstance(channel, bool) or not isinstance(channel, int) or channel < 0:
+            raise ReadableResolutionError("group channel cannot be negative")
         if not self.indices:
             raise ReadableResolutionError("observation groups cannot be empty")
         if any(index < 0 for index in self.indices):
@@ -233,7 +241,7 @@ class ReadableRegion(Generic[C, R]):
 
     descriptor: loci.Region
     configuration_contract: loci.CarrierContract | None
-    value_profile: tuple[str, ...] | None
+    value_profile: alphabets.ValueProfile | None
     result_shape: ResultShape
     join_shape: JoinShape
     grouping: GroupingPlan
@@ -241,9 +249,10 @@ class ReadableRegion(Generic[C, R]):
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
 
     def __post_init__(self) -> None:
-        if self.value_profile is not None:
-            if not self.value_profile or any(not item for item in self.value_profile):
-                raise ReadableResolutionError("value_profile cannot be empty")
+        if self.value_profile is not None and not isinstance(
+            self.value_profile, alphabets.ValueProfile
+        ):
+            raise TypeError("value_profile must be alphabets.ValueProfile")
         is_product = self.grouping.kind is GroupingKind.PRODUCT
         if is_product != bool(self.parts):
             raise ReadableResolutionError(
@@ -265,18 +274,51 @@ class ReadableRegion(Generic[C, R]):
             return self._resolve_product(configuration)
 
         try:
+            if not isinstance(configuration, loci.FiniteConfiguration):
+                raise ReadableResolutionError(
+                    "finite ReadableRegion resolution needs FiniteConfiguration"
+                )
+            if (
+                self.configuration_contract is not None
+                and not self.configuration_contract.accepts(configuration.contract)
+            ):
+                raise ReadableResolutionError(
+                    "ReadableRegion does not accept this carrier contract"
+                )
             snapshot_identity = loci.configuration_identity(configuration)
             targets = loci.resolve_region(self.descriptor, configuration)
-        except loci.LociResolutionError as error:
+            if self.descriptor.kind is loci.RegionKind.RELATIVE:
+                anchors = loci.resolve_relative_anchors(
+                    self.descriptor, configuration
+                )
+                chunk_size = len(self.descriptor.offsets)
+            else:
+                anchors = ()
+                chunk_size = 0
+        except (TypeError, ValueError) as error:
             raise ReadableResolutionError(str(error)) from error
 
         observations: list[Observation[V]] = []
-        for target in targets:
+        for index, target in enumerate(targets):
+            anchor = anchors[index // chunk_size] if anchors else None
             try:
                 value = loci.read_locus(configuration, target)
             except loci.LocusAbsentError as error:
-                raise ReadableResolutionError(str(error)) from error
-            observations.append(Observation(target, Present(value)))
+                evidence = loci.SelectorExpr(
+                    loci.SelectorPrimitive.RELATIVE,
+                    arguments=(target,),
+                )
+                observations.append(Observation(target, Absent(evidence), anchor))
+                continue
+            if configuration.contains(target):
+                state: ObservedState[V] = Present(value)
+            else:
+                evidence = loci.SelectorExpr(
+                    loci.SelectorPrimitive.RELATIVE,
+                    arguments=(target,),
+                )
+                state = BoundaryDefault(value, evidence)
+            observations.append(Observation(target, state, anchor))
 
         groups = _groups_for(self.grouping, tuple(observations))
         return ReadableView(
@@ -296,14 +338,17 @@ class ReadableRegion(Generic[C, R]):
 
         observations: list[Observation[V]] = []
         groups: list[ObservationGroup] = []
+        next_channel: dict[loci.Locus | None, int] = {}
         for field, view in zip(self.parts, views):
             start = len(observations)
             observations.extend(view.observations)
-            for group_index, group in enumerate(view.groups):
+            for group in view.groups:
                 indices = tuple(start + index for index in group.indices)
+                channel = next_channel.get(group.anchor, 0)
+                next_channel[group.anchor] = channel + 1
                 groups.append(
                     ObservationGroup(
-                        f"{field.key}:{group_index}",
+                        (group.anchor, channel),
                         indices,
                         group.anchor,
                     )
@@ -323,7 +368,14 @@ def _groups_for(
     if not observations:
         raise ReadableResolutionError("a finite resolved read view cannot be empty")
     if grouping.kind is GroupingKind.SINGLE:
-        return (ObservationGroup(grouping.key, tuple(range(len(observations)))),)
+        anchor = observations[0].anchor
+        return (
+            ObservationGroup(
+                (anchor, 0),
+                tuple(range(len(observations))),
+                anchor,
+            ),
+        )
     if grouping.kind is GroupingKind.FIXED_CHUNKS:
         assert grouping.chunk_size is not None
         if len(observations) % grouping.chunk_size:
@@ -336,7 +388,7 @@ def _groups_for(
             anchor = observations[start].anchor
             groups.append(
                 ObservationGroup(
-                    f"{grouping.key}:{start // grouping.chunk_size}",
+                    (anchor, 0),
                     indices,
                     anchor,
                 )
@@ -349,7 +401,7 @@ def literal(
     targets: tuple[loci.Locus, ...],
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     key: str = "literal",
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read an explicit ordered set of existing identities."""
@@ -369,7 +421,7 @@ def literal(
 def global_view(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     key: str = "global",
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read the complete old configuration as one ordered group."""
@@ -388,7 +440,7 @@ def grid_relative(
     offsets: tuple[tuple[int, ...], ...],
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     key: str = "relative",
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read one ordered relative-offset group for every carrier anchor."""
@@ -420,7 +472,7 @@ def intensional(
     relation: loci.SelectorExpr,
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     key: str = "intensional",
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Describe a closed non-enumerated read view."""
@@ -481,7 +533,7 @@ def self_at(
     history_offset: int = 0,
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     key: str = "self",
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read the same identity at one current/history offset."""
@@ -500,7 +552,7 @@ def history(
     offsets: tuple[int, ...],
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
     key: str = "history",
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read one ordered temporal/history group per anchor."""
@@ -517,7 +569,7 @@ def eca(
     radius: int = 1,
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = ("boolean",),
+    value_profile: alphabets.ValueProfile | None = alphabets.ValueProfile.BOOLEAN,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read the ordered one-dimensional ``left .. self .. right`` stencil."""
 
@@ -534,7 +586,7 @@ def eca(
 def ar2_0d(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read current and previous scalar values."""
 
@@ -549,7 +601,7 @@ def ar2_0d(
 def dyadlags_0d(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = ("boolean",),
+    value_profile: alphabets.ValueProfile | None = alphabets.ValueProfile.BOOLEAN,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read current and two previous binary values."""
 
@@ -566,7 +618,7 @@ def lagcounts_0d(
     band_count: int = 3,
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = ("boolean",),
+    value_profile: alphabets.ValueProfile | None = alphabets.ValueProfile.BOOLEAN,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read current self followed by explicit lag-count bands."""
 
@@ -604,7 +656,7 @@ def lagcounts_0d(
 def dyadrads_1d(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = ("boolean",),
+    value_profile: alphabets.ValueProfile | None = alphabets.ValueProfile.BOOLEAN,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read self, radius-one, and radius-two one-dimensional groups."""
 
@@ -644,7 +696,7 @@ def dyadrads_1d(
 def dyadaxes_2d(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = ("boolean",),
+    value_profile: alphabets.ValueProfile | None = alphabets.ValueProfile.BOOLEAN,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read self, four cardinal neighbors, and four diagonals."""
 
@@ -684,7 +736,7 @@ def dyadaxes_2d(
 def dyadaxes_3d(
     *,
     configuration_contract: loci.CarrierContract | None = None,
-    value_profile: tuple[str, ...] | None = ("boolean",),
+    value_profile: alphabets.ValueProfile | None = alphabets.ValueProfile.BOOLEAN,
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read self, six face neighbors, and twenty edge/corner neighbors."""
 
