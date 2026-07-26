@@ -1,140 +1,382 @@
-"""Closed writable capability envelopes built from raw regions.
+"""Closed writable capability envelopes.
 
-The Goal 7 target layer in this module owns ``WritableRegion`` descriptors,
-existing and fresh capability schemas, target contracts, namespaces, and
-composition. A Frontier is the complete possible-write envelope for one
-application. It does not select firing sites, expose readable values, resolve
-collisions, or prescribe commit policy; those choices belong to Rule data and
-the one generic application law.
-
-The target shell builds only from ``loci.py`` and is inert. The incompatible
-0.1 ``Frontier``/``time_slice`` contract remains complete below the explicit
-legacy divider until the atomic G7-01 cutover.
+A :class:`WritableRegion` resolves one immutable configuration into the
+complete set of existing and fresh targets a Rule may affect.  It grants no
+read access and says nothing about firing sites, scheduling, collisions, or
+commit policy.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Generic, Literal, NoReturn, TypeVar
+from typing import Generic, TypeVar
 
 from . import loci
+from .seeds import ExactnessProfile
 
 
 C = TypeVar("C")
 W = TypeVar("W")
 
 
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.1: Singular Writable Capabilities
-# ---------------------------------------------------------------------------
+class WritableResolutionError(ValueError):
+    """A WritableRegion cannot be resolved against the supplied snapshot."""
 
 
-class FrontierPrimitive(Enum):
-    """Closed writable-envelope primitives."""
+class Effect(Enum):
+    """Closed effects that a target contract may authorize."""
 
-    CAPABILITY_SPACE = "frontier.capability-space"
-    TARGET_CONTRACT = "frontier.target-contract"
-    FRESH_NAMESPACE = "frontier.fresh-namespace"
+    REPLACE = "replace"
+    DELETE = "delete"
+    CREATE = "create"
+
+
+class WriteFrame(Enum):
+    """Which structural frame a capability addresses."""
+
+    CURRENT = "current"
+    SUCCESSOR = "successor"
+
+
+@dataclass(frozen=True)
+class EffectProfile:
+    """Immutable compatibility declaration for possible Rule effects."""
+
+    existing: tuple[Effect, ...] = (Effect.REPLACE,)
+    fresh: tuple[Effect, ...] = ()
+
+    def __post_init__(self) -> None:
+        if len(set(self.existing)) != len(self.existing):
+            raise WritableResolutionError("existing effects must be unique")
+        if len(set(self.fresh)) != len(self.fresh):
+            raise WritableResolutionError("fresh effects must be unique")
+        if Effect.CREATE in self.existing:
+            raise WritableResolutionError("CREATE cannot target existing structure")
+        if any(effect is not Effect.CREATE for effect in self.fresh):
+            raise WritableResolutionError("fresh capabilities authorize only CREATE")
+
+
+@dataclass(frozen=True)
+class TargetContract:
+    """Value/structure contract attached to each writable capability."""
+
+    locus_kind: loci.LocusKind | None
+    value_profile: tuple[str, ...] | None
+    frame: WriteFrame = WriteFrame.SUCCESSOR
+
+    def __post_init__(self) -> None:
+        if self.value_profile is not None:
+            if not self.value_profile or any(not item for item in self.value_profile):
+                raise WritableResolutionError("value_profile cannot be empty")
+
+
+@dataclass(frozen=True)
+class FreshNamespace:
+    """Stable local namespace for possible structural births."""
+
+    namespace: str
+    parent: loci.Locus | None = None
+
+    def __post_init__(self) -> None:
+        if not self.namespace:
+            raise WritableResolutionError("fresh namespace cannot be empty")
+
+
+@dataclass(frozen=True)
+class ReconstructionLens:
+    """Closed path used by generic commit; never a host callback."""
+
+    target: loci.Locus
+    frame: WriteFrame
+
+
+@dataclass(frozen=True)
+class ReconstructionEvidence:
+    """Application-private proof that all target lenses are reconstructible."""
+
+    snapshot_identity: loci.ConfigurationIdentity
+    lenses: tuple[ReconstructionLens, ...]
+    preserves_outside: bool = True
+    complete: bool = True
+
+    def __post_init__(self) -> None:
+        if not self.preserves_outside or not self.complete:
+            raise WritableResolutionError(
+                "writable reconstruction must be complete and preserve outside"
+            )
+
+
+@dataclass(frozen=True)
+class ExistingCapability:
+    """One existing target that may be preserved/replaced/deleted."""
+
+    target: loci.Locus
+    contract: TargetContract
+    effects: tuple[Effect, ...]
+
+    def __post_init__(self) -> None:
+        if self.target.kind is loci.LocusKind.FRESH:
+            raise WritableResolutionError("existing capability cannot target FRESH")
+        if not self.effects:
+            raise WritableResolutionError("existing capability needs an effect")
+        if any(effect is Effect.CREATE for effect in self.effects):
+            raise WritableResolutionError("existing capability cannot CREATE")
+
+
+@dataclass(frozen=True)
+class FreshCapability:
+    """One potential target that may be absent or created."""
+
+    target: loci.Locus
+    contract: TargetContract
+    namespace: FreshNamespace
+
+    def __post_init__(self) -> None:
+        if self.target.kind is not loci.LocusKind.FRESH:
+            raise WritableResolutionError("fresh capability target must be FRESH")
+
+
+@dataclass(frozen=True)
+class WritableCapabilities:
+    """Resolved complete writable envelope for one snapshot."""
+
+    snapshot_identity: loci.ConfigurationIdentity
+    existing: tuple[ExistingCapability, ...]
+    fresh: tuple[FreshCapability, ...]
+    reconstruction: ReconstructionEvidence
+
+    def __post_init__(self) -> None:
+        targets = tuple(
+            capability.target for capability in (*self.existing, *self.fresh)
+        )
+        if len(set(targets)) != len(targets):
+            raise WritableResolutionError("writable targets must be unique")
+        if self.reconstruction.snapshot_identity != self.snapshot_identity:
+            raise WritableResolutionError(
+                "reconstruction evidence has a different snapshot identity"
+            )
+        lens_targets = tuple(lens.target for lens in self.reconstruction.lenses)
+        if lens_targets != targets:
+            raise WritableResolutionError(
+                "reconstruction lenses must cover capabilities in order"
+            )
+
+    @property
+    def targets(self) -> tuple[loci.Locus, ...]:
+        return tuple(item.target for item in (*self.existing, *self.fresh))
 
 
 @dataclass(frozen=True)
 class WritableRegion(Generic[C, W]):
-    """Closed resolver descriptor for one complete writable envelope."""
+    """Closed resolver for one complete possible-write envelope."""
 
     descriptor: loci.Region
+    configuration_contract: loci.CarrierContract | None = None
+    value_profile: tuple[str, ...] | None = None
+    effect_profile: EffectProfile = EffectProfile()
+    target_contract: TargetContract = TargetContract(
+        None, None, WriteFrame.SUCCESSOR
+    )
+    fresh_namespace: FreshNamespace | None = None
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
+
+    def __post_init__(self) -> None:
+        if self.value_profile != self.target_contract.value_profile:
+            raise WritableResolutionError(
+                "region and target-contract value profiles disagree"
+            )
+        has_fresh_effect = bool(self.effect_profile.fresh)
+        if has_fresh_effect != (self.fresh_namespace is not None):
+            raise WritableResolutionError(
+                "fresh effects and a fresh namespace must be declared together"
+            )
+
+    @property
+    def required_effect_profile(self) -> EffectProfile:
+        return self.effect_profile
+
+    def resolve(self, configuration: C) -> WritableCapabilities:
+        """Resolve independently against one immutable configuration."""
+
+        try:
+            snapshot_identity = loci.configuration_identity(configuration)
+            targets = loci.resolve_region(self.descriptor, configuration)
+        except loci.LociResolutionError as error:
+            raise WritableResolutionError(str(error)) from error
+
+        if len(set(targets)) != len(targets):
+            raise WritableResolutionError("resolved region contains duplicate targets")
+
+        existing: list[ExistingCapability] = []
+        fresh: list[FreshCapability] = []
+        lenses: list[ReconstructionLens] = []
+        for target in targets:
+            if target.kind is loci.LocusKind.FRESH:
+                if self.fresh_namespace is None:
+                    raise WritableResolutionError(
+                        "region resolved a fresh target without a namespace"
+                    )
+                capability = FreshCapability(
+                    target, self.target_contract, self.fresh_namespace
+                )
+                fresh.append(capability)
+            else:
+                existing.append(
+                    ExistingCapability(
+                        target, self.target_contract, self.effect_profile.existing
+                    )
+                )
+            lenses.append(ReconstructionLens(target, self.target_contract.frame))
+
+        if self.effect_profile.fresh and not fresh:
+            raise WritableResolutionError(
+                "fresh effect profile resolved no fresh capabilities"
+            )
+
+        reconstruction = ReconstructionEvidence(
+            snapshot_identity,
+            tuple(lenses),
+        )
+        return WritableCapabilities(
+            snapshot_identity,
+            tuple(existing),
+            tuple(fresh),
+            reconstruction,
+        )
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the standard error for an unfinished Goal 7 Frontier factory."""
+def literal(
+    targets: tuple[loci.Locus, ...],
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: tuple[str, ...] | None = None,
+    effects: tuple[Effect, ...] = (Effect.REPLACE,),
+    frame: WriteFrame = WriteFrame.SUCCESSOR,
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize a literal ordered set of existing targets."""
 
-    raise NotImplementedError("Goal 7 Frontier scaffold is not implemented")
-
-
-def everywhere() -> WritableRegion[C, W]:
-    """Authorize the complete support described by the configuration contract."""
-
-    _not_implemented()
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.2: Writable-Envelope Composition
-# ---------------------------------------------------------------------------
-
-
-def union(parts: tuple[WritableRegion[C, W], ...]) -> WritableRegion[C, W]:
-    """Compose complete writable envelopes by explicit union."""
-
-    _not_implemented()
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 2: Structural Writable Families
-# ---------------------------------------------------------------------------
-
-# Product, relative/dilated, matched-interface, dynamic-address, fresh-child,
-# whole-region, and intensional envelopes enter here after their closed
-# capability and reconstruction contracts are fixed.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 3: Presets and Aliases
-# ---------------------------------------------------------------------------
-
-# Presets delegate to the capability primitives and cannot add scheduling or
-# collision behavior.
-
-
-# ===========================================================================
-# Legacy 0.1 implementation retained until atomic G7-01 cutover
-# ===========================================================================
-
-
-CombineMode = Literal["or", "and", "xor"]
-
-
-@dataclass(frozen=True)
-class Frontier:
-    """Structured frontier definition.
-
-    `components` stores one or more absolute-coordinate loci selectors.
-    Singular frontiers use one component. Compound frontiers use multiple
-    components and combine them with `combine`, usually OR, to determine the
-    active update-site support for the current state slice.
-    """
-
-    components: tuple[loci.Selector, ...]
-    combine: CombineMode = "or"
-    name: str | None = None
-    params: Mapping[str, Any] | None = None
-    family: str | None = None
-
-
-def time_slice(shape: Sequence[int]) -> Frontier:
-    """Select the full current state slice.
-
-    This is the default full-throttle cellular-automaton frontier: every active
-    spatial site at the current time `t` is eligible to update. The selected
-    coordinates are current-state sites `[t, x, y, z]`; the generator maps them
-    to `[t+1, x, y, z]` when writing.
-
-    This is a singular frontier built directly from `loci.absolute_universe`
-    restricted to the current time and wrapped in `loci.selector`.
-    """
-
-    space = loci.coordinate_space(shape)
-
-    universe = loci.absolute_universe(space, t=0)
-    component = loci.selector(
-        universe,
-        order="lex",
-        frame="absolute",
+    if not targets:
+        raise WritableResolutionError("literal targets cannot be empty")
+    return WritableRegion(
+        loci.literal(targets),
+        configuration_contract,
+        value_profile,
+        EffectProfile(existing=effects),
+        TargetContract(None, value_profile, frame),
     )
 
-    return Frontier(
-        components=(component,),
-        name="time_slice",
-        params={"t": 0},
-        family="time_slice",
+
+def everywhere(
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: tuple[str, ...] | None = None,
+    effects: tuple[Effect, ...] = (Effect.REPLACE,),
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize every existing locus in the current carrier."""
+
+    return WritableRegion(
+        loci.all_support(),
+        configuration_contract,
+        value_profile,
+        EffectProfile(existing=effects),
+        TargetContract(None, value_profile, WriteFrame.SUCCESSOR),
     )
+
+
+def next_grid(
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: tuple[str, ...] | None = None,
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize the complete grid-shaped successor frame."""
+
+    return WritableRegion(
+        loci.all_support(),
+        configuration_contract,
+        value_profile,
+        EffectProfile(existing=(Effect.REPLACE,)),
+        TargetContract(None, value_profile, WriteFrame.SUCCESSOR),
+    )
+
+
+def fresh(
+    region: loci.Region,
+    *,
+    namespace: FreshNamespace,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: tuple[str, ...] | None = None,
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize a closed region of potential fresh structural targets."""
+
+    return WritableRegion(
+        region,
+        configuration_contract,
+        value_profile,
+        EffectProfile(existing=(), fresh=(Effect.CREATE,)),
+        TargetContract(loci.LocusKind.FRESH, value_profile, WriteFrame.SUCCESSOR),
+        namespace,
+    )
+
+
+def intensional(
+    binder: str,
+    relation: loci.SelectorExpr,
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: tuple[str, ...] | None = None,
+    effects: tuple[Effect, ...] = (Effect.REPLACE,),
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize a closed non-enumerated existing-target region."""
+
+    return WritableRegion(
+        loci.intensional(binder, relation),
+        configuration_contract,
+        value_profile,
+        EffectProfile(existing=effects),
+        TargetContract(None, value_profile, WriteFrame.SUCCESSOR),
+    )
+
+
+def union(
+    parts: tuple[WritableRegion[C, W], ...],
+) -> WritableRegion[C, WritableCapabilities]:
+    """Union envelopes after proving their local declarations agree."""
+
+    if not parts:
+        raise WritableResolutionError("union needs at least one region")
+    first = parts[0]
+    for part in parts[1:]:
+        if (
+            part.configuration_contract != first.configuration_contract
+            or part.value_profile != first.value_profile
+            or part.effect_profile != first.effect_profile
+            or part.target_contract != first.target_contract
+            or part.fresh_namespace != first.fresh_namespace
+            or part.exactness_profile is not first.exactness_profile
+        ):
+            raise WritableResolutionError(
+                "union parts have incompatible writable declarations"
+            )
+    return WritableRegion(
+        loci.union(tuple(part.descriptor for part in parts)),
+        first.configuration_contract,
+        first.value_profile,
+        first.effect_profile,
+        first.target_contract,
+        first.fresh_namespace,
+        first.exactness_profile,
+    )
+
+
+def product(
+    fields: tuple[tuple[str, WritableRegion[C, W]], ...],
+) -> WritableRegion[C, WritableCapabilities]:
+    """Compose disjoint named envelopes without flattening their identity."""
+
+    if not fields:
+        raise WritableResolutionError("product needs at least one field")
+    keys = tuple(key for key, _ in fields)
+    if any(not key for key in keys) or len(set(keys)) != len(keys):
+        raise WritableResolutionError("product field keys must be nonempty and unique")
+    return union(tuple(region for _, region in fields))

@@ -1,1140 +1,728 @@
 """Closed sources of initial configurations.
 
-The Goal 7 target layer in this module owns exact, constructive, partial,
-probability-law, and intensional Seed descriptors plus explicit source
-composition. It builds from closed loci and configuration data. It does not
-draw from ambient entropy, select rollout horizons, plan datasets, render
-tensors, or define transition behavior; realization evidence belongs to
-``program.py``.
-
-The target ``Seed(source=...)`` contract replaces the current selector/recipe
-record only during the atomic G7-01 cutover. Non-colliding factories below are
-therefore inert scaffolds, followed by the complete live 0.1 implementation.
+``Seed`` describes initial configurations; it never renders arrays, owns an
+ambient random generator, or chooses a rollout horizon.  Every non-exact
+source is a sealed structural value.  Realization and replay evidence belong
+to :mod:`ca.program`.
 """
 
 from __future__ import annotations
 
-import itertools
-import math
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
-from typing import Any, Literal, NoReturn, TypeVar
+from typing import Generic, TypeVar
 
-import numpy as np
-
-from . import loci
+from . import alphabets, loci
 
 
 C = TypeVar("C")
+ExactSeedValue = bool | int | Fraction | str
 
 
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.1: Singular Configuration Sources
-# ---------------------------------------------------------------------------
+class SeedValidationError(ValueError):
+    """A Seed descriptor is malformed or contains an unknown node."""
 
 
-class SeedPrimitive(Enum):
-    """Closed source primitives fixed by the Goal 7 reference scaffold."""
+class ExactnessProfile(Enum):
+    """Exactness promised by a source descriptor."""
 
-    BERNOULLI = "seed.bernoulli"
-
-
-def _not_implemented() -> NoReturn:
-    """Raise the standard error for an unfinished Goal 7 Seed factory."""
-
-    raise NotImplementedError("Goal 7 Seed scaffold is not implemented")
+    EXACT = "exact"
+    REPRESENTED = "represented"
+    SYMBOLIC = "symbolic"
 
 
-def exact(configuration: C) -> "Seed":
-    """Describe one fully specified initial configuration."""
+class EntropyInterface(Enum):
+    """How a source may be realized."""
 
-    _not_implemented()
-
-
-# The target frozen ``Seed`` stores one exact, constructive, partial, law, or
-# intensional source. Its class name remains owned by the incompatible 0.1
-# record until the atomic replacement.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.2: Source Composition
-# ---------------------------------------------------------------------------
-
-
-def product(parts: tuple[tuple[str, "Seed"], ...]) -> "Seed":
-    """Compose named structural source parts."""
-
-    _not_implemented()
-
-
-def overlay(parts: tuple["Seed", ...]) -> "Seed":
-    """Overlay disjoint or explicitly resolved source assignments."""
-
-    _not_implemented()
-
-
-def mixture(parts: tuple[tuple[Fraction, "Seed"], ...]) -> "Seed":
-    """Form an explicit probability-law mixture of sources."""
-
-    _not_implemented()
-
-
-def product_law(parts: tuple[tuple[str, "Seed"], ...]) -> "Seed":
-    """Compose source laws while explicitly declaring independence."""
-
-    _not_implemented()
-
-
-def refine(source: "Seed", constraint: loci.SelectorExpr) -> "Seed":
-    """Add one closed source invariant or refinement relation."""
-
-    _not_implemented()
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 2: General Source Families
-# ---------------------------------------------------------------------------
-
-# Constructive, partial, law-valued, and intensional source families enter
-# here after their output contracts and replay evidence schemas are fixed.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 3: Presets and Aliases
-# ---------------------------------------------------------------------------
-
-# Named presets delegate to the closed source primitives above. The current
-# ``bernoulli`` spelling remains legacy until its exact-law signature replaces
-# the float-and-rendering contract atomically.
-
-
-# ===========================================================================
-# Legacy 0.1 implementation retained until atomic G7-01 cutover
-# ===========================================================================
-
-
-Metric = Literal["l1", "l2", "linf"]
-Stratum = Literal["volume", "shell", "outline", "vertices"]
-DedupeMode = Literal["exact"]
+    NONE = "none"
+    REPLAY_KEY = "replay-key"
 
 
 @dataclass(frozen=True)
-class Seed:
-    """Structured seed definition.
+class SeedOutputContract:
+    """Immutable compatibility declaration for every denoted configuration."""
 
-    `support` is a selector over initialized coordinates. `support=None` means
-    the seed applies to the whole initial support, as with constants. A seed may
-    be deterministic through `selected_value`, stochastic through
-    `distribution`, or a named family whose renderer handles its placement.
-    """
+    configuration_contract: loci.CarrierContract
+    value_profile: alphabets.ValueProfile
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
+    entropy_interface: EntropyInterface = EntropyInterface.NONE
 
-    support: loci.Selector | None
-    selected_value: int | None = None
-    fill_value: int = 0
-    distribution: Any | None = None
-    family: str | None = None
-    params: Mapping[str, Any] | None = None
-    name: str | None = None
+    def __post_init__(self) -> None:
+        if not isinstance(self.value_profile, alphabets.ValueProfile):
+            raise TypeError("value_profile must be alphabets.ValueProfile")
 
 
-def _as_rng(rng: Any | None) -> np.random.Generator:
-    if isinstance(rng, np.random.Generator):
-        return rng
-    if rng is None:
-        return np.random.default_rng()
-    return np.random.default_rng(rng)
+class ConstructionOp(Enum):
+    """Closed constructive-source operations interpreted by ``program.py``."""
+
+    EMPTY = "empty"
+    FILL = "fill"
+    POINT = "point"
+    SEQUENCE = "sequence"
+    RECORD = "record"
+    GRID = "grid"
 
 
-def _initial_slice(context: Mapping[str, Any]) -> loci.Tensor:
-    space = context.get("coordinate_space")
-    if space is None:
-        space = loci.coordinate_space(context["shape"])
-    return loci.absolute_universe(space, t=0)
+ConstructionArgument = (
+    ExactSeedValue
+    | loci.Locus
+    | loci.Region
+    | tuple[ExactSeedValue, ...]
+    | tuple[tuple[str, ExactSeedValue], ...]
+)
 
 
-def _center(center: Mapping[str, int] | Sequence[int] | None) -> dict[str, int]:
-    out = {"x": 0, "y": 0, "z": 0}
+@dataclass(frozen=True)
+class Construction:
+    """One recognized constructive configuration expression."""
 
-    if center is None:
-        return out
-
-    if isinstance(center, Mapping):
-        for axis in out:
-            out[axis] = int(center.get(axis, 0))
-        return out
-
-    for axis, value in zip(("x", "y", "z"), center):
-        out[axis] = int(value)
-
-    return out
+    operation: ConstructionOp
+    arguments: tuple[ConstructionArgument, ...] = ()
 
 
-def _axis_extents(shape: Sequence[int]) -> dict[str, int]:
-    space = loci.coordinate_space(shape)
-    extents = {}
+class BoundaryPolicy(Enum):
+    """Closed finite-grid boundary policies."""
 
-    for axis in loci.active_axes(shape):
-        values = space.intervals[axis]
-        extents[axis] = max(abs(values[0]), abs(values[-1]))
-
-    return extents
+    FIXED = "fixed"
+    PERIODIC = "periodic"
+    REFLECTIVE = "reflective"
 
 
-def _max_body_radius(metric: Metric, extents: Mapping[str, int]) -> int:
-    if not extents:
-        return 0
+@dataclass(frozen=True)
+class GridBoundary:
+    """Boundary data carried by a finite-grid construction."""
 
-    if metric == "linf":
-        return max(extents.values())
+    policy: BoundaryPolicy
+    exterior: ExactSeedValue | None = None
 
-    if metric == "l1":
-        return sum(extents.values())
-
-    squared = sum(extent * extent for extent in extents.values())
-    return math.ceil(math.sqrt(squared))
-
-
-def _subspace_specs(shape: Sequence[int]) -> list[Seed]:
-    space = loci.coordinate_space(shape)
-    axes = loci.active_axes(shape)
-    specs = []
-
-    for free_count in range(0, len(axes) + 1):
-        for free_axes in itertools.combinations(axes, free_count):
-            fixed_axes = tuple(axis for axis in axes if axis not in free_axes)
-
-            for fixed_values in itertools.product(*(space.intervals[axis] for axis in fixed_axes)):
-                fixed = dict(zip(fixed_axes, fixed_values))
-                specs.append(subspace(free_axes=free_axes, fixed=fixed))
-
-    return specs
+    def __post_init__(self) -> None:
+        if self.policy is BoundaryPolicy.FIXED and self.exterior is None:
+            raise SeedValidationError("a fixed boundary requires an exterior value")
+        if self.policy is not BoundaryPolicy.FIXED and self.exterior is not None:
+            raise SeedValidationError(
+                "only a fixed boundary may carry an exterior value"
+            )
 
 
-# ---------------------------------------------------------------------------
-# Phase 1 Core Seeds
-# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class ExactSource(Generic[C]):
+    """One fully specified initial configuration."""
+
+    configuration: C
 
 
-def pair(x0: int, x1: int, fill_value: int = 0) -> Seed:
-    """Build a two-value scalar history seed.
+@dataclass(frozen=True)
+class ConstructiveSource:
+    """A closed constructor, never a host-language callable."""
 
-    This is the deterministic seed family for second-order 0D recurrences.
-    The renderer should place `x0` and `x1` according to the source's temporal
-    history convention.
-    """
+    construction: Construction
 
-    x0 = int(x0)
-    x1 = int(x1)
-    fill_value = int(fill_value)
 
-    return Seed(
-        support=None,
-        fill_value=fill_value,
-        family="pair",
-        params={"x0": x0, "x1": x1, "fill_value": fill_value},
+@dataclass(frozen=True)
+class PartialSource(Generic[C]):
+    """A configuration with explicit unresolved roles and obligations."""
+
+    configuration: C
+    unresolved: tuple[loci.Locus, ...]
+    obligations: tuple[loci.SelectorExpr, ...]
+
+    def __post_init__(self) -> None:
+        if not self.unresolved:
+            raise SeedValidationError("a partial source needs an unresolved role")
+        if len(set(self.unresolved)) != len(self.unresolved):
+            raise SeedValidationError("partial-source roles must be unique")
+
+
+@dataclass(frozen=True)
+class BernoulliLaw:
+    """An exact independent Bernoulli law over a closed support."""
+
+    support: loci.Region
+    probability_true: Fraction
+    false_value: ExactSeedValue = False
+    true_value: ExactSeedValue = True
+
+    def __post_init__(self) -> None:
+        probability = self.probability_true
+        if isinstance(probability, bool) or not isinstance(probability, Fraction):
+            raise TypeError("probability_true must be fractions.Fraction")
+        if probability < 0 or probability > 1:
+            raise SeedValidationError("probability_true must lie in [0, 1]")
+        if self.false_value == self.true_value:
+            raise SeedValidationError("Bernoulli outcomes must be distinct")
+
+
+@dataclass(frozen=True)
+class UniformTupleLaw:
+    """Uniform tuples over ``range(value_count)`` with explicit exclusions."""
+
+    length: int
+    value_count: int
+    excluded: tuple[tuple[int, ...], ...] = ()
+
+    def __post_init__(self) -> None:
+        if isinstance(self.length, bool) or self.length <= 0:
+            raise SeedValidationError("uniform tuple length must be positive")
+        if isinstance(self.value_count, bool) or self.value_count <= 0:
+            raise SeedValidationError("uniform tuple value_count must be positive")
+        for item in self.excluded:
+            if len(item) != self.length:
+                raise SeedValidationError("excluded tuple has the wrong length")
+            if any(value < 0 or value >= self.value_count for value in item):
+                raise SeedValidationError("excluded tuple value is outside the law")
+        if len(set(self.excluded)) != len(self.excluded):
+            raise SeedValidationError("excluded tuples must be unique")
+        if len(self.excluded) >= self.value_count**self.length:
+            raise SeedValidationError("uniform tuple law has empty support")
+
+
+@dataclass(frozen=True)
+class IntensionalProbabilityLaw:
+    """A closed, non-enumerated probability-law presentation."""
+
+    binder: str
+    relation: loci.SelectorExpr
+
+    def __post_init__(self) -> None:
+        if not self.binder:
+            raise SeedValidationError("an intensional law binder cannot be empty")
+
+
+ProbabilityLaw = BernoulliLaw | UniformTupleLaw | IntensionalProbabilityLaw
+
+
+@dataclass(frozen=True)
+class LawSource:
+    """A replayable probability measure over initial configurations."""
+
+    law: ProbabilityLaw
+    construction: Construction | None = None
+
+
+@dataclass(frozen=True)
+class IntensionalSource:
+    """A finite closed presentation of a non-enumerated initial object."""
+
+    binder: str
+    relation: loci.SelectorExpr
+
+    def __post_init__(self) -> None:
+        if not self.binder:
+            raise SeedValidationError("an intensional source binder cannot be empty")
+
+
+@dataclass(frozen=True)
+class ProductPart(Generic[C]):
+    key: str
+    seed: "Seed[C]"
+
+    def __post_init__(self) -> None:
+        if not self.key:
+            raise SeedValidationError("product part keys cannot be empty")
+
+
+@dataclass(frozen=True)
+class ProductSource(Generic[C]):
+    parts: tuple[ProductPart[C], ...]
+
+    def __post_init__(self) -> None:
+        _validate_keys(self.parts)
+
+
+class OverlayConflict(Enum):
+    """Explicit overlap semantics for source overlays."""
+
+    REJECT = "reject"
+    LEFT = "left"
+    RIGHT = "right"
+    REQUIRE_EQUAL = "require-equal"
+
+
+@dataclass(frozen=True)
+class OverlaySource(Generic[C]):
+    parts: tuple["Seed[C]", ...]
+    conflict: OverlayConflict
+
+    def __post_init__(self) -> None:
+        if not self.parts:
+            raise SeedValidationError("an overlay needs at least one part")
+
+
+@dataclass(frozen=True)
+class MixturePart(Generic[C]):
+    weight: Fraction
+    seed: "Seed[C]"
+
+    def __post_init__(self) -> None:
+        if isinstance(self.weight, bool) or not isinstance(self.weight, Fraction):
+            raise TypeError("mixture weights must be fractions.Fraction")
+        if self.weight <= 0:
+            raise SeedValidationError("mixture weights must be positive")
+
+
+@dataclass(frozen=True)
+class MixtureSource(Generic[C]):
+    parts: tuple[MixturePart[C], ...]
+
+    def __post_init__(self) -> None:
+        if not self.parts:
+            raise SeedValidationError("a mixture needs at least one part")
+        if sum((part.weight for part in self.parts), Fraction(0)) != 1:
+            raise SeedValidationError("mixture weights must sum exactly to one")
+
+
+@dataclass(frozen=True)
+class ProductLawSource(Generic[C]):
+    """Named source laws whose independence is stated explicitly."""
+
+    parts: tuple[ProductPart[C], ...]
+
+    def __post_init__(self) -> None:
+        _validate_keys(self.parts)
+        if any(not _has_probability_law(part.seed.source) for part in self.parts):
+            raise SeedValidationError("every product-law part must contain a law")
+
+
+@dataclass(frozen=True)
+class RefinedSource(Generic[C]):
+    source: "Seed[C]"
+    constraint: loci.SelectorExpr
+
+
+SeedSource = (
+    ExactSource[C]
+    | ConstructiveSource
+    | PartialSource[C]
+    | LawSource
+    | IntensionalSource
+    | ProductSource[C]
+    | OverlaySource[C]
+    | MixtureSource[C]
+    | ProductLawSource[C]
+    | RefinedSource[C]
+)
+
+
+@dataclass(frozen=True)
+class SeedDenotation(Generic[C]):
+    """Validated closed source plus its immutable compatibility declaration."""
+
+    source: SeedSource[C]
+    output_contract: SeedOutputContract
+
+    @property
+    def exact_configuration(self) -> C:
+        if not isinstance(self.source, ExactSource):
+            raise SeedValidationError("this denotation is not an exact source")
+        return self.source.configuration
+
+
+@dataclass(frozen=True)
+class Seed(Generic[C]):
+    """One exact, constructive, partial, law-valued, or intensional source."""
+
+    source: SeedSource[C]
+    output_contract: SeedOutputContract
+
+    def __post_init__(self) -> None:
+        _validate_source(self.source)
+        has_entropy = _has_probability_law(self.source)
+        expected = (
+            EntropyInterface.REPLAY_KEY if has_entropy else EntropyInterface.NONE
+        )
+        if self.output_contract.entropy_interface is not expected:
+            raise SeedValidationError(
+                "entropy_interface does not match the source denotation"
+            )
+
+    @property
+    def configuration_contract(self) -> loci.CarrierContract:
+        return self.output_contract.configuration_contract
+
+    @property
+    def value_profile(self) -> alphabets.ValueProfile:
+        return self.output_contract.value_profile
+
+    @property
+    def exactness_profile(self) -> ExactnessProfile:
+        return self.output_contract.exactness_profile
+
+    @property
+    def entropy_interface(self) -> EntropyInterface:
+        return self.output_contract.entropy_interface
+
+    def denote(self) -> SeedDenotation[C]:
+        """Validate and return the complete closed source denotation."""
+
+        _validate_source(self.source)
+        return SeedDenotation(self.source, self.output_contract)
+
+
+_SOURCE_TYPES = (
+    ExactSource,
+    ConstructiveSource,
+    PartialSource,
+    LawSource,
+    IntensionalSource,
+    ProductSource,
+    OverlaySource,
+    MixtureSource,
+    ProductLawSource,
+    RefinedSource,
+)
+_LAW_TYPES = (BernoulliLaw, UniformTupleLaw, IntensionalProbabilityLaw)
+
+
+def _validate_keys(parts: tuple[ProductPart[C], ...]) -> None:
+    if not parts:
+        raise SeedValidationError("a product needs at least one part")
+    keys = tuple(part.key for part in parts)
+    if len(set(keys)) != len(keys):
+        raise SeedValidationError("product part keys must be unique")
+
+
+def _validate_source(source: SeedSource[C]) -> None:
+    if type(source) not in _SOURCE_TYPES:
+        raise SeedValidationError(
+            f"unknown Seed source node {type(source).__name__!r}"
+        )
+    if isinstance(source, LawSource) and type(source.law) not in _LAW_TYPES:
+        raise SeedValidationError(
+            f"unknown probability-law node {type(source.law).__name__!r}"
+        )
+    if isinstance(source, (ProductSource, OverlaySource, MixtureSource, ProductLawSource)):
+        nested = (
+            tuple(part.seed for part in source.parts)
+            if isinstance(source, (ProductSource, MixtureSource, ProductLawSource))
+            else source.parts
+        )
+        for seed in nested:
+            _validate_source(seed.source)
+    if isinstance(source, RefinedSource):
+        _validate_source(source.source.source)
+
+
+def _has_probability_law(source: SeedSource[C]) -> bool:
+    if isinstance(source, (LawSource, MixtureSource, ProductLawSource)):
+        return True
+    if isinstance(source, ProductSource):
+        return any(_has_probability_law(part.seed.source) for part in source.parts)
+    if isinstance(source, OverlaySource):
+        return any(_has_probability_law(seed.source) for seed in source.parts)
+    if isinstance(source, RefinedSource):
+        return _has_probability_law(source.source.source)
+    return False
+
+
+def _contract(
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    *,
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+    entropy: bool = False,
+) -> SeedOutputContract:
+    return SeedOutputContract(
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        exactness_profile=exactness_profile,
+        entropy_interface=(
+            EntropyInterface.REPLAY_KEY if entropy else EntropyInterface.NONE
+        ),
     )
 
 
-def uniform_pair(value_count: int = 97, reject_zero_zero: bool = True) -> Seed:
-    """Sample a two-value scalar history seed uniformly.
-
-    `value_count` is the finite value count, usually the alphabet size for the
-    scalar recurrence source.
-    """
-
-    value_count = int(value_count)
-    reject_zero_zero = bool(reject_zero_zero)
+def exact(
+    configuration: C,
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> Seed[C]:
+    """Describe one fully specified configuration."""
 
     return Seed(
-        support=None,
-        family="uniform_pair",
-        params={
-            "value_count": value_count,
-            "reject_zero_zero": reject_zero_zero,
-        },
-        distribution={
-            "family": "uniform_pair",
-            "value_count": value_count,
-            "reject_zero_zero": reject_zero_zero,
-        },
+        ExactSource(configuration),
+        _contract(
+            configuration_contract,
+            value_profile,
+            exactness_profile=exactness_profile,
+        ),
     )
 
 
-def uniform_bits(length: int, reject_all_zero: bool = False) -> Seed:
-    """Sample a fixed-length binary vector uniformly."""
-
-    length = int(length)
-    reject_all_zero = bool(reject_all_zero)
-    if length <= 0:
-        raise ValueError(f"length must be positive, got {length}")
+def constructive(
+    construction: Construction,
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> Seed[C]:
+    """Describe one closed constructive source."""
 
     return Seed(
-        support=None,
-        family="uniform_bits",
-        params={
-            "length": length,
-            "reject_all_zero": reject_all_zero,
-        },
-        distribution={
-            "family": "uniform_bits",
-            "length": length,
-            "reject_all_zero": reject_all_zero,
-        },
+        ConstructiveSource(construction),
+        _contract(
+            configuration_contract,
+            value_profile,
+            exactness_profile=exactness_profile,
+        ),
     )
+
+
+def partial(
+    configuration: C,
+    *,
+    unresolved: tuple[loci.Locus, ...],
+    obligations: tuple[loci.SelectorExpr, ...],
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> Seed[C]:
+    """Describe an explicitly incomplete configuration."""
+
+    return Seed(
+        PartialSource(configuration, unresolved, obligations),
+        _contract(
+            configuration_contract,
+            value_profile,
+            exactness_profile=exactness_profile,
+        ),
+    )
+
+
+def law(
+    probability_law: ProbabilityLaw,
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    construction: Construction | None = None,
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> Seed[C]:
+    """Describe a replayable probability law over configurations."""
+
+    return Seed(
+        LawSource(probability_law, construction),
+        _contract(
+            configuration_contract,
+            value_profile,
+            exactness_profile=exactness_profile,
+            entropy=True,
+        ),
+    )
+
+
+def intensional(
+    binder: str,
+    relation: loci.SelectorExpr,
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    exactness_profile: ExactnessProfile = ExactnessProfile.SYMBOLIC,
+) -> Seed[C]:
+    """Describe a finite closed presentation of an unenumerated source."""
+
+    return Seed(
+        IntensionalSource(binder, relation),
+        _contract(
+            configuration_contract,
+            value_profile,
+            exactness_profile=exactness_profile,
+        ),
+    )
+
+
+def product(parts: tuple[tuple[str, Seed[C]], ...]) -> Seed[C]:
+    """Compose named structural source parts."""
+
+    normalized = tuple(ProductPart(key, seed) for key, seed in parts)
+    contract = _common_contract(tuple(part.seed for part in normalized))
+    return Seed(ProductSource(normalized), contract)
+
+
+def overlay(
+    parts: tuple[Seed[C], ...],
+    *,
+    conflict: OverlayConflict = OverlayConflict.REJECT,
+) -> Seed[C]:
+    """Overlay source assignments under an explicit conflict law."""
+
+    contract = _common_contract(parts)
+    return Seed(OverlaySource(parts, conflict), contract)
+
+
+def mixture(parts: tuple[tuple[Fraction, Seed[C]], ...]) -> Seed[C]:
+    """Form an exact probability-law mixture."""
+
+    normalized = tuple(MixturePart(weight, seed) for weight, seed in parts)
+    common = _common_contract(tuple(part.seed for part in normalized))
+    contract = SeedOutputContract(
+        common.configuration_contract,
+        common.value_profile,
+        common.exactness_profile,
+        EntropyInterface.REPLAY_KEY,
+    )
+    return Seed(MixtureSource(normalized), contract)
+
+
+def product_law(parts: tuple[tuple[str, Seed[C]], ...]) -> Seed[C]:
+    """Compose named probability laws while declaring independence."""
+
+    normalized = tuple(ProductPart(key, seed) for key, seed in parts)
+    common = _common_contract(tuple(part.seed for part in normalized))
+    contract = SeedOutputContract(
+        common.configuration_contract,
+        common.value_profile,
+        common.exactness_profile,
+        EntropyInterface.REPLAY_KEY,
+    )
+    return Seed(ProductLawSource(normalized), contract)
+
+
+def refine(source: Seed[C], constraint: loci.SelectorExpr) -> Seed[C]:
+    """Add a closed constraint without changing the source contract."""
+
+    return Seed(RefinedSource(source, constraint), source.output_contract)
 
 
 def bernoulli(
-    p_low: float = 0.0,
-    p_high: float = 1.0,
-    support: str | loci.Selector = "initial_slice",
-) -> Seed:
-    """Sample binary values over a seed support.
+    support: loci.Region,
+    probability_true: Fraction = Fraction(1, 2),
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile = alphabets.ValueProfile.BOOLEAN,
+    false_value: ExactSeedValue = False,
+    true_value: ExactSeedValue = True,
+) -> Seed[C]:
+    """Build an exact Bernoulli law; floats and ambient RNGs are rejected."""
 
-    This is a stochastic seed family, separate from structured geometric seed
-    enumeration.
-    """
-
-    if support == "initial_slice":
-        support_selector = loci.selector(
-            _initial_slice,
-            order="none",
-            frame="absolute",
-        )
-    elif isinstance(support, loci.Selector):
-        support_selector = support
-    else:
-        raise ValueError("bernoulli support must be 'initial_slice' or a loci.Selector")
-
-    return Seed(
-        support=support_selector,
-        fill_value=0,
-        family="bernoulli",
-        params={"p_low": p_low, "p_high": p_high, "support": support},
-        distribution={
-            "family": "bernoulli",
-            "p_low": float(p_low),
-            "p_high": float(p_high),
-        },
+    return law(
+        BernoulliLaw(support, probability_true, false_value, true_value),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
     )
 
 
-def selector_seed(
-    selector: loci.Selector,
-    selected_value: int = 1,
-    fill_value: int = 0,
-    distribution: Any | None = None,
-) -> Seed:
-    """Build a seed from an explicit selector-backed support."""
+def sequence(
+    values: tuple[ExactSeedValue, ...],
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+) -> Seed[C]:
+    """Construct one exact ordered history/word configuration."""
 
-    return Seed(
-        support=selector,
-        selected_value=selected_value,
-        fill_value=fill_value,
-        distribution=distribution,
-        family="selector_seed",
-        params={
-            "selected_value": selected_value,
-            "fill_value": fill_value,
-        },
+    if not values:
+        raise SeedValidationError("sequence values cannot be empty")
+    return constructive(
+        Construction(ConstructionOp.SEQUENCE, (values,)),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
     )
 
 
-def point(
-    center: Mapping[str, int] | Sequence[int] | None = None,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select one centered or explicitly positioned seed coordinate."""
+def pair(
+    previous: ExactSeedValue,
+    current: ExactSeedValue,
+    *,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+) -> Seed[C]:
+    """Construct the two-value history used by second-order recurrences."""
 
-    if center is None:
-        target = {"t": 0, "x": 0, "y": 0, "z": 0}
-    elif isinstance(center, Mapping):
-        target = {
-            "t": int(center.get("t", 0)),
-            "x": int(center.get("x", 0)),
-            "y": int(center.get("y", 0)),
-            "z": int(center.get("z", 0)),
-        }
-    else:
-        values = tuple(int(value) for value in center)
-        target = {"t": 0, "x": 0, "y": 0, "z": 0}
-
-        if len(values) == 4:
-            target["t"] = values[0]
-            values = values[1:]
-
-        for axis, coord in zip(("x", "y", "z"), values):
-            target[axis] = coord
-
-    def initial_slice(context: Mapping[str, Any]) -> loci.Tensor:
-        space = context.get("coordinate_space")
-        if space is None:
-            space = loci.coordinate_space(context["shape"])
-        return loci.absolute_universe(space, t=target["t"])
-
-    support = loci.selector(
-        initial_slice,
-        predicates=tuple(
-            loci.coord_eq(axis, coord)
-            for axis, coord in target.items()
-        ),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="point",
-        params={
-            "center": target,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
+    return sequence(
+        (previous, current),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
     )
 
 
-# ---------------------------------------------------------------------------
-# Phase 2 Structured Supports
-# ---------------------------------------------------------------------------
+def uniform_pair(
+    *,
+    value_count: int,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+    reject_zero_zero: bool = True,
+) -> Seed[C]:
+    """Build a replayable uniform law over two finite values."""
 
-
-def subspace(
-    free_axes: Sequence[str],
-    fixed: Mapping[str, int] | None = None,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select an affine subspace such as a row, column, line, or plane."""
-
-    free_axes = tuple(str(axis) for axis in free_axes)
-    fixed = {} if fixed is None else dict(fixed)
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=tuple(
-            loci.coord_eq(axis, int(coord))
-            for axis, coord in fixed.items()
-            if axis not in free_axes
-        ),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="subspace",
-        params={
-            "free_axes": free_axes,
-            "fixed": fixed,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
+    excluded = ((0, 0),) if reject_zero_zero else ()
+    return law(
+        UniformTupleLaw(2, value_count, excluded),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        construction=Construction(ConstructionOp.SEQUENCE),
     )
 
 
-def finite_segment(
-    direction: Sequence[int] | str,
+def uniform_bits(
+    *,
     length: int,
-    center: Mapping[str, int] | Sequence[int] | None = None,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select a finite segment along an axis or lattice direction."""
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile = alphabets.ValueProfile.BOOLEAN,
+    reject_all_zero: bool = False,
+) -> Seed[C]:
+    """Build a replayable uniform law over a fixed binary history."""
 
-    length = int(length)
-    center = _center(center)
-
-    if isinstance(direction, str):
-        direction_values = {"x": 0, "y": 0, "z": 0}
-        direction_values[direction] = 1
-    else:
-        values = tuple(int(value) for value in direction)
-        if len(values) == 4:
-            values = values[1:]
-        direction_values = {
-            axis: value
-            for axis, value in zip(("x", "y", "z"), values)
-        }
-
-    start = -(length // 2)
-    offsets = range(start, start + length)
-    points = []
-    for offset in offsets:
-        points.append([
-            center["x"] + offset * direction_values.get("x", 0),
-            center["y"] + offset * direction_values.get("y", 0),
-            center["z"] + offset * direction_values.get("z", 0),
-        ])
-
-    allowed = np.asarray(points, dtype=np.int64)
-
-    def on_segment(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-        projected = loci.axis_project(coords, ("x", "y", "z"))
-        matches = projected[:, None, :] == allowed[None, :, :]
-        return matches.all(axis=-1).any(axis=-1)
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=(on_segment,),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="finite_segment",
-        params={
-            "direction": direction,
-            "length": length,
-            "center": center,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
+    excluded = ((0,) * length,) if reject_all_zero else ()
+    return law(
+        UniformTupleLaw(length, 2, excluded),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        construction=Construction(ConstructionOp.SEQUENCE),
     )
 
 
-def body(
-    metric: Metric,
-    stratum: Stratum,
-    radius: int | None = None,
-    extents: Mapping[str, int] | None = None,
-    center: Mapping[str, int] | Sequence[int] | None = None,
-    thickness: int = 1,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select a compact metric body such as a block, diamond, ring, or shell."""
+def finite_grid(
+    shape: tuple[int, ...],
+    values: tuple[ExactSeedValue, ...],
+    *,
+    boundary: GridBoundary,
+    configuration_contract: loci.CarrierContract,
+    value_profile: alphabets.ValueProfile,
+) -> Seed[C]:
+    """Construct a rank-1/2/3 finite grid without rendering machinery."""
 
-    center = _center(center)
-    radius = 1 if radius is None else int(radius)
-    thickness = int(thickness)
-
-    def body_predicate(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-        space = context.get("coordinate_space")
-        axes = loci.active_axes(space if space is not None else context["shape"])
-
-        if metric == "linf":
-            projected = loci.axis_project(coords, axes)
-            center_values = np.asarray([center[axis] for axis in axes], dtype=projected.dtype)
-            relative = projected - center_values
-            extent_values = np.asarray(
-                [int(extents.get(axis, radius)) if extents else radius for axis in axes],
-                dtype=projected.dtype,
-            )
-            abs_relative = np.abs(relative)
-            within = (abs_relative <= extent_values).all(axis=-1)
-            boundary_axes = (abs_relative == extent_values).sum(axis=-1)
-
-            if stratum == "volume":
-                return within
-
-            if stratum == "shell":
-                return within & (boundary_axes >= 1)
-
-            if stratum == "outline":
-                return within & (boundary_axes >= max(1, len(axes) - 1))
-
-            return within & (boundary_axes == len(axes))
-
-        distances = loci.norm(coords, axes, metric=metric, center=center)
-
-        if stratum == "volume":
-            return distances <= radius
-
-        if metric == "l2":
-            shell = (distances > radius - thickness) & (distances <= radius)
-        else:
-            shell = distances == radius
-
-        projected = loci.axis_project(coords, axes)
-        center_values = np.asarray([center[axis] for axis in axes], dtype=projected.dtype)
-        relative = projected - center_values
-        nonzero_axes = (relative != 0).sum(axis=-1)
-        zero_axes = len(axes) - nonzero_axes
-
-        if stratum == "shell":
-            return shell
-
-        if stratum == "outline":
-            if len(axes) <= 2:
-                return shell
-            return shell & (zero_axes >= 1)
-
-        return shell & (nonzero_axes == 1)
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=(body_predicate,),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="body",
-        params={
-            "metric": metric,
-            "stratum": stratum,
-            "radius": radius,
-            "extents": extents,
-            "center": center,
-            "thickness": thickness,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
-    )
-
-
-def compound(
-    kind: str,
-    components: Sequence[Seed] | None = None,
-    axes: Sequence[str] | None = None,
-    signs: Sequence[int] | None = None,
-    extent: int | None = None,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select a union-style compound support such as plus or X shapes."""
-
-    kind = str(kind)
-    axes = ("x", "y", "z") if axes is None else tuple(str(axis) for axis in axes)
-    signs = tuple(int(sign) for sign in signs) if signs is not None else None
-    extent = None if extent is None else int(extent)
-
-    if components:
-        selectors = []
-        for component in components:
-            if not isinstance(component, Seed):
-                raise TypeError(
-                    f"compound components must be Seed instances, got {type(component).__name__}"
-                )
-            if component.support is None:
-                raise ValueError("compound components must have selector-backed support")
-            selectors.append(component.support)
-        selectors = tuple(selectors)
-
-        def has_any_component(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-            result = np.zeros(coords.shape[0], dtype=bool)
-            for selector in selectors:
-                selection = loci.select(selector, context)
-                selected = selection.coords
-                if selected is None or selected.size == 0:
-                    continue
-                matches = coords[:, None, :] == selected[None, :, :]
-                result = result | matches.all(axis=-1).any(axis=-1)
-            return result
-
-        support = loci.selector(
-            _initial_slice,
-            predicates=(has_any_component,),
-            order="none",
-            frame="absolute",
+    if not 1 <= len(shape) <= 3:
+        raise SeedValidationError("finite-grid rank must be 1, 2, or 3")
+    if any(isinstance(size, bool) or size <= 0 for size in shape):
+        raise SeedValidationError("finite-grid extents must be positive")
+    cell_count = 1
+    for size in shape:
+        cell_count *= size
+    if len(values) != cell_count:
+        raise SeedValidationError(
+            f"finite-grid needs {cell_count} values, got {len(values)}"
         )
-    else:
-        def compound_predicate(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-            projected = loci.axis_project(coords, axes)
-            abs_projected = np.abs(projected)
-
-            if extent is not None:
-                in_extent = (abs_projected <= extent).all(axis=-1)
-            else:
-                in_extent = np.ones(projected.shape[0], dtype=bool)
-
-            if kind in ("axial-star", "plus"):
-                return in_extent & ((projected != 0).sum(axis=-1) <= 1)
-
-            if kind in ("diagonal-star", "x"):
-                if signs is None:
-                    return in_extent & (abs_projected == abs_projected[:, :1]).all(axis=-1)
-
-                sign_values = np.asarray(signs, dtype=projected.dtype)
-                signed = projected * sign_values
-                return in_extent & (signed == signed[:, :1]).all(axis=-1)
-
-            return np.zeros(projected.shape[0], dtype=bool)
-
-        support = loci.selector(
-            _initial_slice,
-            predicates=(compound_predicate,),
-            order="none",
-            frame="absolute",
-        )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="compound",
-        params={
-            "kind": kind,
-            "axes": axes,
-            "signs": signs,
-            "extent": extent,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
+    boundary_atom: tuple[tuple[str, ExactSeedValue], ...] = (
+        ("policy", boundary.policy.value),
+        *((("exterior", boundary.exterior),) if boundary.exterior is not None else ()),
+    )
+    return constructive(
+        Construction(ConstructionOp.GRID, (shape, values, boundary_atom)),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
     )
 
 
-def region(
-    kind: str,
-    axis: str | None = None,
-    sides: Mapping[str, str] | None = None,
-    bounds: Mapping[str, tuple[int, int]] | None = None,
-    coord: int = 0,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select a large region such as a half-space, orthant, slab, or interface."""
-
-    kind = str(kind)
-    sides = {} if sides is None else dict(sides)
-    bounds = {} if bounds is None else dict(bounds)
-
-    def compare(values: loci.Tensor, side: str, threshold: int) -> loci.Tensor:
-        if side in ("le", "<="):
-            return values <= threshold
-        if side in ("lt", "<"):
-            return values < threshold
-        if side in ("ge", ">="):
-            return values >= threshold
-        if side in ("gt", ">"):
-            return values > threshold
-        return values == threshold
-
-    def region_predicate(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-        if kind == "half-space":
-            values = loci.axis_project(coords, (axis,)).squeeze(-1)
-            return compare(values, sides.get(axis, "ge"), int(coord))
-
-        if kind == "orthant":
-            masks = []
-            for side_axis, side in sides.items():
-                values = loci.axis_project(coords, (side_axis,)).squeeze(-1)
-                masks.append(compare(values, side, int(coord)))
-            return loci.combine_masks(masks, op="and")
-
-        if kind == "slab":
-            masks = []
-            for bound_axis, (low, high) in bounds.items():
-                values = loci.axis_project(coords, (bound_axis,)).squeeze(-1)
-                masks.append((values >= int(low)) & (values <= int(high)))
-            return loci.combine_masks(masks, op="and")
-
-        if kind == "interface":
-            values = loci.axis_project(coords, (axis,)).squeeze(-1)
-            return values == int(coord)
-
-        return np.zeros(coords.shape[0], dtype=bool)
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=(region_predicate,),
-        order="none",
-        frame="absolute",
+def _common_contract(seeds: tuple[Seed[C], ...]) -> SeedOutputContract:
+    if not seeds:
+        raise SeedValidationError("composition needs at least one Seed")
+    first = seeds[0].output_contract
+    for seed in seeds[1:]:
+        current = seed.output_contract
+        if (
+            current.configuration_contract != first.configuration_contract
+            or current.value_profile != first.value_profile
+            or current.exactness_profile is not first.exactness_profile
+        ):
+            raise SeedValidationError("composed Seeds have incompatible contracts")
+    entropy = any(
+        seed.output_contract.entropy_interface is EntropyInterface.REPLAY_KEY
+        for seed in seeds
     )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="region",
-        params={
-            "kind": kind,
-            "axis": axis,
-            "sides": sides,
-            "bounds": bounds,
-            "coord": int(coord),
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
-    )
-
-
-def periodic(
-    kind: str,
-    axes: Sequence[str],
-    step: int = 2,
-    phase: int = 0,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select a periodic support such as parity, product lattice, or grid lattice."""
-
-    kind = str(kind)
-    axes = tuple(str(axis) for axis in axes)
-    step = int(step)
-    phase = int(phase)
-
-    def periodic_predicate(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-        if kind == "parity":
-            return loci.mod_eq(loci.sum_axes(coords, axes), step, phase)
-
-        projected = loci.axis_project(coords, axes)
-        hits = np.remainder(projected - phase, step) == 0
-
-        if kind in ("product-lattice", "sparse-lattice"):
-            return hits.all(axis=-1)
-
-        if kind == "grid-lattice":
-            return hits.any(axis=-1)
-
-        return np.zeros(coords.shape[0], dtype=bool)
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=(periodic_predicate,),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="periodic",
-        params={
-            "kind": kind,
-            "axes": axes,
-            "step": step,
-            "phase": phase,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
-    )
-
-
-def fractal(kind: str, params: Mapping[str, Any], value: int = 1, fill_value: int = 0) -> Seed:
-    """Select a future fractal-style support compiled to loci predicates."""
-
-    predicate_fn = params["predicate"]
-    support = loci.selector(
-        _initial_slice,
-        predicates=(loci.predicate(predicate_fn, params, name=str(kind)),),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="fractal",
-        params={
-            "kind": kind,
-            "params": dict(params),
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
-    )
-
-
-def spiral(kind: str, params: Mapping[str, Any], value: int = 1, fill_value: int = 0) -> Seed:
-    """Select a future spiral-style support compiled to loci predicates."""
-
-    predicate_fn = params["predicate"]
-    support = loci.selector(
-        _initial_slice,
-        predicates=(loci.predicate(predicate_fn, params, name=str(kind)),),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="spiral",
-        params={
-            "kind": kind,
-            "params": dict(params),
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
-    )
-
-
-def path(
-    points: Sequence[Sequence[int]],
-    thickness: int = 0,
-    value: int = 1,
-    fill_value: int = 0,
-) -> Seed:
-    """Select a path through explicit lattice points."""
-
-    canonical_points = []
-    for point_values in points:
-        values = tuple(int(value) for value in point_values)
-        if len(values) == 4:
-            canonical_points.append(values)
-            continue
-
-        coords = [0, 0, 0, 0]
-        for index, value in enumerate(values, start=1):
-            coords[index] = value
-        canonical_points.append(tuple(coords))
-
-    point_tensor = np.asarray(canonical_points, dtype=np.int64)
-    thickness = int(thickness)
-
-    def path_predicate(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-        deltas = coords[:, None, :] - point_tensor[None, :, :]
-        distances = np.abs(deltas[:, :, 1:]).max(axis=-1)
-        same_time = deltas[:, :, 0] == 0
-        return (same_time & (distances <= thickness)).any(axis=-1)
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=(path_predicate,),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=int(value),
-        fill_value=int(fill_value),
-        family="path",
-        params={
-            "points": tuple(canonical_points),
-            "thickness": thickness,
-            "value": int(value),
-            "fill_value": int(fill_value),
-        },
-    )
-
-
-def transform(
-    seed_spec: Seed,
-    invert: bool = False,
-) -> Seed:
-    """Transform a seed support by optional complementing."""
-
-    seed = seed_spec
-
-    if not invert:
-        return seed
-
-    def transformed_predicate(coords: loci.Tensor, context: Mapping[str, Any]) -> loci.Tensor:
-        selection = loci.select(seed.support, context)
-        selected = selection.coords
-        if selected is None or selected.size == 0:
-            return np.ones(coords.shape[0], dtype=bool)
-        matches = coords[:, None, :] == selected[None, :, :]
-        mask = matches.all(axis=-1).any(axis=-1)
-
-        return ~mask
-
-    support = loci.selector(
-        _initial_slice,
-        predicates=(transformed_predicate,),
-        order="none",
-        frame="absolute",
-    )
-
-    return Seed(
-        support=support,
-        selected_value=seed.selected_value,
-        fill_value=seed.fill_value,
-        distribution=seed.distribution,
-        family="transform",
-        params={
-            "seed_spec": seed_spec,
-            "invert": invert,
-        },
-    )
-
-
-# ---------------------------------------------------------------------------
-# Rendering and Dedupe
-# ---------------------------------------------------------------------------
-
-
-def render(seed: Seed, shape: Sequence[int], rng: Any | None = None) -> Any:
-    """Render a seed spec into an initial raw state or mask.
-
-    Rendering is where selector supports are materialized for a concrete shape.
-    It should use `loci.select` or `loci.mask` rather than reimplementing
-    coordinate logic.
-    """
-
-    shape = tuple(int(size) for size in shape)
-    rng = _as_rng(rng)
-
-    if seed.family == "pair":
-        params = seed.params or {}
-        return np.asarray((params["x0"], params["x1"]), dtype=np.int64)
-
-    if seed.family == "uniform_pair":
-        params = seed.params or {}
-        value_count = int(params["value_count"])
-
-        while True:
-            values = rng.integers(value_count, size=2, dtype=np.int64)
-            if not params["reject_zero_zero"] or bool(values.any()):
-                return values
-
-    if seed.family == "uniform_bits":
-        params = seed.params or {}
-        length = int(params["length"])
-        reject_all_zero = bool(params.get("reject_all_zero", False))
-
-        while True:
-            values = rng.integers(2, size=length, dtype=np.int64)
-            if not reject_all_zero or bool(values.any()):
-                return values
-
-    value = seed.fill_value if seed.selected_value is None else seed.selected_value
-    output = np.full(shape, int(value), dtype=np.int64)
-
-    if seed.support is None:
-        return output
-
-    output = np.full(shape, int(seed.fill_value), dtype=np.int64)
-    space = loci.coordinate_space(shape)
-    context = {"shape": shape, "coordinate_space": space}
-    selection = loci.select(seed.support, context)
-    selected = selection.coords
-
-    if selected is None or selected.size == 0:
-        return output
-
-    indices = loci.native_indices(selected, space)
-
-    if seed.distribution and seed.distribution.get("family") == "bernoulli":
-        p_low = float(seed.distribution["p_low"])
-        p_high = float(seed.distribution["p_high"])
-        p = p_low + (p_high - p_low) * float(rng.random())
-        samples = (rng.random(shape) < p).astype(np.int64)
-        output[indices] = samples[indices]
-        return output
-
-    output[indices] = int(seed.selected_value)
-    return output
-
-
-def dedupe(
-    specs: Sequence[Seed],
-    shape: Sequence[int],
-    mode: DedupeMode = "exact",
-) -> list[Seed]:
-    """Remove duplicate rendered seed supports for a concrete shape."""
-
-    if mode != "exact":
-        raise ValueError(f"unsupported dedupe mode {mode!r}")
-
-    kept = []
-    seen = set()
-
-    for spec in specs:
-        rendered = render(spec, shape)
-        key = np.ascontiguousarray(rendered).tobytes()
-
-        if key in seen:
-            continue
-
-        seen.add(key)
-        kept.append(spec)
-
-    return kept
-
-
-# ---------------------------------------------------------------------------
-# Phase 3 Structured Groups and Aliases
-# ---------------------------------------------------------------------------
-
-
-def structured(
-    shape: Sequence[int],
-    include_subspaces: bool = True,
-    include_bodies: bool = True,
-    include_compounds: bool = True,
-    include_regions: bool = True,
-    include_periodic: bool = True,
-    dedupe_mode: DedupeMode | None = "exact",
-) -> list[Seed]:
-    """Enumerate canonical structured seed specs.
-
-    This generates dimension-polymorphic seed specs, expands centered metric
-    bodies across every meaningful radius for the target shape, adds inverted
-    versions of every selector-backed seed, and dedupes collapsed supports after
-    rendering.
-    """
-
-    shape = tuple(int(size) for size in shape)
-    axes = loci.active_axes(shape)
-    extents = _axis_extents(shape)
-    specs: list[Seed] = []
-
-    if include_subspaces:
-        specs.extend(_subspace_specs(shape))
-
-    if include_bodies and axes:
-        for metric in ("linf", "l1", "l2"):
-            max_radius = _max_body_radius(metric, extents)
-
-            for radius in range(1, max_radius + 1):
-                for stratum in ("volume", "shell", "outline", "vertices"):
-                    specs.append(body(metric=metric, stratum=stratum, radius=radius))
-
-    if include_compounds and axes:
-        for extent in range(1, _max_body_radius("linf", extents) + 1):
-            specs.append(compound(kind="plus", axes=axes, extent=extent))
-
-            if len(axes) >= 2:
-                specs.append(compound(kind="x", axes=axes[:2], extent=extent))
-
-    if include_regions and axes:
-        first_axis = axes[0]
-        specs.append(region(kind="half-space", axis=first_axis, sides={first_axis: "ge"}, coord=0))
-        specs.append(region(kind="interface", axis=first_axis, coord=0))
-
-        sides = {axis: "ge" for axis in axes}
-        specs.append(region(kind="orthant", sides=sides, coord=0))
-
-    if include_periodic and axes:
-        for axis in axes:
-            specs.append(periodic(kind="grid-lattice", axes=(axis,)))
-
-        if len(axes) == 3:
-            for parity_axes in itertools.combinations(axes, 2):
-                specs.append(periodic(kind="parity", axes=parity_axes))
-
-        specs.append(periodic(kind="parity", axes=axes))
-        specs.append(periodic(kind="product-lattice", axes=axes))
-        specs.append(periodic(kind="grid-lattice", axes=axes))
-
-    specs.extend(transform(spec, invert=True) for spec in tuple(specs) if spec.support is not None)
-
-    if dedupe_mode is None:
-        return specs
-
-    return dedupe(specs, shape, mode=dedupe_mode)
-
-
-def constant(value: int) -> Seed:
-    """Fill the whole initial support with one value.
-
-    This covers all-dead and all-live starts for later experiments. Structured
-    seeds intentionally do not include this family directly.
-    """
-
-    value = int(value)
-
-    return Seed(
-        support=None,
-        selected_value=value,
-        fill_value=value,
-        family="constant",
-        params={"value": value},
+    return SeedOutputContract(
+        first.configuration_contract,
+        first.value_profile,
+        first.exactness_profile,
+        EntropyInterface.REPLAY_KEY if entropy else EntropyInterface.NONE,
     )

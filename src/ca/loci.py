@@ -1,779 +1,796 @@
-"""Closed structural identities and raw region algebra.
+"""Closed structural identities, carriers, configurations, and regions.
 
-The Goal 7 target layer in this module owns identities, selector expressions,
-and regions without granting either read or write authority. Component modules
-build Seed sources, writable envelopes, and readable views from these values;
-``program.py`` later resolves and applies those component contracts. This
-module does not own configuration policy, family behavior, or execution.
-
-The target declarations are intentionally phase-ordered and inert. The finite
-NumPy selector implementation required by the 0.1 runtime remains intact below
-the explicit legacy divider until the atomic G7-01 cutover.
+``loci`` supplies structure shared by Seeds, writable regions, and readable
+regions without itself granting read or write authority.  Every public value
+is immutable and versioned; selectors are data, never Python callbacks.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+import hashlib
+from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
-from typing import Any, Literal, NoReturn, TypeAlias
-
-import numpy as np
-
-
-ExactLocusPart: TypeAlias = bool | int | Fraction | str
+from itertools import product as cartesian_product
+from typing import Generic, TypeAlias, TypeVar
 
 
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.1: Singular Structural Identities
-# ---------------------------------------------------------------------------
+V = TypeVar("V")
+ClosedScalar: TypeAlias = bool | int | Fraction | str
 
 
 class LocusKind(Enum):
-    """Closed identity variants fixed by the Goal 7 reference scaffold."""
+    """Recognized structural identity forms."""
 
     COORDINATE = "coordinate"
     NAMED = "named"
     OCCURRENCE = "occurrence"
+    PATH = "path"
+    SPAN = "span"
+    PORT = "port"
+    INTERFACE = "interface"
+    PRODUCT = "product"
     GRAPH_ELEMENT = "graph-element"
     FIELD_POINT = "field-point"
+    CONTINUOUS = "continuous"
+    INTENSIONAL = "intensional"
     FRESH = "fresh"
 
 
 @dataclass(frozen=True)
 class Locus:
-    """One closed structural identity; it grants no access authority."""
+    """One semantic identity; it carries no access capability."""
 
     kind: LocusKind
     scope: str
-    path: tuple[ExactLocusPart, ...]
+    path: tuple[ClosedScalar, ...]
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported locus version {self.version}")
+        if not self.scope:
+            raise ValueError("locus scope cannot be empty")
+        if any(not isinstance(part, (bool, int, Fraction, str)) for part in self.path):
+            raise TypeError("locus path contains an unclosed value")
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the standard error for an unfinished Goal 7 loci factory."""
+@dataclass(frozen=True)
+class FreshReference:
+    """A Rule-local fresh key, not yet a globally bound identity."""
 
-    raise NotImplementedError("Goal 7 loci scaffold is not implemented")
+    namespace: str
+    local_key: ClosedScalar
+    parent: Locus | None = None
+    interface: tuple[Locus, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported fresh-reference version {self.version}")
+        if not self.namespace:
+            raise ValueError("fresh namespace cannot be empty")
 
 
-def named(name: str) -> Locus:
-    """Build a named identity within the configuration identity scope."""
-
-    _not_implemented()
+def _locus_token(value: Locus | FreshReference) -> str:
+    return canonical_identity(value)
 
 
-def coordinate(axis: str, value: int) -> Locus:
-    """Build one exact coordinate identity."""
+def named(name: str, *, scope: str = "configuration") -> Locus:
+    if not isinstance(name, str) or not name:
+        raise ValueError("name must be a nonempty string")
+    return Locus(LocusKind.NAMED, scope, (name,))
 
-    _not_implemented()
+
+def coordinate(axis: str, value: int, *, scope: str = "offset") -> Locus:
+    if axis not in ("t", "x", "y", "z"):
+        raise ValueError("axis must be one of t, x, y, z")
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError("coordinate value must be an integer")
+    return Locus(LocusKind.COORDINATE, scope, (axis, value))
 
 
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.2: Selector Expressions and Region Compounds
-# ---------------------------------------------------------------------------
+def cell(coordinates: tuple[int, ...], *, axes: tuple[str, ...] | None = None) -> Locus:
+    if any(isinstance(value, bool) or not isinstance(value, int) for value in coordinates):
+        raise TypeError("cell coordinates must be integers")
+    if axes is None:
+        axes = ("x", "y", "z")[: len(coordinates)]
+    if len(axes) != len(coordinates):
+        raise ValueError("axes and coordinates must have equal length")
+    return Locus(
+        LocusKind.COORDINATE,
+        "grid:" + ",".join(axes),
+        tuple(part for pair in zip(axes, coordinates) for part in pair),
+    )
+
+
+def occurrence(container: Locus | str, index: int) -> Locus:
+    token = container if isinstance(container, str) else _locus_token(container)
+    return Locus(LocusKind.OCCURRENCE, "occurrence", (token, int(index)))
+
+
+def path(*segments: ClosedScalar, scope: str = "path") -> Locus:
+    if not segments:
+        raise ValueError("path requires at least one segment")
+    return Locus(LocusKind.PATH, scope, tuple(segments))
+
+
+def span(container: Locus | str, start: int, stop: int) -> Locus:
+    if stop < start:
+        raise ValueError("span stop must be >= start")
+    token = container if isinstance(container, str) else _locus_token(container)
+    return Locus(LocusKind.SPAN, "span", (token, int(start), int(stop)))
+
+
+def port(owner: Locus | str, name: str) -> Locus:
+    token = owner if isinstance(owner, str) else _locus_token(owner)
+    return Locus(LocusKind.PORT, "port", (token, name))
+
+
+def interface(left: Locus, right: Locus, *, name: str = "interface") -> Locus:
+    return Locus(
+        LocusKind.INTERFACE,
+        name,
+        tuple(sorted((_locus_token(left), _locus_token(right)))),
+    )
+
+
+def product_locus(name: str, parts: tuple[Locus, ...]) -> Locus:
+    if not parts:
+        raise ValueError("product locus requires at least one part")
+    return Locus(
+        LocusKind.PRODUCT,
+        name,
+        tuple(_locus_token(part) for part in parts),
+    )
+
+
+def graph_element(kind: str, identity: ClosedScalar) -> Locus:
+    if kind not in ("node", "edge", "port"):
+        raise ValueError("graph element kind must be node, edge, or port")
+    return Locus(LocusKind.GRAPH_ELEMENT, "graph", (kind, identity))
+
+
+def field_point(
+    field: str,
+    coordinates: tuple[Fraction | int, ...],
+    *,
+    component: str | None = None,
+) -> Locus:
+    path_parts: tuple[ClosedScalar, ...] = (
+        field,
+        *(Fraction(value) for value in coordinates),
+    )
+    if component is not None:
+        path_parts = (*path_parts, component)
+    return Locus(LocusKind.FIELD_POINT, "field", path_parts)
+
+
+def continuous_region(name: str, bounds: tuple[Fraction, ...]) -> Locus:
+    return Locus(
+        LocusKind.CONTINUOUS,
+        "continuous",
+        (name, *(Fraction(bound) for bound in bounds)),
+    )
+
+
+def intensional_reference(binder: str, relation_id: str) -> Locus:
+    return Locus(LocusKind.INTENSIONAL, "intensional", (binder, relation_id))
+
+
+def fresh_reference(
+    namespace: str,
+    local_key: ClosedScalar,
+    *,
+    parent: Locus | None = None,
+    interface_loci: tuple[Locus, ...] = (),
+) -> FreshReference:
+    return FreshReference(namespace, local_key, parent, interface_loci)
 
 
 class SelectorPrimitive(Enum):
-    """Closed selector-expression primitives."""
+    """Closed operations admitted inside selector expressions."""
 
-    PREDICATE = "selector.predicate"
-    TRANSFORM = "selector.transform"
+    LITERAL = "selector.literal"
+    EQUAL = "selector.equal"
+    TAGGED = "selector.tagged"
+    RELATIVE = "selector.relative"
+    METRIC = "selector.metric"
+    PATH = "selector.path"
+    INCIDENCE = "selector.incidence"
+    REACHABLE = "selector.reachable"
+    FIELD_RESTRICTION = "selector.field-restriction"
+    DIFFERENTIAL_GERM = "selector.differential-germ"
+    HISTORY = "selector.history"
     MEMBERSHIP = "selector.membership"
+    AND = "selector.and"
+    OR = "selector.or"
+    NOT = "selector.not"
+
+
+SelectorArgument: TypeAlias = ClosedScalar | Locus | FreshReference
 
 
 @dataclass(frozen=True)
 class SelectorExpr:
-    """Closed selector expression, never a host-language callback."""
+    """One closed selector AST node."""
 
     primitive: SelectorPrimitive
-    arguments: tuple[ExactLocusPart | Locus | "SelectorExpr", ...]
+    arguments: tuple[SelectorArgument, ...] = ()
+    children: tuple["SelectorExpr", ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported selector version {self.version}")
 
 
 class RegionKind(Enum):
-    """Closed raw-region forms shared by component modules."""
+    """Raw structural regions shared by read and write components."""
 
     LITERAL = "literal"
     ALL_SUPPORT = "all-support"
+    CURRENT_SUPPORT = "current-support"
     RELATIVE = "relative"
     PRODUCT = "product"
     UNION = "union"
+    INTERSECTION = "intersection"
+    DIFFERENCE = "difference"
+    SPAN = "span"
+    PATH = "path"
+    MATCHED_INTERFACE = "matched-interface"
+    DYNAMIC_ADDRESS = "dynamic-address"
     FRESH_CHILDREN = "fresh-children"
+    FRESH_EDGES = "fresh-edges"
+    CONTINUOUS = "continuous"
+    DIFFERENTIAL = "differential"
     INTENSIONAL = "intensional"
 
 
 @dataclass(frozen=True)
 class Region:
-    """Raw structural region with no implicit readable or writable meaning."""
+    """A closed raw region.  It grants neither read nor write authority."""
 
     kind: RegionKind
     name: str | None = None
     loci: tuple[Locus, ...] = ()
+    fresh: tuple[FreshReference, ...] = ()
     parts: tuple["Region", ...] = ()
     offsets: tuple[Locus, ...] = ()
     relation: SelectorExpr | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported region version {self.version}")
+        if self.kind is RegionKind.LITERAL and not (self.loci or self.fresh):
+            raise ValueError("literal region cannot be empty")
+        if self.kind in (RegionKind.UNION, RegionKind.PRODUCT) and not self.parts:
+            raise ValueError(f"{self.kind.value} region requires parts")
+        if self.kind is RegionKind.INTENSIONAL and self.relation is None:
+            raise ValueError("intensional region requires a relation")
 
 
-def all_support(carrier: str) -> Region:
-    """Describe the complete support of one named carrier."""
+def literal(
+    loci_values: tuple[Locus, ...] = (),
+    *,
+    fresh: tuple[FreshReference, ...] = (),
+    name: str | None = None,
+) -> Region:
+    return Region(RegionKind.LITERAL, name=name, loci=loci_values, fresh=fresh)
 
-    _not_implemented()
+
+def all_support(carrier: str = "current-carrier") -> Region:
+    return Region(RegionKind.ALL_SUPPORT, name=carrier)
+
+
+def current_support(carrier: str = "current-carrier") -> Region:
+    return Region(RegionKind.CURRENT_SUPPORT, name=carrier)
 
 
 def relative(anchors: Region, offsets: tuple[Locus, ...]) -> Region:
-    """Describe identities relative to a closed anchor region."""
-
-    _not_implemented()
+    if not offsets:
+        raise ValueError("relative region requires offsets")
+    return Region(RegionKind.RELATIVE, parts=(anchors,), offsets=offsets)
 
 
 def union(parts: tuple[Region, ...]) -> Region:
-    """Compose raw regions by explicit union."""
+    return Region(RegionKind.UNION, parts=parts)
 
-    _not_implemented()
+
+def region_product(parts: tuple[tuple[str, Region], ...]) -> Region:
+    if not parts:
+        raise ValueError("region product requires named parts")
+    named_parts = tuple(
+        Region(RegionKind.PRODUCT, name=name, parts=(part,))
+        for name, part in parts
+    )
+    return Region(RegionKind.PRODUCT, parts=named_parts)
+
+
+def fresh_children(
+    parent: Locus,
+    namespace: str,
+    local_keys: tuple[ClosedScalar, ...],
+) -> Region:
+    return Region(
+        RegionKind.FRESH_CHILDREN,
+        name=namespace,
+        fresh=tuple(
+            FreshReference(namespace, local_key, parent)
+            for local_key in local_keys
+        ),
+    )
 
 
 def intensional(binder: str, relation: SelectorExpr) -> Region:
-    """Describe a closed intensional region without enumerating it."""
-
-    _not_implemented()
+    return Region(RegionKind.INTENSIONAL, name=binder, relation=relation)
 
 
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 2: Structural Families
-# ---------------------------------------------------------------------------
-
-# Occurrences, paths, spans, ports, interfaces, products, continuous regions,
-# fresh references, and lenses enter here once their closed signatures land.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 3: Private Finite Representations
-# ---------------------------------------------------------------------------
-
-# Finite selector materialization and canonical tensor-coordinate projection
-# remain private representations; they never become the semantic ontology.
+class BoundaryPolicy(Enum):
+    NONE = "none"
+    FIXED = "fixed"
+    PERIODIC = "periodic"
+    REFLECTIVE = "reflective"
 
 
-# ===========================================================================
-# Legacy 0.1 implementation retained until atomic G7-01 cutover
-# ===========================================================================
-
-
-Tensor = np.ndarray
-Axis = Literal["t", "x", "y", "z"]
-Frame = Literal["absolute", "relative"]
-MaskOp = Literal["identity", "and", "or", "xor"]
-Order = Literal["none", "lex"]
-PredicateFn = Callable[[Tensor, Mapping[str, Any]], Tensor]
-
-_CANONICAL_AXES = ("t", "x", "y", "z")
-_SPATIAL_AXES = ("x", "y", "z")
-_AXIS_COLUMNS = {"t": 0, "x": 1, "y": 2, "z": 3}
-_BOUNDARY_POLICIES = ("none", "fixed", "periodic", "reflective")
+class CarrierKind(Enum):
+    RECORD = "record"
+    HISTORY = "history"
+    GRID = "grid"
+    WORD = "word"
+    TREE = "tree"
+    GRAPH = "graph"
+    FIELD = "field"
+    PRODUCT = "product"
+    INTENSIONAL = "intensional"
 
 
 @dataclass(frozen=True)
-class CoordinateSpace:
-    """Canonical finite coordinate space."""
+class CarrierContract:
+    """Closed structural contract shared independently by program components."""
 
-    shape: tuple[int, ...]
-    steps: int | None = None
-    centered: bool = True
-    intervals: Mapping[str, tuple[int, ...]] = field(default_factory=dict)
+    kind: CarrierKind
+    rank: int | None = None
+    shape: tuple[int, ...] | None = None
+    axes: tuple[str, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported carrier-contract version {self.version}")
+        if self.rank is not None and self.rank < 0:
+            raise ValueError("carrier rank cannot be negative")
+        if self.shape is not None:
+            if any(size <= 0 for size in self.shape):
+                raise ValueError("carrier shape extents must be positive")
+            if self.rank is not None and len(self.shape) != self.rank:
+                raise ValueError("carrier shape and rank disagree")
+        if self.axes and self.rank is not None and len(self.axes) != self.rank:
+            raise ValueError("carrier axes and rank disagree")
+
+    def accepts(self, other: "CarrierContract") -> bool:
+        return (
+            self.kind is other.kind
+            and (self.rank is None or self.rank == other.rank)
+            and (self.shape is None or self.shape == other.shape)
+            and (not self.axes or self.axes == other.axes)
+        )
 
 
 @dataclass(frozen=True)
-class Selector:
-    """Reusable finite-coordinate selector specification."""
+class Boundary(Generic[V]):
+    policy: BoundaryPolicy
+    exterior: V | None = None
+    version: int = 1
 
-    universe: Any
-    predicates: tuple[PredicateFn, ...] = ()
-    combine: MaskOp = "and"
-    order: Order = "lex"
-    frame: Frame = "absolute"
-    read_mode: str | None = None
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported boundary version {self.version}")
+        if self.policy is BoundaryPolicy.FIXED and self.exterior is None:
+            raise ValueError("fixed boundary requires an exterior value")
+        if self.policy is not BoundaryPolicy.FIXED and self.exterior is not None:
+            raise ValueError("only fixed boundary carries an exterior value")
 
 
 @dataclass(frozen=True)
-class Selection:
-    """Concrete selector result."""
+class Carrier(Generic[V]):
+    """Closed carrier/support/topology data for a finite configuration."""
 
-    coords: Tensor | None
-    mask: Tensor
-    universe: Tensor
+    contract: CarrierContract
+    boundary: Boundary[V]
+    attributes: tuple[tuple[str, ClosedScalar], ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported carrier version {self.version}")
+        names = tuple(name for name, _ in self.attributes)
+        if len(names) != len(set(names)):
+            raise ValueError("carrier attributes must have unique names")
 
 
-def coordinate_space(
-    shape: Sequence[int],
-    steps: int | None = None,
-    centered: bool = True,
-) -> CoordinateSpace:
-    """Build a canonical finite coordinate space from native spatial extents."""
+@dataclass(frozen=True)
+class StructuralRelation:
+    """Closed structural side data such as incidence or order."""
 
-    spatial_shape = tuple(int(size) for size in shape)
-    if len(spatial_shape) > 3:
-        raise ValueError(f"shape rank must be 0..3, got {len(spatial_shape)}")
-    if any(size <= 0 for size in spatial_shape):
-        raise ValueError(f"shape extents must be positive, got {spatial_shape}")
+    tag: str
+    arguments: tuple[ClosedScalar | Locus, ...] = ()
+    version: int = 1
 
-    if steps is not None:
-        steps = int(steps)
-        if steps <= 0:
-            raise ValueError(f"steps must be positive when provided, got {steps}")
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported structural relation version {self.version}")
+        if not self.tag:
+            raise ValueError("structural relation tag cannot be empty")
 
-    intervals: dict[str, tuple[int, ...]] = {}
-    intervals["t"] = (0,) if steps is None else tuple(axis_values("t", steps, centered=False).tolist())
 
-    for axis_index, axis in enumerate(_SPATIAL_AXES):
-        if axis_index >= len(spatial_shape):
-            intervals[axis] = (0,)
-            continue
-        intervals[axis] = tuple(axis_values(axis, spatial_shape[axis_index], centered=centered).tolist())
+@dataclass(frozen=True)
+class FiniteConfiguration(Generic[V]):
+    """One immutable finite structural configuration."""
 
-    return CoordinateSpace(
-        shape=spatial_shape,
-        steps=steps,
-        centered=centered,
-        intervals=intervals,
+    carrier: Carrier[V]
+    entries: tuple[tuple[Locus, V], ...]
+    structure: tuple[StructuralRelation, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported configuration version {self.version}")
+        targets = tuple(target for target, _ in self.entries)
+        if len(targets) != len(set(targets)):
+            raise ValueError("configuration entries must have unique loci")
+        ordered = tuple(
+            sorted(self.entries, key=lambda item: canonical_order_key(item[0]))
+        )
+        if ordered != self.entries:
+            object.__setattr__(self, "entries", ordered)
+
+    @property
+    def contract(self) -> CarrierContract:
+        return self.carrier.contract
+
+    @property
+    def identity(self) -> str:
+        return canonical_identity(self)
+
+    def value_at(self, target: Locus) -> V:
+        for locus_value, value in self.entries:
+            if locus_value == target:
+                return value
+        raise KeyError(target)
+
+    def contains(self, target: Locus) -> bool:
+        return any(locus_value == target for locus_value, _ in self.entries)
+
+    def with_entries(
+        self,
+        entries: tuple[tuple[Locus, V], ...],
+        *,
+        structure: tuple[StructuralRelation, ...] | None = None,
+    ) -> "FiniteConfiguration[V]":
+        return FiniteConfiguration(
+            self.carrier,
+            entries,
+            self.structure if structure is None else structure,
+        )
+
+
+@dataclass(frozen=True)
+class IntensionalConfiguration:
+    """A complete closed presentation of a non-enumerated configuration."""
+
+    contract: CarrierContract
+    relation: SelectorExpr
+    identity_evidence: str
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported configuration version {self.version}")
+        if not self.identity_evidence:
+            raise ValueError("intensional configuration needs identity evidence")
+
+    @property
+    def identity(self) -> str:
+        return canonical_identity(self)
+
+
+Configuration: TypeAlias = FiniteConfiguration[V] | IntensionalConfiguration
+
+
+def record_configuration(
+    fields: tuple[tuple[str, V], ...],
+) -> FiniteConfiguration[V]:
+    if not fields:
+        raise ValueError("record configuration requires fields")
+    entries = tuple((named(name, scope="record"), value) for name, value in fields)
+    contract = CarrierContract(CarrierKind.RECORD, rank=0, shape=(), axes=())
+    return FiniteConfiguration(
+        Carrier(contract, Boundary(BoundaryPolicy.NONE)),
+        entries,
     )
 
 
-def active_axes(space_or_shape: CoordinateSpace | Sequence[int]) -> tuple[str, ...]:
-    """Return active spatial axes for a coordinate space or native shape."""
+def history_configuration(values: tuple[V, ...]) -> FiniteConfiguration[V]:
+    if not values:
+        raise ValueError("history configuration requires values")
+    entries = tuple(
+        (occurrence("history", index), value)
+        for index, value in enumerate(values)
+    )
+    contract = CarrierContract(
+        CarrierKind.HISTORY,
+        rank=1,
+        shape=(len(values),),
+        axes=("history",),
+    )
+    return FiniteConfiguration(
+        Carrier(contract, Boundary(BoundaryPolicy.NONE)),
+        entries,
+    )
 
-    shape = space_or_shape.shape if isinstance(space_or_shape, CoordinateSpace) else tuple(space_or_shape)
-    if len(shape) > 3:
-        raise ValueError(f"shape rank must be 0..3, got {len(shape)}")
-    return _SPATIAL_AXES[: len(shape)]
 
-
-def axis_values(axis: str, size: int, centered: bool = True) -> Tensor:
-    """Return coordinate values for one canonical axis."""
-
-    if axis not in _CANONICAL_AXES:
-        raise ValueError(f"unknown axis {axis!r}")
-
-    size = int(size)
+def centered_axis_values(size: int) -> tuple[int, ...]:
     if size <= 0:
-        raise ValueError(f"axis size must be positive, got {size}")
-
-    if axis == "t" or not centered:
-        return np.arange(size, dtype=np.int64)
-
-    if size % 2:
-        half = size // 2
-        return np.arange(-half, half + 1, dtype=np.int64)
-
-    half = size // 2
-    return np.arange(-half + 1, half + 1, dtype=np.int64)
+        raise ValueError("axis size must be positive")
+    low = -(size // 2)
+    return tuple(range(low, low + size))
 
 
-def coord_vectors(space_or_shape: CoordinateSpace | Sequence[int]) -> dict[str, Tensor]:
-    """Return coordinate vectors keyed by canonical axis name."""
-
-    if isinstance(space_or_shape, CoordinateSpace):
-        if space_or_shape.intervals:
-            return {
-                axis: np.asarray(tuple(space_or_shape.intervals[axis]), dtype=np.int64)
-                for axis in _CANONICAL_AXES
-            }
-
-        return coord_vectors(
-            coordinate_space(
-                space_or_shape.shape,
-                space_or_shape.steps,
-                space_or_shape.centered,
-            )
+def grid_loci(shape: tuple[int, ...]) -> tuple[Locus, ...]:
+    if len(shape) not in (1, 2, 3):
+        raise ValueError("grid rank must be 1, 2, or 3")
+    axes = ("x", "y", "z")[: len(shape)]
+    return tuple(
+        cell(tuple(values), axes=axes)
+        for values in cartesian_product(
+            *(centered_axis_values(size) for size in shape)
         )
-
-    shape = tuple(int(s) for s in space_or_shape)
-    if len(shape) > 3:
-        raise ValueError(f"shape rank must be 0..3, got {len(shape)}")
-
-    return {
-        axis: axis_values(axis, size)
-        for axis, size in zip(_SPATIAL_AXES, shape)
-    }
-
-
-def coord_grid(space_or_shape: CoordinateSpace | Sequence[int], frame: Frame = "absolute") -> Tensor:
-    """Build a coordinate grid with final dimension `[t, x, y, z]`."""
-
-    if frame not in ("absolute", "relative"):
-        raise ValueError(f"unknown frame {frame!r}")
-
-    vecs = coord_vectors(space_or_shape)
-    if isinstance(space_or_shape, CoordinateSpace):
-        axes = active_axes(space_or_shape)
-        if space_or_shape.steps is not None:
-            axes = ("t",) + axes
-    else:
-        axes = active_axes(space_or_shape)
-
-    if not axes:
-        return np.zeros((1, 4), dtype=np.int64)
-
-    meshes = np.meshgrid(*(vecs[axis] for axis in axes), indexing="ij")
-    out = np.zeros((*meshes[0].shape, 4), dtype=np.int64)
-    for axis, mesh in zip(axes, meshes):
-        out[..., _AXIS_COLUMNS[axis]] = mesh
-    return out
-
-
-def absolute_universe(
-    space: CoordinateSpace,
-    t: int | Sequence[int] | None = None,
-    axes: Sequence[str] | None = None,
-) -> Tensor:
-    """Create a finite universe of absolute canonical coordinates."""
-
-    if not isinstance(space, CoordinateSpace):
-        raise TypeError("absolute_universe requires a CoordinateSpace")
-
-    selected_axes = None
-    if axes is not None:
-        selected_axes = set(axes)
-        unknown = selected_axes.difference(_CANONICAL_AXES)
-        if unknown:
-            raise ValueError(f"unknown axes: {sorted(unknown)}")
-
-    vecs = coord_vectors(space)
-    if t is not None:
-        if isinstance(t, int):
-            time_values = np.asarray([t], dtype=np.int64)
-        else:
-            time_values = np.asarray(tuple(int(value) for value in t), dtype=np.int64)
-        if time_values.size == 0:
-            raise ValueError("t restriction cannot be empty")
-        if space.steps is not None:
-            valid_t = set(vecs["t"].tolist())
-            missing = [int(value) for value in time_values.tolist() if int(value) not in valid_t]
-            if missing:
-                raise ValueError(f"time coordinates outside coordinate space: {missing}")
-    elif selected_axes is None or "t" in selected_axes:
-        time_values = vecs["t"] if space.steps is not None else np.asarray([0], dtype=np.int64)
-    else:
-        time_values = np.asarray([0], dtype=np.int64)
-
-    values: dict[str, Tensor] = {"t": time_values}
-    active = set(active_axes(space))
-    for axis in _SPATIAL_AXES:
-        should_expand_axis = axis in active and (selected_axes is None or axis in selected_axes)
-        values[axis] = vecs[axis] if should_expand_axis else np.asarray([0], dtype=np.int64)
-
-    meshes = np.meshgrid(*(values[axis] for axis in _CANONICAL_AXES), indexing="ij")
-    return np.stack(meshes, axis=-1).reshape(-1, 4)
-
-
-def offset_universe(
-    time_offsets: Sequence[int],
-    ranges: Mapping[str, Sequence[int]],
-    active_axes: Sequence[str],
-    inactive_zero: bool = True,
-) -> Tensor:
-    """Create a finite universe of source-relative offset coordinates."""
-
-    active = tuple(active_axes)
-    unknown = set(active).difference(_SPATIAL_AXES)
-    if unknown:
-        raise ValueError(f"unknown active axes: {sorted(unknown)}")
-
-    time_values = np.asarray(tuple(int(value) for value in time_offsets), dtype=np.int64)
-    if time_values.size == 0:
-        raise ValueError("time_offsets cannot be empty")
-
-    values: dict[str, Tensor] = {"t": time_values}
-    for axis in _SPATIAL_AXES:
-        if axis not in active and (inactive_zero or axis not in ranges):
-            values[axis] = np.asarray([0], dtype=np.int64)
-            continue
-        if axis in active and axis not in ranges:
-            raise ValueError(f"missing offset range for active axis {axis!r}")
-        axis_values_t = np.asarray(tuple(int(value) for value in ranges[axis]), dtype=np.int64)
-        if axis_values_t.size == 0:
-            raise ValueError(f"offset range for axis {axis!r} cannot be empty")
-        values[axis] = axis_values_t
-
-    meshes = np.meshgrid(*(values[axis] for axis in _CANONICAL_AXES), indexing="ij")
-    return np.stack(meshes, axis=-1).reshape(-1, 4)
-
-
-def selector(
-    universe: Any,
-    predicates: Sequence[PredicateFn] = (),
-    combine: MaskOp = "and",
-    order: Order = "lex",
-    frame: Frame = "absolute",
-    read_mode: str | None = None,
-) -> Selector:
-    """Package a universe, predicates, combiner, order, and frame."""
-
-    if combine not in ("identity", "and", "or", "xor"):
-        raise ValueError(f"unknown mask combiner {combine!r}")
-    if order not in ("none", "lex"):
-        raise ValueError(f"unknown order {order!r}")
-    if frame not in ("absolute", "relative"):
-        raise ValueError(f"unknown frame {frame!r}")
-    return Selector(
-        universe=universe,
-        predicates=tuple(predicates),
-        combine=combine,
-        order=order,
-        frame=frame,
-        read_mode=read_mode,
     )
 
 
-def select(spec: Selector, context: Mapping[str, Any] | None = None) -> Selection:
-    """Evaluate a selector in context."""
+def grid_configuration(
+    shape: tuple[int, ...],
+    values: tuple[V, ...],
+    *,
+    boundary: Boundary[V],
+) -> FiniteConfiguration[V]:
+    targets = grid_loci(shape)
+    if len(values) != len(targets):
+        raise ValueError(
+            f"grid needs {len(targets)} values for shape {shape}, got {len(values)}"
+        )
+    axes = ("x", "y", "z")[: len(shape)]
+    contract = CarrierContract(
+        CarrierKind.GRID,
+        rank=len(shape),
+        shape=shape,
+        axes=axes,
+    )
+    return FiniteConfiguration(
+        Carrier(contract, boundary),
+        tuple(zip(targets, values)),
+    )
 
-    context = {} if context is None else context
-    universe = spec.universe(context) if callable(spec.universe) else spec.universe
-    universe = np.asarray(universe)
-    if universe.shape[-1:] != (4,):
-        raise ValueError(f"selector universe must have final dimension 4, got {tuple(universe.shape)}")
 
-    candidates = universe.reshape(-1, 4)
-    if not spec.predicates:
-        selected_mask = np.ones(candidates.shape[0], dtype=bool)
-    else:
-        predicate_masks = []
-        for predicate_fn in spec.predicates:
-            predicate_mask = np.asarray(predicate_fn(candidates, context), dtype=bool)
-            if predicate_mask.size == 1:
-                predicate_mask = np.broadcast_to(predicate_mask, (candidates.shape[0],))
+def resolve_region(
+    region: Region,
+    configuration: FiniteConfiguration[V],
+) -> tuple[Locus, ...]:
+    """Resolve the finite existing-locus portion of a raw region."""
+
+    if region.kind is RegionKind.LITERAL:
+        return tuple(
+            target
+            for target in region.loci
+            if configuration.contains(target)
+        )
+    if region.kind in (RegionKind.ALL_SUPPORT, RegionKind.CURRENT_SUPPORT):
+        return tuple(target for target, _ in configuration.entries)
+    if region.kind is RegionKind.UNION:
+        seen: set[Locus] = set()
+        out: list[Locus] = []
+        for part in region.parts:
+            for target in resolve_region(part, configuration):
+                if target not in seen:
+                    seen.add(target)
+                    out.append(target)
+        return tuple(sorted(out, key=canonical_order_key))
+    if region.kind is RegionKind.PRODUCT:
+        out: list[Locus] = []
+        for part in region.parts:
+            out.extend(resolve_region(part, configuration))
+        return tuple(out)
+    raise ValueError(f"region {region.kind.value} is not finitely resolvable here")
+
+
+def grid_coordinates(target: Locus) -> tuple[int, ...]:
+    if target.kind is not LocusKind.COORDINATE or not target.scope.startswith("grid:"):
+        raise ValueError("target is not a grid-cell locus")
+    values = target.path
+    if len(values) % 2:
+        raise ValueError("malformed grid-cell locus")
+    return tuple(int(values[index]) for index in range(1, len(values), 2))
+
+
+def read_grid_value(
+    configuration: FiniteConfiguration[V],
+    coordinates: tuple[int, ...],
+) -> V | None:
+    """Read one grid coordinate using the carrier's explicit boundary law."""
+
+    contract = configuration.contract
+    if contract.kind is not CarrierKind.GRID or contract.shape is None:
+        raise ValueError("configuration is not a finite grid")
+    axes = contract.axes
+    bounds = tuple(centered_axis_values(size) for size in contract.shape)
+    adjusted = list(coordinates)
+    outside = False
+    for index, (coordinate_value, axis_values) in enumerate(zip(adjusted, bounds)):
+        if coordinate_value in axis_values:
+            continue
+        outside = True
+        policy = configuration.carrier.boundary.policy
+        if policy is BoundaryPolicy.NONE:
+            return None
+        if policy is BoundaryPolicy.FIXED:
+            return configuration.carrier.boundary.exterior
+        if policy is BoundaryPolicy.PERIODIC:
+            adjusted[index] = axis_values[
+                (coordinate_value - axis_values[0]) % len(axis_values)
+            ]
+        elif policy is BoundaryPolicy.REFLECTIVE:
+            if len(axis_values) == 1:
+                adjusted[index] = axis_values[0]
             else:
-                predicate_mask = predicate_mask.reshape(-1)
-            if predicate_mask.size != candidates.shape[0]:
-                raise ValueError(
-                    f"predicate returned {predicate_mask.size} values for {candidates.shape[0]} candidates"
-                )
-            predicate_masks.append(predicate_mask)
-        selected_mask = combine_masks(predicate_masks, spec.combine)
+                period = 2 * (len(axis_values) - 1)
+                offset = (coordinate_value - axis_values[0]) % period
+                if offset >= len(axis_values):
+                    offset = period - offset
+                adjusted[index] = axis_values[offset]
+    if outside and configuration.carrier.boundary.policy is BoundaryPolicy.FIXED:
+        return configuration.carrier.boundary.exterior
+    return configuration.value_at(cell(tuple(adjusted), axes=axes))
 
-    coords = candidates[selected_mask]
-    if spec.order == "lex" and coords.size:
-        coords = order_lex(coords)
 
-    return Selection(
-        coords=coords,
-        mask=selected_mask.reshape(universe.shape[:-1]),
-        universe=universe,
+def canonical_order_key(value: Locus | FreshReference) -> tuple[str, ...]:
+    """Return an exact, cross-type ordering key for structural identities."""
+
+    if isinstance(value, FreshReference):
+        return (
+            "fresh-reference",
+            value.namespace,
+            _canonical_scalar(value.local_key),
+            "" if value.parent is None else canonical_identity(value.parent),
+            *(canonical_identity(item) for item in value.interface),
+        )
+    return (
+        value.kind.value,
+        value.scope,
+        *(_canonical_scalar(part) for part in value.path),
     )
 
 
-def mask(spec: Selector, context: Mapping[str, Any] | None = None) -> Tensor:
-    """Return the unordered support mask for a selector."""
-
-    return select(spec, context).mask
-
-
-def combine_masks(masks: Sequence[Tensor], op: MaskOp = "and") -> Tensor:
-    """Combine Boolean masks with selector Boolean algebra."""
-
-    masks = [np.asarray(mask, dtype=bool) for mask in masks]
-    if not masks:
-        raise ValueError("at least one mask is required")
-
-    if op == "identity":
-        if len(masks) != 1:
-            raise ValueError("identity combiner requires exactly one mask")
-        return masks[0]
-    if op not in ("and", "or", "xor"):
-        raise ValueError(f"unknown mask combiner {op!r}")
-
-    result = masks[0]
-    for next_mask in masks[1:]:
-        if op == "and":
-            result = result & next_mask
-        elif op == "or":
-            result = result | next_mask
-        else:
-            result = result ^ next_mask
-    return result
+def _canonical_scalar(value: ClosedScalar) -> str:
+    if isinstance(value, bool):
+        return f"bool:{int(value)}"
+    if isinstance(value, Fraction):
+        return f"fraction:{value.numerator}/{value.denominator}"
+    if isinstance(value, int):
+        return f"int:{value}"
+    return f"str:{len(value)}:{value}"
 
 
-def not_mask(mask: Tensor) -> Tensor:
-    """Return the Boolean complement of a support mask."""
-
-    return ~np.asarray(mask, dtype=bool)
-
-
-def order_lex(coords: Tensor, axes: Sequence[str] = ("t", "x", "y", "z")) -> Tensor:
-    """Return coordinates in deterministic lexicographic order."""
-
-    coords_t = np.asarray(coords)
-    if coords_t.shape[-1:] != (4,):
-        raise ValueError(f"coords must have final dimension 4, got {tuple(coords_t.shape)}")
-
-    columns = []
-    for axis in axes:
-        if axis not in _AXIS_COLUMNS:
-            raise ValueError(f"unknown axis {axis!r}")
-        columns.append(_AXIS_COLUMNS[axis])
-
-    flat = coords_t.reshape(-1, 4)
-    if flat.shape[0] == 0:
-        return flat
-    order = np.lexsort(tuple(flat[:, column] for column in reversed(columns)))
-    return flat[order]
-
-
-def axis_project(coords: Tensor, axes: Sequence[str]) -> Tensor:
-    """Project canonical coordinate arrays onto a named axis set."""
-
-    coords_t = np.asarray(coords)
-    if coords_t.shape[-1:] != (4,):
-        raise ValueError(f"coords must have final dimension 4, got {tuple(coords_t.shape)}")
-
-    columns = []
-    for axis in axes:
-        if axis not in _AXIS_COLUMNS:
-            raise ValueError(f"unknown axis {axis!r}")
-        columns.append(_AXIS_COLUMNS[axis])
-    return coords_t[..., columns]
-
-
-def predicate(
-    fn: PredicateFn,
-    params: Mapping[str, Any] | None = None,
-    name: str | None = None,
-) -> PredicateFn:
-    """Wrap a coordinate predicate with fixed parameters."""
-
-    fixed_params = dict(params or {})
-
-    def wrapped(coords: Tensor, context: Mapping[str, Any]) -> Tensor:
-        merged = dict(context)
-        merged.update(fixed_params)
-        return fn(coords, merged)
-
-    if name is not None:
-        wrapped.__name__ = name
-    return wrapped
-
-
-def coord_eq(axis: str, value: int) -> PredicateFn:
-    """Predicate factory for equality on one canonical axis."""
-
-    if axis not in _AXIS_COLUMNS:
-        raise ValueError(f"unknown axis {axis!r}")
-    column = _AXIS_COLUMNS[axis]
-    value = int(value)
-
-    def pred(coords: Tensor, context: Mapping[str, Any]) -> Tensor:
-        return np.asarray(coords)[..., column] == value
-
-    return pred
-
-
-def coord_between(axis: str, low: int, high: int) -> PredicateFn:
-    """Predicate factory for inclusive interval selection on one axis."""
-
-    if axis not in _AXIS_COLUMNS:
-        raise ValueError(f"unknown axis {axis!r}")
-    low, high = int(low), int(high)
-    if low > high:
-        raise ValueError(f"low must be <= high, got {low} > {high}")
-    column = _AXIS_COLUMNS[axis]
-
-    def pred(coords: Tensor, context: Mapping[str, Any]) -> Tensor:
-        coords_t = np.asarray(coords)
-        return (coords_t[..., column] >= low) & (coords_t[..., column] <= high)
-
-    return pred
-
-
-def sum_axes(coords: Tensor, axes: Sequence[str]) -> Tensor:
-    """Sum projected coordinate values over an explicit axis set."""
-
-    return axis_project(coords, axes).sum(axis=-1)
-
-
-def count_where(mask: Tensor, values: Sequence[int] | None = None) -> Tensor:
-    """Count true values along the last axis, optionally testing membership."""
-
-    counts = np.asarray(mask, dtype=bool).sum(axis=-1)
-    if values is None:
-        return counts
-
-    values_t = np.asarray(tuple(int(value) for value in values), dtype=counts.dtype)
-    if values_t.size == 0:
-        return np.zeros_like(counts, dtype=bool)
-    return np.isin(counts, values_t)
-
-
-def norm(
-    coords: Tensor,
-    axes: Sequence[str],
-    metric: Literal["l1", "l2", "linf"],
-    center: Mapping[str, int] | None = None,
-) -> Tensor:
-    """Compute an axis-scoped metric norm over projected coordinates."""
-
-    if metric not in ("l1", "l2", "linf"):
-        raise ValueError(f"unknown metric {metric!r}")
-
-    projected = axis_project(coords, axes)
-    if projected.shape[-1] == 0:
-        return np.zeros(projected.shape[:-1], dtype=np.float32)
-
-    if center is not None:
-        center_values = np.asarray([int(center.get(axis, 0)) for axis in axes], dtype=projected.dtype)
-        projected = projected - center_values
-
-    projected_abs = np.abs(projected)
-    if metric == "l1":
-        return projected_abs.sum(axis=-1)
-    if metric == "l2":
-        return np.sqrt(np.square(projected_abs.astype(np.float32)).sum(axis=-1))
-    return projected_abs.max(axis=-1)
-
-
-def mod_eq(values: Tensor, modulus: int, phase: int = 0) -> Tensor:
-    """Return `values % modulus == phase` as a Boolean mask."""
-
-    modulus = int(modulus)
-    if modulus <= 0:
-        raise ValueError(f"modulus must be positive, got {modulus}")
-    return np.remainder(values, modulus) == (int(phase) % modulus)
-
-
-def state_exists(offset_selector: Selector, value: int) -> PredicateFn:
-    """Predicate factory for state-dependent existence tests."""
-
-    value = int(value)
-
-    def pred(coords: Tensor, context: Mapping[str, Any]) -> Tensor:
-        if "values" not in context:
-            raise KeyError("state_exists requires context['values']")
-
-        selection = select(offset_selector, context)
-        offsets = selection.coords
-        if offsets is None:
-            flat_universe = selection.universe.reshape(-1, 4)
-            offsets = flat_universe[selection.mask.reshape(-1)]
-
-        coords_arr = np.asarray(coords, dtype=np.int64)
-        coords_flat = coords_arr.reshape(-1, 4)
-        output_shape = coords_arr.shape[:-1]
-        if offsets.size == 0:
-            return np.zeros(output_shape, dtype=bool)
-
-        query_coords = coords_flat[:, None, :] + offsets[None, :, :]
-        gathered = gather(
-            query_coords.reshape(-1, 4),
-            np.asarray(context["values"]),
-            context.get("boundary"),
+def _canonical_term(value: object) -> str:
+    if isinstance(value, (bool, int, Fraction, str)):
+        return _canonical_scalar(value)
+    if isinstance(value, Enum):
+        return f"enum:{value.__class__.__name__}:{value.value}"
+    if isinstance(value, tuple):
+        return "tuple[" + ",".join(_canonical_term(item) for item in value) + "]"
+    if value is None:
+        return "none"
+    fields = getattr(value, "__dataclass_fields__", None)
+    if fields is not None:
+        parts = tuple(
+            f"{name}={_canonical_term(getattr(value, name))}"
+            for name in fields
         )
-        gathered = gathered.reshape(coords_flat.shape[0], offsets.shape[0])
-        return (gathered == value).any(axis=-1).reshape(output_shape)
-
-    return pred
+        return f"{value.__class__.__name__}(" + ",".join(parts) + ")"
+    raise TypeError(f"{type(value).__name__} is not closed structural data")
 
 
-def gather(coords: Tensor, values: Tensor, boundary: Mapping[str, Any] | None = None) -> Tensor:
-    """Gather native array values at canonical coordinates."""
+def canonical_identity(value: object) -> str:
+    """Derive a stable semantic identity from closed structural data."""
 
-    values_arr = np.asarray(values)
-    coords_arr = np.asarray(coords, dtype=np.int64)
-    if coords_arr.shape[-1:] != (4,):
-        raise ValueError(f"coords must have final dimension 4, got {tuple(coords_arr.shape)}")
-
-    boundary = {} if boundary is None else dict(boundary)
-    allowed_boundary_fields = {"policy", "value", "coordinate_space"}
-    extra_boundary_fields = set(boundary).difference(allowed_boundary_fields)
-    if extra_boundary_fields:
-        raise ValueError(f"unsupported boundary fields: {sorted(extra_boundary_fields)}")
-
-    space = boundary.get("coordinate_space")
-    if space is None and values_arr.ndim == 0:
-        space = coordinate_space(())
-    if space is None:
-        space = coordinate_space(tuple(values_arr.shape[1:]), steps=int(values_arr.shape[0]))
-    if not isinstance(space, CoordinateSpace):
-        raise TypeError("boundary['coordinate_space'] must be a CoordinateSpace")
-
-    policy = boundary.get("policy", "none")
-    if not isinstance(policy, str):
-        raise TypeError(f"boundary policy must be a string, got {type(policy).__name__}")
-    policy = policy.lower()
-    if policy not in _BOUNDARY_POLICIES:
-        raise ValueError(f"unknown boundary policy {policy!r}")
-    if policy != "fixed" and "value" in boundary:
-        raise ValueError("boundary field 'value' is only valid for fixed policy")
-    fill_value = boundary.get("value", 0)
-
-    mapped = coords_arr.copy()
-    valid = np.ones(coords_arr.shape[:-1], dtype=bool)
-
-    if space.steps is not None:
-        t_low, t_high = int(space.intervals["t"][0]), int(space.intervals["t"][-1])
-        t_coord = mapped[..., 0]
-        valid &= (t_coord >= t_low) & (t_coord <= t_high)
-        mapped[..., 0] = np.clip(t_coord, t_low, t_high)
-
-    active = set(active_axes(space))
-    for axis in _SPATIAL_AXES:
-        col = _AXIS_COLUMNS[axis]
-        coord = mapped[..., col]
-        if axis not in active:
-            valid &= coord == 0
-            mapped[..., col] = 0
-            continue
-
-        interval = space.intervals[axis]
-        low, high = int(interval[0]), int(interval[-1])
-        size = len(interval)
-        in_bounds = (coord >= low) & (coord <= high)
-
-        if policy == "periodic":
-            mapped[..., col] = np.remainder(coord - low, size) + low
-            continue
-        if policy == "reflective":
-            if size == 1:
-                mapped[..., col] = low
-                continue
-            period = 2 * size - 2
-            reflected = np.remainder(coord - low, period)
-            reflected = np.where(reflected < size, reflected, period - reflected)
-            mapped[..., col] = reflected + low
-            continue
-        valid &= in_bounds
-        mapped[..., col] = np.clip(coord, low, high)
-
-    if not bool(valid.all()) and policy != "fixed":
-        raise IndexError("coordinates outside coordinate space and no fixed boundary policy was provided")
-
-    indices = native_indices(mapped, space)
-    if indices:
-        result = values_arr[indices]
-    else:
-        result = np.broadcast_to(values_arr, coords_arr.shape[:-1])
-
-    if bool(valid.all()):
-        return np.asarray(result)
-
-    fill = np.asarray(fill_value, dtype=np.asarray(result).dtype)
-    return np.where(valid, result, fill)
+    payload = _canonical_term(value).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
-def native_indices(coords: Tensor, space: CoordinateSpace) -> tuple[Tensor, ...]:
-    """Convert canonical coordinates to native array index arrays."""
+def semantic_equal(left: object, right: object) -> bool:
+    """Exact structural equality with no representation or hash shortcut."""
 
-    coords_arr = np.asarray(coords, dtype=np.int64)
-    if coords_arr.shape[-1:] != (4,):
-        raise ValueError(f"coords must have final dimension 4, got {tuple(coords_arr.shape)}")
-    if not isinstance(space, CoordinateSpace):
-        raise TypeError("native_indices requires a CoordinateSpace")
+    return type(left) is type(right) and _canonical_term(left) == _canonical_term(right)
 
-    intervals = space.intervals
-    if not intervals:
-        intervals = coordinate_space(space.shape, space.steps, space.centered).intervals
 
-    indices: list[Tensor] = []
-    if space.steps is not None:
-        indices.append(coords_arr[..., _AXIS_COLUMNS["t"]] - int(intervals["t"][0]))
-    for axis in active_axes(space):
-        column = _AXIS_COLUMNS[axis]
-        indices.append(coords_arr[..., column] - int(intervals[axis][0]))
-    return tuple(np.asarray(index, dtype=np.intp) for index in indices)
+def bind_fresh(
+    reference: FreshReference,
+    *,
+    input_configuration_identity: str,
+    canonical_rule_identity: str,
+    witness_identity: str,
+) -> Locus:
+    """Bind one fresh local key from its semantic structural scope."""
+
+    scope = canonical_identity(
+        (
+            input_configuration_identity,
+            canonical_rule_identity,
+            witness_identity,
+            reference.namespace,
+            reference.local_key,
+            reference.parent,
+            reference.interface,
+        )
+    )
+    return Locus(
+        LocusKind.FRESH,
+        reference.namespace,
+        (scope, reference.local_key),
+    )
+
+
+__all__ = [
+    "Boundary",
+    "BoundaryPolicy",
+    "Carrier",
+    "CarrierContract",
+    "CarrierKind",
+    "ClosedScalar",
+    "Configuration",
+    "FiniteConfiguration",
+    "FreshReference",
+    "IntensionalConfiguration",
+    "Locus",
+    "LocusKind",
+    "Region",
+    "RegionKind",
+    "SelectorExpr",
+    "SelectorPrimitive",
+    "StructuralRelation",
+    "all_support",
+    "bind_fresh",
+    "canonical_identity",
+    "canonical_order_key",
+    "cell",
+    "centered_axis_values",
+    "continuous_region",
+    "coordinate",
+    "current_support",
+    "field_point",
+    "fresh_children",
+    "fresh_reference",
+    "graph_element",
+    "grid_configuration",
+    "grid_coordinates",
+    "grid_loci",
+    "history_configuration",
+    "intensional",
+    "intensional_reference",
+    "interface",
+    "literal",
+    "named",
+    "occurrence",
+    "path",
+    "port",
+    "product_locus",
+    "read_grid_value",
+    "record_configuration",
+    "region_product",
+    "relative",
+    "resolve_region",
+    "semantic_equal",
+    "span",
+    "union",
+]
