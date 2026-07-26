@@ -124,6 +124,10 @@ claim that the family has no cross-workstream dependencies. G7-03 follows the
 closed semantic variants so codecs are not designed around temporary records.
 G7-04 only composes already-tested mechanics.
 
+G7-00 through G7-05 are internal implementation checkpoints, not release
+candidates. Although G7-01 sets the source version for the breaking cutover,
+only the fully reconciled G7-06 state may be packaged or shipped as `0.2.0`.
+
 ## File-Level Migration
 
 ### Runtime and package files
@@ -169,7 +173,7 @@ count moves from 20 to 28.
 | `tests/test_seeds.py` | Retain and replace ambient RNG/render assumptions with closed Seed-law and explicit realization tests |
 | `tests/test_specs.py` | Delete after its useful manifest cases become negative cutover tests in serialization/public-surface suites |
 | `tests/test_rollout.py` | Rewrite around `SimpleProgram`, `apply`, and apply-owned rollout; move only independently derived expected steps into CT12 oracles |
-| `tests/test_datasets.py` | Retain and adapt to catalog construction plus downstream materialization |
+| `tests/test_datasets.py` | Retain and adapt at G7-01 to direct program recipes plus downstream materialization; after G7-04, add catalog-delegate/equality cases without moving mechanics into the catalog |
 | `tests/test_rng.py` | Retain for external deterministic helpers; assert the semantic core does not import it |
 | `tests/test_viz_export.py` | Retain and adapt to explicit downstream view records |
 
@@ -202,7 +206,7 @@ tests/conformance/
 ```
 
 Exact helper spelling may stay private, but each named conformance
-responsibility and test file must exist by G7-08.
+responsibility and test file must exist by G7-05.
 
 ## Ordered Implementation Stages
 
@@ -418,6 +422,11 @@ generic application before G7-02 is complete. A workstream assignment is a
 primary ownership/test destination, not a claim that a family has no
 cross-workstream dependency.
 
+The SPF-row owner owns that family's direct construction fixture and dominant
+mechanical skeleton. The PX lead owns the shared cross-family pressure
+invariant and suite. Both obligations land before the aggregate barrier, so
+these two ownership views never create separate readiness claims.
+
 Exit:
 
 - all 60 mechanics assignments below are implemented without a family-named
@@ -429,6 +438,15 @@ Exit:
   `apply`, or ambient lookup;
 - F004/F045 have executable commits while F010/F042 remain roles; and
 - the full active suite remains green with exactly one application path.
+
+General numerical solvers and integrators are not core runtime services.
+Constraints, equations, objectives, flows, and differential laws ship as
+exact or intensional Rule denotations. A finite numerical realization, when
+desired, belongs to separately versioned external tooling and returns
+evidence naming its method, parameters, tolerances, precision, and source
+denotation. Tiny exact fixtures establish conformance; performance choices may
+change realization cost but never program denotation, equality, or exact
+outcomes.
 
 ### G7-03 — Canonical serialization and representation relations
 
@@ -466,6 +484,9 @@ Files: all eight `catalog/` files, root catalog namespace, new
 Implement:
 
 - exactly 60 canonical exact-slug constructors, each once in its primary home;
+- one explicit, closed Python signature and closed-parameter validator for
+  every canonical constructor; no constructor accepts `*args`, `**kwargs`, an
+  opaque recipe bag, ignored keywords, or silent coercions;
 - immutable callable-free `FamilyEntry`, `RoleEntry`, `LegacyEntry`,
   `LegacyTarget`, and `NameEntry` values;
 - canonical, preset, alias, and compatibility callables as explicit ordinary
@@ -484,7 +505,8 @@ Exit:
   F043–F063; F010/F042 are the two close roles and F039 remains unused;
 - legacy dispositions count exactly 15 retain-family, 21 retain-preset,
   2 merge, 3 repair, 2 alias, 1 retire-role, and 1 split, with each row's
-  exact candidate and named-source join retained;
+  exact candidate and named-source join retained, except for T08's explicit
+  no-candidate/no-Book-construction-anchor role disposition;
 - F010 and F042 are callable-free roles; T08 has zero targets; T40 has two
   named targets; every other T row has one;
 - the 49 callable legacy relations count exactly `C=5`, `P=39`, `A=4`,
@@ -493,6 +515,9 @@ Exit:
 - T32 and T44 are presets, not aliases;
 - every callable expansion is an ordinary validated five-field value and
   passes its exact delegate/binding/translation equality; and
+- every constructor composes only G7-02 semantic variants already present in
+  G7-03's completed codec inventory; discovering a missing mechanic reopens
+  G7-02 and G7-03 before catalog work resumes; and
 - there is no `construct(id)`, umbrella `kind=`, registration hook, callable
   metadata, or catalog execution path.
 
@@ -530,6 +555,9 @@ Actions:
 
 - make `README-V2.md` document the implemented five-field runtime, while
   retaining `README-V1.md` only as an explicitly historical snapshot;
+- add the promised 0.1 source-migration note to `README-V2.md` and `api.md`:
+  callers reconstruct programs through catalog constructors or explicit
+  five-field construction; old `Dynamics` manifests are not canonical input;
 - remove “pending target” language from `api.md` without changing its contract;
 - verify conceptual prose and scaffold against exact public signatures,
   ownership, schema version, and catalog exports;
@@ -622,16 +650,16 @@ implementation until the end.
 | Closed versioned structural descriptors and validation | G7-01–02 semantic owners | CT02, CT09 |
 | No callbacks, `Any`, `eval`, formula strings, host CAS, generators, or iterator escape | G7-01–04 closed variants | CT02, CT13 |
 | Exact numeric semantics; no silent float fallback | `alphabets.py`, closed Rule/value data | CT02, CT09–10 |
-| Visible head/control/instruction/phase/schedule/program state | Seed-produced `C`, G7-04A mechanics | PX01, PX07–09 |
+| Visible head/control/instruction/phase/schedule/program state | Seed-produced `C`, G7-02 M-A/M-B mechanics | PX01, PX07–09 |
 | Visible laws, entropy boundary, and replay evidence | `seeds.py`, `rules.py`, `program.py` | CT06 |
-| One generic branch-free application path | `program.py`; old executor deleted G7-07 | CT03–04, CT13 |
+| One generic branch-free application path | `program.py`; old executor deleted G7-01 | CT03–04, CT13 |
 | Typed cardinality/outcome/failure/witness/lineage/provenance | `rules.py` and `program.py` | CT05, CT08–09 |
 | Witnesses retained before successor deduplication | `program.py` quotient | CT08 |
 | Raw structural traces before tensor/rendered views | `program.py`; downstream adapters | CT12–14 |
 | Inverse-on-image and full-result one-step commutation | semantic representation records | CT10 |
 | Lossless codecs, unknown-tag failure, derived IDs/digests | `serialization.py` | CT09 |
 | Presets construct data; no executor registry | `catalog/` explicit callables | CT11, CT13 |
-| In-place migration with no second/fallback executor | G7-07 cutover | CT12–13 |
+| In-place migration with no second/fallback executor | G7-01 atomic cutover | CT12–13 |
 | Typed unsupported/undefined instead of defaults | Rule/Application fault and outcome sums | CT03, CT05 |
 | Canonical Book sources for claims without rediscovery | callable-free `entries.py` metadata | CT11 and 60-family join |
 
@@ -646,20 +674,20 @@ These decisions are closed; Goal 7 does not reopen them for convenience.
 
 | Question | Decision |
 |---|---|
-| `Dynamics` façade | None. `Dynamics` cannot by itself losslessly supply Seed, Alphabet, or the moved configuration structure. Delete it at G7-07 rather than preserve a misleading partial program |
+| `Dynamics` façade | None. `Dynamics` cannot by itself losslessly supply Seed, Alphabet, or the moved configuration structure. Delete it at G7-01 rather than preserve a misleading partial program |
 | `dynamics_from_spec` and 0.1 manifests | Retire. They were construction recipes, not a canonical codec. Document a one-time source migration to catalog constructors or explicit five-field construction; `serialization.loads` rejects them |
 | Canonical serialization | First canonical schema is `ca.simple-program` version `1`; there is no version-0 semantic payload to migrate |
 | Package version | Ship the breaking pre-1.0 cutover as `0.2.0` |
 | `RawEpisode` / `RawBatch` | Remove from semantic core and root. Dense dataset views become downstream `DatasetEpisode` / `DatasetBatch`; canonical traversal returns `program.RolloutResult` |
 | `rollout_batch` | Remove from core/root. Dataset batching is external iteration/materialization over the one rollout path |
 | `apply_rule` | Remove. One-step semantics are only `program.apply` |
-| `canonical_coords` | Remove from root. Coordinate/tensor materialization remains a loci/dataset/viz representation helper |
+| `canonical_coords` | Remove from root. Canonical coordinate tables and trajectory tensor projections become private dataset-view helpers; finite selector materialization remains private to `loci.py` |
 | public `rollout.py` | Physically delete; do not merely omit from `__all__` and do not retain the old executor in a private module |
 | `Frontier` / `Neighborhood` class names | Retire them at the 0.2.0 cutover. Their old meanings are not lossless spelling aliases. Canonical owner-module names are only `WritableRegion` / `ReadableRegion`; the stored field names remain `frontier` / `neighborhood` |
 | `time_slice` frontier | Do not preserve as an alias because its old firing-source/implicit-next-time meaning is not the new writable-envelope contract. Migrate callers to an exact writable-region constructor such as `everywhere` or the appropriate structural envelope |
-| `seeds.render(..., rng=None)` | Remove as semantic behavior. Explicit downstream realization requires a replay/sampler input and returns evidence; deterministic view materialization may remain downstream |
-| broad root constructors/types | Remove at G7-07. Component constructors are module-qualified; whole-program names are under `ca.catalog` |
-| current Dyad*/AR2 names | Retain only as closed component presets or catalog programs where their expansion meets the new contracts; never as root executors or family switches |
+| `seeds.render`, `seeds.dedupe`, bulk `seeds.structured` | Remove as public Seed behavior. Program-owned Seed realization requires an authorized key and returns evidence; dataset-only structured recipe enumeration/deduplication becomes private dataset helpers |
+| broad root constructors/types | Remove at G7-01. Component constructors are module-qualified; whole-program names are under `ca.catalog` |
+| current Dyad*/AR2 names | Retain exactly six Rule presets—`ar2_modular_0d`, `dyadlags_0d`, `lagcounts_0d`, `dyadrads_1d`, `dyadaxes_2d`, `dyadaxes_3d`—and six corresponding Neighborhood presets—`ar2_0d`, `dyadlags_0d`, `lagcounts_0d`, `dyadrads_1d`, `dyadaxes_2d`, `dyadaxes_3d`. They remain module-qualified components, never root exports, unaudited catalog rows, executors, or family switches |
 | catalog compatibility | Implement exactly the catalog ledger. T10's `extended_mobile_automaton` is the sole `K`, category-qualified and deprecated; no additional guessed legacy callables |
 | alias lifetime | True `A` aliases and declared `P` presets are stable catalog API. No temporary component type aliases are shipped |
 | datasets | Retain current module during Goal 7, but build explicit programs and use generic rollout; no family strings choose mechanics |
@@ -682,6 +710,15 @@ At every stage:
 - Rule owns applicability, schedule, conflict, stochastic law, stopping, and
   total replacement semantics;
 - application owns only generic validation/reconstruction/commit/quotient;
+- `apply` does not dispatch on locus kind, Rule tag, family, carrier, or
+  catalog identity. An owning component module may interpret its own sealed
+  generic AST/result variants without selecting a second application law;
+- the static import DAG is enforced: `loci`, `alphabets`, `seeds`,
+  `frontiers`, and `neighborhoods` do not import `rules`, `program`, or
+  catalog; `rules` does not import `program` or catalog; semantic owners never
+  import `serialization`; `program` and `serialization` never import catalog;
+  internals never import root `ca`; and core never imports datasets, RNG, or
+  visualization;
 - core never imports catalog, datasets, RNG helpers, or visualization;
 - serialization never imports catalog or reconstructs a constructor call;
 - category modules never import `catalog.entries`; `catalog.__init__` is the
@@ -691,7 +728,9 @@ At every stage:
   commit, inferred structural repair, or result-policy keyword appears;
 - F045 evaluator code is closed Rule data with visible work state and never
   recursively calls `apply`; and
-- the test oracle never calls the implementation it judges.
+- the test oracle never calls the implementation it judges;
+- the complete active suite is green at every completed stage; and
+- Goal 2 and Goal 5 remain byte-for-byte frozen throughout Goal 7.
 
 ## Final Goal 7 Completion Gate
 
@@ -700,7 +739,8 @@ Goal 7 is complete only when:
 1. the target files and exports match this handoff;
 2. `specs.py` and public `rollout.py` are absent;
 3. exactly one application law exists and rollout demonstrably reuses it;
-4. CT01–CT14 and the 60-family coverage test pass;
+4. CT01–CT14, PX01–PX12, all eight named secondary pressure joins, and the
+   60-family coverage test pass;
 5. all exact SPF/F/T counts, homes, callable kinds, exports, and role
    boundaries match `catalog-migration.md`;
 6. current useful native behavior commutes with generic semantics through
@@ -709,8 +749,8 @@ Goal 7 is complete only when:
    catalog-free;
 8. datasets, RNG, and visualization remain downstream with no semantic or
    executor authority;
-9. source, installed wheel, public signatures, docs, and reference scaffold
-   agree; and
+9. source, installed wheel, public signatures, docs, reference scaffold,
+   `pyproject.toml`, and `uv.lock` agree; and
 10. one final hostile review finds no covert sixth field, second executor,
     family dispatch, lossy compatibility path, or missing audited family.
 
