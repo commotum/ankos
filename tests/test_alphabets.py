@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from ca import alphabets
+from ca import alphabets, loci
 
 
 def test_alphabet_descriptors_are_closed_and_versioned() -> None:
@@ -137,3 +137,197 @@ def test_alphabet_values_reject_mutable_and_profile_incompatible_payloads() -> N
             alphabets.RepresentedNumberProfile.INTERVAL,
             1,
         )
+
+
+def test_algebraic_numbers_are_exact_normalized_isolated_roots() -> None:
+    square_root_two = alphabets.AlgebraicNumber(
+        (1, 0, -2),
+        (Fraction(1), Fraction(2)),
+    )
+    same_root = alphabets.AlgebraicNumber(
+        (2, 0, -4),
+        (Fraction(4, 3), Fraction(3, 2)),
+    )
+
+    assert square_root_two.polynomial == (1, 0, -2)
+    assert square_root_two.root_index == 1
+    assert alphabets.semantic_equal(square_root_two, same_root)
+    assert alphabets.algebraics().contains(square_root_two)
+    assert (
+        alphabets.algebraics().value_profile
+        is alphabets.ValueProfile.ALGEBRAIC
+    )
+
+    with pytest.raises(ValueError, match="exactly one"):
+        alphabets.AlgebraicNumber(
+            (1, 0, -2),
+            (Fraction(-2), Fraction(2)),
+        )
+    with pytest.raises(ValueError, match="root_index"):
+        alphabets.AlgebraicNumber(
+            (1, 0, -2),
+            (Fraction(1), Fraction(2)),
+            root_index=0,
+        )
+
+
+def test_exact_complex_never_accepts_represented_components() -> None:
+    square_root_two = alphabets.AlgebraicNumber(
+        (1, 0, -2),
+        (Fraction(1), Fraction(2)),
+    )
+    value = alphabets.ExactComplex(square_root_two, Fraction(-1, 3))
+    schema = alphabets.exact_complexes()
+
+    assert schema.contains(value)
+    assert schema.value_profile is alphabets.ValueProfile.COMPLEX
+    with pytest.raises(TypeError, match="exact-complex"):
+        alphabets.ExactComplex(  # type: ignore[arg-type]
+            alphabets.RepresentedNumber(
+                alphabets.RepresentedNumberProfile.DECIMAL,
+                "1.0",
+            ),
+            0,
+        )
+
+
+def test_structural_references_bind_recursively_and_fail_closed() -> None:
+    fresh = loci.fresh_reference("child", "left")
+    existing = loci.named("root")
+    bound = loci.named("left", scope="bound")
+    value = alphabets.ValueNode(
+        alphabets.ValueKind.RECORD,
+        "references",
+        fields=(
+            ("existing", alphabets.StructuralReference(existing)),
+            (
+                "nested",
+                alphabets.ValueNode(
+                    alphabets.ValueKind.PRODUCT,
+                    "pair",
+                    items=(alphabets.StructuralReference(fresh), 1),
+                ),
+            ),
+        ),
+    )
+
+    resolved = alphabets.bind_structural_references(
+        value,
+        ((fresh, bound),),
+    )
+
+    assert isinstance(resolved, alphabets.ValueNode)
+    fields = dict(resolved.fields)
+    assert fields["existing"] == alphabets.StructuralReference(existing)
+    nested = fields["nested"]
+    assert isinstance(nested, alphabets.ValueNode)
+    assert nested.items[0] == alphabets.StructuralReference(bound)
+    assert alphabets.structural_references().contains(nested.items[0])
+    with pytest.raises(ValueError, match="unbound"):
+        alphabets.bind_structural_references(value, ())
+
+
+def test_representation_relation_distinguishes_exact_lossy_and_approximate() -> None:
+    source = alphabets.enum(("a", "b"))
+    binary = alphabets.enum((0, 1))
+    exact = alphabets.RepresentationRelation(
+        source.descriptor,
+        binary.descriptor,
+        alphabets.RepresentationProfile.EXACT,
+        (
+            alphabets.RepresentationPair("b", 1),
+            alphabets.RepresentationPair("a", 0),
+        ),
+        (1, 0),
+        (
+            alphabets.RepresentationPair(1, "b"),
+            alphabets.RepresentationPair(0, "a"),
+        ),
+    )
+
+    assert exact.forward("a") == 0
+    assert exact.inverse(1) == "b"
+    assert exact.image_evidence == (0, 1)
+
+    lossy = alphabets.RepresentationRelation(
+        source.descriptor,
+        alphabets.enum((0,)).descriptor,
+        alphabets.RepresentationProfile.LOSSY,
+        (
+            alphabets.RepresentationPair("a", 0),
+            alphabets.RepresentationPair("b", 0),
+        ),
+        (0,),
+        qualification=(("information-loss", "many-to-one"),),
+    )
+    assert lossy.forward("b") == 0
+    with pytest.raises(ValueError, match="only exact"):
+        lossy.inverse(0)
+
+    third = Fraction(1, 3)
+    represented_third = alphabets.RepresentedNumber(
+        alphabets.RepresentedNumberProfile.IEEE754_BINARY32,
+        0x3EAAAAAB,
+    )
+    approximate = alphabets.RepresentationRelation(
+        alphabets.enum((third,)).descriptor,
+        alphabets.represented_numeric(
+            alphabets.RepresentedNumberProfile.IEEE754_BINARY32
+        ).descriptor,
+        alphabets.RepresentationProfile.APPROXIMATE,
+        (alphabets.RepresentationPair(third, represented_third),),
+        (represented_third,),
+        qualification=(("error-model", "nearest-binary32"),),
+    )
+    assert approximate.forward(third) == represented_third
+
+
+def test_representation_relation_validates_coverage_image_and_inverse() -> None:
+    source = alphabets.enum(("a", "b"))
+    target = alphabets.enum((0, 1))
+
+    with pytest.raises(ValueError, match="cover"):
+        alphabets.RepresentationRelation(
+            source.descriptor,
+            target.descriptor,
+            alphabets.RepresentationProfile.EXACT,
+            (alphabets.RepresentationPair("a", 0),),
+            (0,),
+            (alphabets.RepresentationPair(0, "a"),),
+        )
+    with pytest.raises(ValueError, match="inverse-on-image"):
+        alphabets.RepresentationRelation(
+            source.descriptor,
+            target.descriptor,
+            alphabets.RepresentationProfile.EXACT,
+            (
+                alphabets.RepresentationPair("a", 0),
+                alphabets.RepresentationPair("b", 1),
+            ),
+            (0, 1),
+        )
+    with pytest.raises(ValueError, match="error-bound or error-model"):
+        alphabets.RepresentationRelation(
+            alphabets.enum(("a",)).descriptor,
+            target.descriptor,
+            alphabets.RepresentationProfile.APPROXIMATE,
+            (alphabets.RepresentationPair("a", 0),),
+            (0,),
+            qualification=(("method", "rounded"),),
+        )
+
+
+def test_refinement_is_closed_schema_intersection() -> None:
+    nonnegative_small_integer = alphabets.refine(
+        alphabets.integers(),
+        alphabets.integers(minimum=0, maximum=3),
+    )
+
+    assert nonnegative_small_integer.contains(0)
+    assert nonnegative_small_integer.contains(3)
+    assert not nonnegative_small_integer.contains(-1)
+    assert not nonnegative_small_integer.contains(4)
+    assert (
+        nonnegative_small_integer.value_profile
+        is alphabets.ValueProfile.INTEGER
+    )

@@ -701,7 +701,10 @@ class FreshTemplate:
             for local_key in self.local_keys
         ):
             raise TypeError("fresh-template local key is not closed")
-        if len(set(self.local_keys)) != len(self.local_keys):
+        local_key_terms = tuple(
+            _canonical_scalar(local_key) for local_key in self.local_keys
+        )
+        if len(set(local_key_terms)) != len(local_key_terms):
             raise ValueError("fresh-template local keys must be unique")
         if self.parent_region is not None and type(self.parent_region) is not Region:
             raise TypeError("fresh-template parent region is not recognized")
@@ -765,6 +768,10 @@ class Region:
             raise TypeError("region relation must be a SelectorExpr")
         if any(type(item) is not FreshTemplate for item in self.templates):
             raise TypeError("region templates must contain FreshTemplate values")
+        if len(set(map(canonical_identity, self.templates))) != len(
+            self.templates
+        ):
+            raise ValueError("region contains duplicate fresh templates")
         if self.kind is RegionKind.LITERAL and not (self.loci or self.fresh):
             raise ValueError("literal region cannot be empty")
         if self.kind in (
@@ -943,6 +950,22 @@ def _validate_region_shape(region: Region) -> None:
         if any(reference.namespace != region.name for reference in region.fresh):
             raise ValueError(
                 f"{kind.value} references must use the region namespace"
+            )
+        if len(set(region.fresh)) != len(region.fresh):
+            raise ValueError(f"{kind.value} region contains duplicate references")
+        if kind is RegionKind.FRESH_CHILDREN and any(
+            reference.parent is None or reference.interface
+            for reference in region.fresh
+        ):
+            raise ValueError(
+                "fresh-children references need one parent and no interface"
+            )
+        if kind is RegionKind.FRESH_EDGES and any(
+            reference.parent is not None or len(reference.interface) < 2
+            for reference in region.fresh
+        ):
+            raise ValueError(
+                "fresh-edges references need an interface and no parent"
             )
         expected_template_kind = (
             FreshTemplateKind.CHILDREN
@@ -2208,7 +2231,8 @@ def configuration_identity(configuration: object) -> ConfigurationIdentity:
         raise LociResolutionError(
             f"unknown configuration variant {type(configuration).__name__}"
         )
-    return configuration.identity
+    semantic_term = _configuration_semantic_term(configuration)
+    return hashlib.sha256(semantic_term.encode("utf-8")).hexdigest()
 
 
 def read_locus(
@@ -2295,6 +2319,113 @@ def _canonical_term(value: object) -> str:
     raise TypeError(f"{type(value).__name__} is not closed structural data")
 
 
+def _bound_fresh_key(target: Locus) -> tuple[str, str] | None:
+    if target.kind is not LocusKind.FRESH:
+        return None
+    if (
+        len(target.path) != 2
+        or type(target.path[0]) is not str
+        or not target.path[0]
+        or type(target.path[1]) not in (bool, int, Fraction, str)
+    ):
+        raise ValueError(
+            "bound-fresh alpha identity requires bound loci with "
+            "(binding-scope, local-key) paths"
+        )
+    return target.scope, _canonical_scalar(target.path[1])
+
+
+def _validate_bound_fresh_identity_targets(
+    targets: tuple[Locus, ...],
+) -> None:
+    keys = tuple(
+        key
+        for target in targets
+        if (key := _bound_fresh_key(target)) is not None
+    )
+    if len(keys) != len(set(keys)):
+        raise ValueError(
+            "bound-fresh alpha identity requires unique namespace/local-key pairs"
+        )
+
+
+def _alpha_term(value: object) -> str:
+    """Canonical term modulo bound-fresh binding-scope names only."""
+
+    if type(value) is Locus and value.kind is LocusKind.FRESH:
+        key = _bound_fresh_key(value)
+        assert key is not None
+        namespace, local_key = key
+        return (
+            "BoundFreshAlpha("
+            f"namespace={_canonical_scalar(namespace)},"
+            f"local_key={local_key}"
+            ")"
+        )
+    if isinstance(value, (bool, int, Fraction, str)):
+        return _canonical_scalar(value)
+    if isinstance(value, Enum):
+        return f"enum:{value.__class__.__name__}:{value.value}"
+    if type(value) is tuple:
+        return "tuple[" + ",".join(_alpha_term(item) for item in value) + "]"
+    if value is None:
+        return "none"
+    dataclass_fields = getattr(value, "__dataclass_fields__", None)
+    if dataclass_fields is not None:
+        parts = tuple(
+            f"{name}={_alpha_term(getattr(value, name))}"
+            for name in dataclass_fields
+        )
+        return f"{value.__class__.__name__}(" + ",".join(parts) + ")"
+    raise TypeError(f"{type(value).__name__} is not closed structural data")
+
+
+def _configuration_semantic_term(
+    configuration: FiniteConfiguration[object] | IntensionalConfiguration,
+) -> str:
+    law = configuration.contract.identity_law
+    if law is ConfigurationIdentityLaw.EXACT:
+        return _canonical_term(configuration)
+    if law is ConfigurationIdentityLaw.BOUND_FRESH_ALPHA:
+        if type(configuration) is FiniteConfiguration:
+            entries = tuple(
+                sorted(
+                    (
+                        "tuple["
+                        + _alpha_term(target)
+                        + ","
+                        + _alpha_term(value)
+                        + "]"
+                    )
+                    for target, value in configuration.entries
+                )
+            )
+            return (
+                "FiniteConfiguration("
+                f"carrier={_alpha_term(configuration.carrier)},"
+                "entries=tuple[" + ",".join(entries) + "],"
+                f"structure={_alpha_term(configuration.structure)},"
+                f"version={_alpha_term(configuration.version)}"
+                ")"
+            )
+        return _alpha_term(configuration)
+    raise AssertionError(f"unhandled configuration identity law {law.value}")
+
+
+def configuration_equal(left: object, right: object) -> bool:
+    """Compare snapshots under their explicitly declared identity law."""
+
+    if type(left) is not type(right) or not isinstance(
+        left, (FiniteConfiguration, IntensionalConfiguration)
+    ):
+        return False
+    if left.contract.identity_law is not right.contract.identity_law:
+        return False
+    return _configuration_semantic_term(left) == _configuration_semantic_term(
+        right
+    )
+
+
 def canonical_identity(value: object) -> str:
     """Derive a stable semantic identity from closed structural data."""
 
@@ -2305,6 +2436,10 @@ def canonical_identity(value: object) -> str:
 def semantic_equal(left: object, right: object) -> bool:
     """Exact structural equality with no representation or hash shortcut."""
 
+    if isinstance(left, (FiniteConfiguration, IntensionalConfiguration)) or isinstance(
+        right, (FiniteConfiguration, IntensionalConfiguration)
+    ):
+        return configuration_equal(left, right)
     return type(left) is type(right) and _canonical_term(left) == _canonical_term(right)
 
 
@@ -2344,8 +2479,11 @@ __all__ = [
     "ClosedScalar",
     "Configuration",
     "ConfigurationIdentity",
+    "ConfigurationIdentityLaw",
     "FiniteConfiguration",
     "FreshReference",
+    "FreshTemplate",
+    "FreshTemplateKind",
     "IntensionalConfiguration",
     "Locus",
     "LocusAbsentError",
@@ -2362,22 +2500,29 @@ __all__ = [
     "canonical_order_key",
     "cell",
     "centered_axis_values",
+    "configuration_equal",
+    "continuous",
     "continuous_region",
     "configuration_identity",
     "coordinate",
     "current_support",
     "field_point",
     "fresh_children",
+    "fresh_children_dynamic",
+    "fresh_edges",
+    "fresh_edges_dynamic",
     "fresh_reference",
     "graph_element",
     "grid_configuration",
     "grid_coordinates",
     "grid_loci",
     "history_configuration",
+    "intersection",
     "intensional",
     "intensional_reference",
     "interface",
     "literal",
+    "matched_interface",
     "named",
     "occurrence",
     "path",
@@ -2388,10 +2533,26 @@ __all__ = [
     "record_configuration",
     "region_product",
     "relative",
+    "difference",
+    "differential",
+    "dynamic_address",
     "resolve_region",
     "resolve_fresh_references",
     "resolve_relative_anchors",
+    "resolve_selector",
+    "selector_differential_germ",
+    "selector_equal",
+    "selector_field_restriction",
+    "selector_history",
+    "selector_incidence",
+    "selector_literal",
+    "selector_metric",
+    "selector_path",
+    "selector_reachable",
+    "selector_tagged",
     "semantic_equal",
     "span",
+    "span_region",
+    "path_region",
     "union",
 ]

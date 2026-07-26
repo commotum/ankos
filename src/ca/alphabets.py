@@ -882,6 +882,36 @@ def rationals() -> Alphabet[Fraction]:
     return Alphabet(AlphabetDescriptor(AlphabetKind.RATIONALS))
 
 
+def algebraics() -> Alphabet[AlgebraicNumber]:
+    return Alphabet(AlphabetDescriptor(AlphabetKind.ALGEBRAIC))
+
+
+def exact_complexes(
+    components: Alphabet[SemanticValue] | None = None,
+) -> Alphabet[ExactComplex]:
+    """Construct exact complex values over one exact component schema."""
+
+    if components is None:
+        components = union(
+            (
+                rationals(),  # type: ignore[arg-type]
+                algebraics(),  # type: ignore[arg-type]
+            )
+        )
+    if type(components) is not Alphabet:
+        raise TypeError("exact-complex components must be an Alphabet")
+    if components.value_profile is ValueProfile.REPRESENTED:
+        raise ValueError(
+            "exact-complex components cannot use a represented-number schema"
+        )
+    return Alphabet(
+        AlphabetDescriptor(
+            AlphabetKind.EXACT_COMPLEX,
+            children=(components.descriptor,),
+        )
+    )
+
+
 def modular(modulus: int) -> Alphabet[int]:
     if isinstance(modulus, bool) or not isinstance(modulus, int):
         raise TypeError("modulus must be an integer")
@@ -902,6 +932,10 @@ def represented_numeric(
             represented_profile=profile,
         )
     )
+
+
+def structural_references() -> Alphabet[StructuralReference]:
+    return Alphabet(AlphabetDescriptor(AlphabetKind.STRUCTURAL_REFERENCE))
 
 
 def tag(
@@ -1008,6 +1042,22 @@ def symbolic(values: tuple[int | str, ...]) -> Alphabet[int | str]:
     )
 
 
+def refine(
+    base: Alphabet[SemanticValue],
+    constraint: Alphabet[SemanticValue],
+) -> Alphabet[SemanticValue]:
+    """Intersect a base schema with one closed schema-valued constraint."""
+
+    if type(base) is not Alphabet or type(constraint) is not Alphabet:
+        raise TypeError("alphabet refinement needs two Alphabet values")
+    return Alphabet(
+        AlphabetDescriptor(
+            AlphabetKind.REFINEMENT,
+            children=(base.descriptor, constraint.descriptor),
+        )
+    )
+
+
 def boolean() -> Alphabet[bool]:
     return Alphabet(
         AlphabetDescriptor(AlphabetKind.ENUM, values=(False, True))
@@ -1035,6 +1085,10 @@ def _profile(descriptor: AlphabetDescriptor) -> ValueProfile:
             return ValueProfile.RATIONAL
         if all(isinstance(value, (int, str)) and not isinstance(value, bool) for value in descriptor.values):
             return ValueProfile.SYMBOLIC
+        if all(type(value) is AlgebraicNumber for value in descriptor.values):
+            return ValueProfile.ALGEBRAIC
+        if all(type(value) is ExactComplex for value in descriptor.values):
+            return ValueProfile.COMPLEX
     if descriptor.kind in (
         AlphabetKind.NATURALS,
         AlphabetKind.INTEGERS,
@@ -1043,6 +1097,10 @@ def _profile(descriptor: AlphabetDescriptor) -> ValueProfile:
         return ValueProfile.INTEGER
     if descriptor.kind is AlphabetKind.RATIONALS:
         return ValueProfile.RATIONAL
+    if descriptor.kind is AlphabetKind.ALGEBRAIC:
+        return ValueProfile.ALGEBRAIC
+    if descriptor.kind is AlphabetKind.EXACT_COMPLEX:
+        return ValueProfile.COMPLEX
     if descriptor.kind is AlphabetKind.REPRESENTED_NUMBER:
         return ValueProfile.REPRESENTED
     if descriptor.kind is AlphabetKind.SYMBOLIC:
@@ -1059,8 +1117,11 @@ def _profile(descriptor: AlphabetDescriptor) -> ValueProfile:
         AlphabetKind.PATTERN,
         AlphabetKind.EQUATION,
         AlphabetKind.DISTRIBUTION,
+        AlphabetKind.STRUCTURAL_REFERENCE,
     ):
         return ValueProfile.STRUCTURAL
+    if descriptor.kind is AlphabetKind.REFINEMENT:
+        return _profile(descriptor.children[0])
     return ValueProfile.EXACT
 
 
@@ -1084,6 +1145,14 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
             isinstance(value, (int, Fraction))
             and not isinstance(value, bool)
         )
+    if kind is AlphabetKind.ALGEBRAIC:
+        return type(value) is AlgebraicNumber
+    if kind is AlphabetKind.EXACT_COMPLEX:
+        return (
+            type(value) is ExactComplex
+            and _contains(descriptor.children[0], value.real)
+            and _contains(descriptor.children[0], value.imaginary)
+        )
     if kind is AlphabetKind.MODULAR:
         modulus = int(_scalar_parameter(descriptor, "modulus"))
         return isinstance(value, int) and not isinstance(value, bool) and 0 <= value < modulus
@@ -1092,8 +1161,13 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
             isinstance(value, RepresentedNumber)
             and value.profile is descriptor.represented_profile
         )
+    if kind is AlphabetKind.STRUCTURAL_REFERENCE:
+        return type(value) is StructuralReference
     if kind is AlphabetKind.UNION:
         return any(_contains(child, value) for child in descriptor.children)
+    if kind is AlphabetKind.REFINEMENT:
+        base, constraint = descriptor.children
+        return _contains(base, value) and _contains(constraint, value)
     if kind is AlphabetKind.TAG:
         expected_tag = str(_scalar_parameter(descriptor, "name"))
         return (
@@ -1182,7 +1256,12 @@ def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
         if scalars or children or fields or profile:
             raise ValueError(f"{kind.value} alphabet carries irrelevant fields")
         return
-    if kind in (AlphabetKind.NATURALS, AlphabetKind.RATIONALS):
+    if kind in (
+        AlphabetKind.NATURALS,
+        AlphabetKind.RATIONALS,
+        AlphabetKind.ALGEBRAIC,
+        AlphabetKind.STRUCTURAL_REFERENCE,
+    ):
         if values or scalars or children or fields or profile:
             raise ValueError(f"{kind.value} alphabet carries irrelevant fields")
         return
@@ -1205,6 +1284,16 @@ def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
     if kind is AlphabetKind.REPRESENTED_NUMBER:
         if values or scalars or children or fields or not profile:
             raise ValueError("represented-number descriptor shape is invalid")
+        return
+    if kind is AlphabetKind.EXACT_COMPLEX:
+        if (
+            values
+            or scalars
+            or fields
+            or profile
+            or len(descriptor.children) != 1
+        ):
+            raise ValueError("exact-complex descriptor shape is invalid")
         return
     if kind is AlphabetKind.TAG:
         if (
@@ -1258,12 +1347,13 @@ def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
     if kind is AlphabetKind.REFINEMENT:
         if (
             values
+            or scalars
             or fields
             or profile
-            or len(descriptor.children) != 1
-            or not scalars
+            or len(descriptor.children) != 2
         ):
             raise ValueError("refinement alphabet descriptor shape is invalid")
+        return
 
 
 def _value_key(value: SemanticValue) -> tuple[str, ...]:
@@ -1275,6 +1365,27 @@ def _value_key(value: SemanticValue) -> tuple[str, ...]:
         return ("fraction", str(value.numerator), str(value.denominator))
     if isinstance(value, str):
         return ("str", value)
+    if type(value) is AlgebraicNumber:
+        assert value.root_index is not None
+        return (
+            "algebraic",
+            *(str(coefficient) for coefficient in value.polynomial),
+            "root-index",
+            str(value.root_index),
+        )
+    if type(value) is ExactComplex:
+        return (
+            "exact-complex",
+            *_value_key(value.real),
+            "imaginary",
+            *_value_key(value.imaginary),
+        )
+    if type(value) is StructuralReference:
+        return (
+            "structural-reference",
+            type(value.reference).__name__,
+            loci.canonical_identity(value.reference),
+        )
     if isinstance(value, RepresentedNumber):
         return (
             "represented",
@@ -1301,20 +1412,31 @@ def semantic_equal(left: SemanticValue, right: SemanticValue) -> bool:
 
 
 __all__ = [
+    "AlgebraicNumber",
     "Alphabet",
     "AlphabetDescriptor",
     "AlphabetKind",
+    "ExactComplex",
+    "ExactReal",
     "ExactScalar",
     "RepresentedNumber",
     "RepresentedNumberProfile",
+    "RepresentationPair",
+    "RepresentationProfile",
+    "RepresentationRelation",
     "SemanticValue",
+    "StructuralBinding",
+    "StructuralReference",
     "ValueKind",
     "ValueNode",
     "ValueProfile",
+    "algebraics",
+    "bind_structural_references",
     "boolean",
     "distribution",
     "enum",
     "equation",
+    "exact_complexes",
     "field",
     "graph",
     "instruction",
@@ -1328,9 +1450,11 @@ __all__ = [
     "product",
     "rationals",
     "record",
+    "refine",
     "represented_numeric",
     "semantic_equal",
     "symbolic",
+    "structural_references",
     "tag",
     "union",
     "word",

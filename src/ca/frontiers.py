@@ -273,6 +273,7 @@ class WritableRegion(Generic[C, W]):
     )
     fresh_namespace: FreshNamespace | None = None
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
+    parts: tuple["WritableRegion[C, W]", ...] = ()
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -300,18 +301,72 @@ class WritableRegion(Generic[C, W]):
             raise TypeError("writable fresh namespace is not recognized")
         if type(self.exactness_profile) is not ExactnessProfile:
             raise TypeError("writable exactness profile is not recognized")
+        if type(self.parts) is not tuple or any(
+            type(part) is not WritableRegion for part in self.parts
+        ):
+            raise TypeError(
+                "writable composition parts must contain WritableRegion values"
+            )
         if self.value_profile != self.target_contract.value_profile:
             raise WritableResolutionError(
                 "region and target-contract value profiles disagree"
             )
+        if self.parts:
+            if self.descriptor.kind not in (
+                loci.RegionKind.UNION,
+                loci.RegionKind.PRODUCT,
+            ):
+                raise WritableResolutionError(
+                    "writable composition needs a union or product descriptor"
+                )
+            if len(self.parts) != len(self.descriptor.parts):
+                raise WritableResolutionError(
+                    "writable composition parts disagree with its descriptor"
+                )
+            if any(
+                part.exactness_profile is not self.exactness_profile
+                for part in self.parts
+            ):
+                raise WritableResolutionError(
+                    "writable composition exactness declarations disagree"
+                )
+            expected_effects = _combined_effect_profile(self.parts)
+            if self.effect_profile != expected_effects:
+                raise WritableResolutionError(
+                    "writable composition effect profile is not its part union"
+                )
+            expected_contract = _common_configuration_contract(self.parts)
+            if self.configuration_contract != expected_contract:
+                raise WritableResolutionError(
+                    "writable composition carrier contract is not its common "
+                    "part contract"
+                )
+            expected_profile = _common_value_profile(self.parts)
+            if self.value_profile != expected_profile:
+                raise WritableResolutionError(
+                    "writable composition value profile is not its common "
+                    "part profile"
+                )
+            namespaces = _part_fresh_namespaces(self.parts)
+            expected_namespace = namespaces[0] if len(namespaces) == 1 else None
+            if self.fresh_namespace != expected_namespace:
+                raise WritableResolutionError(
+                    "writable composition legacy namespace does not match its "
+                    "part namespaces"
+                )
         has_fresh_effect = bool(self.effect_profile.fresh)
-        if has_fresh_effect != (self.fresh_namespace is not None):
+        has_fresh_namespace = bool(self.fresh_namespaces)
+        if has_fresh_effect != has_fresh_namespace:
             raise WritableResolutionError(
-                "fresh effects and a fresh namespace must be declared together"
+                "fresh effects and fresh namespaces must be declared together"
             )
-        if has_fresh_effect and self.target_contract.locus_kind not in (
+        if (
+            has_fresh_effect
+            and not self.parts
+            and self.target_contract.locus_kind not in (
             None,
             loci.LocusKind.FRESH,
+            )
         ):
             raise WritableResolutionError(
                 "fresh effects cannot declare a non-fresh target kind"
@@ -321,8 +376,19 @@ class WritableRegion(Generic[C, W]):
     def required_effect_profile(self) -> EffectProfile:
         return self.effect_profile
 
+    @property
+    def fresh_namespaces(self) -> tuple[FreshNamespace, ...]:
+        """All declared namespaces, including heterogeneous compositions."""
+
+        if self.parts:
+            return _part_fresh_namespaces(self.parts)
+        return () if self.fresh_namespace is None else (self.fresh_namespace,)
+
     def resolve(self, configuration: C) -> WritableCapabilities:
         """Resolve independently against one immutable configuration."""
+
+        if self.parts:
+            return self._resolve_composition(configuration)
 
         try:
             if type(configuration) is not loci.FiniteConfiguration:
@@ -414,6 +480,79 @@ class WritableRegion(Generic[C, W]):
             reconstruction,
         )
 
+    def _resolve_composition(self, configuration: C) -> WritableCapabilities:
+        """Resolve each part under its own declarations, then compose targets."""
+
+        if type(configuration) is not loci.FiniteConfiguration:
+            raise WritableResolutionError(
+                "finite WritableRegion resolution needs FiniteConfiguration"
+            )
+        resolved_parts = tuple(part.resolve(configuration) for part in self.parts)
+        snapshot_identity = loci.configuration_identity(configuration)
+        if any(
+            resolved.snapshot_identity != snapshot_identity
+            for resolved in resolved_parts
+        ):
+            raise WritableResolutionError(
+                "writable parts resolved against different snapshots"
+            )
+
+        existing_by_target: dict[loci.Locus, ExistingCapability] = {}
+        existing_order: list[loci.Locus] = []
+        fresh_by_target: dict[loci.FreshReference, FreshCapability] = {}
+        fresh_order: list[loci.FreshReference] = []
+        for resolved in resolved_parts:
+            for capability in resolved.existing:
+                prior = existing_by_target.get(capability.target)
+                if prior is None:
+                    existing_by_target[capability.target] = capability
+                    existing_order.append(capability.target)
+                    continue
+                if prior.contract != capability.contract:
+                    raise WritableResolutionError(
+                        "overlapping writable parts attach incompatible target "
+                        "contracts"
+                    )
+                effects = tuple(
+                    effect
+                    for effect in Effect
+                    if effect in prior.effects or effect in capability.effects
+                )
+                existing_by_target[capability.target] = ExistingCapability(
+                    capability.target,
+                    capability.contract,
+                    effects,
+                )
+            for capability in resolved.fresh:
+                prior = fresh_by_target.get(capability.target)
+                if prior is None:
+                    fresh_by_target[capability.target] = capability
+                    fresh_order.append(capability.target)
+                    continue
+                if (
+                    prior.contract != capability.contract
+                    or prior.namespace != capability.namespace
+                ):
+                    raise WritableResolutionError(
+                        "overlapping fresh parts attach incompatible declarations"
+                    )
+
+        if self.descriptor.kind is loci.RegionKind.UNION:
+            existing_order.sort(key=loci.canonical_order_key)
+            fresh_order.sort(key=loci.canonical_order_key)
+        existing = tuple(existing_by_target[target] for target in existing_order)
+        fresh = tuple(fresh_by_target[target] for target in fresh_order)
+        lenses = tuple(
+            ReconstructionLens(capability.target, capability.contract.frame)
+            for capability in (*existing, *fresh)
+        )
+        return WritableCapabilities(
+            snapshot_identity,
+            existing,
+            fresh,
+            ReconstructionEvidence(snapshot_identity, lenses),
+        )
+
 
 def _resolve_targets(
     region: loci.Region,
@@ -421,45 +560,82 @@ def _resolve_targets(
 ) -> tuple[tuple[loci.Locus, ...], tuple[loci.FreshReference, ...]]:
     """Resolve existing and local-fresh identities without binding births."""
 
-    if region.kind is loci.RegionKind.LITERAL:
-        existing = tuple(
-            target for target in region.loci if configuration.contains(target)
-        )
-        return existing, region.fresh
-    if region.kind in (
-        loci.RegionKind.ALL_SUPPORT,
-        loci.RegionKind.CURRENT_SUPPORT,
-    ):
-        return tuple(target for target, _ in configuration.entries), ()
-    if region.kind in (loci.RegionKind.UNION, loci.RegionKind.PRODUCT):
-        existing: list[loci.Locus] = []
-        fresh_targets: list[loci.FreshReference] = []
-        seen_existing: set[loci.Locus] = set()
-        seen_fresh: set[loci.FreshReference] = set()
-        for part in region.parts:
-            part_existing, part_fresh = _resolve_targets(part, configuration)
-            for target in part_existing:
-                if target not in seen_existing:
-                    seen_existing.add(target)
-                    existing.append(target)
-            for target in part_fresh:
-                if target not in seen_fresh:
-                    seen_fresh.add(target)
-                    fresh_targets.append(target)
-        return tuple(existing), tuple(fresh_targets)
-    if region.kind in (
-        loci.RegionKind.FRESH_CHILDREN,
-        loci.RegionKind.FRESH_EDGES,
-    ):
-        return (), region.fresh
-    if region.kind is loci.RegionKind.INTENSIONAL:
-        raise WritableResolutionError(
-            "finite application cannot materialize an intensional writable region"
-        )
     try:
-        return loci.resolve_region(region, configuration), ()
+        existing = tuple(
+            target
+            for target in loci.resolve_region(region, configuration)
+            if configuration.contains(target)
+        )
+        fresh_targets = loci.resolve_fresh_references(region, configuration)
+        return existing, fresh_targets
     except ValueError as error:
         raise WritableResolutionError(str(error)) from error
+
+
+def _combined_effect_profile(
+    parts: tuple[WritableRegion[object, object], ...],
+) -> EffectProfile:
+    return EffectProfile(
+        tuple(
+            effect
+            for effect in Effect
+            if any(effect in part.effect_profile.existing for part in parts)
+        ),
+        tuple(
+            effect
+            for effect in Effect
+            if any(effect in part.effect_profile.fresh for part in parts)
+        ),
+    )
+
+
+def _common_configuration_contract(
+    parts: tuple[WritableRegion[object, object], ...],
+) -> loci.CarrierContract | None:
+    first = parts[0].configuration_contract
+    return first if all(
+        part.configuration_contract == first for part in parts
+    ) else None
+
+
+def _common_value_profile(
+    parts: tuple[WritableRegion[object, object], ...],
+) -> alphabets.ValueProfile | None:
+    first = parts[0].value_profile
+    return first if all(part.value_profile == first for part in parts) else None
+
+
+def _part_fresh_namespaces(
+    parts: tuple[WritableRegion[object, object], ...],
+) -> tuple[FreshNamespace, ...]:
+    namespaces: list[FreshNamespace] = []
+    for part in parts:
+        for namespace in part.fresh_namespaces:
+            if namespace not in namespaces:
+                namespaces.append(namespace)
+    return tuple(
+        sorted(
+            namespaces,
+            key=lambda namespace: (
+                namespace.namespace,
+                ""
+                if namespace.parent is None
+                else loci.canonical_identity(namespace.parent),
+            ),
+        )
+    )
+
+
+def _aggregate_target_contract(
+    parts: tuple[WritableRegion[object, object], ...],
+    value_profile: alphabets.ValueProfile | None,
+) -> TargetContract:
+    first = parts[0].target_contract
+    if all(part.target_contract == first for part in parts):
+        return first
+    frames = {part.target_contract.frame for part in parts}
+    frame = next(iter(frames)) if len(frames) == 1 else WriteFrame.SUCCESSOR
+    return TargetContract(None, value_profile, frame)
 
 
 def literal(
@@ -541,6 +717,37 @@ def fresh(
     )
 
 
+def dynamic_fresh(
+    region: loci.Region,
+    *,
+    namespace: FreshNamespace,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize fresh references derived from each current configuration."""
+
+    if region.kind not in (
+        loci.RegionKind.FRESH_CHILDREN,
+        loci.RegionKind.FRESH_EDGES,
+    ) or not region.templates:
+        raise WritableResolutionError(
+            "dynamic fresh frontier needs a fresh-template region"
+        )
+    if any(
+        template.namespace != namespace.namespace
+        for template in region.templates
+    ):
+        raise WritableResolutionError(
+            "dynamic fresh templates lie outside the declared namespace"
+        )
+    return fresh(
+        region,
+        namespace=namespace,
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+    )
+
+
 def intensional(
     binder: str,
     relation: loci.SelectorExpr,
@@ -567,58 +774,41 @@ def intensional(
 def union(
     parts: tuple[WritableRegion[C, W], ...],
 ) -> WritableRegion[C, WritableCapabilities]:
-    """Union envelopes after proving their local declarations agree."""
+    """Union envelopes while retaining every part's local declarations."""
 
     if type(parts) is not tuple or any(type(part) is not WritableRegion for part in parts):
         raise TypeError("union parts must be an immutable tuple of WritableRegions")
     if not parts:
         raise WritableResolutionError("union needs at least one region")
-    first = parts[0]
-    for part in parts[1:]:
-        if (
-            part.configuration_contract != first.configuration_contract
-            or part.value_profile != first.value_profile
-            or part.target_contract.value_profile
-            != first.target_contract.value_profile
-            or part.target_contract.frame is not first.target_contract.frame
-            or part.exactness_profile is not first.exactness_profile
-        ):
-            raise WritableResolutionError(
-                "union parts have incompatible writable declarations"
-            )
-    namespaces = tuple(
-        part.fresh_namespace
-        for part in parts
-        if part.fresh_namespace is not None
-    )
-    if len(set(namespaces)) > 1:
+    if any(
+        part.exactness_profile is not parts[0].exactness_profile
+        for part in parts[1:]
+    ):
         raise WritableResolutionError(
-            "one WritableRegion cannot merge distinct fresh namespaces"
+            "union parts have incompatible exactness declarations"
         )
-    existing_effects = tuple(
-        effect
-        for effect in Effect
-        if any(effect in part.effect_profile.existing for part in parts)
+    ordered = tuple(
+        sorted(
+            parts,
+            key=lambda part: loci.canonical_identity(part.descriptor),
+        )
     )
-    fresh_effects = tuple(
-        effect
-        for effect in Effect
-        if any(effect in part.effect_profile.fresh for part in parts)
-    )
-    profile = EffectProfile(existing_effects, fresh_effects)
-    namespace = namespaces[0] if namespaces else None
+    profile = _combined_effect_profile(ordered)  # type: ignore[arg-type]
+    namespaces = _part_fresh_namespaces(ordered)  # type: ignore[arg-type]
+    namespace = namespaces[0] if len(namespaces) == 1 else None
+    value_profile = _common_value_profile(ordered)  # type: ignore[arg-type]
     return WritableRegion(
-        loci.union(tuple(part.descriptor for part in parts)),
-        first.configuration_contract,
-        first.value_profile,
-        profile,
-        TargetContract(
-            None,
-            first.value_profile,
-            first.target_contract.frame,
+        descriptor=loci.union(tuple(part.descriptor for part in ordered)),
+        configuration_contract=_common_configuration_contract(ordered),  # type: ignore[arg-type]
+        value_profile=value_profile,
+        effect_profile=profile,
+        target_contract=_aggregate_target_contract(  # type: ignore[arg-type]
+            ordered,
+            value_profile,
         ),
-        namespace,
-        first.exactness_profile,
+        fresh_namespace=namespace,
+        exactness_profile=ordered[0].exactness_profile,
+        parts=ordered,
     )
 
 
@@ -642,15 +832,30 @@ def product(
     keys = tuple(key for key, _ in fields)
     if any(not key for key in keys) or len(set(keys)) != len(keys):
         raise WritableResolutionError("product field keys must be nonempty and unique")
-    combined = union(tuple(region for _, region in fields))
+    regions = tuple(region for _, region in fields)
+    if any(
+        region.exactness_profile is not regions[0].exactness_profile
+        for region in regions[1:]
+    ):
+        raise WritableResolutionError(
+            "product fields have incompatible exactness declarations"
+        )
+    profile = _combined_effect_profile(regions)  # type: ignore[arg-type]
+    namespaces = _part_fresh_namespaces(regions)  # type: ignore[arg-type]
+    namespace = namespaces[0] if len(namespaces) == 1 else None
+    value_profile = _common_value_profile(regions)  # type: ignore[arg-type]
     return WritableRegion(
-        loci.region_product(
+        descriptor=loci.region_product(
             tuple((key, region.descriptor) for key, region in fields)
         ),
-        combined.configuration_contract,
-        combined.value_profile,
-        combined.effect_profile,
-        combined.target_contract,
-        combined.fresh_namespace,
-        combined.exactness_profile,
+        configuration_contract=_common_configuration_contract(regions),  # type: ignore[arg-type]
+        value_profile=value_profile,
+        effect_profile=profile,
+        target_contract=_aggregate_target_contract(  # type: ignore[arg-type]
+            regions,
+            value_profile,
+        ),
+        fresh_namespace=namespace,
+        exactness_profile=regions[0].exactness_profile,
+        parts=regions,
     )

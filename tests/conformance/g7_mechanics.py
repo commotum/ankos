@@ -129,6 +129,7 @@ class MechanicsRun:
     simple_program: ca.SimpleProgram
     source: Configuration
     result: program.ApplicationResult
+    representation: alphabets.RepresentationRelation | None = None
 
 
 def _certificate(kind: rules.CertificateKind, label: str) -> rules.Certificate:
@@ -271,6 +272,7 @@ def _assemble(
     rule: rules.Rule,
     *,
     exactness: seeds.ExactnessProfile = seeds.ExactnessProfile.EXACT,
+    representation: alphabets.RepresentationRelation | None = None,
 ) -> MechanicsRun:
     simple_program = ca.SimpleProgram(
         seeds.exact(
@@ -283,7 +285,13 @@ def _assemble(
         readable,
         rule,
     )
-    return MechanicsRun(row, simple_program, source, ca.apply(simple_program, source))
+    return MechanicsRun(
+        row,
+        simple_program,
+        source,
+        ca.apply(simple_program, source),
+        representation,
+    )
 
 
 def _finite_history_components(
@@ -397,8 +405,13 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
         for index in range(create_count)
     )
     if references:
+        fresh_descriptor = loci.fresh_children(
+            parent,
+            f"g7-{row.spf.lower()}",
+            tuple(range(create_count)),
+        )
         fresh_region = frontiers.fresh(
-            loci.fresh_children(references),
+            fresh_descriptor,
             namespace=frontiers.FreshNamespace(
                 f"g7-{row.spf.lower()}",
                 parent=parent,
@@ -490,6 +503,9 @@ def _px04(row: MechanicsRow) -> MechanicsRun:
         "SPF026": 0,
         "SPF029": 2,
         "SPF033": 2,
+        # Required secondary join: a nonunique PDE relation must retain the
+        # same many-outcome distinction as a finite relation.
+        "SPF039": 2,
     }[row.spf]
     source, alphabet, writable, readable = _finite_history_components((desired,))
     solution_clauses = tuple(
@@ -700,6 +716,11 @@ def _px09(row: MechanicsRow) -> MechanicsRun:
         ),
         rules.GateKind.ALL,
     )
+    boolean_gate_value = rules.conditional(
+        gate_value,
+        rules.literal_expr(True),
+        rules.literal_expr(False),
+    )
     rule = _kernel(
         source,
         alphabet,
@@ -714,7 +735,7 @@ def _px09(row: MechanicsRow) -> MechanicsRun:
                         _existing_plan(
                             2,
                             rules.DispositionAction.REPLACE,
-                            gate_value,
+                            boolean_gate_value,
                         ),
                     ),
                     stop=True,
@@ -723,6 +744,78 @@ def _px09(row: MechanicsRow) -> MechanicsRun:
         ),
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _exact_representation(row: MechanicsRow) -> alphabets.RepresentationRelation:
+    """Build a row-specific exact finite map with a proved inverse on image."""
+
+    offset = 1000 + int(row.spf[-3:]) * 10
+    source_schema = alphabets.enum((0, 1)).descriptor
+    target_schema = alphabets.enum((offset, offset + 1)).descriptor
+    relation = (
+        alphabets.RepresentationPair(0, offset),
+        alphabets.RepresentationPair(1, offset + 1),
+    )
+    return alphabets.RepresentationRelation(
+        source_schema,
+        target_schema,
+        alphabets.RepresentationProfile.EXACT,
+        relation,
+        (offset, offset + 1),
+        (
+            alphabets.RepresentationPair(offset, 0),
+            alphabets.RepresentationPair(offset + 1, 1),
+        ),
+    )
+
+
+def _px10(row: MechanicsRow) -> MechanicsRun:
+    """Apply one exact representation map and retain its inverse obligation."""
+
+    representation = _exact_representation(row)
+    encoded = representation.forward(1)
+    assert type(encoded) is int
+    source = loci.history_configuration((1, 0))
+    alphabet = alphabets.enum((0, 1, *representation.image_evidence))
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.equal(rules.observation(0), rules.literal_expr(1)),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(
+                            1,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(encoded),
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+        ),
+    )
+    return _assemble(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        rule,
+        representation=representation,
+    )
 
 
 def _px11(row: MechanicsRow) -> MechanicsRun:
@@ -773,7 +866,7 @@ def _px12(row: MechanicsRow) -> MechanicsRun:
             interface=(parent,),
         )
         fresh = frontiers.fresh(
-            loci.fresh_children((reference,)),
+            loci.fresh_children(parent, "g7-causal", ("event-1",)),
             namespace=frontiers.FreshNamespace("g7-causal", parent=parent),
             configuration_contract=source.contract,
             value_profile=alphabet.value_profile,
@@ -829,15 +922,204 @@ def run_mechanics_fixture(row: MechanicsRow) -> MechanicsRun:
         "PX07": _px07,
         "PX08": _px08,
         "PX09": _px09,
-        # G7-02 representation relations are joined here after their value
-        # owner lands; until then the ordinary stopped transduction path is
-        # still exercised by the same Rule/application boundary.
-        "PX10": _px08,
+        "PX10": _px10,
         "PX11": _px11,
         "PX12": _px12,
     }
     execution = builders[row.primary](row)
     if not isinstance(execution.result, program.ApplicationComplete):
-        detail = execution.result.fault.detail
-        raise AssertionError(f"{row.spf}/{row.fixture} rejected: {detail}")
+        fault = execution.result.fault
+        raise AssertionError(
+            f"{row.spf}/{row.fixture} rejected: {fault.reason}; "
+            f"{fault.evidence!r}"
+        )
     return execution
+
+
+def run_secondary_fixture(row: MechanicsRow, pressure: str) -> MechanicsRun:
+    """Exercise one of the eight deliberate cross-pressure joins."""
+
+    if pressure not in row.secondary:
+        raise ValueError(f"{row.spf} has no declared {pressure} secondary join")
+    secondary_row = MechanicsRow(
+        row.spf,
+        row.family,
+        row.name,
+        row.workstream,
+        pressure,
+        f"{row.fixture}:secondary-{pressure.lower()}",
+    )
+    builders = {
+        "PX03": _px03,
+        "PX04": _px04,
+        "PX08": _px08,
+    }
+    execution = builders[pressure](secondary_row)
+    if not isinstance(execution.result, program.ApplicationComplete):
+        fault = execution.result.fault
+        raise AssertionError(
+            f"{row.spf}/{pressure} secondary fixture rejected: "
+            f"{fault.reason}; {fault.evidence!r}"
+        )
+    return execution
+
+
+def _finite_successors(
+    result: program.ApplicationComplete,
+) -> tuple[loci.FiniteConfiguration, ...]:
+    return tuple(
+        group.successor
+        for group in result.successor_quotient_with_derivation_fibers.atoms
+        if isinstance(group.successor, loci.FiniteConfiguration)
+    )
+
+
+def assert_mechanics_run(
+    execution: MechanicsRun,
+    *,
+    pressure: str | None = None,
+) -> None:
+    """Assert the pressure-specific invariant, not merely a successful call."""
+
+    row = execution.row
+    pressure = row.primary if pressure is None else pressure
+    result = execution.result
+    assert type(execution.simple_program) is ca.SimpleProgram
+    assert isinstance(result, program.ApplicationComplete)
+    assert result.evidence.program_identity == execution.simple_program.canonical_identity
+    assert result.evidence.input_configuration_identity == execution.source.identity
+
+    successors = _finite_successors(result)
+    derivations = tuple(
+        atom
+        for atom in result.applied_atoms.atoms
+        if isinstance(atom, program.AppliedDerivation)
+    )
+
+    if pressure == "PX01":
+        assert derivations
+        for derivation in derivations:
+            before = dict(execution.source.entries)
+            after = dict(derivation.successor.entries)
+            changed = {
+                target
+                for target in before
+                if before.get(target) != after.get(target)
+            }
+            assert len(changed) >= 2
+        if row.spf == "SPF030":
+            assert rules.cardinality_size(result.derivation_cardinality) == 2
+            assert rules.cardinality_size(result.successor_cardinality) == 2
+        return
+
+    if pressure == "PX02":
+        delete_count, create_count = _PX02_SHAPES[row.spf]
+        assert len(derivations) == 1
+        derivation = derivations[0]
+        assert len(derivation.fresh_bindings) == create_count
+        successor = derivation.successor
+        assert isinstance(successor, loci.FiniteConfiguration)
+        assert len(successor.entries) == (
+            len(execution.source.entries) - delete_count + create_count
+        )
+        assert successor.contract.kind is loci.CarrierKind.WORD
+        return
+
+    if pressure == "PX03":
+        assert len(successors) == 1
+        values = tuple(value for _, value in successors[0].entries)
+        assert values[-1] == sum(
+            value for _, value in execution.source.entries[:3]
+        )
+        return
+
+    if pressure == "PX04":
+        expected = {
+            "SPF014": (1, 1),
+            "SPF018": (2, 2),
+            "SPF024": (1, 1),
+            "SPF026": (0, 0),
+            "SPF029": (2, 2),
+            "SPF033": (2, 1),
+            "SPF039": (2, 2),
+        }[row.spf]
+        assert rules.cardinality_size(result.derivation_cardinality) == expected[0]
+        assert rules.cardinality_size(result.successor_cardinality) == expected[1]
+        if expected[0] == 0:
+            assert len(result.no_successor_partition.atoms) == 1
+        if row.spf == "SPF033":
+            fibers = result.successor_quotient_with_derivation_fibers.atoms
+            assert len(fibers) == 1
+            assert len(fibers[0].derivations) == 2
+        return
+
+    if pressure == "PX05":
+        assert len(derivations) == 1
+        assert isinstance(derivations[0].source.continuation, rules.Stop)
+        successor = successors[0]
+        values = tuple(value for _, value in successor.entries)
+        assert values == (
+            Fraction(0),
+            Fraction(1),
+            Fraction(1, 4),
+            1,
+        )
+        return
+
+    if pressure == "PX06":
+        law = result.source_outcomes.probability_law
+        assert law is not None
+        assert tuple(item.mass for item in law.masses) == (
+            Fraction(1, 2),
+            Fraction(1, 2),
+        )
+        assert isinstance(result.applied_atom_measure, program.MeasureAvailable)
+        assert result.applied_atom_measure.measure.total_mass == Fraction(1)
+        assert isinstance(result.successor_submeasure, program.MeasureAvailable)
+        assert result.successor_submeasure.measure.total_mass == Fraction(1)
+        return
+
+    if pressure == "PX07":
+        assert len(successors) == 1
+        assert tuple(value for _, value in successors[0].entries) == (0, 31, 1)
+        return
+
+    if pressure == "PX08":
+        assert len(derivations) == 1
+        assert isinstance(derivations[0].source.continuation, rules.Stop)
+        return
+
+    if pressure == "PX10":
+        assert len(derivations) == 1
+        assert isinstance(derivations[0].source.continuation, rules.Stop)
+        representation = execution.representation
+        assert representation is not None
+        assert representation.profile is alphabets.RepresentationProfile.EXACT
+        encoded = representation.forward(1)
+        assert representation.inverse(encoded) == 1
+        assert tuple(value for _, value in successors[0].entries) == (1, encoded)
+        return
+
+    if pressure == "PX09":
+        assert len(successors) == 1
+        assert tuple(value for _, value in successors[0].entries) == (
+            True,
+            True,
+            True,
+        )
+        assert isinstance(derivations[0].source.continuation, rules.Stop)
+        return
+
+    if pressure == "PX11":
+        assert len(successors) == 1
+        assert tuple(value for _, value in successors[0].entries) == (1, 0, 0, 1)
+        return
+
+    if pressure == "PX12":
+        assert len(derivations) == 1
+        assert isinstance(derivations[0].source.continuation, rules.Stop)
+        if row.spf == "SPF004":
+            assert len(derivations[0].fresh_bindings) == 1
+        return
+
+    raise AssertionError(f"missing pressure assertion for {pressure}")

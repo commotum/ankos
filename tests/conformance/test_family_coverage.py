@@ -14,6 +14,9 @@ from g7_mechanics import (
     PRIMARY_PRESSURES,
     SECONDARY_JOINS,
     WORKSTREAM_COUNTS,
+    assert_mechanics_run,
+    run_mechanics_fixture,
+    run_secondary_fixture,
 )
 
 
@@ -46,11 +49,12 @@ def test_every_family_joins_exact_spf_f_home_source_and_pressure_metadata() -> N
     raise AssertionError("G7-04 catalog metadata join is not active")
 
 
-@pytest.mark.skip(reason="G7-02 direct mechanics fixtures are being implemented")
-def test_every_family_runs_its_named_fixture_through_generic_application() -> None:
+@pytest.mark.parametrize("row", MECHANICS_ROWS, ids=lambda row: row.spf)
+def test_every_family_runs_its_named_fixture_through_generic_application(row) -> None:
     """Finite and intensional cases use the same denotational boundary."""
 
-    raise AssertionError("G7-02 mechanics fixture join is not active")
+    execution = run_mechanics_fixture(row)
+    assert_mechanics_run(execution)
 
 
 def test_all_eight_secondary_pressure_joins_are_present_exactly() -> None:
@@ -64,6 +68,10 @@ def test_all_eight_secondary_pressure_joins_are_present_exactly() -> None:
         )
     )
     assert actual == tuple(sorted(SECONDARY_JOINS))
+    rows = {row.spf: row for row in MECHANICS_ROWS}
+    for spf, pressure in SECONDARY_JOINS:
+        execution = run_secondary_fixture(rows[spf], pressure)
+        assert_mechanics_run(execution, pressure=pressure)
 
 
 def test_close_roles_and_retired_seed_role_are_excluded_from_sixty_rows() -> None:

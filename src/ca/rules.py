@@ -300,7 +300,7 @@ def group(index: int) -> RuleExpr:
 
 
 def target_reference() -> RuleExpr:
-    """Reference the existing writable target currently evaluating a plan."""
+    """Reference the existing or fresh target currently evaluating a plan."""
 
     return RuleExpr(ExpressionPrimitive.TARGET_REFERENCE)
 
@@ -2109,8 +2109,14 @@ def _materialize_clause_derivation(
         expression: RuleExpr,
         *,
         anchor: loci.Locus | None,
+        target: loci.Locus | loci.FreshReference | None = None,
     ) -> RuleRuntimeValue:
-        value, proof = _evaluate_proven(expression, readable, anchor=anchor)
+        value, proof = _evaluate_proven(
+            expression,
+            readable,
+            anchor=anchor,
+            target=target,
+        )
         proofs.append(proof)
         return value
 
@@ -2153,7 +2159,11 @@ def _materialize_clause_derivation(
                 create(
                     target,
                     _require_semantic_value(
-                        evaluate(plan.value, anchor=None)
+                        evaluate(
+                            plan.value,
+                            anchor=None,
+                            target=target,
+                        )
                     ),
                 )
             )
@@ -2623,8 +2633,14 @@ def _evaluate(
     readable: _ReadableView,
     *,
     anchor: loci.Locus | None,
+    target: loci.Locus | loci.FreshReference | None = None,
 ) -> RuleRuntimeValue:
-    result, _ = _evaluate_proven(expression, readable, anchor=anchor)
+    result, _ = _evaluate_proven(
+        expression,
+        readable,
+        anchor=anchor,
+        target=target,
+    )
     return result
 
 
@@ -2633,12 +2649,14 @@ def _evaluate_proven(
     readable: _ReadableView,
     *,
     anchor: loci.Locus | None,
+    target: loci.Locus | loci.FreshReference | None = None,
 ) -> tuple[RuleRuntimeValue, EvaluationProof]:
     steps: list[EvaluationStep] = []
     result = _evaluate_value(
         expression,
         readable,
         anchor=anchor,
+        target=anchor if target is None else target,
         steps=steps,
     )
     return result, EvaluationProof(tuple(steps))
@@ -2649,6 +2667,7 @@ def _evaluate_value(
     readable: _ReadableView,
     *,
     anchor: loci.Locus | None,
+    target: loci.Locus | loci.FreshReference | None,
     steps: list[EvaluationStep],
 ) -> RuleRuntimeValue:
     def evaluate(child: RuleExpr) -> RuleRuntimeValue:
@@ -2656,6 +2675,7 @@ def _evaluate_value(
             child,
             readable,
             anchor=anchor,
+            target=target,
             steps=steps,
         )
 
@@ -2697,11 +2717,11 @@ def _evaluate_value(
             _observation_evidence(items),
         )
     if primitive is ExpressionPrimitive.TARGET_REFERENCE:
-        if anchor is None:
+        if target is None:
             raise ValueError(
-                "target-reference expression requires an existing-target context"
+                "target-reference expression requires a writable-target context"
             )
-        return finish(alphabets.StructuralReference(anchor))
+        return finish(alphabets.StructuralReference(target))
     if primitive is ExpressionPrimitive.PROJECT:
         source = evaluate(_child(arguments, 0))
         if not isinstance(source, tuple):
@@ -3022,6 +3042,8 @@ def clause_kernel(
     an explicit final always-true clause, not interpreter policy.
     """
 
+    if type(contract) is not RuleContract:
+        raise TypeError("clause kernel contract is not recognized")
     denotation = ClauseKernelDenotation(
         clauses,
         selection,

@@ -267,57 +267,92 @@ def test_g7_01_selector_shapes_are_closed_and_explicit() -> None:
         )
 
 
-def test_unimplemented_selector_primitives_reject_until_their_mechanics_exist() -> None:
-    implemented = {
-        loci.SelectorPrimitive.LITERAL,
-        loci.SelectorPrimitive.MEMBERSHIP,
-        loci.SelectorPrimitive.RELATIVE,
-        loci.SelectorPrimitive.AND,
-        loci.SelectorPrimitive.OR,
-        loci.SelectorPrimitive.NOT,
-    }
+def test_every_selector_primitive_has_one_closed_validated_shape() -> None:
+    target = loci.path("root")
+    literal = loci.selector_literal(target)
+    selectors = (
+        literal,
+        loci.selector_equal(target, target),
+        loci.selector_tagged("path"),
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.RELATIVE,
+            arguments=(target,),
+        ),
+        loci.selector_metric(loci.cell((0,)), 1),
+        loci.selector_path(target),
+        loci.selector_incidence(target),
+        loci.selector_reachable(target, 2),
+        loci.selector_field_restriction(
+            "u",
+            (Fraction(0), Fraction(1)),
+        ),
+        loci.selector_differential_germ("u", 1),
+        loci.selector_history(),
+        loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP),
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.AND,
+            children=(literal, literal),
+        ),
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.OR,
+            children=(literal, literal),
+        ),
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.NOT,
+            children=(literal,),
+        ),
+    )
 
-    for primitive in set(loci.SelectorPrimitive) - implemented:
-        with pytest.raises(ValueError, match="reserved for G7-02"):
-            loci.SelectorExpr(primitive)
+    assert {selector.primitive for selector in selectors} == set(
+        loci.SelectorPrimitive
+    )
+    with pytest.raises(ValueError, match="nonnegative exact radius"):
+        loci.selector_metric(loci.cell((0,)), -1)
+    with pytest.raises(ValueError, match="ordered integer range"):
+        loci.selector_history(2, 1)
+    with pytest.raises(ValueError, match="lower/upper"):
+        loci.selector_field_restriction(
+            "u",
+            (Fraction(1), Fraction(0)),
+        )
 
 
-def test_every_g7_01_region_variant_has_one_validated_shape() -> None:
+def test_every_region_variant_has_one_validated_shape() -> None:
     target = loci.named("target")
+    other = loci.named("other")
     base = loci.literal((target,))
     membership = loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP)
-    fresh_edge = loci.FreshReference("edges", "edge")
     regions = (
         base,
         loci.all_support(),
         loci.current_support(),
         loci.relative(base, (loci.coordinate("x", 1),)),
         loci.region_product((("left", base),)),
-        loci.union((base, loci.literal((loci.named("other"),)))),
+        loci.union((base, loci.literal((other,)))),
+        loci.intersection((base, loci.all_support())),
+        loci.difference(loci.all_support(), base),
+        loci.span_region("word", 0, 1),
+        loci.path_region(loci.path("root")),
+        loci.matched_interface(base, loci.literal((other,))),
+        loci.dynamic_address(base),
         loci.fresh_children(target, "children", ("child",)),
-        loci.Region(
-            loci.RegionKind.FRESH_EDGES,
-            name="edges",
-            fresh=(fresh_edge,),
+        loci.fresh_edges(
+            (target, other),
+            "edges",
+            ("edge",),
+        ),
+        loci.continuous(
+            "interval",
+            (Fraction(0), Fraction(1)),
+        ),
+        loci.differential(
+            "u",
+            loci.selector_differential_germ("u", 1),
         ),
         loci.intensional("x", membership),
     )
-    implemented = {
-        loci.RegionKind.LITERAL,
-        loci.RegionKind.ALL_SUPPORT,
-        loci.RegionKind.CURRENT_SUPPORT,
-        loci.RegionKind.RELATIVE,
-        loci.RegionKind.PRODUCT,
-        loci.RegionKind.UNION,
-        loci.RegionKind.FRESH_CHILDREN,
-        loci.RegionKind.FRESH_EDGES,
-        loci.RegionKind.INTENSIONAL,
-    }
 
-    assert {region.kind for region in regions} == implemented
-    for kind in set(loci.RegionKind) - implemented:
-        with pytest.raises(ValueError, match="reserved for G7-02"):
-            loci.Region(kind)
+    assert {region.kind for region in regions} == set(loci.RegionKind)
 
 
 def test_region_variants_reject_irrelevant_or_ambiguous_fields_locally() -> None:

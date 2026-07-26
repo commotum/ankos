@@ -30,6 +30,9 @@ def _closed_observed_value(value: object) -> bool:
     """Recognize the exact closed semantic-value variants."""
 
     return type(value) in (bool, int, Fraction, str) or type(value) in (
+        alphabets.AlgebraicNumber,
+        alphabets.ExactComplex,
+        alphabets.StructuralReference,
         alphabets.RepresentedNumber,
         alphabets.ValueNode,
     )
@@ -91,6 +94,33 @@ class ResultShape:
         keys = tuple(field.key for field in self.fields)
         if len(set(keys)) != len(keys):
             raise ReadableResolutionError("result-shape keys must be unique")
+
+
+@dataclass(frozen=True)
+class ReadDependency:
+    """One exact structural dependency exposed by a resolved read view."""
+
+    key: str
+    region: loci.Region
+    selector: loci.SelectorExpr | None
+    exactness_profile: ExactnessProfile
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ReadableResolutionError(
+                f"unsupported read-dependency version {self.version!r}"
+            )
+        if type(self.key) is not str or not self.key:
+            raise ReadableResolutionError("read-dependency key cannot be empty")
+        if type(self.region) is not loci.Region:
+            raise TypeError("read-dependency region is not recognized")
+        if self.selector is not None and type(
+            self.selector
+        ) is not loci.SelectorExpr:
+            raise TypeError("read-dependency selector is not recognized")
+        if type(self.exactness_profile) is not ExactnessProfile:
+            raise TypeError("read-dependency exactness is not recognized")
 
 
 def _field_extent(field: ReadField) -> tuple[str, int | None]:
@@ -255,8 +285,14 @@ class ReadableView(Generic[V]):
     observations: tuple[Observation[V], ...]
     groups: tuple[ObservationGroup, ...]
     join_shape: JoinShape
+    dependencies: tuple[ReadDependency, ...] = ()
+    version: int = 1
 
     def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ReadableResolutionError(
+                f"unsupported readable-view version {self.version!r}"
+            )
         if type(self.snapshot_identity) is not str or not self.snapshot_identity:
             raise ReadableResolutionError(
                 "readable view needs a snapshot identity"
@@ -271,6 +307,19 @@ class ReadableView(Generic[V]):
             raise TypeError("view groups must be an immutable tuple")
         if type(self.join_shape) is not JoinShape:
             raise TypeError("view join shape is not recognized")
+        if type(self.dependencies) is not tuple or any(
+            type(item) is not ReadDependency for item in self.dependencies
+        ):
+            raise TypeError("view dependencies must be an immutable tuple")
+        if not self.dependencies:
+            raise ReadableResolutionError(
+                "a readable view must expose its structural dependency"
+            )
+        dependency_keys = tuple(item.key for item in self.dependencies)
+        if len(set(dependency_keys)) != len(dependency_keys):
+            raise ReadableResolutionError(
+                "readable-view dependency keys must be unique"
+            )
         if not self.observations or not self.groups:
             raise ReadableResolutionError(
                 "a materialized readable view cannot be empty"
@@ -291,6 +340,73 @@ class ReadableView(Generic[V]):
                     raise ReadableResolutionError(
                         "group and observation anchors disagree"
                     )
+
+
+@dataclass(frozen=True)
+class IntensionalReadableView:
+    """A resolved, non-enumerated dependency view bound to one snapshot.
+
+    No value is invented for a non-materialized dependency.  Closed Rules can
+    consume the dependency and source relation directly; finite-expression
+    Rules see empty observation/group tuples and therefore fail closed.
+    """
+
+    snapshot_identity: loci.ConfigurationIdentity
+    dependencies: tuple[ReadDependency, ...]
+    join_shape: JoinShape
+    configuration_relation: loci.SelectorExpr | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ReadableResolutionError(
+                f"unsupported intensional-view version {self.version!r}"
+            )
+        if (
+            type(self.snapshot_identity) is not str
+            or not self.snapshot_identity
+        ):
+            raise ReadableResolutionError(
+                "intensional view needs a snapshot identity"
+            )
+        if type(self.dependencies) is not tuple or any(
+            type(item) is not ReadDependency for item in self.dependencies
+        ):
+            raise TypeError(
+                "intensional dependencies must be an immutable tuple"
+            )
+        if not self.dependencies:
+            raise ReadableResolutionError(
+                "intensional view needs at least one dependency"
+            )
+        keys = tuple(item.key for item in self.dependencies)
+        if len(set(keys)) != len(keys):
+            raise ReadableResolutionError(
+                "intensional dependency keys must be unique"
+            )
+        if type(self.join_shape) is not JoinShape:
+            raise TypeError("intensional join shape is not recognized")
+        if self.join_shape.mode not in (JoinMode.NONE, JoinMode.GLOBAL):
+            raise ReadableResolutionError(
+                "non-enumerated views require NONE or GLOBAL joins"
+            )
+        if self.configuration_relation is not None and type(
+            self.configuration_relation
+        ) is not loci.SelectorExpr:
+            raise TypeError(
+                "intensional configuration relation is not recognized"
+            )
+
+    @property
+    def observations(self) -> tuple[Observation[alphabets.SemanticValue], ...]:
+        return ()
+
+    @property
+    def groups(self) -> tuple[ObservationGroup, ...]:
+        return ()
+
+
+ResolvedReadableView = ReadableView[V] | IntensionalReadableView
 
 
 class GroupingKind(Enum):

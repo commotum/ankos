@@ -108,6 +108,10 @@ def test_rule_expression_ast_is_closed_versioned_and_exact() -> None:
         ),
         (rules.ExpressionPrimitive.OBSERVATION, (True,)),
         (rules.ExpressionPrimitive.GROUP, (-1,)),
+        (
+            rules.ExpressionPrimitive.TARGET_REFERENCE,
+            (rules.literal_expr(1),),
+        ),
         (rules.ExpressionPrimitive.PROJECT, (rules.literal_expr(1),)),
         (
             rules.ExpressionPrimitive.PROJECT,
@@ -275,6 +279,34 @@ def test_public_evidence_and_evaluation_ast_types_are_exported_and_closed() -> N
             1,
             ["read"],  # type: ignore[arg-type]
         )
+
+
+def test_clause_kernel_records_and_helpers_are_public() -> None:
+    expected = {
+        "CapabilitySelector",
+        "CapabilitySelectorKind",
+        "ClauseKernelDenotation",
+        "ClauseResult",
+        "ClauseSelection",
+        "DerivationClauseResult",
+        "ExistingDispositionPlan",
+        "FreshDispositionPlan",
+        "NoSuccessorClauseResult",
+        "RuleClause",
+        "capability_index",
+        "capability_target",
+        "clause_kernel",
+        "conditional",
+        "divide",
+        "equal",
+        "every_capability",
+        "less_equal",
+        "less_than",
+        "subtract",
+        "target_reference",
+    }
+
+    assert expected.issubset(set(rules.__all__))
 
 
 def test_native_rule_denotes_one_total_derivation() -> None:
@@ -708,10 +740,23 @@ def test_clause_kernel_can_emit_the_current_target_as_structural_data() -> None:
         configuration_contract=source.contract,
         value_profile=alphabets.ValueProfile.STRUCTURAL,
     )
-    writable = frontiers.everywhere(
+    existing = frontiers.everywhere(
         configuration_contract=source.contract,
         value_profile=alphabets.ValueProfile.STRUCTURAL,
     )
+    existing_target = source.entries[0][0]
+    fresh_target = loci.fresh_reference(
+        "nodes",
+        "new",
+        parent=existing_target,
+    )
+    fresh = frontiers.fresh(
+        loci.literal(fresh=(fresh_target,)),
+        namespace=frontiers.FreshNamespace("nodes", existing_target),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.STRUCTURAL,
+    )
+    writable = frontiers.union((existing, fresh))
     rule = rules.clause_kernel(
         (
             rules.RuleClause(
@@ -721,6 +766,13 @@ def test_clause_kernel_can_emit_the_current_target_as_structural_data() -> None:
                         rules.ExistingDispositionPlan(
                             rules.capability_index(0),
                             rules.DispositionAction.REPLACE,
+                            rules.target_reference(),
+                        ),
+                    ),
+                    fresh=(
+                        rules.FreshDispositionPlan(
+                            rules.capability_target(fresh_target),
+                            rules.DispositionAction.CREATE,
                             rules.target_reference(),
                         ),
                     ),
@@ -743,7 +795,10 @@ def test_clause_kernel_can_emit_the_current_target_as_structural_data() -> None:
     assert isinstance(atom, rules.Derivation)
     payload = atom.replacement.existing[0].payload
     assert isinstance(payload, rules.ValuePayload)
-    assert payload.value == alphabets.StructuralReference(source.entries[0][0])
+    assert payload.value == alphabets.StructuralReference(existing_target)
+    fresh_payload = atom.replacement.fresh[0].payload
+    assert isinstance(fresh_payload, rules.ValuePayload)
+    assert fresh_payload.value == alphabets.StructuralReference(fresh_target)
 
 
 def test_clause_kernel_fails_closed_for_no_match_and_bad_probability_mass() -> None:
@@ -889,6 +944,64 @@ def test_clause_kernel_records_and_contracts_reject_ambiguous_shapes() -> None:
             ),
             rules.ClauseSelection.ALL,
             _certificate(rules.CertificateKind.COMPLETENESS),
+        )
+
+
+def test_clause_kernel_constructor_rejects_undeclared_effects_and_entropy() -> None:
+    source = loci.record_configuration((("value", 0),))
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    )
+    replacing_clause = rules.RuleClause(
+        rules.literal_expr(1),
+        _derivation_clause_result(
+            existing=(
+                rules.ExistingDispositionPlan(
+                    rules.capability_index(0),
+                    rules.DispositionAction.REPLACE,
+                    rules.literal_expr(1),
+                ),
+            ),
+        ),
+    )
+    no_effect_contract = rules.RuleContract(
+        source.contract,
+        alphabets.ValueProfile.INTEGER,
+        readable.result_shape,
+        readable.join_shape,
+        frontiers.EffectProfile(existing=()),
+    )
+
+    with pytest.raises(ValueError, match="omits required existing effects"):
+        rules.clause_kernel(
+            (replacing_clause,),
+            contract=no_effect_contract,
+            completeness_evidence=_certificate(
+                rules.CertificateKind.COMPLETENESS
+            ),
+        )
+
+    deterministic_contract = rules.RuleContract(
+        source.contract,
+        alphabets.ValueProfile.INTEGER,
+        readable.result_shape,
+        readable.join_shape,
+        frontiers.EffectProfile(),
+    )
+    with pytest.raises(ValueError, match="replay-key entropy"):
+        rules.clause_kernel(
+            (
+                rules.RuleClause(
+                    replacing_clause.condition,
+                    replacing_clause.result,
+                    Fraction(1),
+                ),
+            ),
+            contract=deterministic_contract,
+            completeness_evidence=_certificate(
+                rules.CertificateKind.COMPLETENESS
+            ),
         )
 
 
