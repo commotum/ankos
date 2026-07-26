@@ -947,7 +947,7 @@ def intensional(
     configuration_contract: loci.CarrierContract | None = None,
     value_profile: alphabets.ValueProfile | None = None,
     effects: tuple[Effect, ...] = (Effect.REPLACE,),
-) -> WritableRegion[C, WritableCapabilities]:
+) -> WritableRegion[C, IntensionalWritableCapabilities]:
     """Authorize a closed non-enumerated existing-target region."""
 
     if type(binder) is not str or not binder:
@@ -965,7 +965,7 @@ def intensional(
 
 def union(
     parts: tuple[WritableRegion[C, W], ...],
-) -> WritableRegion[C, WritableCapabilities]:
+) -> WritableRegion[C, ResolvedWritableCapabilities]:
     """Union envelopes while retaining every part's local declarations."""
 
     if type(parts) is not tuple or any(type(part) is not WritableRegion for part in parts):
@@ -1014,7 +1014,7 @@ def union(
 
 def product(
     fields: tuple[tuple[str, WritableRegion[C, W]], ...],
-) -> WritableRegion[C, WritableCapabilities]:
+) -> WritableRegion[C, ResolvedWritableCapabilities]:
     """Compose disjoint named envelopes without flattening their identity."""
 
     if type(fields) is not tuple or any(

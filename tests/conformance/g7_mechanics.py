@@ -130,6 +130,9 @@ class MechanicsRun:
     source: Configuration
     result: program.ApplicationResult
     representation: alphabets.RepresentationRelation | None = None
+    representation_source: alphabets.SemanticValue | None = None
+    representation_target: alphabets.SemanticValue | None = None
+    recipe: FiniteRecipe | None = None
     trajectory: tuple[
         tuple[Configuration, program.ApplicationComplete],
         ...,
@@ -365,6 +368,9 @@ def _assemble(
     *,
     exactness: seeds.ExactnessProfile = seeds.ExactnessProfile.EXACT,
     representation: alphabets.RepresentationRelation | None = None,
+    representation_source: alphabets.SemanticValue | None = None,
+    representation_target: alphabets.SemanticValue | None = None,
+    recipe: FiniteRecipe | None = None,
 ) -> MechanicsRun:
     simple_program = ca.SimpleProgram(
         seeds.exact(
@@ -383,6 +389,9 @@ def _assemble(
         source,
         ca.apply(simple_program, source),
         representation,
+        representation_source,
+        representation_target,
+        recipe,
     )
 
 
@@ -597,60 +606,132 @@ def _word_configuration(values: tuple[int, ...]) -> loci.FiniteConfiguration[int
     )
 
 
-def _px02(row: MechanicsRow) -> MechanicsRun:
-    """Apply one input-derived total delete/create structural patch."""
-
-    delete_count, create_count = _PX02_SHAPES[row.spf]
-    source = _word_configuration((1, 2, 3) if row.spf == "SPF028" else (1, 2))
-    alphabet = alphabets.integers()
-    existing = frontiers.everywhere(
-        configuration_contract=source.contract,
-        value_profile=alphabet.value_profile,
-        effects=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
-    )
-    parent = source.entries[0][0]
+def _fresh_children_writable(
+    source: loci.FiniteConfiguration,
+    alphabet: alphabets.Alphabet,
+    *,
+    parent: loci.Locus,
+    namespace: str,
+    keys: tuple[loci.ClosedScalar, ...],
+) -> tuple[frontiers.WritableRegion, tuple[loci.FreshReference, ...]]:
     references = tuple(
-        loci.FreshReference(
-            f"g7-{row.spf.lower()}",
-            index,
-            parent=parent,
-            interface=(parent,),
-        )
-        for index in range(create_count)
+        loci.FreshReference(namespace, key, parent=parent)
+        for key in keys
     )
-    if references:
-        fresh_descriptor = loci.fresh_children(
-            parent,
-            f"g7-{row.spf.lower()}",
-            tuple(range(create_count)),
-        )
-        fresh_region = frontiers.fresh(
-            fresh_descriptor,
-            namespace=frontiers.FreshNamespace(
-                f"g7-{row.spf.lower()}",
-                parent=parent,
-            ),
+    return (
+        frontiers.fresh(
+            loci.fresh_children(parent, namespace, keys),
+            namespace=frontiers.FreshNamespace(namespace, parent=parent),
             configuration_contract=source.contract,
             value_profile=alphabet.value_profile,
+        ),
+        references,
+    )
+
+
+def _graph_node(name: str) -> alphabets.ValueNode:
+    return alphabets.ValueNode(
+        alphabets.ValueKind.GRAPH,
+        "node",
+        fields=(("name", name),),
+    )
+
+
+def _graph_edge(
+    left: loci.Locus | loci.FreshReference,
+    right: loci.Locus | loci.FreshReference,
+    *,
+    name: str,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(
+        alphabets.ValueKind.GRAPH,
+        "edge",
+        fields=(
+            ("left", alphabets.StructuralReference(left)),
+            ("name", name),
+            ("right", alphabets.StructuralReference(right)),
+        ),
+    )
+
+
+def _px02_graph(row: MechanicsRow) -> MechanicsRun:
+    """Replace ``a-b-c`` by the explicit interface patch ``a-x-y-c``."""
+
+    node_a = loci.graph_element("node", "a")
+    node_b = loci.graph_element("node", "b")
+    node_c = loci.graph_element("node", "c")
+    edge_ab = loci.graph_element("edge", "a-b")
+    edge_bc = loci.graph_element("edge", "b-c")
+    source = _structural_configuration(
+        loci.CarrierKind.GRAPH,
+        (
+            (node_a, _graph_node("a")),
+            (node_b, _graph_node("b")),
+            (node_c, _graph_node("c")),
+            (edge_ab, _graph_edge(node_a, node_b, name="a-b")),
+            (edge_bc, _graph_edge(node_b, node_c, name="b-c")),
+        ),
+    )
+    alphabet = alphabets.graph()
+    existing = frontiers.literal(
+        (node_b, edge_ab, edge_bc),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=(frontiers.Effect.DELETE,),
+    )
+
+    node_namespace = "g7-graph-nodes"
+    node_region, node_references = _fresh_children_writable(
+        source,
+        alphabet,
+        parent=node_b,
+        namespace=node_namespace,
+        keys=("x", "y"),
+    )
+    node_x, node_y = node_references
+
+    edge_namespace = "g7-graph-edges"
+    edge_references = tuple(
+        loci.FreshReference(
+            edge_namespace,
+            key,
+            interface=(node_a, node_c),
         )
-        writable = frontiers.union((existing, fresh_region))
-    else:
-        writable = existing
-    readable = neighborhoods.global_view(
+        for key in ("a-x", "x-y", "y-c")
+    )
+    edge_region = frontiers.fresh(
+        loci.fresh_edges(
+            (node_a, node_c),
+            edge_namespace,
+            ("a-x", "x-y", "y-c"),
+        ),
+        namespace=frontiers.FreshNamespace(edge_namespace),
         configuration_contract=source.contract,
         value_profile=alphabet.value_profile,
     )
-    existing_plans = tuple(
-        _existing_plan(index, rules.DispositionAction.DELETE)
-        for index in range(delete_count)
+    writable = frontiers.union((existing, node_region, edge_region))
+    readable = neighborhoods.literal(
+        (node_a, node_b, node_c, edge_ab, edge_bc),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        key="matched-path-and-interface",
     )
-    fresh_plans = tuple(
-        _fresh_plan(
-            index,
-            rules.DispositionAction.CREATE,
-            rules.add(rules.observation(0), rules.literal_expr(index + 10)),
-        )
-        for index in range(create_count)
+
+    created = (
+        (node_x, _graph_node("x")),
+        (node_y, _graph_node("y")),
+        (
+            edge_references[0],
+            _graph_edge(node_a, node_x, name="a-x"),
+        ),
+        (
+            edge_references[1],
+            _graph_edge(node_x, node_y, name="x-y"),
+        ),
+        (
+            edge_references[2],
+            _graph_edge(node_y, node_c, name="y-c"),
+        ),
     )
     rule = _kernel(
         source,
@@ -659,7 +740,195 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
         readable,
         (
             _clause(
-                rules.less_equal(rules.literal_expr(0), rules.observation(0)),
+                rules.literal_expr(1),
+                _derivation_result(
+                    row.fixture,
+                    existing=tuple(
+                        _existing_target_plan(
+                            target,
+                            rules.DispositionAction.DELETE,
+                        )
+                        for target in (node_b, edge_ab, edge_bc)
+                    ),
+                    fresh=tuple(
+                        _fresh_target_plan(
+                            reference,
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(value),
+                        )
+                        for reference, value in created
+                    ),
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px02(row: MechanicsRow) -> MechanicsRun:
+    """Apply one input-derived total delete/create structural patch."""
+
+    if row.spf == "SPF028":
+        return _px02_graph(row)
+
+    delete_count, create_count = _PX02_SHAPES[row.spf]
+    if row.spf in {"SPF002", "SPF005", "SPF016", "SPF025", "SPF037"}:
+        values = {
+            "SPF002": (1, 2),
+            "SPF005": (0, 1, 2, 3),
+            "SPF016": (1, 1, 0, 1),
+            "SPF025": (4, 9, 5),
+            "SPF037": (1, 2),
+        }[row.spf]
+        source = _word_configuration(values)
+    elif row.spf == "SPF022":
+        source = _structural_configuration(
+            loci.CarrierKind.TREE,
+            (
+                (loci.path("root", scope="growth-tree"), 1),
+                (loci.path("root", "left", scope="growth-tree"), 2),
+            ),
+        )
+    elif row.spf == "SPF023":
+        source = _structural_configuration(
+            loci.CarrierKind.HISTORY,
+            tuple(
+                (loci.occurrence("history", index), value)
+                for index, value in enumerate((1, 1))
+            ),
+            rank=1,
+            axes=("history",),
+        )
+    elif row.spf == "SPF031":
+        source = _structural_configuration(
+            loci.CarrierKind.GRID,
+            (
+                (loci.cell((-1, 0), axes=("x", "y")), 1),
+                (loci.cell((0, 0), axes=("x", "y")), 2),
+                (loci.cell((1, 0), axes=("x", "y")), 1),
+            ),
+            rank=2,
+            axes=("x", "y"),
+        )
+    elif row.spf == "SPF038":
+        source = _structural_configuration(
+            loci.CarrierKind.GRAPH,
+            (
+                (loci.graph_element("node", "a"), 1),
+                (loci.graph_element("node", "b"), 2),
+                (loci.graph_element("edge", "a-b"), 3),
+            ),
+        )
+    elif row.spf == "SPF049":
+        source = _structural_configuration(
+            loci.CarrierKind.TREE,
+            (
+                (loci.path("add", scope="term"), 7),
+                (loci.path("add", "x", scope="term"), 8),
+                (loci.path("add", "zero", scope="term"), 0),
+            ),
+        )
+    else:
+        raise AssertionError(f"missing PX02 recipe for {row.spf}")
+
+    alphabet = alphabets.integers()
+    source_targets = tuple(target for target, _ in source.entries)
+    if row.spf in {"SPF002", "SPF022", "SPF023"}:
+        delete_targets = ()
+    elif row.spf in {"SPF005", "SPF016"}:
+        delete_targets = source_targets[1:3] if row.spf == "SPF005" else source_targets[:2]
+    elif row.spf in {"SPF025", "SPF031"}:
+        delete_targets = (source_targets[1],)
+    elif row.spf == "SPF037":
+        delete_targets = source_targets
+    elif row.spf == "SPF038":
+        delete_targets = (
+            next(
+                target
+                for target in source_targets
+                if target.kind is loci.LocusKind.GRAPH_ELEMENT
+                and target.path[0] == "edge"
+            ),
+        )
+    else:
+        assert row.spf == "SPF049"
+        delete_targets = (loci.path("add", scope="term"),)
+    assert len(delete_targets) == delete_count
+
+    parts: list[frontiers.WritableRegion] = []
+    if delete_targets:
+        parts.append(
+            frontiers.literal(
+                delete_targets,
+                configuration_contract=source.contract,
+                value_profile=alphabet.value_profile,
+                effects=(frontiers.Effect.DELETE,),
+            )
+        )
+    parent = {
+        "SPF002": source_targets[-1],
+        "SPF005": source_targets[0],
+        "SPF016": source_targets[-1],
+        "SPF022": loci.path("root", scope="growth-tree"),
+        "SPF023": source_targets[-1],
+        "SPF025": source_targets[0],
+        "SPF031": source_targets[-1],
+        "SPF037": source_targets[0],
+        "SPF038": source_targets[0],
+        "SPF049": loci.path("add", "x", scope="term"),
+    }[row.spf]
+    references: tuple[loci.FreshReference, ...] = ()
+    if create_count:
+        fresh_region, references = _fresh_children_writable(
+            source,
+            alphabet,
+            parent=parent,
+            namespace=f"g7-{row.spf.lower()}",
+            keys=tuple(f"created-{index}" for index in range(create_count)),
+        )
+        parts.append(fresh_region)
+    if len(parts) == 1:
+        writable = parts[0]
+    else:
+        writable = frontiers.union(tuple(parts))
+    readable = neighborhoods.literal(
+        source_targets,
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        key="matched-old-structure",
+    )
+    existing_plans = tuple(
+        _existing_target_plan(target, rules.DispositionAction.DELETE)
+        for target in delete_targets
+    )
+    created_values = {
+        "SPF002": (3,),
+        "SPF005": (7, 8),
+        "SPF016": (9,),
+        "SPF022": (3,),
+        "SPF023": (2,),
+        "SPF025": (),
+        "SPF031": (4, 5),
+        "SPF037": (1, 2),
+        "SPF038": (4, 5),
+        "SPF049": (8,),
+    }[row.spf]
+    fresh_plans = tuple(
+        _fresh_target_plan(
+            reference,
+            rules.DispositionAction.CREATE,
+            rules.literal_expr(value),
+        )
+        for reference, value in zip(references, created_values, strict=True)
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.literal_expr(1),
                 _derivation_result(
                     row.fixture,
                     existing=existing_plans,
@@ -674,34 +943,116 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
 def _px03(row: MechanicsRow) -> MechanicsRun:
     """Use the complete immutable snapshot in one coupled global decision."""
 
-    marker = int(row.spf[-3:])
-    source, alphabet, writable, readable = _finite_history_components(
-        (marker, 2, 3, 0)
+    fields, read_names, result_name = {
+        "SPF017": (
+            (("fixed", 0), ("metric", 2), ("movable", -1)),
+            ("fixed", "metric"),
+            "movable",
+        ),
+        "SPF019": (
+            (("score0", 2), ("score1", 5), ("score2", 3), ("winner", -1)),
+            ("score0", "score1", "score2"),
+            "winner",
+        ),
+        "SPF027": (
+            (("factor_xy", 2), ("factor_yz", 3), ("normalization", 1)),
+            ("factor_xy", "factor_yz"),
+            "normalization",
+        ),
+        "SPF035": (
+            (("stored0", 0), ("stored1", 2), ("query", 1), ("nearest", -1)),
+            ("stored0", "stored1", "query"),
+            "nearest",
+        ),
+        "SPF040": (
+            (("fitness0", 3), ("fitness1", 7), ("fitness2", 5), ("selected", -1)),
+            ("fitness0", "fitness1", "fitness2"),
+            "selected",
+        ),
+        "SPF046": (
+            (("event0", 1), ("event1", 1), ("event2", 0), ("cover_size", -1)),
+            ("event0", "event1", "event2"),
+            "cover_size",
+        ),
+        "SPF051": (
+            (("history0", 1), ("history1", -1), ("amplitude", 9)),
+            ("history0", "history1"),
+            "amplitude",
+        ),
+    }[row.spf]
+    source = _record_configuration(fields)
+    alphabet = (
+        alphabets.rationals()
+        if row.spf == "SPF017"
+        else alphabets.integers()
     )
-    aggregate = rules.add(
-        rules.observation(0),
-        rules.observation(1),
-        rules.observation(2),
+    targets = _record_targets(source)
+    read_targets = tuple(targets[name] for name in read_names)
+    result_target = targets[result_name]
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=(result_target,),
+        read_targets=read_targets,
+    )
+    outputs: tuple[rules.RuleExpr, ...] = {
+        "SPF017": (
+            rules.divide(
+                rules.add(rules.observation(0), rules.observation(1)),
+                rules.literal_expr(2),
+            ),
+        ),
+        "SPF019": (rules.literal_expr(1),),
+        "SPF027": (
+            rules.multiply(rules.observation(0), rules.observation(1)),
+        ),
+        "SPF035": (
+            rules.observation(0),
+            rules.observation(1),
+        ),
+        "SPF040": (
+            rules.conditional(
+                rules.less_than(rules.observation(0), rules.observation(1)),
+                rules.literal_expr(1),
+                rules.literal_expr(0),
+            ),
+        ),
+        "SPF046": (
+            rules.add(
+                rules.observation(0),
+                rules.observation(1),
+                rules.observation(2),
+            ),
+        ),
+        "SPF051": (
+            rules.add(rules.observation(0), rules.observation(1)),
+        ),
+    }[row.spf]
+    condition = rules.less_equal(
+        rules.literal_expr(0),
+        rules.add(*(rules.observation(index) for index in range(len(read_targets)))),
     )
     rule = _kernel(
         source,
         alphabet,
         writable,
         readable,
-        (
+        tuple(
             _clause(
-                rules.less_than(rules.observation(3), aggregate),
+                condition,
                 _derivation_result(
-                    row.fixture,
+                    f"{row.fixture}:result-{index}",
                     existing=(
-                        _existing_plan(
-                            3,
+                        _existing_target_plan(
+                            result_target,
                             rules.DispositionAction.REPLACE,
-                            aggregate,
+                            output,
                         ),
                     ),
+                    stop=row.spf == "SPF035",
                 ),
-            ),
+            )
+            for index, output in enumerate(outputs)
         ),
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
@@ -710,55 +1061,93 @@ def _px03(row: MechanicsRow) -> MechanicsRun:
 def _px04(row: MechanicsRow) -> MechanicsRun:
     """Denote typed zero, witnessed one, or witnessed many alternatives."""
 
-    desired = {
-        "SPF014": 1,
-        "SPF018": 2,
-        "SPF024": 1,
-        "SPF026": 0,
-        "SPF029": 2,
-        "SPF033": 2,
-        # Required secondary join: a nonunique PDE relation must retain the
-        # same many-outcome distinction as a finite relation.
-        "SPF039": 2,
-    }[row.spf]
-    source, alphabet, writable, readable = _finite_history_components((desired,))
-    solution_clauses = tuple(
-        _clause(
-            rules.less_than(rules.literal_expr(solution), rules.observation(0)),
-            _derivation_result(
-                f"{row.fixture}:solution-{solution}",
-                existing=(
-                    _existing_plan(
-                        0,
-                        rules.DispositionAction.REPLACE,
-                        # SPF033 deliberately demonstrates two witnesses that
-                        # quotient to one successor.
-                        rules.literal_expr(
-                            1 if row.spf == "SPF033" else solution + 1
-                        ),
+    if row.spf == "SPF014":
+        source = _record_configuration((("axiom", 1), ("model", -1)))
+        targets = _record_targets(source)
+        read_targets = (targets["axiom"],)
+        write_targets = (targets["model"],)
+        alternatives = (((targets["model"], 0),),)
+    elif row.spf == "SPF018":
+        source = _record_configuration((("rhs", 1), ("x", -1), ("y", -1)))
+        targets = _record_targets(source)
+        read_targets = (targets["rhs"],)
+        write_targets = (targets["x"], targets["y"])
+        alternatives = (
+            ((targets["x"], 0), (targets["y"], 1)),
+            ((targets["x"], 1), (targets["y"], 0)),
+        )
+    elif row.spf == "SPF024":
+        source = _record_configuration((("observed", 1), ("predecessor", -1)))
+        targets = _record_targets(source)
+        read_targets = (targets["observed"],)
+        write_targets = (targets["predecessor"],)
+        alternatives = (((targets["predecessor"], 0),),)
+    elif row.spf == "SPF026":
+        source = _record_configuration((("guard", 0), ("image", -1)))
+        targets = _record_targets(source)
+        read_targets = (targets["guard"],)
+        write_targets = (targets["image"],)
+        alternatives = ()
+    elif row.spf == "SPF029":
+        source = _record_configuration((("rhs", 1), ("x", -1), ("y", -1)))
+        targets = _record_targets(source)
+        read_targets = (targets["rhs"],)
+        write_targets = (targets["x"], targets["y"])
+        alternatives = (
+            ((targets["x"], 0), (targets["y"], 1)),
+            ((targets["x"], 1), (targets["y"], 0)),
+        )
+    elif row.spf == "SPF033":
+        source = _record_configuration((("symbol", 0),))
+        targets = _record_targets(source)
+        read_targets = (targets["symbol"],)
+        write_targets = (targets["symbol"],)
+        alternatives = (
+            ((targets["symbol"], 1),),
+            ((targets["symbol"], 1),),
+        )
+    else:
+        raise AssertionError(f"missing PX04 recipe for {row.spf}")
+
+    alphabet = alphabets.integers()
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=write_targets,
+        read_targets=read_targets,
+    )
+    if alternatives:
+        clauses = tuple(
+            _clause(
+                rules.literal_expr(1),
+                _derivation_result(
+                    f"{row.fixture}:solution-{index}",
+                    existing=tuple(
+                        _existing_target_plan(
+                            target,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(value),
+                        )
+                        for target, value in replacements
                     ),
+                    stop=row.spf != "SPF033",
                 ),
-                stop=row.spf in {
-                    "SPF014",
-                    "SPF018",
-                    "SPF024",
-                    "SPF026",
-                    "SPF029",
-                },
+            )
+            for index, replacements in enumerate(alternatives)
+        )
+    else:
+        clauses = (
+            _clause(
+                rules.equal(rules.observation(0), rules.literal_expr(0)),
+                _no_successor_result(f"{row.fixture}:guarded-zero"),
             ),
         )
-        for solution in range(2)
-    )
-    fallback = _clause(
-        rules.equal(rules.observation(0), rules.literal_expr(0)),
-        _no_successor_result(f"{row.fixture}:zero"),
-    )
     rule = _kernel(
         source,
         alphabet,
         writable,
         readable,
-        (*solution_clauses, fallback),
+        clauses,
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
 
@@ -766,6 +1155,61 @@ def _px04(row: MechanicsRow) -> MechanicsRun:
 def _px05_finite(row: MechanicsRow) -> MechanicsRun:
     """Commit an exact Fraction-valued flow/event segment and stop."""
 
+    if row.spf == "SPF036":
+        initial = alphabets.ValueNode(
+            alphabets.ValueKind.FIELD,
+            "ode-state",
+            fields=(("equation", "dx/dt=1"), ("initial", 0)),
+        )
+        unset = alphabets.ValueNode(
+            alphabets.ValueKind.FIELD,
+            "solution-slot",
+            fields=(("status", "unset"),),
+        )
+        solution = alphabets.ValueNode(
+            alphabets.ValueKind.FIELD,
+            "maximal-solution",
+            fields=(
+                ("domain", "maximal-real-line"),
+                ("expression", "x(t)=t"),
+                ("initial", 0),
+            ),
+        )
+        source = loci.history_configuration((initial, unset))
+        alphabet = alphabets.field()
+        read_targets = (source.entries[0][0],)
+        write_targets = (source.entries[1][0],)
+        writable, readable = _literal_regions(
+            source,
+            alphabet,
+            write_targets=write_targets,
+            read_targets=read_targets,
+        )
+        rule = _kernel(
+            source,
+            alphabet,
+            writable,
+            readable,
+            (
+                _clause(
+                    rules.literal_expr(1),
+                    _derivation_result(
+                        row.fixture,
+                        existing=(
+                            _existing_target_plan(
+                                write_targets[0],
+                                rules.DispositionAction.REPLACE,
+                                rules.literal_expr(solution),
+                            ),
+                        ),
+                        stop=True,
+                    ),
+                ),
+            ),
+        )
+        return _assemble(row, source, alphabet, writable, readable, rule)
+
+    assert row.spf == "SPF006"
     source, alphabet, writable, readable = _finite_history_components(
         (Fraction(1, 4), Fraction(-1), Fraction(0), Fraction(0)),
         alphabet=alphabets.rationals(),
@@ -816,18 +1260,23 @@ def _px05_finite(row: MechanicsRow) -> MechanicsRun:
 def _px05_intensional(row: MechanicsRow) -> MechanicsRun:
     """Retain an exact uncountable differential solution relation."""
 
-    field_value = alphabets.ValueNode(
-        alphabets.ValueKind.FIELD,
-        "partial-field",
-        fields=(("domain", "closed-interval:[0,1]"), ("derivative", 0)),
+    contract = loci.CarrierContract(loci.CarrierKind.FIELD)
+    dependency = loci.selector_differential_germ("u", 1)
+    source = loci.IntensionalConfiguration(
+        contract,
+        dependency,
+        "spf039:all-exact-field-presentations",
     )
-    source = loci.history_configuration((field_value,))
     alphabet = alphabets.field()
-    writable = frontiers.everywhere(
+    writable = frontiers.intensional(
+        "u",
+        dependency,
         configuration_contract=source.contract,
         value_profile=alphabet.value_profile,
     )
-    readable = neighborhoods.global_view(
+    readable = neighborhoods.differential_germ(
+        "u",
+        1,
         configuration_contract=source.contract,
         value_profile=alphabet.value_profile,
     )
@@ -838,6 +1287,7 @@ def _px05_intensional(row: MechanicsRow) -> MechanicsRun:
             rules.literal_expr("binder:c"),
             rules.literal_expr("du/dx=0"),
             rules.literal_expr("domain:[0,1]"),
+            rules.literal_expr("replace-entire-field:u"),
         ),
     )
     uncountable = rules.Many(
@@ -880,27 +1330,216 @@ def _px05(row: MechanicsRow) -> MechanicsRun:
 def _px06(row: MechanicsRow) -> MechanicsRun:
     """Return an exact law without drawing, then expose both submeasures."""
 
-    source, alphabet, writable, readable = _finite_history_components((1, 0))
-    accepted = _derivation_result(
-        f"{row.fixture}:accepted",
-        existing=(
-            _existing_plan(
-                1,
-                rules.DispositionAction.REPLACE,
-                rules.add(rules.observation(0), rules.literal_expr(1)),
+    if row.spf == "SPF009":
+        source = _record_configuration(
+            (("site", 0), ("energy", 2), ("drive_count", 0))
+        )
+        targets = _record_targets(source)
+        read_targets = (targets["site"], targets["energy"], targets["drive_count"])
+        write_targets = (targets["site"], targets["energy"], targets["drive_count"])
+        branches: tuple[
+            tuple[Fraction, tuple[tuple[loci.Locus, int], ...] | None, str],
+            ...,
+        ] = (
+            (
+                Fraction(1, 2),
+                (
+                    (targets["site"], 1),
+                    (targets["energy"], 1),
+                    (targets["drive_count"], 1),
+                ),
+                "drive-right",
             ),
-        ),
+            (
+                Fraction(1, 2),
+                (
+                    (targets["site"], -1),
+                    (targets["energy"], 1),
+                    (targets["drive_count"], 1),
+                ),
+                "drive-left",
+            ),
+        )
+    elif row.spf == "SPF015":
+        source = _record_configuration(
+            (
+                ("source", 2),
+                ("contact_site", 0),
+                ("free_site", 0),
+                ("attached", 0),
+                ("relaunch", 0),
+                ("phase", 0),
+            )
+        )
+        targets = _record_targets(source)
+        read_targets = tuple(targets[name] for name in (
+            "source",
+            "contact_site",
+            "free_site",
+            "attached",
+        ))
+        write_targets = tuple(targets[name] for name in (
+            "source",
+            "contact_site",
+            "free_site",
+            "attached",
+            "relaunch",
+            "phase",
+        ))
+        branches = (
+            (
+                Fraction(1, 2),
+                (
+                    (targets["source"], 0),
+                    (targets["contact_site"], 1),
+                    (targets["attached"], 1),
+                    (targets["relaunch"], 0),
+                    (targets["phase"], 1),
+                ),
+                "first-contact-attach",
+            ),
+            (
+                Fraction(1, 2),
+                (
+                    (targets["source"], 0),
+                    (targets["free_site"], 1),
+                    (targets["attached"], 0),
+                    (targets["relaunch"], 1),
+                    (targets["phase"], 1),
+                ),
+                "free-flight-relaunch",
+            ),
+        )
+    elif row.spf == "SPF041":
+        source = _record_configuration(
+            (
+                ("count_a", 2),
+                ("count_b", 1),
+                ("fit_parameter", 0),
+                ("generated_path", -1),
+                ("phase", 0),
+            )
+        )
+        targets = _record_targets(source)
+        read_targets = tuple(targets[name] for name in (
+            "count_a",
+            "count_b",
+            "fit_parameter",
+            "phase",
+        ))
+        write_targets = tuple(targets[name] for name in (
+            "fit_parameter",
+            "generated_path",
+            "phase",
+        ))
+        branches = (
+            (
+                Fraction(2, 3),
+                (
+                    (targets["fit_parameter"], 2),
+                    (targets["generated_path"], 0),
+                    (targets["phase"], 1),
+                ),
+                "fitted-path-a",
+            ),
+            (
+                Fraction(1, 3),
+                (
+                    (targets["fit_parameter"], 2),
+                    (targets["generated_path"], 1),
+                    (targets["phase"], 1),
+                ),
+                "fitted-path-b",
+            ),
+        )
+    elif row.spf == "SPF043":
+        source = _record_configuration(
+            (("node0_successor", -1), ("node1_successor", -1), ("phase", 0))
+        )
+        targets = _record_targets(source)
+        read_targets = (targets["phase"],)
+        write_targets = tuple(targets[name] for name in (
+            "node0_successor",
+            "node1_successor",
+            "phase",
+        ))
+        branches = tuple(
+            (
+                Fraction(1, 4),
+                (
+                    (targets["node0_successor"], left),
+                    (targets["node1_successor"], right),
+                    (targets["phase"], 1),
+                ),
+                f"functional-graph-{left}{right}",
+            )
+            for left in (0, 1)
+            for right in (0, 1)
+        )
+    elif row.spf == "SPF047":
+        source = _record_configuration(
+            (("incumbent", 0), ("proposal_counter", 0))
+        )
+        targets = _record_targets(source)
+        read_targets = (targets["incumbent"], targets["proposal_counter"])
+        write_targets = (targets["incumbent"], targets["proposal_counter"])
+        branches = (
+            (
+                Fraction(1, 2),
+                (
+                    (targets["incumbent"], 1),
+                    (targets["proposal_counter"], 1),
+                ),
+                "accepted",
+            ),
+            (
+                Fraction(1, 4),
+                ((targets["proposal_counter"], 1),),
+                "rejected-continue",
+            ),
+            (Fraction(1, 4), None, "no-proposal"),
+        )
+    else:
+        raise AssertionError(f"missing PX06 recipe for {row.spf}")
+
+    alphabet = alphabets.integers()
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=write_targets,
+        read_targets=read_targets,
     )
-    continued = _derivation_result(f"{row.fixture}:rejected-continue")
+    clauses = tuple(
+        _clause(
+            rules.literal_expr(1),
+            (
+                _no_successor_result(
+                    f"{row.fixture}:{label}",
+                    rules.NoSuccessorOutcome.DECLARED_FAILURE,
+                )
+                if replacements is None
+                else _derivation_result(
+                    f"{row.fixture}:{label}",
+                    existing=tuple(
+                        _existing_target_plan(
+                            target,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(value),
+                        )
+                        for target, value in replacements
+                    ),
+                )
+            ),
+            mass=mass,
+        )
+        for mass, replacements, label in branches
+    )
     rule = _kernel(
         source,
         alphabet,
         writable,
         readable,
-        (
-            _clause(rules.literal_expr(1), accepted, mass=Fraction(1, 2)),
-            _clause(rules.literal_expr(1), continued, mass=Fraction(1, 2)),
-        ),
+        clauses,
         stochastic=True,
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
@@ -909,7 +1548,41 @@ def _px06(row: MechanicsRow) -> MechanicsRun:
 def _px07(row: MechanicsRow) -> MechanicsRun:
     """Mutate carrier data and visible program/instruction state together."""
 
-    source, alphabet, writable, readable = _finite_history_components((1, 30, 0))
+    if row.spf == "SPF034":
+        fields = (
+            ("cell", 1),
+            ("mutable_rule_entry", 30),
+            ("phase", 0),
+        )
+        read_names = ("cell", "mutable_rule_entry", "phase")
+        replacements = (
+            ("cell", 0),
+            ("mutable_rule_entry", 31),
+            ("phase", 1),
+        )
+    else:
+        assert row.spf == "SPF048"
+        fields = (
+            ("pc", 0),
+            ("memory0_opcode", 7),
+            ("memory1_data", 7),
+            ("halted", 0),
+        )
+        read_names = ("pc", "memory0_opcode", "memory1_data")
+        replacements = (
+            ("pc", 0),
+            ("memory0_opcode", 0),
+            ("halted", 1),
+        )
+    source = _record_configuration(fields)
+    alphabet = alphabets.integers()
+    targets = _record_targets(source)
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=tuple(targets[name] for name, _ in replacements),
+        read_targets=tuple(targets[name] for name in read_names),
+    )
     rule = _kernel(
         source,
         alphabet,
@@ -917,25 +1590,16 @@ def _px07(row: MechanicsRow) -> MechanicsRun:
         readable,
         (
             _clause(
-                rules.equal(rules.observation(0), rules.literal_expr(1)),
+                rules.literal_expr(1),
                 _derivation_result(
                     row.fixture,
-                    existing=(
-                        _existing_plan(
-                            0,
+                    existing=tuple(
+                        _existing_target_plan(
+                            targets[name],
                             rules.DispositionAction.REPLACE,
-                            rules.literal_expr(0),
-                        ),
-                        _existing_plan(
-                            1,
-                            rules.DispositionAction.REPLACE,
-                            rules.add(rules.observation(1), rules.literal_expr(1)),
-                        ),
-                        _existing_plan(
-                            2,
-                            rules.DispositionAction.REPLACE,
-                            rules.add(rules.observation(2), rules.literal_expr(1)),
-                        ),
+                            rules.literal_expr(value),
+                        )
+                        for name, value in replacements
                     ),
                 ),
             ),
@@ -947,7 +1611,32 @@ def _px07(row: MechanicsRow) -> MechanicsRun:
 def _px08(row: MechanicsRow) -> MechanicsRun:
     """Produce a typed one-shot successor whose continuation is stopped."""
 
-    source, alphabet, writable, readable = _finite_history_components((1, 0))
+    fields, read_names, replacements = {
+        "SPF010": (
+            (("candidate", 4), ("bound", 5), ("witness", -1), ("phase", 0)),
+            ("candidate", "bound", "phase"),
+            (("witness", 4), ("phase", 1)),
+        ),
+        "SPF020": (
+            (("query_hash", 0), ("bucket_key", 0), ("bucket_value", 7), ("result", -1), ("phase", 0)),
+            ("query_hash", "bucket_key", "bucket_value", "phase"),
+            (("result", 7), ("phase", 1)),
+        ),
+        "SPF044": (
+            (("argument", 3), ("frame_depth", 1), ("accumulator", 2), ("result", -1), ("phase", 0)),
+            ("argument", "frame_depth", "accumulator", "phase"),
+            (("frame_depth", 0), ("result", 5), ("phase", 1)),
+        ),
+    }[row.spf]
+    source = _record_configuration(fields)
+    alphabet = alphabets.integers()
+    targets = _record_targets(source)
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=tuple(targets[name] for name, _ in replacements),
+        read_targets=tuple(targets[name] for name in read_names),
+    )
     rule = _kernel(
         source,
         alphabet,
@@ -955,24 +1644,18 @@ def _px08(row: MechanicsRow) -> MechanicsRun:
         readable,
         (
             _clause(
-                rules.equal(rules.observation(0), rules.literal_expr(1)),
+                rules.literal_expr(1),
                 _derivation_result(
                     row.fixture,
-                    existing=(
-                        _existing_plan(
-                            1,
+                    existing=tuple(
+                        _existing_target_plan(
+                            targets[name],
                             rules.DispositionAction.REPLACE,
-                            rules.add(rules.observation(0), rules.literal_expr(6)),
-                        ),
+                            rules.literal_expr(value),
+                        )
+                        for name, value in replacements
                     ),
                     stop=True,
-                ),
-            ),
-            _clause(
-                rules.equal(rules.observation(0), rules.literal_expr(0)),
-                _no_successor_result(
-                    f"{row.fixture}:divergent",
-                    rules.NoSuccessorOutcome.DIVERGENT,
                 ),
             ),
         ),
@@ -983,27 +1666,24 @@ def _px08(row: MechanicsRow) -> MechanicsRun:
 def _px09(row: MechanicsRow) -> MechanicsRun:
     """Evaluate a closed fixed wiring/gate expression and stop."""
 
-    source = loci.history_configuration((True, True, False))
+    source = _record_configuration((("wire_x", True), ("wire_y", False), ("cursor", False)))
     alphabet = alphabets.boolean()
-    writable = frontiers.everywhere(
-        configuration_contract=source.contract,
-        value_profile=alphabet.value_profile,
+    targets = _record_targets(source)
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=(targets["wire_x"], targets["wire_y"], targets["cursor"]),
+        read_targets=(targets["wire_x"], targets["wire_y"], targets["cursor"]),
     )
-    readable = neighborhoods.global_view(
-        configuration_contract=source.contract,
-        value_profile=alphabet.value_profile,
-    )
-    gate_value = rules.gate(
+    addressed_pair = rules.gate(
         rules.RuleExpr(
             rules.ExpressionPrimitive.TUPLE,
-            (rules.observation(0), rules.observation(1)),
+            (
+                rules.observation(0),
+                rules.equal(rules.observation(1), rules.literal_expr(False)),
+            ),
         ),
         rules.GateKind.ALL,
-    )
-    boolean_gate_value = rules.conditional(
-        gate_value,
-        rules.literal_expr(True),
-        rules.literal_expr(False),
     )
     rule = _kernel(
         source,
@@ -1017,9 +1697,23 @@ def _px09(row: MechanicsRow) -> MechanicsRun:
                     row.fixture,
                     existing=(
                         _existing_plan(
+                            0,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(True),
+                        ),
+                        _existing_plan(
+                            1,
+                            rules.DispositionAction.REPLACE,
+                            rules.conditional(
+                                addressed_pair,
+                                rules.literal_expr(True),
+                                rules.observation(1),
+                            ),
+                        ),
+                        _existing_plan(
                             2,
                             rules.DispositionAction.REPLACE,
-                            boolean_gate_value,
+                            rules.literal_expr(True),
                         ),
                     ),
                     stop=True,
@@ -2009,7 +2703,18 @@ def _ct12_stochastic() -> MechanicsRun:
     """The exact mixed search law: accept, reject-and-count, or no proposal."""
 
     row = next(row for row in MECHANICS_ROWS if row.spf == "SPF047")
-    source = loci.record_configuration((("x", 0), ("k", 0)))
+    plain_source = loci.record_configuration((("x", 0), ("k", 0)))
+    source = loci.FiniteConfiguration(
+        loci.Carrier(
+            plain_source.contract,
+            plain_source.carrier.boundary,
+            (
+                ("objective", "(x-1)^2"),
+                ("proposal-law", "closed"),
+            ),
+        ),
+        plain_source.entries,
+    )
     alphabet = alphabets.integers()
     writable = frontiers.everywhere(
         configuration_contract=source.contract,
@@ -2084,12 +2789,20 @@ def _ct12_flow() -> MechanicsRun:
         _ct12_value("equals", _ct12_value("x-of", "t"), "t"),
         kind=alphabets.ValueKind.FIELD,
     )
-    source = loci.record_configuration(
+    plain_source = loci.record_configuration(
         (
             ("equation", equation),
             ("initial", initial),
             ("solution", "unset"),
         )
+    )
+    source = loci.FiniteConfiguration(
+        loci.Carrier(
+            plain_source.contract,
+            plain_source.carrier.boundary,
+            (("duration-or-event-selector", "none"),),
+        ),
+        plain_source.entries,
     )
     alphabet = alphabets.enum((equation, initial, "unset", solution))
     solution_target = next(
@@ -2148,7 +2861,14 @@ def _ct12_intensional() -> MechanicsRun:
     domain_target = loci.named("domain", scope="field")
     u_target = loci.named("u", scope="field")
     source = loci.FiniteConfiguration(
-        loci.Carrier(contract, loci.Boundary(loci.BoundaryPolicy.NONE)),
+        loci.Carrier(
+            contract,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+            (
+                ("differential-germ", "du/dx=0"),
+                ("side-data", "none"),
+            ),
+        ),
         ((domain_target, domain), (u_target, unknown)),
     )
     alphabet = alphabets.field()
@@ -2224,7 +2944,6 @@ def _ct12_intensional() -> MechanicsRun:
 def runtime_ct12_fixture(case_id: str) -> MechanicsRun:
     """Build one of the ten frozen non-native CT12 mechanics cases."""
 
-    rows = {row.spf: row for row in MECHANICS_ROWS}
     builders = {
         "px01.mobile-head-branching": _ct12_mobile,
         "px02.parallel-substitution": _ct12_substitution,
