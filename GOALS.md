@@ -7,7 +7,8 @@
    produced the frozen Goal 2 handoff.
 2. [Goal 2](goal-2/README.md) — the original implementation and conformance
    handoff. Frozen as a comparison baseline; it is evidence for the completed
-   Goal 6 remaster and future Goal 7, not the current plan to execute.
+   Goal 6 remaster and completed Goal 7 implementation, not the current plan
+   to execute.
 3. [Goal 3](goal-3/0-plan.md) — source-verified correction and release of the
    canonical *A New Kind of Science* Markdown corpus. Complete; its compact
    historical plan and release record remain.
@@ -25,20 +26,18 @@
    core/catalog structure, and all 60 audited families without changing
    runtime behavior. Its exact mechanics-first implementation contract is
    [goal-7-handoff.md](goal-6/goal-7-handoff.md).
-
-## Next Goal — Scaffolded, Not Started
-
 7. [Goal 7](goal-7/0-plan.md) — five-field runtime implementation. Its
-   operating scaffold and completion contract are ready, but no implementation
-   stage has started. Inert source declarations and explicitly skipped test
-   obligations make the target shape concrete; they do not implement behavior
-   or provide conformance evidence. Begin with
-   [`1-ORACLES`](goal-7/0-plan.md#1-oracles) only after an explicit start
-   instruction.
+   seven stages are complete: one immutable five-field `SimpleProgram`, one
+   family-blind `apply`, rollout through that operation, fail-closed canonical
+   serialization, and ordinary catalog constructors for all 60 audited
+   families now form the coherent `0.2.0` release candidate. Exact release
+   evidence is in [`7-RELEASE.md`](goal-7/7-RELEASE.md).
 
-The current order is Goal 5 (completed semantic authority) → Goal 6 (completed
-architecture and handoff) → Goal 7 (future implementation). Goal 2 remains
-frozen evidence; Goal 4 is superseded and excluded from the live path.
+## Current State
+
+The live sequence—Goal 5 semantic authority, Goal 6 architecture, and Goal 7
+implementation—is complete. No later numbered goal is scaffolded. Goal 2
+remains frozen evidence; Goal 4 is superseded and excluded from the live path.
 
 The canonical book source used by current and future work begins at
 [Contents.md](ref/A-New-Kind-of-Science/Contents.md), whose 29 document links

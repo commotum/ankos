@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-06 RELEASE RECONCILIATION ACTIVE**
+Status: **COMPLETE**
 
 ## Big-Picture Objective
 
@@ -100,8 +100,9 @@ other Goal 6 contracts remain authoritative.
   generic application and agree with independent complete-result fixtures.
 - Datasets, RNG helpers, tensor projections, and visualization are downstream
   consumers of ordinary programs and explicit rollout views.
-- Source and lock metadata are at `0.2.0`, NumPy is a runtime dependency, and
-  pytest is development-only. This is an internal checkpoint, not a release.
+- G7-01 set source and lock metadata to `0.2.0`, with NumPy as a runtime
+  dependency and pytest development-only. That stage remained an internal
+  checkpoint until G7-06 completed the release proof.
 - G7-02's original closure began from clean commit `130b230` with
   `225 passed, 36 skipped` and closed at `356 passed, 26 skipped`; no
   originally scoped G7-02 skip remained.
@@ -182,9 +183,15 @@ other Goal 6 contracts remain authoritative.
   environment and passed dependency, import, signature, codec, catalog,
   application, rollout, and `py.typed` checks. Exact evidence is in
   [`6-CONFORMANCE.md`](6-CONFORMANCE.md).
-- G7-06 is the first incomplete stage and has begun from clean commit
-  `1c92123cf3c04a421759f5acd84141a6074a6fbe`. Its live transaction record is
-  [`7-RELEASE.md`](7-RELEASE.md). No release-readiness claim has been made.
+- G7-06 is complete. It began from clean commit
+  `1c92123cf3c04a421759f5acd84141a6074a6fbe`; its reconciliation, exact
+  verification commands, wheel identity, hostile reviews, and authorized
+  contract resolution are recorded in [`7-RELEASE.md`](7-RELEASE.md).
+- The final conformance directory reports `270 passed`; the complete active
+  suite reports `1044 passed`, both with no skips or xfails. The final
+  CPython 3.10 wheel contains 36 paths, passes isolated installation and
+  dependency checks, and has SHA-256
+  `8eaa83a4553a10af42d4f572e1e16cea8359a5ec29b13c20dcb167aebc60d435`.
 - G7-06's only hostile-review contract conflict is resolved by explicit user
   authorization: `INTENSIONAL_SUPPORT` remains a fifth rollout truncation
   cause for positive-depth traversal blocked by valid unenumerated support.
@@ -210,8 +217,9 @@ other Goal 6 contracts remain authoritative.
 - Catalog remained unexposed until its required mechanics and codecs were
   complete. G7-04 may now expose it only when each owned constructor,
   delegate, metadata join, and migration obligation is authoritative.
-- Stages G7-00 through G7-05 are internal checkpoints. Only the reconciled
-  G7-06 result may be published as `0.2.0`.
+- Stages G7-00 through G7-05 remain internal checkpoints. Reconciled G7-06
+  closes the coherent `0.2.0` release candidate; publishing remains a separate
+  external action and was not performed by this goal.
 - A concrete counterexample changes assumptions; implementation inconvenience
   does not.
 
@@ -344,7 +352,7 @@ stage file and may evolve with the implementation.
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Complete | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Complete | All normative suites and joins pass together |
-| `7-RELEASE` | G7-06 | In progress | Docs, packaging, cleanup, and hostile final gate |
+| `7-RELEASE` | G7-06 | Complete | Docs, packaging, cleanup, and hostile final gate |
 
 No stage file exists until that stage begins.
 
@@ -601,7 +609,7 @@ Handoff stage: **G7-05 — Complete conformance**
 
 Stage status: **Complete.** The requirement audit, repaired conformance
 evidence, installed-wheel proof, and hostile closure are recorded in
-[`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 is active under
+[`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 later completed under
 [`7-RELEASE.md`](7-RELEASE.md).
 
 #### Big Picture Objective
@@ -643,7 +651,7 @@ surface has no hidden alternate semantics.
 
 Handoff stage: **G7-06 — Documentation, packaging, and cleanup**
 
-Stage status: **In progress.** The live release-reconciliation record is
+Stage status: **Complete.** The release-reconciliation record is
 [`7-RELEASE.md`](7-RELEASE.md).
 
 #### Big Picture Objective

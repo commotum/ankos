@@ -1,6 +1,6 @@
 # 7-RELEASE
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -20,7 +20,7 @@ Status: **IN PROGRESS**
   `1044 passed` in the complete active suite, both with no skips or xfails.
   The two tests added during this stage make documentation link, fence, and
   current Python-example structure durable release checks.
-- The final decision-independent wheel is
+- The final wheel is
   `ankos-0.2.0-py3-none-any.whl`, 216540 bytes, with SHA-256
   `8eaa83a4553a10af42d4f572e1e16cea8359a5ec29b13c20dcb167aebc60d435`.
   It contains 36 paths and passes isolated clean-install checks under CPython
@@ -42,8 +42,8 @@ Status: **IN PROGRESS**
 - Existing green conformance is necessary but insufficient: documentation,
   source signatures, lock metadata, wheel contents, links, code fences, and
   clean-install behavior must agree.
-- `GOALS.md` must remain unchanged until every other G7-06 completion gate
-  passes.
+- `GOALS.md` was held unchanged until every other G7-06 completion gate
+  passed.
 
 ## Authorized Contract Resolution
 
@@ -151,11 +151,11 @@ must remain untouched.
       family, or competing API story.
 - [x] Explicit authority resolves the fifth truncation-cause conflict without
       editing the frozen Goal 6 tree.
-- [ ] `GOALS.md` is updated only after every other requirement passes.
+- [x] `GOALS.md` is updated only after every other requirement passes.
 
 ## Verification Evidence
 
-The final decision-independent source state was verified with:
+The final authorized release state was verified with:
 
 | Gate | Exact command | Result |
 |---|---|---|
@@ -164,7 +164,7 @@ The final decision-independent source state was verified with:
 | Complete active suite | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests` | `1044 passed` |
 | Lockfile | `UV_CACHE_DIR=/tmp/uv-cache uv lock --check` | 12 packages resolved; lock current |
 | Compilation | `UV_CACHE_DIR=/tmp/uv-cache uv run python -m compileall -q src tests examples ref/notes/ca-scaffold.py` | passed |
-| Documentation structure | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests/test_release_documentation.py` | `2 passed`; 10 release documents checked, with current Python fences parsed in `README-V2.md` and `api.md` |
+| Documentation structure | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests/test_release_documentation.py` | `2 passed`; 11 release documents checked, with current Python fences parsed in `README-V2.md` and `api.md` |
 | Reference walkthrough | `UV_CACHE_DIR=/tmp/uv-cache uv run python ref/notes/ca-scaffold.py` | `ca-scaffold: ok` |
 | Example CLI | `UV_CACHE_DIR=/tmp/uv-cache uv run python examples/export_viz_samples.py --help` | passed |
 | Pending/stub scan | `rg -n 'pytest\\.skip\|pytest\\.mark\\.skip\|pytest\\.mark\\.xfail\|@pytest\\.mark\\.xfail\|NotImplementedError\|_pending\\(\|_not_implemented\\(\|not implemented' src tests --glob '*.py'` | no matches |
@@ -222,7 +222,9 @@ runtime cleanup, and the complete release contract:
 
 ## Stage Results
 
-The release implementation and decision-independent evidence are complete,
-and the narrow contract supersession is authorized. `GOALS.md` remains
-intentionally unchanged until the closing verification rerun passes. No
-release has been published.
+Complete. The release surface is reconciled, the generic zero-step defect is
+repaired, the fifth truncation cause is explicitly authorized, every
+completion and no-cheating gate passes, and the independent final hostile
+audit reports no blocker. `GOALS.md` was updated only after the closing
+verification rerun. Goal 7 now yields a coherent `0.2.0` release candidate;
+no release was published.

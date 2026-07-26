@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RELEASE_DOCUMENTS = tuple(
     ROOT / name
     for name in (
+        "GOALS.md",
         "README-V1.md",
         "README-V2.md",
         "api.md",
