@@ -168,6 +168,49 @@ def _criterion_programs() -> dict[str, ca.SimpleProgram]:
     }
 
 
+def _zero_criterion_programs(
+    *,
+    relation_label: str = "empty declared solution relation",
+    evidence_label: str = "solution relation has exactly zero members",
+) -> dict[str, ca.SimpleProgram]:
+    (
+        partial_assignment,
+        predicates,
+        allowed_templates,
+        required_occurrence,
+        _,
+        _,
+    ) = _constraint_inputs()
+    relation = rules.literal_expr(relation_label)
+    cardinality = rules.ExactlyZero(
+        rules.Certificate(
+            rules.CertificateKind.CARDINALITY,
+            rules.literal_expr(evidence_label),
+        )
+    )
+    return {
+        "local": criteria.local_constraint_system(
+            partial_assignment=partial_assignment,
+            predicates=predicates,
+            relation=relation,
+            cardinality=cardinality,
+        ),
+        "template": criteria.template_constraint_system(
+            partial_assignment=partial_assignment,
+            allowed_templates=allowed_templates,
+            relation=relation,
+            cardinality=cardinality,
+        ),
+        "seeded-template": criteria.seeded_template_constraint_system(
+            partial_assignment=partial_assignment,
+            allowed_templates=allowed_templates,
+            required_occurrences=(required_occurrence,),
+            relation=relation,
+            cardinality=cardinality,
+        ),
+    }
+
+
 def _all_preset_programs() -> dict[str, ca.SimpleProgram]:
     return {
         "constant-digit-register": _register_program(),
@@ -253,6 +296,36 @@ def test_look_and_say_executes_the_representative_step_and_rollout() -> None:
         _single_state(rolled.continuing_leaves.atoms[0].configuration)
         == expected_state
     )
+
+
+def test_register_expressions_are_range_checked_before_commit() -> None:
+    simple_program = media.constant_digit_register(
+        register=0,
+        register_law=rules.literal_expr(-1),
+        digit_projection=rules.literal_expr(3),
+        base=2,
+    )
+    source = _exact_source(simple_program)
+    source_identity = loci.configuration_identity(source)
+
+    rejected = ca.apply(simple_program, source)
+
+    assert type(rejected) is program.ApplicationRejected
+    assert (
+        rejected.fault.phase
+        is program.ApplicationPhase.RESULT_VALIDATION
+    )
+    assert loci.configuration_identity(source) == source_identity
+    assert not hasattr(rejected, "applied_atoms")
+    assert not hasattr(
+        rejected,
+        "successor_quotient_with_derivation_fibers",
+    )
+    for value in (simple_program, rejected):
+        encoded = serialization.dumps(value)
+        assert serialization.loads(encoded) == serialization.Decoded(value)
+        assert serialization.dumps(value) == encoded
+        assert b"catalog:" not in encoded
 
 
 def test_constraint_presets_retain_three_distinct_source_presentations() -> None:
@@ -352,6 +425,85 @@ def test_constraint_presets_apply_as_closed_intensional_relations(
     assert type(rolled) is program.RolloutTruncated
     assert rolled.cause is program.TruncationCause.INTENSIONAL_SUPPORT
     assert len(rolled.raw_trace.applications.atoms) == 1
+
+
+@pytest.mark.parametrize(
+    "name",
+    ("local", "template", "seeded-template"),
+)
+def test_exact_zero_constraint_relations_lower_to_typed_terminal_results(
+    name: str,
+) -> None:
+    relation = rules.literal_expr("empty declared solution relation")
+    cardinality_statement = rules.literal_expr(
+        "solution relation has exactly zero members"
+    )
+    simple_program = _zero_criterion_programs()[name]
+    source = _exact_source(simple_program)
+    source_identity = loci.configuration_identity(source)
+
+    applied = ca.apply(simple_program, source)
+
+    assert type(applied) is program.ApplicationComplete
+    assert (
+        applied.source_outcomes.support.presentation
+        is rules.SupportPresentation.FINITE
+    )
+    assert type(applied.outcome_atom_cardinality) is rules.ExactlyOne
+    assert type(applied.derivation_cardinality) is rules.ExactlyZero
+    assert type(applied.successor_cardinality) is rules.ExactlyZero
+    assert applied.successor_quotient_with_derivation_fibers.atoms == ()
+    (terminal,) = applied.no_successor_partition.atoms
+    assert terminal.source.outcome is rules.NoSuccessorOutcome.TERMINAL
+    assert terminal.source.reason == rules.literal_expr(
+        "constraint-relation-empty"
+    )
+    assert terminal.source.provenance == (
+        "mechanics:constraint-relation-empty",
+    )
+    assert terminal.source.certificate == rules.Certificate(
+        rules.CertificateKind.TERMINALITY,
+        rules.RuleExpr(
+            rules.ExpressionPrimitive.TUPLE,
+            (
+                rules.literal_expr("constraint-relation:exact-zero"),
+                relation,
+                cardinality_statement,
+            ),
+        ),
+    )
+    assert loci.configuration_identity(source) == source_identity
+
+    for value in (simple_program, applied):
+        encoded = serialization.dumps(value)
+        assert serialization.loads(encoded) == serialization.Decoded(value)
+        assert serialization.dumps(value) == encoded
+        assert b"catalog:" not in encoded
+
+
+@pytest.mark.parametrize(
+    "name",
+    ("local", "template", "seeded-template"),
+)
+def test_exact_zero_constraint_identity_retains_relation_and_evidence(
+    name: str,
+) -> None:
+    baseline = _zero_criterion_programs()[name]
+    changed_relation = _zero_criterion_programs(
+        relation_label="different empty relation",
+    )[name]
+    changed_evidence = _zero_criterion_programs(
+        evidence_label="different exact-zero evidence",
+    )[name]
+
+    assert baseline != changed_relation
+    assert baseline != changed_evidence
+    assert serialization.dumps(baseline) != serialization.dumps(
+        changed_relation
+    )
+    assert serialization.dumps(baseline) != serialization.dumps(
+        changed_evidence
+    )
 
 
 @pytest.mark.parametrize(

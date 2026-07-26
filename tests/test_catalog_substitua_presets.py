@@ -591,6 +591,53 @@ def test_terminal_presets_return_typed_no_successor_outcomes() -> None:
         _assert_terminal(simple_program)
 
 
+def test_closed_rule_expressions_are_range_checked_before_commit() -> None:
+    scalar_rewrite = alphabets.rewrite_rules_value(
+        (
+            alphabets.rewrite_rule_value(
+                alphabets.pattern_node("root", ()),
+                alphabets.template_literal(0),
+            ),
+        )
+    )
+    programs = (
+        substitua.constant_digit_sequence(
+            base=2,
+            prefix=(0,),
+            next_digit=rules.literal_expr(2),
+            source_evidence=_evidence("out-of-range-digit"),
+        ),
+        substitua.variable_index_recursive_sequence(
+            prefix=(1,),
+            recurrence=rules.literal_expr(-1),
+        ),
+        substitua.symbolic_system(
+            expression=alphabets.symbolic_value("root"),
+            rewrites=scalar_rewrite,
+        ),
+    )
+
+    for simple_program in programs:
+        source = _initial(simple_program)
+        source_identity = loci.configuration_identity(source)
+
+        rejected = ca.apply(simple_program, source)
+
+        assert type(rejected) is program.ApplicationRejected
+        assert (
+            rejected.fault.phase
+            is program.ApplicationPhase.RESULT_VALIDATION
+        )
+        assert loci.configuration_identity(source) == source_identity
+        assert not hasattr(rejected, "applied_atoms")
+        assert not hasattr(
+            rejected,
+            "successor_quotient_with_derivation_fibers",
+        )
+        _roundtrip(simple_program)
+        _roundtrip(rejected)
+
+
 @pytest.mark.parametrize(
     ("call", "match"),
     (

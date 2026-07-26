@@ -255,25 +255,59 @@ def _constraint_components(
         configuration_contract=source.contract,
         value_profile=alphabet.value_profile,
     )
-    rule = rules.relation(
-        relation,
-        cardinality,
-        contract=rules.RuleContract(
-            source.contract,
-            alphabet.value_profile,
-            readable.result_shape,
-            readable.join_shape,
-            frontiers.EffectProfile(),
-        ),
-        completeness_evidence=_certificate(
-            rules.CertificateKind.COMPLETENESS,
-            "constraint-relation:complete",
-        ),
-        soundness_evidence=_certificate(
-            rules.CertificateKind.SOUNDNESS,
-            "constraint-relation:sound",
-        ),
+    contract = rules.RuleContract(
+        source.contract,
+        alphabet.value_profile,
+        readable.result_shape,
+        readable.join_shape,
+        frontiers.EffectProfile(),
     )
+    if type(cardinality) is rules.ExactlyZero:
+        exact_zero_statement = rules.RuleExpr(
+            rules.ExpressionPrimitive.TUPLE,
+            (
+                rules.literal_expr("constraint-relation:exact-zero"),
+                relation,
+                cardinality.evidence.statement,
+            ),
+        )
+        rule = rules.clause_kernel(
+            (
+                rules.RuleClause(
+                    rules.literal_expr(True),
+                    rules.NoSuccessorClauseResult(
+                        rules.NoSuccessorOutcome.TERMINAL,
+                        rules.literal_expr("constraint-relation-empty"),
+                        rules.literal_expr("constraint-relation-empty"),
+                        ("mechanics:constraint-relation-empty",),
+                        rules.Certificate(
+                            rules.CertificateKind.TERMINALITY,
+                            exact_zero_statement,
+                        ),
+                    ),
+                ),
+            ),
+            contract=contract,
+            completeness_evidence=_certificate(
+                rules.CertificateKind.COMPLETENESS,
+                "constraint-relation:exact-zero-complete",
+            ),
+            selection=rules.ClauseSelection.FIRST,
+        )
+    else:
+        rule = rules.relation(
+            relation,
+            cardinality,
+            contract=contract,
+            completeness_evidence=_certificate(
+                rules.CertificateKind.COMPLETENESS,
+                "constraint-relation:complete",
+            ),
+            soundness_evidence=_certificate(
+                rules.CertificateKind.SOUNDNESS,
+                "constraint-relation:sound",
+            ),
+        )
     return (
         seeds.exact(source, value_profile=alphabet.value_profile),
         alphabet,
