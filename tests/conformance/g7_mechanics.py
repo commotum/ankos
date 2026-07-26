@@ -573,7 +573,7 @@ _PX02_SHAPES = {
     "SPF028": (3, 5),
     "SPF031": (1, 2),
     "SPF037": (2, 2),
-    "SPF038": (1, 2),
+    "SPF038": (2, 2),
     "SPF049": (1, 1),
 }
 
@@ -749,11 +749,111 @@ def _px02_graph(row: MechanicsRow) -> MechanicsRun:
     return _assemble(row, source, alphabet, writable, readable, rule)
 
 
+def _px02_parallel_graph(row: MechanicsRow) -> MechanicsRun:
+    """Commit two compatible edge rewrites as one typed network patch."""
+
+    node_a = loci.graph_element("node", "a")
+    node_b = loci.graph_element("node", "b")
+    node_c = loci.graph_element("node", "c")
+    node_d = loci.graph_element("node", "d")
+    edge_ab = loci.graph_element("edge", "a-b")
+    edge_cd = loci.graph_element("edge", "c-d")
+    source = _structural_configuration(
+        loci.CarrierKind.GRAPH,
+        (
+            (node_a, _graph_node("a")),
+            (node_b, _graph_node("b")),
+            (node_c, _graph_node("c")),
+            (node_d, _graph_node("d")),
+            (edge_ab, _graph_edge(node_a, node_b, name="a-b")),
+            (edge_cd, _graph_edge(node_c, node_d, name="c-d")),
+        ),
+    )
+    alphabet = alphabets.graph()
+    existing = frontiers.literal(
+        (edge_ab, edge_cd),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=(frontiers.Effect.DELETE,),
+    )
+    namespace = "g7-parallel-network-edges"
+    edge_ac = loci.FreshReference(
+        namespace,
+        "a-c",
+        interface=(node_a, node_c),
+    )
+    edge_bd = loci.FreshReference(
+        namespace,
+        "b-d",
+        interface=(node_b, node_d),
+    )
+    fresh = frontiers.fresh(
+        loci.Region(
+            loci.RegionKind.FRESH_EDGES,
+            name=namespace,
+            fresh=(edge_ac, edge_bd),
+        ),
+        namespace=frontiers.FreshNamespace(namespace),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    writable = frontiers.union((existing, fresh))
+    readable = neighborhoods.literal(
+        (node_a, node_b, node_c, node_d, edge_ab, edge_cd),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        key="two-compatible-network-matches",
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.literal_expr(1),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_target_plan(
+                            edge_ab,
+                            rules.DispositionAction.DELETE,
+                        ),
+                        _existing_target_plan(
+                            edge_cd,
+                            rules.DispositionAction.DELETE,
+                        ),
+                    ),
+                    fresh=(
+                        _fresh_target_plan(
+                            edge_ac,
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(
+                                _graph_edge(node_a, node_c, name="a-c")
+                            ),
+                        ),
+                        _fresh_target_plan(
+                            edge_bd,
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(
+                                _graph_edge(node_b, node_d, name="b-d")
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
 def _px02(row: MechanicsRow) -> MechanicsRun:
     """Apply one input-derived total delete/create structural patch."""
 
     if row.spf == "SPF028":
         return _px02_graph(row)
+    if row.spf == "SPF038":
+        return _px02_parallel_graph(row)
 
     delete_count, create_count = _PX02_SHAPES[row.spf]
     if row.spf in {"SPF002", "SPF005", "SPF016", "SPF025", "SPF037"}:
@@ -794,15 +894,6 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
             rank=2,
             axes=("x", "y"),
         )
-    elif row.spf == "SPF038":
-        source = _structural_configuration(
-            loci.CarrierKind.GRAPH,
-            (
-                (loci.graph_element("node", "a"), 1),
-                (loci.graph_element("node", "b"), 2),
-                (loci.graph_element("edge", "a-b"), 3),
-            ),
-        )
     elif row.spf == "SPF049":
         source = _structural_configuration(
             loci.CarrierKind.TREE,
@@ -825,15 +916,6 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
         delete_targets = (source_targets[1],)
     elif row.spf == "SPF037":
         delete_targets = source_targets
-    elif row.spf == "SPF038":
-        delete_targets = (
-            next(
-                target
-                for target in source_targets
-                if target.kind is loci.LocusKind.GRAPH_ELEMENT
-                and target.path[0] == "edge"
-            ),
-        )
     else:
         assert row.spf == "SPF049"
         delete_targets = (loci.path("add", scope="term"),)
@@ -858,7 +940,6 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
         "SPF025": source_targets[0],
         "SPF031": source_targets[-1],
         "SPF037": source_targets[0],
-        "SPF038": source_targets[0],
         "SPF049": loci.path("add", "x", scope="term"),
     }[row.spf]
     references: tuple[loci.FreshReference, ...] = ()
@@ -894,7 +975,6 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
         "SPF025": (),
         "SPF031": (4, 5),
         "SPF037": (1, 2),
-        "SPF038": (4, 5),
         "SPF049": (8,),
     }[row.spf]
     fresh_plans = tuple(
@@ -924,8 +1004,97 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
     return _assemble(row, source, alphabet, writable, readable, rule)
 
 
+def _causal_event(name: str, time: int, position: int) -> alphabets.ValueNode:
+    return alphabets.ValueNode(
+        alphabets.ValueKind.GRAPH,
+        "event",
+        fields=(
+            ("name", name),
+            ("position", position),
+            ("time", time),
+        ),
+    )
+
+
+def _px03_causal_cover(row: MechanicsRow) -> MechanicsRun:
+    """Construct the causal cover relation from the complete event set."""
+
+    event_0 = loci.graph_element("node", "event/e0")
+    event_1 = loci.graph_element("node", "event/e1")
+    event_2 = loci.graph_element("node", "event/e2")
+    source = _structural_configuration(
+        loci.CarrierKind.GRAPH,
+        (
+            (event_0, _causal_event("e0", 0, 0)),
+            (event_1, _causal_event("e1", 1, 1)),
+            (event_2, _causal_event("e2", 2, 1)),
+        ),
+    )
+    alphabet = alphabets.graph()
+    namespace = "g7-causal-cover-edges"
+    causal_01 = loci.FreshReference(
+        namespace,
+        "e0->e1",
+        interface=(event_0, event_1),
+    )
+    causal_12 = loci.FreshReference(
+        namespace,
+        "e1->e2",
+        interface=(event_1, event_2),
+    )
+    writable = frontiers.fresh(
+        loci.Region(
+            loci.RegionKind.FRESH_EDGES,
+            name=namespace,
+            fresh=(causal_01, causal_12),
+        ),
+        namespace=frontiers.FreshNamespace(namespace),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        key="complete-event-set",
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.literal_expr(1),
+                _derivation_result(
+                    row.fixture,
+                    fresh=(
+                        _fresh_target_plan(
+                            causal_01,
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(
+                                _graph_edge(event_0, event_1, name="e0->e1")
+                            ),
+                        ),
+                        _fresh_target_plan(
+                            causal_12,
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(
+                                _graph_edge(event_1, event_2, name="e1->e2")
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
 def _px03(row: MechanicsRow) -> MechanicsRun:
     """Use the complete immutable snapshot in one coupled global decision."""
+
+    if row.spf == "SPF046":
+        return _px03_causal_cover(row)
 
     fields, read_names, result_name = {
         "SPF017": (
@@ -952,11 +1121,6 @@ def _px03(row: MechanicsRow) -> MechanicsRun:
             (("fitness0", 3), ("fitness1", 7), ("fitness2", 5), ("selected", -1)),
             ("fitness0", "fitness1", "fitness2"),
             "selected",
-        ),
-        "SPF046": (
-            (("event0", 1), ("event1", 1), ("event2", 0), ("cover_size", -1)),
-            ("event0", "event1", "event2"),
-            "cover_size",
         ),
         "SPF051": (
             (("history0", 1), ("history1", -1), ("amplitude", 9)),
@@ -1001,13 +1165,6 @@ def _px03(row: MechanicsRow) -> MechanicsRun:
                 rules.literal_expr(0),
             ),
         ),
-        "SPF046": (
-            rules.add(
-                rules.observation(0),
-                rules.observation(1),
-                rules.observation(2),
-            ),
-        ),
         "SPF051": (
             rules.add(rules.observation(0), rules.observation(1)),
         ),
@@ -1046,11 +1203,23 @@ def _px04(row: MechanicsRow) -> MechanicsRun:
     """Denote typed zero, witnessed one, or witnessed many alternatives."""
 
     if row.spf == "SPF014":
-        source = _record_configuration((("axiom", 1), ("model", -1)))
+        source = _record_configuration(
+            (
+                ("domain_size", 1),
+                ("required_p0", 1),
+                ("p0", -1),
+                ("model_complete", 0),
+            )
+        )
         targets = _record_targets(source)
-        read_targets = (targets["axiom"],)
-        write_targets = (targets["model"],)
-        alternatives = (((targets["model"], 0),),)
+        read_targets = (targets["domain_size"], targets["required_p0"])
+        write_targets = (targets["p0"], targets["model_complete"])
+        alternatives = (
+            (
+                (targets["p0"], 1),
+                (targets["model_complete"], 1),
+            ),
+        )
     elif row.spf == "SPF018":
         source = _record_configuration((("rhs", 1), ("x", -1), ("y", -1)))
         targets = _record_targets(source)
@@ -1061,11 +1230,27 @@ def _px04(row: MechanicsRow) -> MechanicsRun:
             ((targets["x"], 1), (targets["y"], 0)),
         )
     elif row.spf == "SPF024":
-        source = _record_configuration((("observed", 1), ("predecessor", -1)))
-        targets = _record_targets(source)
-        read_targets = (targets["observed"],)
-        write_targets = (targets["predecessor"],)
-        alternatives = (((targets["predecessor"], 0),),)
+        source = loci.grid_configuration(
+            (5,),
+            (1, 0, -1, -1, 0),
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        )
+        (
+            observed_left,
+            observed_right,
+            predecessor_left,
+            predecessor_right,
+            cursor,
+        ) = tuple(target for target, _ in source.entries)
+        read_targets = (observed_left, observed_right)
+        write_targets = (predecessor_left, predecessor_right, cursor)
+        alternatives = (
+            (
+                (predecessor_left, 0),
+                (predecessor_right, 1),
+                (cursor, 1),
+            ),
+        )
     elif row.spf == "SPF026":
         source = _record_configuration((("guard", 0), ("image", -1)))
         targets = _record_targets(source)
@@ -2539,6 +2724,62 @@ def _resolved_write_targets(
     return execution.simple_program.frontier.resolve(execution.source).targets
 
 
+def normalized_mechanics_signature(execution: MechanicsRun) -> tuple[object, ...]:
+    """Return a label-, identity-, and payload-independent mechanics shape."""
+
+    assert isinstance(execution.result, program.ApplicationComplete)
+    assert isinstance(execution.source, loci.FiniteConfiguration)
+    readable_targets = _materialized_read_targets(execution)
+    writable = execution.simple_program.frontier.resolve(execution.source)
+    derivation_shapes = tuple(
+        sorted(
+            (
+                tuple(
+                    sorted(
+                        item.action.value
+                        for item in atom.source.replacement.existing
+                    )
+                ),
+                tuple(
+                    sorted(
+                        item.action.value
+                        for item in atom.source.replacement.fresh
+                    )
+                ),
+                type(atom.source.continuation).__name__,
+                len(atom.successor.entries) - len(execution.source.entries),
+            )
+            for atom in execution.result.applied_atoms.atoms
+            if isinstance(atom, program.AppliedDerivation)
+        )
+    )
+    no_successor_shapes = tuple(
+        sorted(
+            atom.source.outcome.value
+            for atom in execution.result.no_successor_partition.atoms
+        )
+    )
+    return (
+        execution.source.contract.kind.value,
+        len(execution.source.entries),
+        tuple(sorted(target.kind.value for target, _ in execution.source.entries)),
+        len(readable_targets),
+        tuple(sorted(target.kind.value for target in readable_targets)),
+        len(writable.existing),
+        tuple(
+            sorted(capability.target.kind.value for capability in writable.existing)
+        ),
+        len(writable.fresh),
+        tuple(
+            sorted(len(capability.target.interface) for capability in writable.fresh)
+        ),
+        derivation_shapes,
+        no_successor_shapes,
+        rules.cardinality_size(execution.result.derivation_cardinality),
+        rules.cardinality_size(execution.result.successor_cardinality),
+    )
+
+
 def _payload(disposition: rules.Disposition) -> alphabets.SemanticValue | None:
     if type(disposition.payload) is rules.NoPayload:
         return None
@@ -2679,17 +2920,27 @@ def assert_mechanics_run(
             "SPF049": loci.CarrierKind.TREE,
         }[row.spf]
         assert successor.contract.kind is expected_carrier
-        expected_reads = (
-            (
+        if row.spf == "SPF028":
+            expected_reads = (
                 loci.graph_element("node", "a"),
                 loci.graph_element("node", "b"),
                 loci.graph_element("node", "c"),
                 loci.graph_element("edge", "a-b"),
                 loci.graph_element("edge", "b-c"),
             )
-            if row.spf == "SPF028"
-            else tuple(target for target, _ in execution.source.entries)
-        )
+        elif row.spf == "SPF038":
+            expected_reads = (
+                loci.graph_element("node", "a"),
+                loci.graph_element("node", "b"),
+                loci.graph_element("node", "c"),
+                loci.graph_element("node", "d"),
+                loci.graph_element("edge", "a-b"),
+                loci.graph_element("edge", "c-d"),
+            )
+        else:
+            expected_reads = tuple(
+                target for target, _ in execution.source.entries
+            )
         assert _materialized_read_targets(execution) == expected_reads
         writable = execution.simple_program.frontier.resolve(execution.source)
         assert set(item.target for item in writable.existing) == {
@@ -2753,6 +3004,48 @@ def assert_mechanics_run(
             assert edges["x-y"]["right"] == alphabets.StructuralReference(node_by_name["y"])
             assert edges["y-c"]["left"] == alphabets.StructuralReference(node_by_name["y"])
             assert edges["y-c"]["right"] == alphabets.StructuralReference(node_c)
+        elif row.spf == "SPF038":
+            assert execution.source.structure == successor.structure == ()
+            bindings = {
+                binding.reference: binding.identity
+                for binding in derivation.fresh_bindings
+            }
+            assert {
+                reference.local_key: reference.interface
+                for reference in bindings
+            } == {
+                "a-c": (
+                    loci.graph_element("node", "a"),
+                    loci.graph_element("node", "c"),
+                ),
+                "b-d": (
+                    loci.graph_element("node", "b"),
+                    loci.graph_element("node", "d"),
+                ),
+            }
+            created_edges = {
+                dict(successor.value_at(identity).fields)["name"]: dict(
+                    successor.value_at(identity).fields
+                )
+                for identity in bindings.values()
+            }
+            node_a = loci.graph_element("node", "a")
+            node_b = loci.graph_element("node", "b")
+            node_c = loci.graph_element("node", "c")
+            node_d = loci.graph_element("node", "d")
+            assert set(created_edges) == {"a-c", "b-d"}
+            assert created_edges["a-c"] == {
+                "left": alphabets.StructuralReference(node_a),
+                "name": "a-c",
+                "right": alphabets.StructuralReference(node_c),
+            }
+            assert created_edges["b-d"] == {
+                "left": alphabets.StructuralReference(node_b),
+                "name": "b-d",
+                "right": alphabets.StructuralReference(node_d),
+            }
+            assert not successor.contains(loci.graph_element("edge", "a-b"))
+            assert not successor.contains(loci.graph_element("edge", "c-d"))
         return
 
     if pressure == "PX03":
@@ -2774,13 +3067,66 @@ def assert_mechanics_run(
                 for successor in successors
             } == {(0, 1), (1, 0)}
             return
+        if row.spf == "SPF046":
+            assert execution.source.contract.kind is loci.CarrierKind.GRAPH
+            assert execution.source.structure == ()
+            assert _materialized_read_targets(execution) == tuple(
+                target for target, _ in execution.source.entries
+            )
+            assert len(derivations) == len(successors) == 1
+            derivation = derivations[0]
+            assert len(derivation.source.replacement.existing) == 0
+            assert len(derivation.source.replacement.fresh) == 2
+            assert all(
+                disposition.action is rules.DispositionAction.CREATE
+                for disposition in derivation.source.replacement.fresh
+            )
+            assert len(derivation.fresh_bindings) == 2
+            successor = successors[0]
+            assert successor.structure == ()
+            assert len(successor.entries) == 5
+            event_0 = loci.graph_element("node", "event/e0")
+            event_1 = loci.graph_element("node", "event/e1")
+            event_2 = loci.graph_element("node", "event/e2")
+            assert {
+                reference.local_key: reference.interface
+                for reference in (
+                    binding.reference
+                    for binding in derivation.fresh_bindings
+                )
+            } == {
+                "e0->e1": (event_0, event_1),
+                "e1->e2": (event_1, event_2),
+            }
+            for event in (event_0, event_1, event_2):
+                value = successor.value_at(event)
+                assert isinstance(value, alphabets.ValueNode)
+                assert value.tag == "event"
+            causal_edges = {
+                dict(value.fields)["name"]: dict(value.fields)
+                for binding in derivation.fresh_bindings
+                for value in (successor.value_at(binding.identity),)
+                if isinstance(value, alphabets.ValueNode)
+            }
+            assert causal_edges == {
+                "e0->e1": {
+                    "left": alphabets.StructuralReference(event_0),
+                    "name": "e0->e1",
+                    "right": alphabets.StructuralReference(event_1),
+                },
+                "e1->e2": {
+                    "left": alphabets.StructuralReference(event_1),
+                    "name": "e1->e2",
+                    "right": alphabets.StructuralReference(event_2),
+                },
+            }
+            return
         expected = {
             "SPF017": (("fixed", "metric"), "movable", (Fraction(1),)),
             "SPF019": (("score0", "score1", "score2"), "winner", (1,)),
             "SPF027": (("factor_xy", "factor_yz"), "normalization", (6,)),
             "SPF035": (("stored0", "stored1", "query"), "nearest", (0, 2)),
             "SPF040": (("fitness0", "fitness1", "fitness2"), "selected", (1,)),
-            "SPF046": (("event0", "event1", "event2"), "cover_size", (2,)),
             "SPF051": (("history0", "history1"), "amplitude", (0,)),
         }[row.spf]
         read_names, result_name, expected_values = expected
@@ -2845,6 +3191,39 @@ def assert_mechanics_run(
                 )
                 for successor in successors
             } == {(0, 1), (1, 0)}
+        if row.spf == "SPF014":
+            assert execution.source.contract.kind is loci.CarrierKind.RECORD
+            targets = _record_targets(execution.source)
+            assert _materialized_read_targets(execution) == (
+                targets["domain_size"],
+                targets["required_p0"],
+            )
+            assert set(_resolved_write_targets(execution)) == {
+                targets["p0"],
+                targets["model_complete"],
+            }
+            assert len(successors) == 1
+            assert _record_values(successors[0]) == {
+                "domain_size": 1,
+                "required_p0": 1,
+                "p0": 1,
+                "model_complete": 1,
+            }
+        elif row.spf == "SPF024":
+            assert execution.source.contract.kind is loci.CarrierKind.GRID
+            source_targets = tuple(
+                target for target, _ in execution.source.entries
+            )
+            assert _materialized_read_targets(execution) == source_targets[:2]
+            assert _resolved_write_targets(execution) == source_targets[2:]
+            assert len(successors) == 1
+            assert tuple(value for _, value in successors[0].entries) == (
+                1,
+                0,
+                0,
+                1,
+                1,
+            )
         if row.spf in {"SPF014", "SPF024"}:
             assert all(
                 isinstance(item.source.continuation, rules.Stop)

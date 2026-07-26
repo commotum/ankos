@@ -1148,15 +1148,62 @@ def _validate_projection_cardinality_claims(
     source: Cardinality,
     claims: ProjectionCardinalities,
 ) -> None:
-    """Reject exact projection claims that violate quotient arithmetic."""
+    """Reject exact projection claims that violate partition/quotient arithmetic."""
 
     # ``Undetermined`` is an honest absence of a cardinality proof, not an
-    # infinite value.  Unknown operands therefore cannot establish an
-    # arithmetic contradiction and must remain admissible.
+    # infinite value.  It remains admissible unless the known claims around it
+    # force a contradictory bound or exact complement.
     source_shape = _known_cardinality_shape(source)
     derivation_shape = _known_cardinality_shape(claims.derivations)
     no_successor_shape = _known_cardinality_shape(claims.no_successors)
     successor_shape = _known_cardinality_shape(claims.successors)
+
+    raw_partition_shape = _known_cardinality_sum(
+        derivation_shape,
+        no_successor_shape,
+    )
+    if (
+        source_shape is not None
+        and raw_partition_shape is not None
+        and source_shape != raw_partition_shape
+    ):
+        raise ValueError(
+            "derivation and no-successor cardinalities do not partition "
+            "the source support"
+        )
+
+    if source_shape is not None:
+        for label, component_shape in (
+            ("derivation", derivation_shape),
+            ("no-successor", no_successor_shape),
+        ):
+            if (
+                component_shape is not None
+                and not _known_cardinality_leq(component_shape, source_shape)
+            ):
+                raise ValueError(
+                    f"{label} cardinality cannot exceed the source support"
+                )
+
+    inferred_derivations: list[KnownCardinalityShape] = []
+    if successor_shape == ("finite", 0):
+        inferred_derivations.append(("finite", 0))
+    complement_shape = _known_partition_complement(
+        source_shape,
+        no_successor_shape,
+    )
+    if complement_shape is not None:
+        inferred_derivations.append(complement_shape)
+    if derivation_shape is None and inferred_derivations:
+        derivation_shape = inferred_derivations[0]
+        if any(
+            inferred != derivation_shape
+            for inferred in inferred_derivations[1:]
+        ):
+            raise ValueError(
+                "known projection claims force inconsistent derivation "
+                "cardinalities"
+            )
 
     partition_shape = _known_cardinality_sum(
         derivation_shape,
@@ -1173,34 +1220,40 @@ def _validate_projection_cardinality_claims(
         )
 
     if derivation_shape is None or successor_shape is None:
-        return
-    derivation_kind, derivation_size = derivation_shape
-    successor_kind, successor_size = successor_shape
-    if derivation_kind == "finite":
-        assert derivation_size is not None
-        if derivation_size == 0:
-            if successor_shape != ("finite", 0):
-                raise ValueError(
-                    "zero derivations require zero distinct successors"
-                )
-            return
         if (
-            successor_kind != "finite"
-            or successor_size is None
-            or not 1 <= successor_size <= derivation_size
+            source_shape is not None
+            and successor_shape is not None
+            and not _known_cardinality_leq(successor_shape, source_shape)
         ):
             raise ValueError(
-                "successor cardinality must lie between one and the finite "
-                "derivation cardinality"
+                "successor cardinality cannot exceed the source support"
+            )
+        return
+    derivation_kind = derivation_shape[0]
+    if derivation_shape == ("finite", 0):
+        if successor_shape != ("finite", 0):
+            raise ValueError(
+                "zero derivations require zero distinct successors"
             )
         return
     if successor_shape == ("finite", 0):
         raise ValueError(
-            "infinite derivations cannot have zero successors"
+            "nonzero derivations cannot have zero successors"
         )
-    if derivation_kind == "countable" and successor_kind == "uncountable":
+    if not _known_cardinality_leq(successor_shape, derivation_shape):
+        if derivation_kind == "countable":
+            raise ValueError(
+                "a successor quotient cannot exceed countably many derivations"
+            )
         raise ValueError(
-            "a successor quotient cannot exceed countably many derivations"
+            "successor cardinality cannot exceed derivation cardinality"
+        )
+    if (
+        source_shape is not None
+        and not _known_cardinality_leq(successor_shape, source_shape)
+    ):
+        raise ValueError(
+            "successor cardinality cannot exceed the source support"
         )
 
 
@@ -1233,6 +1286,42 @@ def _known_cardinality_sum(
         return ("countable", None)
     assert left[1] is not None and right[1] is not None
     return ("finite", left[1] + right[1])
+
+
+def _known_cardinality_leq(
+    left: KnownCardinalityShape,
+    right: KnownCardinalityShape,
+) -> bool:
+    if left[0] == "finite":
+        if right[0] != "finite":
+            return True
+        assert left[1] is not None and right[1] is not None
+        return left[1] <= right[1]
+    if left[0] == "countable":
+        return right[0] in ("countable", "uncountable")
+    return right[0] == "uncountable"
+
+
+def _known_partition_complement(
+    source: KnownCardinalityShape | None,
+    known_part: KnownCardinalityShape | None,
+) -> KnownCardinalityShape | None:
+    """Return an exact complement only when cardinal arithmetic determines it."""
+
+    if source is None or known_part is None:
+        return None
+    if not _known_cardinality_leq(known_part, source):
+        return None
+    source_kind, source_size = source
+    part_kind, part_size = known_part
+    if source_kind == "finite":
+        assert source_size is not None and part_size is not None
+        return ("finite", source_size - part_size)
+    if source_kind == "countable" and part_kind == "finite":
+        return ("countable", None)
+    if source_kind == "uncountable" and part_kind in ("finite", "countable"):
+        return ("uncountable", None)
+    return None
 
 
 def _atom_identity(atom: object) -> str:

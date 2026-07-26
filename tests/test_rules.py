@@ -1099,6 +1099,7 @@ def test_intensional_projection_cardinalities_reject_impossible_infinite_claims(
     composition = _certificate(rules.CertificateKind.COMPOSITION)
     zero = rules.finite_cardinality(0)
     one = rules.finite_cardinality(1)
+    two = rules.finite_cardinality(2)
     countable = rules.Many(
         None,
         rules.InfiniteCardinality.COUNTABLY_INFINITE,
@@ -1107,6 +1108,10 @@ def test_intensional_projection_cardinalities_reject_impossible_infinite_claims(
     uncountable = rules.Many(
         None,
         rules.InfiniteCardinality.UNCOUNTABLE,
+        cardinality,
+    )
+    unknown = rules.Undetermined(
+        rules.literal_expr("unknown-projection"),
         cardinality,
     )
 
@@ -1140,6 +1145,16 @@ def test_intensional_projection_cardinalities_reject_impossible_infinite_claims(
         outcome(uncountable, countable, zero, countable)
     with pytest.raises(ValueError, match="do not partition"):
         outcome(uncountable, one, countable, one)
+    with pytest.raises(ValueError, match="cannot exceed the source"):
+        outcome(one, two, unknown, one)
+    with pytest.raises(ValueError, match="cannot exceed the source"):
+        outcome(one, unknown, two, unknown)
+    with pytest.raises(ValueError, match="cannot exceed the source"):
+        outcome(countable, uncountable, unknown, one)
+    with pytest.raises(ValueError, match="inconsistent derivation"):
+        outcome(one, unknown, zero, zero)
+    with pytest.raises(ValueError, match="cannot exceed the source"):
+        outcome(countable, unknown, unknown, uncountable)
 
     assert outcome(countable, countable, zero, one).projection_cardinalities
     assert outcome(uncountable, uncountable, zero, countable).projection_cardinalities

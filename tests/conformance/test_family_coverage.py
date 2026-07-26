@@ -17,6 +17,7 @@ from g7_mechanics import (
     SECONDARY_JOINS,
     WORKSTREAM_COUNTS,
     assert_mechanics_run,
+    normalized_mechanics_signature,
     run_mechanics_fixture,
     run_secondary_fixture,
 )
@@ -115,6 +116,24 @@ def test_px10_families_have_eight_distinct_representation_workspaces() -> None:
         for execution in executions
     }
     assert len(relation_graphs) == 8
+
+
+def test_model_search_and_inverse_reconstruction_are_not_alpha_renames() -> None:
+    """SPF014 and SPF024 retain mechanically different audited meanings."""
+
+    rows = {row.spf: row for row in MECHANICS_ROWS}
+    model_search = run_mechanics_fixture(rows["SPF014"])
+    inverse_reconstruction = run_mechanics_fixture(rows["SPF024"])
+
+    assert (
+        normalized_mechanics_signature(model_search)
+        != normalized_mechanics_signature(inverse_reconstruction)
+    )
+    assert model_search.source.contract.kind is loci.CarrierKind.RECORD
+    assert (
+        inverse_reconstruction.source.contract.kind
+        is loci.CarrierKind.GRID
+    )
 
 
 def test_close_roles_and_retired_seed_role_are_excluded_from_sixty_rows() -> None:
