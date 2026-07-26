@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-04 CATALOG NEXT**
+Status: **IN PROGRESS — G7-05 CONFORMANCE NEXT**
 
 ## Big-Picture Objective
 
@@ -78,9 +78,10 @@ conflict, and reconcile the plan before changing runtime behavior.
   exactly `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule`;
   `program.apply` is the sole family-blind step law; and callable root
   `rollout` traverses only through it.
-- The root exposes exactly eleven names: the three operations/value names,
-  seven pre-codec core namespaces, and `serialization`. It does not eagerly
-  import datasets, RNG, visualization, or catalog.
+- The root exposes exactly twelve names: the three operations/value names,
+  seven core component namespaces, `serialization`, and `catalog`. It does
+  not eagerly import datasets, RNG, or visualization, and no catalog
+  constructor is flattened onto the root.
 - `src/ca` has 28 tracked paths. `specs.py` and public `rollout.py` are
   physically absent, as is `tests/test_specs.py`; `ca.rollout` and `ca.specs`
   have no importable submodule spec.
@@ -121,75 +122,41 @@ conflict, and reconcile the plan before changing runtime behavior.
   through one fixed native/represented conjugate pair shared across that
   relation's two points. Lossy, approximate, and out-of-image cases remain
   explicitly qualified.
-- The G7-04 entry baseline reported `413 passed, 13 skipped`. Every retained
-  skip was owned by G7-04 catalog construction or callable-free metadata; no
-  G7-03 skip remained.
-- G7-04 started from clean commit `cf88affc29e225f64aaeca200c6f6548ecc42512`.
-  Its live implementation and evidence record is
+- G7-04 started from clean commit
+  `cf88affc29e225f64aaeca200c6f6548ecc42512` at
+  `413 passed, 13 skipped`. Its dependency-driven G7-02/G7-03 reclosures and
+  final implementation evidence are recorded in
   [`5-CATALOG.md`](5-CATALOG.md).
-- At G7-04 entry, all eight catalog files are inert and unexposed: the 60
-  canonical signatures raise `NotImplementedError`, authorized delegators
-  remain pending inventories, metadata records have no values, and root `ca`
-  does not expose `catalog`.
-- The 13 retained skips are owned exactly by G7-04: five CT11 catalog
-  expansion tests, five catalog unit tests, two family constructor/metadata
-  joins, and one callable-free role test.
-- G7-04's preimplementation audit found that Goal 6 freezes sixty semantic
-  parameter inventories, forty preset names, four aliases, and one
-  compatibility spelling, but does not define a closed compiler language from
-  those semantic inventories into the five fields.
-- A hostile audit across all sixty rows confirmed that treating those lists as
-  executable Python signatures would require a second schema, matcher,
-  evaluator, probability, structural-edit, and differential compiler
-  ontology. That conflicts with the catalog-as-alias design and is not implied
-  by the fixed G7-02 pressure witnesses.
-- The contract is reconciled around the explicit five-component canonical
-  profile already shown in `ref/notes/ca-scaffold.py`: every canonical family
-  function accepts `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule`
-  and returns their ordinary `SimpleProgram`. The Goal 6 semantic parameter
-  lists remain callable-free descriptive metadata. Presets still require real
-  closed bindings and may not ignore arguments or return hardcoded witnesses.
-  The full decision and audit evidence are in [`5-CATALOG.md`](5-CATALOG.md).
-- All sixty canonical five-component constructors and all four true aliases
-  are now explicit ordinary functions. The constructor half of the family
-  coverage join passes for every SPF001–SPF060 representative.
-- Callable-free metadata is populated for exactly 60 families, 2 roles,
-  45 legacy entries, and 105 public-name relations with the frozen
-  `60 C / 40 P / 4 A / 1 K` census and exact home/disposition/target counts.
-- The active suite reports `522 passed, 11 skipped`; the eleven skips are the
-  five CT11 expansion tests, five catalog callable/export tests, and the
-  F010/F042 role-boundary test. The worktree is clean at `db48ebd`.
-- The remaining preset audit exposed missing reusable mechanics that the
-  original G7-02 pressure fixtures did not prove. Validated refinements are
-  authoritative for property-defined T06/T07 and relation-defined
-  T31–T33, but using them for source-facing T02–T05, T09–T12, T21–T25,
-  T34–T44, substitution, recurrence, and transduction rows would change
-  their audited argument domains into false aliases.
-- The bounded reopened G7-02 work is complete and recorded in
-  [`3-MECHANICS.md`](3-MECHANICS.md). Composite structural values,
-  rank-generic grids, exact arithmetic, sequence comprehensions,
-  value-relative read/write regions, an anchored clause kernel, exact
-  word/tree pattern rewriting, and rank-N mosaic substitution close the 31
-  already-ready plus 9 formerly missing preset domains without a sixth field
-  or catalog compiler.
-- Public application evidence includes mobile motion, a distributed
-  rank-two Turing transition, ordered and nonoverlapping word/tree rewrites,
-  typed no-match versus identity-match behavior, nontrivial two-dimensional
-  tile assembly, and rank-four periodic/fixed contextual mosaics. Hostile
-  direct/wire tests reject impossible anchored views, and arithmetic faults
-  reject through the typed Rule/application boundary.
-- G7-03's dependency reclosure is complete and recorded in
-  [`4-CODECS.md`](4-CODECS.md). It identified and repaired six fail-closed
-  owner-boundary categories across anchored readable views, Rule graphs,
-  complete results, parallel composition, and intensional primitive/law
-  refinement without changing the five-field API, schema version, codec
-  algorithm, or exact PX10 relation set.
-- The active suite now reports `830 passed, 11 skipped`. The eleven skips are
-  exactly the five CT11 catalog-expansion tests, five catalog unit tests, and
-  the F010/F042 callable-free role test; all remain G7-04-owned.
-- G7-02 and G7-03 are reclosed. G7-04 is the first incomplete stage and is
-  resumable at the remaining preset, compatibility, export, and owned-test
-  implementation gate.
+- The catalog contract is reconciled around the explicit five-component
+  canonical profile already shown in `ref/notes/ca-scaffold.py`. All sixty
+  canonical functions accept `seed`, `alphabet`, `frontier`, `neighborhood`,
+  and `rule`; Goal 6's semantic parameter lists remain callable-free
+  descriptive metadata.
+- All forty presets are now bounded source-facing compilers or validators over
+  closed reusable mechanics. T06/T07 validate their finite rule tables, and
+  T31–T33 compile explicit `ValueNode` relation presentations; none accepts an
+  already-expanded program as a pretend refinement.
+- G7-04 implements exactly 60 canonical constructors, 40 presets, 4 true
+  aliases, and the sole category-qualified compatibility adapter. Callable-free
+  metadata contains exactly 60 families, 2 roles, 45 legacy entries, and 105
+  name relations with kinds `60 C / 40 P / 4 A / 1 K`.
+- Exact public counts are 105 qualified catalog callables, 104 flat catalog
+  callables, 111 `ca.catalog.__all__` entries including seven navigation
+  namespaces, and 12 root exports including `catalog`.
+- Equivalent source-facing paths expand to equal five-field programs and
+  byte-identical canonical payloads. Canonical serialization contains no
+  catalog/SPF/F/T identity or invocation receipt.
+- Hostile closure repaired constructor-spelling leakage, an implicit
+  integer-to-rational recurrence bias, missing-transition Turing quiescence,
+  and movement-boundary preemption. Missing Turing transitions and outward
+  fixed-boundary moves are typed terminal results; anchored mobile presets use
+  an explicitly periodic carrier and normalize edge destinations.
+- CT11, the catalog unit surface, the constructor/metadata family joins, and
+  the F010/F042 role boundary are active. The focused catalog/conformance slice
+  reports `338 passed`; the complete active suite reports `975 passed` with no
+  skips.
+- G7-04 is complete. G7-05 is the first incomplete stage; no G7-05
+  implementation has started.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -343,8 +310,8 @@ stage file and may evolve with the implementation.
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows and promised preset domains supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
-| `5-CATALOG` | G7-04 | Resumable | Exact constructors, metadata, exports, and migration |
-| `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
+| `5-CATALOG` | G7-04 | Complete | Exact constructors, metadata, exports, and migration |
+| `6-CONFORMANCE` | G7-05 | Next | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
 
 No stage file exists until that stage begins.
@@ -554,9 +521,9 @@ application results.
 
 Handoff stage: **G7-04 — Catalog assembly and exact legacy migration**
 
-Stage status: **Resumable at the preset-contract gate.** The dependency
-reclosures are complete; the live evidence, reconciled API choice, and
-remaining implementation work are in [`5-CATALOG.md`](5-CATALOG.md).
+Stage status: **Complete.** The dependency reclosures, executable catalog
+freeze, hostile repairs, and exact verification evidence are recorded in
+[`5-CATALOG.md`](5-CATALOG.md). G7-05 remains unstarted.
 
 #### Big Picture Objective
 
