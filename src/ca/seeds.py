@@ -722,7 +722,13 @@ def _validate_construction_output(
                 "SEQUENCE construction requires a history carrier"
             )
         values = arguments[0]
-        if contract.shape is not None and contract.shape != (len(values),):
+        concrete = loci.CarrierContract(
+            loci.CarrierKind.HISTORY,
+            rank=1,
+            shape=(len(values),),
+            axes=("history",),
+        )
+        if not contract.accepts(concrete):
             raise SeedValidationError(
                 "SEQUENCE values disagree with the declared history carrier"
             )
@@ -732,6 +738,16 @@ def _validate_construction_output(
         if contract.kind is not loci.CarrierKind.RECORD:
             raise SeedValidationError(
                 "RECORD construction requires a record carrier"
+            )
+        concrete = loci.CarrierContract(
+            loci.CarrierKind.RECORD,
+            rank=0,
+            shape=(),
+            axes=(),
+        )
+        if not contract.accepts(concrete):
+            raise SeedValidationError(
+                "RECORD fields disagree with the declared record carrier"
             )
         return
 
@@ -754,10 +770,22 @@ def _validate_construction_output(
         return
 
     if operation is ConstructionOp.FILL:
-        if contract.kind not in (
-            loci.CarrierKind.HISTORY,
-            loci.CarrierKind.GRID,
-        ) or contract.shape is None:
+        if (
+            contract.kind
+            not in (
+                loci.CarrierKind.HISTORY,
+                loci.CarrierKind.GRID,
+            )
+            or contract.shape is None
+            or (
+                contract.kind is loci.CarrierKind.HISTORY
+                and len(contract.shape) != 1
+            )
+            or (
+                contract.kind is loci.CarrierKind.GRID
+                and not 1 <= len(contract.shape) <= 3
+            )
+        ):
             raise SeedValidationError(
                 "FILL requires a concrete history or grid carrier"
             )
@@ -825,9 +853,26 @@ def _validate_uniform_tuple_output(
             law_supplied=True,
         )
     if contract.kind is loci.CarrierKind.HISTORY:
-        if contract.shape is not None and contract.shape != (law.length,):
+        concrete = loci.CarrierContract(
+            loci.CarrierKind.HISTORY,
+            rank=1,
+            shape=(law.length,),
+            axes=("history",),
+        )
+        if not contract.accepts(concrete):
             raise SeedValidationError(
                 "uniform tuple length disagrees with its history carrier"
+            )
+    elif contract.kind is loci.CarrierKind.RECORD:
+        concrete = loci.CarrierContract(
+            loci.CarrierKind.RECORD,
+            rank=0,
+            shape=(),
+            axes=(),
+        )
+        if not contract.accepts(concrete):
+            raise SeedValidationError(
+                "uniform tuple fields disagree with its record carrier"
             )
     elif contract.kind is loci.CarrierKind.GRID:
         size = _carrier_size(contract)

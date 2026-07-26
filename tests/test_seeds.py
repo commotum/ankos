@@ -165,3 +165,46 @@ def test_seed_descriptors_reject_callbacks_and_malformed_composition() -> None:
             seeds.sequence((True, False)),
             "opaque",  # type: ignore[arg-type]
         )
+
+
+def test_constructive_and_uniform_sources_validate_their_output_carriers() -> None:
+    history = loci.CarrierContract(
+        loci.CarrierKind.HISTORY,
+        rank=1,
+        shape=(2,),
+        axes=("history",),
+    )
+    grid = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=1,
+        shape=(2,),
+        axes=("x",),
+    )
+
+    fill = seeds.constructive(
+        seeds.Construction(seeds.ConstructionOp.FILL, (True,)),
+        configuration_contract=history,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    uniform_grid = seeds.law(
+        seeds.UniformTupleLaw(2, 2),
+        configuration_contract=grid,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        construction=seeds.Construction(seeds.ConstructionOp.GRID),
+    )
+
+    assert isinstance(fill.source, seeds.ConstructiveSource)
+    assert isinstance(uniform_grid.source, seeds.LawSource)
+    with pytest.raises(seeds.SeedValidationError, match="cannot omit"):
+        seeds.constructive(
+            seeds.Construction(seeds.ConstructionOp.SEQUENCE),
+            configuration_contract=history,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        )
+    with pytest.raises(seeds.SeedValidationError, match="length disagrees"):
+        seeds.law(
+            seeds.UniformTupleLaw(3, 2),
+            configuration_contract=grid,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+            construction=seeds.Construction(seeds.ConstructionOp.GRID),
+        )

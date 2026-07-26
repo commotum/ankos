@@ -1562,6 +1562,16 @@ def _validate_finite_application(
                 raise ValueError(
                     "a source no-successor atom mapped to an applied derivation"
                 )
+            expected_output_lineage = _lineage_after(
+                item.input_trace_lineage,
+                result.evidence.application_identity,
+                item.source.canonical_identity,
+                item.source.progress.value,
+            )
+            if item.output_trace_lineage != expected_output_lineage:
+                raise ValueError(
+                    "applied derivation output lineage has the wrong edge"
+                )
             if (
                 item.evidence.disposition_identity
                 != item.source.replacement.canonical_identity
@@ -1569,10 +1579,49 @@ def _validate_finite_application(
                 raise ValueError(
                     "applied derivation evidence names the wrong disposition"
                 )
+            expected_references = tuple(
+                disposition.target
+                for disposition in item.source.replacement.fresh
+            )
+            if tuple(
+                binding.reference for binding in item.fresh_bindings
+            ) != expected_references:
+                raise ValueError(
+                    "applied derivation bindings do not cover fresh dispositions"
+                )
+            expected_binding_identities = tuple(
+                loci.bind_fresh(
+                    reference,
+                    input_configuration_identity=(
+                        result.evidence.input_configuration_identity
+                    ),
+                    canonical_rule_identity=(
+                        result.evidence.canonical_rule_identity
+                    ),
+                    witness_identity=item.source.witness.canonical_identity,
+                )
+                for reference in expected_references
+            )
+            if tuple(
+                binding.identity for binding in item.fresh_bindings
+            ) != expected_binding_identities:
+                raise ValueError(
+                    "fresh bindings disagree with application/rule/witness identities"
+                )
         else:
             if type(expected_source) is not rules.NoSuccessor:
                 raise ValueError(
                     "a source derivation mapped to applied no-successor"
+                )
+            expected_output_lineage = _lineage_after(
+                item.input_trace_lineage,
+                result.evidence.application_identity,
+                item.source.canonical_identity,
+                item.source.outcome.value,
+            )
+            if item.output_trace_lineage != expected_output_lineage:
+                raise ValueError(
+                    "applied no-successor output lineage has the wrong edge"
                 )
             if item.evidence.disposition_identity != "no-disposition":
                 raise ValueError(
@@ -2005,12 +2054,12 @@ def apply(
                 atom.progress.value,
             )
             applied.append(
-                    AppliedDerivation(
-                        successor,
-                        atom,
-                        bindings,
-                        input_lineage,
-                        output_lineage,
+                AppliedDerivation(
+                    successor,
+                    atom,
+                    bindings,
+                    input_lineage,
+                    output_lineage,
                     AppliedEvidence(
                         application_identity,
                         atom.replacement.canonical_identity,

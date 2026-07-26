@@ -91,6 +91,47 @@ def test_seed_law_is_retained_and_replay_draw_is_deterministic() -> None:
     assert left.raw_trace.seed_evidence == right.raw_trace.seed_evidence
 
 
+def test_constructive_seed_realizes_at_zero_steps_but_partiality_does_not() -> None:
+    source = loci.history_configuration((True, False, False))
+    fill_seed = seeds.constructive(
+        seeds.Construction(seeds.ConstructionOp.FILL, (True,)),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    filled_program, _ = _program(fill_seed)
+
+    filled = ca.rollout(filled_program, steps=0)
+
+    assert isinstance(filled, program.RolloutTruncated)
+    assert filled.cause is program.TruncationCause.DEPTH_BOUND
+    realized = filled.continuing_leaves.atoms[0].configuration
+    assert isinstance(realized, loci.FiniteConfiguration)
+    assert tuple(value for _, value in realized.entries) == (True, True, True)
+
+    obligation = loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP)
+    partial_seed = seeds.partial(
+        source,
+        unresolved=(source.entries[0][0],),
+        obligations=(obligation,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    partial_program, _ = _program(partial_seed)
+
+    partial = ca.rollout(partial_program, steps=0)
+
+    assert isinstance(partial, program.RolloutTruncated)
+    assert partial.cause is program.TruncationCause.INTENSIONAL_SUPPORT
+    assert (
+        partial.raw_trace.roots.support.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
+    denotation = partial.raw_trace.seed_evidence.denotation
+    assert denotation is not None
+    assert isinstance(denotation.source, seeds.PartialSource)
+    assert denotation.source.obligations == (obligation,)
+
+
 def test_rollout_accepts_only_settled_keywords() -> None:
     simple_program, source = _program()
 
