@@ -21,7 +21,7 @@ verified**
   tensor stepping in `rollout.py`, four dataset recipes that construct
   `Dynamics`, and visualization adapters over `RawEpisode`/`RawBatch`.
   Those are migration inputs, not a second architecture to preserve.
-- Goal 7 is not scaffolded or authorized. This stage produces its
+- Goal 7 is not scaffolded or authorized. This stage produced its
   dependency-ordered handoff only.
 
 ## Updated Assumptions
@@ -141,7 +141,7 @@ Files expected to change:
 - Direct checks report 60 unique family rows, homes
   `11/15/8/14/9/3`, `19 covered + 41 additions`, 45 unique T rows with
   dispositions `15/21/2/3/2/1/1`, twelve PX sections, fourteen CT suites, and
-  exact 60-row conformance and mechanics joins. All 27 actual local file links
+  exact 60-row conformance and mechanics joins. All 30 actual local file links
   resolve across the 19 checked canonical/stage Markdown files, all checked
   code-fence counts are even, the reference scaffold parses, compiles, runs,
   and has exact five-field/`apply`/`rollout` signatures, and

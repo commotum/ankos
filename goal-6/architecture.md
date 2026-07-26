@@ -3,9 +3,10 @@
 Status: **COMPLETE — ARCHITECTURE, CATALOG, CONFORMANCE, AND GOAL 7 HANDOFF
 VERIFIED**
 
-This is the evolving canonical architecture specification for Goal 6. It
-records settled decisions and points to later-stage artifacts rather than
-duplicating the completed taxonomy.
+This is the completed canonical architecture specification for Goal 6. It
+records settled decisions and points to focused catalog, conformance, and
+implementation-handoff artifacts rather than duplicating the completed
+taxonomy.
 
 ## Purpose
 
@@ -71,8 +72,8 @@ conflict, stochastic, result, and update semantics. Generic application
 validates and atomically commits Rule results; it does not supply a sixth policy
 axis.
 
-These decisions are fixed by Goal 5. Their detailed protocols are the work of
-Stages 2 and 3.
+These decisions are fixed by Goal 5. Their detailed protocols were closed and
+verified in Stages 2 and 3 below.
 
 ## Document Ownership
 
