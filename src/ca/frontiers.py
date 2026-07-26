@@ -249,6 +249,13 @@ class WritableRegion(Generic[C, W]):
                 raise WritableResolutionError(
                     "fresh target parent is absent from the input configuration"
                 )
+            if any(
+                not configuration.contains(interface)
+                for interface in target.interface
+            ):
+                raise WritableResolutionError(
+                    "fresh target interface is absent from the input configuration"
+                )
             if (
                 self.fresh_namespace.parent is not None
                 and target.parent != self.fresh_namespace.parent

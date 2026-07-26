@@ -1,10 +1,11 @@
 """CT04: atomic reconstruction and preserve-outside semantics."""
 
-from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
+import pytest
 
 import ca
+from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
-from conformance.g7_fixtures import certificate, derivation, rule_contract
+from g7_fixtures import certificate, derivation, rule_contract
 
 
 def _literal_program(

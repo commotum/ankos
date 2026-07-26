@@ -8,7 +8,7 @@ import pytest
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, rules, seeds
 
-from conformance.g7_fixtures import native_program
+from g7_fixtures import native_program
 
 
 def _walk(value: object) -> None:

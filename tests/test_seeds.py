@@ -1,111 +1,140 @@
-"""Tests for seed behavior."""
+"""Unit tests for closed Seed denotations."""
 
-import numpy as np
+from fractions import Fraction
+
 import pytest
 
-import ca
-from ca import loci, seeds
+from ca import alphabets, loci, seeds
 
 
-def test_pair_seed_renders_numpy_pair() -> None:
-    rendered = seeds.render(seeds.pair(3, 5), ())
+def test_exact_seed_infers_carrier_and_value_profile() -> None:
+    configuration = loci.history_configuration((True, False, True))
+    seed = seeds.exact(configuration)
 
-    assert isinstance(rendered, np.ndarray)
-    assert rendered.tolist() == [3, 5]
-
-
-def test_uniform_bits_renders_binary_vector() -> None:
-    rendered = seeds.render(seeds.uniform_bits(length=3), ())
-
-    assert rendered.shape == (3,)
-    assert rendered.dtype == np.int64
-    assert set(rendered.tolist()).issubset({0, 1})
+    assert isinstance(seed.source, seeds.ExactSource)
+    assert seed.configuration_contract == configuration.contract
+    assert seed.value_profile is alphabets.ValueProfile.BOOLEAN
+    assert seed.denote().exact_configuration is configuration
+    assert seed.entropy_interface is seeds.EntropyInterface.NONE
 
 
-def test_uniform_bits_seed_is_deterministic_with_rng() -> None:
-    seed = seeds.uniform_bits(length=3)
-    left = seeds.render(seed, (), rng=np.random.default_rng(123))
-    right = seeds.render(seed, (), rng=np.random.default_rng(123))
-
-    np.testing.assert_array_equal(left, right)
-
-
-def test_uniform_bits_can_reject_all_zero_samples() -> None:
-    seed = seeds.uniform_bits(length=3, reject_all_zero=True)
-
-    for offset in range(100):
-        rendered = seeds.render(seed, (), rng=np.random.default_rng(offset))
-        assert rendered.any()
-
-
-def test_uniform_bits_rejects_invalid_length() -> None:
-    with pytest.raises(ValueError):
-        seeds.uniform_bits(length=0)
-
-
-def test_uniform_bits_is_publicly_exported() -> None:
-    assert ca.uniform_bits is seeds.uniform_bits
-
-
-def test_uniform_bits_integrates_with_dyadlags_rollout() -> None:
-    dynamics = ca.Dynamics(
-        domain="t+0d",
-        shape=(),
-        rule=ca.dyadlags_0d_rule(),
-        neighborhoods=(ca.dyadlags_0d_neighborhood(),),
-        frontier=ca.time_slice(()),
+def test_constructive_partial_and_intensional_sources_are_explicit() -> None:
+    contract = loci.CarrierContract(
+        loci.CarrierKind.HISTORY,
+        rank=1,
+        shape=(2,),
+        axes=("history",),
     )
-    seed_state = ca.seeds.render(ca.uniform_bits(length=3), ())
+    construction = seeds.Construction(
+        seeds.ConstructionOp.SEQUENCE,
+        ((True, False),),
+    )
+    constructive = seeds.constructive(
+        construction,
+        configuration_contract=contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    configuration = loci.history_configuration((True, False))
+    obligation = loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP)
+    partial = seeds.partial(
+        configuration,
+        unresolved=(configuration.entries[0][0],),
+        obligations=(obligation,),
+        configuration_contract=contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    intensional = seeds.intensional(
+        "x",
+        obligation,
+        configuration_contract=loci.CarrierContract(
+            loci.CarrierKind.INTENSIONAL
+        ),
+        value_profile=alphabets.ValueProfile.SYMBOLIC,
+    )
 
-    episode = ca.rollout(dynamics, rule_id=0, seed_state=seed_state, steps=4)
-
-    assert episode.states.shape == (4,)
-
-
-def test_constant_seed_renders_full_shape() -> None:
-    rendered = seeds.render(seeds.constant(7), (2, 3))
-
-    assert rendered.tolist() == [[7, 7, 7], [7, 7, 7]]
+    assert isinstance(constructive.source, seeds.ConstructiveSource)
+    assert isinstance(partial.source, seeds.PartialSource)
+    assert isinstance(intensional.source, seeds.IntensionalSource)
 
 
-def test_point_seed_uses_centered_coordinates() -> None:
-    rendered = seeds.render(seeds.point({"x": 0}, value=1), (3,))
+def test_probability_seed_requires_exact_law_and_replay_key_interface() -> None:
+    contract = loci.CarrierContract(
+        loci.CarrierKind.HISTORY,
+        rank=1,
+        shape=(3,),
+        axes=("history",),
+    )
+    seed = seeds.uniform_bits(
+        length=3,
+        configuration_contract=contract,
+        reject_all_zero=True,
+    )
 
-    assert rendered.tolist() == [0, 1, 0]
-
-
-def test_bernoulli_seed_is_deterministic_with_rng() -> None:
-    seed = seeds.bernoulli(p_low=0.5, p_high=0.5)
-    left = seeds.render(seed, (4,), rng=np.random.default_rng(123))
-    right = seeds.render(seed, (4,), rng=np.random.default_rng(123))
-
-    assert left.tolist() == right.tolist()
-
-
-def test_bernoulli_rejects_unknown_support_specs() -> None:
-    with pytest.raises(ValueError):
-        seeds.bernoulli(support={"family": "initial_slice"})  # type: ignore[arg-type]
-
-
-def test_compound_rejects_non_seed_components() -> None:
+    assert isinstance(seed.source, seeds.LawSource)
+    assert isinstance(seed.source.law, seeds.UniformTupleLaw)
+    assert seed.source.law.excluded == ((0, 0, 0),)
+    assert seed.entropy_interface is seeds.EntropyInterface.REPLAY_KEY
+    assert not hasattr(seed, "rng")
     with pytest.raises(TypeError):
-        seeds.compound(kind="plus", components=({"family": "point"},))  # type: ignore[list-item]
+        seeds.bernoulli(
+            loci.literal((loci.named("cell"),)),
+            0.5,  # type: ignore[arg-type]
+            configuration_contract=loci.CarrierContract(
+                loci.CarrierKind.RECORD,
+                rank=0,
+                shape=(),
+            ),
+        )
 
 
-def test_compound_rejects_components_without_support() -> None:
-    with pytest.raises(ValueError):
-        seeds.compound(kind="plus", components=(seeds.constant(1),))
+def test_seed_composition_preserves_one_closed_component() -> None:
+    left = seeds.sequence((True, False))
+    right = seeds.sequence((False, True))
+    overlay = seeds.overlay(
+        (left, right),
+        conflict=seeds.OverlayConflict.REQUIRE_EQUAL,
+    )
+    mixture = seeds.mixture(
+        ((Fraction(1, 2), left), (Fraction(1, 2), right))
+    )
+
+    assert isinstance(overlay, seeds.Seed)
+    assert isinstance(overlay.source, seeds.OverlaySource)
+    assert isinstance(mixture.source, seeds.MixtureSource)
+    assert mixture.entropy_interface is seeds.EntropyInterface.REPLAY_KEY
 
 
-def test_compound_accepts_selector_backed_seed_components() -> None:
-    selector = loci.selector(loci.absolute_universe(loci.coordinate_space((3,)), t=0))
-    seed = seeds.selector_seed(selector)
-    compound = seeds.compound(kind="plus", components=(seed,))
+def test_named_helpers_build_structural_configurations_not_arrays() -> None:
+    pair = seeds.pair(3, 5)
+    grid = seeds.finite_grid(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.FIXED, False),
+    )
 
-    assert compound.support is not None
+    assert pair.configuration_contract.kind is loci.CarrierKind.RECORD
+    assert grid.configuration_contract.kind is loci.CarrierKind.GRID
+    assert isinstance(pair.denote().exact_configuration, loci.FiniteConfiguration)
+    assert isinstance(grid.denote().exact_configuration, loci.FiniteConfiguration)
+    assert not hasattr(seeds, "render")
+    assert not hasattr(seeds, "structured")
 
 
-def test_structured_can_skip_dedupe() -> None:
-    specs = seeds.structured((3,), dedupe_mode=None)
-
-    assert specs
+def test_seed_descriptors_reject_callbacks_and_malformed_composition() -> None:
+    with pytest.raises(seeds.SeedValidationError):
+        seeds.Construction(
+            seeds.ConstructionOp.SEQUENCE,
+            ((lambda: None,),),  # type: ignore[arg-type]
+        )
+    with pytest.raises(seeds.SeedValidationError):
+        seeds.mixture(())
+    with pytest.raises(seeds.SeedValidationError):
+        seeds.uniform_bits(
+            length=0,
+            configuration_contract=loci.CarrierContract(
+                loci.CarrierKind.HISTORY,
+                rank=1,
+                shape=(1,),
+                axes=("history",),
+            ),
+        )

@@ -415,6 +415,11 @@ def _validate_configuration(
     if isinstance(configuration, loci.FiniteConfiguration):
         for _, value in configuration.entries:
             program.alphabet.require(cast(alphabets.SemanticValue, value))
+        boundary = configuration.carrier.boundary
+        if boundary.policy is loci.BoundaryPolicy.FIXED:
+            program.alphabet.require(
+                cast(alphabets.SemanticValue, boundary.exterior)
+            )
     loci.configuration_identity(configuration)
 
 
@@ -522,6 +527,7 @@ def _bind_fresh_for_atom(
     *,
     input_identity: str,
     rule_identity: str,
+    occupied_identities: tuple[loci.Locus, ...],
 ) -> tuple[FreshBinding, ...]:
     bindings: list[FreshBinding] = []
     for capability in writable.fresh:
@@ -538,6 +544,8 @@ def _bind_fresh_for_atom(
     identities = tuple(binding.identity for binding in bindings)
     if len(identities) != len(set(identities)):
         raise ValueError("fresh bindings collide")
+    if set(identities).intersection(occupied_identities):
+        raise ValueError("fresh binding collides with an existing identity")
     return tuple(bindings)
 
 
@@ -902,6 +910,11 @@ def apply(
                     writable,
                     input_identity=input_identity,
                     rule_identity=program.rule.canonical_identity,
+                    occupied_identities=(
+                        tuple(target for target, _ in configuration.entries)
+                        if isinstance(configuration, loci.FiniteConfiguration)
+                        else ()
+                    ),
                 )
                 if isinstance(atom, rules.Derivation)
                 else ()
@@ -1237,6 +1250,19 @@ def _enumerate_bernoulli(
     if law.support.kind is not loci.RegionKind.LITERAL or not law.support.loci:
         raise ValueError("finite Bernoulli realization requires literal support")
     targets = law.support.loci
+    if contract.kind is loci.CarrierKind.HISTORY and contract.shape is not None:
+        if len(targets) != contract.shape[0]:
+            raise ValueError("Bernoulli support size disagrees with its history")
+    if contract.kind is loci.CarrierKind.GRID:
+        if contract.shape is None:
+            raise ValueError("finite Bernoulli grid requires a concrete shape")
+        expected_size = 1
+        for extent in contract.shape:
+            expected_size *= extent
+        if len(targets) != expected_size:
+            raise ValueError("Bernoulli support size disagrees with its carrier")
+        if set(targets) != set(loci.grid_loci(contract.shape)):
+            raise ValueError("Bernoulli support does not equal the grid carrier")
     configurations: list[
         loci.FiniteConfiguration[alphabets.SemanticValue]
     ] = []
@@ -1245,18 +1271,19 @@ def _enumerate_bernoulli(
         values = tuple(
             law.true_value if bit else law.false_value for bit in bits
         )
-        if contract.kind is loci.CarrierKind.RECORD:
+        if contract.kind in (
+            loci.CarrierKind.RECORD,
+            loci.CarrierKind.HISTORY,
+            loci.CarrierKind.GRID,
+        ):
             configuration = loci.FiniteConfiguration(
-                loci.Carrier(
-                    contract,
-                    loci.Boundary(loci.BoundaryPolicy.NONE),
-                ),
+                loci.Carrier(contract, law.boundary),
                 tuple(zip(targets, values)),
             )
-        elif contract.kind is loci.CarrierKind.HISTORY:
-            configuration = _configuration_from_values(contract, values)
         else:
-            raise ValueError("finite Bernoulli fixture needs record/history carrier")
+            raise ValueError(
+                "finite Bernoulli realization needs record/history/grid carrier"
+            )
         true_count = sum(bits)
         probability = (
             law.probability_true**true_count
@@ -1284,7 +1311,9 @@ def _finite_seed_space(
         )
         return (cast(C, configuration),), None
     if isinstance(source, seeds.PartialSource):
-        return (source.configuration,), None
+        raise ValueError(
+            "partial Seed has unresolved roles; supply a complete explicit initial"
+        )
     if isinstance(source, seeds.LawSource):
         if isinstance(source.law, seeds.UniformTupleLaw):
             configurations, weights = _enumerate_uniform_tuple(
@@ -1351,6 +1380,7 @@ def _root_space(
             None if replay_key is None else loci.canonical_identity(replay_key)
         )
         selected_identity: str | None = None
+        realized_configurations = configurations
         if replay_key is not None and weights is not None:
             selected = _select_weighted(
                 configurations,
@@ -1363,8 +1393,7 @@ def _root_space(
                     )
                 ),
             )
-            configurations = (selected,)
-            weights = None
+            realized_configurations = (selected,)
             selected_identity = loci.configuration_identity(selected)
 
         support = rules.finite_support(configurations, label="seed-roots")
@@ -1404,7 +1433,7 @@ def _root_space(
                     )
                 ),
             )
-            for configuration in configurations
+            for configuration in realized_configurations
         )
         evidence = SeedRealizationEvidence(
             source_identity,

@@ -6,7 +6,7 @@ import pytest
 
 import ca
 
-from conformance.g7_fixtures import native_program
+from g7_fixtures import native_program
 
 
 def test_simple_program_has_exactly_the_five_settled_fields() -> None:

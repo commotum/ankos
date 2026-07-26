@@ -424,6 +424,10 @@ class CarrierContract:
                 raise ValueError("carrier shape and rank disagree")
         if self.axes and self.rank is not None and len(self.axes) != self.rank:
             raise ValueError("carrier axes and rank disagree")
+        if any(not isinstance(axis, str) or not axis for axis in self.axes):
+            raise TypeError("carrier axes must be nonempty strings")
+        if len(set(self.axes)) != len(self.axes):
+            raise ValueError("carrier axes must be unique")
 
     def accepts(self, other: "CarrierContract") -> bool:
         return (
@@ -463,6 +467,16 @@ class Carrier(Generic[V]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported carrier version {self.version}")
+        if not isinstance(self.contract, CarrierContract):
+            raise TypeError("carrier contract is not recognized")
+        if not isinstance(self.boundary, Boundary):
+            raise TypeError("carrier boundary is not recognized")
+        if any(
+            not isinstance(name, str)
+            or not isinstance(value, (bool, int, Fraction, str))
+            for name, value in self.attributes
+        ):
+            raise TypeError("carrier attributes are not closed")
         names = tuple(name for name, _ in self.attributes)
         if len(names) != len(set(names)):
             raise ValueError("carrier attributes must have unique names")
@@ -479,8 +493,13 @@ class StructuralRelation:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported structural relation version {self.version}")
-        if not self.tag:
+        if not isinstance(self.tag, str) or not self.tag:
             raise ValueError("structural relation tag cannot be empty")
+        if any(
+            not isinstance(argument, (bool, int, Fraction, str, Locus))
+            for argument in self.arguments
+        ):
+            raise TypeError("structural relation contains an opaque argument")
 
 
 @dataclass(frozen=True)
@@ -495,9 +514,34 @@ class FiniteConfiguration(Generic[V]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported configuration version {self.version}")
+        if not isinstance(self.carrier, Carrier):
+            raise TypeError("configuration carrier is not recognized")
+        if any(
+            not isinstance(target, Locus)
+            for target, _ in self.entries
+        ):
+            raise TypeError("configuration targets must be Locus values")
+        if any(not isinstance(item, StructuralRelation) for item in self.structure):
+            raise TypeError("configuration structure must contain closed relations")
         targets = tuple(target for target, _ in self.entries)
         if len(targets) != len(set(targets)):
             raise ValueError("configuration entries must have unique loci")
+        contract = self.carrier.contract
+        if contract.kind is CarrierKind.HISTORY and contract.shape is not None:
+            expected = tuple(
+                occurrence("history", index)
+                for index in range(contract.shape[0])
+            )
+            if set(targets) != set(expected):
+                raise ValueError(
+                    "finite history entries do not equal the declared carrier"
+                )
+        if contract.kind is CarrierKind.GRID and contract.shape is not None:
+            expected = grid_loci(contract.shape, axes=contract.axes or None)
+            if set(targets) != set(expected):
+                raise ValueError(
+                    "finite grid entries do not equal the declared carrier"
+                )
         ordered = tuple(
             sorted(self.entries, key=lambda item: canonical_order_key(item[0]))
         )
@@ -604,10 +648,17 @@ def centered_axis_values(size: int) -> tuple[int, ...]:
     return tuple(range(low, low + size))
 
 
-def grid_loci(shape: tuple[int, ...]) -> tuple[Locus, ...]:
+def grid_loci(
+    shape: tuple[int, ...],
+    *,
+    axes: tuple[str, ...] | None = None,
+) -> tuple[Locus, ...]:
     if len(shape) not in (1, 2, 3):
         raise ValueError("grid rank must be 1, 2, or 3")
-    axes = ("x", "y", "z")[: len(shape)]
+    if axes is None:
+        axes = ("x", "y", "z")[: len(shape)]
+    if len(axes) != len(shape):
+        raise ValueError("grid axes and shape must have equal rank")
     return tuple(
         cell(tuple(values), axes=axes)
         for values in cartesian_product(

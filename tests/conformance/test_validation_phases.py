@@ -4,7 +4,7 @@ from ca import program as program_api, rules
 
 import ca
 
-from conformance.g7_fixtures import derivation, finite_record_program, native_program
+from g7_fixtures import derivation, finite_record_program, native_program
 
 
 def test_application_runs_the_exact_generic_phase_order() -> None:

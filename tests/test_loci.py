@@ -1,83 +1,135 @@
-"""Tests for coordinate loci behavior."""
+"""Unit tests for closed structural identities and configurations."""
 
-import numpy as np
+from fractions import Fraction
+
 import pytest
 
 from ca import loci
 
 
-def test_rank_zero_coord_grid_is_two_dimensional() -> None:
-    grid = loci.coord_grid(loci.coordinate_space((), steps=3))
-
-    assert grid.shape == (3, 4)
-    assert grid.tolist() == [[0, 0, 0, 0], [1, 0, 0, 0], [2, 0, 0, 0]]
-
-
-def test_centered_axis_values() -> None:
-    assert loci.axis_values("x", 3).tolist() == [-1, 0, 1]
-    assert loci.axis_values("x", 4).tolist() == [-1, 0, 1, 2]
-
-
-def test_absolute_universe_time_major_1d() -> None:
-    space = loci.coordinate_space((3,), steps=2)
-    universe = loci.absolute_universe(space)
-
-    assert universe.tolist() == [
-        [0, -1, 0, 0],
-        [0, 0, 0, 0],
-        [0, 1, 0, 0],
-        [1, -1, 0, 0],
-        [1, 0, 0, 0],
-        [1, 1, 0, 0],
-    ]
-
-
-def test_selector_predicates_and_order() -> None:
-    space = loci.coordinate_space((3,))
-    selector = loci.selector(
-        loci.absolute_universe(space),
-        predicates=(loci.coord_between("x", 0, 1),),
-        order="lex",
+def test_locus_constructors_cover_closed_structural_identity_forms() -> None:
+    node = loci.graph_element("node", "n")
+    values = (
+        loci.coordinate("x", -2),
+        loci.named("state"),
+        loci.occurrence("word", 3),
+        loci.path("root", 1),
+        loci.span("word", 1, 4),
+        loci.port(node, "out"),
+        loci.interface(node, loci.graph_element("node", "m")),
+        loci.product_locus("pair", (node, loci.named("state"))),
+        node,
+        loci.field_point("u", (Fraction(1, 2),)),
+        loci.continuous_region("interval", (Fraction(0), Fraction(1))),
+        loci.intensional_reference("x", "x > 0"),
     )
 
-    selected = loci.select(selector)
-
-    assert selected.coords.tolist() == [[0, 0, 0, 0], [0, 1, 0, 0]]
-
-
-def test_gather_boundary_policies() -> None:
-    values = np.array([[10, 20, 30]])
-    coords = np.array([[0, 2, 0, 0]])
-
-    assert loci.gather(coords, values, {"policy": "fixed", "value": 99}).tolist() == [99]
-    assert loci.gather(coords, values, {"policy": "periodic"}).tolist() == [10]
-    assert loci.gather(coords, values, {"policy": "reflective"}).tolist() == [20]
+    assert {value.kind for value in values} == set(loci.LocusKind) - {
+        loci.LocusKind.FRESH
+    }
+    assert all(value.version == 1 for value in values)
 
 
-def test_gather_reads_centered_coordinate() -> None:
-    values = np.array([[10, 20, 30]])
-    coords = np.array([
-        [0, -1, 0, 0],
-        [0, 0, 0, 0],
-        [0, 1, 0, 0],
-    ])
+def test_canonical_order_is_numeric_not_lexicographic() -> None:
+    targets = tuple(
+        sorted(
+            (loci.cell((2,)), loci.cell((-1,)), loci.cell((0,)), loci.cell((-2,))),
+            key=loci.canonical_order_key,
+        )
+    )
 
-    assert loci.gather(coords, values).tolist() == [10, 20, 30]
-
-
-def test_gather_uses_trajectory_time_axis() -> None:
-    states = np.array([[1, 2, 3], [4, 5, 6]])
-    coords = np.array([[1, 0, 0, 0]])
-
-    assert loci.gather(coords, states).tolist() == [5]
+    assert tuple(loci.grid_coordinates(target)[0] for target in targets) == (
+        -2,
+        -1,
+        0,
+        2,
+    )
 
 
-def test_gather_rejects_legacy_boundary_aliases() -> None:
-    values = np.array([[10, 20, 30]])
-    coords = np.array([[0, 2, 0, 0]])
+def test_configuration_storage_order_and_identity_are_canonical() -> None:
+    carrier = loci.Carrier(
+        loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=()),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    a = loci.named("a", scope="record")
+    b = loci.named("b", scope="record")
+    left = loci.FiniteConfiguration(carrier, ((b, 2), (a, 1)))
+    right = loci.FiniteConfiguration(carrier, ((a, 1), (b, 2)))
 
-    with pytest.raises(ValueError, match="unsupported boundary fields"):
-        loci.gather(coords, values, {"mode": "periodic"})
+    assert left.entries == right.entries
+    assert left.identity == right.identity
+    assert loci.semantic_equal(left, right)
+    assert left.with_entries(((a, 3), (b, 2))).value_at(a) == 3
 
-    with pytest.raises(ValueError, match="unsupported boundary fields"):
-        loci.gather(coords, values, {"policy": "fixed", "fill_value": 99})
+
+@pytest.mark.parametrize(
+    ("boundary", "coordinate", "expected"),
+    (
+        (loci.Boundary(loci.BoundaryPolicy.FIXED, 9), (2,), 9),
+        (loci.Boundary(loci.BoundaryPolicy.PERIODIC), (2,), 1),
+        (loci.Boundary(loci.BoundaryPolicy.REFLECTIVE), (2,), 2),
+    ),
+)
+def test_grid_boundary_data_owns_outside_reads(
+    boundary: loci.Boundary[int],
+    coordinate: tuple[int, ...],
+    expected: int,
+) -> None:
+    configuration = loci.grid_configuration(
+        (3,),
+        (1, 2, 3),
+        boundary=boundary,
+    )
+
+    assert loci.read_grid_value(configuration, coordinate) == expected
+
+
+def test_regions_resolve_without_granting_capabilities() -> None:
+    configuration = loci.record_configuration((("a", 1), ("b", 2)))
+    a, b = tuple(target for target, _ in configuration.entries)
+    region = loci.union(
+        (
+            loci.literal((b,)),
+            loci.literal((a,)),
+        )
+    )
+
+    assert loci.resolve_region(region, configuration) == (a, b)
+    assert not hasattr(region, "read")
+    assert not hasattr(region, "write")
+
+
+def test_fresh_binding_is_deterministic_structural_data() -> None:
+    parent = loci.named("parent")
+    reference = loci.fresh_reference("children", "a", parent=parent)
+    arguments = {
+        "input_configuration_identity": "input",
+        "canonical_rule_identity": "rule",
+        "witness_identity": "witness",
+    }
+
+    left = loci.bind_fresh(reference, **arguments)
+    right = loci.bind_fresh(reference, **arguments)
+
+    assert left == right
+    assert left.kind is loci.LocusKind.FRESH
+    assert loci.bind_fresh(
+        loci.fresh_reference("children", "b", parent=parent),
+        **arguments,
+    ) != left
+
+
+def test_closed_nodes_reject_opaque_or_malformed_payloads() -> None:
+    with pytest.raises(TypeError):
+        loci.Locus(
+            loci.LocusKind.PATH,
+            "path",
+            (object(),),  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.LITERAL,
+            arguments=(lambda: None,),  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError):
+        loci.CarrierContract(loci.CarrierKind.GRID, rank=2, shape=(3,))
