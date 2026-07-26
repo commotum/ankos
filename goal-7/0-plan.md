@@ -246,7 +246,7 @@ stage file and may evolve with the implementation.
 | Stage | Handoff stage | Status | Completion boundary |
 |---|---|---|---|
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
-| `2-CUTOVER` | G7-01 | Pending | Atomic five-field runtime replacement |
+| `2-CUTOVER` | G7-01 | In Progress | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Pending | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Pending | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
@@ -260,7 +260,7 @@ No stage file exists until that stage begins.
 Handoff stage: **G7-00 — Freeze behavior and independent oracles**
 
 Stage status: **Complete.** Durable evidence and the exact 16-case inventory
-are recorded in [`1-ORACLES.md`](1-ORACLES.md). G7-01 has not started.
+are recorded in [`1-ORACLES.md`](1-ORACLES.md).
 
 #### Big Picture Objective
 
@@ -296,6 +296,9 @@ preserving its architecture, so the cutover can be judged independently.
 ### 2-CUTOVER
 
 Handoff stage: **G7-01 — Atomic five-field core cutover**
+
+Stage status: **In Progress.** The live transaction record is
+[`2-CUTOVER.md`](2-CUTOVER.md).
 
 #### Big Picture Objective
 
