@@ -433,17 +433,27 @@ def _validate_join(
     if readable.join_shape != program.rule.contract.required_join_shape:
         raise ValueError("resolved readable join shape disagrees with Rule")
     existing_targets = tuple(item.target for item in writable.existing)
-    if readable.join_shape.mode in (
+    anchors = {
+        group.anchor
+        for group in readable.groups
+        if group.anchor is not None
+    }
+    if readable.join_shape.mode is neighborhoods.JoinMode.TARGET_IDENTITY:
+        if anchors != set(existing_targets):
+            raise ValueError("target-identity join does not cover writable targets")
+    elif readable.join_shape.mode in (
         neighborhoods.JoinMode.ANCHOR_IDENTITY,
         neighborhoods.JoinMode.PRODUCT,
     ):
-        anchors = {
-            group.anchor
-            for group in readable.groups
-            if group.anchor is not None
-        }
-        if anchors != set(existing_targets):
-            raise ValueError("read/write anchor join does not cover writable targets")
+        # An anchor identifies the read context used by the Rule; it is not
+        # necessarily every member of the complete writable envelope.  A
+        # temporal macro-rule, for example, reads one current-anchored history
+        # group and returns a total disposition over the whole history.
+        # Requiring equality here would incorrectly turn Frontier into the
+        # firing/read set.  Every realized anchor must still be writable when
+        # this join mode claims an R-to-W identity relation.
+        if not anchors or not anchors.issubset(set(existing_targets)):
+            raise ValueError("read anchors do not belong to the writable envelope")
 
 
 def _validate_rule_space(
@@ -493,17 +503,14 @@ def _validate_rule_space(
             if isinstance(disposition.payload, rules.ValuePayload):
                 alphabet.require(disposition.payload.value)
         for disposition in replacement.fresh:
-            if (
-                disposition.action is rules.DispositionAction.CREATE
-                and frontiers.Effect.CREATE
-                not in writable.fresh[
-                    replacement.fresh.index(disposition)
-                ].contract_effects
+            # Presence in ``writable.fresh`` is itself the resolved CREATE
+            # capability.  FreshCapability deliberately has no second effect
+            # list: its closed sum admits only Absent or Create.
+            if disposition.action not in (
+                rules.DispositionAction.ABSENT,
+                rules.DispositionAction.CREATE,
             ):
-                # Current FreshCapability authorizes CREATE structurally by
-                # existing in a fresh-only envelope; the compatibility
-                # property below is used when present.
-                raise ValueError("creation is not authorized")
+                raise ValueError("fresh disposition uses an unauthorized action")
             if isinstance(disposition.payload, rules.ValuePayload):
                 alphabet.require(disposition.payload.value)
     return outcome_space

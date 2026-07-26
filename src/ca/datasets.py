@@ -456,6 +456,7 @@ def _build_0d_dyadlags_program(
 
     if shape or boundary.policy != "none":
         raise ValueError("0d-dyadlags requires shape () and boundary none")
+    _require_seed_boundary(seed, boundary)
     contract = seed.configuration_contract
     return program.SimpleProgram(
         seed=seed,
@@ -482,6 +483,8 @@ def _build_1d_dyadrads_program(
     """Build the five-field radius-one binary line experiment."""
 
     _require_grid_rank(shape, 1)
+    _require_seed_boundary(seed, boundary)
+    _require_seed_grid_shape(seed, shape)
     contract = seed.configuration_contract
     return program.SimpleProgram(
         seed=seed,
@@ -508,6 +511,8 @@ def _build_2d_dyadaxes_program(
     """Build the five-field binary square-grid experiment."""
 
     _require_grid_rank(shape, 2)
+    _require_seed_boundary(seed, boundary)
+    _require_seed_grid_shape(seed, shape)
     contract = seed.configuration_contract
     return program.SimpleProgram(
         seed=seed,
@@ -534,6 +539,8 @@ def _build_3d_dyadaxes_program(
     """Build the five-field binary cubic-grid experiment."""
 
     _require_grid_rank(shape, 3)
+    _require_seed_boundary(seed, boundary)
+    _require_seed_grid_shape(seed, shape)
     contract = seed.configuration_contract
     return program.SimpleProgram(
         seed=seed,
@@ -553,6 +560,26 @@ def _build_3d_dyadaxes_program(
 def _require_grid_rank(shape: tuple[int, ...], rank: int) -> None:
     if len(shape) != rank or any(size <= 0 for size in shape):
         raise ValueError(f"expected a positive rank-{rank} grid shape, got {shape}")
+
+
+def _require_seed_boundary(
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    boundary: BoundarySpec,
+) -> None:
+    configuration = seed.denote().exact_configuration
+    if not isinstance(configuration, loci.FiniteConfiguration):
+        raise TypeError("dataset recipes require an exact finite Seed")
+    if configuration.carrier.boundary != _loci_boundary(boundary):
+        raise ValueError("dataset boundary and exact Seed boundary disagree")
+
+
+def _require_seed_grid_shape(
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    shape: tuple[int, ...],
+) -> None:
+    contract = seed.configuration_contract
+    if contract.kind is not loci.CarrierKind.GRID or contract.shape != shape:
+        raise ValueError("dataset shape and exact Seed grid shape disagree")
 
 
 # ---------------------------------------------------------------------------
@@ -737,17 +764,34 @@ def _linear_configurations(
     if len(roots) != 1 or not isinstance(roots[0], loci.FiniteConfiguration):
         raise ValueError("dataset projection requires one finite root")
 
-    out: list[loci.FiniteConfiguration[bool]] = [roots[0]]
+    root = roots[0]
+    out: list[loci.FiniteConfiguration[bool]] = [root]
+    current: loci.FiniteConfiguration[bool] = root
     for application in _finite_support(result.raw_trace.applications):
+        if (
+            application.evidence.input_configuration_identity
+            != current.identity
+        ):
+            raise ValueError(
+                "dataset projection rejects disconnected trace applications"
+            )
+        applied = _finite_support(application.applied_atoms)
+        if len(applied) != 1 or not isinstance(
+            applied[0], program.AppliedDerivation
+        ):
+            raise ValueError(
+                "dataset projection requires one replacement derivation"
+            )
         groups = _finite_support(
             application.successor_quotient_with_derivation_fibers
         )
-        if len(groups) != 1:
+        if len(groups) != 1 or len(groups[0].derivations) != 1:
             raise ValueError("dataset projection rejects branching rollouts")
         successor = groups[0].successor
         if not isinstance(successor, loci.FiniteConfiguration):
             raise ValueError("dataset projection rejects intensional successors")
         out.append(successor)
+        current = successor
     return tuple(out)
 
 

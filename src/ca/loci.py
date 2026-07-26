@@ -463,6 +463,10 @@ class FiniteConfiguration(Generic[V]):
     def identity(self) -> str:
         return canonical_identity(self)
 
+    @property
+    def canonical_identity(self) -> str:
+        return self.identity
+
     def value_at(self, target: Locus) -> V:
         for locus_value, value in self.entries:
             if locus_value == target:
@@ -503,6 +507,10 @@ class IntensionalConfiguration:
     @property
     def identity(self) -> str:
         return canonical_identity(self)
+
+    @property
+    def canonical_identity(self) -> str:
+        return self.identity
 
 
 Configuration: TypeAlias = FiniteConfiguration[V] | IntensionalConfiguration
