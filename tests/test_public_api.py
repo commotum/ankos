@@ -41,10 +41,14 @@ def test_component_constructors_are_module_qualified() -> None:
         "everywhere",
         "eca",
         "elementary",
-        "catalog",
     ):
         assert broad_export not in ca.__all__
         assert not hasattr(ca, broad_export)
+    # Importing ``ca.catalog`` explicitly attaches that normal Python
+    # submodule to its parent package.  Eager root exposure is checked in the
+    # fresh-process test below rather than through order-dependent process
+    # state here.
+    assert "catalog" not in ca.__all__
     assert ca.serialization.__name__ == "ca.serialization"
 
 
@@ -77,6 +81,8 @@ assert "ca.rollout" not in sys.modules
 assert "ca.datasets" not in sys.modules
 assert "ca.rng" not in sys.modules
 assert "ca.viz" not in sys.modules
+assert "ca.catalog" not in sys.modules
+assert not hasattr(ca, "catalog")
 assert not hasattr(ca, "Dynamics")
 assert not hasattr(ca, "RawEpisode")
 assert not hasattr(ca, "rollout_batch")
