@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-03 REOPENED CODECS**
+Status: **IN PROGRESS — G7-04 CATALOG NEXT**
 
 ## Big-Picture Objective
 
@@ -111,10 +111,11 @@ conflict, and reconcile the plan before changing runtime behavior.
   [`4-CODECS.md`](4-CODECS.md). The later preset-mechanics delta has reopened
   its exhaustive coverage contract.
 - `ca.serialization` remains one catalog-free, fail-closed canonical v1
-  codec. Its live explicit registry now contains 187 owner types and 441
-  variants: 141 frozen-record representatives and 300 enum members. Unknown,
-  legacy, and unavailable migration paths reject. G7-03 must still audit the
-  new forms exhaustively before reclosure.
+  codec. Its live explicit registry contains 187 owner types and 441
+  variants: 141 frozen-record representatives and every one of 300 enum
+  members. Unknown, legacy, and unavailable migration paths reject. The
+  reopened G7-03 audit now covers the new forms with real inhabitants,
+  malformed-wire mutations, and complete-result round trips.
 - CT10 proves the eight exact PX10 representation relations over both points
   of each declared domain. For each relation, it compares complete results
   through one fixed native/represented conjugate pair shared across that
@@ -177,12 +178,17 @@ conflict, and reconcile the plan before changing runtime behavior.
   tile assembly, and rank-four periodic/fixed contextual mosaics. Hostile
   direct/wire tests reject impossible anchored views, and arithmetic faults
   reject through the typed Rule/application boundary.
-- The active suite now reports `804 passed, 11 skipped`. The eleven skips are
+- G7-03's dependency reclosure is complete and recorded in
+  [`4-CODECS.md`](4-CODECS.md). It identified and repaired three fail-closed
+  graph-validation defects in anchored readable views and Rules without
+  changing the five-field API, schema version, codec algorithm, or exact PX10
+  relation set.
+- The active suite now reports `829 passed, 11 skipped`. The eleven skips are
   exactly the five CT11 catalog-expansion tests, five catalog unit tests, and
   the F010/F042 callable-free role test; all remain G7-04-owned.
-- G7-02 is reclosed. G7-03 is the first incomplete stage: it must consume the
-  441-row inventory, add representative and mutation coverage for every new
-  sealed form, and rerun the hostile codec gate. G7-04 remains paused.
+- G7-02 and G7-03 are reclosed. G7-04 is the first incomplete stage and is
+  resumable at the remaining preset, compatibility, export, and owned-test
+  implementation gate.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -201,8 +207,9 @@ conflict, and reconcile the plan before changing runtime behavior.
 - G7-01 is a single atomic completion boundary. Internal work may be ordered
   and committed, but no partial cutover is a completed stage or release state.
 - G7-02 has three workstreams but one aggregate completion barrier.
-- Catalog files may physically exist before G7-04, but they remain inert,
-  unexposed shells until all required mechanics and codecs are complete.
+- Catalog remained unexposed until its required mechanics and codecs were
+  complete. G7-04 may now expose it only when each owned constructor,
+  delegate, metadata join, and migration obligation is authoritative.
 - Stages G7-00 through G7-05 are internal checkpoints. Only the reconciled
   G7-06 result may be published as `0.2.0`.
 - A concrete counterexample changes assumptions; implementation inconvenience
@@ -334,8 +341,8 @@ stage file and may evolve with the implementation.
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows and promised preset domains supported by reusable mechanics |
-| `4-CODECS` | G7-03 | Reopened | Canonical serialization and representation proofs |
-| `5-CATALOG` | G7-04 | Paused | Exact constructors, metadata, exports, and migration |
+| `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
+| `5-CATALOG` | G7-04 | Resumable | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
 
@@ -503,12 +510,11 @@ adding family-specific runtime types or behavior to `program.py`.
 
 Handoff stage: **G7-03 — Canonical serialization and representation relations**
 
-Stage status: **Reopened.** The original closed registry, canonical codec,
-typed failure boundary, CT09 schema coverage, CT10 representation proofs,
-hostile review, and exact verification evidence are recorded in
-[`4-CODECS.md`](4-CODECS.md). G7-02's preset-domain mechanics added sealed
-forms and expanded records that now require the same exhaustive round-trip,
-malformed-wire, and hostile fail-closed treatment.
+Stage status: **Complete after dependency reclosure.** The original closed
+registry, canonical codec, typed failure boundary, CT09 schema coverage, CT10
+representation proofs, reopened mechanics-delta audit, hostile repairs, and
+exact verification evidence are recorded in
+[`4-CODECS.md`](4-CODECS.md).
 
 #### Big Picture Objective
 
@@ -547,9 +553,9 @@ application results.
 
 Handoff stage: **G7-04 — Catalog assembly and exact legacy migration**
 
-Stage status: **Paused at the preset-contract gate.** The live evidence,
-two coherent API choices, and resumable next action are in
-[`5-CATALOG.md`](5-CATALOG.md).
+Stage status: **Resumable at the preset-contract gate.** The dependency
+reclosures are complete; the live evidence, reconciled API choice, and
+remaining implementation work are in [`5-CATALOG.md`](5-CATALOG.md).
 
 #### Big Picture Objective
 

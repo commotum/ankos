@@ -328,3 +328,134 @@ round-tripped, mutation-tested, and included in the hostile fail-closed gate.
 The existing schema version remains `1` unless the new mechanics force a wire
 incompatibility. This reopening does not authorize catalog tags, constructor
 receipts, permissive migration, or a second codec.
+
+### G7-04 dependency reclosure
+
+The reopened stage resumed from clean commit
+`a36cfe1aee7cb2d658c72c97350d2c9e9a787f47`, after G7-02's preset
+mechanics and final record were complete. Its baseline was
+`804 passed, 11 skipped`; every skip was already G7-04-owned.
+
+The inventory and production registry were mechanically complete at entry,
+but the audit rejected the shortcut of treating one record inhabitant per
+type as exhaustive evidence. The exact delta from the original closed G7-03
+surface is:
+
+- nine additional sealed owner types;
+- fifty-four additional inventory variants;
+- four expanded version-1 record shapes;
+- fifty additional enum members; and
+- twenty-nine additional `ExpressionPrimitive` members.
+
+The live totals remain exact at `187 owner types / 441 variants`:
+`141` frozen-record representatives and every one of `300` enum members.
+The four expanded records are `WritableRegion`, `ReadDependency`,
+`ReadableRegion`, and `CapabilitySelector`; their new fields are required,
+and wire forms that omit them reject rather than acquiring defaults.
+
+Requirement-specific codec evidence now goes beyond the aggregate type count:
+
+- all twenty-nine reopened Rule-expression primitives have inhabitable
+  canonical round trips and hostile argument-shape mutations;
+- fixed, periodic, and reflective windows; all three rewrite scans; and
+  independent plus fixed/periodic/reflective contextual mosaics retain
+  distinct exact bytes;
+- mixed string/integer value paths, all five predicate forms, all three anchor
+  cardinalities, rational intervals, symbolic-expression alphabets,
+  semantic-key maps, pattern/template rewrite bundles, rank-four dense
+  fields, and rank-four configurations/programs round-trip;
+- actual value-anchored writable/readable/dependency/view records,
+  group-item selectors, all three conflict policies, anchored denotations,
+  complete anchored Rules/programs, and their `ApplicationComplete` results
+  round-trip and re-encode identically; and
+- complete public application results for composite/comprehension,
+  pattern-rewrite, and mosaic mechanics cross the same codec boundary.
+
+Hostile signed-wire tests cover unknown values for every affected enum schema,
+missing or invalid expanded fields, malformed paths and predicates, reordered
+or incomplete interval descriptors, noncanonical structural ordering,
+duplicate semantic map keys, forged window/scan/offset forms, invalid
+group-item operands, non-group anchored proposals, proposed zero-anchor
+writes, impossible anchored regions/views, and pre-delta record shapes.
+
+The hostile review exposed three real owner-validation gaps and repaired them
+without changing the public API or codec algorithm:
+
+- `IntensionalReadableView` now rejects finite value-anchor dependencies;
+- `ReadableView` checks the declared anchor cardinality against distinct
+  realized source anchors; and
+- `Rule` itself, not only the public builder, checks an anchored denotation's
+  required write effects and replay-key requirement.
+
+Those checks are necessary because a fail-closed decoder reconstructs public
+records directly through their owner validators. The codec still does not
+dispatch on `ValueNode` tags: malformed specialized grid, pattern, or rewrite
+conventions remain valid generic structural values until their declared
+specialized parser or Rule operation consumes them.
+
+No new `RepresentationRelation` was introduced by the preset-mechanics
+delta. The eight exact PX10 relations and their complete-result commutation
+test are byte-for-byte unchanged from the catalog baseline and passed again.
+Lossy, approximate, and out-of-image qualifications remain explicit.
+
+Schema version `1` remains correct. The earlier G7-03 bytes were an internal,
+explicitly nonpublishable Goal 7 checkpoint, not a released compatibility
+surface. This reclosure replaces that draft before the first `0.2.0` release;
+the four expanded record shapes are the canonical v1 shapes, and draft blobs
+missing their required fields fail closed. No migration or fallback decoder
+was added.
+
+The reclosed tree passed:
+
+```text
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
+  tests/test_serialization.py \
+  tests/test_neighborhoods.py \
+  tests/test_rules.py \
+  tests/test_anchored_rule_kernel.py \
+  tests/test_value_anchored_regions.py
+-> 167 passed
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
+  tests/test_rule_comprehensions.py \
+  tests/test_pattern_rewrite.py \
+  tests/test_mosaic_substitution.py \
+  tests/test_reopened_mechanics_apply.py \
+  tests/test_composite_values.py \
+  tests/test_structural_values.py \
+  tests/test_rank_interval_dynamic_width.py
+-> 188 passed
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
+  tests/conformance/test_codec_inventory.py \
+  tests/conformance/test_serialization_contract.py \
+  tests/conformance/test_representation_commutation.py \
+  tests/conformance/test_observer_boundary.py \
+  tests/conformance/test_import_and_dispatch.py
+-> 61 passed, 1 G7-04-owned skip
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
+-> 829 passed, 11 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv lock --check
+-> resolved successfully
+
+UV_CACHE_DIR=/tmp/uv-cache uv run python -m compileall -q src tests
+-> pass
+
+deterministic hostile-byte decode probe
+-> 5,000 inputs returned typed total results
+
+git diff --check
+-> pass
+```
+
+The eleven skips remain exactly five CT11 catalog-expansion tests, five
+catalog unit tests, and the F010/F042 callable-free role test. Static gates
+also prove five stored program fields, 187 unique v1 tags, exactly one
+production `apply`, rollout calling it, frozen Goals 2/5/6, catalog-free
+serialization, and the owner-to-codec import direction.
+
+G7-03 is reclosed. G7-04 is resumable at its preset and compatibility
+implementation gate; no catalog behavior was implemented during this codec
+stage, and Goal 7 is not release-ready.

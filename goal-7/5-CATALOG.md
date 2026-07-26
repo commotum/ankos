@@ -26,9 +26,10 @@
 - Both family constructor/metadata joins are active. The current focused
   catalog/public/family slice reports `181 passed`; the complete active suite
   reports `522 passed, 11 skipped`.
-- The later preset audit reopened dependencies. G7-02 has since reclosed its
-  reusable preset mechanics at `804 passed, 11 skipped`; G7-03 is now the
-  first incomplete stage, and G7-04 remains paused until codecs reclose.
+- The later preset audit reopened dependencies. G7-02 reclosed its reusable
+  preset mechanics at `804 passed, 11 skipped`, and G7-03 has now reclosed the
+  expanded codec surface at `829 passed, 11 skipped`. G7-04 is resumable; all
+  eleven skips are its remaining catalog/role obligations.
 
 ## Updated Assumptions
 
@@ -201,7 +202,7 @@ Using the validated-refinement signature for every `P` would be a false
 resolution: it cannot establish continued-fraction or mathematical-constant
 provenance, and it changes the audited input domain of the mobile, Turing,
 substitution, recurrence, and related constructions. Per the Goal 6 handoff,
-G7-02 and G7-03 are reopened before G7-04 resumes.
+G7-02 and G7-03 were reopened and reclosed before G7-04 could resume.
 
 ## Big Picture Objective
 
@@ -353,6 +354,19 @@ manifest/helper when that keeps the expected ledger independent.
   `db48ebd`.
 - The detailed preset audit establishes the hybrid source-facing versus
   validated-refinement contract above. Its bounded mechanics dependency is
-  now reclosed in G7-02; G7-03 remains reopened for exhaustive codec
-  reconciliation. G7-04 stays paused with no fake preset or guessed adapter
-  exposed until that dependency re-closes.
+  reclosed in G7-02, and the resulting sealed surface is exhaustively
+  reclosed in G7-03. G7-04 can now resume with no fake preset or guessed
+  adapter exposed.
+
+### Dependency reclosure handback
+
+G7-03 retained one catalog-free canonical v1 codec with 187 owner types and
+441 variants, added real round-trip and hostile-wire coverage for every
+reopened mechanics form, and repaired three owner-validation gaps found by
+that audit. It introduced no catalog tag, constructor receipt, preset
+dispatch, migration fallback, or additional representation claim.
+
+The next G7-04 action is to implement the remaining thirty-nine presets and
+sole compatibility adapter from their now-codec-covered closed mechanics,
+then assemble exports and remove the eleven owned skips one obligation at a
+time. G7-05 remains unstarted.

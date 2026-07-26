@@ -2714,6 +2714,43 @@ class AnchoredClauseKernelDenotation:
                 )
 
 
+def _validate_anchored_rule_contract(
+    denotation: AnchoredClauseKernelDenotation,
+    contract: RuleContract,
+) -> None:
+    """Validate cross-record obligations shared by construction and decoding."""
+
+    required_existing = {
+        frontiers.Effect.REPLACE
+        if plan.action is DispositionAction.REPLACE
+        else frontiers.Effect.DELETE
+        for clause in denotation.clauses
+        for plan in clause.result.existing_plans
+        if plan.action in (
+            DispositionAction.REPLACE,
+            DispositionAction.DELETE,
+        )
+    }
+    if not required_existing.issubset(
+        contract.required_effect_profile.existing
+    ):
+        missing = required_existing.difference(
+            contract.required_effect_profile.existing
+        )
+        raise ValueError(
+            "anchored Rule contract omits required existing effects: "
+            + ", ".join(sorted(effect.value for effect in missing))
+        )
+    if (
+        any(clause.mass is not None for clause in denotation.clauses)
+        and contract.entropy_interface
+        is not seeds.EntropyInterface.REPLAY_KEY
+    ):
+        raise ValueError(
+            "probabilistic anchored Rule requires replay-key entropy"
+        )
+
+
 @dataclass(frozen=True)
 class ParallelDenotation(Generic[R, W, C]):
     parts: tuple["Rule[R, W, C]", ...]
@@ -2883,37 +2920,7 @@ class Rule(Generic[R, W, C]):
             raise TypeError("Rule contract is not recognized")
         denotation = self.descriptor.denotation
         if type(denotation) is AnchoredClauseKernelDenotation:
-            required_existing = {
-                frontiers.Effect.REPLACE
-                if plan.action is DispositionAction.REPLACE
-                else frontiers.Effect.DELETE
-                for clause in denotation.clauses
-                for plan in clause.result.existing_plans
-                if plan.action in (
-                    DispositionAction.REPLACE,
-                    DispositionAction.DELETE,
-                )
-            }
-            if not required_existing.issubset(
-                self.contract.required_effect_profile.existing
-            ):
-                missing = required_existing.difference(
-                    self.contract.required_effect_profile.existing
-                )
-                raise ValueError(
-                    "anchored Rule contract omits required existing effects: "
-                    + ", ".join(
-                        sorted(effect.value for effect in missing)
-                    )
-                )
-            if (
-                any(clause.mass is not None for clause in denotation.clauses)
-                and self.contract.entropy_interface
-                is not seeds.EntropyInterface.REPLAY_KEY
-            ):
-                raise ValueError(
-                    "probabilistic anchored Rule requires replay-key entropy"
-                )
+            _validate_anchored_rule_contract(denotation, self.contract)
 
     @property
     def canonical_identity(self) -> str:
@@ -6366,30 +6373,7 @@ def anchored_clause_kernel(
         zero_result,
         completeness_evidence,
     )
-    required_existing: set[frontiers.Effect] = set()
-    for clause in clauses:
-        result = clause.result
-        assert isinstance(result, DerivationClauseResult)
-        for plan in result.existing_plans:
-            if plan.action is DispositionAction.REPLACE:
-                required_existing.add(frontiers.Effect.REPLACE)
-            elif plan.action is DispositionAction.DELETE:
-                required_existing.add(frontiers.Effect.DELETE)
-    declared = contract.required_effect_profile
-    if not required_existing.issubset(declared.existing):
-        missing = required_existing.difference(declared.existing)
-        raise ValueError(
-            "anchored clause kernel contract omits required existing effects: "
-            + ", ".join(sorted(effect.value for effect in missing))
-        )
-    if (
-        any(clause.mass is not None for clause in clauses)
-        and contract.entropy_interface
-        is not seeds.EntropyInterface.REPLAY_KEY
-    ):
-        raise ValueError(
-            "probabilistic anchored clause kernel requires replay-key entropy"
-        )
+    _validate_anchored_rule_contract(denotation, contract)
     descriptor: RuleDescriptor[R, W, C] = RuleDescriptor(
         RulePrimitive.ANCHORED_CLAUSE_KERNEL,
         denotation,
