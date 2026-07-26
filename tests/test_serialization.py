@@ -7,6 +7,8 @@ from enum import Enum
 from fractions import Fraction
 from hashlib import sha256
 import json
+import subprocess
+import sys
 
 import pytest
 
@@ -295,3 +297,32 @@ def test_catalog_invocation_legacy_dynamics_and_observers_are_not_canonical() ->
     object.__setattr__(nested_locus, "scope", "")
     with pytest.raises(TypeError):
         serialization.dumps(source)
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            """
+import importlib.abc
+import sys
+
+class BlockCatalog(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == "ca.catalog" or fullname.startswith("ca.catalog."):
+            raise ImportError("catalog blocked")
+        return None
+
+sys.meta_path.insert(0, BlockCatalog())
+import ca
+value = ca.loci.coordinate("x", 3)
+blob = ca.serialization.dumps(value)
+decoded = ca.serialization.loads(blob)
+assert decoded == ca.serialization.Decoded(value)
+assert "ca.catalog" not in sys.modules
+""",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr

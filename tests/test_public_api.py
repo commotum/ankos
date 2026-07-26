@@ -1,4 +1,4 @@
-"""Tests for the narrow G7-01 package façade."""
+"""Tests for the narrow package façade through G7-03."""
 
 import importlib
 import importlib.util
@@ -24,6 +24,7 @@ def test_root_exports_only_the_settled_namespaces_and_three_conveniences() -> No
         "frontiers",
         "neighborhoods",
         "rules",
+        "serialization",
     ]
     assert set(vars(ca)) >= set(ca.__all__)
 
@@ -41,10 +42,10 @@ def test_component_constructors_are_module_qualified() -> None:
         "eca",
         "elementary",
         "catalog",
-        "serialization",
     ):
         assert broad_export not in ca.__all__
         assert not hasattr(ca, broad_export)
+    assert ca.serialization.__name__ == "ca.serialization"
 
 
 def test_apply_and_rollout_have_the_exact_public_signatures() -> None:

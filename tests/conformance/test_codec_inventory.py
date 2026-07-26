@@ -91,6 +91,8 @@ def _public_sealed_types(
 
 
 def _tag(owner_name: str, type_name: str) -> str:
+    if owner_name == "program" and type_name == "SimpleProgram":
+        return "ca.simple-program"
     kebab = re.sub(r"([a-z0-9])([A-Z])", r"\1-\2", type_name).lower()
     return f"ca.{owner_name}.{kebab}"
 
@@ -238,12 +240,7 @@ def test_inventory_joins_the_closed_production_schema_exactly() -> None:
         assert rows
         assert schema.owner == owner
         assert schema.type_name == type_name
-        expected_tag = (
-            "ca.simple-program"
-            if owner == "ca.program" and type_name == "SimpleProgram"
-            else rows[0]["tag"]
-        )
-        assert schema.tag == expected_tag
+        assert schema.tag == rows[0]["tag"]
         assert schema.version == int(rows[0]["version"])
         assert schema.value_type.__module__ == owner
         assert schema.value_type.__name__ == type_name

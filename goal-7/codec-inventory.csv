@@ -341,7 +341,7 @@ ca.rules,Rule,frozen-dataclass,record,ca.rules.rule,1,descriptor|contract,,Rule.
 ca.rules,EvaluationStep,frozen-dataclass,record,ca.rules.evaluation-step,1,expression|anchor|result|read_evidence|version,,EvaluationStep.__post_init__,structural-fields
 ca.rules,EvaluationProof,frozen-dataclass,record,ca.rules.evaluation-proof,1,steps|version,,EvaluationProof.__post_init__,structural-fields
 ca.program,CompatibilityEvidence,frozen-dataclass,record,ca.program.compatibility-evidence,1,configuration_contract|value_profile|clauses,,_require_compatible_five_fields,structural-fields
-ca.program,SimpleProgram,frozen-dataclass,record,ca.program.simple-program,1,seed|alphabet|frontier|neighborhood|rule,,SimpleProgram.__post_init__,structural-fields
+ca.program,SimpleProgram,frozen-dataclass,record,ca.simple-program,1,seed|alphabet|frontier|neighborhood|rule,,SimpleProgram.__post_init__,structural-fields
 ca.program,ApplicationPhase,enum-member,PROGRAM,ca.program.application-phase,1,value,program,Enum.__call__,enum-member
 ca.program,ApplicationPhase,enum-member,INPUT,ca.program.application-phase,1,value,input,Enum.__call__,enum-member
 ca.program,ApplicationPhase,enum-member,FRONTIER,ca.program.application-phase,1,value,frontier,Enum.__call__,enum-member
