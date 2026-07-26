@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-01 COMPLETE**
+Status: **IN PROGRESS — G7-02 MECHANICS**
 
 ## Big-Picture Objective
 
@@ -94,10 +94,13 @@ conflict, and reconcile the plan before changing runtime behavior.
   consumers of ordinary programs and explicit rollout views.
 - Source and lock metadata are at `0.2.0`, NumPy is a runtime dependency, and
   pytest is development-only. This is an internal checkpoint, not a release.
-- The active suite reports `225 passed, 36 skipped`. Every remaining skip has
-  an explicit G7-02–G7-05 owner; G7-01 owns none.
+- G7-02 began from clean commit
+  `130b230` with `uv run pytest -q tests` reporting
+  `225 passed, 36 skipped`. Every remaining skip has an explicit G7-02–G7-05
+  owner; G7-01 owns none.
 - Serialization and catalog files remain inert, unexposed shells. G7-02 has
-  not started and `3-MECHANICS.md` does not yet exist.
+  started; its live plan and evidence record is
+  [`3-MECHANICS.md`](3-MECHANICS.md).
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -248,7 +251,7 @@ stage file and may evolve with the implementation.
 |---|---|---|---|
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
-| `3-MECHANICS` | G7-02 | Pending | All 60 rows supported by reusable mechanics |
+| `3-MECHANICS` | G7-02 | In Progress | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Pending | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
