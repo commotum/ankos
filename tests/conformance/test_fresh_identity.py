@@ -132,10 +132,38 @@ def test_every_fresh_scope_input_contributes_to_the_bound_identity() -> None:
         bind(input_identity="other-configuration"),
         bind(rule_identity="other-rule"),
         bind(witness_identity="other-witness"),
-        bind(loci.fresh_reference("other-namespace", "local", parent=parent_a, interface_loci=(parent_a,))),
-        bind(loci.fresh_reference("children", "other-local", parent=parent_a, interface_loci=(parent_a,))),
-        bind(loci.fresh_reference("children", "local", parent=parent_b, interface_loci=(parent_a,))),
-        bind(loci.fresh_reference("children", "local", parent=parent_a, interface_loci=(parent_b,))),
+        bind(
+            loci.fresh_reference(
+                "other-namespace",
+                "local",
+                parent=parent_a,
+                interface_loci=(parent_a,),
+            )
+        ),
+        bind(
+            loci.fresh_reference(
+                "children",
+                "other-local",
+                parent=parent_a,
+                interface_loci=(parent_a,),
+            )
+        ),
+        bind(
+            loci.fresh_reference(
+                "children",
+                "local",
+                parent=parent_b,
+                interface_loci=(parent_a,),
+            )
+        ),
+        bind(
+            loci.fresh_reference(
+                "children",
+                "local",
+                parent=parent_a,
+                interface_loci=(parent_b,),
+            )
+        ),
     )
 
     assert len(set(variants)) == len(variants)

@@ -166,8 +166,10 @@ conflict, and reconcile the plan before changing runtime behavior.
 - The G7-05 stage-entry conformance directory reports `221 passed`, and the
   complete active suite reports `993 passed` with no skips. The initial static
   scan nevertheless found three unused conformance helper placeholders behind
-  `_not_implemented()` and `NotImplementedError`; they must be removed or
-  replaced before aggregate conformance can close.
+  `_not_implemented()` and `NotImplementedError`; they were removed after the
+  audit confirmed that dedicated CT09–CT11 suites supersede them. The interim
+  repaired conformance slice reports `253 passed`; CT12 hardening and final
+  aggregate gates remain.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.

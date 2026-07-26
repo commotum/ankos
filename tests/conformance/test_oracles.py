@@ -1069,8 +1069,8 @@ MOBILE_RIGHT_ATOM = OracleSourceAtom(
 )
 MOBILE_CASE = OracleCase(
     case_id="px01.mobile-head-branching",
-    mechanics=("mobile", "turing"),
-    conformance_refs=("PX01:F031", "CT12:mobile/Turing"),
+    mechanics=("mobile",),
+    conformance_refs=("PX01:F031", "CT12:mobile"),
     current_native=False,
     source=MOBILE_SOURCE,
     writable=(TAPE_LEFT, TAPE_SOURCE, TAPE_RIGHT),
@@ -1103,6 +1103,95 @@ MOBILE_CASE = OracleCase(
         applied_intensional_relation=None,
         successor_intensional_relation=None,
         evidence=_term("application-evidence", "px01.mobile-head-branching"),
+    ),
+)
+
+
+# CT12 Turing machine: a deterministic stateful write-and-move transition.
+#
+# This is deliberately not another label on the mobile fixture above.  Its
+# expected record describes a conventional transition keyed by machine state
+# and scanned symbol; the runtime test reaches it through the public catalog
+# constructor rather than through a test-owned finite Rule.
+TURING_HEAD_Q0 = _term("head", "q", 0)
+TURING_HEAD_P1 = _term("head", "p", 1)
+TURING_SOURCE = _term(
+    "tape",
+    _term("at", -1, 1),
+    _term("at", 0, TURING_HEAD_Q0),
+    _term("at", 1, 1),
+)
+TURING_SUCCESSOR = _term(
+    "tape",
+    _term("at", -1, TURING_HEAD_P1),
+    _term("at", 0, 1),
+    _term("at", 1, 1),
+)
+TURING_ATOM = OracleSourceAtom(
+    atom_id="turing-q0-write1-left",
+    kind="derivation",
+    witness=_term(
+        "turing-transition-witness",
+        _term("state", "q"),
+        _term("scanned", 0),
+        _term("next-state", "p"),
+        _term("write", 1),
+        _term("move", -1),
+    ),
+    provenance=("mechanics:indexed-replacement",),
+    progress="advanced",
+    continuation=_term("continue"),
+    dispositions=(
+        _disposition(TAPE_LEFT, "replace", TURING_HEAD_P1),
+        _disposition(TAPE_SOURCE, "replace", 1),
+        _disposition(TAPE_RIGHT, "preserve"),
+    ),
+    reason=None,
+    certificate=_term(
+        "turing-transition-certificate",
+        "q",
+        0,
+        "p",
+        1,
+        -1,
+    ),
+)
+TURING_CASE = OracleCase(
+    case_id="px01.turing-stateful-step",
+    mechanics=("turing",),
+    conformance_refs=("PX01:F031", "CT12:Turing"),
+    current_native=False,
+    source=TURING_SOURCE,
+    writable=(TAPE_LEFT, TAPE_SOURCE, TAPE_RIGHT),
+    readable=_term("global-turing-tape", TURING_SOURCE),
+    expected=OracleExpected(
+        support_kind="finite",
+        source_outcomes=(TURING_ATOM,),
+        applied_atoms=(
+            _applied(
+                TURING_ATOM,
+                TURING_SUCCESSOR,
+                "px01.turing-stateful-step",
+            ),
+        ),
+        no_successor_partition=(),
+        outcome_cardinality=EXACT_ONE,
+        derivation_cardinality=EXACT_ONE,
+        successor_cardinality=EXACT_ONE,
+        successor_fibers=(
+            OracleFiber(
+                TURING_SUCCESSOR,
+                ("turing-q0-write1-left",),
+            ),
+        ),
+        measures=ABSENT_MEASURES,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
+        evidence=_term(
+            "application-evidence",
+            "px01.turing-stateful-step",
+        ),
     ),
 )
 
@@ -1979,6 +2068,7 @@ CT12_CASES = (
     STOCHASTIC_CASE,
     FLOW_CASE,
     DIFFERENTIAL_CASE,
+    TURING_CASE,
 )
 
 EXPECTED_CT12_CASE_IDS = (
@@ -1998,6 +2088,7 @@ EXPECTED_CT12_CASE_IDS = (
     "px06.stochastic-search-law",
     "px05.exact-differential-flow",
     "px05.constant-field-intensional",
+    "px01.turing-stateful-step",
 )
 
 REQUIRED_CT12_MECHANICS = (
@@ -2169,7 +2260,7 @@ def test_oracle_inventory_covers_every_minimum_ct12_mechanic() -> None:
     covered = {mechanic for case in CT12_CASES for mechanic in case.mechanics}
     assert covered >= set(REQUIRED_CT12_MECHANICS)
     assert tuple(case.case_id for case in CT12_CASES) == EXPECTED_CT12_CASE_IDS
-    assert len(CT12_CASES) == 16
+    assert len(CT12_CASES) == 17
     assert all(case.current_native for case in CT12_CASES[:6])
     assert not any(case.current_native for case in CT12_CASES[6:])
 

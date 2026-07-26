@@ -62,6 +62,7 @@ def _oracle_scalar(value: object) -> test_oracles.OracleScalar:
 def _rule_expr_as_oracle_term(
     expression: rules.RuleExpr,
 ) -> test_oracles.OracleValue:
+    assert expression.version == 1
     if expression.primitive is rules.ExpressionPrimitive.LITERAL:
         assert len(expression.arguments) == 1
         value = expression.arguments[0]
@@ -649,13 +650,34 @@ def _cardinality_as_oracle(
     assert actual.evidence.version == 1
     size = rules.cardinality_size(actual)
     if size is not None:
+        assert actual.evidence.statement == rules.literal_expr(
+            f"exactly:{size}"
+        )
         return test_oracles.OracleCardinality("exact", size)
     assert isinstance(actual, rules.Many)
     assert actual.infinite is rules.InfiniteCardinality.UNCOUNTABLE
+    assert actual.evidence.statement == rules.literal_expr(
+        "constant-field:uncountable"
+    )
     return test_oracles.OracleCardinality("uncountable", None)
 
 
-def _assert_support_evidence(support: rules.SupportSpace) -> None:
+def _assert_support_evidence(
+    support: rules.SupportSpace,
+    *,
+    label: str | None = None,
+    completeness_statement: rules.RuleExpr | None = None,
+    soundness_statement: rules.RuleExpr | None = None,
+) -> None:
+    """Require exact support evidence, including its closed statement."""
+
+    if label is not None:
+        assert completeness_statement is None
+        assert soundness_statement is None
+        completeness_statement = rules.literal_expr(f"{label}:complete")
+        soundness_statement = rules.literal_expr(f"{label}:sound")
+    assert completeness_statement is not None
+    assert soundness_statement is not None
     assert support.version == 1
     assert (
         support.completeness_evidence.kind
@@ -664,6 +686,8 @@ def _assert_support_evidence(support: rules.SupportSpace) -> None:
     assert support.soundness_evidence.kind is rules.CertificateKind.SOUNDNESS
     assert support.completeness_evidence.version == 1
     assert support.soundness_evidence.version == 1
+    assert support.completeness_evidence.statement == completeness_statement
+    assert support.soundness_evidence.statement == soundness_statement
 
 
 def _measure_as_oracle(
@@ -689,12 +713,15 @@ def _application_evidence_as_oracle(
         actual.readable_binding_identity,
         actual.writable_binding_identity,
         actual.application_identity,
+        actual.canonical_rule_identity,
+        actual.input_trace_lineage_identity,
     )
     assert all(type(identity) is str and identity for identity in runtime_identities)
     assert actual.program_identity == simple_program.canonical_identity
     assert actual.input_configuration_identity == source.identity
     assert actual.readable_binding_identity == loci.canonical_identity(readable)
     assert actual.writable_binding_identity == loci.canonical_identity(writable)
+    assert actual.canonical_rule_identity == simple_program.rule.canonical_identity
     assert actual.application_identity == loci.canonical_identity(
         (
             simple_program.canonical_identity,
@@ -702,6 +729,14 @@ def _application_evidence_as_oracle(
             actual.readable_binding_identity,
             actual.writable_binding_identity,
         )
+    )
+    direct_lineage = program.TraceLineage(
+        loci.canonical_identity(
+            ("direct-application-root", source.identity)
+        )
+    )
+    assert actual.input_trace_lineage_identity == (
+        direct_lineage.canonical_identity
     )
     # The frozen oracle names an application semantically; runtime identity
     # fields are hashes.  Project only after validating every hashed field.
@@ -737,7 +772,7 @@ def _assert_complete_native_result(
     assert source_support.presentation is rules.SupportPresentation.FINITE
     assert actual.source_outcomes.probability_law is None
     assert actual.source_outcomes.version == 1
-    _assert_support_evidence(source_support)
+    _assert_support_evidence(source_support, label="expression")
     source_cardinality = _cardinality_as_oracle(source_support.cardinality)
     assert source_cardinality == _cardinality_as_oracle(
         actual.outcome_atom_cardinality
@@ -820,7 +855,7 @@ def _assert_complete_native_result(
         )
     normalized_source_atoms.sort(key=lambda atom: atom.atom_id)
 
-    _assert_support_evidence(actual.applied_atoms)
+    _assert_support_evidence(actual.applied_atoms, label="applied-atoms")
     applied_cardinality = _cardinality_as_oracle(
         actual.applied_atoms.cardinality
     )
@@ -885,13 +920,16 @@ def _assert_complete_native_result(
     normalized_applied.sort(key=lambda atom: atom.atom_id)
 
     assert actual.no_successor_partition.atoms == ()
-    _assert_support_evidence(actual.no_successor_partition)
+    _assert_support_evidence(
+        actual.no_successor_partition,
+        label="no-successor-partition",
+    )
     assert _cardinality_as_oracle(
         actual.no_successor_partition.cardinality
     ) == test_oracles.OracleCardinality("exact", 0)
 
     successor_support = actual.successor_quotient_with_derivation_fibers
-    _assert_support_evidence(successor_support)
+    _assert_support_evidence(successor_support, label="successor-quotient")
     successor_cardinality = _cardinality_as_oracle(
         actual.successor_cardinality
     )
@@ -981,6 +1019,33 @@ def test_reference_oracles_are_statically_independent_of_runtime_semantics() -> 
     assert called_names.isdisjoint({"apply", "rollout", "denote", "commit"})
 
 
+def test_production_runtime_is_statically_independent_of_reference_oracles() -> None:
+    """The dependency arrow may never point from production into CT12 data."""
+
+    production_root = Path(ca.__file__).resolve().parent
+    forbidden = {
+        "test_oracles",
+        "tests.conformance.test_oracles",
+        "conformance.test_oracles",
+    }
+    for path in production_root.rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        imported = {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        }
+        imported_from = {
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+            and node.module is not None
+        }
+        assert imported.isdisjoint(forbidden), path
+        assert imported_from.isdisjoint(forbidden), path
+
+
 @pytest.mark.parametrize("case_id", NATIVE_CASES)
 def test_finite_native_fixtures_match_complete_generic_results(
     case_id: str,
@@ -1002,6 +1067,7 @@ def _ct12_expression_as_oracle(
 ) -> test_oracles.OracleValue:
     """Normalize closed fixture syntax without collapsing booleans to integers."""
 
+    assert expression.version == 1
     if expression.primitive is rules.ExpressionPrimitive.LITERAL:
         assert len(expression.arguments) == 1
         value = expression.arguments[0]
@@ -1024,6 +1090,7 @@ def _ct12_semantic_as_oracle(
     if type(value) in (bool, int, Fraction, str):
         return value
     assert isinstance(value, alphabets.ValueNode)
+    assert value.version == 1
     assert not value.fields
     return _term(
         value.tag,
@@ -1585,8 +1652,23 @@ def _ct12_dispositions_as_oracle(
 ) -> tuple[test_oracles.OracleDisposition, ...]:
     assert actual.version == 1
     assert actual.totality_evidence.kind is rules.CertificateKind.TOTALITY
+    assert actual.totality_evidence.version == 1
+    assert _ct12_expression_as_oracle(
+        actual.totality_evidence.statement
+    ) == _term("totality", "complete-writable-envelope")
     normalized: dict[test_oracles.OracleTerm, test_oracles.OracleDisposition] = {}
     for item in actual.entries:
+        assert item.version == 1
+        assert item.evidence.kind is rules.CertificateKind.TOTALITY
+        assert item.evidence.version == 1
+        expected_evidence = (
+            f"fresh:{item.action.value}"
+            if isinstance(item.target, loci.FreshReference)
+            else f"existing:{item.action.value}"
+        )
+        assert item.evidence.statement == rules.literal_expr(
+            expected_evidence
+        )
         target = _ct12_target_as_oracle(case_id, item.target)
         assert target not in normalized
         payload = (
@@ -1613,7 +1695,11 @@ def _ct12_continuation_as_oracle(
     assert isinstance(actual, rules.Stop)
     assert actual.version == 1
     assert actual.certificate.kind is rules.CertificateKind.TERMINALITY
+    assert actual.certificate.version == 1
     assert _ct12_expression_as_oracle(actual.reason) == "completed"
+    assert _ct12_expression_as_oracle(
+        actual.certificate.statement
+    ) == _term("terminal", "completed")
     return _term("stop", "completed")
 
 
@@ -1707,6 +1793,7 @@ def _ct12_assert_applied_lineage(
     application: program.ApplicationComplete,
     source: loci.FiniteConfiguration,
 ) -> None:
+    assert actual.evidence.version == 1
     direct_root = loci.canonical_identity(("direct-application-root", source.identity))
     assert actual.input_trace_lineage == program.TraceLineage(direct_root)
     outcome = (
@@ -2030,14 +2117,61 @@ def _assert_complete_non_native_result(
 
     support = actual.source_outcomes.support
     assert actual.source_outcomes.version == 1
-    _assert_support_evidence(support)
+    if support.presentation is rules.SupportPresentation.INTENSIONAL:
+        _assert_support_evidence(
+            support,
+            completeness_statement=rules.literal_expr(
+                "constant-field:complete"
+            ),
+            soundness_statement=rules.literal_expr(
+                "constant-field:sound"
+            ),
+        )
+        for phase, mapped_support in (
+            ("applied-atoms", actual.applied_atoms),
+            (
+                "no-successor-partition",
+                actual.no_successor_partition,
+            ),
+            (
+                "successor-quotient",
+                actual.successor_quotient_with_derivation_fibers,
+            ),
+        ):
+            assert mapped_support.relation is not None
+            statement = _ct12_tagged(
+                f"application-phase:{phase}",
+                mapped_support.relation,
+            )
+            _assert_support_evidence(
+                mapped_support,
+                completeness_statement=statement,
+                soundness_statement=statement,
+            )
+    else:
+        _assert_support_evidence(
+            support,
+            label="ct12-independent-literal",
+        )
+        _assert_support_evidence(
+            actual.applied_atoms,
+            label="applied-atoms",
+        )
+        _assert_support_evidence(
+            actual.no_successor_partition,
+            label="no-successor-partition",
+        )
+        _assert_support_evidence(
+            actual.successor_quotient_with_derivation_fibers,
+            label="successor-quotient",
+        )
     assert _cardinality_as_oracle(actual.outcome_atom_cardinality) == (
         _cardinality_as_oracle(support.cardinality)
     )
-    _assert_support_evidence(actual.applied_atoms)
-    _assert_support_evidence(actual.no_successor_partition)
-    _assert_support_evidence(
-        actual.successor_quotient_with_derivation_fibers
+    _cardinality_as_oracle(actual.applied_atoms.cardinality)
+    _cardinality_as_oracle(actual.no_successor_partition.cardinality)
+    _cardinality_as_oracle(
+        actual.successor_quotient_with_derivation_fibers.cardinality
     )
 
     if support.presentation is rules.SupportPresentation.INTENSIONAL:
@@ -2048,6 +2182,7 @@ def _assert_complete_non_native_result(
         assert not actual.applied_atoms.atoms
         assert not actual.no_successor_partition.atoms
         assert not actual.successor_quotient_with_derivation_fibers.atoms
+        assert actual.source_outcomes.probability_law is None
         assert actual.applied_atoms.relation is not None
         applied_relation = _ct12_intensional_projection_as_oracle(
             "applied-atoms",
@@ -2105,10 +2240,29 @@ def _assert_complete_non_native_result(
         ) == _term("application-evidence", case_id)
         claims = actual.source_outcomes.projection_cardinalities
         assert claims is not None
+        assert claims.version == 1
         assert claims.mapping_evidence.kind is rules.CertificateKind.COMPOSITION
+        assert claims.mapping_evidence.version == 1
         assert _ct12_expression_as_oracle(
             claims.mapping_evidence.statement
         ) == "constant-field:injective-total-projection"
+        assert claims.derivations == actual.derivation_cardinality
+        assert claims.no_successors == (
+            actual.no_successor_partition.cardinality
+        )
+        assert claims.successors == actual.successor_cardinality
+        assert actual.applied_atoms.cardinality == support.cardinality
+        assert (
+            actual.successor_quotient_with_derivation_fibers.cardinality
+            == actual.successor_cardinality
+        )
+        _cardinality_as_oracle(actual.applied_atoms.cardinality)
+        _cardinality_as_oracle(
+            actual.no_successor_partition.cardinality
+        )
+        _cardinality_as_oracle(
+            actual.successor_quotient_with_derivation_fibers.cardinality
+        )
         normalized_evidence = _term(
             "application-evidence",
             case_id,
@@ -2306,9 +2460,22 @@ def _assert_complete_non_native_result(
         assert all(item.mass is None for item in normalized_source_atoms)
     else:
         assert law.presentation is rules.ProbabilityPresentation.FINITE
+        assert law.measure is None
         assert law.version == 1
         assert law.normalization_evidence.kind is rules.CertificateKind.NORMALIZATION
+        assert law.normalization_evidence.version == 1
+        assert law.normalization_evidence.statement == rules.literal_expr(
+            "finite-law:normalized"
+        )
         assert law.measurable_space_evidence.kind is rules.CertificateKind.MEASURABILITY
+        assert law.measurable_space_evidence.version == 1
+        assert law.measurable_space_evidence.statement == rules.literal_expr(
+            "finite-law:measurable"
+        )
+        assert sum(
+            (item.mass for item in law.masses),
+            Fraction(0),
+        ) == Fraction(1)
         assert {
             runtime_to_oracle_id[item.atom_identity]: item.mass
             for item in law.masses
@@ -2386,6 +2553,294 @@ def _normalize_non_native_case(
     )
 
 
+def _turing_value_as_oracle(
+    value: alphabets.SemanticValue,
+) -> test_oracles.OracleValue:
+    assert isinstance(value, alphabets.ValueNode)
+    assert value.version == 1
+    assert value.kind is alphabets.ValueKind.TAG
+    assert not value.fields
+    assert len(value.items) == 1
+    symbol = value.items[0]
+    assert type(symbol) is int
+    if value.tag == "cell":
+        return symbol
+    assert value.tag in {"head:q", "head:p"}
+    return _term("head", value.tag.removeprefix("head:"), symbol)
+
+
+def _turing_configuration_as_oracle(
+    actual: loci.FiniteConfiguration,
+) -> test_oracles.OracleTerm:
+    assert actual.contract.kind is loci.CarrierKind.GRID
+    assert actual.contract.shape == (3,)
+    assert actual.contract.axes == ("x",)
+    by_coordinate = {
+        loci.grid_coordinates(target)[0]: _turing_value_as_oracle(value)
+        for target, value in actual.entries
+    }
+    assert set(by_coordinate) == {-1, 0, 1}
+    return _term(
+        "tape",
+        *(
+            _term("at", coordinate, by_coordinate[coordinate])
+            for coordinate in (-1, 0, 1)
+        ),
+    )
+
+
+def _turing_target_as_oracle(
+    target: loci.Locus,
+) -> test_oracles.OracleTerm:
+    coordinate = loci.grid_coordinates(target)
+    assert len(coordinate) == 1
+    assert coordinate[0] in {-1, 0, 1}
+    return _term("tape-cell", coordinate[0])
+
+
+def _normalize_turing_catalog_case() -> test_oracles.OracleExpected:
+    """Normalize a real catalog Turing program against test-owned semantics."""
+
+    from ca.catalog import machina
+
+    oracle_case = test_oracles.TURING_CASE
+    simple_program = machina.turing_machine(
+        tape=(1, 0, 1),
+        head=1,
+        initial_state="q",
+        states=("q", "p"),
+        symbols=2,
+        transitions=((("q", 0), ("p", 1, -1)),),
+    )
+    denotation = simple_program.seed.denote()
+    source = denotation.exact_configuration
+    assert isinstance(source, loci.FiniteConfiguration)
+    actual = ca.apply(simple_program, source)
+    assert isinstance(actual, program.ApplicationComplete)
+    assert_closed_descriptor(simple_program)
+    assert_closed_descriptor(actual)
+
+    assert _turing_configuration_as_oracle(source) == oracle_case.source
+    writable = simple_program.frontier.resolve(source)
+    assert isinstance(writable, frontiers.WritableCapabilities)
+    assert writable.snapshot_identity == source.identity
+    assert not writable.fresh
+    assert tuple(
+        _turing_target_as_oracle(item.target)
+        for item in writable.existing
+    ) == oracle_case.writable
+    assert tuple(item.target for item in writable.existing) == tuple(
+        lens.target for lens in writable.reconstruction.lenses
+    )
+    assert all(
+        item.effects == (frontiers.Effect.REPLACE,)
+        for item in writable.existing
+    )
+
+    readable = simple_program.neighborhood.resolve(source)
+    assert isinstance(readable, neighborhoods.ReadableView)
+    assert readable.snapshot_identity == source.identity
+    assert {
+        observation.target: observation.value
+        for observation in readable.observations
+        if not isinstance(observation.state, neighborhoods.Absent)
+    } == dict(source.entries)
+    assert len(readable.groups) == 1
+    assert readable.groups[0].indices == (0, 1, 2)
+    assert _term(
+        "global-turing-tape",
+        _turing_configuration_as_oracle(source),
+    ) == oracle_case.readable
+
+    support = actual.source_outcomes.support
+    assert actual.source_outcomes.version == 1
+    assert actual.source_outcomes.probability_law is None
+    assert actual.source_outcomes.projection_cardinalities is None
+    assert support.presentation is rules.SupportPresentation.FINITE
+    assert support.relation is None
+    _assert_support_evidence(support, label="clause-kernel")
+    assert len(support.atoms) == 1
+    source_atom = support.atoms[0]
+    assert isinstance(source_atom, rules.Derivation)
+    assert source_atom.version == 1
+    assert source_atom.progress is rules.Progress.ADVANCED
+    assert source_atom.continuation == rules.Continue()
+    assert source_atom.provenance == ("mechanics:indexed-replacement",)
+    assert source_atom.witness.version == 1
+    assert source_atom.witness.identity == loci.canonical_identity(
+        source_atom.witness.descriptor
+    )
+    witness_parts = source_atom.witness.descriptor.arguments
+    assert source_atom.witness.descriptor.version == 1
+    assert source_atom.witness.descriptor.primitive is rules.ExpressionPrimitive.TUPLE
+    assert len(witness_parts) == 6
+    assert tuple(
+        part.arguments[0]
+        for part in witness_parts[:4]
+        if isinstance(part, rules.RuleExpr)
+        and part.primitive is rules.ExpressionPrimitive.LITERAL
+    ) == (
+        "clause-kernel-witness-v1",
+        1,
+        "indexed-replacement",
+        "indexed-replacement",
+    )
+    assert isinstance(witness_parts[4], rules.RuleExpr)
+    assert witness_parts[4].version == 1
+    assert isinstance(witness_parts[5], rules.RuleExpr)
+    assert witness_parts[5] == rules.literal_expr(
+        source_atom.replacement.canonical_identity
+    )
+    assert source_atom.certificate.kind is rules.CertificateKind.DERIVATION
+    assert source_atom.certificate.version == 1
+    assert source_atom.certificate.statement == rules.literal_expr(
+        "indexed-replacement:derived"
+    )
+
+    replacement = source_atom.replacement
+    assert replacement.version == 1
+    assert replacement.totality_evidence.kind is rules.CertificateKind.TOTALITY
+    assert replacement.totality_evidence.version == 1
+    assert replacement.totality_evidence.statement == rules.literal_expr(
+        "clause-kernel:1:total"
+    )
+    normalized_dispositions = []
+    for disposition in replacement.existing:
+        assert disposition.version == 1
+        assert disposition.evidence.kind is rules.CertificateKind.TOTALITY
+        assert disposition.evidence.version == 1
+        assert disposition.evidence.statement == rules.literal_expr(
+            f"existing:{disposition.action.value}"
+        )
+        payload = (
+            _turing_value_as_oracle(disposition.payload.value)
+            if isinstance(disposition.payload, rules.ValuePayload)
+            else None
+        )
+        normalized_dispositions.append(
+            test_oracles.OracleDisposition(
+                _turing_target_as_oracle(disposition.target),
+                disposition.action.value,
+                payload,
+            )
+        )
+    assert not replacement.fresh
+    semantic_atom_id = "turing-q0-write1-left"
+    semantic_witness = _term(
+        "turing-transition-witness",
+        _term("state", "q"),
+        _term("scanned", 0),
+        _term("next-state", "p"),
+        _term("write", 1),
+        _term("move", -1),
+    )
+    semantic_certificate = _term(
+        "turing-transition-certificate",
+        "q",
+        0,
+        "p",
+        1,
+        -1,
+    )
+    normalized_source_atom = test_oracles.OracleSourceAtom(
+        atom_id=semantic_atom_id,
+        kind="derivation",
+        witness=semantic_witness,
+        provenance=source_atom.provenance,
+        progress=source_atom.progress.value,
+        continuation=_term("continue"),
+        dispositions=tuple(normalized_dispositions),
+        reason=None,
+        certificate=semantic_certificate,
+        mass=None,
+    )
+
+    _assert_support_evidence(actual.applied_atoms, label="applied-atoms")
+    _assert_support_evidence(
+        actual.no_successor_partition,
+        label="no-successor-partition",
+    )
+    successor_support = actual.successor_quotient_with_derivation_fibers
+    _assert_support_evidence(successor_support, label="successor-quotient")
+    source_cardinality = _cardinality_as_oracle(
+        actual.outcome_atom_cardinality
+    )
+    assert source_cardinality == _cardinality_as_oracle(support.cardinality)
+    derivation_cardinality = _cardinality_as_oracle(
+        actual.derivation_cardinality
+    )
+    _cardinality_as_oracle(actual.applied_atoms.cardinality)
+    assert _cardinality_as_oracle(
+        actual.no_successor_partition.cardinality
+    ) == test_oracles.EXACT_ZERO
+    successor_cardinality = _cardinality_as_oracle(
+        actual.successor_cardinality
+    )
+    assert successor_cardinality == _cardinality_as_oracle(
+        successor_support.cardinality
+    )
+
+    assert len(actual.applied_atoms.atoms) == 1
+    applied = actual.applied_atoms.atoms[0]
+    assert isinstance(applied, program.AppliedDerivation)
+    assert applied.source is source_atom
+    assert not applied.fresh_bindings
+    _ct12_assert_applied_lineage(applied, actual, source)
+    normalized_successor = _turing_configuration_as_oracle(applied.successor)
+    normalized_applied = test_oracles.OracleAppliedAtom(
+        semantic_atom_id,
+        semantic_atom_id,
+        normalized_successor,
+        (),
+        _term("lineage", oracle_case.case_id, semantic_atom_id),
+        _term(
+            "applied-atom-evidence",
+            oracle_case.case_id,
+            semantic_atom_id,
+        ),
+    )
+    assert actual.no_successor_partition.atoms == ()
+    assert len(successor_support.atoms) == 1
+    group = successor_support.atoms[0]
+    assert group.derivations == (applied,)
+    assert _turing_configuration_as_oracle(group.successor) == (
+        normalized_successor
+    )
+
+    normalized_evidence = _application_evidence_as_oracle(
+        actual.evidence,
+        oracle_case=oracle_case,
+        simple_program=simple_program,
+        source=source,
+        readable=readable,
+        writable=writable,
+    )
+    return test_oracles.OracleExpected(
+        support_kind="finite",
+        source_outcomes=(normalized_source_atom,),
+        applied_atoms=(normalized_applied,),
+        no_successor_partition=(),
+        outcome_cardinality=source_cardinality,
+        derivation_cardinality=derivation_cardinality,
+        successor_cardinality=successor_cardinality,
+        successor_fibers=(
+            test_oracles.OracleFiber(
+                normalized_successor,
+                (semantic_atom_id,),
+            ),
+        ),
+        measures=test_oracles.OracleMeasures(
+            _measure_as_oracle(actual.applied_atom_measure),
+            _measure_as_oracle(actual.successor_submeasure),
+            _measure_as_oracle(actual.no_successor_submeasure),
+        ),
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
+        evidence=normalized_evidence,
+    )
+
+
 def _assert_non_native_case(case_id: str) -> None:
     oracle = _ORACLES_BY_ID[case_id]
     assert_full_application_equal(
@@ -2407,13 +2862,128 @@ def test_variable_structure_and_stochastic_fixtures_match_completely(
 
 @pytest.mark.parametrize(
     "oracle_case",
-    test_oracles.CT12_CASES[14:],
+    test_oracles.CT12_CASES[14:16],
     ids=lambda case: case.case_id,
 )
 def test_differential_and_intensional_fixtures_use_exact_tiny_oracles(
     oracle_case: test_oracles.OracleCase,
 ) -> None:
     _assert_non_native_case(oracle_case.case_id)
+
+
+def test_catalog_turing_machine_matches_its_distinct_tiny_oracle() -> None:
+    assert_full_application_equal(
+        _normalize_turing_catalog_case(),
+        test_oracles.TURING_CASE.expected,
+    )
+
+
+def _assert_hostile_runtime_mutation_is_rejected(
+    case_id: str,
+    mutate,
+) -> None:
+    oracle = _ORACLES_BY_ID[case_id]
+    execution = runtime_ct12_fixture(case_id)
+    actual = execution.result
+    assert isinstance(actual, program.ApplicationComplete)
+    mutate(actual)
+    with pytest.raises(AssertionError):
+        _assert_complete_non_native_result(oracle, execution, actual)
+
+
+def test_non_native_normalizer_rejects_mutated_support_evidence() -> None:
+    def mutate_completeness(actual: program.ApplicationComplete) -> None:
+        object.__setattr__(
+            actual.source_outcomes.support.completeness_evidence,
+            "statement",
+            rules.literal_expr("forged:complete"),
+        )
+
+    def mutate_soundness_version(actual: program.ApplicationComplete) -> None:
+        object.__setattr__(
+            actual.applied_atoms.soundness_evidence,
+            "version",
+            7,
+        )
+
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px01.mobile-head-branching",
+        mutate_completeness,
+    )
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px04.multiway-diamond",
+        mutate_soundness_version,
+    )
+
+
+def test_non_native_normalizer_rejects_mutated_cardinality_evidence() -> None:
+    def mutate_cardinality(actual: program.ApplicationComplete) -> None:
+        object.__setattr__(
+            actual.derivation_cardinality.evidence,
+            "statement",
+            rules.literal_expr("forged-cardinality"),
+        )
+
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px04.constraint-mod3-many",
+        mutate_cardinality,
+    )
+
+
+def test_non_native_normalizer_rejects_mutated_probability_evidence() -> None:
+    def mutate_normalization(actual: program.ApplicationComplete) -> None:
+        law = actual.source_outcomes.probability_law
+        assert law is not None
+        object.__setattr__(
+            law.normalization_evidence,
+            "statement",
+            rules.literal_expr("forged-normalization"),
+        )
+
+    def mutate_measurability_version(
+        actual: program.ApplicationComplete,
+    ) -> None:
+        law = actual.source_outcomes.probability_law
+        assert law is not None
+        object.__setattr__(
+            law.measurable_space_evidence,
+            "version",
+            9,
+        )
+
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px06.stochastic-search-law",
+        mutate_normalization,
+    )
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px06.stochastic-search-law",
+        mutate_measurability_version,
+    )
+
+
+def test_non_native_normalizer_rejects_mutated_disposition_evidence() -> None:
+    def mutate_totality(actual: program.ApplicationComplete) -> None:
+        atom = actual.source_outcomes.support.atoms[0]
+        assert isinstance(atom, rules.Derivation)
+        object.__setattr__(
+            atom.replacement.totality_evidence,
+            "statement",
+            rules.literal_expr("forged-totality"),
+        )
+
+    def mutate_entry_version(actual: program.ApplicationComplete) -> None:
+        atom = actual.source_outcomes.support.atoms[0]
+        assert isinstance(atom, rules.Derivation)
+        object.__setattr__(atom.replacement.entries[0].evidence, "version", 3)
+
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px02.parallel-substitution",
+        mutate_totality,
+    )
+    _assert_hostile_runtime_mutation_is_rejected(
+        "px02.graph-interface-replacement",
+        mutate_entry_version,
+    )
 
 
 def test_fresh_binding_normalization_resists_mutated_frozen_evidence() -> None:

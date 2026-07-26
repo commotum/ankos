@@ -128,8 +128,18 @@ def test_replay_ignores_ambient_rng_unrelated_draws_and_worker_presentation() ->
         initial=source,
         replay_key="stable-coordinate",
     )
-    random.seed(918273)
-    _ = tuple(random.random() for _ in range(200))
+    ambient_state = random.getstate()
+    try:
+        random.seed(918273)
+        _ = tuple(random.random() for _ in range(200))
+        ambient_perturbed = ca.rollout(
+            simple_program,
+            steps=1,
+            initial=source,
+            replay_key="stable-coordinate",
+        )
+    finally:
+        random.setstate(ambient_state)
     for unrelated_key in ("other-a", "other-b", "other-c"):
         ca.rollout(
             simple_program,
@@ -180,6 +190,7 @@ def test_replay_ignores_ambient_rng_unrelated_draws_and_worker_presentation() ->
             )
         )
 
+    assert ambient_perturbed == expected
     assert all(item == expected for item in eager)
     assert all(item == expected for item in lazy)
     assert all(item == expected for item in serial_worker)
