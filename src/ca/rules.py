@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
+from string import Formatter
 from typing import Generic, Protocol, TypeAlias, TypeVar, cast
 
 from . import alphabets, frontiers, loci, neighborhoods, seeds
@@ -23,7 +24,14 @@ W = TypeVar("W")
 A = TypeVar("A")
 V = TypeVar("V", bound=alphabets.SemanticValue)
 
-RuleScalar: TypeAlias = bool | int | Fraction | str
+RuleScalar: TypeAlias = (
+    bool
+    | int
+    | Fraction
+    | str
+    | alphabets.RepresentedNumber
+    | alphabets.ValueNode
+)
 RuleRuntimeValue: TypeAlias = (
     alphabets.SemanticValue | tuple["RuleRuntimeValue", ...]
 )
@@ -89,7 +97,18 @@ class RuleExpr:
         if not isinstance(self.primitive, ExpressionPrimitive):
             raise TypeError("Rule expression primitive is not recognized")
         if any(
-            not isinstance(argument, (bool, int, Fraction, str, RuleExpr))
+            not isinstance(
+                argument,
+                (
+                    bool,
+                    int,
+                    Fraction,
+                    str,
+                    alphabets.RepresentedNumber,
+                    alphabets.ValueNode,
+                    RuleExpr,
+                ),
+            )
             for argument in self.arguments
         ):
             raise TypeError(
@@ -117,6 +136,16 @@ class RuleContract:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported Rule contract version {self.version}")
+        if type(self.configuration_contract) is not loci.CarrierContract:
+            raise TypeError("Rule configuration contract is not recognized")
+        if not isinstance(self.value_profile, alphabets.ValueProfile):
+            raise TypeError("Rule value profile is not recognized")
+        if type(self.required_read_shape) is not neighborhoods.ResultShape:
+            raise TypeError("Rule read shape is not recognized")
+        if type(self.required_join_shape) is not neighborhoods.JoinShape:
+            raise TypeError("Rule join shape is not recognized")
+        if type(self.required_effect_profile) is not frontiers.EffectProfile:
+            raise TypeError("Rule effect profile is not recognized")
         if not isinstance(self.exactness_profile, seeds.ExactnessProfile):
             raise TypeError("Rule exactness_profile must be seeds.ExactnessProfile")
         if not isinstance(self.entropy_interface, seeds.EntropyInterface):
@@ -275,7 +304,9 @@ class Many:
         if (finite is None) == (self.infinite is None):
             raise ValueError("Many requires exactly one finite or infinite size")
         if finite is not None and (
-            isinstance(finite, bool) or finite < 2
+            isinstance(finite, bool)
+            or not isinstance(finite, int)
+            or finite < 2
         ):
             raise ValueError("finite Many cardinality must be at least two")
 
@@ -746,6 +777,8 @@ class AtomMass:
     def __post_init__(self) -> None:
         if not self.atom_identity:
             raise ValueError("probability mass needs an atom identity")
+        if isinstance(self.mass, bool) or not isinstance(self.mass, Fraction):
+            raise TypeError("probability mass must be an exact Fraction")
         if self.mass <= 0:
             raise ValueError("probability masses must be strictly positive")
 
@@ -902,9 +935,126 @@ class ExistingPlan:
             raise ValueError("by-index plan cannot be empty")
 
 
+class EvaluationScope(Enum):
+    ONCE = "once"
+    EACH_TARGET = "each-target"
+
+
+@dataclass(frozen=True)
+class EvidenceExpression:
+    """A closed expression projected into denotation evidence."""
+
+    expression: RuleExpr
+    scope: EvaluationScope = EvaluationScope.ONCE
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(
+                f"unsupported evidence-expression version {self.version}"
+            )
+        if type(self.expression) is not RuleExpr:
+            raise TypeError("evidence expression must contain a RuleExpr")
+        if not isinstance(self.scope, EvaluationScope):
+            raise TypeError("evidence-expression scope is not recognized")
+
+
+@dataclass(frozen=True)
+class FormattedEvidence:
+    """One restricted text rendering of an evaluated exact scalar."""
+
+    template: str
+    expression: RuleExpr
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(
+                f"unsupported formatted-evidence version {self.version}"
+            )
+        if self.template not in ("{}", "0x{:016x}"):
+            raise ValueError("formatted evidence uses an unsupported template")
+        if type(self.expression) is not RuleExpr:
+            raise TypeError("formatted evidence requires a RuleExpr")
+
+
+@dataclass(frozen=True)
+class EvidenceTerm:
+    """A closed tree whose expression leaves are evaluated at denotation."""
+
+    tag: str
+    arguments: tuple[
+        RuleScalar | EvidenceExpression | FormattedEvidence | "EvidenceTerm",
+        ...,
+    ] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported evidence-term version {self.version}")
+        if not isinstance(self.tag, str) or not self.tag:
+            raise ValueError("evidence-term tag must be a nonempty string")
+        if any(
+            not isinstance(
+                argument,
+                (
+                    bool,
+                    int,
+                    Fraction,
+                    str,
+                    alphabets.RepresentedNumber,
+                    alphabets.ValueNode,
+                    EvidenceExpression,
+                    FormattedEvidence,
+                    EvidenceTerm,
+                ),
+            )
+            for argument in self.arguments
+        ):
+            raise TypeError("evidence term contains an opaque argument")
+
+
+@dataclass(frozen=True)
+class ProvenanceTemplate:
+    """Restricted scalar formatting over closed evaluated expressions."""
+
+    template: str
+    expressions: tuple[RuleExpr, ...]
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(
+                f"unsupported provenance-template version {self.version}"
+            )
+        if not isinstance(self.template, str) or not self.template:
+            raise ValueError("provenance template cannot be empty")
+        if any(type(item) is not RuleExpr for item in self.expressions):
+            raise TypeError("provenance templates require RuleExpr values")
+        fields = []
+        for _, field_name, format_spec, conversion in Formatter().parse(
+            self.template
+        ):
+            if field_name is None:
+                continue
+            if conversion is not None or format_spec not in ("", "016x"):
+                raise ValueError("unsupported provenance formatting operation")
+            if not field_name.isdecimal():
+                raise ValueError("provenance fields must use numeric indices")
+            fields.append(int(field_name))
+        if fields and (
+            min(fields) < 0 or max(fields) >= len(self.expressions)
+        ):
+            raise ValueError("provenance template field is out of range")
+
+
 @dataclass(frozen=True)
 class LiteralDenotation(Generic[V]):
     outcomes: OutcomeSpace[RuleAtom[V]]
+
+    def __post_init__(self) -> None:
+        if type(self.outcomes) is not OutcomeSpace:
+            raise TypeError("literal denotation needs an OutcomeSpace")
 
 
 @dataclass(frozen=True)
@@ -915,6 +1065,34 @@ class ExpressionDenotation:
     witness: RuleExpr
     provenance: Provenance
     certificate: Certificate
+    certificate_template: EvidenceTerm | None = None
+    provenance_templates: tuple[ProvenanceTemplate, ...] = ()
+
+    def __post_init__(self) -> None:
+        if type(self.existing_plan) is not ExistingPlan:
+            raise TypeError("expression denotation plan is not recognized")
+        if not isinstance(self.progress, Progress):
+            raise TypeError("expression progress is not recognized")
+        if type(self.continuation) not in (Continue, Stop):
+            raise TypeError("expression continuation is not recognized")
+        if type(self.witness) is not RuleExpr:
+            raise TypeError("expression witness is not recognized")
+        if (
+            not self.provenance
+            or any(not isinstance(item, str) or not item for item in self.provenance)
+        ):
+            raise ValueError("expression provenance must be closed and nonempty")
+        if type(self.certificate) is not Certificate:
+            raise TypeError("expression certificate is not recognized")
+        if self.certificate_template is not None and type(
+            self.certificate_template
+        ) is not EvidenceTerm:
+            raise TypeError("expression certificate template is not recognized")
+        if any(
+            type(item) is not ProvenanceTemplate
+            for item in self.provenance_templates
+        ):
+            raise TypeError("expression provenance templates are not recognized")
 
 
 @dataclass(frozen=True)
@@ -924,6 +1102,32 @@ class IntensionalDenotation:
     completeness_evidence: Certificate
     soundness_evidence: Certificate
     probability_law: ProbabilityLaw | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.relation) is not RuleExpr:
+            raise TypeError("intensional relation must be a RuleExpr")
+        if type(self.cardinality) not in (
+            ExactlyZero,
+            ExactlyOne,
+            Many,
+            Undetermined,
+        ):
+            raise TypeError("intensional cardinality is not recognized")
+        if (
+            type(self.completeness_evidence) is not Certificate
+            or self.completeness_evidence.kind
+            is not CertificateKind.COMPLETENESS
+        ):
+            raise ValueError("intensional denotation needs completeness evidence")
+        if (
+            type(self.soundness_evidence) is not Certificate
+            or self.soundness_evidence.kind is not CertificateKind.SOUNDNESS
+        ):
+            raise ValueError("intensional denotation needs soundness evidence")
+        if self.probability_law is not None and type(
+            self.probability_law
+        ) is not ProbabilityLaw:
+            raise TypeError("intensional probability law is not recognized")
 
 
 @dataclass(frozen=True)
@@ -952,6 +1156,8 @@ class RuleDescriptor(Generic[R, W, C]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported Rule descriptor version {self.version}")
+        if not isinstance(self.primitive, RulePrimitive):
+            raise TypeError("Rule primitive is not recognized")
         expected = {
             RulePrimitive.LITERAL: LiteralDenotation,
             RulePrimitive.EXPRESSION: ExpressionDenotation,
@@ -1019,6 +1225,7 @@ RuleResult: TypeAlias = RuleComplete[C, V] | RuleRejected
 class _Observation(Protocol):
     target: loci.Locus
     value: alphabets.SemanticValue
+    state: object
 
 
 class _GroupKey(Protocol):
@@ -1055,6 +1262,12 @@ class Rule(Generic[R, W, C]):
 
     descriptor: RuleDescriptor[R, W, C]
     contract: RuleContract
+
+    def __post_init__(self) -> None:
+        if type(self.descriptor) is not RuleDescriptor:
+            raise TypeError("Rule descriptor is not recognized")
+        if type(self.contract) is not RuleContract:
+            raise TypeError("Rule contract is not recognized")
 
     @property
     def canonical_identity(self) -> str:
@@ -1132,6 +1345,20 @@ def _denote_expression(
     existing_targets = tuple(item.target for item in writable.existing)
     fresh_targets = tuple(item.target for item in writable.fresh)
     plan = denotation.existing_plan
+    proofs: list[EvaluationProof] = []
+
+    def evaluate(
+        expression: RuleExpr,
+        *,
+        anchor: loci.Locus | None,
+    ) -> RuleRuntimeValue:
+        value, proof = _evaluate_proven(
+            expression,
+            readable,
+            anchor=anchor,
+        )
+        proofs.append(proof)
+        return value
 
     if plan.kind is ExistingPlanKind.PRESERVE:
         existing = tuple(preserve(target) for target in existing_targets)
@@ -1146,7 +1373,7 @@ def _denote_expression(
             replace(
                 target,
                 _require_semantic_value(
-                    _evaluate(expression, readable, anchor=None)
+                    evaluate(expression, anchor=None)
                 ),
             )
             for target, expression in zip(
@@ -1161,7 +1388,7 @@ def _denote_expression(
             replace(
                 target,
                 _require_semantic_value(
-                    _evaluate(expression, readable, anchor=target)
+                    evaluate(expression, anchor=target)
                 ),
             )
             for target in existing_targets
@@ -1180,9 +1407,8 @@ def _denote_expression(
             replace(
                 target,
                 _require_semantic_value(
-                    _evaluate(
+                    evaluate(
                         expression_by_target[target],
-                        readable,
                         anchor=target,
                     )
                 ),
@@ -1196,10 +1422,50 @@ def _denote_expression(
         fresh,
         _certificate(CertificateKind.TOTALITY, "expression-plan:total"),
     )
+    if denotation.certificate_template is None:
+        certificate = denotation.certificate
+    else:
+        certificate = Certificate(
+            denotation.certificate.kind,
+            _materialize_evidence_term(
+                denotation.certificate_template,
+                readable,
+                existing_targets,
+                proofs,
+            ),
+        )
+    dynamic_provenance = tuple(
+        _materialize_provenance(
+            template,
+            readable,
+            proofs,
+        )
+        for template in denotation.provenance_templates
+    )
+    boundary_provenance = _boundary_provenance(readable)
+    provenance = (
+        denotation.provenance
+        if not boundary_provenance
+        else (
+            denotation.provenance[0],
+            *boundary_provenance,
+            *denotation.provenance[1:],
+        )
+    )
+    provenance = (*provenance, *dynamic_provenance)
+    proof_expression = (
+        _evaluation_proofs_as_expr(tuple(proofs))
+        if proofs
+        else RuleExpr(
+            ExpressionPrimitive.TUPLE,
+            (literal_expr("evaluation-proof-v1"),),
+        )
+    )
     witness_descriptor = RuleExpr(
         ExpressionPrimitive.TUPLE,
         (
             denotation.witness,
+            proof_expression,
             literal_expr(total.canonical_identity),
         ),
     )
@@ -1212,10 +1478,95 @@ def _denote_expression(
         denotation.progress,
         denotation.continuation,
         witness,
-        denotation.provenance,
-        denotation.certificate,
+        provenance,
+        certificate,
     )
     return RuleComplete(OutcomeSpace(finite_support((atom,), label="expression")))
+
+
+def _materialize_evidence_term(
+    term: EvidenceTerm,
+    readable: _ReadableView,
+    existing_targets: tuple[loci.Locus, ...],
+    proofs: list[EvaluationProof],
+) -> RuleExpr:
+    arguments: list[RuleExpr] = [literal_expr(term.tag)]
+    for argument in term.arguments:
+        if isinstance(argument, EvidenceTerm):
+            arguments.append(
+                _materialize_evidence_term(
+                    argument,
+                    readable,
+                    existing_targets,
+                    proofs,
+                )
+            )
+        elif isinstance(argument, EvidenceExpression):
+            anchors: tuple[loci.Locus | None, ...] = (
+                (None,)
+                if argument.scope is EvaluationScope.ONCE
+                else existing_targets
+            )
+            for anchor in anchors:
+                value, proof = _evaluate_proven(
+                    argument.expression,
+                    readable,
+                    anchor=anchor,
+                )
+                proofs.append(proof)
+                arguments.append(_runtime_as_expr(value))
+        elif isinstance(argument, FormattedEvidence):
+            value, proof = _evaluate_proven(
+                argument.expression,
+                readable,
+                anchor=None,
+            )
+            proofs.append(proof)
+            if isinstance(value, tuple):
+                raise TypeError("formatted evidence expression must be scalar")
+            normalized = int(value) if isinstance(value, bool) else value
+            arguments.append(literal_expr(argument.template.format(normalized)))
+        else:
+            arguments.append(literal_expr(argument))
+    return RuleExpr(ExpressionPrimitive.TUPLE, tuple(arguments))
+
+
+def _materialize_provenance(
+    template: ProvenanceTemplate,
+    readable: _ReadableView,
+    proofs: list[EvaluationProof],
+) -> str:
+    values: list[RuleScalar] = []
+    for expression in template.expressions:
+        value, proof = _evaluate_proven(expression, readable, anchor=None)
+        proofs.append(proof)
+        if isinstance(value, tuple):
+            raise TypeError("provenance template expression must be scalar")
+        values.append(int(value) if isinstance(value, bool) else value)
+    return template.template.format(*values)
+
+
+def _boundary_provenance(readable: _ReadableView) -> tuple[str, ...]:
+    boundaries = tuple(
+        item.state.boundary
+        for item in readable.observations
+        if isinstance(item.state, neighborhoods.BoundaryDefault)
+    )
+    unique = tuple(dict.fromkeys(boundaries))
+    tags: list[str] = []
+    for boundary in unique:
+        if boundary.policy is loci.BoundaryPolicy.FIXED:
+            exterior = boundary.exterior
+            if exterior is False or exterior == 0:
+                suffix = "fixed-zero"
+            elif exterior is True or exterior == 1:
+                suffix = "fixed-one"
+            else:
+                suffix = "fixed-" + loci.canonical_identity(exterior)
+        else:
+            suffix = boundary.policy.value
+        tags.append(f"configuration-topology:{suffix}")
+    return tuple(tags)
 
 
 def _denote_parallel(
@@ -1346,102 +1697,238 @@ def _merge_dispositions(
     )
 
 
+@dataclass(frozen=True)
+class EvaluationStep:
+    """One exact postorder step in a closed expression evaluation."""
+
+    expression: RuleExpr
+    anchor: loci.Locus | None
+    result: RuleRuntimeValue
+    read_evidence: tuple[str, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported evaluation-step version {self.version}")
+
+
+@dataclass(frozen=True)
+class EvaluationProof:
+    """Complete closed evaluation trace for one top-level expression."""
+
+    steps: tuple[EvaluationStep, ...]
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.version != 1:
+            raise ValueError(f"unsupported evaluation-proof version {self.version}")
+        if not self.steps:
+            raise ValueError("evaluation proof cannot be empty")
+
+
 def _evaluate(
     expression: RuleExpr,
     readable: _ReadableView,
     *,
     anchor: loci.Locus | None,
 ) -> RuleRuntimeValue:
+    result, _ = _evaluate_proven(expression, readable, anchor=anchor)
+    return result
+
+
+def _evaluate_proven(
+    expression: RuleExpr,
+    readable: _ReadableView,
+    *,
+    anchor: loci.Locus | None,
+) -> tuple[RuleRuntimeValue, EvaluationProof]:
+    steps: list[EvaluationStep] = []
+    result = _evaluate_value(
+        expression,
+        readable,
+        anchor=anchor,
+        steps=steps,
+    )
+    return result, EvaluationProof(tuple(steps))
+
+
+def _evaluate_value(
+    expression: RuleExpr,
+    readable: _ReadableView,
+    *,
+    anchor: loci.Locus | None,
+    steps: list[EvaluationStep],
+) -> RuleRuntimeValue:
+    def evaluate(child: RuleExpr) -> RuleRuntimeValue:
+        return _evaluate_value(
+            child,
+            readable,
+            anchor=anchor,
+            steps=steps,
+        )
+
+    def finish(
+        result: RuleRuntimeValue,
+        read_evidence: tuple[str, ...] = (),
+    ) -> RuleRuntimeValue:
+        steps.append(
+            EvaluationStep(
+                expression,
+                anchor,
+                result,
+                read_evidence,
+            )
+        )
+        return result
+
     primitive = expression.primitive
     arguments = expression.arguments
     if primitive is ExpressionPrimitive.LITERAL:
         if len(arguments) != 1 or isinstance(arguments[0], RuleExpr):
             raise ValueError("literal expression is malformed")
-        return arguments[0]
+        return finish(arguments[0])
     if primitive is ExpressionPrimitive.OBSERVATION:
         index = _literal_int(arguments, 0)
-        return readable.observations[index].value
+        item = readable.observations[index]
+        return finish(
+            item.value,
+            _observation_evidence((item,)),
+        )
     if primitive is ExpressionPrimitive.GROUP:
         channel = _literal_int(arguments, 0)
-        return tuple(
-            readable.observations[index].value
+        items = tuple(
+            readable.observations[index]
             for index in _group_indices(readable, anchor, channel)
         )
+        return finish(
+            tuple(item.value for item in items),
+            _observation_evidence(items),
+        )
     if primitive is ExpressionPrimitive.PROJECT:
-        source = _evaluate(_child(arguments, 0), readable, anchor=anchor)
+        source = evaluate(_child(arguments, 0))
         if not isinstance(source, tuple):
             raise TypeError("project source is not tuple-valued")
-        return source[_literal_int(arguments, 1)]
+        return finish(source[_literal_int(arguments, 1)])
     if primitive is ExpressionPrimitive.TUPLE:
-        return tuple(
-            _evaluate(_as_expression(argument), readable, anchor=anchor)
+        return finish(tuple(
+            evaluate(_as_expression(argument))
             for argument in arguments
-        )
+        ))
     if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):
         values = tuple(
-            _require_int(
-                _evaluate(_as_expression(argument), readable, anchor=anchor)
-            )
+            _require_int(evaluate(_as_expression(argument)))
             for argument in arguments
         )
         if primitive is ExpressionPrimitive.ADD:
-            return sum(values)
+            return finish(sum(values))
         product = 1
         for value in values:
             product *= value
-        return product
+        return finish(product)
     if primitive is ExpressionPrimitive.MODULO:
-        value = _require_int(_evaluate(_child(arguments, 0), readable, anchor=anchor))
+        value = _require_int(evaluate(_child(arguments, 0)))
         modulus_value = _literal_int(arguments, 1)
         if modulus_value <= 0:
             raise ValueError("modulo expression needs positive modulus")
-        return value % modulus_value
+        return finish(value % modulus_value)
     if primitive is ExpressionPrimitive.COUNT:
-        values = _require_tuple(
-            _evaluate(_child(arguments, 0), readable, anchor=anchor)
-        )
-        return sum(1 for value in values if _require_bit(value) == 1)
+        values = _require_tuple(evaluate(_child(arguments, 0)))
+        return finish(sum(1 for value in values if _require_bit(value) == 1))
     if primitive is ExpressionPrimitive.GATE:
-        source = _evaluate(_child(arguments, 0), readable, anchor=anchor)
+        source = evaluate(_child(arguments, 0))
         threshold = _literal_int(arguments, 2)
         gate_name = _literal_str(arguments, 1)
         values = source if isinstance(source, tuple) else (source,)
         total = sum(_require_bit(value) for value in values)
         kind = GateKind(gate_name)
         if kind is GateKind.ANY:
-            return int(total > 0)
+            return finish(int(total > 0))
         if kind is GateKind.ALL:
-            return int(total == len(values))
+            return finish(int(total == len(values)))
         if kind is GateKind.MAJORITY:
-            return int(total * 2 > len(values))
+            return finish(int(total * 2 > len(values)))
         if kind is GateKind.AT_LEAST:
-            return int(total >= threshold)
+            return finish(int(total >= threshold))
         if kind is GateKind.AT_MOST:
-            return int(total <= threshold)
-        return int(total == threshold)
+            return finish(int(total <= threshold))
+        return finish(int(total == threshold))
     if primitive is ExpressionPrimitive.LOOKUP:
-        table = _require_tuple(
-            _evaluate(_child(arguments, 0), readable, anchor=anchor)
-        )
-        index = _require_int(
-            _evaluate(_child(arguments, 1), readable, anchor=anchor)
-        )
-        return table[index]
+        table = _require_tuple(evaluate(_child(arguments, 0)))
+        index = _require_int(evaluate(_child(arguments, 1)))
+        return finish(table[index])
     if primitive is ExpressionPrimitive.EQUAL:
-        left = _evaluate(_child(arguments, 0), readable, anchor=anchor)
-        right = _evaluate(_child(arguments, 1), readable, anchor=anchor)
-        return loci.semantic_equal(left, right)
+        left = evaluate(_child(arguments, 0))
+        right = evaluate(_child(arguments, 1))
+        return finish(loci.semantic_equal(left, right))
     if primitive in (ExpressionPrimitive.ALL, ExpressionPrimitive.ANY):
-        values = _require_tuple(
-            _evaluate(_child(arguments, 0), readable, anchor=anchor)
-        )
+        values = _require_tuple(evaluate(_child(arguments, 0)))
         bits = tuple(_require_bit(value) for value in values)
-        return (
+        return finish(
             int(all(bits))
             if primitive is ExpressionPrimitive.ALL
             else int(any(bits))
         )
     raise ValueError(f"unsupported expression primitive {primitive.value}")
+
+
+def _observation_evidence(
+    observations: tuple[_Observation, ...],
+) -> tuple[str, ...]:
+    evidence: list[str] = []
+    for item in observations:
+        state = item.state
+        state_identity = loci.canonical_identity(state)
+        evidence.append(
+            loci.canonical_identity((item.target, state_identity))
+        )
+    return tuple(evidence)
+
+
+def _runtime_as_expr(value: RuleRuntimeValue) -> RuleExpr:
+    if isinstance(value, tuple):
+        return RuleExpr(
+            ExpressionPrimitive.TUPLE,
+            tuple(_runtime_as_expr(item) for item in value),
+        )
+    return literal_expr(value)
+
+
+def _evaluation_proofs_as_expr(
+    proofs: tuple[EvaluationProof, ...],
+) -> RuleExpr:
+    steps = tuple(step for proof in proofs for step in proof.steps)
+    return RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("evaluation-proof-v1"),
+            *(
+                RuleExpr(
+                    ExpressionPrimitive.TUPLE,
+                    (
+                        literal_expr("step"),
+                        literal_expr(
+                            "none"
+                            if step.anchor is None
+                            else loci.canonical_identity(step.anchor)
+                        ),
+                        step.expression,
+                        _runtime_as_expr(step.result),
+                        RuleExpr(
+                            ExpressionPrimitive.TUPLE,
+                            (
+                                literal_expr("read-evidence"),
+                                *(
+                                    literal_expr(item)
+                                    for item in step.read_evidence
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+                for step in steps
+            ),
+        ),
+    )
 
 
 def _group_indices(
@@ -1563,6 +2050,8 @@ def expression(
     progress: Progress = Progress.ADVANCED,
     continuation: Continuation = Continue(),
     certificate: Certificate | None = None,
+    certificate_template: EvidenceTerm | None = None,
+    provenance_templates: tuple[ProvenanceTemplate, ...] = (),
 ) -> Rule[R, W, C]:
     """Build one deterministic closed expression-to-disposition Rule."""
 
@@ -1578,6 +2067,8 @@ def expression(
             provenance,
             certificate
             or _certificate(CertificateKind.DERIVATION, "expression:verified"),
+            certificate_template,
+            provenance_templates,
         ),
     )
     return Rule(descriptor, contract)
@@ -1737,12 +2228,15 @@ def ar2_modular_0d(
         raise ValueError("modulus must be positive")
     a = rule // columns + 1
     b = rule % columns
+    current_term = multiply(literal_expr(a), observation(1))
+    previous_term = multiply(literal_expr(b), observation(0))
+    sum_term = add(
+        current_term,
+        previous_term,
+        literal_expr(constant),
+    )
     next_value = modulo(
-        add(
-            multiply(literal_expr(a), observation(1)),
-            multiply(literal_expr(b), observation(0)),
-            literal_expr(constant),
-        ),
+        sum_term,
         modulus,
     )
     carrier = loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=())
@@ -1778,6 +2272,31 @@ def ar2_modular_0d(
         provenance=(
             "native:ar2_modular_0d",
             f"rule-{rule}:a={a},b={b},c={constant},mod={modulus}",
+        ),
+        certificate_template=EvidenceTerm(
+            "arithmetic-certificate",
+            (
+                EvidenceTerm(
+                    "equals",
+                    (
+                        EvidenceTerm(
+                            "mod",
+                            (
+                                EvidenceTerm(
+                                    "sum",
+                                    (
+                                        EvidenceExpression(current_term),
+                                        EvidenceExpression(previous_term),
+                                        constant,
+                                    ),
+                                ),
+                                modulus,
+                            ),
+                        ),
+                        EvidenceExpression(next_value),
+                    ),
+                ),
+            ),
         ),
     )
 
@@ -1815,7 +2334,21 @@ def dyadlags_0d(*, rule: int) -> Rule[R, W, C]:
             ExpressionPrimitive.TUPLE,
             (literal_expr("dyadlags-0d"), literal_expr(number), index),
         ),
-        provenance=("native:dyadlags_0d", f"rule-{number}"),
+        provenance=("native:dyadlags_0d",),
+        certificate_template=EvidenceTerm(
+            "lookup-certificate",
+            (
+                number,
+                EvidenceExpression(index),
+                EvidenceExpression(output),
+            ),
+        ),
+        provenance_templates=(
+            ProvenanceTemplate(
+                f"rule-{number}:bit-{{0}}={{1}}",
+                (index, output),
+            ),
+        ),
     )
 
 
@@ -1833,6 +2366,11 @@ def _splitmix64(seed: int, stream: int) -> int:
 def _sampled_lag_table(number: int) -> tuple[bool, ...]:
     base = (number ^ _LAGCOUNTS_HASH_KEY) & _UINT64_MASK
     return tuple(bool(_splitmix64(base, context) & 1) for context in range(128))
+
+
+def _sampled_lag_hashes(number: int) -> tuple[int, ...]:
+    base = (number ^ _LAGCOUNTS_HASH_KEY) & _UINT64_MASK
+    return tuple(_splitmix64(base, context) for context in range(128))
 
 
 def lagcounts_0d(
@@ -1853,6 +2391,7 @@ def lagcounts_0d(
         multiply(literal_expr(32), count(group(3))),
     )
     output = lookup(_sampled_lag_table(number), context)
+    hash_word = lookup(_sampled_lag_hashes(number), context)
     prior = tuple(observation(index) for index in range(8, -1, -1))
     carrier = loci.CarrierContract(
         loci.CarrierKind.HISTORY,
@@ -1876,7 +2415,26 @@ def lagcounts_0d(
             ExpressionPrimitive.TUPLE,
             (literal_expr("lagcounts-0d"), literal_expr(number), context),
         ),
-        provenance=("native:lagcounts_0d", f"rule-{number}"),
+        provenance=("native:lagcounts_0d",),
+        certificate_template=EvidenceTerm(
+            "deterministic-table-certificate",
+            (
+                number,
+                EvidenceExpression(context),
+                FormattedEvidence("0x{:016x}", hash_word),
+                EvidenceExpression(output),
+            ),
+        ),
+        provenance_templates=(
+            ProvenanceTemplate(
+                "hash-word:0x{0:016x}",
+                (hash_word,),
+            ),
+            ProvenanceTemplate(
+                "output-bit:{0}",
+                (output,),
+            ),
+        ),
     )
 
 
@@ -1888,6 +2446,7 @@ def _spatial_lookup(
     secondary_threshold: int,
     label: str,
     readable: neighborhoods.ReadableRegion[object, object],
+    certificate_template: EvidenceTerm,
 ) -> Rule[R, W, C]:
     number = _rule_number(rule)
     primary = gate(group(1), GateKind.MAJORITY)
@@ -1918,6 +2477,7 @@ def _spatial_lookup(
             (literal_expr(label), literal_expr(number), index),
         ),
         provenance=(f"native:{label.replace('-', '_')}", f"rule-{number}"),
+        certificate_template=certificate_template,
     )
 
 
@@ -1951,6 +2511,21 @@ def dyadrads_1d(*, rule: int) -> Rule[R, W, C]:
             (literal_expr("dyadrads-1d"), literal_expr(number), index),
         ),
         provenance=("native:dyadrads_1d", f"rule-{number}"),
+        certificate_template=EvidenceTerm(
+            "lookup-certificate",
+            (
+                number,
+                EvidenceTerm(
+                    "indices",
+                    (
+                        EvidenceExpression(
+                            index,
+                            EvaluationScope.EACH_TARGET,
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
 
@@ -1972,6 +2547,10 @@ def dyadaxes_2d(*, rule: int) -> Rule[R, W, C]:
             configuration_contract=carrier,
             value_profile=alphabets.ValueProfile.BOOLEAN,
         ),
+        certificate_template=EvidenceTerm(
+            "lookup-certificate",
+            (rule, "bit-7-only"),
+        ),
     )
 
 
@@ -1992,6 +2571,16 @@ def dyadaxes_3d(*, rule: int) -> Rule[R, W, C]:
         readable=neighborhoods.dyadaxes_3d(
             configuration_contract=carrier,
             value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        certificate_template=EvidenceTerm(
+            "lookup-certificate",
+            (
+                rule,
+                EvidenceTerm(
+                    "bit-7-sites",
+                    ("center-and-six-face-centers",),
+                ),
+            ),
         ),
     )
 

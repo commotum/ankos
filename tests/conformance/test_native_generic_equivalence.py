@@ -71,6 +71,60 @@ def _rule_expr_as_oracle_term(
     return test_oracles.OracleTerm(converted[0], converted[1:])
 
 
+def _literal_value(expression: rules.RuleExpr) -> object:
+    assert expression.primitive is rules.ExpressionPrimitive.LITERAL
+    assert len(expression.arguments) == 1
+    value = expression.arguments[0]
+    assert not isinstance(value, rules.RuleExpr)
+    return value
+
+
+def _assert_evaluation_proof(
+    expression: rules.RuleExpr,
+    readable: neighborhoods.ReadableView,
+    writable_targets: tuple[loci.Locus, ...],
+) -> None:
+    assert expression.primitive is rules.ExpressionPrimitive.TUPLE
+    assert expression.arguments
+    head = expression.arguments[0]
+    assert isinstance(head, rules.RuleExpr)
+    assert _literal_value(head) == "evaluation-proof-v1"
+    assert len(expression.arguments) > 1
+    allowed_reads = {
+        loci.canonical_identity(
+            (item.target, loci.canonical_identity(item.state))
+        )
+        for item in readable.observations
+    }
+    allowed_anchors = {
+        "none",
+        *(loci.canonical_identity(target) for target in writable_targets),
+    }
+    saw_read = False
+    for step in expression.arguments[1:]:
+        assert isinstance(step, rules.RuleExpr)
+        assert step.primitive is rules.ExpressionPrimitive.TUPLE
+        assert len(step.arguments) == 5
+        tag, anchor, evaluated_expression, result, reads = step.arguments
+        assert isinstance(tag, rules.RuleExpr)
+        assert _literal_value(tag) == "step"
+        assert isinstance(anchor, rules.RuleExpr)
+        assert _literal_value(anchor) in allowed_anchors
+        assert isinstance(evaluated_expression, rules.RuleExpr)
+        assert isinstance(result, rules.RuleExpr)
+        assert isinstance(reads, rules.RuleExpr)
+        assert reads.primitive is rules.ExpressionPrimitive.TUPLE
+        assert reads.arguments
+        read_tag = reads.arguments[0]
+        assert isinstance(read_tag, rules.RuleExpr)
+        assert _literal_value(read_tag) == "read-evidence"
+        for read in reads.arguments[1:]:
+            assert isinstance(read, rules.RuleExpr)
+            assert _literal_value(read) in allowed_reads
+            saw_read = True
+    assert saw_read
+
+
 def _oracle_sequence_values(term: test_oracles.OracleTerm) -> tuple[object, ...]:
     if term.tag == "history":
         values = term.arguments[0]
@@ -178,9 +232,22 @@ def _assert_cardinality_matches(
 ) -> None:
     if expected.kind == "exact":
         assert rules.cardinality_size(actual) == expected.value
+        assert actual.evidence.kind is rules.CertificateKind.CARDINALITY
     else:
         assert isinstance(actual, rules.Many)
         assert actual.infinite is rules.InfiniteCardinality.UNCOUNTABLE
+        assert actual.evidence.kind is rules.CertificateKind.CARDINALITY
+
+
+def _assert_support_evidence(support: rules.SupportSpace) -> None:
+    assert support.version == 1
+    assert (
+        support.completeness_evidence.kind
+        is rules.CertificateKind.COMPLETENESS
+    )
+    assert support.soundness_evidence.kind is rules.CertificateKind.SOUNDNESS
+    assert support.completeness_evidence.version == 1
+    assert support.soundness_evidence.version == 1
 
 
 def _assert_absent_measure(
@@ -217,6 +284,12 @@ def _assert_complete_native_result(
     assert expected.support_kind == "finite"
     assert actual.source_outcomes.support.presentation is rules.SupportPresentation.FINITE
     assert actual.source_outcomes.probability_law is None
+    assert actual.source_outcomes.version == 1
+    _assert_support_evidence(actual.source_outcomes.support)
+    _assert_cardinality_matches(
+        actual.source_outcomes.support.cardinality,
+        expected.outcome_cardinality,
+    )
     assert len(actual.source_outcomes.support.atoms) == len(expected.source_outcomes)
 
     runtime_by_oracle_id: dict[
@@ -228,10 +301,12 @@ def _assert_complete_native_result(
         strict=True,
     ):
         assert expected_atom.kind == "derivation"
+        assert expected_atom.reason is None
         assert isinstance(runtime_atom, rules.Derivation)
         runtime_by_oracle_id[expected_atom.atom_id] = runtime_atom
         assert runtime_atom.progress.value == expected_atom.progress
         assert isinstance(runtime_atom.continuation, rules.Continue)
+        assert runtime_atom.continuation.version == 1
         assert expected_atom.continuation == test_oracles.OracleTerm("continue")
         assert runtime_atom.provenance == expected_atom.provenance
         assert _normalized_dispositions(
@@ -240,16 +315,31 @@ def _assert_complete_native_result(
             expected_atom.dispositions,
         ) == expected_atom.dispositions
         assert runtime_atom.replacement.totality_evidence.kind is rules.CertificateKind.TOTALITY
+        assert runtime_atom.replacement.version == 1
+        assert runtime_atom.version == 1
+        assert runtime_atom.witness.version == 1
+        assert runtime_atom.certificate.version == 1
+        assert (
+            runtime_atom.certificate.kind
+            is rules.CertificateKind.DERIVATION
+        )
         assert runtime_atom.witness.canonical_identity == loci.canonical_identity(
             runtime_atom.witness.descriptor
         )
         witness_descriptor = runtime_atom.witness.descriptor
         assert witness_descriptor.primitive is rules.ExpressionPrimitive.TUPLE
-        assert len(witness_descriptor.arguments) == 2
+        assert len(witness_descriptor.arguments) == 3
         static_witness = witness_descriptor.arguments[0]
-        disposition_identity = witness_descriptor.arguments[1]
+        evaluation_proof = witness_descriptor.arguments[1]
+        disposition_identity = witness_descriptor.arguments[2]
         assert isinstance(static_witness, rules.RuleExpr)
+        assert isinstance(evaluation_proof, rules.RuleExpr)
         assert isinstance(disposition_identity, rules.RuleExpr)
+        _assert_evaluation_proof(
+            evaluation_proof,
+            readable,
+            tuple(item.target for item in writable.existing),
+        )
         assert _rule_expr_as_oracle_term(disposition_identity) == (
             runtime_atom.replacement.canonical_identity
         )
@@ -266,12 +356,14 @@ def _assert_complete_native_result(
         assert expected_atom.mass is None
 
     assert len(actual.applied_atoms.atoms) == len(expected.applied_atoms)
+    _assert_support_evidence(actual.applied_atoms)
     for runtime_applied, expected_applied in zip(
         actual.applied_atoms.atoms,
         expected.applied_atoms,
         strict=True,
     ):
         assert isinstance(runtime_applied, program.AppliedDerivation)
+        assert expected_applied.atom_id == expected_applied.source_atom_id
         assert runtime_applied.source is runtime_by_oracle_id[
             expected_applied.source_atom_id
         ]
@@ -292,7 +384,12 @@ def _assert_complete_native_result(
         direct_root = loci.canonical_identity(
             ("direct-application-root", source.identity)
         )
+        assert runtime_applied.input_trace_lineage == program.TraceLineage(
+            direct_root
+        )
         assert runtime_applied.output_trace_lineage.root_identity == direct_root
+        assert runtime_applied.output_trace_lineage.version == 1
+        assert runtime_applied.evidence.version == 1
         expected_edge = loci.canonical_identity(
             (
                 loci.canonical_identity(
@@ -306,6 +403,11 @@ def _assert_complete_native_result(
         assert runtime_applied.output_trace_lineage.path == (expected_edge,)
 
     assert actual.no_successor_partition.atoms == ()
+    _assert_support_evidence(actual.no_successor_partition)
+    _assert_cardinality_matches(
+        actual.no_successor_partition.cardinality,
+        test_oracles.EXACT_ZERO,
+    )
     assert expected.no_successor_partition == ()
     _assert_cardinality_matches(
         actual.outcome_atom_cardinality,
@@ -316,11 +418,22 @@ def _assert_complete_native_result(
         expected.derivation_cardinality,
     )
     _assert_cardinality_matches(
+        actual.applied_atoms.cardinality,
+        expected.derivation_cardinality,
+    )
+    _assert_cardinality_matches(
         actual.successor_cardinality,
         expected.successor_cardinality,
     )
     assert len(actual.successor_quotient_with_derivation_fibers.atoms) == len(
         expected.successor_fibers
+    )
+    _assert_support_evidence(
+        actual.successor_quotient_with_derivation_fibers
+    )
+    _assert_cardinality_matches(
+        actual.successor_quotient_with_derivation_fibers.cardinality,
+        expected.successor_cardinality,
     )
     for runtime_fiber, expected_fiber in zip(
         actual.successor_quotient_with_derivation_fibers.atoms,

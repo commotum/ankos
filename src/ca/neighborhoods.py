@@ -111,6 +111,7 @@ class BoundaryDefault(Generic[V]):
 
     value: V
     evidence: loci.SelectorExpr
+    boundary: loci.Boundary[V]
 
 
 @dataclass(frozen=True)
@@ -339,7 +340,11 @@ class ReadableRegion(Generic[C, R]):
                     loci.SelectorPrimitive.RELATIVE,
                     arguments=(target,),
                 )
-                state = BoundaryDefault(value, evidence)
+                state = BoundaryDefault(
+                    value,
+                    evidence,
+                    configuration.carrier.boundary,
+                )
             observations.append(Observation(target, state, anchor))
 
         groups = _groups_for(self.grouping, tuple(observations))
