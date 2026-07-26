@@ -99,6 +99,8 @@ program = ca.SimpleProgram(
     ),
     rule=ca.rules.elementary(30),
 )
+
+assert program == ca.catalog.eca(rule=30, width=79)
 ```
 
 Within each plural module, the public progression is primitives, compounds,
@@ -378,10 +380,11 @@ RolloutResult =
   | RolloutRejected(rollout_fault)
 ```
 
-The truncation cause is typed as `DepthBound`, `IntensionalSupport`,
-`ResourceExhausted`, `Cancelled`, or `Pruned`. A truncated result retains the
-raw partial trace and continuing derivation fibers; it makes no terminal or
-exact-cardinality claim.
+The cause is one of `TruncationCause.DEPTH_BOUND`,
+`TruncationCause.INTENSIONAL_SUPPORT`,
+`TruncationCause.RESOURCE_EXHAUSTED`, `TruncationCause.CANCELLED`, or
+`TruncationCause.PRUNED`. A truncated result retains the raw partial trace and
+continuing derivation fibers; it makes no terminal or exact-cardinality claim.
 
 With no explicit `initial`, traversal starts from the Seed result space. With
 no `replay_key`, finite or intensional Seed/Rule laws remain complete
