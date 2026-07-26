@@ -165,7 +165,76 @@ def test_missing_unauthorized_conflicting_or_invalid_effect_rejects_all() -> Non
     readable = neighborhoods.global_view(
         configuration_contract=source.contract,
         value_profile=alphabets.ValueProfile.BOOLEAN,
+        )
+
+
+def test_overlapping_incompatible_write_capabilities_reject_before_commit() -> None:
+    source = loci.record_configuration((("cell", False),))
+    target = source.entries[0][0]
+    current = frontiers.literal(
+        (target,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        frame=frontiers.WriteFrame.CURRENT,
     )
+    successor = frontiers.literal(
+        (target,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        frame=frontiers.WriteFrame.SUCCESSOR,
+    )
+    writable = frontiers.union((current, successor))
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    simple_program = _literal_program(
+        source,
+        writable,
+        readable,
+        derivation(
+            "overlapping-write-contracts",
+            existing=(rules.replace(target, True),),
+        ),
+    )
+    before = source.identity
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.FRONTIER
+    assert "overlapping writable parts" in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
+
+
+def test_changed_quiescent_successor_rejects_after_atomic_reconstruction() -> None:
+    source = loci.record_configuration((("cell", False),))
+    target = source.entries[0][0]
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    atom = derivation(
+        "invalid-quiescent-change",
+        existing=(rules.replace(target, True),),
+        progress=rules.Progress.QUIESCENT,
+        continuation=rules.Continue(),
+    )
+    simple_program = _literal_program(source, writable, readable, atom)
+    before = source.identity
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.SUCCESSOR
+    assert "Quiescent derivation changed" in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
 
     unauthorized = derivation(
         "unauthorized-delete",

@@ -189,12 +189,45 @@ def test_replay_ignores_ambient_rng_unrelated_draws_and_worker_presentation() ->
                 reversed(range(3)),
             )
         )
+    def ordered_atoms(targets):
+        replacement = tuple(
+            rules.replace(target, True) for target in targets
+        )
+        return (
+            derivation("order-left", existing=replacement),
+            derivation("order-right", existing=replacement),
+        )
+
+    ordered_program, ordered_source = finite_record_program(
+        (("cell", False),),
+        ordered_atoms,
+        probability=(Fraction(1, 3), Fraction(2, 3)),
+    )
+    reversed_program, _ = finite_record_program(
+        (("cell", False),),
+        lambda targets: tuple(reversed(ordered_atoms(targets))),
+        probability=(Fraction(2, 3), Fraction(1, 3)),
+    )
+    ordered_rollout = ca.rollout(
+        ordered_program,
+        steps=1,
+        initial=ordered_source,
+        replay_key="stable-order",
+    )
+    reversed_rollout = ca.rollout(
+        reversed_program,
+        steps=1,
+        initial=ordered_source,
+        replay_key="stable-order",
+    )
 
     assert ambient_perturbed == expected
     assert all(item == expected for item in eager)
     assert all(item == expected for item in lazy)
     assert all(item == expected for item in serial_worker)
     assert all(item == expected for item in parallel_workers)
+    assert ordered_program == reversed_program
+    assert ordered_rollout == reversed_rollout
 
 
 def test_seed_law_handles_no_key_keyed_realization_and_explicit_initial() -> None:
@@ -245,42 +278,69 @@ def test_seed_law_handles_no_key_keyed_realization_and_explicit_initial() -> Non
     assert explicit.raw_trace.seed_evidence.source_identity == "explicit-initial"
 
 
-def test_seed_law_is_immutable_across_keys_and_invalid_keys_fail_closed() -> None:
-    contract = loci.CarrierContract(
-        loci.CarrierKind.HISTORY,
-        rank=1,
-        shape=(3,),
-        axes=("history",),
+def test_two_locus_bernoulli_seed_replay_is_explicit_and_fail_closed() -> None:
+    def preserve_both(targets):
+        return (
+            derivation(
+                "preserve-bernoulli-root",
+                existing=tuple(rules.preserve(target) for target in targets),
+                progress=rules.Progress.QUIESCENT,
+            ),
+        )
+
+    deterministic, source = finite_record_program(
+        (("left", False), ("right", False)),
+        preserve_both,
     )
-    seed = seeds.uniform_bits(length=3, configuration_contract=contract)
-    alphabet = alphabets.boolean()
-    writable = frontiers.everywhere(
-        configuration_contract=contract,
-        value_profile=alphabet.value_profile,
+    support = loci.literal(tuple(target for target, _ in source.entries))
+    seed = seeds.bernoulli(
+        support,
+        Fraction(1, 3),
+        configuration_contract=source.contract,
     )
-    readable = neighborhoods.dyadlags_0d(configuration_contract=contract)
     simple_program = ca.SimpleProgram(
         seed,
-        alphabet,
-        writable,
-        readable,
-        rules.dyadlags_0d(rule=6),
+        deterministic.alphabet,
+        deterministic.frontier,
+        deterministic.neighborhood,
+        deterministic.rule,
     )
     seed_identity = loci.canonical_identity(seed)
 
+    unkeyed = ca.rollout(simple_program, steps=0)
+    same_left = ca.rollout(simple_program, steps=0, replay_key="same-key")
+    same_right = ca.rollout(simple_program, steps=0, replay_key="same-key")
     left = ca.rollout(simple_program, steps=0, replay_key="left-key")
     right = ca.rollout(simple_program, steps=0, replay_key="right-key")
+    explicit = ca.rollout(
+        simple_program,
+        steps=0,
+        initial=source,
+        replay_key="explicit-key",
+    )
     invalid = ca.rollout(
         simple_program,
         steps=0,
         replay_key=object(),  # type: ignore[arg-type]
     )
 
+    assert isinstance(unkeyed, program.RolloutTruncated)
+    assert len(unkeyed.raw_trace.roots.support.atoms) == 4
+    assert unkeyed.raw_trace.roots.probability_law is not None
+    assert same_left == same_right
+    assert isinstance(same_left, program.RolloutTruncated)
+    assert same_left.raw_trace.seed_evidence.draws == (
+        same_right.raw_trace.seed_evidence.draws
+    )
     assert isinstance(left, program.RolloutTruncated)
     assert isinstance(right, program.RolloutTruncated)
     assert left.raw_trace.roots == right.raw_trace.roots
     assert left.raw_trace.seed_evidence.denotation == right.raw_trace.seed_evidence.denotation
     assert loci.canonical_identity(simple_program.seed) == seed_identity
+    assert isinstance(explicit, program.RolloutTruncated)
+    assert explicit.raw_trace.roots.support.atoms == (source,)
+    assert explicit.raw_trace.seed_evidence.source_identity == "explicit-initial"
+    assert explicit.raw_trace.seed_evidence.draws == ()
     assert isinstance(invalid, program.RolloutRejected)
     assert invalid.fault.evidence == ("TypeError",)
     assert not hasattr(invalid, "raw_trace")

@@ -110,6 +110,39 @@ def test_eventful_identity_is_one_applied_derivation_and_one_successor() -> None
     assert loci.configuration_equal(applied_atom.successor, source)
 
 
+def test_quiescent_identity_can_continue_without_becoming_terminal() -> None:
+    def quiescent_identity(targets):
+        return (
+            derivation(
+                "quiescent-identity",
+                existing=tuple(rules.preserve(target) for target in targets),
+                progress=rules.Progress.QUIESCENT,
+                continuation=rules.Continue(),
+            ),
+        )
+
+    simple_program, source = finite_record_program(
+        (("cell", False),),
+        quiescent_identity,
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    _assert_finite_application_shape(
+        result,
+        outcomes=1,
+        derivations=1,
+        successors=1,
+        no_successors=0,
+    )
+    applied = result.applied_atoms.atoms[0]
+    assert isinstance(applied, program.AppliedDerivation)
+    assert applied.source.progress is rules.Progress.QUIESCENT
+    assert isinstance(applied.source.continuation, rules.Continue)
+    assert loci.configuration_equal(applied.successor, source)
+
+
 def test_empty_output_value_is_one_successor_not_an_empty_relation() -> None:
     nonempty = alphabets.word_value(("A",), tag="symbols")
     empty = alphabets.word_value((), tag="symbols")

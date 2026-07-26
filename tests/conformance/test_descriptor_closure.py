@@ -8,7 +8,7 @@ import pytest
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, rules, seeds
 
-from g7_fixtures import native_program
+from g7_fixtures import diamond_program, native_program
 from helpers import assert_closed_descriptor
 
 
@@ -305,6 +305,41 @@ def test_component_exactness_and_representation_profiles_must_agree() -> None:
             program.neighborhood,
             represented_rule,
         )
+
+
+def test_seed_and_rule_entropy_interfaces_are_explicit_and_independent() -> None:
+    deterministic, _, _ = native_program("dyadlags")
+    stochastic_seed = seeds.uniform_bits(
+        length=3,
+        configuration_contract=deterministic.seed.configuration_contract,
+    )
+    stochastic_initial = ca.SimpleProgram(
+        stochastic_seed,
+        deterministic.alphabet,
+        deterministic.frontier,
+        deterministic.neighborhood,
+        deterministic.rule,
+    )
+    stochastic_transition, _ = diamond_program()
+
+    assert (
+        stochastic_initial.seed.entropy_interface
+        is seeds.EntropyInterface.REPLAY_KEY
+    )
+    assert (
+        stochastic_initial.rule.contract.entropy_interface
+        is seeds.EntropyInterface.NONE
+    )
+    assert (
+        stochastic_transition.seed.entropy_interface
+        is seeds.EntropyInterface.NONE
+    )
+    assert (
+        stochastic_transition.rule.contract.entropy_interface
+        is seeds.EntropyInterface.REPLAY_KEY
+    )
+    assert not hasattr(stochastic_initial.seed, "rng")
+    assert not hasattr(stochastic_transition.rule, "rng")
 
 
 def test_descriptors_reject_callbacks_opaque_escape_and_ambient_entropy() -> None:

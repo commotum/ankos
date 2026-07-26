@@ -17,6 +17,7 @@ import pytest
 import ca
 from ca import program
 
+from g7_catalog_manifest import CANONICAL_ROWS, LEGACY_CALLABLE_ROWS
 from g7_fixtures import diamond_program, native_program
 
 
@@ -209,6 +210,19 @@ def _call_paths(nodes: tuple[ast.FunctionDef, ...]) -> set[tuple[str, ...]]:
     }
 
 
+def _attribute_paths(
+    nodes: tuple[ast.FunctionDef, ...],
+) -> set[tuple[str, ...]]:
+    return {
+        path
+        for root in nodes
+        for node in ast.walk(root)
+        if isinstance(node, ast.Attribute)
+        for path in (_attribute_path(node),)
+        if path
+    }
+
+
 def _assert_no_dispatch_vocabulary(
     nodes: tuple[ast.FunctionDef, ...],
 ) -> None:
@@ -222,9 +236,18 @@ def _assert_no_dispatch_vocabulary(
         "carrier_label",
         "constructor_name",
         "book_category",
+        "semantic_family",
+        "book_source",
+        "source_ref",
+        "rule_tag",
+        "rule_kind",
         "LocusKind",
         "RulePrimitive",
         "apply_rule",
+        "globals",
+        "locals",
+        "__import__",
+        "import_module",
     }
     forbidden_attributes = {
         "family_id",
@@ -232,6 +255,11 @@ def _assert_no_dispatch_vocabulary(
         "carrier_label",
         "constructor_name",
         "book_category",
+        "semantic_family",
+        "book_source",
+        "source_ref",
+        "rule_tag",
+        "rule_kind",
         "apply_rule",
     }
     assert names.isdisjoint(forbidden_names)
@@ -240,6 +268,36 @@ def _assert_no_dispatch_vocabulary(
         re.fullmatch(r"(?:SPF|F|T)\d{3}", value)
         for value in strings
     )
+    assert not {
+        "semantic-family",
+        "book-source",
+        "constructor-name",
+        "catalog-id",
+        "family-id",
+        "rule-tag",
+        "rule-kind",
+    }.intersection(strings)
+    assert not any(
+        "rule" in path and path[-1] in {"kind", "primitive", "tag"}
+        for path in _attribute_paths(nodes)
+    )
+    getattr_calls = [
+        call
+        for root in nodes
+        for call in ast.walk(root)
+        if isinstance(call, ast.Call)
+        and isinstance(call.func, ast.Name)
+        and call.func.id == "getattr"
+    ]
+    getattr_fields = {
+        call.args[1].value
+        for call in getattr_calls
+        if len(call.args) >= 2
+        if isinstance(call.args[1], ast.Constant)
+        if isinstance(call.args[1].value, str)
+    }
+    assert len(getattr_calls) == len(getattr_fields)
+    assert getattr_fields <= {"canonical_identity"}
 
 
 def test_static_import_graph_matches_the_complete_one_way_package_dag() -> None:
@@ -367,6 +425,24 @@ def test_apply_is_the_only_production_step_and_its_call_graph_has_no_dispatch() 
     tree = _tree(PROGRAM_PATH)
     apply_graph = _rooted_function_graph(tree, "apply")
     _assert_no_dispatch_vocabulary(apply_graph)
+    functions = _top_level_functions(tree)
+    rule_denotation_owners = {
+        name
+        for name, node in functions.items()
+        for call in ast.walk(node)
+        if isinstance(call, ast.Call)
+        and _attribute_path(call.func)[-2:] == ("rule", "denote")
+    }
+    commit_owners = {
+        name
+        for name, node in functions.items()
+        for call in ast.walk(node)
+        if isinstance(call, ast.Call)
+        and isinstance(call.func, ast.Name)
+        and call.func.id == "_commit"
+    }
+    assert rule_denotation_owners == {"apply"}
+    assert commit_owners == {"apply"}
 
 
 def test_rollout_statically_reuses_apply_without_a_second_step_path() -> None:
@@ -431,6 +507,16 @@ def test_public_surface_submodules_and_signatures_are_exact() -> None:
         "-> 'RolloutResult[C]'"
     )
     assert callable(ca.rollout)
+    catalog_constructor_names = {
+        row[2].replace("-", "_")
+        for row in CANONICAL_ROWS
+    } | {
+        row[0]
+        for row in LEGACY_CALLABLE_ROWS
+    }
+    assert not {
+        name for name in catalog_constructor_names if hasattr(ca, name)
+    }
     for submodule in OBSOLETE_PUBLIC_SUBMODULES:
         qualified = f"ca.{submodule}"
         assert importlib.util.find_spec(qualified) is None

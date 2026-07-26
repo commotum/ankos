@@ -279,6 +279,33 @@ def test_raw_bindings_remain_available_before_alpha_equivalence() -> None:
     assert fiber.derivations[0].fresh_bindings == applied.fresh_bindings
 
 
+def test_trace_lineage_does_not_change_denotation_or_fresh_identity() -> None:
+    simple_program, source, _ = _fresh_program()
+    left_lineage = program.TraceLineage("left-root")
+    right_lineage = program.TraceLineage("right-root")
+
+    left = ca.apply(
+        simple_program,
+        program.ApplicationInput(source, left_lineage),
+    )
+    right = ca.apply(
+        simple_program,
+        program.ApplicationInput(source, right_lineage),
+    )
+
+    assert isinstance(left, program.ApplicationComplete)
+    assert isinstance(right, program.ApplicationComplete)
+    assert left.source_outcomes == right.source_outcomes
+    left_atom = left.applied_atoms.atoms[0]
+    right_atom = right.applied_atoms.atoms[0]
+    assert isinstance(left_atom, program.AppliedDerivation)
+    assert isinstance(right_atom, program.AppliedDerivation)
+    assert left_atom.fresh_bindings == right_atom.fresh_bindings
+    assert left_atom.successor == right_atom.successor
+    assert left_atom.input_trace_lineage != right_atom.input_trace_lineage
+    assert left_atom.output_trace_lineage != right_atom.output_trace_lineage
+
+
 def test_created_values_bind_same_derivation_structural_references() -> None:
     source_value = alphabets.ValueNode(
         alphabets.ValueKind.GRAPH,
