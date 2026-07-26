@@ -376,6 +376,26 @@ def conditional(
     )
 
 
+def capability_index(index: int) -> CapabilitySelector:
+    """Select one resolved writable capability by canonical sequence index."""
+
+    return CapabilitySelector(CapabilitySelectorKind.INDEX, index=index)
+
+
+def capability_target(
+    target: loci.Locus | loci.FreshReference,
+) -> CapabilitySelector:
+    """Select one resolved writable capability by exact target identity."""
+
+    return CapabilitySelector(CapabilitySelectorKind.TARGET, target=target)
+
+
+def every_capability() -> CapabilitySelector:
+    """Select every capability in the existing or fresh side of a plan."""
+
+    return CapabilitySelector(CapabilitySelectorKind.EVERY)
+
+
 # ---------------------------------------------------------------------------
 # Evidence, cardinality, total dispositions, and Rule atoms
 # ---------------------------------------------------------------------------
@@ -1310,6 +1330,310 @@ class IntensionalDenotation:
             raise TypeError("intensional probability law is not recognized")
 
 
+class ClauseSelection(Enum):
+    """How an ordered closed clause kernel retains matching clauses."""
+
+    ALL = "all"
+    FIRST = "first"
+
+
+class CapabilitySelectorKind(Enum):
+    """Closed ways for a disposition plan to address resolved capabilities."""
+
+    INDEX = "index"
+    TARGET = "target"
+    EVERY = "every"
+
+
+@dataclass(frozen=True)
+class CapabilitySelector:
+    """One closed reference into an existing or fresh capability sequence."""
+
+    kind: CapabilitySelectorKind
+    index: int | None = None
+    target: loci.Locus | loci.FreshReference | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "capability selector")
+        if type(self.kind) is not CapabilitySelectorKind:
+            raise TypeError("capability selector kind is not recognized")
+        if self.kind is CapabilitySelectorKind.INDEX:
+            if type(self.index) is not int or self.index < 0:
+                raise ValueError(
+                    "index capability selector needs a non-negative integer"
+                )
+            if self.target is not None:
+                raise ValueError("index capability selector cannot carry a target")
+            return
+        if self.kind is CapabilitySelectorKind.TARGET:
+            if self.index is not None:
+                raise ValueError("target capability selector cannot carry an index")
+            if type(self.target) not in (loci.Locus, loci.FreshReference):
+                raise TypeError(
+                    "target capability selector needs a Locus or FreshReference"
+                )
+            return
+        if self.index is not None or self.target is not None:
+            raise ValueError("every capability selector carries no index or target")
+
+
+@dataclass(frozen=True)
+class ExistingDispositionPlan:
+    """One closed existing-capability action selected by index, identity, or all."""
+
+    selector: CapabilitySelector
+    action: DispositionAction
+    value: RuleExpr | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "existing disposition plan")
+        if type(self.selector) is not CapabilitySelector:
+            raise TypeError("existing disposition selector is not recognized")
+        if (
+            self.selector.kind is CapabilitySelectorKind.TARGET
+            and type(self.selector.target) is not loci.Locus
+        ):
+            raise TypeError("existing target selector needs a bound Locus")
+        if self.action not in (
+            DispositionAction.PRESERVE,
+            DispositionAction.REPLACE,
+            DispositionAction.DELETE,
+        ):
+            raise ValueError("existing disposition plan has a fresh-only action")
+        if self.action is DispositionAction.REPLACE:
+            if type(self.value) is not RuleExpr:
+                raise TypeError("replace plan needs one closed value expression")
+        elif self.value is not None:
+            raise ValueError("preserve/delete plans cannot carry a value expression")
+
+
+@dataclass(frozen=True)
+class FreshDispositionPlan:
+    """One closed fresh-capability action selected by index, identity, or all."""
+
+    selector: CapabilitySelector
+    action: DispositionAction
+    value: RuleExpr | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "fresh disposition plan")
+        if type(self.selector) is not CapabilitySelector:
+            raise TypeError("fresh disposition selector is not recognized")
+        if (
+            self.selector.kind is CapabilitySelectorKind.TARGET
+            and type(self.selector.target) is not loci.FreshReference
+        ):
+            raise TypeError("fresh target selector needs a FreshReference")
+        if self.action not in (
+            DispositionAction.ABSENT,
+            DispositionAction.CREATE,
+        ):
+            raise ValueError("fresh disposition plan has an existing-only action")
+        if self.action is DispositionAction.CREATE:
+            if type(self.value) is not RuleExpr:
+                raise TypeError("create plan needs one closed value expression")
+        elif self.value is not None:
+            raise ValueError("absent plans cannot carry a value expression")
+
+
+def _validate_plan_selectors(
+    plans: tuple[ExistingDispositionPlan, ...]
+    | tuple[FreshDispositionPlan, ...],
+    *,
+    owner: str,
+) -> None:
+    if len({plan.selector for plan in plans}) != len(plans):
+        raise ValueError(f"{owner} contains duplicate capability selectors")
+    if any(
+        plan.selector.kind is CapabilitySelectorKind.EVERY for plan in plans
+    ) and len(plans) != 1:
+        raise ValueError(
+            f"{owner} cannot combine an every selector with another selector"
+        )
+
+
+@dataclass(frozen=True)
+class DerivationClauseResult:
+    """A matched clause's complete, input-dependent derivation plan."""
+
+    existing_plans: tuple[ExistingDispositionPlan, ...]
+    fresh_plans: tuple[FreshDispositionPlan, ...]
+    progress: Progress
+    continuation: Continuation
+    witness: RuleExpr
+    provenance: Provenance
+    certificate: Certificate
+    existing_default: DispositionAction = DispositionAction.PRESERVE
+    fresh_default: DispositionAction = DispositionAction.ABSENT
+    certificate_template: EvidenceTerm | None = None
+    provenance_templates: tuple[ProvenanceTemplate, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "derivation clause result")
+        if type(self.existing_plans) is not tuple or any(
+            type(plan) is not ExistingDispositionPlan
+            for plan in self.existing_plans
+        ):
+            raise TypeError(
+                "derivation existing plans must be an immutable plan tuple"
+            )
+        if type(self.fresh_plans) is not tuple or any(
+            type(plan) is not FreshDispositionPlan for plan in self.fresh_plans
+        ):
+            raise TypeError("derivation fresh plans must be an immutable plan tuple")
+        _validate_plan_selectors(self.existing_plans, owner="existing plans")
+        _validate_plan_selectors(self.fresh_plans, owner="fresh plans")
+        if type(self.progress) is not Progress:
+            raise TypeError("derivation clause progress is not recognized")
+        if type(self.continuation) not in (Continue, Stop):
+            raise TypeError("derivation clause continuation is not recognized")
+        if type(self.witness) is not RuleExpr:
+            raise TypeError("derivation clause witness is not recognized")
+        if type(self.provenance) is not tuple or not self.provenance or any(
+            type(item) is not str or not item for item in self.provenance
+        ):
+            raise ValueError(
+                "derivation clause provenance must be a nonempty immutable tuple"
+            )
+        if (
+            type(self.certificate) is not Certificate
+            or self.certificate.kind is not CertificateKind.DERIVATION
+        ):
+            raise ValueError("derivation clause needs derivation evidence")
+        if self.existing_default is not DispositionAction.PRESERVE:
+            raise ValueError("existing clause default must explicitly Preserve")
+        if self.fresh_default is not DispositionAction.ABSENT:
+            raise ValueError("fresh clause default must explicitly Absent")
+        if self.certificate_template is not None and type(
+            self.certificate_template
+        ) is not EvidenceTerm:
+            raise TypeError("derivation clause certificate template is not recognized")
+        if type(self.provenance_templates) is not tuple or any(
+            type(item) is not ProvenanceTemplate
+            for item in self.provenance_templates
+        ):
+            raise TypeError(
+                "derivation clause provenance templates are not recognized"
+            )
+
+
+@dataclass(frozen=True)
+class NoSuccessorClauseResult:
+    """A matched clause's typed, input-dependent no-successor result."""
+
+    outcome: NoSuccessorOutcome
+    reason: RuleExpr
+    witness: RuleExpr
+    provenance: Provenance
+    certificate: Certificate
+    certificate_template: EvidenceTerm | None = None
+    provenance_templates: tuple[ProvenanceTemplate, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "no-successor clause result")
+        if type(self.outcome) is not NoSuccessorOutcome:
+            raise TypeError("no-successor clause outcome is not recognized")
+        if type(self.reason) is not RuleExpr:
+            raise TypeError("no-successor clause reason is not recognized")
+        if type(self.witness) is not RuleExpr:
+            raise TypeError("no-successor clause witness is not recognized")
+        if type(self.provenance) is not tuple or not self.provenance or any(
+            type(item) is not str or not item for item in self.provenance
+        ):
+            raise ValueError(
+                "no-successor clause provenance must be a nonempty immutable tuple"
+            )
+        expected = (
+            CertificateKind.DIVERGENCE
+            if self.outcome is NoSuccessorOutcome.DIVERGENT
+            else CertificateKind.TERMINALITY
+        )
+        if (
+            type(self.certificate) is not Certificate
+            or self.certificate.kind is not expected
+        ):
+            raise ValueError(
+                f"{self.outcome.value} clause needs {expected.value} evidence"
+            )
+        if self.certificate_template is not None and type(
+            self.certificate_template
+        ) is not EvidenceTerm:
+            raise TypeError(
+                "no-successor clause certificate template is not recognized"
+            )
+        if type(self.provenance_templates) is not tuple or any(
+            type(item) is not ProvenanceTemplate
+            for item in self.provenance_templates
+        ):
+            raise TypeError(
+                "no-successor clause provenance templates are not recognized"
+            )
+
+
+ClauseResult: TypeAlias = DerivationClauseResult | NoSuccessorClauseResult
+
+
+@dataclass(frozen=True)
+class RuleClause:
+    """One ordered closed predicate/result branch in a reusable Rule kernel."""
+
+    condition: RuleExpr
+    result: ClauseResult
+    mass: Fraction | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "Rule clause")
+        if type(self.condition) is not RuleExpr:
+            raise TypeError("Rule clause condition is not recognized")
+        if type(self.result) not in (
+            DerivationClauseResult,
+            NoSuccessorClauseResult,
+        ):
+            raise TypeError("Rule clause result is not recognized")
+        if self.mass is not None:
+            if type(self.mass) is not Fraction:
+                raise TypeError("Rule clause mass must be an exact Fraction")
+            if self.mass <= 0:
+                raise ValueError("Rule clause mass must be strictly positive")
+
+
+@dataclass(frozen=True)
+class ClauseKernelDenotation:
+    """An ordered finite clause relation evaluated over one immutable ``(R, W)``."""
+
+    clauses: tuple[RuleClause, ...]
+    selection: ClauseSelection
+    completeness_evidence: Certificate
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "clause-kernel denotation")
+        if type(self.clauses) is not tuple or any(
+            type(clause) is not RuleClause for clause in self.clauses
+        ):
+            raise TypeError("clause kernel needs an immutable RuleClause tuple")
+        if not self.clauses:
+            raise ValueError("clause kernel needs at least one clause")
+        if type(self.selection) is not ClauseSelection:
+            raise TypeError("clause-kernel selection is not recognized")
+        if (
+            type(self.completeness_evidence) is not Certificate
+            or self.completeness_evidence.kind is not CertificateKind.COMPLETENESS
+        ):
+            raise ValueError("clause kernel needs completeness evidence")
+        weighted = tuple(clause.mass is not None for clause in self.clauses)
+        if any(weighted) and not all(weighted):
+            raise ValueError(
+                "clause-kernel masses must be present on every clause or none"
+            )
+
+
 @dataclass(frozen=True)
 class ParallelDenotation(Generic[R, W, C]):
     parts: tuple["Rule[R, W, C]", ...]
@@ -1326,6 +1650,7 @@ class ParallelDenotation(Generic[R, W, C]):
 RuleDenotation: TypeAlias = (
     LiteralDenotation[alphabets.SemanticValue]
     | ExpressionDenotation
+    | ClauseKernelDenotation
     | IntensionalDenotation
     | ParallelDenotation[R, W, C]
 )
@@ -1345,6 +1670,7 @@ class RuleDescriptor(Generic[R, W, C]):
         expected = {
             RulePrimitive.LITERAL: LiteralDenotation,
             RulePrimitive.EXPRESSION: ExpressionDenotation,
+            RulePrimitive.CLAUSE_KERNEL: ClauseKernelDenotation,
             RulePrimitive.RELATION: IntensionalDenotation,
             RulePrimitive.DISTRIBUTION: IntensionalDenotation,
             RulePrimitive.DIFFERENTIAL: IntensionalDenotation,
@@ -1369,6 +1695,7 @@ class RuleFaultReason(Enum):
     INCOMPATIBLE_READ_VIEW = "incompatible-read-view"
     INCOMPATIBLE_WRITABLE = "incompatible-writable"
     EVALUATION_FAILURE = "evaluation-failure"
+    NO_MATCHING_CLAUSE = "no-matching-clause"
     INCOMPLETE_DISPOSITION = "incomplete-disposition"
     UNAUTHORIZED_EFFECT = "unauthorized-effect"
     CONFLICTING_EFFECT = "conflicting-effect"
@@ -1523,6 +1850,8 @@ def _denote_descriptor(
         return RuleComplete(denotation.outcomes)
     if isinstance(denotation, ExpressionDenotation):
         return _denote_expression(denotation, readable, writable)
+    if isinstance(denotation, ClauseKernelDenotation):
+        return _denote_clause_kernel(denotation, readable, writable)
     if isinstance(denotation, IntensionalDenotation):
         support: SupportSpace[RuleAtom[alphabets.SemanticValue]] = (
             intensional_support(
@@ -1687,6 +2016,326 @@ def _denote_expression(
         certificate,
     )
     return RuleComplete(OutcomeSpace(finite_support((atom,), label="expression")))
+
+
+DispositionPlan: TypeAlias = ExistingDispositionPlan | FreshDispositionPlan
+
+
+def _capability_indices(
+    selector: CapabilitySelector,
+    targets: tuple[loci.Locus | loci.FreshReference, ...],
+) -> tuple[int, ...]:
+    if selector.kind is CapabilitySelectorKind.EVERY:
+        return tuple(range(len(targets)))
+    if selector.kind is CapabilitySelectorKind.INDEX:
+        assert selector.index is not None
+        if selector.index >= len(targets):
+            raise IndexError(
+                f"capability index {selector.index} is outside resolved envelope"
+            )
+        return (selector.index,)
+    assert selector.target is not None
+    try:
+        return (targets.index(selector.target),)
+    except ValueError as error:
+        raise KeyError(
+            "capability target identity is absent from resolved envelope"
+        ) from error
+
+
+def _plans_by_index(
+    plans: tuple[DispositionPlan, ...],
+    targets: tuple[loci.Locus | loci.FreshReference, ...],
+) -> dict[int, DispositionPlan]:
+    selected: dict[int, DispositionPlan] = {}
+    for plan in plans:
+        for index in _capability_indices(plan.selector, targets):
+            if index in selected:
+                raise ValueError(
+                    "disposition plans overlap on one resolved capability"
+                )
+            selected[index] = plan
+    return selected
+
+
+def _materialize_clause_provenance(
+    provenance: Provenance,
+    templates: tuple[ProvenanceTemplate, ...],
+    readable: _ReadableView,
+    proofs: list[EvaluationProof],
+) -> Provenance:
+    dynamic = tuple(
+        _materialize_provenance(template, readable, proofs)
+        for template in templates
+    )
+    boundary = _boundary_provenance(readable)
+    base = (
+        provenance
+        if not boundary
+        else (provenance[0], *boundary, *provenance[1:])
+    )
+    return (*base, *dynamic)
+
+
+def _materialize_clause_derivation(
+    result: DerivationClauseResult,
+    *,
+    clause_index: int,
+    selection_proofs: tuple[EvaluationProof, ...],
+    readable: _ReadableView,
+    writable: _WritableCapabilities,
+) -> Derivation[alphabets.SemanticValue]:
+    existing_targets = tuple(item.target for item in writable.existing)
+    fresh_targets = tuple(item.target for item in writable.fresh)
+    proofs = list(selection_proofs)
+
+    def evaluate(
+        expression: RuleExpr,
+        *,
+        anchor: loci.Locus | None,
+    ) -> RuleRuntimeValue:
+        value, proof = _evaluate_proven(expression, readable, anchor=anchor)
+        proofs.append(proof)
+        return value
+
+    existing_plans = _plans_by_index(
+        tuple(result.existing_plans),
+        tuple(existing_targets),
+    )
+    existing: list[Disposition[loci.Locus, alphabets.SemanticValue]] = []
+    for index, target in enumerate(existing_targets):
+        plan = existing_plans.get(index)
+        if plan is None or plan.action is DispositionAction.PRESERVE:
+            existing.append(preserve(target))
+        elif plan.action is DispositionAction.DELETE:
+            existing.append(delete(target))
+        else:
+            assert plan.action is DispositionAction.REPLACE
+            assert plan.value is not None
+            existing.append(
+                replace(
+                    target,
+                    _require_semantic_value(
+                        evaluate(plan.value, anchor=target)
+                    ),
+                )
+            )
+
+    fresh_plans = _plans_by_index(
+        tuple(result.fresh_plans),
+        tuple(fresh_targets),
+    )
+    fresh: list[Disposition[loci.FreshReference, alphabets.SemanticValue]] = []
+    for index, target in enumerate(fresh_targets):
+        plan = fresh_plans.get(index)
+        if plan is None or plan.action is DispositionAction.ABSENT:
+            fresh.append(absent(target))
+        else:
+            assert plan.action is DispositionAction.CREATE
+            assert plan.value is not None
+            fresh.append(
+                create(
+                    target,
+                    _require_semantic_value(
+                        evaluate(plan.value, anchor=None)
+                    ),
+                )
+            )
+
+    total = TotalDisposition(
+        tuple(existing),
+        tuple(fresh),
+        _certificate(
+            CertificateKind.TOTALITY,
+            f"clause-kernel:{clause_index}:total",
+        ),
+    )
+    continuation = result.continuation
+    if isinstance(continuation, Stop):
+        continuation = Stop(
+            _runtime_as_expr(evaluate(continuation.reason, anchor=None)),
+            continuation.certificate,
+        )
+    witness_value = evaluate(result.witness, anchor=None)
+    certificate = (
+        result.certificate
+        if result.certificate_template is None
+        else Certificate(
+            result.certificate.kind,
+            _materialize_evidence_term(
+                result.certificate_template,
+                readable,
+                existing_targets,
+                proofs,
+            ),
+        )
+    )
+    provenance = _materialize_clause_provenance(
+        result.provenance,
+        result.provenance_templates,
+        readable,
+        proofs,
+    )
+    proof_expression = _evaluation_proofs_as_expr(tuple(proofs))
+    witness_descriptor = RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("clause-kernel-witness-v1"),
+            literal_expr(clause_index),
+            result.witness,
+            _runtime_as_expr(witness_value),
+            proof_expression,
+            literal_expr(total.canonical_identity),
+        ),
+    )
+    return Derivation(
+        total,
+        result.progress,
+        continuation,
+        Witness(
+            loci.canonical_identity(witness_descriptor),
+            witness_descriptor,
+        ),
+        provenance,
+        certificate,
+    )
+
+
+def _materialize_clause_no_successor(
+    result: NoSuccessorClauseResult,
+    *,
+    clause_index: int,
+    selection_proofs: tuple[EvaluationProof, ...],
+    readable: _ReadableView,
+    writable: _WritableCapabilities,
+) -> NoSuccessor:
+    existing_targets = tuple(item.target for item in writable.existing)
+    proofs = list(selection_proofs)
+
+    def evaluate(expression: RuleExpr) -> RuleRuntimeValue:
+        value, proof = _evaluate_proven(expression, readable, anchor=None)
+        proofs.append(proof)
+        return value
+
+    reason = _runtime_as_expr(evaluate(result.reason))
+    witness_value = evaluate(result.witness)
+    certificate = (
+        result.certificate
+        if result.certificate_template is None
+        else Certificate(
+            result.certificate.kind,
+            _materialize_evidence_term(
+                result.certificate_template,
+                readable,
+                existing_targets,
+                proofs,
+            ),
+        )
+    )
+    provenance = _materialize_clause_provenance(
+        result.provenance,
+        result.provenance_templates,
+        readable,
+        proofs,
+    )
+    proof_expression = _evaluation_proofs_as_expr(tuple(proofs))
+    witness_descriptor = RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("clause-kernel-witness-v1"),
+            literal_expr(clause_index),
+            literal_expr(result.outcome.value),
+            result.witness,
+            _runtime_as_expr(witness_value),
+            reason,
+            proof_expression,
+        ),
+    )
+    return NoSuccessor(
+        result.outcome,
+        reason,
+        Witness(
+            loci.canonical_identity(witness_descriptor),
+            witness_descriptor,
+        ),
+        provenance,
+        certificate,
+    )
+
+
+def _denote_clause_kernel(
+    denotation: ClauseKernelDenotation,
+    readable: _ReadableView,
+    writable: _WritableCapabilities,
+) -> RuleResult[C, alphabets.SemanticValue]:
+    selected: list[tuple[int, RuleClause]] = []
+    selection_proofs: list[EvaluationProof] = []
+    for index, clause in enumerate(denotation.clauses):
+        condition, proof = _evaluate_proven(
+            clause.condition,
+            readable,
+            anchor=None,
+        )
+        selection_proofs.append(proof)
+        if _require_bit(condition):
+            selected.append((index, clause))
+            if denotation.selection is ClauseSelection.FIRST:
+                break
+
+    if not selected:
+        return _rejected(
+            RuleFaultPhase.DENOTATION,
+            RuleFaultReason.NO_MATCHING_CLAUSE,
+            "complete clause kernel had no matching typed outcome",
+        )
+
+    atoms: list[RuleAtom[alphabets.SemanticValue]] = []
+    masses: list[Fraction] = []
+    retained_selection_proofs = tuple(selection_proofs)
+    for index, clause in selected:
+        if isinstance(clause.result, DerivationClauseResult):
+            atom: RuleAtom[alphabets.SemanticValue] = (
+                _materialize_clause_derivation(
+                    clause.result,
+                    clause_index=index,
+                    selection_proofs=retained_selection_proofs,
+                    readable=readable,
+                    writable=writable,
+                )
+            )
+        else:
+            atom = _materialize_clause_no_successor(
+                clause.result,
+                clause_index=index,
+                selection_proofs=retained_selection_proofs,
+                readable=readable,
+                writable=writable,
+            )
+        atoms.append(atom)
+        if clause.mass is not None:
+            masses.append(clause.mass)
+
+    try:
+        support = finite_support(tuple(atoms), label="clause-kernel")
+    except (TypeError, ValueError) as error:
+        return _rejected(
+            RuleFaultPhase.RESULT_VALIDATION,
+            RuleFaultReason.INVALID_DESCRIPTOR,
+            f"invalid clause-kernel support: {error}",
+        )
+    probability_law: ProbabilityLaw | None = None
+    if masses:
+        try:
+            probability_law = finite_probability_law(
+                tuple(zip(atoms, masses, strict=True))
+            )
+        except (TypeError, ValueError) as error:
+            return _rejected(
+                RuleFaultPhase.RESULT_VALIDATION,
+                RuleFaultReason.INVALID_PROBABILITY_LAW,
+                f"invalid clause-kernel probability law: {error}",
+            )
+    return RuleComplete(OutcomeSpace(support, probability_law))
 
 
 def _materialize_evidence_term(
@@ -2043,15 +2692,23 @@ def _evaluate_value(
         ))
     if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):
         values = tuple(
-            _require_int(evaluate(_as_expression(argument)))
+            _require_exact_number(evaluate(_as_expression(argument)))
             for argument in arguments
         )
         if primitive is ExpressionPrimitive.ADD:
             return finish(sum(values))
-        product = 1
+        product: int | Fraction = 1
         for value in values:
             product *= value
         return finish(product)
+    if primitive in (ExpressionPrimitive.SUBTRACT, ExpressionPrimitive.DIVIDE):
+        left = _require_exact_number(evaluate(_child(arguments, 0)))
+        right = _require_exact_number(evaluate(_child(arguments, 1)))
+        if primitive is ExpressionPrimitive.SUBTRACT:
+            return finish(left - right)
+        if right == 0:
+            raise ZeroDivisionError("division expression denominator is zero")
+        return finish(Fraction(left, right))
     if primitive is ExpressionPrimitive.MODULO:
         value = _require_int(evaluate(_child(arguments, 0)))
         modulus_value = _literal_int(arguments, 1)
@@ -2087,6 +2744,16 @@ def _evaluate_value(
         left = evaluate(_child(arguments, 0))
         right = evaluate(_child(arguments, 1))
         return finish(loci.semantic_equal(left, right))
+    if primitive in (ExpressionPrimitive.LESS, ExpressionPrimitive.LESS_EQUAL):
+        left = _require_exact_number(evaluate(_child(arguments, 0)))
+        right = _require_exact_number(evaluate(_child(arguments, 1)))
+        if primitive is ExpressionPrimitive.LESS:
+            return finish(int(left < right))
+        return finish(int(left <= right))
+    if primitive is ExpressionPrimitive.CONDITIONAL:
+        condition = _require_bit(evaluate(_child(arguments, 0)))
+        selected = _child(arguments, 1 if condition else 2)
+        return finish(evaluate(selected))
     if primitive in (ExpressionPrimitive.ALL, ExpressionPrimitive.ANY):
         values = _require_tuple(evaluate(_child(arguments, 0)))
         bits = tuple(_require_bit(value) for value in values)
@@ -2221,6 +2888,14 @@ def _require_int(value: RuleRuntimeValue) -> int:
         return int(value)
     if not isinstance(value, int):
         raise TypeError("expected integer Rule expression")
+    return value
+
+
+def _require_exact_number(value: RuleRuntimeValue) -> int | Fraction:
+    if isinstance(value, bool):
+        return int(value)
+    if type(value) not in (int, Fraction):
+        raise TypeError("expected exact numeric Rule expression")
     return value
 
 

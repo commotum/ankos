@@ -20,7 +20,10 @@ from g7_fixtures import diamond_program, native_program
 
 CORE_DEPENDENCIES = {
     "loci": set(),
-    "alphabets": set(),
+    # Alphabet owns closed value structure, including typed references to
+    # structural identities.  This one-way base-layer edge introduces no
+    # cycle: loci remains independent of every value/component owner.
+    "alphabets": {"loci"},
     "seeds": {"alphabets", "loci"},
     "frontiers": {"alphabets", "loci", "seeds"},
     "neighborhoods": {"alphabets", "loci", "seeds"},
