@@ -9,6 +9,8 @@ from collections import Counter
 
 import pytest
 
+from ca import loci
+
 from g7_mechanics import (
     MECHANICS_ROWS,
     PRIMARY_PRESSURES,
@@ -70,8 +72,49 @@ def test_all_eight_secondary_pressure_joins_are_present_exactly() -> None:
     assert actual == tuple(sorted(SECONDARY_JOINS))
     rows = {row.spf: row for row in MECHANICS_ROWS}
     for spf, pressure in SECONDARY_JOINS:
+        primary = run_mechanics_fixture(rows[spf])
         execution = run_secondary_fixture(rows[spf], pressure)
+        assert (
+            execution.simple_program.canonical_identity
+            == primary.simple_program.canonical_identity
+        )
         assert_mechanics_run(execution, pressure=pressure)
+
+
+def test_px10_families_have_eight_distinct_representation_workspaces() -> None:
+    """A common codec purpose does not collapse eight W/R/Rule skeletons."""
+
+    rows = tuple(row for row in MECHANICS_ROWS if row.primary == "PX10")
+    executions = tuple(run_mechanics_fixture(row) for row in rows)
+
+    assert tuple(execution.source.contract.kind for execution in executions) == (
+        loci.CarrierKind.RECORD,
+        loci.CarrierKind.TREE,
+        loci.CarrierKind.FIELD,
+        loci.CarrierKind.HISTORY,
+        loci.CarrierKind.GRID,
+        loci.CarrierKind.PRODUCT,
+        loci.CarrierKind.HISTORY,
+        loci.CarrierKind.WORD,
+    )
+    skeletons = {
+        (
+            execution.source.contract.kind,
+            loci.canonical_identity(execution.simple_program.frontier.descriptor),
+            loci.canonical_identity(execution.simple_program.neighborhood.descriptor),
+            execution.simple_program.rule.canonical_identity,
+        )
+        for execution in executions
+    }
+    assert len(skeletons) == 8
+    relation_graphs = {
+        (
+            execution.representation_source,
+            execution.representation_target,
+        )
+        for execution in executions
+    }
+    assert len(relation_graphs) == 8
 
 
 def test_close_roles_and_retired_seed_role_are_excluded_from_sixty_rows() -> None:

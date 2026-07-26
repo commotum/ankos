@@ -83,8 +83,28 @@ def test_stateful_transform_with_its_own_commit_remains_an_ordinary_program() ->
     execution = run_mechanics_fixture(row)
     assert_mechanics_run(execution)
     assert isinstance(execution.result, program.ApplicationComplete)
-    derivation = execution.result.applied_atoms.atoms[0]
-    assert isinstance(derivation, program.AppliedDerivation)
-    assert derivation.source.provenance == (
-        "mechanics:visible-surrogate-evaluator-state",
+    derivations = tuple(
+        step_result.applied_atoms.atoms[0]
+        for _, step_result in execution.trajectory
+    )
+    assert all(
+        isinstance(derivation, program.AppliedDerivation)
+        for derivation in derivations
+    )
+    assert tuple(
+        derivation.source.provenance
+        for derivation in derivations
+    ) == (
+        (
+            "mechanics:"
+            "visible-surrogate-evaluator-state:evaluate-observed",
+        ),
+        (
+            "mechanics:"
+            "visible-surrogate-evaluator-state:evaluate-surrogate",
+        ),
+        (
+            "mechanics:"
+            "visible-surrogate-evaluator-state:calibrate",
+        ),
     )

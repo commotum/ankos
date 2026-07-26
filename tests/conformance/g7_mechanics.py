@@ -132,24 +132,10 @@ class MechanicsRun:
     representation: alphabets.RepresentationRelation | None = None
     representation_source: alphabets.SemanticValue | None = None
     representation_target: alphabets.SemanticValue | None = None
-    recipe: FiniteRecipe | None = None
     trajectory: tuple[
         tuple[Configuration, program.ApplicationComplete],
         ...,
     ] = ()
-
-
-@dataclass(frozen=True)
-class FiniteRecipe:
-    """Exact test-owned finite mechanics expected from one family fixture."""
-
-    read_targets: tuple[loci.Locus, ...]
-    write_targets: tuple[loci.Locus, ...]
-    successor_entries: tuple[
-        tuple[tuple[loci.Locus, alphabets.SemanticValue], ...],
-        ...,
-    ]
-    stop: tuple[bool, ...]
 
 
 def _record_configuration(
@@ -370,7 +356,6 @@ def _assemble(
     representation: alphabets.RepresentationRelation | None = None,
     representation_source: alphabets.SemanticValue | None = None,
     representation_target: alphabets.SemanticValue | None = None,
-    recipe: FiniteRecipe | None = None,
 ) -> MechanicsRun:
     simple_program = ca.SimpleProgram(
         seeds.exact(
@@ -391,7 +376,6 @@ def _assemble(
         representation,
         representation_source,
         representation_target,
-        recipe,
     )
 
 
@@ -2536,6 +2520,68 @@ def _finite_successors(
     )
 
 
+def _materialized_read_targets(execution: MechanicsRun) -> tuple[loci.Locus, ...]:
+    resolved = execution.simple_program.neighborhood.resolve(execution.source)
+    if type(resolved) is neighborhoods.IntensionalReadableView:
+        return ()
+    return tuple(observation.target for observation in resolved.observations)
+
+
+def _resolved_write_targets(
+    execution: MechanicsRun,
+) -> tuple[loci.Locus | loci.FreshReference, ...]:
+    return execution.simple_program.frontier.resolve(execution.source).targets
+
+
+def _payload(disposition: rules.Disposition) -> alphabets.SemanticValue | None:
+    if type(disposition.payload) is rules.NoPayload:
+        return None
+    assert type(disposition.payload) is rules.ValuePayload
+    return disposition.payload.value
+
+
+def _record_values(configuration: loci.FiniteConfiguration) -> dict[str, object]:
+    return {
+        str(target.path[-1]): value
+        for target, value in configuration.entries
+        if target.kind is loci.LocusKind.NAMED
+    }
+
+
+def _assert_exact_total_replacement(
+    derivation: program.AppliedDerivation,
+    *,
+    existing: tuple[
+        tuple[loci.Locus, rules.DispositionAction, alphabets.SemanticValue | None],
+        ...,
+    ],
+    fresh: tuple[
+        tuple[
+            loci.FreshReference,
+            rules.DispositionAction,
+            alphabets.SemanticValue | None,
+        ],
+        ...,
+    ] = (),
+) -> None:
+    actual_existing = {
+        item.target: (item.action, _payload(item))
+        for item in derivation.source.replacement.existing
+    }
+    actual_fresh = {
+        item.target: (item.action, _payload(item))
+        for item in derivation.source.replacement.fresh
+    }
+    assert actual_existing == {
+        target: (action, value)
+        for target, action, value in existing
+    }
+    assert actual_fresh == {
+        target: (action, value)
+        for target, action, value in fresh
+    }
+
+
 def assert_mechanics_run(
     execution: MechanicsRun,
     *,
@@ -2559,19 +2605,48 @@ def assert_mechanics_run(
     )
 
     if pressure == "PX01":
-        assert derivations
-        for derivation in derivations:
-            before = dict(execution.source.entries)
-            after = dict(derivation.successor.entries)
-            changed = {
-                target
-                for target in before
-                if before.get(target) != after.get(target)
-            }
-            assert len(changed) >= 2
-        if row.spf == "SPF030":
-            assert rules.cardinality_size(result.derivation_cardinality) == 2
-            assert rules.cardinality_size(result.successor_cardinality) == 2
+        fields, read_names, write_names, alternatives, stopped = _PX01_CASES[
+            row.spf
+        ]
+        assert isinstance(execution.source, loci.FiniteConfiguration)
+        targets = _record_targets(execution.source)
+        assert _materialized_read_targets(execution) == tuple(
+            targets[name] for name in read_names
+        )
+        assert set(_resolved_write_targets(execution)) == {
+            targets[name] for name in write_names
+        }
+        assert len(derivations) == len(alternatives)
+        source_values = dict(execution.source.entries)
+        for derivation, replacements in zip(
+            derivations, alternatives, strict=True
+        ):
+            expected_map = dict(source_values)
+            expected_map.update(
+                (targets[name], value) for name, value in replacements
+            )
+            assert dict(derivation.successor.entries) == expected_map
+            _assert_exact_total_replacement(
+                derivation,
+                existing=tuple(
+                    (
+                        targets[name],
+                        rules.DispositionAction.REPLACE,
+                        value,
+                    )
+                    for name, value in replacements
+                ),
+            )
+            assert isinstance(
+                derivation.source.continuation,
+                rules.Stop if stopped else rules.Continue,
+            )
+        assert rules.cardinality_size(result.derivation_cardinality) == len(
+            alternatives
+        )
+        assert rules.cardinality_size(result.successor_cardinality) == len(
+            alternatives
+        )
         return
 
     if pressure == "PX02":
@@ -2584,18 +2659,156 @@ def assert_mechanics_run(
         assert len(successor.entries) == (
             len(execution.source.entries) - delete_count + create_count
         )
-        assert successor.contract.kind is loci.CarrierKind.WORD
+        expected_carrier = {
+            "SPF002": loci.CarrierKind.WORD,
+            "SPF005": loci.CarrierKind.WORD,
+            "SPF016": loci.CarrierKind.WORD,
+            "SPF022": loci.CarrierKind.TREE,
+            "SPF023": loci.CarrierKind.HISTORY,
+            "SPF025": loci.CarrierKind.WORD,
+            "SPF028": loci.CarrierKind.GRAPH,
+            "SPF031": loci.CarrierKind.GRID,
+            "SPF037": loci.CarrierKind.WORD,
+            "SPF038": loci.CarrierKind.GRAPH,
+            "SPF049": loci.CarrierKind.TREE,
+        }[row.spf]
+        assert successor.contract.kind is expected_carrier
+        expected_reads = (
+            (
+                loci.graph_element("node", "a"),
+                loci.graph_element("node", "b"),
+                loci.graph_element("node", "c"),
+                loci.graph_element("edge", "a-b"),
+                loci.graph_element("edge", "b-c"),
+            )
+            if row.spf == "SPF028"
+            else tuple(target for target, _ in execution.source.entries)
+        )
+        assert _materialized_read_targets(execution) == expected_reads
+        writable = execution.simple_program.frontier.resolve(execution.source)
+        assert set(item.target for item in writable.existing) == {
+            item.target
+            for item in derivation.source.replacement.existing
+        }
+        assert set(item.target for item in writable.fresh) == {
+            item.target
+            for item in derivation.source.replacement.fresh
+        }
+        assert all(
+            item.action is rules.DispositionAction.DELETE
+            for item in derivation.source.replacement.existing
+        )
+        assert all(
+            item.action is rules.DispositionAction.CREATE
+            for item in derivation.source.replacement.fresh
+        )
+        deleted = {
+            item.target for item in derivation.source.replacement.existing
+        }
+        for target, value in execution.source.entries:
+            if target not in deleted:
+                assert successor.value_at(target) == value
+        if row.spf == "SPF028":
+            assert execution.source.structure == successor.structure == ()
+            bindings = {
+                binding.reference: binding.identity
+                for binding in derivation.fresh_bindings
+            }
+            edge_refs = tuple(
+                reference
+                for reference in bindings
+                if reference.namespace == "g7-graph-edges"
+            )
+            assert len(edge_refs) == 3
+            node_a = loci.graph_element("node", "a")
+            node_c = loci.graph_element("node", "c")
+            assert all(reference.interface == (node_a, node_c) for reference in edge_refs)
+            created = {
+                binding.reference: successor.value_at(binding.identity)
+                for binding in derivation.fresh_bindings
+            }
+            node_by_name = {
+                dict(value.fields)["name"]: bindings[reference]
+                for reference, value in created.items()
+                if isinstance(value, alphabets.ValueNode)
+                and value.tag == "node"
+            }
+            assert set(node_by_name) == {"x", "y"}
+            edges = {
+                dict(value.fields)["name"]: dict(value.fields)
+                for value in created.values()
+                if isinstance(value, alphabets.ValueNode)
+                and value.tag == "edge"
+            }
+            assert set(edges) == {"a-x", "x-y", "y-c"}
+            assert edges["a-x"]["left"] == alphabets.StructuralReference(node_a)
+            assert edges["a-x"]["right"] == alphabets.StructuralReference(node_by_name["x"])
+            assert edges["x-y"]["left"] == alphabets.StructuralReference(node_by_name["x"])
+            assert edges["x-y"]["right"] == alphabets.StructuralReference(node_by_name["y"])
+            assert edges["y-c"]["left"] == alphabets.StructuralReference(node_by_name["y"])
+            assert edges["y-c"]["right"] == alphabets.StructuralReference(node_c)
         return
 
     if pressure == "PX03":
-        assert len(successors) == 1
-        values = tuple(value for _, value in successors[0].entries)
-        assert values[-1] == sum(
-            value for _, value in execution.source.entries[:3]
+        assert isinstance(execution.source, loci.FiniteConfiguration)
+        if row.spf == "SPF018":
+            assert set(_materialized_read_targets(execution)) == {
+                target for target, _ in execution.source.entries
+            }
+            assert set(_resolved_write_targets(execution)) == {
+                _record_targets(execution.source)["x"],
+                _record_targets(execution.source)["y"],
+            }
+            assert len(successors) == 2
+            assert {
+                (
+                    _record_values(successor)["x"],
+                    _record_values(successor)["y"],
+                )
+                for successor in successors
+            } == {(0, 1), (1, 0)}
+            return
+        expected = {
+            "SPF017": (("fixed", "metric"), "movable", (Fraction(1),)),
+            "SPF019": (("score0", "score1", "score2"), "winner", (1,)),
+            "SPF027": (("factor_xy", "factor_yz"), "normalization", (6,)),
+            "SPF035": (("stored0", "stored1", "query"), "nearest", (0, 2)),
+            "SPF040": (("fitness0", "fitness1", "fitness2"), "selected", (1,)),
+            "SPF046": (("event0", "event1", "event2"), "cover_size", (2,)),
+            "SPF051": (("history0", "history1"), "amplitude", (0,)),
+        }[row.spf]
+        read_names, result_name, expected_values = expected
+        targets = _record_targets(execution.source)
+        assert _materialized_read_targets(execution) == tuple(
+            targets[name] for name in read_names
         )
+        assert _resolved_write_targets(execution) == (targets[result_name],)
+        assert len(successors) == len(expected_values)
+        assert {
+            _record_values(successor)[result_name]
+            for successor in successors
+        } == set(expected_values)
+        for derivation in derivations:
+            disposition = derivation.source.replacement.existing
+            assert len(disposition) == 1
+            assert disposition[0].target == targets[result_name]
+            assert disposition[0].action is rules.DispositionAction.REPLACE
+            assert isinstance(
+                derivation.source.continuation,
+                rules.Stop if row.spf == "SPF035" else rules.Continue,
+            )
         return
 
     if pressure == "PX04":
+        if row.spf == "SPF039":
+            for cardinality in (
+                result.outcome_atom_cardinality,
+                result.derivation_cardinality,
+                result.successor_cardinality,
+            ):
+                assert isinstance(cardinality, rules.Many)
+                assert cardinality.infinite is rules.InfiniteCardinality.UNCOUNTABLE
+            return
         expected = {
             "SPF014": (1, 1),
             "SPF018": (2, 2),
@@ -2603,20 +2816,45 @@ def assert_mechanics_run(
             "SPF026": (0, 0),
             "SPF029": (2, 2),
             "SPF033": (2, 1),
-            "SPF039": (2, 2),
         }[row.spf]
         assert rules.cardinality_size(result.derivation_cardinality) == expected[0]
         assert rules.cardinality_size(result.successor_cardinality) == expected[1]
         if expected[0] == 0:
             assert len(result.no_successor_partition.atoms) == 1
+            no_successor = result.no_successor_partition.atoms[0]
+            assert (
+                no_successor.source.outcome
+                is rules.NoSuccessorOutcome.TERMINAL
+            )
         if row.spf == "SPF033":
             fibers = result.successor_quotient_with_derivation_fibers.atoms
             assert len(fibers) == 1
             assert len(fibers[0].derivations) == 2
+            assert _record_values(fibers[0].successor)["symbol"] == 1
+        if row.spf in {"SPF018", "SPF029"}:
+            assert {
+                (
+                    _record_values(successor)["x"],
+                    _record_values(successor)["y"],
+                )
+                for successor in successors
+            } == {(0, 1), (1, 0)}
+        if row.spf in {"SPF014", "SPF024"}:
+            assert all(
+                isinstance(item.source.continuation, rules.Stop)
+                for item in derivations
+            )
         return
 
     if pressure == "PX05":
         if row.spf == "SPF039":
+            assert isinstance(execution.source, loci.IntensionalConfiguration)
+            assert type(
+                execution.simple_program.frontier.resolve(execution.source)
+            ) is frontiers.IntensionalWritableCapabilities
+            assert type(
+                execution.simple_program.neighborhood.resolve(execution.source)
+            ) is neighborhoods.IntensionalReadableView
             assert (
                 result.source_outcomes.support.presentation
                 is rules.SupportPresentation.INTENSIONAL
@@ -2639,36 +2877,132 @@ def assert_mechanics_run(
         assert len(derivations) == 1
         assert isinstance(derivations[0].source.continuation, rules.Stop)
         successor = successors[0]
-        values = tuple(value for _, value in successor.entries)
-        assert values == (
-            Fraction(0),
-            Fraction(1),
-            Fraction(1, 4),
-            1,
-        )
+        if row.spf == "SPF006":
+            assert tuple(value for _, value in successor.entries) == (
+                Fraction(0),
+                Fraction(1),
+                Fraction(1, 4),
+                1,
+            )
+        else:
+            assert row.spf == "SPF036"
+            solution = successor.entries[1][1]
+            assert isinstance(solution, alphabets.ValueNode)
+            assert solution.tag == "maximal-solution"
+            assert dict(solution.fields) == {
+                "domain": "maximal-real-line",
+                "expression": "x(t)=t",
+                "initial": 0,
+            }
         return
 
     if pressure == "PX06":
         law = result.source_outcomes.probability_law
         assert law is not None
-        assert tuple(item.mass for item in law.masses) == (
-            Fraction(1, 2),
-            Fraction(1, 2),
-        )
+        expected_masses = {
+            "SPF009": (Fraction(1, 2), Fraction(1, 2)),
+            "SPF015": (Fraction(1, 2), Fraction(1, 2)),
+            "SPF041": (Fraction(1, 3), Fraction(2, 3)),
+            "SPF043": (Fraction(1, 4),) * 4,
+            "SPF047": (Fraction(1, 4), Fraction(1, 4), Fraction(1, 2)),
+        }[row.spf]
+        assert tuple(sorted(item.mass for item in law.masses)) == expected_masses
         assert isinstance(result.applied_atom_measure, program.MeasureAvailable)
         assert result.applied_atom_measure.measure.total_mass == Fraction(1)
         assert isinstance(result.successor_submeasure, program.MeasureAvailable)
-        assert result.successor_submeasure.measure.total_mass == Fraction(1)
+        successor_mass = Fraction(3, 4) if row.spf == "SPF047" else Fraction(1)
+        assert result.successor_submeasure.measure.total_mass == successor_mass
+        if row.spf == "SPF047":
+            assert isinstance(
+                result.no_successor_submeasure,
+                program.MeasureAvailable,
+            )
+            assert (
+                result.no_successor_submeasure.measure.total_mass
+                == Fraction(1, 4)
+            )
+            assert len(result.no_successor_partition.atoms) == 1
+            assert len(derivations) == 2
+            assert {
+                (
+                    _record_values(successor)["incumbent"],
+                    _record_values(successor)["proposal_counter"],
+                )
+                for successor in successors
+            } == {(1, 1), (0, 1)}
+        elif row.spf == "SPF043":
+            assert len(derivations) == len(successors) == 4
+            assert {
+                (
+                    _record_values(successor)["node0_successor"],
+                    _record_values(successor)["node1_successor"],
+                )
+                for successor in successors
+            } == {(0, 0), (0, 1), (1, 0), (1, 1)}
+        elif row.spf == "SPF041":
+            assert {
+                (
+                    _record_values(successor)["fit_parameter"],
+                    _record_values(successor)["generated_path"],
+                    _record_values(successor)["phase"],
+                )
+                for successor in successors
+            } == {(2, 0, 1), (2, 1, 1)}
+        elif row.spf == "SPF015":
+            assert {
+                (
+                    _record_values(successor)["contact_site"],
+                    _record_values(successor)["free_site"],
+                    _record_values(successor)["attached"],
+                    _record_values(successor)["relaunch"],
+                )
+                for successor in successors
+            } == {(1, 0, 1, 0), (0, 1, 0, 1)}
+        else:
+            assert row.spf == "SPF009"
+            assert {
+                _record_values(successor)["site"]
+                for successor in successors
+            } == {-1, 1}
+        assert all(
+            isinstance(item.source.continuation, rules.Continue)
+            for item in derivations
+        )
         return
 
     if pressure == "PX07":
         assert len(successors) == 1
-        assert tuple(value for _, value in successors[0].entries) == (0, 31, 1)
+        expected = {
+            "SPF034": {
+                "cell": 0,
+                "mutable_rule_entry": 31,
+                "phase": 1,
+            },
+            "SPF048": {
+                "pc": 0,
+                "memory0_opcode": 0,
+                "memory1_data": 7,
+                "halted": 1,
+            },
+        }[row.spf]
+        assert _record_values(successors[0]) == expected
         return
 
     if pressure == "PX08":
-        assert len(derivations) == 1
-        assert isinstance(derivations[0].source.continuation, rules.Stop)
+        expected_count = 2 if row.spf == "SPF035" else 1
+        assert len(derivations) == expected_count
+        assert all(
+            isinstance(item.source.continuation, rules.Stop)
+            for item in derivations
+        )
+        if row.primary == "PX08":
+            expected = {
+                "SPF010": {"witness": 4, "phase": 1},
+                "SPF020": {"result": 7, "phase": 1},
+                "SPF044": {"frame_depth": 0, "result": 5, "phase": 1},
+            }[row.spf]
+            values = _record_values(successors[0])
+            assert all(values[name] == value for name, value in expected.items())
         return
 
     if pressure == "PX10":
@@ -2677,31 +3011,124 @@ def assert_mechanics_run(
         representation = execution.representation
         assert representation is not None
         assert representation.profile is alphabets.RepresentationProfile.EXACT
-        encoded = representation.forward(1)
-        assert representation.inverse(encoded) == 1
-        assert tuple(value for _, value in successors[0].entries) == (1, encoded)
+        assert execution.representation_source is not None
+        assert execution.representation_target is not None
+        encoded = representation.forward(execution.representation_source)
+        assert encoded == execution.representation_target
+        assert representation.inverse(encoded) == execution.representation_source
+        expected_shapes = {
+            "SPF012": (loci.CarrierKind.RECORD, 2, 2),
+            "SPF054": (loci.CarrierKind.TREE, 3, 2),
+            "SPF055": (loci.CarrierKind.FIELD, 4, 4),
+            "SPF056": (loci.CarrierKind.HISTORY, 4, 2),
+            "SPF057": (loci.CarrierKind.GRID, 4, 2),
+            "SPF058": (loci.CarrierKind.PRODUCT, 2, 3),
+            "SPF059": (loci.CarrierKind.HISTORY, 3, 5),
+            "SPF060": (loci.CarrierKind.WORD, 6, 4),
+        }[row.spf]
+        carrier, read_count, write_count = expected_shapes
+        assert execution.source.contract.kind is carrier
+        assert len(_materialized_read_targets(execution)) == read_count
+        assert len(_resolved_write_targets(execution)) == write_count
+        successor_values = tuple(value for _, value in successors[0].entries)
+        if row.spf == "SPF060":
+            assert isinstance(encoded, alphabets.ValueNode)
+            assert successor_values[-4:-1] == encoded.items
+            assert successor_values[-1] == "done"
+        else:
+            assert any(
+                alphabets.semantic_equal(value, encoded)
+                for value in successor_values
+            )
         return
 
     if pressure == "PX09":
         assert len(successors) == 1
-        assert tuple(value for _, value in successors[0].entries) == (
-            True,
-            True,
-            True,
-        )
+        assert _record_values(successors[0]) == {
+            "cursor": True,
+            "wire_x": True,
+            "wire_y": True,
+        }
         assert isinstance(derivations[0].source.continuation, rules.Stop)
         return
 
     if pressure == "PX11":
         assert len(successors) == 1
-        assert tuple(value for _, value in successors[0].entries) == (1, 0, 0, 1)
+        assert len(derivations) == 1
+        derivation = derivations[0]
+        assert len(derivation.fresh_bindings) == 1
+        binding = derivation.fresh_bindings[0]
+        assert binding.reference.namespace == "g7-priority-oracle"
+        assert binding.reference.local_key == "O[0]"
+        assert derivation.successor.value_at(binding.identity) == 1
+        values = _record_values(successors[0])
+        assert {
+            name: values[name]
+            for name in (
+                "p0_state",
+                "p1_state",
+                "p1_use_o0",
+                "p1_work",
+                "scheduler_next",
+            )
+        } == {
+            "p0_state": 1,
+            "p1_state": 2,
+            "p1_use_o0": -1,
+            "p1_work": 0,
+            "scheduler_next": 1,
+        }
+        assert len(_materialized_read_targets(execution)) == 6
+        assert len(_resolved_write_targets(execution)) == 6
         return
 
     if pressure == "PX12":
-        assert len(derivations) == 1
-        assert isinstance(derivations[0].source.continuation, rules.Stop)
         if row.spf == "SPF004":
-            assert len(derivations[0].fresh_bindings) == 1
+            assert len(derivations) == 1
+            assert isinstance(derivations[0].source.continuation, rules.Stop)
+            assert len(derivations[0].fresh_bindings) == 2
+            assert execution.source.contract.kind is loci.CarrierKind.GRAPH
+            assert all(
+                isinstance(
+                    derivations[0].successor.value_at(binding.identity),
+                    alphabets.ValueNode,
+                )
+                for binding in derivations[0].fresh_bindings
+            )
+            return
+        assert row.spf == "SPF042"
+        assert len(execution.trajectory) == 3
+        phase_trace = []
+        for index, (step_source, step_result) in enumerate(execution.trajectory):
+            step_derivations = tuple(
+                atom
+                for atom in step_result.applied_atoms.atoms
+                if isinstance(atom, program.AppliedDerivation)
+            )
+            assert len(step_derivations) == 1
+            step = step_derivations[0]
+            assert step_result.evidence.program_identity == execution.simple_program.canonical_identity
+            assert step_result.evidence.input_configuration_identity == step_source.identity
+            assert isinstance(
+                step.source.continuation,
+                rules.Stop if index == 2 else rules.Continue,
+            )
+            phase_trace.append(_record_values(step.successor))
+        assert (
+            phase_trace[0]["phase"],
+            phase_trace[0]["frame_depth"],
+            phase_trace[0]["observed_result"],
+        ) == (1, 1, 2)
+        assert (
+            phase_trace[1]["phase"],
+            phase_trace[1]["frame_depth"],
+            phase_trace[1]["surrogate_result"],
+        ) == (2, 1, 1)
+        assert (
+            phase_trace[2]["phase"],
+            phase_trace[2]["frame_depth"],
+            phase_trace[2]["decision"],
+        ) == (3, 0, 1)
         return
 
     raise AssertionError(f"missing pressure assertion for {pressure}")

@@ -1150,46 +1150,89 @@ def _validate_projection_cardinality_claims(
 ) -> None:
     """Reject exact projection claims that violate quotient arithmetic."""
 
-    source_size = cardinality_size(source)
-    derivation_size = cardinality_size(claims.derivations)
-    no_successor_size = cardinality_size(claims.no_successors)
-    successor_size = cardinality_size(claims.successors)
+    # ``Undetermined`` is an honest absence of a cardinality proof, not an
+    # infinite value.  Unknown operands therefore cannot establish an
+    # arithmetic contradiction and must remain admissible.
+    source_shape = _known_cardinality_shape(source)
+    derivation_shape = _known_cardinality_shape(claims.derivations)
+    no_successor_shape = _known_cardinality_shape(claims.no_successors)
+    successor_shape = _known_cardinality_shape(claims.successors)
 
-    if source_size is not None:
-        if derivation_size is None or no_successor_size is None:
-            raise ValueError(
-                "finite source support needs exact finite derivation and "
-                "no-successor projection claims"
-            )
-        if derivation_size + no_successor_size != source_size:
-            raise ValueError(
-                "derivation and no-successor cardinalities do not partition "
-                "the source support"
-            )
+    partition_shape = _known_cardinality_sum(
+        derivation_shape,
+        no_successor_shape,
+    )
+    if (
+        source_shape is not None
+        and partition_shape is not None
+        and source_shape != partition_shape
+    ):
+        raise ValueError(
+            "derivation and no-successor cardinalities do not partition "
+            "the source support"
+        )
 
-    if derivation_size is not None:
-        if successor_size is None:
-            raise ValueError(
-                "finite derivation support needs an exact finite successor "
-                "quotient claim"
-            )
-        if derivation_size == 0 and successor_size != 0:
-            raise ValueError(
-                "zero derivations require zero distinct successors"
-            )
-        if derivation_size > 0 and not 1 <= successor_size <= derivation_size:
+    if derivation_shape is None or successor_shape is None:
+        return
+    derivation_kind, derivation_size = derivation_shape
+    successor_kind, successor_size = successor_shape
+    if derivation_kind == "finite":
+        assert derivation_size is not None
+        if derivation_size == 0:
+            if successor_shape != ("finite", 0):
+                raise ValueError(
+                    "zero derivations require zero distinct successors"
+                )
+            return
+        if (
+            successor_kind != "finite"
+            or successor_size is None
+            or not 1 <= successor_size <= derivation_size
+        ):
             raise ValueError(
                 "successor cardinality must lie between one and the finite "
                 "derivation cardinality"
             )
-    elif (
-        isinstance(claims.derivations, Many)
-        and claims.derivations.infinite is not None
-        and isinstance(claims.successors, ExactlyZero)
-    ):
+        return
+    if successor_shape == ("finite", 0):
         raise ValueError(
             "infinite derivations cannot have zero successors"
         )
+    if derivation_kind == "countable" and successor_kind == "uncountable":
+        raise ValueError(
+            "a successor quotient cannot exceed countably many derivations"
+        )
+
+
+KnownCardinalityShape: TypeAlias = tuple[str, int | None]
+
+
+def _known_cardinality_shape(
+    value: Cardinality,
+) -> KnownCardinalityShape | None:
+    size = cardinality_size(value)
+    if size is not None:
+        return ("finite", size)
+    if isinstance(value, Many):
+        if value.infinite is InfiniteCardinality.COUNTABLY_INFINITE:
+            return ("countable", None)
+        if value.infinite is InfiniteCardinality.UNCOUNTABLE:
+            return ("uncountable", None)
+    return None
+
+
+def _known_cardinality_sum(
+    left: KnownCardinalityShape | None,
+    right: KnownCardinalityShape | None,
+) -> KnownCardinalityShape | None:
+    if left is None or right is None:
+        return None
+    if "uncountable" in (left[0], right[0]):
+        return ("uncountable", None)
+    if "countable" in (left[0], right[0]):
+        return ("countable", None)
+    assert left[1] is not None and right[1] is not None
+    return ("finite", left[1] + right[1])
 
 
 def _atom_identity(atom: object) -> str:
