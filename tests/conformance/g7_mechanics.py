@@ -4140,12 +4140,17 @@ def _materialized_px10_target(
 
     spf = execution.row.spf
     if spf == "SPF012":
-        count = 2 if execution.representation_case_index == 0 else 1
+        unset = _codec_record("unset", status="unset")
         fields: list[tuple[str, alphabets.SemanticValue]] = []
-        for index in range(count):
+        reached_unset = False
+        for index in range(2):
             record = successor.value_at(
                 loci.named(f"run{index}", scope="record")
             )
+            if alphabets.semantic_equal(record, unset):
+                reached_unset = True
+                continue
+            assert not reached_unset
             assert type(record) is alphabets.ValueNode
             assert record.kind is alphabets.ValueKind.RECORD
             assert record.tag == "run-record"
@@ -4155,6 +4160,7 @@ def _materialized_px10_target(
             assert type(symbol) is str
             assert type(length) is int
             fields.append((f"run{index}", f"{symbol}:{length}"))
+        assert fields
         return alphabets.ValueNode(
             alphabets.ValueKind.RECORD,
             "run-records",
@@ -4209,24 +4215,30 @@ def _materialized_px10_target(
                 items.append(f"ref:offset={offset},length={length}")
         return _codec_word("history-records", *items)
     if spf == "SPF057":
-        if execution.representation_case_index == 0:
-            return successor.value_at(
-                loci.named("region-tree", scope="grid-workspace")
-            )
+        region = successor.value_at(
+            loci.named("region-tree", scope="grid-workspace")
+        )
+        assert type(region) is alphabets.ValueNode
+        assert region.kind is alphabets.ValueKind.RECORD
+        if region.tag == "region-leaf":
+            return region
+        assert region.tag == "region-branch"
         derivations = tuple(
             atom
             for atom in result.applied_atoms.atoms
             if isinstance(atom, program.AppliedDerivation)
         )
         assert len(derivations) == 1
-        child_bindings = tuple(
-            binding
+        binding_by_reference = {
+            binding.reference: binding.identity
             for binding in derivations[0].fresh_bindings
-            if binding.reference.namespace == "g7-region-children"
-        )
+        }
         child_payloads = {
-            binding.reference.local_key: successor.value_at(binding.identity)
-            for binding in child_bindings
+            disposition.target.local_key: successor.value_at(
+                binding_by_reference[disposition.target]
+            )
+            for disposition in derivations[0].source.replacement.fresh
+            if disposition.action is rules.DispositionAction.CREATE
         }
         expected_values = {
             "north-west": 1,
@@ -4244,17 +4256,11 @@ def _materialized_px10_target(
                 "bounds": key,
                 "value": expected_value,
             }
-        branch = successor.value_at(
-            loci.named("region-tree", scope="grid-workspace")
-        )
-        assert type(branch) is alphabets.ValueNode
-        assert branch.kind is alphabets.ValueKind.RECORD
-        assert branch.tag == "region-branch"
-        assert dict(branch.fields) == {
+        assert dict(region.fields) == {
             "children": len(child_payloads),
             "bounds": "2x2",
         }
-        return branch
+        return region
     if spf == "SPF058":
         base = loci.named("basis-workspace", scope="product")
         coefficients = tuple(
@@ -4294,15 +4300,19 @@ def _materialized_px10_source(
     values = tuple(observation.value for observation in resolved.observations)
     spf = execution.row.spf
     if spf == "SPF012":
-        count = 5 if execution.representation_case_index == 0 else 1
+        symbols = tuple(
+            execution.source.value_at(
+                loci.named(f"symbol{index}", scope="record")
+            )
+            for index in range(5)
+        )
+        while symbols and symbols[-1] == "<end>":
+            symbols = symbols[:-1]
+        assert symbols
+        assert "<end>" not in symbols
         return _codec_word(
             "source-word",
-            *(
-                execution.source.value_at(
-                    loci.named(f"symbol{index}", scope="record")
-                )
-                for index in range(count)
-            ),
+            *symbols,
         )
     if spf == "SPF054":
         return values[0]
@@ -4317,13 +4327,17 @@ def _materialized_px10_source(
             ),
         )
     if spf == "SPF056":
-        count = 4 if execution.representation_case_index == 0 else 3
+        symbols = tuple(
+            execution.source.value_at(loci.occurrence("codec-input", index))
+            for index in range(4)
+        )
+        while symbols and symbols[-1] == "<end>":
+            symbols = symbols[:-1]
+        assert symbols
+        assert "<end>" not in symbols
         return _codec_word(
             "history-input",
-            *(
-                execution.source.value_at(loci.occurrence("codec-input", index))
-                for index in range(count)
-            ),
+            *symbols,
         )
     if spf == "SPF057":
         tag = "uniform-grid" if len(set(values)) == 1 else "nonuniform-grid"
@@ -5577,18 +5591,25 @@ def assert_mechanics_run(
             execution.representation_target,
         )
         if row.spf == "SPF012":
-            assert type(execution.representation_source) is alphabets.ValueNode
-            source_symbols = execution.representation_source.items
-            run_count = 2 if execution.representation_case_index == 0 else 1
+            materialized_source = _materialized_px10_source(execution)
+            assert type(materialized_source) is alphabets.ValueNode
+            source_symbols = materialized_source.items
+            unset = _codec_record("unset", status="unset")
             run_specs = []
-            for index in range(run_count):
+            reached_unset = False
+            for index in range(2):
                 record = final_successor.value_at(
                     loci.named(f"run{index}", scope="record")
                 )
+                if alphabets.semantic_equal(record, unset):
+                    reached_unset = True
+                    continue
+                assert not reached_unset
                 assert type(record) is alphabets.ValueNode
                 assert record.tag == "run-record"
                 fields = dict(record.fields)
                 run_specs.append((fields["symbol"], fields["length"]))
+            assert run_specs
             assert sum(length for _, length in run_specs) == len(source_symbols)
             assert tuple(
                 symbol
@@ -5613,9 +5634,8 @@ def assert_mechanics_run(
             )
         if row.spf == "SPF054":
             derivation = final_derivations[0]
-            expected_created = (
-                1 if execution.representation_case_index == 0 else 2
-            )
+            assert type(encoded) is alphabets.ValueNode
+            expected_created = len(encoded.items)
             assert len(derivation.source.replacement.existing) == 1
             assert len(derivation.source.replacement.fresh) == 2
             assert len(derivation.fresh_bindings) == 2
@@ -5638,7 +5658,6 @@ def assert_mechanics_run(
                 for disposition in derivation.source.replacement.fresh
                 if disposition.action is rules.DispositionAction.CREATE
             )
-            assert type(encoded) is alphabets.ValueNode
             assert created_bits == encoded.items
             assert (
                 execution.source.value_at(
@@ -5661,15 +5680,18 @@ def assert_mechanics_run(
                 step_result.source_outcomes.probability_law is None
                 for _, step_result in execution.trajectory
             )
+            materialized_source = _materialized_px10_source(execution)
+            assert type(materialized_source) is alphabets.ValueNode
             assert (
                 execution.trajectory[1][0].value_at(
                     loci.field_point("codec", (0,), component="symbol-1")
                 )
-                == ("B" if execution.representation_case_index == 0 else "A")
+                == materialized_source.items[1]
             )
         if row.spf == "SPF056":
-            assert type(execution.representation_source) is alphabets.ValueNode
-            symbols = execution.representation_source.items
+            materialized_source = _materialized_px10_source(execution)
+            assert type(materialized_source) is alphabets.ValueNode
+            symbols = materialized_source.items
             reconstruction = tuple(
                 final_successor.value_at(
                     loci.occurrence("codec-reconstruction", index)
@@ -5700,7 +5722,7 @@ def assert_mechanics_run(
                 loci.occurrence("codec-record", 2)
             )
             assert type(third_record) is alphabets.ValueNode
-            if execution.representation_case_index == 0:
+            if third_record.tag == "reference-record":
                 assert third_record.tag == "reference-record"
                 assert dict(third_record.fields) == {"offset": 2, "length": 2}
                 third_source = execution.trajectory[2][0]
@@ -5714,7 +5736,11 @@ def assert_mechanics_run(
             else:
                 assert third_record.tag == "literal-record"
                 assert dict(third_record.fields) == {"symbol": "C"}
-        if row.spf == "SPF057" and execution.representation_case_index == 1:
+        if (
+            row.spf == "SPF057"
+            and type(materialized_target) is alphabets.ValueNode
+            and materialized_target.tag == "region-branch"
+        ):
             derivation = final_derivations[0]
             assert len(derivation.source.replacement.existing) == 2
             assert len(derivation.source.replacement.fresh) == 4
@@ -5737,7 +5763,23 @@ def assert_mechanics_run(
                 is alphabets.ValueNode
                 for binding in derivation.fresh_bindings
             )
-        if row.spf == "SPF057" and execution.representation_case_index == 0:
+        if (
+            row.spf == "SPF057"
+            and type(materialized_target) is alphabets.ValueNode
+            and materialized_target.tag == "region-leaf"
+        ):
+            derivation = final_derivations[0]
+            assert len(derivation.source.replacement.existing) == 2
+            assert len(derivation.source.replacement.fresh) == 4
+            assert len(derivation.fresh_bindings) == 4
+            assert all(
+                item.action is rules.DispositionAction.ABSENT
+                for item in derivation.source.replacement.fresh
+            )
+            assert all(
+                not final_successor.contains(binding.identity)
+                for binding in derivation.fresh_bindings
+            )
             assert type(materialized_target) is alphabets.ValueNode
             assert materialized_target.tag == "region-leaf"
             assert dict(materialized_target.fields) == {

@@ -233,6 +233,7 @@ def _transition_system(
     ],
     *,
     identity: str,
+    witness_payload: alphabets.ValueNode | None = None,
 ) -> tuple[
     ca.SimpleProgram,
     tuple[loci.FiniteConfiguration, loci.FiniteConfiguration],
@@ -297,7 +298,11 @@ def _transition_system(
                     (),
                     rules.Progress.ADVANCED,
                     stopped,
-                    rules.literal_expr(f"{identity}:case-{index}"),
+                    rules.literal_expr(
+                        witness_payload
+                        if witness_payload is not None
+                        else f"{identity}:case-{index}"
+                    ),
                     (f"test:{identity}:case-{index}",),
                     certificate(
                         rules.CertificateKind.DERIVATION,
@@ -428,10 +433,10 @@ def _stochastic_pair() -> tuple[
     return relation, native, represented
 
 
-def _clause_read_evidence_identities(
+def _clause_read_evidence_expressions(
     witness: rules.Witness,
-) -> tuple[str, ...]:
-    """Extract only runtime read IDs from a clause-kernel witness proof."""
+) -> tuple[rules.RuleExpr, ...]:
+    """Extract only runtime read-ID literals from a clause witness proof."""
 
     descriptor = witness.descriptor
     if (
@@ -446,7 +451,7 @@ def _clause_read_evidence_identities(
     ):
         return ()
 
-    evidence: list[str] = []
+    evidence: list[rules.RuleExpr] = []
 
     def visit(expression: rules.RuleExpr) -> None:
         if (
@@ -467,7 +472,7 @@ def _clause_read_evidence_identities(
                     len(item.arguments) == 1
                     and type(item.arguments[0]) is str
                 )
-                evidence.append(item.arguments[0])
+                evidence.append(item)
             return
         for item in expression.arguments:
             if type(item) is rules.RuleExpr:
@@ -475,6 +480,31 @@ def _clause_read_evidence_identities(
 
     visit(descriptor.arguments[4])
     return tuple(evidence)
+
+
+def _clause_disposition_identity_expression(
+    atom: rules.Derivation | rules.NoSuccessor,
+) -> rules.RuleExpr | None:
+    """Return the exact clause-witness slot naming its disposition."""
+
+    if type(atom) is not rules.Derivation:
+        return None
+    descriptor = atom.witness.descriptor
+    if (
+        descriptor.primitive is not rules.ExpressionPrimitive.TUPLE
+        or len(descriptor.arguments) != 6
+        or type(descriptor.arguments[0]) is not rules.RuleExpr
+        or descriptor.arguments[0].primitive
+        is not rules.ExpressionPrimitive.LITERAL
+        or descriptor.arguments[0].arguments
+        != ("clause-kernel-witness-v1",)
+        or type(descriptor.arguments[5]) is not rules.RuleExpr
+    ):
+        return None
+    disposition = descriptor.arguments[5]
+    assert disposition.primitive is rules.ExpressionPrimitive.LITERAL
+    assert disposition.arguments == (atom.replacement.canonical_identity,)
+    return disposition
 
 
 def _identity_aliases(
@@ -494,9 +524,12 @@ def _identity_aliases(
             (type(atom).__name__, *atom.provenance)
         )
         aliases[atom.canonical_identity] = f"@source:{source_label}"
-        for index, identity in enumerate(
-            dict.fromkeys(_clause_read_evidence_identities(atom.witness))
-        ):
+        identities = tuple(
+            expression.arguments[0]
+            for expression in _clause_read_evidence_expressions(atom.witness)
+        )
+        for index, identity in enumerate(dict.fromkeys(identities)):
+            assert type(identity) is str
             aliases[identity] = (
                 f"@read-evidence:{source_label}:{index}"
             )
@@ -521,7 +554,6 @@ _IDENTITY_FIELDS = frozenset(
     {
         (rules.AtomMass, "atom_identity"),
         (rules.Witness, "identity"),
-        (rules.Witness, "descriptor"),
         (program.FreshBinding, "identity"),
         (program.AppliedEvidence, "application_identity"),
         (program.AppliedEvidence, "disposition_identity"),
@@ -545,6 +577,15 @@ def _normalize_complete_result(
     """Normalize every stored field, changing only declared values and IDs."""
 
     aliases = _identity_aliases(result)
+    identity_expression_ids: set[int] = set()
+    for atom in result.source_outcomes.support.atoms:
+        identity_expression_ids.update(
+            id(expression)
+            for expression in _clause_read_evidence_expressions(atom.witness)
+        )
+        disposition = _clause_disposition_identity_expression(atom)
+        if disposition is not None:
+            identity_expression_ids.add(id(disposition))
     output_lineages = {
         (
             atom.output_trace_lineage.root_identity,
@@ -629,7 +670,12 @@ def _normalize_complete_result(
             field_value = normalize(
                 getattr(value, field.name),
                 identity_bearing=identity_bearing
-                or (type(value), field.name) in _IDENTITY_FIELDS,
+                or (type(value), field.name) in _IDENTITY_FIELDS
+                or (
+                    type(value) is rules.RuleExpr
+                    and id(value) in identity_expression_ids
+                    and field.name == "arguments"
+                ),
             )
             if (
                 type(value) is rules.SupportSpace
@@ -716,6 +762,68 @@ def test_spf060_oracle_rejects_payload_only_relation_mutations(
 
     with pytest.raises(AssertionError):
         _assert_exact_relation_matches_oracle(corrupted, oracle_pairs)
+
+
+def test_witness_descriptor_semantics_matching_derived_ids_are_preserved() -> None:
+    """Identity slots cannot erase equal semantic strings in a witness AST."""
+
+    oracle_pairs = PX10_ORACLE_PAIRS["SPF012"]
+    probe_program, probe_sources, _, _ = _transition_system(
+        oracle_pairs,
+        identity="descriptor-identity-collision",
+    )
+    probe = ca.apply(probe_program, probe_sources[0])
+    assert isinstance(probe, program.ApplicationComplete)
+    probe_atom = probe.applied_atoms.atoms[0]
+    assert isinstance(probe_atom, program.AppliedDerivation)
+    derived_identity = probe_atom.source.replacement.canonical_identity
+
+    semantic_witness = alphabets.ValueNode(
+        alphabets.ValueKind.WORD,
+        derived_identity,
+        items=(derived_identity,),
+    )
+    collision_program, collision_sources, _, _ = _transition_system(
+        oracle_pairs,
+        identity="descriptor-identity-collision",
+        witness_payload=semantic_witness,
+    )
+    collision = ca.apply(collision_program, collision_sources[0])
+    assert isinstance(collision, program.ApplicationComplete)
+    collision_atom = collision.applied_atoms.atoms[0]
+    assert isinstance(collision_atom, program.AppliedDerivation)
+    assert (
+        collision_atom.source.replacement.canonical_identity
+        == derived_identity
+    )
+
+    def contains_semantic_value(expression: rules.RuleExpr) -> bool:
+        return any(
+            item == semantic_witness
+            or (
+                type(item) is rules.RuleExpr
+                and contains_semantic_value(item)
+            )
+            for item in expression.arguments
+        )
+
+    assert contains_semantic_value(collision_atom.source.witness.descriptor)
+    normalized = _normalize_complete_result(collision)
+
+    def strings(value: object) -> tuple[str, ...]:
+        if type(value) is str:
+            return (value,)
+        if type(value) is tuple:
+            return tuple(item for child in value for item in strings(child))
+        return ()
+
+    # At least the ValueNode tag and item survive.  The equal disposition-ID
+    # proof slot is independently mapped to its field-qualified alias.
+    assert strings(normalized).count(derived_identity) >= 2
+    assert any(
+        item.startswith("@disposition:")
+        for item in strings(normalized)
+    )
 
 
 def _terminal_px10_result(
