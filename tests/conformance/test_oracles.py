@@ -631,7 +631,7 @@ LINE_ATOM = OracleAtom(
         _term("indices", 5, 2, 5, 2, 4),
         _term("rule-id", 30),
     ),
-    provenance=("native:dyadrads_1d", "fixed-boundary:0", "rule-30"),
+    provenance=("native:dyadrads_1d", "configuration-topology:fixed-zero", "rule-30"),
     lineage=_term(
         "lineage",
         "native.cellular.dyadrads-rule-30",
@@ -727,7 +727,11 @@ GRID_ATOM = OracleAtom(
         ),
         _term("rule-id", 128),
     ),
-    provenance=("native:dyadaxes_2d", "fixed-boundary:0", "rule-128"),
+    provenance=(
+        "native:dyadaxes_2d",
+        "configuration-topology:fixed-zero",
+        "rule-128",
+    ),
     lineage=_term(
         "lineage",
         "native.multidimensional.dyadaxes-2d-rule-128",
@@ -893,7 +897,11 @@ CUBE_ATOM = OracleAtom(
         _term("index-multiplicity", _term("index", 7, 7), _term("index", 3, 12), _term("index", 1, 8)),
         _term("rule-id", 128),
     ),
-    provenance=("native:dyadaxes_3d", "fixed-boundary:0", "rule-128"),
+    provenance=(
+        "native:dyadaxes_3d",
+        "configuration-topology:fixed-zero",
+        "rule-128",
+    ),
     lineage=_term(
         "lineage",
         "native.multidimensional.dyadaxes-3d-rule-128",
@@ -1111,12 +1119,26 @@ SUBSTITUTION_CASE = OracleCase(
             OracleFreshBinding(
                 local_key=_term("offspring-key", SUB_OLD_A, 0),
                 identity=SUB_NEW_A,
-                evidence=_term("fresh-recipe", "parent", SUB_OLD_A, "ordinal", 0),
+                evidence=_term(
+                    "fresh-recipe",
+                    _term("input-identity", "word:old-generation"),
+                    _term("rule-identity", "A->AB"),
+                    _term("witness", "generation-witness"),
+                    _term("namespace", "px02.parallel-substitution"),
+                    _term("parent-and-ordinal", SUB_OLD_A, 0),
+                ),
             ),
             OracleFreshBinding(
                 local_key=_term("offspring-key", SUB_OLD_A, 1),
                 identity=SUB_NEW_B,
-                evidence=_term("fresh-recipe", "parent", SUB_OLD_A, "ordinal", 1),
+                evidence=_term(
+                    "fresh-recipe",
+                    _term("input-identity", "word:old-generation"),
+                    _term("rule-identity", "A->AB"),
+                    _term("witness", "generation-witness"),
+                    _term("namespace", "px02.parallel-substitution"),
+                    _term("parent-and-ordinal", SUB_OLD_A, 1),
+                ),
             ),
         ),
         measures=ABSENT_MEASURES,
@@ -1214,9 +1236,9 @@ CONSTRAINT_ZERO_ATOM = OracleAtom(
     reason=_term("terminal", "no-solution"),
     certificate=_term(
         "truth-table",
-        _term("row", 0, False),
-        _term("row", 1, False),
-        _term("row", 2, False),
+        _term("row", 0, _term("square-residue", 0), False),
+        _term("row", 1, _term("square-residue", 1), False),
+        _term("row", 2, _term("square-residue", 1), False),
     ),
 )
 CONSTRAINT_ZERO_CASE = OracleCase(
@@ -1410,7 +1432,7 @@ GRAPH_ATOM = OracleAtom(
     certificate=_term(
         "interface-certificate",
         _term("external", "a", "c"),
-        _term("fresh", GRAPH_X, GRAPH_Y),
+        _term("fresh", GRAPH_X, GRAPH_Y, GRAPH_AX, GRAPH_XY, GRAPH_YC),
     ),
 )
 GRAPH_CASE = OracleCase(
@@ -1448,27 +1470,67 @@ GRAPH_CASE = OracleCase(
             OracleFreshBinding(
                 GRAPH_X_SLOT,
                 GRAPH_X,
-                _term("fresh-recipe", "rule:F029", "match:b", "local:x"),
+                _term(
+                    "fresh-recipe",
+                    _term("input-identity", "graph:a-b-c"),
+                    _term("rule-identity", "F029"),
+                    _term("match-witness", "node:b"),
+                    _term("interface", "a", "c"),
+                    _term("namespace", "px02.graph-interface-replacement"),
+                    _term("local-key", "x"),
+                ),
             ),
             OracleFreshBinding(
                 GRAPH_Y_SLOT,
                 GRAPH_Y,
-                _term("fresh-recipe", "rule:F029", "match:b", "local:y"),
+                _term(
+                    "fresh-recipe",
+                    _term("input-identity", "graph:a-b-c"),
+                    _term("rule-identity", "F029"),
+                    _term("match-witness", "node:b"),
+                    _term("interface", "a", "c"),
+                    _term("namespace", "px02.graph-interface-replacement"),
+                    _term("local-key", "y"),
+                ),
             ),
             OracleFreshBinding(
                 GRAPH_AX_SLOT,
                 GRAPH_AX,
-                _term("fresh-recipe", "rule:F029", "match:b", "local:a-x"),
+                _term(
+                    "fresh-recipe",
+                    _term("input-identity", "graph:a-b-c"),
+                    _term("rule-identity", "F029"),
+                    _term("match-witness", "node:b"),
+                    _term("interface", "a", "c"),
+                    _term("namespace", "px02.graph-interface-replacement"),
+                    _term("local-key", "a-x"),
+                ),
             ),
             OracleFreshBinding(
                 GRAPH_XY_SLOT,
                 GRAPH_XY,
-                _term("fresh-recipe", "rule:F029", "match:b", "local:x-y"),
+                _term(
+                    "fresh-recipe",
+                    _term("input-identity", "graph:a-b-c"),
+                    _term("rule-identity", "F029"),
+                    _term("match-witness", "node:b"),
+                    _term("interface", "a", "c"),
+                    _term("namespace", "px02.graph-interface-replacement"),
+                    _term("local-key", "x-y"),
+                ),
             ),
             OracleFreshBinding(
                 GRAPH_YC_SLOT,
                 GRAPH_YC,
-                _term("fresh-recipe", "rule:F029", "match:b", "local:y-c"),
+                _term(
+                    "fresh-recipe",
+                    _term("input-identity", "graph:a-b-c"),
+                    _term("rule-identity", "F029"),
+                    _term("match-witness", "node:b"),
+                    _term("interface", "a", "c"),
+                    _term("namespace", "px02.graph-interface-replacement"),
+                    _term("local-key", "y-c"),
+                ),
             ),
         ),
         measures=ABSENT_MEASURES,
@@ -1645,7 +1707,7 @@ FLOW_ATOM = OracleAtom(
         _term("initial-value", 0, 0),
         _term("coverage", "maximal-exact-real-solution"),
     ),
-    provenance=("PX05:F006",),
+    provenance=("PX05:F037",),
     lineage=_term(
         "lineage",
         "px05.exact-differential-flow",
@@ -1671,7 +1733,7 @@ FLOW_ATOM = OracleAtom(
 FLOW_CASE = OracleCase(
     case_id="px05.exact-differential-flow",
     mechanics=("differential",),
-    conformance_refs=("PX05:F006", "CT12"),
+    conformance_refs=("PX05:F037", "CT12"),
     current_native=False,
     source=FLOW_SOURCE,
     writable=(FLOW_SOLUTION_SLOT,),

@@ -95,7 +95,7 @@ The completed implementation adds
   | `px04.constraint-mod3-many` | PX04/F019 finite many |
   | `px02.graph-interface-replacement` | PX02/F029 variable support and fresh IDs |
   | `px06.stochastic-search-law` | PX06/F050 exact law and submeasures |
-  | `px05.exact-differential-flow` | PX05/F006 exact maximal solution |
+  | `px05.exact-differential-flow` | PX05/F037 exact maximal solution |
   | `px05.constant-field-intensional` | PX04/PX05 F041 uncountable relation |
 
 The Stage 1 diff allowlist is exactly:
