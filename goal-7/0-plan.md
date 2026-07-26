@@ -149,13 +149,16 @@ conflict, and reconcile the plan before changing runtime behavior.
 - Hostile closure repaired constructor-spelling leakage, an implicit
   integer-to-rational recurrence bias, false identity successors at Turing and
   zero-active mobile termination, movement-boundary preemption, absent
-  finite-stencil reads, and a stale one-dimensional Turing tape restriction.
+  finite-stencil reads, a stale one-dimensional Turing tape restriction, and
+  exact-zero Criteria relations that lacked typed terminal results.
   Missing or inapplicable Turing transitions and outward fixed-boundary moves
   are typed terminal results; anchored mobile presets use an explicitly
-  periodic carrier and normalize edge destinations.
+  periodic carrier and normalize edge destinations. Closed expression outputs
+  are checked against their declared Alphabet during generic result
+  validation, with no commit on rejection.
 - CT11, the catalog unit surface, the constructor/metadata family joins, and
   the F010/F042 role boundary are active. The focused catalog/conformance slice
-  reports `348 passed`; the complete active suite reports `985 passed` with no
+  reports `356 passed`; the complete active suite reports `993 passed` with no
   skips.
 - G7-04 is complete. G7-05 is the first incomplete stage; no G7-05
   implementation has started.

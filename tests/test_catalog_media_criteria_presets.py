@@ -504,6 +504,13 @@ def test_exact_zero_constraint_identity_retains_relation_and_evidence(
     assert serialization.dumps(baseline) != serialization.dumps(
         changed_evidence
     )
+    terminal_identities = []
+    for simple_program in (baseline, changed_relation, changed_evidence):
+        applied = ca.apply(simple_program, _exact_source(simple_program))
+        assert type(applied) is program.ApplicationComplete
+        (terminal,) = applied.no_successor_partition.atoms
+        terminal_identities.append(terminal.source.canonical_identity)
+    assert len(set(terminal_identities)) == 3
 
 
 @pytest.mark.parametrize(

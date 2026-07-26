@@ -786,7 +786,8 @@ def constant_digit_sequence(
     ``next_digit`` evaluates over ``observation(0)``, the complete current
     ``digits`` word.  ``source_evidence`` is retained as closed provenance
     evidence; the constructor does not claim to prove the represented
-    mathematical constant.
+    mathematical constant.  Generic application validates the evaluated digit
+    against the declared base before any successor is committed.
     """
 
     if type(base) is not int or base < 2:
@@ -1185,10 +1186,11 @@ def variable_index_recursive_sequence(
     prefix: tuple[int, ...],
     recurrence: rules.RuleExpr,
 ) -> SimpleProgram:
-    """Append one positive term from a closed value-addressed recurrence.
+    """Append one natural-number term from a closed value-addressed recurrence.
 
     ``recurrence`` observes a record containing the current ``prefix`` word
-    and one-origin ``next_index``.
+    and one-origin ``next_index``.  Generic application validates its
+    evaluated value against the natural-number history alphabet.
     """
 
     if (
@@ -1710,7 +1712,12 @@ def symbolic_system(
     rewrites: alphabets.ValueNode,
     scan: rules.RewriteScan = rules.RewriteScan.RULE_PRIORITY_FIRST,
 ) -> SimpleProgram:
-    """Apply one closed ordered rewrite to a positional symbolic tree."""
+    """Apply one closed ordered rewrite to a positional symbolic tree.
+
+    Rewrite syntax is validated here; generic application validates the
+    evaluated replacement against the symbolic-expression alphabet before
+    committing it.
+    """
 
     if (
         type(expression) is not alphabets.ValueNode

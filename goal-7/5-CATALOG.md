@@ -24,8 +24,8 @@ Status: **COMPLETE — EXACT CATALOG, MIGRATION, AND HOSTILE GATES CLOSED**
 - Every public callable is explicit, keyword-only, annotated, nonvariadic, and
   free of `Any`.
 - All thirteen G7-04-owned skips are removed. The focused catalog/conformance
-  slice reports `348 passed`; the complete active suite reports
-  `985 passed` with no skips.
+  slice reports `356 passed`; the complete active suite reports
+  `993 passed` with no skips.
 - Goal 2, Goal 5, and Goal 6 remain frozen. G7-05 has not started.
 
 ## Updated Assumptions
@@ -337,6 +337,13 @@ fractions require a nonempty integer tuple with a strictly positive tail and
 closed evidence; retaining that evidence does not prove an external
 mathematical provenance.
 
+Closed recurrence, next-digit, and symbolic-rewrite expressions are structural
+laws, not static output-range proofs. Generic application checks every
+evaluated replacement against the declared Alphabet at
+`RESULT_VALIDATION`; an out-of-range result is an `ApplicationRejected` with
+no commit. A caller that requires total iteration must therefore supply an
+alphabet-preserving law.
+
 ### Machina presets — 4
 
 ```python
@@ -419,7 +426,9 @@ The register form requires a nonnegative exact integer, `base >= 2`, and two
 closed expressions evaluated over the old `{register, digit}` record; both
 fields commit atomically. Look-and-say requires a nonempty tuple of
 nonnegative exact integers and emits one length/value pair per maximal equal
-run.
+run. Closed register expressions are likewise structural laws rather than
+static range proofs: generic result validation rejects an evaluated negative
+register or out-of-base digit before either field commits.
 
 ### Criteria presets — 3
 
@@ -448,8 +457,11 @@ seeded_template_constraint_system(
 ```
 
 These forms compile explicit `ValueNode` presentations, a closed relation, and
-an exact or undetermined cardinality into an intensional relation; they do not
-invoke or hide a solver. The seeded form additionally requires a nonempty
+an exact or undetermined cardinality without invoking or hiding a solver.
+`ExactlyZero` lowers to one finite typed terminal no-successor atom whose
+identity and terminality certificate retain both the relation and its
+cardinality evidence. `ExactlyOne`, `Many`, and `Undetermined` remain closed
+intensional relations. The seeded form additionally requires a nonempty
 immutable tuple of `ValueNode` occurrences.
 
 ### True aliases and compatibility adapter
@@ -556,7 +568,7 @@ to the target, and is available only as
   `105 qualified / 104 flat / 111 catalog __all__ / 12 root`.
 - Every alias has the delegate's exact signature. K has the exact
   neighbor-updating signature and expansion.
-- Hostile review found and closed seven real defect classes:
+- Hostile review found and closed eight real defect classes:
   - preset-specific witness/provenance strings leaked invocation identity;
   - rational recurrences silently coerced an explicit integer zero bias;
   - Turing terminal handling first returned an unchanged successor for a
@@ -567,24 +579,31 @@ to the target, and is available only as
   - nonzero finite CA stencils accepted absent boundaries that could not
     produce a total readable view; and
   - the global one-dimensional Turing compiler retained an obsolete
-    three-cell minimum from the anchored implementation.
+    three-cell minimum from the anchored implementation; and
+  - certified exact-zero Criteria relations were left as bare empty
+    intensional support instead of a typed terminal no-successor result.
 - The repaired source uses mechanics-level evidence, omission-derived exact
   recurrence zero, global finite Turing clause tables with terminal fallback,
   periodic anchored mobile carriers, and explicit normalized Turing
-  destinations.
+  destinations. Exact-zero Criteria programs retain the supplied relation and
+  cardinality evidence in distinct terminal identities.
+- Secondary hostile review also froze the intended dynamic range boundary for
+  closed expression parameters: construction validates syntax and declared
+  input shape, while generic result validation checks evaluated Alphabet
+  membership and rejects atomically.
 - Exact equality and byte-equality tests cover aliases, K, CA
   specializations, rank-specific versus lattice paths, arithmetic versus
   digit reversal, and 2D substitution versus geometric substitution.
 - Focused catalog/conformance verification:
 
   ```text
-  348 passed in 15.81s
+  356 passed in 16.05s
   ```
 
 - Complete active verification:
 
   ```text
-  985 passed
+  993 passed in 46.60s
   ```
 
 - Static reconciliation proves `60 / 2 / 45 / 105`, all 105 explicit

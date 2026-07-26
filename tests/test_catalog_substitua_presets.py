@@ -407,6 +407,13 @@ def test_variable_index_sequence_exposes_prefix_and_one_origin_next_index() -> N
     assert fields["next_index"] == 4
     assert alphabets.word_items(fields["prefix"]) == (1, 2, 3)
 
+    zero_program = substitua.variable_index_recursive_sequence(
+        prefix=(1,),
+        recurrence=rules.literal_expr(0),
+    )
+    zero_value, _ = _apply_value(zero_program)
+    assert alphabets.word_items(_fields(zero_value)["prefix"]) == (1, 0)
+
 
 def test_word_substitutions_preserve_their_distinguishing_mechanics() -> None:
     neighbor = substitua.neighbor_dependent_substitution(

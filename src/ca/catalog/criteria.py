@@ -239,7 +239,11 @@ def _constraint_components(
     neighborhoods.ReadableRegion,
     rules.Rule,
 ]:
-    """Compile a closed constraint presentation without running a solver."""
+    """Compile a closed constraint presentation without running a solver.
+
+    Certified exact emptiness is a finite typed terminal result.  Every other
+    cardinality remains attached to the closed intensional relation.
+    """
 
     if type(state) is not alphabets.ValueNode:
         raise TypeError(f"{label} state must be a ValueNode")
@@ -271,6 +275,13 @@ def _constraint_components(
                 cardinality.evidence.statement,
             ),
         )
+        exact_zero_witness = rules.RuleExpr(
+            rules.ExpressionPrimitive.TUPLE,
+            (
+                rules.literal_expr("constraint-relation-empty"),
+                rules.literal_expr(exact_zero_statement.canonical_identity),
+            ),
+        )
         rule = rules.clause_kernel(
             (
                 rules.RuleClause(
@@ -278,7 +289,7 @@ def _constraint_components(
                     rules.NoSuccessorClauseResult(
                         rules.NoSuccessorOutcome.TERMINAL,
                         rules.literal_expr("constraint-relation-empty"),
-                        rules.literal_expr("constraint-relation-empty"),
+                        exact_zero_witness,
                         ("mechanics:constraint-relation-empty",),
                         rules.Certificate(
                             rules.CertificateKind.TERMINALITY,

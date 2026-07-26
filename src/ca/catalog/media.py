@@ -368,7 +368,9 @@ def constant_digit_register(
 
     Both expressions evaluate over ``observation(0)``, a record with
     ``register`` and ``digit`` fields.  The transition replaces that record
-    atomically; no draw or host callback participates.
+    atomically; no draw or host callback participates.  Generic application
+    validates both evaluated fields against the declared record alphabet
+    before committing either one.
     """
 
     if type(register) is not int or register < 0:
