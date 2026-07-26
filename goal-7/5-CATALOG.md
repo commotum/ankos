@@ -603,7 +603,7 @@ to the target, and is available only as
 - Complete active verification:
 
   ```text
-  993 passed in 46.60s
+  993 passed in 46.87s
   ```
 
 - Static reconciliation proves `60 / 2 / 45 / 105`, all 105 explicit
