@@ -415,6 +415,300 @@ def _is_semantic_value(value: object) -> bool:
     )
 
 
+class ValueSelectionError(ValueError):
+    """A closed value selector cannot be resolved unambiguously."""
+
+
+@dataclass(frozen=True)
+class ValuePath:
+    """A closed path through positional items and named ValueNode fields.
+
+    The empty path denotes the complete value.  Integer segments select
+    positional ``ValueNode.items`` and string segments select named
+    ``ValueNode.fields``.  Paths never invoke host-language attributes,
+    mappings, or callbacks.
+    """
+
+    segments: tuple[str | int, ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueSelectionError(
+                f"unsupported value-path version {self.version!r}"
+            )
+        if type(self.segments) is not tuple:
+            raise TypeError("value-path segments must be an immutable tuple")
+        for segment in self.segments:
+            if type(segment) is int:
+                if segment < 0:
+                    raise ValueSelectionError(
+                        "value-path item indices cannot be negative"
+                    )
+            elif type(segment) is str:
+                if not segment:
+                    raise ValueSelectionError(
+                        "value-path field names cannot be empty"
+                    )
+            else:
+                raise TypeError(
+                    "value-path segments must be nonnegative integers or "
+                    "nonempty strings"
+                )
+
+
+class ValuePredicateKind(Enum):
+    """Closed primitives in the value-selection expression algebra."""
+
+    EQUAL = "equal"
+    TAGGED = "tagged"
+    AND = "and"
+    OR = "or"
+    NOT = "not"
+
+
+@dataclass(frozen=True)
+class ValuePredicate:
+    """One closed predicate over a semantic value.
+
+    Leaf predicates carry a path and either an exact expected value or a
+    structural tag.  Boolean predicates carry only child predicates.
+    """
+
+    kind: ValuePredicateKind
+    path: ValuePath | None = None
+    expected: SemanticValue | None = None
+    tag: str | None = None
+    children: tuple["ValuePredicate", ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueSelectionError(
+                f"unsupported value-predicate version {self.version!r}"
+            )
+        if type(self.kind) is not ValuePredicateKind:
+            raise TypeError("value-predicate kind is not recognized")
+        if self.path is not None and type(self.path) is not ValuePath:
+            raise TypeError("value-predicate path is not recognized")
+        if type(self.children) is not tuple or any(
+            type(child) is not ValuePredicate for child in self.children
+        ):
+            raise TypeError(
+                "value-predicate children must be an immutable predicate tuple"
+            )
+
+        if self.kind is ValuePredicateKind.EQUAL:
+            if (
+                self.path is None
+                or self.expected is None
+                or not _is_semantic_value(self.expected)
+                or self.tag is not None
+                or self.children
+            ):
+                raise ValueSelectionError(
+                    "EQUAL predicates need exactly one path and closed expected "
+                    "value"
+                )
+            return
+        if self.kind is ValuePredicateKind.TAGGED:
+            if (
+                self.path is None
+                or type(self.tag) is not str
+                or not self.tag
+                or self.expected is not None
+                or self.children
+            ):
+                raise ValueSelectionError(
+                    "TAGGED predicates need exactly one path and nonempty tag"
+                )
+            return
+        if self.path is not None or self.expected is not None or self.tag is not None:
+            raise ValueSelectionError(
+                "boolean value predicates cannot carry leaf operands"
+            )
+        if self.kind in (ValuePredicateKind.AND, ValuePredicateKind.OR):
+            if len(self.children) < 2:
+                raise ValueSelectionError(
+                    f"{self.kind.value.upper()} predicates need at least two children"
+                )
+            return
+        if self.kind is ValuePredicateKind.NOT:
+            if len(self.children) != 1:
+                raise ValueSelectionError(
+                    "NOT predicates need exactly one child"
+                )
+            return
+        raise AssertionError(f"unhandled value-predicate kind {self.kind.value}")
+
+
+class AnchorCardinality(Enum):
+    """How many source loci a value anchor is allowed to select."""
+
+    EXACTLY_ONE = "exactly-one"
+    ONE_OR_MORE = "one-or-more"
+    ZERO_OR_MORE = "zero-or-more"
+
+
+@dataclass(frozen=True)
+class ValueAnchor:
+    """A versioned value predicate with an explicit selection cardinality."""
+
+    predicate: ValuePredicate
+    cardinality: AnchorCardinality = AnchorCardinality.EXACTLY_ONE
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueSelectionError(
+                f"unsupported value-anchor version {self.version!r}"
+            )
+        if type(self.predicate) is not ValuePredicate:
+            raise TypeError("value-anchor predicate is not recognized")
+        if type(self.cardinality) is not AnchorCardinality:
+            raise TypeError("value-anchor cardinality is not recognized")
+
+
+def value_equals(
+    expected: SemanticValue,
+    *,
+    path: ValuePath = ValuePath(),
+) -> ValuePredicate:
+    """Match exact semantic equality at one closed path."""
+
+    return ValuePredicate(
+        ValuePredicateKind.EQUAL,
+        path=path,
+        expected=expected,
+    )
+
+
+def value_tagged(
+    tag: str,
+    *,
+    path: ValuePath = ValuePath(),
+) -> ValuePredicate:
+    """Match a structural ValueNode tag at one closed path."""
+
+    return ValuePredicate(
+        ValuePredicateKind.TAGGED,
+        path=path,
+        tag=tag,
+    )
+
+
+def value_and(
+    children: tuple[ValuePredicate, ...],
+) -> ValuePredicate:
+    """Match when every child predicate matches."""
+
+    return ValuePredicate(ValuePredicateKind.AND, children=children)
+
+
+def value_or(
+    children: tuple[ValuePredicate, ...],
+) -> ValuePredicate:
+    """Match when at least one child predicate matches."""
+
+    return ValuePredicate(ValuePredicateKind.OR, children=children)
+
+
+def value_not(child: ValuePredicate) -> ValuePredicate:
+    """Match when one child predicate does not match."""
+
+    if type(child) is not ValuePredicate:
+        raise TypeError("value NOT needs a ValuePredicate child")
+    return ValuePredicate(ValuePredicateKind.NOT, children=(child,))
+
+
+def resolve_value_path(
+    value: SemanticValue,
+    path: ValuePath,
+) -> SemanticValue:
+    """Resolve a closed value path or fail without host-language fallback."""
+
+    if not _is_semantic_value(value):
+        raise TypeError("value-path resolution needs a closed semantic value")
+    if type(path) is not ValuePath:
+        raise TypeError("value path is not recognized")
+    current = value
+    for segment in path.segments:
+        if type(current) is not ValueNode:
+            raise ValueSelectionError(
+                "value path traverses a non-structural semantic value"
+            )
+        if type(segment) is int:
+            if segment >= len(current.items):
+                raise ValueSelectionError("value-path item index is absent")
+            current = current.items[segment]
+            continue
+        for name, field_value in current.fields:
+            if name == segment:
+                current = field_value
+                break
+        else:
+            raise ValueSelectionError("value-path field is absent")
+    return current
+
+
+def value_matches(
+    predicate: ValuePredicate,
+    value: SemanticValue,
+) -> bool:
+    """Evaluate one closed value predicate using exact semantic equality."""
+
+    if type(predicate) is not ValuePredicate:
+        raise TypeError("value predicate is not recognized")
+    if not _is_semantic_value(value):
+        raise TypeError("value predicate needs a closed semantic value")
+    kind = predicate.kind
+    if kind in (ValuePredicateKind.EQUAL, ValuePredicateKind.TAGGED):
+        assert predicate.path is not None
+        try:
+            selected = resolve_value_path(value, predicate.path)
+        except ValueSelectionError:
+            return False
+        if kind is ValuePredicateKind.EQUAL:
+            assert predicate.expected is not None
+            return semantic_equal(selected, predicate.expected)
+        assert predicate.tag is not None
+        return type(selected) is ValueNode and selected.tag == predicate.tag
+    if kind is ValuePredicateKind.AND:
+        return all(value_matches(child, value) for child in predicate.children)
+    if kind is ValuePredicateKind.OR:
+        return any(value_matches(child, value) for child in predicate.children)
+    if kind is ValuePredicateKind.NOT:
+        return not value_matches(predicate.children[0], value)
+    raise AssertionError(f"unhandled value-predicate kind {kind.value}")
+
+
+def select_value_anchors(
+    anchor: ValueAnchor,
+    configuration: loci.FiniteConfiguration[SemanticValue],
+) -> tuple[loci.Locus, ...]:
+    """Select source loci in snapshot order and enforce anchor cardinality."""
+
+    if type(anchor) is not ValueAnchor:
+        raise TypeError("value anchor is not recognized")
+    if type(configuration) is not loci.FiniteConfiguration:
+        raise ValueSelectionError(
+            "value anchors require an enumerable finite configuration"
+        )
+    selected = tuple(
+        target
+        for target, value in configuration.entries
+        if value_matches(anchor.predicate, value)
+    )
+    count = len(selected)
+    if anchor.cardinality is AnchorCardinality.EXACTLY_ONE and count != 1:
+        raise ValueSelectionError(
+            f"EXACTLY_ONE value anchor selected {count} loci"
+        )
+    if anchor.cardinality is AnchorCardinality.ONE_OR_MORE and count < 1:
+        raise ValueSelectionError("ONE_OR_MORE value anchor selected no loci")
+    return selected
+
+
 def _require_node_kind(
     value: SemanticValue,
     kind: ValueKind,
@@ -1771,6 +2065,7 @@ def semantic_equal(left: SemanticValue, right: SemanticValue) -> bool:
 
 __all__ = [
     "AlgebraicNumber",
+    "AnchorCardinality",
     "Alphabet",
     "AlphabetDescriptor",
     "AlphabetKind",
@@ -1785,9 +2080,14 @@ __all__ = [
     "SemanticValue",
     "StructuralBinding",
     "StructuralReference",
+    "ValueAnchor",
     "ValueKind",
     "ValueNode",
+    "ValuePath",
+    "ValuePredicate",
+    "ValuePredicateKind",
     "ValueProfile",
+    "ValueSelectionError",
     "algebraics",
     "bind_structural_references",
     "boolean",
@@ -1825,6 +2125,8 @@ __all__ = [
     "record_value",
     "refine",
     "represented_numeric",
+    "resolve_value_path",
+    "select_value_anchors",
     "semantic_equal",
     "symbolic",
     "symbolic_value",
@@ -1833,6 +2135,12 @@ __all__ = [
     "tag_payload",
     "tag_value",
     "union",
+    "value_and",
+    "value_equals",
+    "value_matches",
+    "value_not",
+    "value_or",
+    "value_tagged",
     "word",
     "word_items",
     "word_value",

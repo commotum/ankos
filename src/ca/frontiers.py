@@ -381,6 +381,7 @@ class WritableRegion(Generic[C, W]):
     fresh_namespace: FreshNamespace | None = None
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
     parts: tuple["WritableRegion[C, W]", ...] = ()
+    value_anchor: alphabets.ValueAnchor | None = None
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -414,10 +415,25 @@ class WritableRegion(Generic[C, W]):
             raise TypeError(
                 "writable composition parts must contain WritableRegion values"
             )
+        if self.value_anchor is not None and type(
+            self.value_anchor
+        ) is not alphabets.ValueAnchor:
+            raise TypeError("writable value anchor is not recognized")
         if self.value_profile != self.target_contract.value_profile:
             raise WritableResolutionError(
                 "region and target-contract value profiles disagree"
             )
+        if self.value_anchor is not None:
+            if self.parts:
+                raise WritableResolutionError(
+                    "value-anchored writable regions cannot be compositions"
+                )
+            _value_relative_offset_rank(self.descriptor)
+            if self.effect_profile.fresh or self.fresh_namespace is not None:
+                raise WritableResolutionError(
+                    "value-relative writable regions authorize existing targets only"
+                )
+            _validate_value_relative_contract(self.configuration_contract)
         if self.parts:
             if self.descriptor.kind not in (
                 loci.RegionKind.UNION,
@@ -526,7 +542,18 @@ class WritableRegion(Generic[C, W]):
                 raise WritableResolutionError(
                     "WritableRegion does not accept this carrier contract"
                 )
-            if (
+            if self.value_anchor is not None:
+                if type(configuration) is not loci.FiniteConfiguration:
+                    raise WritableResolutionError(
+                        "value anchors require an enumerable finite snapshot"
+                    )
+                targets = _resolve_value_relative_targets(
+                    self.descriptor,
+                    self.value_anchor,
+                    configuration,
+                )
+                fresh_targets: tuple[loci.FreshReference, ...] = ()
+            elif (
                 type(configuration) is loci.IntensionalConfiguration
                 or _requires_intensional_resolution(self.descriptor)
             ):
@@ -546,10 +573,11 @@ class WritableRegion(Generic[C, W]):
                     self.target_contract,
                     reconstruction,
                 )
-            assert type(configuration) is loci.FiniteConfiguration
-            targets, fresh_targets = _resolve_targets(
-                self.descriptor, configuration
-            )
+            else:
+                assert type(configuration) is loci.FiniteConfiguration
+                targets, fresh_targets = _resolve_targets(
+                    self.descriptor, configuration
+                )
         except (TypeError, ValueError) as error:
             raise WritableResolutionError(str(error)) from error
 
@@ -747,6 +775,95 @@ def _resolve_targets(
         raise WritableResolutionError(str(error)) from error
 
 
+def _value_relative_offset_rank(region: loci.Region) -> int:
+    """Validate the strict relative-offset descriptor used by value anchors."""
+
+    if (
+        region.kind is not loci.RegionKind.RELATIVE
+        or len(region.parts) != 1
+        or region.parts[0].kind is not loci.RegionKind.ALL_SUPPORT
+        or not region.offsets
+    ):
+        raise WritableResolutionError(
+            "value-anchored writable regions need one all-support relative "
+            "descriptor"
+        )
+    offsets: list[tuple[int, ...]] = []
+    for offset in region.offsets:
+        if (
+            type(offset) is not loci.Locus
+            or offset.kind is not loci.LocusKind.COORDINATE
+            or offset.scope != "relative"
+            or not offset.path
+            or any(type(coordinate) is not int for coordinate in offset.path)
+        ):
+            raise WritableResolutionError(
+                "value-relative offsets must be nonempty integer coordinate tuples"
+            )
+        offsets.append(tuple(offset.path))  # type: ignore[arg-type]
+    rank = len(offsets[0])
+    if any(len(offset) != rank for offset in offsets):
+        raise WritableResolutionError(
+            "value-relative offsets must have one common rank"
+        )
+    if len(set(offsets)) != len(offsets):
+        raise WritableResolutionError("value-relative offsets must be unique")
+    return rank
+
+
+def _validate_value_relative_contract(
+    contract: loci.CarrierContract | None,
+) -> None:
+    if contract is None:
+        return
+    if contract.kind not in (loci.CarrierKind.GRID, loci.CarrierKind.HISTORY):
+        raise WritableResolutionError(
+            "value-relative writes support only grid or history carriers"
+        )
+    if contract.kind is loci.CarrierKind.HISTORY and contract.rank not in (
+        None,
+        1,
+    ):
+        raise WritableResolutionError("history-relative writes require rank one")
+
+
+def _resolve_value_relative_targets(
+    region: loci.Region,
+    anchor: alphabets.ValueAnchor,
+    configuration: loci.FiniteConfiguration[object],
+) -> tuple[loci.Locus, ...]:
+    """Expand source-value anchors and deduplicate their possible writes."""
+
+    rank = _value_relative_offset_rank(region)
+    contract = configuration.contract
+    if contract.kind not in (loci.CarrierKind.GRID, loci.CarrierKind.HISTORY):
+        raise WritableResolutionError(
+            "value-relative writes support only grid or history carriers"
+        )
+    if contract.rank != rank:
+        raise WritableResolutionError(
+            "value-relative offset rank disagrees with the carrier"
+        )
+    anchors = alphabets.select_value_anchors(
+        anchor,
+        configuration,  # type: ignore[arg-type]
+    )
+    seen: set[loci.Locus] = set()
+    targets: list[loci.Locus] = []
+    for source in anchors:
+        relative = loci.relative(loci.literal((source,)), region.offsets)
+        for target in loci.resolve_region(relative, configuration):
+            if not configuration.contains(target):
+                raise WritableResolutionError(
+                    "value-relative write crosses the existing carrier boundary"
+                )
+            if target in seen:
+                continue
+            seen.add(target)
+            targets.append(target)
+    return tuple(targets)
+
+
 def _contains_fresh_template(region: loci.Region) -> bool:
     return bool(region.templates) or any(
         _contains_fresh_template(part) for part in region.parts
@@ -850,6 +967,64 @@ def literal(
         value_profile,
         EffectProfile(existing=effects),
         TargetContract(None, value_profile, frame),
+    )
+
+
+def value_relative(
+    anchor: alphabets.ValueAnchor,
+    offsets: tuple[tuple[int, ...], ...],
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    effects: tuple[Effect, ...] = (Effect.REPLACE,),
+    frame: WriteFrame = WriteFrame.SUCCESSOR,
+) -> WritableRegion[C, WritableCapabilities]:
+    """Authorize the deduplicated write envelope around value-selected sources.
+
+    This constructor declares only possible writes.  The selected source
+    values do not imply firing, scheduling, or update semantics.
+    """
+
+    if type(anchor) is not alphabets.ValueAnchor:
+        raise TypeError("value-relative frontier needs a ValueAnchor")
+    if type(offsets) is not tuple or any(
+        type(offset) is not tuple
+        or not offset
+        or any(type(coordinate) is not int for coordinate in offset)
+        for offset in offsets
+    ):
+        raise TypeError(
+            "value-relative offsets must be nonempty immutable integer tuples"
+        )
+    if not offsets:
+        raise WritableResolutionError("value-relative offsets cannot be empty")
+    rank = len(offsets[0])
+    if any(len(offset) != rank for offset in offsets):
+        raise WritableResolutionError(
+            "value-relative offsets must have one common rank"
+        )
+    if len(set(offsets)) != len(offsets):
+        raise WritableResolutionError("value-relative offsets must be unique")
+    _validate_value_relative_contract(configuration_contract)
+    if (
+        configuration_contract is not None
+        and configuration_contract.rank is not None
+        and configuration_contract.rank != rank
+    ):
+        raise WritableResolutionError(
+            "value-relative offsets disagree with the declared carrier rank"
+        )
+    offset_loci = tuple(
+        loci.Locus(loci.LocusKind.COORDINATE, "relative", offset)
+        for offset in offsets
+    )
+    return WritableRegion(
+        descriptor=loci.relative(loci.all_support(), offset_loci),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        effect_profile=EffectProfile(existing=effects),
+        target_contract=TargetContract(None, value_profile, frame),
+        value_anchor=anchor,
     )
 
 

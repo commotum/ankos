@@ -104,6 +104,7 @@ class ReadDependency:
     region: loci.Region
     selector: loci.SelectorExpr | None
     exactness_profile: ExactnessProfile
+    value_anchor: alphabets.ValueAnchor | None = None
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -121,6 +122,10 @@ class ReadDependency:
             raise TypeError("read-dependency selector is not recognized")
         if type(self.exactness_profile) is not ExactnessProfile:
             raise TypeError("read-dependency exactness is not recognized")
+        if self.value_anchor is not None and type(
+            self.value_anchor
+        ) is not alphabets.ValueAnchor:
+            raise TypeError("read-dependency value anchor is not recognized")
 
 
 def _field_extent(field: ReadField) -> tuple[str, int | None]:
@@ -320,10 +325,22 @@ class ReadableView(Generic[V]):
             raise ReadableResolutionError(
                 "readable-view dependency keys must be unique"
             )
-        if not self.observations or not self.groups:
+        if bool(self.observations) != bool(self.groups):
             raise ReadableResolutionError(
-                "a materialized readable view cannot be empty"
+                "readable observations and groups must be empty together"
             )
+        if not self.observations:
+            permits_empty = (
+                len(self.dependencies) == 1
+                and self.dependencies[0].value_anchor is not None
+                and self.dependencies[0].value_anchor.cardinality
+                is alphabets.AnchorCardinality.ZERO_OR_MORE
+            )
+            if not permits_empty:
+                raise ReadableResolutionError(
+                    "an empty readable view needs an explicit ZERO_OR_MORE "
+                    "value anchor"
+                )
         covered: list[int] = []
         for group in self.groups:
             covered.extend(group.indices)
@@ -472,6 +489,7 @@ class ReadableRegion(Generic[C, R]):
     parts: tuple[ReadableField[C, R], ...] = ()
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
     selector: loci.SelectorExpr | None = None
+    value_anchor: alphabets.ValueAnchor | None = None
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -505,6 +523,10 @@ class ReadableRegion(Generic[C, R]):
             self.selector
         ) is not loci.SelectorExpr:
             raise TypeError("readable selector is not recognized")
+        if self.value_anchor is not None and type(
+            self.value_anchor
+        ) is not alphabets.ValueAnchor:
+            raise TypeError("readable value anchor is not recognized")
         is_product = self.grouping.kind is GroupingKind.PRODUCT
         if is_product != bool(self.parts):
             raise ReadableResolutionError(
@@ -515,6 +537,12 @@ class ReadableRegion(Generic[C, R]):
                 "product grouping and product join mode must agree"
             )
         if is_product:
+            if self.value_anchor is not None or any(
+                part.region.value_anchor is not None for part in self.parts
+            ):
+                raise ReadableResolutionError(
+                    "value-anchored readable regions cannot be product fields"
+                )
             if self.selector is not None:
                 raise ReadableResolutionError(
                     "product readable regions cannot add a hidden outer selector"
@@ -558,6 +586,29 @@ class ReadableRegion(Generic[C, R]):
             if len(self.result_shape.fields) != field_count:
                 raise ReadableResolutionError(
                     "fixed grouping and result-field counts disagree"
+                )
+        if self.value_anchor is not None:
+            if self.selector is not None or self.parts:
+                raise ReadableResolutionError(
+                    "value-anchored readable regions cannot add selectors or parts"
+                )
+            rank = _value_relative_offset_rank(self.descriptor)
+            _validate_value_relative_contract(self.configuration_contract)
+            if (
+                self.configuration_contract is not None
+                and self.configuration_contract.rank is not None
+                and self.configuration_contract.rank != rank
+            ):
+                raise ReadableResolutionError(
+                    "value-relative offsets disagree with the declared carrier rank"
+                )
+            if (
+                self.grouping.kind is not GroupingKind.FIXED_CHUNKS
+                or self.grouping.chunk_size != len(self.descriptor.offsets)
+                or self.join_shape.mode is not JoinMode.ANCHOR_IDENTITY
+            ):
+                raise ReadableResolutionError(
+                    "value-relative reads need one fixed ordered group per anchor"
                 )
         if (
             self.selector is not None
@@ -618,8 +669,13 @@ class ReadableRegion(Generic[C, R]):
                 self.descriptor,
                 self.selector,
                 self.exactness_profile,
+                self.value_anchor,
             )
             if type(configuration) is loci.IntensionalConfiguration:
+                if self.value_anchor is not None:
+                    raise ReadableResolutionError(
+                        "value anchors require an enumerable finite snapshot"
+                    )
                 return IntensionalReadableView(
                     snapshot_identity,
                     (dependency,),
@@ -635,19 +691,30 @@ class ReadableRegion(Generic[C, R]):
                     (dependency,),
                     self.join_shape,
                 )
-            targets = loci.resolve_region(self.descriptor, configuration)
-            if self.selector is not None:
-                targets = loci.resolve_selector(
-                    self.selector,
+            if self.value_anchor is not None:
+                anchors, targets = _resolve_value_relative_targets(
+                    self.descriptor,
+                    self.value_anchor,
                     configuration,
-                    candidates=targets,
                 )
-            if self.descriptor.kind is loci.RegionKind.RELATIVE:
+                chunk_size = len(self.descriptor.offsets)
+            else:
+                targets = loci.resolve_region(self.descriptor, configuration)
+                if self.selector is not None:
+                    targets = loci.resolve_selector(
+                        self.selector,
+                        configuration,
+                        candidates=targets,
+                    )
+            if (
+                self.value_anchor is None
+                and self.descriptor.kind is loci.RegionKind.RELATIVE
+            ):
                 anchors = loci.resolve_relative_anchors(
                     self.descriptor, configuration
                 )
                 chunk_size = len(self.descriptor.offsets)
-            else:
+            elif self.value_anchor is None:
                 anchors = ()
                 chunk_size = 0
         except (TypeError, ValueError) as error:
@@ -659,6 +726,10 @@ class ReadableRegion(Generic[C, R]):
             try:
                 value = loci.read_locus(configuration, target)
             except loci.LocusAbsentError as error:
+                if self.value_anchor is not None:
+                    raise ReadableResolutionError(
+                        "value-relative read crosses an unsupported boundary"
+                    ) from error
                 evidence = loci.SelectorExpr(
                     loci.SelectorPrimitive.RELATIVE,
                     arguments=(target,),
@@ -679,7 +750,15 @@ class ReadableRegion(Generic[C, R]):
                 )
             observations.append(Observation(target, state, anchor))
 
-        groups = _groups_for(self.grouping, tuple(observations))
+        groups = _groups_for(
+            self.grouping,
+            tuple(observations),
+            allow_empty=(
+                self.value_anchor is not None
+                and self.value_anchor.cardinality
+                is alphabets.AnchorCardinality.ZERO_OR_MORE
+            ),
+        )
         view = ReadableView(
             snapshot_identity,
             tuple(observations),
@@ -717,6 +796,7 @@ class ReadableRegion(Generic[C, R]):
                     dependency.region,
                     dependency.selector,
                     dependency.exactness_profile,
+                    dependency.value_anchor,
                 )
                 for dependency in view.dependencies
             )
@@ -780,8 +860,12 @@ def _requires_intensional_resolution(
 def _groups_for(
     grouping: GroupingPlan,
     observations: tuple[Observation[V], ...],
+    *,
+    allow_empty: bool = False,
 ) -> tuple[ObservationGroup, ...]:
     if not observations:
+        if allow_empty:
+            return ()
         raise ReadableResolutionError("a finite resolved read view cannot be empty")
     if grouping.kind is GroupingKind.SINGLE:
         anchor = observations[0].anchor

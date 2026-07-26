@@ -44,22 +44,25 @@ def _map(
     )
 
 
-def test_map_items_performs_independent_substitution_with_exact_binding_proof() -> None:
+def test_flat_map_items_performs_independent_substitution_with_exact_binding_proof() -> None:
     source = _word("symbols", "A", "B", "A")
-    substitutions = _map(("A", 1), ("B", 0))
-    expression = rules.map_items(
+    substitutions = _map(
+        ("A", _word("symbols", "A", "B")),
+        ("B", _word("symbols", "A")),
+    )
+    expression = rules.flat_map_items(
         rules.literal_expr(source),
         rules.map_lookup(
             rules.literal_expr(substitutions),
             rules.bound_value(),
-            rules.literal_expr(-1),
+            rules.literal_expr(_word("symbols")),
         ),
-        "bits",
+        "symbols",
     )
 
     result, proof = _evaluate(expression)
 
-    assert result == _word("bits", 1, 0, 1)
+    assert result == _word("symbols", "A", "B", "A", "A", "B")
     binding_steps = tuple(
         step
         for step in proof.steps
@@ -287,6 +290,18 @@ def test_empty_comprehensions_and_windows_keep_closed_word_tags() -> None:
         rules.filter_items(
             rules.literal_expr(_word("items", 1)),
             rules.literal_expr(2),
+        ),
+        rules.filter_items(
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                (
+                    rules.RuleExpr(
+                        rules.ExpressionPrimitive.TUPLE,
+                        (rules.literal_expr(1),),
+                    ),
+                ),
+            ),
+            rules.literal_expr(0),
         ),
         rules.flat_map_items(
             rules.literal_expr(_word("items", 1)),

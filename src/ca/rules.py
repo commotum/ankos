@@ -3745,9 +3745,12 @@ def _evaluate_value(
         )
     if primitive is ExpressionPrimitive.FILTER_ITEMS:
         items, tag = _sequence_items(evaluate(_child(arguments, 0)))
+        semantic_items = tuple(
+            _require_semantic_value(item) for item in items
+        )
         predicate = _child(arguments, 1)
-        retained: list[RuleRuntimeValue] = []
-        for index, item in enumerate(items):
+        retained: list[alphabets.SemanticValue] = []
+        for index, item in enumerate(semantic_items):
             if _require_bit(evaluate_bound(predicate, item, index)):
                 retained.append(item)
         return finish(_word_from_items(tuple(retained), tag=tag))
@@ -5111,9 +5114,9 @@ __all__ = [
     "literal",
     "literal_expr",
     "lookup",
+    "map_items",
     "map_lookup",
     "map_update",
-    "map_items",
     "maximal_runs",
     "modulo",
     "multiply",
