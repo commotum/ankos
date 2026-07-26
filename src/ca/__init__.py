@@ -5,7 +5,16 @@ their plural owner modules, while complete named constructions will live under
 ``ca.catalog`` once that later Goal 7 stage lands.
 """
 
-from . import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
+from . import (
+    alphabets,
+    frontiers,
+    loci,
+    neighborhoods,
+    program,
+    rules,
+    seeds,
+    serialization,
+)
 from .program import SimpleProgram, apply, rollout
 
 
@@ -20,4 +29,5 @@ __all__ = [
     "frontiers",
     "neighborhoods",
     "rules",
+    "serialization",
 ]

@@ -1,16 +1,18 @@
-"""CT10: exact representation mechanics and staged full-result commutation.
+"""CT10: inverse-on-image and complete one-step representation commutation."""
 
-G7-02 owns the closed exact/lossy relation and inverse-on-image mechanics.
-G7-03 owns canonical codec mapping and the exhaustive comparison of complete
-application results.
-"""
+from __future__ import annotations
 
+from dataclasses import fields, is_dataclass
+from enum import Enum
 from fractions import Fraction
+import re
 
 import pytest
 
-from ca import alphabets
+import ca
+from ca import alphabets, loci, program, rules, serialization
 
+from g7_fixtures import derivation, finite_record_program, no_successor
 from g7_mechanics import (
     MECHANICS_ROWS,
     assert_mechanics_run,
@@ -18,34 +20,300 @@ from g7_mechanics import (
 )
 
 
-def test_exact_representation_is_inverse_on_its_declared_image() -> None:
-    """Decode of an encoded source recovers the exact semantic source."""
+PX10_ROWS = tuple(row for row in MECHANICS_ROWS if row.primary == "PX10")
+_HASH = re.compile(r"[0-9a-f]{64}")
 
-    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF058")
+
+def _exact_relation(row) -> alphabets.RepresentationRelation:
     execution = run_mechanics_fixture(row)
     assert_mechanics_run(execution)
     relation = execution.representation
 
     assert relation is not None
     assert relation.profile is alphabets.RepresentationProfile.EXACT
-    for pair in relation.mapping:
-        assert relation.inverse(relation.forward(pair.source)) == pair.source
-    with pytest.raises(ValueError, match="outside"):
-        relation.inverse(-1)
+    return relation
 
 
-@pytest.mark.skip(reason="G7-03 owns canonical full-result representation mapping")
-def test_represented_and_native_one_step_results_commute_completely() -> None:
-    """Mapped generic application equals the independent native application."""
+def _transition_pair(
+    relation: alphabets.RepresentationRelation,
+) -> tuple[program.ApplicationComplete, program.ApplicationComplete]:
+    """Build independently expanded native/represented conjugate steps."""
 
-    raise AssertionError("G7-03 full-result commutation is not active")
+    assert len(relation.relation) >= 2
+    first, second = relation.relation[:2]
+
+    def build(
+        initial: alphabets.SemanticValue,
+        following: alphabets.SemanticValue,
+        values: tuple[alphabets.SemanticValue, ...],
+    ) -> tuple[ca.SimpleProgram, loci.FiniteConfiguration]:
+        def atoms(targets: tuple[loci.Locus, ...]):
+            return (
+                derivation(
+                    "representation-step",
+                    existing=(rules.replace(targets[0], following),),
+                ),
+            )
+
+        return finite_record_program(
+            (("value", initial),),
+            atoms,
+            alphabet=alphabets.enum(values),
+            effects=(ca.frontiers.Effect.REPLACE,),
+        )
+
+    native_program, native_source = build(
+        first.source,
+        second.source,
+        tuple(pair.source for pair in relation.relation),
+    )
+    represented_program, represented_source = build(
+        first.target,
+        second.target,
+        tuple(pair.target for pair in relation.relation),
+    )
+    native = ca.apply(native_program, native_source)
+    represented = ca.apply(represented_program, represented_source)
+    assert isinstance(native, program.ApplicationComplete)
+    assert isinstance(represented, program.ApplicationComplete)
+    return native, represented
 
 
-@pytest.mark.skip(reason="G7-03 owns codec mapping of all evidence and fibers")
+def _stochastic_pair() -> tuple[
+    alphabets.RepresentationRelation,
+    program.ApplicationComplete,
+    program.ApplicationComplete,
+]:
+    """Exercise laws, no-successors, submeasures, and a two-witness fiber."""
+
+    encoded_false = alphabets.ValueNode(
+        alphabets.ValueKind.TAG,
+        "encoded-bit",
+        items=(0,),
+    )
+    encoded_true = alphabets.ValueNode(
+        alphabets.ValueKind.TAG,
+        "encoded-bit",
+        items=(1,),
+    )
+    source_schema = alphabets.enum((False, True)).descriptor
+    target_schema = alphabets.enum((encoded_false, encoded_true)).descriptor
+    relation = alphabets.RepresentationRelation(
+        source_schema,
+        target_schema,
+        alphabets.RepresentationProfile.EXACT,
+        (
+            alphabets.RepresentationPair(False, encoded_false),
+            alphabets.RepresentationPair(True, encoded_true),
+        ),
+        (encoded_false, encoded_true),
+        inverse_evidence=(
+            alphabets.RepresentationPair(encoded_false, False),
+            alphabets.RepresentationPair(encoded_true, True),
+        ),
+    )
+
+    def build(
+        initial: alphabets.SemanticValue,
+        following: alphabets.SemanticValue,
+        alphabet: alphabets.Alphabet,
+    ) -> tuple[ca.SimpleProgram, loci.FiniteConfiguration]:
+        def atoms(targets: tuple[loci.Locus, ...]):
+            replacement = (rules.replace(targets[0], following),)
+            return (
+                derivation("left-witness", existing=replacement),
+                derivation("right-witness", existing=replacement),
+                no_successor(
+                    "rejected-witness",
+                    rules.NoSuccessorOutcome.UNDEFINED,
+                ),
+            )
+
+        return finite_record_program(
+            (("value", initial),),
+            atoms,
+            alphabet=alphabet,
+            effects=(ca.frontiers.Effect.REPLACE,),
+            probability=(
+                Fraction(1, 4),
+                Fraction(1, 4),
+                Fraction(1, 2),
+            ),
+        )
+
+    native_program, native_source = build(
+        False,
+        True,
+        alphabets.enum((False, True)),
+    )
+    represented_program, represented_source = build(
+        encoded_false,
+        encoded_true,
+        alphabets.enum((encoded_false, encoded_true)),
+    )
+    native = ca.apply(native_program, native_source)
+    represented = ca.apply(represented_program, represented_source)
+    assert isinstance(native, program.ApplicationComplete)
+    assert isinstance(represented, program.ApplicationComplete)
+    return relation, native, represented
+
+
+def _identity_aliases(
+    result: program.ApplicationComplete,
+) -> dict[str, str]:
+    aliases = {
+        result.evidence.program_identity: "@program",
+        result.evidence.input_configuration_identity: "@input",
+        result.evidence.readable_binding_identity: "@readable",
+        result.evidence.writable_binding_identity: "@writable",
+        result.evidence.application_identity: "@application",
+        result.evidence.canonical_rule_identity: "@rule",
+        result.evidence.input_trace_lineage_identity: "@input-lineage",
+    }
+    for atom in result.source_outcomes.support.atoms:
+        aliases[atom.canonical_identity] = f"@source:{atom.witness.identity}"
+    for atom in result.applied_atoms.atoms:
+        witness = atom.source.witness.identity
+        aliases[atom.canonical_identity] = f"@applied:{witness}"
+        aliases[atom.evidence.application_identity] = "@application"
+        aliases[atom.evidence.disposition_identity] = f"@disposition:{witness}"
+        aliases[atom.input_trace_lineage.root_identity] = "@lineage-root"
+        aliases[atom.output_trace_lineage.root_identity] = "@lineage-root"
+        for index, identity in enumerate(atom.input_trace_lineage.path):
+            aliases.setdefault(identity, f"@input-path:{index}")
+        for index, identity in enumerate(atom.output_trace_lineage.path):
+            aliases.setdefault(identity, f"@output-path:{index}")
+        if isinstance(atom, program.AppliedDerivation):
+            aliases[loci.configuration_identity(atom.successor)] = "@successor"
+    return aliases
+
+
+def _normalize_complete_result(
+    result: program.ApplicationComplete,
+    *,
+    decode_relation: alphabets.RepresentationRelation | None = None,
+) -> tuple[object, ...]:
+    """Normalize every stored field, changing only declared values and IDs."""
+
+    aliases = _identity_aliases(result)
+    fallback_hashes: dict[str, str] = {}
+
+    def normalize(value: object) -> object:
+        if (
+            decode_relation is not None
+            and isinstance(value, alphabets.ValueNode)
+        ):
+            for pair in decode_relation.relation:
+                if alphabets.semantic_equal(value, pair.target):
+                    return normalize(pair.source)
+        if value is None or type(value) in (bool, int):
+            return value
+        if type(value) is Fraction:
+            return ("fraction", value.numerator, value.denominator)
+        if type(value) is str:
+            if value in aliases:
+                return aliases[value]
+            if _HASH.fullmatch(value):
+                return fallback_hashes.setdefault(
+                    value,
+                    f"@derived:{len(fallback_hashes)}",
+                )
+            return value
+        if isinstance(value, Enum):
+            return (
+                "enum",
+                value.__class__.__module__,
+                value.__class__.__name__,
+                value.value,
+            )
+        if type(value) is tuple:
+            return tuple(normalize(item) for item in value)
+        if not is_dataclass(value):
+            raise AssertionError(
+                f"unhandled complete-result value {type(value).__name__}"
+            )
+        normalized_fields: list[tuple[str, object]] = []
+        for field in fields(value):
+            field_value = normalize(getattr(value, field.name))
+            if (
+                type(value) is rules.SupportSpace
+                and field.name == "atoms"
+            ) or (
+                type(value) is rules.ProbabilityLaw
+                and field.name == "masses"
+            ) or (
+                type(value) is program.ProgramMeasure
+                and field.name == "masses"
+            ) or (
+                type(value) is program.SuccessorGroup
+                and field.name == "derivations"
+            ):
+                assert type(field_value) is tuple
+                field_value = tuple(sorted(field_value, key=repr))
+            normalized_fields.append((field.name, field_value))
+        return (
+            "record",
+            value.__class__.__module__,
+            value.__class__.__name__,
+            tuple(normalized_fields),
+        )
+
+    normalized = normalize(result)
+    assert type(normalized) is tuple
+    return normalized
+
+
+def test_exact_representation_is_inverse_on_its_declared_image() -> None:
+    """Every exact PX10 relation decodes its full declared image."""
+
+    assert len(PX10_ROWS) == 8
+    for row in PX10_ROWS:
+        relation = _exact_relation(row)
+        for pair in relation.relation:
+            assert relation.inverse(relation.forward(pair.source)) == pair.source
+        with pytest.raises(ValueError, match="outside"):
+            relation.inverse(
+                alphabets.ValueNode(
+                    alphabets.ValueKind.SYMBOLIC,
+                    "outside-image",
+                )
+            )
+
+
+@pytest.mark.parametrize("row", PX10_ROWS, ids=lambda row: row.spf)
+def test_represented_and_native_one_step_results_commute_completely(row) -> None:
+    """Mapped represented application equals native application in every field."""
+
+    relation = _exact_relation(row)
+    native, represented = _transition_pair(relation)
+
+    assert _normalize_complete_result(
+        represented,
+        decode_relation=relation,
+    ) == _normalize_complete_result(native)
+
+
 def test_commutation_compares_all_outcomes_evidence_measures_and_fibers() -> None:
-    """State-only equality cannot establish a representation relation."""
+    """The mapper covers nontrivial laws, no-successors, fibers, and evidence."""
 
-    raise AssertionError("G7-03 complete-result mapping is not active")
+    relation, native, represented = _stochastic_pair()
+    assert len(native.source_outcomes.support.atoms) == 3
+    assert len(native.no_successor_partition.atoms) == 1
+    assert len(
+        native.successor_quotient_with_derivation_fibers.atoms[0].derivations
+    ) == 2
+    assert isinstance(native.applied_atom_measure, program.MeasureAvailable)
+    assert isinstance(native.successor_submeasure, program.MeasureAvailable)
+    assert isinstance(native.no_successor_submeasure, program.MeasureAvailable)
+
+    assert _normalize_complete_result(
+        represented,
+        decode_relation=relation,
+    ) == _normalize_complete_result(native)
+    for result in (native, represented):
+        blob = serialization.dumps(result)
+        assert serialization.loads(blob) == serialization.Decoded(result)
+        assert serialization.dumps(serialization.loads(blob).value) == blob
 
 
 def test_lossy_approximate_or_out_of_image_translation_remains_explicit() -> None:

@@ -206,3 +206,62 @@ def test_codec_inventory_freezes_tags_versions_validators_and_equality() -> None
 
     owner_types = {(row["owner"], row["type"]) for row in rows}
     assert len({row["tag"] for row in rows}) == len(owner_types)
+
+
+def test_inventory_joins_the_closed_production_schema_exactly() -> None:
+    """Every CSV obligation has one and only one production schema owner."""
+
+    serialization = importlib.import_module("ca.serialization")
+    schema_rows = serialization._schema_rows()
+    inventory = _inventory_rows()
+
+    assert len(schema_rows) == len(
+        {(row["owner"], row["type"]) for row in inventory}
+    )
+    assert len(schema_rows) == 178
+    by_owner_type = {
+        (row.owner, row.type_name): row for row in schema_rows
+    }
+    assert len(by_owner_type) == len(schema_rows)
+
+    inventory_keys = {
+        (row["owner"], row["type"]) for row in inventory
+    }
+    assert set(by_owner_type) == inventory_keys
+
+    for (owner, type_name), schema in by_owner_type.items():
+        rows = tuple(
+            row
+            for row in inventory
+            if row["owner"] == owner and row["type"] == type_name
+        )
+        assert rows
+        assert schema.owner == owner
+        assert schema.type_name == type_name
+        assert schema.tag == rows[0]["tag"]
+        assert schema.version == int(rows[0]["version"])
+        assert schema.value_type.__module__ == owner
+        assert schema.value_type.__name__ == type_name
+        if rows[0]["kind"] == "enum-member":
+            assert schema.fields == ("value",)
+            assert schema.enum_values == tuple(
+                row["wire_value"] for row in rows
+            )
+            assert tuple(schema.value_type) == tuple(
+                schema.value_type(value) for value in schema.enum_values
+            )
+        else:
+            assert len(rows) == 1
+            assert schema.enum_values == ()
+            assert schema.fields == tuple(
+                field
+                for field in rows[0]["exact_fields"].split("|")
+                if field
+            )
+
+    assert set(serialization._SCHEMA_BY_TYPE) == {
+        row.value_type for row in schema_rows
+    }
+    assert set(serialization._SCHEMA_BY_TAG) == {
+        row.tag for row in schema_rows
+    }
