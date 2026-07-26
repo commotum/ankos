@@ -242,6 +242,7 @@ def weighted_network_state_update(
 # ---------------------------------------------------------------------------
 
 _ZERO_INTEGER_BOUNDARY = loci.Boundary(loci.BoundaryPolicy.FIXED, 0)
+_PERIODIC_INTEGER_BOUNDARY = loci.Boundary(loci.BoundaryPolicy.PERIODIC)
 _ZERO_RATIONAL_BOUNDARY = loci.Boundary(
     loci.BoundaryPolicy.FIXED,
     Fraction(0),
@@ -765,7 +766,7 @@ def generalized_mobile_automaton(
         ],
         ...,
     ],
-    boundary: loci.Boundary[int] = _ZERO_INTEGER_BOUNDARY,
+    boundary: loci.Boundary[int] = _PERIODIC_INTEGER_BOUNDARY,
     conflict_policy: rules.ProposalConflictPolicy = (
         rules.ProposalConflictPolicy.REQUIRE_EQUAL
     ),
@@ -839,6 +840,15 @@ def generalized_mobile_automaton(
         raise ValueError(
             "generalized mobile transitions must be total on all symbol triples"
         )
+    resolved_boundary = _integer_boundary(
+        boundary,
+        colors=size,
+        label="generalized mobile automaton",
+    )
+    if resolved_boundary.policy is not loci.BoundaryPolicy.PERIODIC:
+        raise ValueError(
+            "generalized mobile automaton requires a periodic boundary"
+        )
 
     alphabet = alphabets.union(
         (
@@ -854,7 +864,7 @@ def generalized_mobile_automaton(
         (len(values),),
         source_values,
         boundary=_tagged_boundary(
-            boundary,
+            resolved_boundary,
             colors=size,
             label="generalized mobile automaton",
         ),

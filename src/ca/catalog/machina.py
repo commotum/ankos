@@ -184,6 +184,7 @@ def priority_dovetailed_oracle_construction(
 # ---------------------------------------------------------------------------
 
 _ZERO_INTEGER_BOUNDARY = loci.Boundary(loci.BoundaryPolicy.FIXED, 0)
+_PERIODIC_INTEGER_BOUNDARY = loci.Boundary(loci.BoundaryPolicy.PERIODIC)
 _LINE_OFFSETS = ((-1,), (0,), (1,))
 _CARDINAL_2D = (
     (-1, 0),
@@ -277,6 +278,22 @@ def _tagged_boundary(
             if resolved.policy is loci.BoundaryPolicy.FIXED
             else None
         ),
+    )
+
+
+def _periodic_tagged_boundary(
+    boundary: loci.Boundary[int],
+    *,
+    symbols: int,
+    label: str,
+) -> loci.Boundary[alphabets.ValueNode]:
+    resolved = _integer_boundary(boundary, symbols=symbols, label=label)
+    if resolved.policy is not loci.BoundaryPolicy.PERIODIC:
+        raise ValueError(f"{label} requires a periodic boundary")
+    return _tagged_boundary(
+        resolved,
+        symbols=symbols,
+        label=label,
     )
 
 
@@ -648,7 +665,7 @@ def mobile_automaton(
         tuple[tuple[int, int, int], tuple[int, int]],
         ...,
     ],
-    boundary: loci.Boundary[int] = _ZERO_INTEGER_BOUNDARY,
+    boundary: loci.Boundary[int] = _PERIODIC_INTEGER_BOUNDARY,
 ) -> SimpleProgram:
     """Construct a center-updating mobile automaton with one tagged head."""
 
@@ -666,7 +683,7 @@ def mobile_automaton(
             _mobile_head(value) if index == head_index else _cell(value)
             for index, value in enumerate(values)
         ),
-        boundary=_tagged_boundary(
+        boundary=_periodic_tagged_boundary(
             boundary,
             symbols=size,
             label="mobile automaton",
@@ -718,7 +735,7 @@ def neighbor_updating_mobile_automaton(
         ],
         ...,
     ],
-    boundary: loci.Boundary[int] = _ZERO_INTEGER_BOUNDARY,
+    boundary: loci.Boundary[int] = _PERIODIC_INTEGER_BOUNDARY,
 ) -> SimpleProgram:
     """Construct a mobile automaton that atomically rewrites its full block."""
 
@@ -736,7 +753,7 @@ def neighbor_updating_mobile_automaton(
             _mobile_head(value) if index == head_index else _cell(value)
             for index, value in enumerate(values)
         ),
-        boundary=_tagged_boundary(
+        boundary=_periodic_tagged_boundary(
             boundary,
             symbols=size,
             label="neighbor-updating mobile automaton",
@@ -777,21 +794,6 @@ def neighbor_updating_mobile_automaton(
             alphabets.AnchorCardinality.EXACTLY_ONE,
         ),
         clauses=clauses,
-    )
-
-
-def _turing_anchor(states: tuple[str, ...]) -> alphabets.ValueAnchor:
-    predicates = tuple(
-        alphabets.value_tagged(f"head:{state}") for state in states
-    )
-    predicate = (
-        predicates[0]
-        if len(predicates) == 1
-        else alphabets.value_or(predicates)
-    )
-    return alphabets.ValueAnchor(
-        predicate,
-        alphabets.AnchorCardinality.EXACTLY_ONE,
     )
 
 
@@ -1215,7 +1217,7 @@ def extended_mobile_automaton(
         ],
         ...,
     ],
-    boundary: loci.Boundary[int] = _ZERO_INTEGER_BOUNDARY,
+    boundary: loci.Boundary[int] = _PERIODIC_INTEGER_BOUNDARY,
 ) -> SimpleProgram:
     """Deprecated exact spelling of :func:`neighbor_updating_mobile_automaton`."""
 

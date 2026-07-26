@@ -59,6 +59,16 @@ def _values(configuration: loci.FiniteConfiguration) -> tuple:
     return tuple(value for _, value in configuration.entries)
 
 
+def _assert_terminal(simple: program.SimpleProgram) -> program.ApplicationComplete:
+    result = program.apply(simple, _source(simple))
+    assert isinstance(result, program.ApplicationComplete)
+    assert result.successor_quotient_with_derivation_fibers.atoms == ()
+    assert len(result.no_successor_partition.atoms) == 1
+    terminal = result.no_successor_partition.atoms[0].source
+    assert terminal.outcome is rules.NoSuccessorOutcome.TERMINAL
+    return result
+
+
 def _identity_table(
     colors: int,
     width: int,
@@ -72,15 +82,17 @@ def _identity_table(
 
 def _mobile_transitions(
     colors: int,
+    movement: int = 1,
 ) -> tuple[tuple[tuple[int, int, int], tuple[int, int]], ...]:
     return tuple(
-        (key, (key[1], 1))
+        (key, (key[1], movement))
         for key in cartesian_product(range(colors), repeat=3)
     )
 
 
 def _neighbor_mobile_transitions(
     colors: int,
+    movement: int = 1,
 ) -> tuple[
     tuple[
         tuple[int, int, int],
@@ -89,13 +101,14 @@ def _neighbor_mobile_transitions(
     ...,
 ]:
     return tuple(
-        (key, (key, 1))
+        (key, (key, movement))
         for key in cartesian_product(range(colors), repeat=3)
     )
 
 
 def _generalized_transitions(
     colors: int,
+    movement: int = 1,
 ) -> tuple[
     tuple[
         tuple[int, int, int],
@@ -104,7 +117,7 @@ def _generalized_transitions(
     ...,
 ]:
     return tuple(
-        (key, (key[1], (1,)))
+        (key, (key[1], (movement,)))
         for key in cartesian_product(range(colors), repeat=3)
     )
 
@@ -294,6 +307,179 @@ def test_mobile_presets_apply_atomic_source_and_destination_writes() -> None:
     assert _values(_successor(neighbor)) == expected
 
 
+def test_periodic_movement_presets_normalize_edge_destinations() -> None:
+    generalized = automata.generalized_mobile_automaton(
+        initial=(1, 0, 0),
+        active=(0,),
+        colors=2,
+        transitions=_generalized_transitions(2, -1),
+    )
+    mobile = machina.mobile_automaton(
+        initial=(1, 0, 0),
+        head=0,
+        colors=2,
+        transitions=_mobile_transitions(2, -1),
+    )
+    neighbor = machina.neighbor_updating_mobile_automaton(
+        initial=(1, 0, 0),
+        head=0,
+        colors=2,
+        transitions=_neighbor_mobile_transitions(2, -1),
+    )
+    legacy_arguments = dict(
+        initial=(1, 0, 0),
+        head=0,
+        colors=2,
+        transitions=_neighbor_mobile_transitions(2, -1),
+    )
+    with pytest.warns(DeprecationWarning):
+        legacy = machina.extended_mobile_automaton(**legacy_arguments)
+
+    assert _values(_successor(generalized))[-1] == alphabets.tag_value(
+        "active",
+        0,
+    )
+    for simple in (mobile, neighbor, legacy):
+        assert _values(_successor(simple))[-1] == alphabets.tag_value(
+            "head",
+            0,
+        )
+
+
+@pytest.mark.parametrize(
+    "constructor",
+    (
+        lambda boundary: automata.generalized_mobile_automaton(
+            initial=(0, 0, 0),
+            active=(0,),
+            colors=2,
+            transitions=_generalized_transitions(2, -1),
+            boundary=boundary,
+        ),
+        lambda boundary: machina.mobile_automaton(
+            initial=(0, 0, 0),
+            head=0,
+            colors=2,
+            transitions=_mobile_transitions(2, -1),
+            boundary=boundary,
+        ),
+        lambda boundary: machina.neighbor_updating_mobile_automaton(
+            initial=(0, 0, 0),
+            head=0,
+            colors=2,
+            transitions=_neighbor_mobile_transitions(2, -1),
+            boundary=boundary,
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "boundary",
+    (
+        loci.Boundary(loci.BoundaryPolicy.FIXED, 0),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+        loci.Boundary(loci.BoundaryPolicy.REFLECTIVE),
+    ),
+)
+def test_anchored_movement_presets_reject_nonperiodic_carriers(
+    constructor,
+    boundary: loci.Boundary,
+) -> None:
+    with pytest.raises(ValueError, match="periodic boundary"):
+        constructor(boundary)
+
+
+def test_extended_mobile_rejects_nonperiodic_carrier_after_warning() -> None:
+    with pytest.warns(DeprecationWarning):
+        with pytest.raises(ValueError, match="periodic boundary"):
+            machina.extended_mobile_automaton(
+                initial=(0, 0, 0),
+                head=0,
+                colors=2,
+                transitions=_neighbor_mobile_transitions(2, -1),
+                boundary=loci.Boundary(loci.BoundaryPolicy.REFLECTIVE),
+            )
+
+
+def test_turing_edges_are_rule_owned_under_finite_and_wrapping_boundaries() -> None:
+    terminal_1d = machina.turing_machine(
+        tape=(0, 0, 0),
+        head=0,
+        initial_state="q0",
+        states=("q0",),
+        symbols=2,
+        transitions=((("q0", 0), ("q0", 1, -1)),),
+    )
+    terminal_2d = machina.turing_machine_2d(
+        shape=(2, 2),
+        tape=(0,) * 4,
+        head=(0, 0),
+        initial_state="q0",
+        states=("q0",),
+        symbols=2,
+        transitions=((("q0", 0), ("q0", 1, (-1, 0))),),
+    )
+    periodic_1d = machina.turing_machine(
+        tape=(0, 0, 0),
+        head=0,
+        initial_state="q0",
+        states=("q0", "q1"),
+        symbols=2,
+        transitions=((("q0", 0), ("q1", 1, -1)),),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+    )
+    periodic_2d = machina.turing_machine_2d(
+        shape=(3, 3),
+        tape=(0,) * 9,
+        head=(0, 0),
+        initial_state="q0",
+        states=("q0", "q1"),
+        symbols=2,
+        transitions=((("q0", 0), ("q1", 1, (0, -1))),),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+    )
+
+    _assert_terminal(terminal_1d)
+    _assert_terminal(terminal_2d)
+    assert _values(_successor(periodic_1d))[-1] == alphabets.tag_value(
+        "head:q1",
+        0,
+    )
+    assert _values(_successor(periodic_2d))[2] == alphabets.tag_value(
+        "head:q1",
+        0,
+    )
+
+
+def test_turing_reflective_aliases_commit_one_normalized_destination() -> None:
+    reflected_1d = machina.turing_machine(
+        tape=(0, 0, 0),
+        head=0,
+        initial_state="q0",
+        states=("q0", "q1"),
+        symbols=2,
+        transitions=((("q0", 0), ("q1", 1, -1)),),
+        boundary=loci.Boundary(loci.BoundaryPolicy.REFLECTIVE),
+    )
+    aliased_2d = machina.turing_machine_2d(
+        shape=(1, 1),
+        tape=(0,),
+        head=(0, 0),
+        initial_state="q0",
+        states=("q0", "q1"),
+        symbols=2,
+        transitions=((("q0", 0), ("q1", 1, (0, 1))),),
+        boundary=loci.Boundary(loci.BoundaryPolicy.REFLECTIVE),
+    )
+
+    assert _values(_successor(reflected_1d))[1] == alphabets.tag_value(
+        "head:q1",
+        0,
+    )
+    assert _values(_successor(aliased_2d)) == (
+        alphabets.tag_value("head:q1", 1),
+    )
+
+
 def test_extended_mobile_adapter_warns_and_delegates_losslessly() -> None:
     arguments = dict(
         initial=(0, 0, 1, 0, 0),
@@ -306,7 +492,145 @@ def test_extended_mobile_adapter_warns_and_delegates_losslessly() -> None:
     with pytest.warns(DeprecationWarning, match="neighbor_updating"):
         legacy = machina.extended_mobile_automaton(**arguments)
 
-    assert legacy == machina.neighbor_updating_mobile_automaton(**arguments)
+    canonical = machina.neighbor_updating_mobile_automaton(**arguments)
+    assert legacy == canonical
+    assert serialization.dumps(legacy) == serialization.dumps(canonical)
+
+
+def test_equivalent_rank_one_preset_paths_have_no_invocation_identity() -> None:
+    initial = (0, 1, 2, 1, 0)
+    identity = _identity_table(3, 3, 1)
+    programs = (
+        automata.multicolor_cellular_automaton(
+            initial=initial,
+            colors=3,
+            rule=identity,
+        ),
+        automata.quiescent_cellular_automaton(
+            initial=initial,
+            colors=3,
+            rule=identity,
+            background=0,
+        ),
+        automata.quiescent_cellular_automaton(
+            initial=initial,
+            colors=3,
+            rule=identity,
+            background=1,
+        ),
+        automata.symmetric_cellular_automaton(
+            initial=initial,
+            colors=3,
+            rule=identity,
+        ),
+    )
+
+    assert all(simple == programs[0] for simple in programs[1:])
+    encoded = serialization.dumps(programs[0])
+    assert all(serialization.dumps(simple) == encoded for simple in programs[1:])
+
+
+def test_totalistic_specializations_are_exact_expansion_paths() -> None:
+    three_arguments = dict(
+        initial=(0, 1, 2, 1, 0),
+        rule=tuple(index % 3 for index in range(7)),
+    )
+    four_arguments = dict(
+        initial=(0, 1, 3, 1, 0),
+        rule=tuple(index % 4 for index in range(10)),
+    )
+    three_general = automata.totalistic_cellular_automaton(
+        colors=3,
+        radius=1,
+        **three_arguments,
+    )
+    three_specialized = automata.three_color_totalistic_cellular_automaton(
+        **three_arguments,
+    )
+    four_general = automata.totalistic_cellular_automaton(
+        colors=4,
+        radius=1,
+        **four_arguments,
+    )
+    four_specialized = automata.higher_color_totalistic_cellular_automaton(
+        colors=4,
+        radius=1,
+        **four_arguments,
+    )
+
+    assert three_general == three_specialized
+    assert serialization.dumps(three_general) == serialization.dumps(
+        three_specialized
+    )
+    assert four_general == four_specialized
+    assert serialization.dumps(four_general) == serialization.dumps(
+        four_specialized
+    )
+
+
+def test_ranked_named_presets_equal_the_same_lattice_expansion() -> None:
+    initial_2d = (0, 1, 1, 0)
+    von_neumann = (
+        (-1, 0),
+        (0, -1),
+        (0, 0),
+        (0, 1),
+        (1, 0),
+    )
+    named_2d = automata.cellular_automaton_2d(
+        shape=(2, 2),
+        initial=initial_2d,
+        colors=2,
+        rule=_identity_table(2, 5, 2),
+    )
+    lattice_2d = automata.lattice_cellular_automaton(
+        shape=(2, 2),
+        initial=initial_2d,
+        colors=2,
+        offsets=von_neumann,
+        rule=_identity_table(2, 5, 2),
+        axes=("x", "y"),
+    )
+    named_3d = automata.cellular_automaton_3d(
+        shape=(2, 1, 1),
+        initial=(0, 1),
+        colors=2,
+        offsets=((0, 0, 0),),
+        rule=(0, 1),
+    )
+    lattice_3d = automata.lattice_cellular_automaton(
+        shape=(2, 1, 1),
+        initial=(0, 1),
+        colors=2,
+        offsets=((0, 0, 0),),
+        rule=(0, 1),
+        axes=("x", "y", "z"),
+    )
+
+    assert named_2d == lattice_2d
+    assert serialization.dumps(named_2d) == serialization.dumps(lattice_2d)
+    assert named_3d == lattice_3d
+    assert serialization.dumps(named_3d) == serialization.dumps(lattice_3d)
+
+
+def test_digit_reversal_equals_its_generic_arithmetic_expansion() -> None:
+    source = rules.observation(0)
+    expression = rules.add(
+        source,
+        rules.from_digits(
+            rules.reverse(rules.integer_digits(source, 2)),
+            2,
+        ),
+    )
+    generic = automata.arithmetic_iteration(
+        initial=6,
+        alphabet=alphabets.naturals(),
+        map_expression=expression,
+    )
+    named = automata.digit_reversal_map(initial=6, base=2)
+
+    assert generic == named
+    assert serialization.dumps(generic) == serialization.dumps(named)
 
 
 def test_turing_presets_apply_tagged_control_transitions() -> None:
@@ -339,7 +663,7 @@ def test_turing_presets_apply_tagged_control_transitions() -> None:
 
 
 def test_missing_turing_transition_is_an_explicit_terminal_continuation() -> None:
-    simple = machina.turing_machine(
+    one_dimensional = machina.turing_machine(
         tape=(0, 0, 1, 0, 0),
         head=2,
         initial_state="q0",
@@ -348,15 +672,19 @@ def test_missing_turing_transition_is_an_explicit_terminal_continuation() -> Non
         transitions=((("q0", 0), ("q0", 1, 1)),),
         boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
     )
+    two_dimensional = machina.turing_machine_2d(
+        shape=(3, 3),
+        tape=(0, 0, 0, 0, 1, 0, 0, 0, 0),
+        head=(1, 1),
+        initial_state="q0",
+        states=("q0",),
+        symbols=2,
+        transitions=((("q0", 0), ("q0", 1, (0, 1))),),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+    )
 
-    result = program.apply(simple, _source(simple))
-
-    assert isinstance(result, program.ApplicationComplete)
-    atom = result.source_outcomes.support.atoms[0]
-    assert isinstance(atom, rules.Derivation)
-    assert isinstance(atom.continuation, rules.Stop)
-    assert atom.progress is rules.Progress.QUIESCENT
-    assert loci.configuration_equal(_successor(simple), _source(simple))
+    _assert_terminal(one_dimensional)
+    _assert_terminal(two_dimensional)
 
 
 def _all_program_samples() -> tuple[program.SimpleProgram, ...]:
@@ -480,9 +808,9 @@ def _all_program_samples() -> tuple[program.SimpleProgram, ...]:
 
 def test_all_new_presets_round_trip_through_the_closed_codec() -> None:
     for simple in _all_program_samples():
-        assert serialization.loads(serialization.dumps(simple)) == (
-            serialization.Decoded(simple)
-        )
+        encoded = serialization.dumps(simple)
+        assert serialization.loads(encoded) == serialization.Decoded(simple)
+        assert b"catalog:" not in encoded
 
 
 @pytest.mark.parametrize(

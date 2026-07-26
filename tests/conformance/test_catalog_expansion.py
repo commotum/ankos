@@ -10,7 +10,7 @@ from itertools import product
 import pytest
 
 import ca
-from ca import alphabets, loci, rules
+from ca import alphabets, loci, rules, serialization
 from ca.catalog import automata, criteria, entries, machina, media, substitua
 
 from g7_catalog_manifest import (
@@ -578,8 +578,15 @@ def test_canonical_preset_alias_and_compatibility_relations_are_exact() -> None:
     for spelling, simple_program in programs.items():
         canonical = _canonical_callable(target_by_spelling[spelling])
         expanded = canonical(**_program_arguments(simple_program))
+        encoded = serialization.dumps(simple_program)
 
         assert expanded == simple_program
+        assert serialization.dumps(expanded) == encoded
+        assert serialization.loads(encoded) == serialization.Decoded(
+            simple_program
+        )
+        assert b"catalog:" not in encoded
+        assert b"catalog-source-evidence" not in encoded
         assert tuple(field.name for field in fields(expanded)) == _FIVE_FIELDS
         assert not hasattr(expanded, "family_id")
         assert not hasattr(expanded, "catalog_spelling")

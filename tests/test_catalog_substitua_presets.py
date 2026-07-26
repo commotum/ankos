@@ -59,6 +59,7 @@ def _roundtrip(value):
     assert serialization.loads(encoded) == serialization.Decoded(value)
     assert serialization.dumps(value) == encoded
     assert b"catalog:" not in encoded
+    assert b"catalog-source-evidence" not in encoded
 
 
 def _apply_value(
@@ -645,6 +646,14 @@ def test_terminal_presets_return_typed_no_successor_outcomes() -> None:
                 coefficients=(Fraction(1),),
             ),
             "match",
+        ),
+        (
+            lambda: substitua.recursive_sequence(
+                prefix=(Fraction(1),),
+                coefficients=(Fraction(1),),
+                bias=0,
+            ),
+            "bias",
         ),
         (
             lambda: substitua.variable_index_recursive_sequence(

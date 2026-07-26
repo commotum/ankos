@@ -1097,7 +1097,7 @@ def recursive_sequence(
     *,
     prefix: tuple[int | Fraction, ...],
     coefficients: tuple[int | Fraction, ...],
-    bias: int | Fraction = 0,
+    bias: int | Fraction | None = None,
 ) -> SimpleProgram:
     """Append one exact affine recurrence term; coefficients are lag-one first."""
 
@@ -1125,9 +1125,14 @@ def recursive_sequence(
         raise TypeError(
             "recursive-sequence coefficients must match the prefix type"
         )
-    if numeric_type is Fraction and type(bias) is int and bias == 0:
-        bias = Fraction(0)
-    if type(bias) is not numeric_type:
+    effective_bias: int | Fraction
+    if bias is None:
+        effective_bias = (
+            0 if numeric_type is int else Fraction(0)
+        )
+    elif type(bias) is numeric_type:
+        effective_bias = bias
+    else:
         raise TypeError("recursive-sequence bias must match the prefix type")
     if len(prefix) < len(coefficients):
         raise ValueError(
@@ -1150,7 +1155,7 @@ def recursive_sequence(
         )
         for lag, coefficient in enumerate(coefficients, start=1)
     )
-    next_term = rules.add(rules.literal_expr(bias), *terms)
+    next_term = rules.add(rules.literal_expr(effective_bias), *terms)
     output = rules.concatenate(
         source_expr,
         rules.word_value("sequence", next_term),
