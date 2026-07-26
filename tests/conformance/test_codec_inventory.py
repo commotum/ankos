@@ -85,11 +85,9 @@ def _public_sealed_types(
     return tuple(sealed)
 
 
-def _tag(owner_name: str, type_name: str) -> str:
-    if owner_name == "program" and type_name == "SimpleProgram":
-        return "ca.simple-program"
-    kebab = re.sub(r"([a-z0-9])([A-Z])", r"\1-\2", type_name).lower()
-    return f"ca.{owner_name}.{kebab}"
+_WIRE_TAG_RE = re.compile(
+    r"ca(?:\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*)+\Z"
+)
 
 
 def _local_validator(owner_name: str, value: type[object]) -> str:
@@ -181,7 +179,7 @@ def test_codec_inventory_freezes_tags_versions_validators_and_equality() -> None
         is_enum = issubclass(value, Enum)
 
         assert row["kind"] == ("enum-member" if is_enum else "frozen-dataclass")
-        assert row["tag"] == _tag(owner_name, row["type"])
+        assert _WIRE_TAG_RE.fullmatch(row["tag"]) is not None
         assert row["version"] == "1"
         if not is_enum:
             version_fields = tuple(
@@ -203,6 +201,12 @@ def test_codec_inventory_freezes_tags_versions_validators_and_equality() -> None
 
     owner_types = {(row["owner"], row["type"]) for row in rows}
     assert len({row["tag"] for row in rows}) == len(owner_types)
+    assert {
+        row["tag"]
+        for row in rows
+        if row["owner"] == "ca.program"
+        and row["type"] == "SimpleProgram"
+    } == {"ca.simple-program"}
 
 
 def test_inventory_joins_the_closed_production_schema_exactly() -> None:

@@ -507,8 +507,107 @@ def _clause_disposition_identity_expression(
     return disposition
 
 
+def _representation_stable_key(
+    value: object,
+    *,
+    decode_relation: alphabets.RepresentationRelation | None,
+    identity_expression_ids: frozenset[int] = frozenset(),
+) -> tuple[object, ...]:
+    """Project semantics exactly while masking only declared derived-ID slots."""
+
+    if (
+        decode_relation is not None
+        and isinstance(value, alphabets.ValueNode)
+    ):
+        for pair in decode_relation.relation:
+            if alphabets.semantic_equal(value, pair.target):
+                return _representation_stable_key(
+                    pair.source,
+                    decode_relation=None,
+                    identity_expression_ids=identity_expression_ids,
+                )
+    if value is None:
+        return ("none",)
+    if type(value) is bool:
+        return ("bool", value)
+    if type(value) is int:
+        return ("int", value)
+    if type(value) is Fraction:
+        return ("fraction", value.numerator, value.denominator)
+    if type(value) is str:
+        return ("string", value)
+    if isinstance(value, Enum):
+        return (
+            "enum",
+            value.__class__.__module__,
+            value.__class__.__name__,
+            value.value,
+        )
+    if type(value) is tuple:
+        return (
+            "tuple",
+            tuple(
+                _representation_stable_key(
+                    item,
+                    decode_relation=decode_relation,
+                    identity_expression_ids=identity_expression_ids,
+                )
+                for item in value
+            ),
+        )
+    if not is_dataclass(value):
+        raise AssertionError(
+            f"unhandled representation-key value {type(value).__name__}"
+        )
+
+    normalized_fields: list[tuple[str, tuple[object, ...]]] = []
+    for field in fields(value):
+        if type(value) is rules.Witness and field.name == "identity":
+            field_key = ("derived-witness-identity",)
+        elif (
+            type(value) is rules.RuleExpr
+            and id(value) in identity_expression_ids
+            and field.name == "arguments"
+        ):
+            field_key = ("derived-proof-identity",)
+        else:
+            field_key = _representation_stable_key(
+                getattr(value, field.name),
+                decode_relation=decode_relation,
+                identity_expression_ids=identity_expression_ids,
+            )
+        normalized_fields.append((field.name, field_key))
+    return (
+        "record",
+        value.__class__.__module__,
+        value.__class__.__name__,
+        tuple(normalized_fields),
+    )
+
+
+def _source_atom_key(
+    atom: rules.Derivation | rules.NoSuccessor,
+    *,
+    decode_relation: alphabets.RepresentationRelation | None,
+) -> tuple[object, ...]:
+    identity_expressions = set(
+        id(expression)
+        for expression in _clause_read_evidence_expressions(atom.witness)
+    )
+    disposition = _clause_disposition_identity_expression(atom)
+    if disposition is not None:
+        identity_expressions.add(id(disposition))
+    return _representation_stable_key(
+        atom,
+        decode_relation=decode_relation,
+        identity_expression_ids=frozenset(identity_expressions),
+    )
+
+
 def _identity_aliases(
     result: program.ApplicationComplete,
+    *,
+    decode_relation: alphabets.RepresentationRelation | None,
 ) -> dict[str, str]:
     aliases = {
         result.evidence.program_identity: "@program",
@@ -519,10 +618,20 @@ def _identity_aliases(
         result.evidence.canonical_rule_identity: "@rule",
         result.evidence.input_trace_lineage_identity: "@input-lineage",
     }
-    for atom in result.source_outcomes.support.atoms:
-        source_label = ":".join(
-            (type(atom).__name__, *atom.provenance)
-        )
+    source_atoms = result.source_outcomes.support.atoms
+    source_keys = tuple(
+        _source_atom_key(atom, decode_relation=decode_relation)
+        for atom in source_atoms
+    )
+    source_key_ranks = {
+        key: index
+        for index, key in enumerate(sorted(set(source_keys), key=repr))
+    }
+    source_key_occurrences: dict[tuple[object, ...], int] = {}
+    for atom, source_key in zip(source_atoms, source_keys, strict=True):
+        occurrence = source_key_occurrences.get(source_key, 0)
+        source_key_occurrences[source_key] = occurrence + 1
+        source_label = f"{source_key_ranks[source_key]}:{occurrence}"
         aliases[atom.canonical_identity] = f"@source:{source_label}"
         identities = tuple(
             expression.arguments[0]
@@ -533,6 +642,28 @@ def _identity_aliases(
             aliases[identity] = (
                 f"@read-evidence:{source_label}:{index}"
             )
+
+    successors_by_identity = {
+        loci.configuration_identity(atom.successor): atom.successor
+        for atom in result.applied_atoms.atoms
+        if isinstance(atom, program.AppliedDerivation)
+    }
+    successor_keys = {
+        identity: _representation_stable_key(
+            successor,
+            decode_relation=decode_relation,
+        )
+        for identity, successor in successors_by_identity.items()
+    }
+    successor_key_ranks = {
+        key: index
+        for index, key in enumerate(
+            sorted(set(successor_keys.values()), key=repr)
+        )
+    }
+    for identity, key in successor_keys.items():
+        aliases[identity] = f"@successor:{successor_key_ranks[key]}"
+
     for atom in result.applied_atoms.atoms:
         source_alias = aliases[atom.source.canonical_identity]
         aliases[atom.canonical_identity] = f"@applied:{source_alias}"
@@ -545,8 +676,6 @@ def _identity_aliases(
                 aliases[loci.canonical_identity(binding.identity)] = (
                     f"@fresh:{source_alias}:{index}"
                 )
-        if isinstance(atom, program.AppliedDerivation):
-            aliases[loci.configuration_identity(atom.successor)] = "@successor"
     return aliases
 
 

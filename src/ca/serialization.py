@@ -37,6 +37,9 @@ _PROGRAM_SCHEMA_VERSION = 1
 _DIGEST_PREFIX = "sha256:"
 _DIGEST_RE = re.compile(r"sha256:[0-9a-f]{64}\Z")
 _DECIMAL_RE = re.compile(r"(?:0|-[1-9][0-9]*|[1-9][0-9]*)\Z")
+_WIRE_TAG_RE = re.compile(
+    r"ca(?:\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*)+\Z"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -1100,19 +1103,10 @@ def _validate_registry() -> None:
             raise RuntimeError(f"invalid canonical schema owner for {row.tag}")
         if value_type.__name__ != row.type_name or row.version != 1:
             raise RuntimeError(f"invalid canonical schema identity for {row.tag}")
-        owner_name = row.owner.removeprefix("ca.")
-        kebab_type = re.sub(
-            r"([a-z0-9])([A-Z])",
-            r"\1-\2",
-            row.type_name,
-        ).lower()
-        expected_tag = (
-            _PROGRAM_SCHEMA_TAG
-            if value_type is program.SimpleProgram
-            else f"ca.{owner_name}.{kebab_type}"
-        )
-        if row.tag != expected_tag:
-            raise RuntimeError(f"canonical schema tag drift for {row.tag}")
+        if _WIRE_TAG_RE.fullmatch(row.tag) is None:
+            raise RuntimeError(
+                f"invalid canonical schema tag syntax for {row.tag!r}"
+            )
         if row.enum_values:
             if not issubclass(value_type, Enum):
                 raise RuntimeError(f"{row.tag} is declared as a non-enum")

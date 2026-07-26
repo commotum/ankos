@@ -4045,6 +4045,7 @@ def run_px10_representation_case(
         raise ValueError("PX10 representation case index must be 0 or 1")
     primary = _px10(row, case_index=0)
     alternate_recipe = _px10(row, case_index=1)
+    assert primary.simple_program == alternate_recipe.simple_program
     assert (
         primary.simple_program.canonical_identity
         == alternate_recipe.simple_program.canonical_identity

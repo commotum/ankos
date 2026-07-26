@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from fractions import Fraction
 from hashlib import sha256
 import json
 import subprocess
 import sys
+from types import MappingProxyType
 
 import pytest
 
@@ -177,6 +178,60 @@ def test_registry_fails_closed_when_an_owner_gains_an_unregistered_type(
 
     with pytest.raises(RuntimeError, match="missing=.*FutureSealed"):
         serialization._validate_registry()
+
+
+def test_explicit_wire_tag_survives_python_type_and_module_rename(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A deliberate code move updates membership metadata, never wire v1."""
+
+    value = loci.coordinate("x", 7, scope="stable-wire")
+    original = serialization._SCHEMA_BY_TYPE[loci.Locus]
+    assert original.tag == "ca.loci.locus"
+
+    renamed = replace(
+        original,
+        owner=program.__name__,
+        type_name="SpatialLocus",
+    )
+    schemas = tuple(
+        renamed if row.value_type is loci.Locus else row
+        for row in serialization._schema_rows()
+    )
+    by_type = dict(serialization._SCHEMA_BY_TYPE)
+    by_type[loci.Locus] = renamed
+    by_tag = dict(serialization._SCHEMA_BY_TAG)
+    by_tag[renamed.tag] = renamed
+
+    monkeypatch.setattr(loci.Locus, "__module__", program.__name__)
+    monkeypatch.setattr(loci.Locus, "__name__", "SpatialLocus")
+    monkeypatch.setattr(loci.Locus, "__qualname__", "SpatialLocus")
+    monkeypatch.setattr(
+        program,
+        "SpatialLocus",
+        loci.Locus,
+        raising=False,
+    )
+    monkeypatch.setattr(serialization, "_SCHEMAS", schemas)
+    monkeypatch.setattr(
+        serialization,
+        "_SCHEMA_BY_TYPE",
+        MappingProxyType(by_type),
+    )
+    monkeypatch.setattr(
+        serialization,
+        "_SCHEMA_BY_TAG",
+        MappingProxyType(by_tag),
+    )
+
+    serialization._validate_registry()
+    encoded = serialization.dumps(value)
+    envelope = json.loads(encoded)
+
+    assert renamed.owner == "ca.program"
+    assert renamed.type_name == "SpatialLocus"
+    assert envelope["tag"] == "ca.loci.locus"
+    assert serialization.loads(encoded) == serialization.Decoded(value)
 
 
 def test_mutated_enum_singleton_cannot_encode_as_another_member() -> None:
