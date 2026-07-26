@@ -492,6 +492,16 @@ production `apply` definition, rollout calling that operation, no forbidden
 core dependency or semantic-family dispatch, and no change to Goal 2, Goal 5,
 or Goal 6.
 
+The final hostile review of code tree `c6714402b45e` found no reclosure
+blocker. It independently mapped public application evidence for T09–T12 and
+T25 to the anchored/mobile/Turing mechanics, T16/T20 to word/tree pattern
+rewriting, and T26/T28 to independent/contextual ranked mosaics. A rank-one
+through rank-four property probe also found periodic/reflective alias
+normalization consistent across loci, Frontier, and Neighborhood. Two
+nonblocking cleanup opportunities remain for G7-05 or later: make the manual
+whole-core AST prohibition scan a permanent conformance test, and consolidate
+the currently equivalent boundary-alias normalization helpers.
+
 G7-02 is reclosed. The first next action is the reopened G7-03 codec audit:
 consume the 441-row inventory, add real representatives for every new sealed
 record and enum member, round-trip the new expression forms and expanded
