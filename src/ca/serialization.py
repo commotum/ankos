@@ -1326,6 +1326,14 @@ def _encode_node(value: object) -> dict[str, object]:
         member_value = value.value
         if type(member_value) is not str or member_value not in schema.enum_values:
             raise TypeError(f"{schema.tag} has an undeclared enum value")
+        try:
+            canonical_member = schema.value_type(member_value)
+        except (TypeError, ValueError) as error:
+            raise TypeError(
+                f"{schema.tag} is not a canonical enum member"
+            ) from error
+        if canonical_member is not value:
+            raise TypeError(f"{schema.tag} is not a canonical enum member")
         return _node(schema.tag, {"value": member_value})
     try:
         field_values = tuple(

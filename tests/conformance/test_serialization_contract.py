@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import fields
+from dataclasses import fields, is_dataclass, replace
 from enum import Enum
 from fractions import Fraction
 from hashlib import sha256
@@ -144,6 +144,29 @@ def test_every_public_semantic_value_round_trips_and_reencodes_identically() -> 
     for value in values:
         decoded = _decoded(value)
         _assert_semantically_equal(value, decoded)
+
+
+def test_every_semantic_record_version_is_exact_integer_one() -> None:
+    """Boolean and rational lookalikes cannot masquerade as schema version 1."""
+
+    versioned = tuple(
+        value
+        for value in representative_values()
+        if is_dataclass(value)
+        and any(field.name == "version" for field in fields(value))
+    )
+    assert len(versioned) == 60
+
+    for value in versioned:
+        canonical = serialization.dumps(value)
+        for invalid in (True, Fraction(1, 1)):
+            with pytest.raises((TypeError, ValueError)):
+                replace(value, version=invalid)
+            object.__setattr__(value, "version", invalid)
+            with pytest.raises(TypeError):
+                serialization.dumps(value)
+            object.__setattr__(value, "version", 1)
+        assert serialization.dumps(value) == canonical
 
 
 def test_program_payload_has_exactly_five_expanded_field_keys() -> None:

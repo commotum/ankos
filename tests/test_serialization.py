@@ -179,6 +179,33 @@ def test_registry_fails_closed_when_an_owner_gains_an_unregistered_type(
         serialization._validate_registry()
 
 
+def test_mutated_enum_singleton_cannot_encode_as_another_member() -> None:
+    """Enum value forgery is rejected without polluting this interpreter."""
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            """
+from ca import loci, serialization
+
+member = loci.LocusKind.COORDINATE
+object.__setattr__(member, "_value_", "named")
+try:
+    serialization.dumps(member)
+except TypeError:
+    pass
+else:
+    raise AssertionError("forged enum member encoded canonically")
+""",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+
+
 def test_unknown_lossy_noncanonical_or_forged_payloads_fail_closed() -> None:
     """Hostile schema and integrity mutations cannot default or migrate."""
 
