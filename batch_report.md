@@ -1,4 +1,11 @@
-# ANKoS Batch Rollout Report
+# Historical ANKoS 0.1 Batch Rollout Report
+
+> **Superseded implementation record:** Everything below describes the removed
+> 0.1 `Dynamics`/`RawBatch` batching surface. It is retained as historical
+> engineering evidence, not current package documentation or migration
+> guidance. For ankos 0.2.0, see [`README-V2.md`](README-V2.md) and
+> [`api.md`](api.md); dense dataset batching is a downstream view over ordinary
+> five-field programs and the one generic rollout path.
 
 This report summarizes Stage 1 of the Phase 9 batching plan: ANKoS now exposes
 a raw batched rollout primitive that PE can call for same-domain episode

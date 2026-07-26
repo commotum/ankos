@@ -1,4 +1,11 @@
-# ANKoS Visualization Feature Spec
+# Historical ANKoS 0.1 Visualization Feature Spec
+
+> **Superseded design record:** The specification below was written against
+> the removed 0.1 `Dynamics`, `RawEpisode`, and `RawBatch` surface. Its bundle
+> format history remains useful, but its Python API examples are not current.
+> ankos 0.2.0 visualization consumes explicit downstream
+> `DatasetEpisode`/`DatasetBatch` views; see [`README-V2.md`](README-V2.md),
+> [`api.md`](api.md), and `src/ca/viz/`.
 
 ## Purpose
 

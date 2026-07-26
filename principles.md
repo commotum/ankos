@@ -14,27 +14,41 @@ Catalog labels do not create executors. Different names, semantic roles, or stat
 
 ## 2. Share Execution Only Where Semantics Are Shared
 
-Use one reference executor wherever systems genuinely share an execution algebra. Never create family-specific rollouts, but never conceal fundamentally different semantics behind an empty universal interface.
+Use one family-blind application law wherever systems genuinely share the
+five-field algebra. Never create family-specific application or rollout paths,
+but never conceal fundamentally different semantics behind an empty universal
+interface.
 
-For systems with canonical transition or rewrite evolution, the common process is:
+For executable constructions, the common process is:
 
 ```text
-active  = FRONTIER.select(state)
-reads   = NEIGHBORHOOD.read(state, active)
-writes  = RULE(active, reads)
-next    = UPDATE.apply(state, active, writes)
+writable = FRONTIER.resolve(snapshot)
+readable = NEIGHBORHOOD.resolve(snapshot)
+outcomes = RULE.denote(readable, writable)
+result   = APPLY.validate_and_atomically_reconstruct(snapshot, outcomes)
 ```
 
-This process must be validated against representative constructions. If supporting a family requires `Any`, family switches, hidden engines, duplicated semantics, or global-state smuggling, stop and reconsider the algebra.
+Frontier and Neighborhood resolve independently from the same immutable
+snapshot. Rule returns complete typed alternatives, and `apply` performs only
+family-blind validation, reconstruction, commit, quotient, and measure
+projection. If supporting a family requires `Any`, family switches, hidden
+engines, duplicated semantics, or global-state smuggling, stop and reconsider
+the algebra.
 
 ## 3. Give Each Component One Responsibility
 
-Within the common transition algebra:
+Within the common five-field algebra:
 
-- `FRONTIER`: where rules fire.
-- `NEIGHBORHOOD`: what those loci can observe.
-- `RULE`: what typed writes or replacements are proposed.
-- `UPDATE`: how applicable writes become the next state or states.
+- `SEED`: where valid initial configurations or laws over them come from.
+- `ALPHABET`: which closed semantic values and equality laws are valid.
+- `FRONTIER`: every existing or potential component a Rule alternative may
+  change.
+- `NEIGHBORHOOD`: the complete identity-preserving view Rule may observe.
+- `RULE`: applicability, scheduling, conflicts, stochastic laws, stopping,
+  and complete typed atomic dispositions.
+- `APPLY`: generic validation, fresh binding, reconstruction, successor
+  validation, quotienting, and measure projection; it is an operation, not a
+  sixth stored component.
 
 These boundaries are hypotheses too. Redraw them if a real construction demonstrates that the responsibilities are wrong.
 
@@ -58,7 +72,11 @@ The alphabet defines possible values. It does not by itself define where values 
 
 ## 6. Keep Domain, Addresses, and Topology Separate
 
-`DOMAIN` names the task/program's dimensional space—`t+0D`, `t+1D`, `t+2D`, and so on—with discrete or continuous character explicit. CONFIGURATION owns the support/topology that inhabits that space. Alphabets, value sets, parameter sets, and serialization addresses are not DOMAINs.
+Domain is a descriptive property of a construction's carrier—scalar, line,
+plane, graph, field, and so on—not a stored program axis. CONFIGURATION owns
+the support/topology that realizes it, with discrete or continuous character
+explicit. Alphabets, value sets, parameter sets, and serialization addresses
+are not domains.
 
 The program core does not privilege a serialization address. Sequence order, graph adjacency, tree structure, and higher-dimensional geometry must remain explicit in state or metadata rather than being inferred accidentally from integer proximity.
 
@@ -92,7 +110,9 @@ Some choices are intrinsically coupled: rule tables depend on neighborhood arity
 
 ## 10. Use Presets Without Hiding Behavior
 
-The family index should configure common systems and validate parameters strictly while returning an ordinary shared specification. A preset is declarative convenience, not an alternate implementation.
+The catalog should configure common systems and validate parameters strictly
+while returning an ordinary `SimpleProgram`. A preset is declarative
+convenience, not an alternate implementation.
 
 Every catalog entry should remain discoverable, but multiple entries may resolve to the same construction with different parameters, restrictions, seeds, or validation rules.
 
@@ -107,7 +127,7 @@ But synchronous update, first-match order, replacement order, and other executio
 The intended flow is explicit and one-way:
 
 ```text
-program -> trace -> experiment encoding -> batch/visualization
+program -> application/rollout result -> experiment encoding -> batch/visualization
 ```
 
 Flattening, padding, token ordering, type prefixes, coordinate metadata, loss masks, and visualization operate on generated traces. They must not distort the generator API or become hidden inputs to program execution.
@@ -116,7 +136,10 @@ Flattening, padding, token ordering, type prefixes, coordinate metadata, loss ma
 
 Implement the smallest set of examples that exercises every suspected primitive and difficult interaction. Choose examples likely to break the design, not merely typical examples.
 
-Let those examples reveal the actual axis parameters, invariants, and genuinely different update composition laws. Expand to all 45 catalog entries only after the common mechanisms survive these tests without exceptions or duplicated paths.
+Let those examples reveal the actual component contracts, invariants, and
+genuinely different Rule compositions. Expand to all 60 audited executable
+families only after the common mechanisms survive these tests without
+exceptions or duplicated paths.
 
 ## 14. Treat Failed Composition as Design Information
 

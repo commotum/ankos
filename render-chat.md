@@ -1,3 +1,10 @@
+# Historical Visualization Design Conversation
+
+> **Superseded design transcript:** This conversation predates the 0.2.0
+> five-field runtime and uses removed `Dynamics`/`RawEpisode`/`RawBatch`
+> spellings. It is retained as design history, not current API guidance. See
+> [`README-V2.md`](README-V2.md) and [`api.md`](api.md) for current usage.
+
 Jake:
 I need to create a visualizer for this library. I want something ultra-fast, and ultra-lightweight. What's the best way for me to do this? Ideally we build something custom, not use an existing 3D or 2D graphics library since that comes with so much baggage and extra code. Like I want something super thin and fast.
 
