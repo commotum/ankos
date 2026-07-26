@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-06 RELEASE RECONCILIATION NEXT**
+Status: **IN PROGRESS — G7-06 RELEASE RECONCILIATION ACTIVE**
 
 ## Big-Picture Objective
 
@@ -175,8 +175,9 @@ conflict, and reconcile the plan before changing runtime behavior.
   environment and passed dependency, import, signature, codec, catalog,
   application, rollout, and `py.typed` checks. Exact evidence is in
   [`6-CONFORMANCE.md`](6-CONFORMANCE.md).
-- G7-06 is the first incomplete stage. No documentation reconciliation,
-  release cleanup, or release-readiness claim has started.
+- G7-06 is the first incomplete stage and has begun from clean commit
+  `1c92123cf3c04a421759f5acd84141a6074a6fbe`. Its live transaction record is
+  [`7-RELEASE.md`](7-RELEASE.md). No release-readiness claim has been made.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -332,7 +333,7 @@ stage file and may evolve with the implementation.
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Complete | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Complete | All normative suites and joins pass together |
-| `7-RELEASE` | G7-06 | Next | Docs, packaging, cleanup, and hostile final gate |
+| `7-RELEASE` | G7-06 | In progress | Docs, packaging, cleanup, and hostile final gate |
 
 No stage file exists until that stage begins.
 
@@ -629,6 +630,9 @@ surface has no hidden alternate semantics.
 ### 7-RELEASE
 
 Handoff stage: **G7-06 — Documentation, packaging, and cleanup**
+
+Stage status: **In progress.** The live release-reconciliation record is
+[`7-RELEASE.md`](7-RELEASE.md).
 
 #### Big Picture Objective
 
