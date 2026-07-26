@@ -375,12 +375,50 @@ def _rule_samples() -> tuple[object, ...]:
             "codec rejection",
         )
     )
+    anchored_result = rules.DerivationClauseResult(
+        (
+            rules.ExistingDispositionPlan(
+                rules.capability_group_item(0, 0),
+                rules.DispositionAction.PRESERVE,
+            ),
+        ),
+        (),
+        rules.Progress.QUIESCENT,
+        rules.Continue(),
+        expression,
+        ("codec:anchored",),
+        _certificate(rules.CertificateKind.DERIVATION, "codec-anchored"),
+    )
+    anchored_zero = rules.DerivationClauseResult(
+        (),
+        (),
+        rules.Progress.QUIESCENT,
+        rules.Continue(),
+        rules.literal_expr("codec-zero-anchors"),
+        ("codec:zero-anchors",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "codec-zero-anchors",
+        ),
+    )
+    anchored_denotation = rules.AnchoredClauseKernelDenotation(
+        (rules.RuleClause(rules.literal_expr(True), anchored_result),),
+        0,
+        rules.ClauseSelection.FIRST,
+        rules.ProposalConflictPolicy.REQUIRE_EQUAL,
+        anchored_zero,
+        _certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "codec-anchored-complete",
+        ),
+    )
     return (
         unknown,
         outcome,
         literal_rule,
         expression_rule,
         rules.parallel((expression_rule, expression_rule)),
+        anchored_denotation,
         existing_plan,
         evidence_term,
         rules.EvaluationProof(

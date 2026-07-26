@@ -230,8 +230,8 @@ _SCHEMAS = (
     # rules enums
     _enum(rules.RulePrimitive, "ca.rules.rule-primitive", (
         "rule.literal", "rule.expression", "rule.clause-kernel",
-        "rule.relation", "rule.distribution", "rule.parallel",
-        "rule.differential",
+        "rule.anchored-clause-kernel", "rule.relation",
+        "rule.distribution", "rule.parallel", "rule.differential",
     )),
     _enum(rules.ExpressionPrimitive, "ca.rules.expression-primitive", (
         "expression.literal", "expression.observation", "expression.group",
@@ -294,9 +294,14 @@ _SCHEMAS = (
         "all", "first",
     )),
     _enum(
+        rules.ProposalConflictPolicy,
+        "ca.rules.proposal-conflict-policy",
+        ("require-equal", "first", "last"),
+    ),
+    _enum(
         rules.CapabilitySelectorKind,
         "ca.rules.capability-selector-kind",
-        ("index", "target", "every"),
+        ("index", "target", "group-item", "every"),
     ),
     _enum(rules.RuleFaultPhase, "ca.rules.rule-fault-phase", (
         "rule-denotation", "result-validation", "composition",
@@ -843,7 +848,7 @@ _SCHEMAS = (
     _record(
         rules.CapabilitySelector,
         "ca.rules.capability-selector",
-        ("kind", "index", "target", "version"),
+        ("kind", "index", "target", "channel", "item", "version"),
     ),
     _record(
         rules.ExistingDispositionPlan,
@@ -882,6 +887,14 @@ _SCHEMAS = (
         rules.ClauseKernelDenotation,
         "ca.rules.clause-kernel-denotation",
         ("clauses", "selection", "completeness_evidence", "version"),
+    ),
+    _record(
+        rules.AnchoredClauseKernelDenotation,
+        "ca.rules.anchored-clause-kernel-denotation",
+        (
+            "clauses", "group_channel", "selection", "conflict_policy",
+            "zero_result", "completeness_evidence", "version",
+        ),
     ),
     _record(
         rules.ParallelDenotation,
@@ -1095,8 +1108,8 @@ def _validate_registry() -> None:
         program,
     )
     owners = {owner.__name__ for owner in owner_modules}
-    if len(_SCHEMAS) != 184:
-        raise RuntimeError("canonical schema registry must contain 184 owner types")
+    if len(_SCHEMAS) != 186:
+        raise RuntimeError("canonical schema registry must contain 186 owner types")
     if len({row.value_type for row in _SCHEMAS}) != len(_SCHEMAS):
         raise RuntimeError("canonical schema registry contains a duplicate type")
     if len({row.tag for row in _SCHEMAS}) != len(_SCHEMAS):
@@ -1104,8 +1117,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 430:
-        raise RuntimeError("canonical schema registry must contain 430 variants")
+    if variant_count != 436:
+        raise RuntimeError("canonical schema registry must contain 436 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:

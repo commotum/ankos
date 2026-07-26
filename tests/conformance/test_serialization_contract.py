@@ -135,11 +135,11 @@ def test_every_public_semantic_value_round_trips_and_reencodes_identically() -> 
     values = representative_values()
     sealed_types = public_sealed_types()
 
-    assert len(values) == 430
-    assert len(sealed_types) == 184
+    assert len(values) == 436
+    assert len(sealed_types) == 186
     assert {type(value) for value in values} == set(sealed_types)
-    assert sum(isinstance(value, Enum) for value in values) == 290
-    assert sum(not isinstance(value, Enum) for value in values) == 140
+    assert sum(isinstance(value, Enum) for value in values) == 295
+    assert sum(not isinstance(value, Enum) for value in values) == 141
 
     for value in values:
         decoded = _decoded(value)
@@ -155,7 +155,7 @@ def test_every_semantic_record_version_is_exact_integer_one() -> None:
         if is_dataclass(value)
         and any(field.name == "version" for field in fields(value))
     )
-    assert len(versioned) == 63
+    assert len(versioned) == 64
 
     for value in versioned:
         canonical = serialization.dumps(value)
