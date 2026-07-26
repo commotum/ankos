@@ -723,58 +723,6 @@ def flat_map_lookup(source: RuleExpr, table: RuleExpr) -> RuleExpr:
     return RuleExpr(ExpressionPrimitive.FLAT_MAP_LOOKUP, (source, table))
 
 
-_MAP_TAG = "map"
-_MAP_ENTRY_TAG = "entry"
-
-
-def map_entry(
-    key: RuleScalar,
-    value: RuleScalar,
-) -> alphabets.ValueNode:
-    """Construct one explicit arbitrary-semantic-key association entry."""
-
-    if not _is_rule_scalar(key) or not _is_rule_scalar(value):
-        raise TypeError("map entries require closed semantic keys and values")
-    return alphabets.ValueNode(
-        alphabets.ValueKind.PRODUCT,
-        _MAP_ENTRY_TAG,
-        items=(key, value),
-    )
-
-
-def map_value(
-    entries: tuple[tuple[RuleScalar, RuleScalar], ...],
-) -> alphabets.ValueNode:
-    """Construct a canonical sealed association from semantic key/value pairs."""
-
-    if type(entries) is not tuple or any(
-        type(entry) is not tuple or len(entry) != 2
-        for entry in entries
-    ):
-        raise TypeError(
-            "map entries must be an immutable tuple of key/value pairs"
-        )
-    normalized = tuple(map_entry(key, value) for key, value in entries)
-    keys = tuple(entry.items[0] for entry in normalized)
-    if any(
-        loci.semantic_equal(left, right)
-        for index, left in enumerate(keys)
-        for right in keys[index + 1 :]
-    ):
-        raise ValueError("map entries contain duplicate semantic keys")
-    ordered = tuple(
-        sorted(
-            normalized,
-            key=lambda entry: loci.canonical_identity(entry.items[0]),
-        )
-    )
-    return alphabets.ValueNode(
-        alphabets.ValueKind.WORD,
-        _MAP_TAG,
-        items=ordered,
-    )
-
-
 def capability_index(index: int) -> CapabilitySelector:
     """Select one resolved writable capability by canonical sequence index."""
 
@@ -3474,7 +3422,17 @@ def _evaluate_value(
                 updated.append((old_key, old_value))
         if not replaced:
             updated.append((key, value))
-        return finish(map_value(tuple(updated)))
+        return finish(
+            alphabets.map_value(
+                tuple(
+                    alphabets.map_entry_value(
+                        entry_key,
+                        entry_value,
+                    )
+                    for entry_key, entry_value in updated
+                )
+            )
+        )
     if primitive is ExpressionPrimitive.INDEX_OF:
         items, _ = _sequence_items(evaluate(_child(arguments, 0)))
         needle = _require_semantic_value(evaluate(_child(arguments, 1)))
@@ -3571,8 +3529,8 @@ def _evaluate_value(
             raise ZeroDivisionError("division expression denominator is zero")
         return finish(Fraction(left, right))
     if primitive is ExpressionPrimitive.FLOOR_DIVIDE:
-        left = _require_exact_number(evaluate(_child(arguments, 0)))
-        right = _require_exact_number(evaluate(_child(arguments, 1)))
+        left = _require_strict_exact_number(evaluate(_child(arguments, 0)))
+        right = _require_strict_exact_number(evaluate(_child(arguments, 1)))
         if right == 0:
             raise ZeroDivisionError(
                 "floor-divide expression denominator is zero"
@@ -3580,10 +3538,10 @@ def _evaluate_value(
         quotient = Fraction(left) / Fraction(right)
         return finish(quotient.numerator // quotient.denominator)
     if primitive is ExpressionPrimitive.ABSOLUTE:
-        value = _require_exact_number(evaluate(_child(arguments, 0)))
+        value = _require_strict_exact_number(evaluate(_child(arguments, 0)))
         return finish(abs(value))
     if primitive is ExpressionPrimitive.FRACTIONAL_PART:
-        value = _require_exact_number(evaluate(_child(arguments, 0)))
+        value = _require_strict_exact_number(evaluate(_child(arguments, 0)))
         return finish(value - int(value))
     if primitive is ExpressionPrimitive.MODULO:
         value = _require_int(evaluate(_child(arguments, 0)))
@@ -3885,6 +3843,16 @@ def _require_strict_int(value: RuleRuntimeValue) -> int:
     return value
 
 
+def _require_strict_exact_number(
+    value: RuleRuntimeValue,
+) -> int | Fraction:
+    if type(value) not in (int, Fraction):
+        raise TypeError(
+            "expected a non-Boolean exact numeric Rule expression"
+        )
+    return value
+
+
 def _require_value_node(
     value: RuleRuntimeValue,
     kind: alphabets.ValueKind,
@@ -3931,39 +3899,10 @@ def _association_entries(
 ) -> tuple[tuple[alphabets.SemanticValue, alphabets.SemanticValue], ...]:
     association = _require_value_node(
         value,
-        alphabets.ValueKind.WORD,
+        alphabets.ValueKind.MAP,
         owner="map operation",
     )
-    if association.tag != _MAP_TAG:
-        raise TypeError(
-            f"map operation requires a {_MAP_TAG!r}-tagged semantic word"
-        )
-    entries: list[
-        tuple[alphabets.SemanticValue, alphabets.SemanticValue]
-    ] = []
-    for item in association.items:
-        if (
-            type(item) is not alphabets.ValueNode
-            or item.kind is not alphabets.ValueKind.PRODUCT
-            or item.tag != _MAP_ENTRY_TAG
-            or len(item.items) != 2
-        ):
-            raise TypeError(
-                "map operation requires explicit two-item entry products"
-            )
-        key, entry_value = item.items
-        entries.append((key, entry_value))
-    keys = tuple(key for key, _ in entries)
-    if any(
-        loci.semantic_equal(left, right)
-        for index, left in enumerate(keys)
-        for right in keys[index + 1 :]
-    ):
-        raise ValueError("map value contains duplicate semantic keys")
-    identities = tuple(loci.canonical_identity(key) for key in keys)
-    if identities != tuple(sorted(identities)):
-        raise ValueError("map entries are not in canonical key order")
-    return tuple(entries)
+    return alphabets.map_entries(association)
 
 
 def _association_lookup(
@@ -4785,10 +4724,8 @@ __all__ = [
     "literal",
     "literal_expr",
     "lookup",
-    "map_entry",
     "map_lookup",
     "map_update",
-    "map_value",
     "maximal_runs",
     "modulo",
     "multiply",
