@@ -660,6 +660,7 @@ def _assert_px10_step_algebra(
         for item in disposition.entries
     )
 
+    assert source_atom.progress is rules.Progress.ADVANCED
     expected_continuation = rules.Stop if terminal else rules.Continue
     assert type(source_atom.continuation) is expected_continuation
 
@@ -802,6 +803,12 @@ def test_represented_and_native_one_step_results_commute_completely(
     )
     actual_target = materialized_px10_target(execution)
     assert alphabets.semantic_equal(actual_target, oracle_target)
+    if row.spf == "SPF060":
+        assert type(actual_target) is alphabets.ValueNode
+        assert type(oracle_target) is alphabets.ValueNode
+        assert actual_target.kind is alphabets.ValueKind.WORD
+        assert actual_target.tag == oracle_target.tag == "xor-output"
+        assert actual_target.items == oracle_target.items
 
     terminal_result = _assert_px10_trajectory_algebra(execution)
     terminal_derivations = tuple(
