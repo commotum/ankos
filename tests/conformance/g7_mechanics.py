@@ -480,20 +480,6 @@ _PX01_CASES: dict[
         ),
         False,
     ),
-    "SPF032": (
-        (("source_a", 1), ("source_b", 1), ("collision", 0), ("phase", 0)),
-        ("source_a", "source_b", "collision", "phase"),
-        ("source_a", "source_b", "collision", "phase"),
-        ((("source_a", 0), ("source_b", 0), ("collision", 2), ("phase", 1)),),
-        False,
-    ),
-    "SPF045": (
-        (("pc", 0), ("counter", 2), ("register", 5)),
-        ("pc", "counter", "register"),
-        ("pc", "counter", "register"),
-        ((("pc", 1), ("counter", 1), ("register", 7)),),
-        False,
-    ),
     "SPF050": (
         (("old0", 1), ("old1", 0), ("next0", 0), ("next1", 0), ("cursor", 0)),
         ("old0", "old1", "cursor"),
@@ -520,8 +506,182 @@ def _record_targets(
     }
 
 
+def _all_conditions(*conditions: rules.RuleExpr) -> rules.RuleExpr:
+    return rules.gate(
+        rules.RuleExpr(rules.ExpressionPrimitive.TUPLE, conditions),
+        rules.GateKind.ALL,
+    )
+
+
+def _px01_multi_active_collision(row: MechanicsRow) -> MechanicsRun:
+    """Resolve two active sources competing for one shared destination."""
+
+    source = loci.grid_configuration(
+        (5,),
+        (0, 1, 0, 2, 0),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    alphabet = alphabets.integers()
+    (
+        priority,
+        source_a,
+        destination,
+        source_b,
+        resolution,
+    ) = tuple(target for target, _ in source.entries)
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=(source_a, source_b, destination, resolution),
+        read_targets=(source_a, source_b, destination, priority),
+    )
+    active_sources = (
+        rules.less_than(rules.literal_expr(0), rules.observation(0)),
+        rules.less_than(rules.literal_expr(0), rules.observation(1)),
+    )
+
+    def resolution(
+        label: str,
+        selected_source: rules.RuleExpr,
+        selected_marker: int,
+    ) -> rules.DerivationClauseResult:
+        return _derivation_result(
+            f"{row.fixture}:{label}",
+            existing=(
+                _existing_target_plan(
+                    source_a,
+                    rules.DispositionAction.REPLACE,
+                    rules.literal_expr(0),
+                ),
+                _existing_target_plan(
+                    source_b,
+                    rules.DispositionAction.REPLACE,
+                    rules.literal_expr(0),
+                ),
+                _existing_target_plan(
+                    destination,
+                    rules.DispositionAction.REPLACE,
+                    selected_source,
+                ),
+                _existing_target_plan(
+                    resolution,
+                    rules.DispositionAction.REPLACE,
+                    rules.literal_expr(selected_marker),
+                ),
+            ),
+        )
+
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                _all_conditions(
+                    *active_sources,
+                    rules.equal(
+                        rules.observation(3),
+                        rules.literal_expr(0),
+                    ),
+                ),
+                resolution("source-a-wins", rules.observation(0), 1),
+            ),
+            _clause(
+                _all_conditions(*active_sources),
+                resolution("source-b-wins", rules.observation(1), 2),
+            ),
+        ),
+        selection=rules.ClauseSelection.FIRST,
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px01_register_machine(row: MechanicsRow) -> MechanicsRun:
+    """Execute one visible instruction over pc, counter, and register state."""
+
+    source = _record_configuration(
+        (
+            ("pc", 0),
+            ("instruction", 1),
+            ("counter", 2),
+            ("register", 5),
+        )
+    )
+    alphabet = alphabets.integers()
+    targets = _record_targets(source)
+    read_targets = tuple(
+        targets[name]
+        for name in ("pc", "instruction", "counter", "register")
+    )
+    write_targets = tuple(
+        targets[name] for name in ("pc", "counter", "register")
+    )
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=write_targets,
+        read_targets=read_targets,
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                _all_conditions(
+                    rules.equal(
+                        rules.observation(1),
+                        rules.literal_expr(1),
+                    ),
+                    rules.less_than(
+                        rules.literal_expr(0),
+                        rules.observation(2),
+                    ),
+                ),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_target_plan(
+                            targets["pc"],
+                            rules.DispositionAction.REPLACE,
+                            rules.add(
+                                rules.observation(0),
+                                rules.literal_expr(1),
+                            ),
+                        ),
+                        _existing_target_plan(
+                            targets["counter"],
+                            rules.DispositionAction.REPLACE,
+                            rules.subtract(
+                                rules.observation(2),
+                                rules.literal_expr(1),
+                            ),
+                        ),
+                        _existing_target_plan(
+                            targets["register"],
+                            rules.DispositionAction.REPLACE,
+                            rules.add(
+                                rules.observation(3),
+                                rules.observation(2),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
 def _px01(row: MechanicsRow) -> MechanicsRun:
     """Couple source, control, and every possible destination atomically."""
+
+    if row.spf == "SPF032":
+        return _px01_multi_active_collision(row)
+    if row.spf == "SPF045":
+        return _px01_register_machine(row)
 
     fields, read_names, write_names, alternatives, stop = _PX01_CASES[row.spf]
     source = _record_configuration(fields)
@@ -1721,12 +1881,19 @@ def _px07(row: MechanicsRow) -> MechanicsRun:
         fields = (
             ("cell", 1),
             ("mutable_rule_entry", 30),
+            ("rule_version", 0),
             ("phase", 0),
         )
-        read_names = ("cell", "mutable_rule_entry", "phase")
+        read_names = (
+            "cell",
+            "mutable_rule_entry",
+            "rule_version",
+            "phase",
+        )
         replacements = (
             ("cell", 0),
             ("mutable_rule_entry", 31),
+            ("rule_version", 1),
             ("phase", 1),
         )
     else:
@@ -1752,6 +1919,41 @@ def _px07(row: MechanicsRow) -> MechanicsRun:
         write_targets=tuple(targets[name] for name, _ in replacements),
         read_targets=tuple(targets[name] for name in read_names),
     )
+    if row.spf == "SPF034":
+        condition = _all_conditions(
+            rules.equal(rules.observation(0), rules.literal_expr(1)),
+            rules.equal(rules.observation(1), rules.literal_expr(30)),
+        )
+        replacement_expressions = (
+            ("cell", rules.literal_expr(0)),
+            (
+                "mutable_rule_entry",
+                rules.add(
+                    rules.observation(1),
+                    rules.literal_expr(1),
+                ),
+            ),
+            (
+                "rule_version",
+                rules.add(
+                    rules.observation(2),
+                    rules.literal_expr(1),
+                ),
+            ),
+            (
+                "phase",
+                rules.add(
+                    rules.observation(3),
+                    rules.literal_expr(1),
+                ),
+            ),
+        )
+    else:
+        condition = rules.literal_expr(1)
+        replacement_expressions = tuple(
+            (name, rules.literal_expr(value))
+            for name, value in replacements
+        )
     rule = _kernel(
         source,
         alphabet,
@@ -1759,16 +1961,16 @@ def _px07(row: MechanicsRow) -> MechanicsRun:
         readable,
         (
             _clause(
-                rules.literal_expr(1),
+                condition,
                 _derivation_result(
                     row.fixture,
                     existing=tuple(
                         _existing_target_plan(
                             targets[name],
                             rules.DispositionAction.REPLACE,
-                            rules.literal_expr(value),
+                            expression,
                         )
-                        for name, value in replacements
+                        for name, expression in replacement_expressions
                     ),
                 ),
             ),

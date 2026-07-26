@@ -21,12 +21,12 @@
   twelve primary pressure partitions contain each SPF001–SPF060 once, and the
   required secondary joins are SPF018/PX03, SPF039/PX04, plus
   SPF012/SPF013/SPF014/SPF024/SPF035/SPF042 on PX08.
-- The remaining CT10, CT14, CT12, and 60-family test shells mix G7-02
-  mechanics obligations with later codec/catalog obligations. G7-02 will
-  activate the mechanics-owned assertions and leave only explicitly
-  stage-owned G7-03/G7-04 assertions skipped.
+- The CT10, CT14, CT12, and 60-family shells originally mixed G7-02
+  mechanics obligations with later codec/catalog obligations. G7-02
+  activated every mechanics-owned assertion; only explicitly owned
+  G7-03/G7-04 assertions remain skipped.
 - `serialization.py` and every `catalog/` module remain inert and unexposed.
-  G7-02 will not implement or expose them.
+  G7-02 did not implement or expose them.
 
 ## Updated Assumptions
 
@@ -166,4 +166,120 @@ focused files under `tests/conformance/`.
 
 ## Stage Results
 
-In progress.
+### Authoritative behavior
+
+- The common mechanics now cover finite, structural, dynamic-fresh, global,
+  differential, and genuinely intensional read/write regions without adding
+  a sixth program field or another executor.
+- Locus selectors and region algebra resolve stable cells, occurrences,
+  paths, spans, interfaces, products, addresses, structural references, and
+  deterministic fresh identities. Alpha-equivalent fresh structures bind and
+  quotient by structural identity, while unbound references fail closed.
+- Alphabet mechanics now cover exact algebraic, complex, structural, and
+  represented values with explicit exact/lossy representation relations.
+- Frontier resolution preserves the complete possible-write envelope for
+  finite and intensional configurations. Neighborhood resolution covers
+  literal, global, metric, history, path, interface, field, differential, and
+  intensional views from one immutable snapshot.
+- Rule now has one closed generic clause kernel for applicability,
+  branching, priority, coupled replacement, delete/create, stopped results,
+  relations, exact laws, and differential/intensional results. Projection
+  cardinalities enforce finite/countable/uncountable partition and quotient
+  arithmetic while retaining honest `Undetermined` claims.
+- `program.apply` required only two family-blind contract repairs:
+  structural-reference binding/alpha quotienting and the intensional writable
+  join. A finite Rule result cannot escape through an intensional writable
+  envelope.
+- Each SPF001–SPF060 row has one direct ordinary five-field construction.
+  The matrix covers PX01–PX12 and all eight secondary joins, and secondary
+  executions reuse the exact primary `SimpleProgram`.
+- CT12 compares complete native/generic results for all 16 frozen cases.
+  Fresh bindings, intensional projections, fibers, and measures are derived
+  exclusively from runtime data; three mutation probes prevent oracle-value
+  passthrough.
+
+### Files and boundaries
+
+- Extended `src/ca/loci.py`, `alphabets.py`, `frontiers.py`,
+  `neighborhoods.py`, `rules.py`, and the demonstrated generic joins in
+  `program.py`. Existing Seed forms already met the pressure contracts and
+  required no production change.
+- Added the test-owned mechanics ledger in
+  `tests/conformance/g7_mechanics.py`, activated the G7-02 portions of CT10,
+  CT12, CT14, observer, cardinality, fresh-identity, and witness-quotient
+  conformance, and expanded the corresponding component unit tests.
+- Added `codec-inventory.csv` with 387 sealed semantic-variant rows and an
+  executable completeness check in
+  `tests/conformance/test_codec_inventory.py`.
+- Left `serialization.py`, every `catalog/` module, root exports, datasets,
+  RNG, visualization, Goal 2, Goal 5, and Goal 6 unchanged from the G7-02
+  baseline.
+
+### Verification
+
+The completed tree passed:
+
+```text
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
+→ 354 passed, 26 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/conformance/test_family_coverage.py
+→ 65 passed, 2 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/conformance/test_native_generic_equivalence.py
+→ 20 passed
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/test_rules.py \
+  tests/conformance/test_outcome_cardinality.py \
+  tests/conformance/test_codec_inventory.py
+→ 61 passed
+
+git diff --check
+→ pass
+```
+
+Static inspection additionally established:
+
+- exactly one production `apply`, in `src/ca/program.py`;
+- no SPF/family/catalog dispatch, callback, `Any`, `eval`, ambient RNG,
+  NumPy, or catalog import in the seven core modules;
+- no change to catalog, serialization, root exports, datasets, RNG,
+  visualization, Goal 2, Goal 5, or Goal 6;
+- 387 inventory rows, each with a tag, version, fields, owner, validator, and
+  equality law; and
+- zero G7-02-owned skips.
+
+The 26 retained skips divide exactly between later owners: 13 for G7-03
+serialization/representation work and 13 for G7-04 catalog/metadata work.
+
+### Hostile review and repaired assumptions
+
+Hostile review rejected several initially green but insufficient
+implementations. The repairs now have dedicated regressions:
+
+- pressure rows must expose their actual mechanics, not merely relabel one
+  shared toy; SPF014 and SPF024 are structurally distinct, and SPF038/SPF046
+  preserve typed graph/event topology through writable loci, interfaces,
+  payloads, and `StructuralReference` endpoints;
+- secondary pressure joins must reuse the primary construction rather than
+  substitute a different fixture;
+- an intensional frontier needs a real end-to-end application boundary, not
+  only a descriptor;
+- an unknown cardinality is not an infinite cardinality, but known source,
+  partition, complement, and quotient bounds still constrain it; and
+- CT12 normalization cannot copy any frozen expected evidence, relation,
+  fiber, or measure.
+
+Direct adversarial replay closed every confirmed blocker while retaining
+honest unknown/infinite controls. The five-field architecture, Frontier
+meaning, family-blind application law, and immutable configuration snapshot
+did not require revision. Structural topology is represented by typed loci
+and payload relations rather than by mutating carrier metadata.
+
+G7-02 is closed. The first G7-03 action is to create `4-CODECS.md`, consume
+the 387-row inventory as the exhaustive codec worklist, and implement the
+closed tag/version/value codec kernel without importing or exposing catalog.
+No G7-03 implementation or stage file began here.
