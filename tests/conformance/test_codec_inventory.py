@@ -119,7 +119,17 @@ def _inventory_rows() -> tuple[dict[str, str], ...]:
         reader = csv.DictReader(stream)
         assert tuple(reader.fieldnames or ()) == INVENTORY_COLUMNS
         rows = tuple(reader)
-    assert all(None not in row for row in rows)
+    assert all(
+        key is not None and value is not None
+        for row in rows
+        for key, value in row.items()
+    )
+    assert all(
+        row[column]
+        for row in rows
+        for column in INVENTORY_COLUMNS
+        if column not in {"exact_fields", "wire_value"}
+    )
     return rows
 
 
@@ -176,6 +186,13 @@ def test_codec_inventory_freezes_tags_versions_validators_and_equality() -> None
         assert row["kind"] == ("enum-member" if is_enum else "frozen-dataclass")
         assert row["tag"] == _tag(owner_name, row["type"])
         assert row["version"] == "1"
+        if not is_enum:
+            version_fields = tuple(
+                field for field in fields(value) if field.name == "version"
+            )
+            if version_fields:
+                assert len(version_fields) == 1
+                assert version_fields[0].default == 1
         assert row["local_validator"] == (
             "Enum.__call__"
             if is_enum
@@ -187,9 +204,5 @@ def test_codec_inventory_freezes_tags_versions_validators_and_equality() -> None
             enum=is_enum,
         )
 
-    type_tags = {
-        (row["owner"], row["type"], row["tag"]) for row in rows
-    }
-    assert len(type_tags) == len(
-        {(row["owner"], row["type"]) for row in rows}
-    )
+    owner_types = {(row["owner"], row["type"]) for row in rows}
+    assert len({row["tag"] for row in rows}) == len(owner_types)
