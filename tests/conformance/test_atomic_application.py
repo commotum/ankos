@@ -165,6 +165,37 @@ def test_missing_unauthorized_conflicting_or_invalid_effect_rejects_all() -> Non
     readable = neighborhoods.global_view(
         configuration_contract=source.contract,
         value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+
+    unauthorized = derivation(
+        "unauthorized-delete",
+        existing=(rules.delete(target),),
+    )
+    result = ca.apply(
+        _literal_program(source, writable, readable, unauthorized),
+        source,
+    )
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
+
+    missing = derivation("missing", existing=())
+    result = ca.apply(_literal_program(source, writable, readable, missing), source)
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
+
+    invalid = derivation(
+        "invalid-alphabet-value",
+        existing=(rules.replace(target, 2),),
+    )
+    result = ca.apply(_literal_program(source, writable, readable, invalid), source)
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
+
+    with pytest.raises(ValueError, match="duplicate"):
+        rules.TotalDisposition(
+            (rules.preserve(target), rules.replace(target, True)),
+            (),
+            certificate(rules.CertificateKind.TOTALITY, "conflicting"),
         )
 
 
@@ -235,32 +266,3 @@ def test_changed_quiescent_successor_rejects_after_atomic_reconstruction() -> No
     assert "Quiescent derivation changed" in result.fault.reason
     assert source.identity == before
     assert not hasattr(result, "applied_atoms")
-
-    unauthorized = derivation(
-        "unauthorized-delete",
-        existing=(rules.delete(target),),
-    )
-    result = ca.apply(
-        _literal_program(source, writable, readable, unauthorized),
-        source,
-    )
-    assert isinstance(result, program.ApplicationRejected)
-    assert result.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
-
-    missing = derivation("missing", existing=())
-    result = ca.apply(_literal_program(source, writable, readable, missing), source)
-    assert isinstance(result, program.ApplicationRejected)
-
-    invalid = derivation(
-        "invalid-alphabet-value",
-        existing=(rules.replace(target, 2),),
-    )
-    result = ca.apply(_literal_program(source, writable, readable, invalid), source)
-    assert isinstance(result, program.ApplicationRejected)
-
-    with pytest.raises(ValueError, match="duplicate"):
-        rules.TotalDisposition(
-            (rules.preserve(target), rules.replace(target, True)),
-            (),
-            certificate(rules.CertificateKind.TOTALITY, "conflicting"),
-        )

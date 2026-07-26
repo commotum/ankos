@@ -244,6 +244,39 @@ def test_rule_read_shape_must_match_neighborhood() -> None:
         )
 
 
+def test_rule_reads_must_remain_inside_the_resolved_neighborhood() -> None:
+    program, source, _ = native_program("dyadlags")
+    out_of_range_rule = rules.expression(
+        rules.ExistingPlan(
+            rules.ExistingPlanKind.BY_INDEX,
+            (
+                rules.observation(999),
+                rules.observation(1),
+                rules.observation(2),
+            ),
+        ),
+        contract=program.rule.contract,
+        witness=rules.literal_expr("out-of-range-read"),
+        provenance=("test:out-of-range-read",),
+    )
+    simple_program = ca.SimpleProgram(
+        program.seed,
+        program.alphabet,
+        program.frontier,
+        program.neighborhood,
+        out_of_range_rule,
+    )
+    before = source.identity
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, ca.program.ApplicationRejected)
+    assert result.fault.phase is ca.program.ApplicationPhase.RULE_DENOTATION
+    assert "out of range" in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
+
+
 def test_rule_join_shape_must_match_neighborhood() -> None:
     program, _, _ = native_program("dyadlags")
     wrong_rule = replace(

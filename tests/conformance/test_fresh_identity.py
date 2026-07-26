@@ -265,6 +265,71 @@ def test_fresh_collision_rejects_application_without_commit(
     assert not hasattr(result, "applied_atoms")
 
 
+def test_fresh_binding_cannot_collide_with_an_occupied_fresh_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    occupied = loci.Locus(
+        loci.LocusKind.FRESH,
+        "already-present",
+        ("occupied",),
+    )
+    carrier = loci.Carrier(
+        loci.CarrierContract(
+            loci.CarrierKind.RECORD,
+            rank=0,
+            shape=(),
+        ),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    source = loci.FiniteConfiguration(carrier, ((occupied, False),))
+    reference = loci.fresh_reference("children", "new-child")
+    writable = frontiers.fresh(
+        loci.literal(fresh=(reference,)),
+        namespace=frontiers.FreshNamespace("children"),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    alphabet = alphabets.boolean()
+    atom = derivation(
+        "occupied-fresh-collision",
+        existing=(),
+        fresh=(rules.create(reference, True),),
+    )
+    simple_program = ca.SimpleProgram(
+        seeds.exact(source),
+        alphabet,
+        writable,
+        readable,
+        rules.finite_rule(
+            (atom,),
+            contract=rule_contract(
+                source,
+                alphabet,
+                writable,
+                readable,
+            ),
+        ),
+    )
+    monkeypatch.setattr(
+        loci,
+        "bind_fresh",
+        lambda *args, **kwargs: occupied,
+    )
+    before = source.identity
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.FRESH_BINDING
+    assert "collides with an existing identity" in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
+
+
 def test_raw_bindings_remain_available_before_alpha_equivalence() -> None:
     simple_program, source, references = _fresh_program()
 

@@ -246,6 +246,7 @@ def _assert_no_dispatch_vocabulary(
         "apply_rule",
         "globals",
         "locals",
+        "vars",
         "__import__",
         "import_module",
     }
@@ -261,6 +262,7 @@ def _assert_no_dispatch_vocabulary(
         "rule_tag",
         "rule_kind",
         "apply_rule",
+        "__dict__",
     }
     assert names.isdisjoint(forbidden_names)
     assert attributes.isdisjoint(forbidden_attributes)

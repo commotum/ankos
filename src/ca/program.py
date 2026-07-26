@@ -971,6 +971,56 @@ def _validate_rule_space(
     rules.Derivation[alphabets.SemanticValue] | rules.NoSuccessor
 ]:
     outcome_space = result.outcome_space
+    law = outcome_space.probability_law
+    if law is not None:
+        try:
+            rebuilt_law = rules.ProbabilityLaw(
+                law.presentation,
+                tuple(
+                    rules.AtomMass(item.atom_identity, item.mass)
+                    for item in law.masses
+                ),
+                (
+                    None
+                    if law.measure is None
+                    else rules.RuleExpr(
+                        law.measure.primitive,
+                        law.measure.arguments,
+                        law.measure.version,
+                    )
+                ),
+                rules.Certificate(
+                    law.normalization_evidence.kind,
+                    rules.RuleExpr(
+                        law.normalization_evidence.statement.primitive,
+                        law.normalization_evidence.statement.arguments,
+                        law.normalization_evidence.statement.version,
+                    ),
+                    law.normalization_evidence.version,
+                ),
+                rules.Certificate(
+                    law.measurable_space_evidence.kind,
+                    rules.RuleExpr(
+                        law.measurable_space_evidence.statement.primitive,
+                        law.measurable_space_evidence.statement.arguments,
+                        law.measurable_space_evidence.statement.version,
+                    ),
+                    law.measurable_space_evidence.version,
+                ),
+                law.version,
+            )
+            rebuilt_space = rules.OutcomeSpace(
+                outcome_space.support,
+                rebuilt_law,
+                outcome_space.projection_cardinalities,
+                outcome_space.version,
+            )
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Rule probability law is invalid: {error}"
+            ) from error
+        if rebuilt_law != law or rebuilt_space != outcome_space:
+            raise ValueError("Rule probability law is not canonical")
     has_law = outcome_space.probability_law is not None
     declares_law = (
         contract.entropy_interface is seeds.EntropyInterface.REPLAY_KEY

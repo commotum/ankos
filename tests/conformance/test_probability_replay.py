@@ -424,6 +424,61 @@ def test_unavailable_is_narrowly_limited_to_successor_quotient_measure() -> None
         )
 
 
+@pytest.mark.parametrize(
+    "corruption",
+    ("measurability", "atom-space", "normalization"),
+)
+def test_malformed_rule_law_rejects_application_without_partial_output(
+    corruption: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    simple_program, source = diamond_program()
+    writable = simple_program.frontier.resolve(source)
+    readable = simple_program.neighborhood.resolve(source)
+    rule_result = simple_program.rule.denote(readable, writable)
+    assert isinstance(rule_result, rules.RuleComplete)
+    law = rule_result.outcome_space.probability_law
+    assert law is not None
+
+    if corruption == "measurability":
+        object.__setattr__(
+            law.measurable_space_evidence,
+            "kind",
+            rules.CertificateKind.NORMALIZATION,
+        )
+    elif corruption == "atom-space":
+        object.__setattr__(
+            law.masses[0],
+            "atom_identity",
+            "forged-atom-outside-support",
+        )
+    else:
+        object.__setattr__(
+            law.masses[0],
+            "mass",
+            Fraction(1, 6),
+        )
+
+    real_denote = rules.Rule.denote
+
+    def forged_denotation(subject, *args):
+        if subject is simple_program.rule:
+            return rule_result
+        return real_denote(subject, *args)
+
+    monkeypatch.setattr(rules.Rule, "denote", forged_denotation)
+    before = source.identity
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
+    assert "probability law" in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
+    assert not hasattr(result, "successor_quotient_with_derivation_fibers")
+
+
 def test_large_seed_law_is_retained_without_eager_enumeration_and_draws_directly() -> None:
     length = 20
     contract = loci.CarrierContract(
