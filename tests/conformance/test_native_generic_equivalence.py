@@ -1561,8 +1561,7 @@ def _ct12_measure_view_exact(
                     item.mass,
                 )
                 for item in measure.masses
-            )
-            ,
+            ),
             key=repr,
         )
     )
@@ -2042,11 +2041,23 @@ def _assert_non_native_case(case_id: str) -> None:
     )
 
 
-def test_variable_structure_and_stochastic_fixtures_match_completely() -> None:
-    for case in test_oracles.CT12_CASES[6:14]:
-        _assert_non_native_case(case.case_id)
+@pytest.mark.parametrize(
+    "oracle_case",
+    test_oracles.CT12_CASES[6:14],
+    ids=lambda case: case.case_id,
+)
+def test_variable_structure_and_stochastic_fixtures_match_completely(
+    oracle_case: test_oracles.OracleCase,
+) -> None:
+    _assert_non_native_case(oracle_case.case_id)
 
 
-def test_differential_and_intensional_fixtures_use_exact_tiny_oracles() -> None:
-    for case in test_oracles.CT12_CASES[14:]:
-        _assert_non_native_case(case.case_id)
+@pytest.mark.parametrize(
+    "oracle_case",
+    test_oracles.CT12_CASES[14:],
+    ids=lambda case: case.case_id,
+)
+def test_differential_and_intensional_fixtures_use_exact_tiny_oracles(
+    oracle_case: test_oracles.OracleCase,
+) -> None:
+    _assert_non_native_case(oracle_case.case_id)

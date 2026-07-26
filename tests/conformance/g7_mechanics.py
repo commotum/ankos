@@ -1070,7 +1070,7 @@ def _px04(row: MechanicsRow) -> MechanicsRun:
     elif row.spf == "SPF018":
         source = _record_configuration((("rhs", 1), ("x", -1), ("y", -1)))
         targets = _record_targets(source)
-        read_targets = (targets["rhs"],)
+        read_targets = (targets["rhs"], targets["x"], targets["y"])
         write_targets = (targets["x"], targets["y"])
         alternatives = (
             ((targets["x"], 0), (targets["y"], 1)),
@@ -1724,44 +1724,350 @@ def _px09(row: MechanicsRow) -> MechanicsRun:
     return _assemble(row, source, alphabet, writable, readable, rule)
 
 
-def _exact_representation(row: MechanicsRow) -> alphabets.RepresentationRelation:
-    """Build a row-specific exact finite map with a proved inverse on image."""
+def _exact_representation(
+    source_value: alphabets.SemanticValue,
+    target_value: alphabets.SemanticValue,
+    alternate_source: alphabets.SemanticValue,
+    alternate_target: alphabets.SemanticValue,
+) -> alphabets.RepresentationRelation:
+    """Build one exact two-point relation with a complete inverse on image."""
 
-    offset = 1000 + int(row.spf[-3:]) * 10
-    source_schema = alphabets.enum((0, 1)).descriptor
-    target_schema = alphabets.enum((offset, offset + 1)).descriptor
+    source_schema = alphabets.enum((source_value, alternate_source)).descriptor
+    target_schema = alphabets.enum((target_value, alternate_target)).descriptor
     relation = (
-        alphabets.RepresentationPair(0, offset),
-        alphabets.RepresentationPair(1, offset + 1),
+        alphabets.RepresentationPair(source_value, target_value),
+        alphabets.RepresentationPair(alternate_source, alternate_target),
     )
     return alphabets.RepresentationRelation(
         source_schema,
         target_schema,
         alphabets.RepresentationProfile.EXACT,
         relation,
-        (offset, offset + 1),
+        (target_value, alternate_target),
         (
-            alphabets.RepresentationPair(offset, 0),
-            alphabets.RepresentationPair(offset + 1, 1),
+            alphabets.RepresentationPair(target_value, source_value),
+            alphabets.RepresentationPair(alternate_target, alternate_source),
         ),
     )
 
 
-def _px10(row: MechanicsRow) -> MechanicsRun:
-    """Apply one exact representation map and retain its inverse obligation."""
+def _codec_word(tag: str, *items: alphabets.SemanticValue) -> alphabets.ValueNode:
+    return alphabets.ValueNode(alphabets.ValueKind.WORD, tag, items=items)
 
-    representation = _exact_representation(row)
-    encoded = representation.forward(1)
-    assert type(encoded) is int
-    source = loci.history_configuration((1, 0))
-    alphabet = alphabets.enum((0, 1, *representation.image_evidence))
-    writable = frontiers.everywhere(
-        configuration_contract=source.contract,
-        value_profile=alphabet.value_profile,
+
+def _codec_record(
+    tag: str,
+    **fields: alphabets.SemanticValue,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(
+        alphabets.ValueKind.RECORD,
+        tag,
+        fields=tuple(fields.items()),
     )
-    readable = neighborhoods.global_view(
-        configuration_contract=source.contract,
-        value_profile=alphabet.value_profile,
+
+
+def _codec_product(
+    tag: str,
+    *items: alphabets.SemanticValue,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(alphabets.ValueKind.PRODUCT, tag, items=items)
+
+
+def _closed_enum(
+    values: tuple[alphabets.SemanticValue, ...],
+) -> alphabets.Alphabet:
+    distinct: list[alphabets.SemanticValue] = []
+    for value in values:
+        if not any(alphabets.semantic_equal(value, prior) for prior in distinct):
+            distinct.append(value)
+    return alphabets.enum(tuple(distinct))
+
+
+def _px10(row: MechanicsRow) -> MechanicsRun:
+    """Run eight deliberately different exact representation workspaces."""
+
+    unset = _codec_record("unset", status="unset")
+    if row.spf == "SPF012":
+        native = _codec_word("source-word", "A", "A", "A", "B", "B")
+        encoded = _codec_record("run-records", run0="A:3", run1="B:2")
+        alternate_native = _codec_word("source-word", "B")
+        alternate_encoded = _codec_record("run-records", run0="B:1")
+        source = _record_configuration(
+            (("input", native), ("records", unset), ("phase", "scan"))
+        )
+        targets = _record_targets(source)
+        read_targets = (targets["input"], targets["phase"])
+        writes = (
+            (targets["records"], rules.literal_expr(encoded)),
+            (targets["phase"], rules.literal_expr("done")),
+        )
+    elif row.spf == "SPF054":
+        native = _codec_word("prefix-block", "A")
+        encoded = _codec_word("prefix-bits", 0)
+        alternate_native = _codec_word("prefix-block", "B")
+        alternate_encoded = _codec_word("prefix-bits", 1, 0)
+        block = loci.path("root", "block", scope="prefix-tree")
+        codebook = loci.path("root", "codebook", scope="prefix-tree")
+        output = loci.path("root", "output", scope="prefix-tree")
+        cursor = loci.path("root", "cursor", scope="prefix-tree")
+        source = _structural_configuration(
+            loci.CarrierKind.TREE,
+            (
+                (block, native),
+                (codebook, _codec_record("prefix-tree", A="0", B="10", C="11")),
+                (output, unset),
+                (cursor, "block-0"),
+            ),
+        )
+        read_targets = (block, codebook, cursor)
+        writes = (
+            (output, rules.literal_expr(encoded)),
+            (cursor, rules.literal_expr("done")),
+        )
+    elif row.spf == "SPF055":
+        native = _codec_word("message", "A", "B")
+        encoded = _codec_record(
+            "nested-interval",
+            low=Fraction(1, 4),
+            high=Fraction(1, 2),
+        )
+        alternate_native = _codec_word("message", "A", "A")
+        alternate_encoded = _codec_record(
+            "nested-interval",
+            low=Fraction(0),
+            high=Fraction(1, 4),
+        )
+        message = loci.field_point("codec", (0,), component="message")
+        low = loci.field_point("codec", (0,), component="low")
+        high = loci.field_point("codec", (0,), component="high")
+        output = loci.field_point("codec", (0,), component="interval")
+        cursor = loci.field_point("codec", (0,), component="cursor")
+        source = _structural_configuration(
+            loci.CarrierKind.FIELD,
+            (
+                (message, native),
+                (low, Fraction(0)),
+                (high, Fraction(1)),
+                (output, unset),
+                (cursor, "symbol-0"),
+            ),
+            rank=1,
+            axes=("x",),
+        )
+        read_targets = (message, low, high, cursor)
+        writes = (
+            (low, rules.literal_expr(Fraction(1, 4))),
+            (high, rules.literal_expr(Fraction(1, 2))),
+            (output, rules.literal_expr(encoded)),
+            (cursor, rules.literal_expr("done")),
+        )
+    elif row.spf == "SPF056":
+        native = _codec_word("history-input", "A", "B", "A", "B")
+        encoded = _codec_word(
+            "history-records",
+            "literal:A",
+            "literal:B",
+            "ref:offset=2,length=2",
+        )
+        alternate_native = _codec_word("history-input", "A", "B", "C")
+        alternate_encoded = _codec_word(
+            "history-records",
+            "literal:A",
+            "literal:B",
+            "literal:C",
+        )
+        history_targets = tuple(loci.occurrence("history", index) for index in range(6))
+        source = _structural_configuration(
+            loci.CarrierKind.HISTORY,
+            tuple(
+                zip(
+                    history_targets,
+                    ("A", "B", "A", "B", unset, "search"),
+                    strict=True,
+                )
+            ),
+            rank=1,
+            axes=("history",),
+        )
+        read_targets = history_targets[:4]
+        writes = (
+            (history_targets[4], rules.literal_expr(encoded)),
+            (history_targets[5], rules.literal_expr("done")),
+        )
+    elif row.spf == "SPF057":
+        native = _codec_product("uniform-grid", 1, 1, 1, 1)
+        encoded = _codec_record("region-leaf", bounds="2x2", value=1)
+        alternate_native = _codec_product("nonuniform-grid", 1, 0, 0, 1)
+        alternate_encoded = _codec_record(
+            "region-branch",
+            children=4,
+            bounds="2x2",
+        )
+        cells = (
+            loci.cell((-1, -1), axes=("x", "y")),
+            loci.cell((-1, 0), axes=("x", "y")),
+            loci.cell((0, -1), axes=("x", "y")),
+            loci.cell((0, 0), axes=("x", "y")),
+        )
+        result_target = loci.named("region-tree", scope="grid-workspace")
+        cursor = loci.named("cursor", scope="grid-workspace")
+        source = _structural_configuration(
+            loci.CarrierKind.GRID,
+            (
+                *tuple((target, 1) for target in cells),
+                (result_target, unset),
+                (cursor, "root"),
+            ),
+            rank=2,
+            axes=("x", "y"),
+        )
+        read_targets = cells
+        writes = (
+            (result_target, rules.literal_expr(encoded)),
+            (cursor, rules.literal_expr("done")),
+        )
+    elif row.spf == "SPF058":
+        native = _codec_word("vector", 1, 1)
+        encoded = _codec_word("walsh-coefficients", 1, 0)
+        alternate_native = _codec_word("vector", 1, -1)
+        alternate_encoded = _codec_word("walsh-coefficients", 0, 1)
+        base = loci.named("basis-workspace", scope="product")
+        vector0 = loci.product_locus("vector-0", (base,))
+        vector1 = loci.product_locus("vector-1", (base,))
+        coefficient0 = loci.product_locus("coefficient-0", (base,))
+        coefficient1 = loci.product_locus("coefficient-1", (base,))
+        result_target = loci.product_locus("result", (base,))
+        source = _structural_configuration(
+            loci.CarrierKind.PRODUCT,
+            (
+                (vector0, 1),
+                (vector1, 1),
+                (coefficient0, -1),
+                (coefficient1, -1),
+                (result_target, unset),
+            ),
+        )
+        read_targets = (vector0, vector1)
+        writes = (
+            (coefficient0, rules.observation(0)),
+            (
+                coefficient1,
+                rules.subtract(rules.observation(0), rules.observation(1)),
+            ),
+            (result_target, rules.literal_expr(encoded)),
+        )
+    elif row.spf == "SPF059":
+        native = _codec_word("samples", 1, 2, 3)
+        encoded = _codec_word("residuals", 1, 1, 1)
+        alternate_native = _codec_word("samples", 2, 4, 6)
+        alternate_encoded = _codec_word("residuals", 2, 2, 2)
+        history_targets = tuple(loci.occurrence("history", index) for index in range(8))
+        source = _structural_configuration(
+            loci.CarrierKind.HISTORY,
+            tuple(
+                zip(
+                    history_targets,
+                    (1, 2, 3, 0, 0, 0, unset, "predict"),
+                    strict=True,
+                )
+            ),
+            rank=1,
+            axes=("history",),
+        )
+        read_targets = history_targets[:3]
+        writes = (
+            (history_targets[3], rules.observation(0)),
+            (
+                history_targets[4],
+                rules.subtract(rules.observation(1), rules.observation(0)),
+            ),
+            (
+                history_targets[5],
+                rules.subtract(rules.observation(2), rules.observation(1)),
+            ),
+            (history_targets[6], rules.literal_expr(encoded)),
+            (history_targets[7], rules.literal_expr("done")),
+        )
+    elif row.spf == "SPF060":
+        native = _codec_product(
+            "xor-operands",
+            _codec_word("data", 1, 0, 1),
+            _codec_word("generator", 0, 1, 1),
+        )
+        encoded = _codec_word("xor-output", 1, 1, 0)
+        alternate_native = _codec_product(
+            "xor-operands",
+            _codec_word("data", 0, 0, 0),
+            _codec_word("generator", 1, 1, 1),
+        )
+        alternate_encoded = _codec_word("xor-output", 1, 1, 1)
+        word_targets = tuple(loci.occurrence("word", index) for index in range(10))
+        source = _structural_configuration(
+            loci.CarrierKind.WORD,
+            tuple(
+                zip(
+                    word_targets,
+                    (1, 0, 1, 0, 1, 1, 0, 0, 0, "aligned"),
+                    strict=True,
+                )
+            ),
+            rank=1,
+            axes=("word",),
+        )
+        read_targets = word_targets[:6]
+        writes = (
+            (
+                word_targets[6],
+                rules.modulo(
+                    rules.add(rules.observation(0), rules.observation(3)),
+                    2,
+                ),
+            ),
+            (
+                word_targets[7],
+                rules.modulo(
+                    rules.add(rules.observation(1), rules.observation(4)),
+                    2,
+                ),
+            ),
+            (
+                word_targets[8],
+                rules.modulo(
+                    rules.add(rules.observation(2), rules.observation(5)),
+                    2,
+                ),
+            ),
+            (word_targets[9], rules.literal_expr("done")),
+        )
+    else:
+        raise AssertionError(f"missing PX10 recipe for {row.spf}")
+
+    representation = _exact_representation(
+        native,
+        encoded,
+        alternate_native,
+        alternate_encoded,
+    )
+    future_values = (
+        encoded,
+        alternate_native,
+        alternate_encoded,
+        "done",
+        Fraction(1, 4),
+        Fraction(1, 2),
+        -1,
+        0,
+        1,
+    )
+    alphabet = _closed_enum(
+        tuple(value for _, value in source.entries) + future_values
+    )
+    write_targets = tuple(target for target, _ in writes)
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=write_targets,
+        read_targets=read_targets,
     )
     rule = _kernel(
         source,
@@ -1770,15 +2076,16 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         readable,
         (
             _clause(
-                rules.equal(rules.observation(0), rules.literal_expr(1)),
+                rules.literal_expr(1),
                 _derivation_result(
                     row.fixture,
-                    existing=(
-                        _existing_plan(
-                            1,
+                    existing=tuple(
+                        _existing_target_plan(
+                            target,
                             rules.DispositionAction.REPLACE,
-                            rules.literal_expr(encoded),
-                        ),
+                            value,
+                        )
+                        for target, value in writes
                     ),
                     stop=True,
                 ),
@@ -1793,13 +2100,55 @@ def _px10(row: MechanicsRow) -> MechanicsRun:
         readable,
         rule,
         representation=representation,
+        representation_source=native,
+        representation_target=encoded,
     )
 
 
 def _px11(row: MechanicsRow) -> MechanicsRun:
     """Advance one priority requirement and atomically injure the lower one."""
 
-    source, alphabet, writable, readable = _finite_history_components((0, 1, 1, 0))
+    source = _record_configuration(
+        (
+            ("oracle_default", 0),
+            ("p0_state", 0),
+            ("p1_state", 1),
+            ("p1_use_o0", 0),
+            ("p1_work", 7),
+            ("scheduler_next", 0),
+        )
+    )
+    alphabet = alphabets.integers()
+    targets = _record_targets(source)
+    existing_targets = tuple(
+        targets[name]
+        for name in (
+            "p0_state",
+            "p1_state",
+            "p1_use_o0",
+            "p1_work",
+            "scheduler_next",
+        )
+    )
+    existing = frontiers.literal(
+        existing_targets,
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    oracle_region, (oracle_o0,) = _fresh_children_writable(
+        source,
+        alphabet,
+        parent=targets["oracle_default"],
+        namespace="g7-priority-oracle",
+        keys=("O[0]",),
+    )
+    writable = frontiers.union((existing, oracle_region))
+    readable = neighborhoods.literal(
+        tuple(target for target, _ in source.entries),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        key="priority-runs-uses-and-scheduler",
+    )
     rule = _kernel(
         source,
         alphabet,
@@ -1807,14 +2156,42 @@ def _px11(row: MechanicsRow) -> MechanicsRun:
         readable,
         (
             _clause(
-                rules.equal(rules.observation(0), rules.literal_expr(0)),
+                rules.literal_expr(1),
                 _derivation_result(
                     row.fixture,
                     existing=(
-                        _existing_plan(0, rules.DispositionAction.REPLACE, rules.literal_expr(1)),
-                        _existing_plan(1, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
-                        _existing_plan(2, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
-                        _existing_plan(3, rules.DispositionAction.REPLACE, rules.literal_expr(1)),
+                        _existing_target_plan(
+                            targets["p0_state"],
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(1),
+                        ),
+                        _existing_target_plan(
+                            targets["p1_state"],
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(2),
+                        ),
+                        _existing_target_plan(
+                            targets["p1_use_o0"],
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(-1),
+                        ),
+                        _existing_target_plan(
+                            targets["p1_work"],
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(0),
+                        ),
+                        _existing_target_plan(
+                            targets["scheduler_next"],
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(1),
+                        ),
+                    ),
+                    fresh=(
+                        _fresh_target_plan(
+                            oracle_o0,
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(1),
+                        ),
                     ),
                 ),
             ),
@@ -1828,31 +2205,68 @@ def _px12(row: MechanicsRow) -> MechanicsRun:
     """Keep executable transform/evaluator state inside an ordinary program."""
 
     if row.spf == "SPF004":
-        # The structural birth is the causal node; producer and cursor remain
-        # explicit existing state and the completed transform stops.
-        source = _word_configuration((1, 0))
-        alphabet = alphabets.integers()
-        existing = frontiers.everywhere(
+        causal_e0 = loci.graph_element("node", "causal/e0")
+        trace_e1 = loci.graph_element("node", "trace/e1")
+        producer_y = loci.graph_element("node", "producer/y")
+        cursor = loci.graph_element("node", "cursor")
+        source = _structural_configuration(
+            loci.CarrierKind.GRAPH,
+            (
+                (causal_e0, _graph_node("causal/e0")),
+                (
+                    trace_e1,
+                    alphabets.ValueNode(
+                        alphabets.ValueKind.GRAPH,
+                        "trace-event",
+                        fields=(("reads", "x"), ("writes", "y")),
+                    ),
+                ),
+                (producer_y, _graph_node("unset-producer/y")),
+                (cursor, _graph_node("trace/e1")),
+            ),
+        )
+        alphabet = alphabets.graph()
+        existing = frontiers.literal(
+            (producer_y, cursor),
             configuration_contract=source.contract,
             value_profile=alphabet.value_profile,
         )
-        parent = source.entries[0][0]
-        reference = loci.FreshReference(
-            "g7-causal",
-            "event-1",
-            parent=parent,
-            interface=(parent,),
+        node_region, (causal_e1,) = _fresh_children_writable(
+            source,
+            alphabet,
+            parent=trace_e1,
+            namespace="g7-causal-node",
+            keys=("causal/e1",),
         )
-        fresh = frontiers.fresh(
-            loci.fresh_children(parent, "g7-causal", ("event-1",)),
-            namespace=frontiers.FreshNamespace("g7-causal", parent=parent),
+        edge_reference = loci.FreshReference(
+            "g7-causal-edge",
+            "causal/e0->causal/e1",
+            interface=(causal_e0, trace_e1),
+        )
+        edge_region = frontiers.fresh(
+            loci.fresh_edges(
+                (causal_e0, trace_e1),
+                "g7-causal-edge",
+                ("causal/e0->causal/e1",),
+            ),
+            namespace=frontiers.FreshNamespace("g7-causal-edge"),
             configuration_contract=source.contract,
             value_profile=alphabet.value_profile,
         )
-        writable = frontiers.union((existing, fresh))
-        readable = neighborhoods.global_view(
+        writable = frontiers.union((existing, node_region, edge_region))
+        readable = neighborhoods.literal(
+            (trace_e1, causal_e0, producer_y, cursor),
             configuration_contract=source.contract,
             value_profile=alphabet.value_profile,
+            key="trace-event-and-current-producers",
+        )
+        producer_value = alphabets.ValueNode(
+            alphabets.ValueKind.GRAPH,
+            "producer",
+            fields=(
+                ("event", alphabets.StructuralReference(causal_e1)),
+                ("variable", "y"),
+            ),
         )
         rule = _kernel(
             source,
@@ -1865,17 +2279,33 @@ def _px12(row: MechanicsRow) -> MechanicsRun:
                     _derivation_result(
                         row.fixture,
                         existing=(
-                            _existing_plan(
-                                1,
+                            _existing_target_plan(
+                                producer_y,
                                 rules.DispositionAction.REPLACE,
-                                rules.literal_expr(1),
+                                rules.literal_expr(producer_value),
+                            ),
+                            _existing_target_plan(
+                                cursor,
+                                rules.DispositionAction.REPLACE,
+                                rules.literal_expr(_graph_node("done")),
                             ),
                         ),
                         fresh=(
-                            _fresh_plan(
-                                0,
+                            _fresh_target_plan(
+                                causal_e1,
                                 rules.DispositionAction.CREATE,
-                                rules.literal_expr(1),
+                                rules.literal_expr(_graph_node("causal/e1")),
+                            ),
+                            _fresh_target_plan(
+                                edge_reference,
+                                rules.DispositionAction.CREATE,
+                                rules.literal_expr(
+                                    _graph_edge(
+                                        causal_e0,
+                                        causal_e1,
+                                        name="causal/e0->causal/e1",
+                                    )
+                                ),
                             ),
                         ),
                         stop=True,
@@ -1884,7 +2314,171 @@ def _px12(row: MechanicsRow) -> MechanicsRun:
             ),
         )
         return _assemble(row, source, alphabet, writable, readable, rule)
-    return _px08(row)
+
+    assert row.spf == "SPF042"
+    source = _record_configuration(
+        (
+            ("observed0", 1),
+            ("observed1", 1),
+            ("surrogate0", 1),
+            ("surrogate1", 0),
+            ("program_descriptor", 1),
+            ("phase", 0),
+            ("frame_depth", 0),
+            ("observed_result", -1),
+            ("surrogate_result", -1),
+            ("decision", -1),
+        )
+    )
+    alphabet = alphabets.integers()
+    targets = _record_targets(source)
+    read_targets = tuple(
+        targets[name]
+        for name in (
+            "observed0",
+            "observed1",
+            "surrogate0",
+            "surrogate1",
+            "program_descriptor",
+            "phase",
+            "frame_depth",
+            "observed_result",
+            "surrogate_result",
+            "decision",
+        )
+    )
+    write_targets = tuple(
+        targets[name]
+        for name in (
+            "phase",
+            "frame_depth",
+            "observed_result",
+            "surrogate_result",
+            "decision",
+        )
+    )
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=write_targets,
+        read_targets=read_targets,
+    )
+    clauses = (
+        _clause(
+            rules.equal(rules.observation(5), rules.literal_expr(0)),
+            _derivation_result(
+                f"{row.fixture}:evaluate-observed",
+                existing=(
+                    _existing_target_plan(
+                        targets["observed_result"],
+                        rules.DispositionAction.REPLACE,
+                        rules.add(rules.observation(0), rules.observation(1)),
+                    ),
+                    _existing_target_plan(
+                        targets["phase"],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(1),
+                    ),
+                    _existing_target_plan(
+                        targets["frame_depth"],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(1),
+                    ),
+                ),
+            ),
+        ),
+        _clause(
+            rules.equal(rules.observation(5), rules.literal_expr(1)),
+            _derivation_result(
+                f"{row.fixture}:evaluate-surrogate",
+                existing=(
+                    _existing_target_plan(
+                        targets["surrogate_result"],
+                        rules.DispositionAction.REPLACE,
+                        rules.add(rules.observation(2), rules.observation(3)),
+                    ),
+                    _existing_target_plan(
+                        targets["phase"],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(2),
+                    ),
+                    _existing_target_plan(
+                        targets["frame_depth"],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(1),
+                    ),
+                ),
+            ),
+        ),
+        _clause(
+            rules.equal(rules.observation(5), rules.literal_expr(2)),
+            _derivation_result(
+                f"{row.fixture}:calibrate",
+                existing=(
+                    _existing_target_plan(
+                        targets["decision"],
+                        rules.DispositionAction.REPLACE,
+                        rules.conditional(
+                            rules.less_than(
+                                rules.observation(8),
+                                rules.observation(7),
+                            ),
+                            rules.literal_expr(1),
+                            rules.literal_expr(0),
+                        ),
+                    ),
+                    _existing_target_plan(
+                        targets["phase"],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(3),
+                    ),
+                    _existing_target_plan(
+                        targets["frame_depth"],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(0),
+                    ),
+                ),
+                stop=True,
+            ),
+        ),
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        clauses,
+        selection=rules.ClauseSelection.FIRST,
+    )
+    first = _assemble(row, source, alphabet, writable, readable, rule)
+    assert isinstance(first.result, program.ApplicationComplete)
+
+    def successor_of(
+        result: program.ApplicationComplete,
+    ) -> loci.FiniteConfiguration:
+        groups = result.successor_quotient_with_derivation_fibers.atoms
+        assert len(groups) == 1
+        successor = groups[0].successor
+        assert isinstance(successor, loci.FiniteConfiguration)
+        return successor
+
+    second_source = successor_of(first.result)
+    second_result = ca.apply(first.simple_program, second_source)
+    assert isinstance(second_result, program.ApplicationComplete)
+    third_source = successor_of(second_result)
+    third_result = ca.apply(first.simple_program, third_source)
+    assert isinstance(third_result, program.ApplicationComplete)
+    return MechanicsRun(
+        row=row,
+        simple_program=first.simple_program,
+        source=source,
+        result=first.result,
+        trajectory=(
+            (source, first.result),
+            (second_source, second_result),
+            (third_source, third_result),
+        ),
+    )
 
 
 def run_mechanics_fixture(row: MechanicsRow) -> MechanicsRun:
@@ -1915,29 +2509,19 @@ def run_mechanics_fixture(row: MechanicsRow) -> MechanicsRun:
 
 
 def run_secondary_fixture(row: MechanicsRow, pressure: str) -> MechanicsRun:
-    """Exercise one of the eight deliberate cross-pressure joins."""
+    """Re-assert a secondary invariant on the same family construction."""
 
     if pressure not in row.secondary:
         raise ValueError(f"{row.spf} has no declared {pressure} secondary join")
-    secondary_row = MechanicsRow(
-        row.spf,
-        row.family,
-        row.name,
-        row.workstream,
-        pressure,
-        f"{row.fixture}:secondary-{pressure.lower()}",
-    )
-    builders = {
-        "PX03": _px03,
-        "PX04": _px04,
-        "PX08": _px08,
-    }
-    execution = builders[pressure](secondary_row)
-    if not isinstance(execution.result, program.ApplicationComplete):
-        fault = execution.result.fault
-        raise AssertionError(
-            f"{row.spf}/{pressure} secondary fixture rejected: "
-            f"{fault.reason}; {fault.evidence!r}"
+    execution = run_mechanics_fixture(row)
+    if row.spf == "SPF042" and pressure == "PX08":
+        source, result = execution.trajectory[-1]
+        return MechanicsRun(
+            row=row,
+            simple_program=execution.simple_program,
+            source=source,
+            result=result,
+            trajectory=execution.trajectory,
         )
     return execution
 
