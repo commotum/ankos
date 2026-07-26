@@ -483,6 +483,7 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
             raise TypeError(
                 "mosaic-substitute offsets must use the closed offset word"
             )
+        offset_rank: int | None = None
         for offset in offsets.items:
             if (
                 type(offset) is not alphabets.ValueNode
@@ -497,6 +498,12 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
             if any(type(component) is not int for component in offset.items):
                 raise TypeError(
                     "mosaic-substitute offset components must be integers"
+                )
+            if offset_rank is None:
+                offset_rank = len(offset.items)
+            elif len(offset.items) != offset_rank:
+                raise ValueError(
+                    "mosaic-substitute offsets must share one rank"
                 )
         if not offsets.items:
             if len(arguments) != 3:
@@ -1014,6 +1021,7 @@ def mosaic_substitute(
     if type(offsets) is not tuple:
         raise TypeError("mosaic offsets must be an immutable tuple")
     encoded_offsets: list[alphabets.ValueNode] = []
+    offset_rank: int | None = None
     for offset in offsets:
         if type(offset) is not tuple:
             raise TypeError("each mosaic offset must be an immutable tuple")
@@ -1021,6 +1029,10 @@ def mosaic_substitute(
             raise ValueError("mosaic offsets cannot have rank zero")
         if any(type(component) is not int for component in offset):
             raise TypeError("mosaic offset components must be integers")
+        if offset_rank is None:
+            offset_rank = len(offset)
+        elif len(offset) != offset_rank:
+            raise ValueError("mosaic offsets must share one rank")
         encoded_offsets.append(
             alphabets.word_value(offset, tag=_MOSAIC_OFFSET_TAG)
         )
@@ -5237,6 +5249,921 @@ def _runtime_equal(
     )
 
 
+_RewriteBindings: TypeAlias = tuple[
+    tuple[str, alphabets.SemanticValue],
+    ...,
+]
+_RewriteReplacement: TypeAlias = (
+    alphabets.SemanticValue | tuple[alphabets.SemanticValue, ...]
+)
+
+
+@dataclass(frozen=True)
+class _RewriteRuleValue:
+    pattern: alphabets.ValueNode
+    template: alphabets.ValueNode
+
+
+@dataclass(frozen=True)
+class _RewriteCandidate:
+    path: tuple[int, ...]
+    span: int
+    rule_index: int
+    bindings: _RewriteBindings
+    replacement: _RewriteReplacement
+
+
+def _pattern_tag(value: object, *, owner: str) -> alphabets.ValueNode:
+    if (
+        type(value) is not alphabets.ValueNode
+        or value.kind is not alphabets.ValueKind.PATTERN
+    ):
+        raise TypeError(f"{owner} must be a PATTERN ValueNode")
+    if value.fields:
+        raise ValueError(f"{owner} cannot carry named fields")
+    return value
+
+
+def _validate_match_pattern(
+    value: object,
+    *,
+    allow_sequence: bool,
+) -> tuple[str, ...]:
+    pattern = _pattern_tag(value, owner="match pattern")
+    if pattern.tag == "match.literal":
+        if len(pattern.items) != 1:
+            raise ValueError("match.literal needs exactly one value")
+        return ()
+    if pattern.tag == "match.bind":
+        if (
+            len(pattern.items) != 1
+            or type(pattern.items[0]) is not str
+            or not pattern.items[0]
+        ):
+            raise ValueError("match.bind needs one nonempty string name")
+        return (pattern.items[0],)
+    if pattern.tag == "match.node":
+        if (
+            not pattern.items
+            or type(pattern.items[0]) is not str
+            or not pattern.items[0]
+        ):
+            raise ValueError(
+                "match.node needs one leading nonempty string head"
+            )
+        bindings: list[str] = []
+        for child in pattern.items[1:]:
+            bindings.extend(
+                _validate_match_pattern(child, allow_sequence=False)
+            )
+        return tuple(bindings)
+    if pattern.tag == "match.sequence":
+        if not allow_sequence:
+            raise ValueError(
+                "match.sequence is valid only at a word-pattern root"
+            )
+        if not pattern.items:
+            raise ValueError("match.sequence cannot be empty")
+        bindings = []
+        for child in pattern.items:
+            bindings.extend(
+                _validate_match_pattern(child, allow_sequence=False)
+            )
+        return tuple(bindings)
+    raise ValueError(f"unrecognized match pattern tag {pattern.tag!r}")
+
+
+def _validate_template_pattern(
+    value: object,
+    *,
+    allow_sequence: bool,
+) -> tuple[str, ...]:
+    template = _pattern_tag(value, owner="rewrite template")
+    if template.tag == "template.literal":
+        if len(template.items) != 1:
+            raise ValueError("template.literal needs exactly one value")
+        return ()
+    if template.tag == "template.binding":
+        if (
+            len(template.items) != 1
+            or type(template.items[0]) is not str
+            or not template.items[0]
+        ):
+            raise ValueError(
+                "template.binding needs one nonempty string name"
+            )
+        return (template.items[0],)
+    if template.tag == "template.node":
+        if (
+            not template.items
+            or type(template.items[0]) is not str
+            or not template.items[0]
+        ):
+            raise ValueError(
+                "template.node needs one leading nonempty string head"
+            )
+        bindings: list[str] = []
+        for child in template.items[1:]:
+            bindings.extend(
+                _validate_template_pattern(child, allow_sequence=False)
+            )
+        return tuple(bindings)
+    if template.tag == "template.sequence":
+        if not allow_sequence:
+            raise ValueError(
+                "template.sequence is valid only at a word-template root"
+            )
+        bindings = []
+        for child in template.items:
+            bindings.extend(
+                _validate_template_pattern(child, allow_sequence=False)
+            )
+        return tuple(bindings)
+    raise ValueError(f"unrecognized rewrite template tag {template.tag!r}")
+
+
+def _validated_rewrite_rules(
+    value: alphabets.SemanticValue,
+    *,
+    sequence_domain: bool,
+) -> tuple[_RewriteRuleValue, ...]:
+    rules = _require_value_node(
+        value,
+        alphabets.ValueKind.WORD,
+        owner="pattern-rewrite rules",
+    )
+    if rules.tag != "rewrite-rules":
+        raise ValueError(
+            "pattern-rewrite rules word must be tagged rewrite-rules"
+        )
+    if not rules.items:
+        raise ValueError("pattern-rewrite rules cannot be empty")
+    validated: list[_RewriteRuleValue] = []
+    for rule in rules.items:
+        if (
+            type(rule) is not alphabets.ValueNode
+            or rule.kind is not alphabets.ValueKind.PRODUCT
+            or rule.tag != "rewrite"
+            or rule.fields
+            or len(rule.items) != 2
+        ):
+            raise ValueError(
+                "pattern-rewrite rules need two-item rewrite products"
+            )
+        pattern = _pattern_tag(rule.items[0], owner="match pattern")
+        template = _pattern_tag(rule.items[1], owner="rewrite template")
+        if sequence_domain:
+            if pattern.tag != "match.sequence":
+                raise ValueError(
+                    "word rewrites require match.sequence pattern roots"
+                )
+            if template.tag != "template.sequence":
+                raise ValueError(
+                    "word rewrites require template.sequence template roots"
+                )
+        elif pattern.tag == "match.sequence" or template.tag == (
+            "template.sequence"
+        ):
+            raise ValueError(
+                "symbolic-tree rewrites cannot contain sequence roots"
+            )
+        pattern_bindings = frozenset(
+            _validate_match_pattern(
+                pattern,
+                allow_sequence=sequence_domain,
+            )
+        )
+        template_bindings = frozenset(
+            _validate_template_pattern(
+                template,
+                allow_sequence=sequence_domain,
+            )
+        )
+        unbound = template_bindings - pattern_bindings
+        if unbound:
+            raise ValueError(
+                "rewrite template contains unbound names: "
+                + ", ".join(sorted(unbound))
+            )
+        validated.append(_RewriteRuleValue(pattern, template))
+    return tuple(validated)
+
+
+def _match_pattern_value(
+    pattern: alphabets.ValueNode,
+    candidate: alphabets.SemanticValue,
+    bindings: dict[str, alphabets.SemanticValue],
+) -> bool:
+    if pattern.tag == "match.literal":
+        return alphabets.semantic_equal(pattern.items[0], candidate)
+    if pattern.tag == "match.bind":
+        name = cast(str, pattern.items[0])
+        if name not in bindings:
+            bindings[name] = candidate
+            return True
+        return alphabets.semantic_equal(bindings[name], candidate)
+    if pattern.tag != "match.node":
+        raise ValueError(
+            "sequence patterns cannot occur below a rewrite root"
+        )
+    if (
+        type(candidate) is not alphabets.ValueNode
+        or candidate.kind is not alphabets.ValueKind.SYMBOLIC
+        or candidate.fields
+        or candidate.tag != pattern.items[0]
+        or len(candidate.items) != len(pattern.items) - 1
+    ):
+        return False
+    for child_pattern, child_value in zip(
+        pattern.items[1:],
+        candidate.items,
+        strict=True,
+    ):
+        child = _pattern_tag(child_pattern, owner="match child")
+        if not _match_pattern_value(child, child_value, bindings):
+            return False
+    return True
+
+
+def _instantiate_template(
+    template: alphabets.ValueNode,
+    bindings: dict[str, alphabets.SemanticValue],
+) -> alphabets.SemanticValue:
+    if template.tag == "template.literal":
+        return template.items[0]
+    if template.tag == "template.binding":
+        name = cast(str, template.items[0])
+        try:
+            return bindings[name]
+        except KeyError as error:
+            raise ValueError(
+                f"rewrite template binding {name!r} is unbound"
+            ) from error
+    if template.tag != "template.node":
+        raise ValueError(
+            "sequence templates cannot occur below a rewrite root"
+        )
+    head = cast(str, template.items[0])
+    return alphabets.symbolic_value(
+        head,
+        items=tuple(
+            _instantiate_template(
+                _pattern_tag(child, owner="template child"),
+                bindings,
+            )
+            for child in template.items[1:]
+        ),
+    )
+
+
+def _instantiate_sequence_template(
+    template: alphabets.ValueNode,
+    bindings: dict[str, alphabets.SemanticValue],
+) -> tuple[alphabets.SemanticValue, ...]:
+    if template.tag != "template.sequence":
+        raise ValueError(
+            "word rewrites require a template.sequence root"
+        )
+    return tuple(
+        _instantiate_template(
+            _pattern_tag(child, owner="template sequence child"),
+            bindings,
+        )
+        for child in template.items
+    )
+
+
+def _bindings_tuple(
+    bindings: dict[str, alphabets.SemanticValue],
+) -> _RewriteBindings:
+    return tuple(bindings.items())
+
+
+def _word_rewrite_candidate(
+    source: alphabets.ValueNode,
+    rule: _RewriteRuleValue,
+    *,
+    start: int,
+    rule_index: int,
+) -> _RewriteCandidate | None:
+    pattern_items = rule.pattern.items
+    stop = start + len(pattern_items)
+    if stop > len(source.items):
+        return None
+    bindings: dict[str, alphabets.SemanticValue] = {}
+    for pattern_item, source_item in zip(
+        pattern_items,
+        source.items[start:stop],
+        strict=True,
+    ):
+        pattern = _pattern_tag(
+            pattern_item,
+            owner="match sequence child",
+        )
+        if not _match_pattern_value(pattern, source_item, bindings):
+            return None
+    replacement = _instantiate_sequence_template(
+        rule.template,
+        bindings,
+    )
+    return _RewriteCandidate(
+        (start,),
+        len(pattern_items),
+        rule_index,
+        _bindings_tuple(bindings),
+        replacement,
+    )
+
+
+def _symbolic_tree_locations(
+    source: alphabets.SemanticValue,
+) -> tuple[tuple[tuple[int, ...], alphabets.SemanticValue], ...]:
+    locations: list[
+        tuple[tuple[int, ...], alphabets.SemanticValue]
+    ] = []
+
+    def visit(
+        value: alphabets.SemanticValue,
+        path: tuple[int, ...],
+    ) -> None:
+        locations.append((path, value))
+        if (
+            type(value) is not alphabets.ValueNode
+            or value.kind is not alphabets.ValueKind.SYMBOLIC
+        ):
+            return
+        if value.fields:
+            raise ValueError(
+                "symbolic-tree rewrite sources must be positional"
+            )
+        for index, child in enumerate(value.items):
+            visit(child, (*path, index))
+
+    visit(source, ())
+    return tuple(locations)
+
+
+def _tree_rewrite_candidate(
+    rule: _RewriteRuleValue,
+    *,
+    path: tuple[int, ...],
+    value: alphabets.SemanticValue,
+    rule_index: int,
+) -> _RewriteCandidate | None:
+    bindings: dict[str, alphabets.SemanticValue] = {}
+    if not _match_pattern_value(rule.pattern, value, bindings):
+        return None
+    return _RewriteCandidate(
+        path,
+        1,
+        rule_index,
+        _bindings_tuple(bindings),
+        _instantiate_template(rule.template, bindings),
+    )
+
+
+def _word_rewrite_candidates(
+    source: alphabets.ValueNode,
+    rewrite_rules: tuple[_RewriteRuleValue, ...],
+    *,
+    scan: RewriteScan,
+) -> tuple[_RewriteCandidate, ...]:
+    locations = range(len(source.items))
+    if scan is RewriteScan.RULE_PRIORITY_FIRST:
+        for rule_index, rule in enumerate(rewrite_rules):
+            for start in locations:
+                candidate = _word_rewrite_candidate(
+                    source,
+                    rule,
+                    start=start,
+                    rule_index=rule_index,
+                )
+                if candidate is not None:
+                    return (candidate,)
+        return ()
+    if scan is RewriteScan.LOCATION_PRIORITY_FIRST:
+        for start in locations:
+            for rule_index, rule in enumerate(rewrite_rules):
+                candidate = _word_rewrite_candidate(
+                    source,
+                    rule,
+                    start=start,
+                    rule_index=rule_index,
+                )
+                if candidate is not None:
+                    return (candidate,)
+        return ()
+    accepted: list[_RewriteCandidate] = []
+    accepted_stop = 0
+    for start in locations:
+        if start < accepted_stop:
+            continue
+        for rule_index, rule in enumerate(rewrite_rules):
+            candidate = _word_rewrite_candidate(
+                source,
+                rule,
+                start=start,
+                rule_index=rule_index,
+            )
+            if candidate is None:
+                continue
+            accepted.append(candidate)
+            accepted_stop = start + candidate.span
+            break
+    return tuple(accepted)
+
+
+def _tree_rewrite_candidates(
+    locations: tuple[
+        tuple[tuple[int, ...], alphabets.SemanticValue],
+        ...,
+    ],
+    rewrite_rules: tuple[_RewriteRuleValue, ...],
+    *,
+    scan: RewriteScan,
+) -> tuple[_RewriteCandidate, ...]:
+    if scan is RewriteScan.RULE_PRIORITY_FIRST:
+        for rule_index, rule in enumerate(rewrite_rules):
+            for path, value in locations:
+                candidate = _tree_rewrite_candidate(
+                    rule,
+                    path=path,
+                    value=value,
+                    rule_index=rule_index,
+                )
+                if candidate is not None:
+                    return (candidate,)
+        return ()
+    if scan is RewriteScan.LOCATION_PRIORITY_FIRST:
+        for path, value in locations:
+            for rule_index, rule in enumerate(rewrite_rules):
+                candidate = _tree_rewrite_candidate(
+                    rule,
+                    path=path,
+                    value=value,
+                    rule_index=rule_index,
+                )
+                if candidate is not None:
+                    return (candidate,)
+        return ()
+    accepted: list[_RewriteCandidate] = []
+    for path, value in locations:
+        if any(
+            path[: len(choice.path)] == choice.path
+            for choice in accepted
+        ):
+            continue
+        for rule_index, rule in enumerate(rewrite_rules):
+            candidate = _tree_rewrite_candidate(
+                rule,
+                path=path,
+                value=value,
+                rule_index=rule_index,
+            )
+            if candidate is not None:
+                accepted.append(candidate)
+                break
+    return tuple(accepted)
+
+
+def _apply_word_replacements(
+    source: alphabets.ValueNode,
+    candidates: tuple[_RewriteCandidate, ...],
+) -> alphabets.ValueNode:
+    output: list[alphabets.SemanticValue] = []
+    cursor = 0
+    for candidate in candidates:
+        start = candidate.path[0]
+        output.extend(source.items[cursor:start])
+        if type(candidate.replacement) is not tuple:
+            raise TypeError(
+                "word rewrite candidates require sequence replacements"
+            )
+        output.extend(candidate.replacement)
+        cursor = start + candidate.span
+    output.extend(source.items[cursor:])
+    return alphabets.ValueNode(
+        alphabets.ValueKind.WORD,
+        source.tag,
+        items=tuple(output),
+        version=source.version,
+    )
+
+
+def _apply_tree_replacements(
+    source: alphabets.SemanticValue,
+    candidates: tuple[_RewriteCandidate, ...],
+) -> alphabets.SemanticValue:
+    replacements = {
+        candidate.path: candidate.replacement
+        for candidate in candidates
+    }
+
+    def replace_at(
+        value: alphabets.SemanticValue,
+        path: tuple[int, ...],
+    ) -> alphabets.SemanticValue:
+        if path in replacements:
+            replacement = replacements[path]
+            if type(replacement) is tuple:
+                raise TypeError(
+                    "tree rewrite candidates require scalar replacements"
+                )
+            return replacement
+        if (
+            type(value) is not alphabets.ValueNode
+            or value.kind is not alphabets.ValueKind.SYMBOLIC
+        ):
+            return value
+        return alphabets.ValueNode(
+            alphabets.ValueKind.SYMBOLIC,
+            value.tag,
+            items=tuple(
+                replace_at(child, (*path, index))
+                for index, child in enumerate(value.items)
+            ),
+            version=value.version,
+        )
+
+    return replace_at(source, ())
+
+
+def _rewrite_match_record(
+    candidate: _RewriteCandidate,
+) -> alphabets.ValueNode:
+    binding_map = alphabets.map_value(
+        tuple(
+            alphabets.map_entry_value(name, value)
+            for name, value in candidate.bindings
+        ),
+        tag="rewrite-bindings",
+    )
+    return alphabets.record_value(
+        (
+            (
+                "path",
+                alphabets.word_value(
+                    candidate.path,
+                    tag="rewrite-path",
+                ),
+            ),
+            ("span", candidate.span),
+            ("rule_index", candidate.rule_index),
+            ("bindings", binding_map),
+        ),
+        tag="pattern-match",
+    )
+
+
+def _pattern_rewrite_result(
+    result: alphabets.SemanticValue,
+    candidates: tuple[_RewriteCandidate, ...],
+) -> alphabets.ValueNode:
+    return alphabets.record_value(
+        (
+            ("matched", bool(candidates)),
+            ("result", result),
+            (
+                "matches",
+                alphabets.word_value(
+                    tuple(
+                        _rewrite_match_record(candidate)
+                        for candidate in candidates
+                    ),
+                    tag="pattern-matches",
+                ),
+            ),
+        ),
+        tag="pattern-rewrite",
+    )
+
+
+def _apply_pattern_rewrite(
+    source: alphabets.SemanticValue,
+    rewrite_rules_value: alphabets.SemanticValue,
+    *,
+    scan: RewriteScan,
+) -> alphabets.ValueNode:
+    if type(scan) is not RewriteScan:
+        raise TypeError("pattern-rewrite scan is not recognized")
+    if (
+        type(source) is alphabets.ValueNode
+        and source.kind is alphabets.ValueKind.WORD
+    ):
+        rewrite_rules = _validated_rewrite_rules(
+            rewrite_rules_value,
+            sequence_domain=True,
+        )
+        candidates = _word_rewrite_candidates(
+            source,
+            rewrite_rules,
+            scan=scan,
+        )
+        result = (
+            source
+            if not candidates
+            else _apply_word_replacements(source, candidates)
+        )
+        return _pattern_rewrite_result(result, candidates)
+    if (
+        type(source) is alphabets.ValueNode
+        and source.kind is alphabets.ValueKind.SYMBOLIC
+    ):
+        locations = _symbolic_tree_locations(source)
+        rewrite_rules = _validated_rewrite_rules(
+            rewrite_rules_value,
+            sequence_domain=False,
+        )
+        candidates = _tree_rewrite_candidates(
+            locations,
+            rewrite_rules,
+            scan=scan,
+        )
+        result = (
+            source
+            if not candidates
+            else _apply_tree_replacements(source, candidates)
+        )
+        return _pattern_rewrite_result(result, candidates)
+    raise TypeError(
+        "pattern-rewrite source must be a WORD or positional SYMBOLIC tree"
+    )
+
+
+def _decode_mosaic_offsets(
+    value: RuleScalar | RuleExpr,
+) -> tuple[tuple[int, ...], ...]:
+    if (
+        type(value) is not alphabets.ValueNode
+        or value.kind is not alphabets.ValueKind.WORD
+        or value.tag != _MOSAIC_OFFSETS_TAG
+        or value.fields
+    ):
+        raise TypeError("mosaic offsets do not use the closed offset word")
+    offsets: list[tuple[int, ...]] = []
+    for item in value.items:
+        if (
+            type(item) is not alphabets.ValueNode
+            or item.kind is not alphabets.ValueKind.WORD
+            or item.tag != _MOSAIC_OFFSET_TAG
+            or item.fields
+            or not item.items
+        ):
+            raise ValueError("mosaic offset word contains a malformed offset")
+        if any(type(component) is not int for component in item.items):
+            raise TypeError("mosaic offset components must be integers")
+        offsets.append(cast(tuple[int, ...], item.items))
+    return tuple(offsets)
+
+
+def _flat_coordinate(
+    coordinate: tuple[int, ...],
+    shape: tuple[int, ...],
+) -> int:
+    if len(coordinate) != len(shape):
+        raise ValueError("grid coordinate rank disagrees with shape")
+    flat = 0
+    for component, extent in zip(coordinate, shape, strict=True):
+        if component < 0 or component >= extent:
+            raise IndexError("grid coordinate lies outside its shape")
+        flat = flat * extent + component
+    return flat
+
+
+def _ranked_coordinate(
+    index: int,
+    shape: tuple[int, ...],
+) -> tuple[int, ...]:
+    if type(index) is not int or index < 0:
+        raise ValueError("flat grid index must be a nonnegative integer")
+    size = 1
+    for extent in shape:
+        size *= extent
+    if index >= size:
+        raise IndexError("flat grid index lies outside its shape")
+    coordinate = [0] * len(shape)
+    remainder = index
+    for axis in range(len(shape) - 1, -1, -1):
+        coordinate[axis] = remainder % shape[axis]
+        remainder //= shape[axis]
+    return tuple(coordinate)
+
+
+def _mosaic_context_key(
+    source_cells: tuple[alphabets.SemanticValue, ...],
+    source_shape: tuple[int, ...],
+    coordinate: tuple[int, ...],
+    offsets: tuple[tuple[int, ...], ...],
+    *,
+    boundary: SequenceBoundary,
+    exterior: alphabets.SemanticValue | None,
+) -> alphabets.ValueNode:
+    context: list[alphabets.SemanticValue] = []
+    for offset in offsets:
+        raw = tuple(
+            component + displacement
+            for component, displacement in zip(
+                coordinate,
+                offset,
+                strict=True,
+            )
+        )
+        if all(
+            0 <= component < extent
+            for component, extent in zip(raw, source_shape, strict=True)
+        ):
+            sampled = raw
+        elif boundary is SequenceBoundary.FIXED:
+            if exterior is None:
+                raise ValueError(
+                    "fixed mosaic context requires one exterior value"
+                )
+            context.append(exterior)
+            continue
+        elif boundary is SequenceBoundary.PERIODIC:
+            sampled = tuple(
+                component % extent
+                for component, extent in zip(
+                    raw,
+                    source_shape,
+                    strict=True,
+                )
+            )
+        else:
+            sampled = tuple(
+                _reflect_sequence_index(component, extent)
+                for component, extent in zip(
+                    raw,
+                    source_shape,
+                    strict=True,
+                )
+            )
+        context.append(
+            source_cells[_flat_coordinate(sampled, source_shape)]
+        )
+    return alphabets.word_value(tuple(context), tag="mosaic-context")
+
+
+def _apply_mosaic_substitution(
+    source: alphabets.SemanticValue,
+    productions: alphabets.SemanticValue,
+    *,
+    offsets: tuple[tuple[int, ...], ...],
+    boundary: SequenceBoundary | None,
+    exterior: alphabets.SemanticValue | None,
+) -> alphabets.ValueNode:
+    source_node = _require_value_node(
+        source,
+        alphabets.ValueKind.FIELD,
+        owner="mosaic-substitute source",
+    )
+    source_axes, source_shape, source_cells = (
+        alphabets.grid_field_parts(source_node)
+    )
+    rank = len(source_shape)
+    if type(offsets) is not tuple:
+        raise TypeError("mosaic offsets must be an immutable tuple")
+    for offset in offsets:
+        if (
+            type(offset) is not tuple
+            or len(offset) != rank
+            or any(type(component) is not int for component in offset)
+        ):
+            raise ValueError(
+                "every contextual mosaic offset must have source rank"
+            )
+    if offsets:
+        if type(boundary) is not SequenceBoundary:
+            raise TypeError(
+                "contextual mosaic substitution needs a boundary law"
+            )
+        if boundary is SequenceBoundary.FIXED:
+            if exterior is None:
+                raise ValueError(
+                    "fixed mosaic substitution requires one exterior value"
+                )
+        elif exterior is not None:
+            raise ValueError(
+                "non-fixed mosaic substitution cannot carry an exterior"
+            )
+    elif boundary is not None or exterior is not None:
+        raise ValueError(
+            "independent mosaic substitution has no boundary or exterior"
+        )
+
+    production_entries = _association_entries(productions)
+    if not production_entries:
+        raise ValueError("mosaic production map cannot be empty")
+    parsed_entries: list[
+        tuple[
+            alphabets.SemanticValue,
+            tuple[alphabets.SemanticValue, ...],
+        ]
+    ] = []
+    tile_shape: tuple[int, ...] | None = None
+    for key, tile in production_entries:
+        if offsets and (
+            type(key) is not alphabets.ValueNode
+            or key.kind is not alphabets.ValueKind.WORD
+            or key.tag != "mosaic-context"
+            or key.fields
+            or len(key.items) != len(offsets)
+        ):
+            raise ValueError(
+                "contextual mosaic keys must be exact mosaic-context words"
+            )
+        tile_node = _require_value_node(
+            tile,
+            alphabets.ValueKind.FIELD,
+            owner="mosaic production tile",
+        )
+        axes, shape, cells = alphabets.grid_field_parts(tile_node)
+        if axes != source_axes or len(shape) != rank:
+            raise ValueError(
+                "mosaic production tile axes/rank disagree with the source"
+            )
+        if tile_shape is None:
+            tile_shape = shape
+        elif shape != tile_shape:
+            raise ValueError(
+                "mosaic production tiles must share one common shape"
+            )
+        parsed_entries.append((key, cells))
+
+    selected_tiles: list[tuple[alphabets.SemanticValue, ...]] = []
+    for flat_index, source_cell in enumerate(source_cells):
+        if offsets:
+            if boundary is None:
+                raise ValueError(
+                    "contextual mosaic substitution needs a boundary law"
+                )
+            coordinate = _ranked_coordinate(flat_index, source_shape)
+            key = _mosaic_context_key(
+                source_cells,
+                source_shape,
+                coordinate,
+                offsets,
+                boundary=boundary,
+                exterior=exterior,
+            )
+        else:
+            key = source_cell
+        selected: tuple[alphabets.SemanticValue, ...] | None = None
+        for candidate_key, cells in parsed_entries:
+            if alphabets.semantic_equal(candidate_key, key):
+                selected = cells
+                break
+        if selected is None:
+            raise KeyError("mosaic production is missing for a source key")
+        selected_tiles.append(selected)
+
+    if tile_shape is None:
+        raise KeyError("mosaic production map is empty")
+    output_shape = tuple(
+        source_extent * tile_extent
+        for source_extent, tile_extent in zip(
+            source_shape,
+            tile_shape,
+            strict=True,
+        )
+    )
+    output_size = 1
+    for extent in output_shape:
+        output_size *= extent
+    output: list[alphabets.SemanticValue | None] = [None] * output_size
+    for source_index, tile_cells in enumerate(selected_tiles):
+        source_coordinate = _ranked_coordinate(
+            source_index,
+            source_shape,
+        )
+        for tile_index, cell in enumerate(tile_cells):
+            tile_coordinate = _ranked_coordinate(
+                tile_index,
+                tile_shape,
+            )
+            output_coordinate = tuple(
+                source_component * tile_extent + tile_component
+                for source_component, tile_extent, tile_component in zip(
+                    source_coordinate,
+                    tile_shape,
+                    tile_coordinate,
+                    strict=True,
+                )
+            )
+            output[_flat_coordinate(output_coordinate, output_shape)] = cell
+    if any(cell is None for cell in output):
+        raise ValueError("mosaic assembly left an output cell unfilled")
+    return alphabets.grid_field_value(
+        source_axes,
+        output_shape,
+        tuple(
+            cast(alphabets.SemanticValue, cell)
+            for cell in output
+        ),
+        tag=source_node.tag,
+    )
+
+
 def _integer_digit_values(value: int, base: int) -> tuple[int, ...]:
     if type(value) is not int or value < 0:
         raise ValueError("digit encoding needs a nonnegative integer")
@@ -6053,6 +6980,7 @@ __all__ = [
     "RulePrimitive",
     "RuleRejected",
     "RuleResult",
+    "RewriteScan",
     "SequenceBoundary",
     "Stop",
     "SupportPresentation",
@@ -6118,9 +7046,11 @@ __all__ = [
     "map_update",
     "maximal_runs",
     "modulo",
+    "mosaic_substitute",
     "multiply",
     "observation",
     "parallel",
+    "pattern_rewrite",
     "preserve",
     "product_value",
     "project",
