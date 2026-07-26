@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-04 CATALOG**
+Status: **PAUSED — G7-04 CATALOG CONTRACT DECISION**
 
 ## Big-Picture Objective
 
@@ -131,6 +131,21 @@ conflict, and reconcile the plan before changing runtime behavior.
 - The 13 retained skips are owned exactly by G7-04: five CT11 catalog
   expansion tests, five catalog unit tests, two family constructor/metadata
   joins, and one callable-free role test.
+- G7-04's preimplementation audit found that Goal 6 freezes the sixty
+  canonical keyword names, forty preset names, four aliases, and one
+  compatibility spelling, but not the accepted argument types, defaults,
+  normalization, or exact argument-to-five-field expansion for the canonical
+  constructors, presets, or compatibility adapter. The current shells call
+  the delegator signatures unsettled, while the reference scaffold gives a
+  conflicting five-component canonical example and only one concrete preset.
+- The G7-02 pressure fixtures prove that the generic runtime can express one
+  honest case for every family; they are deliberately test-owned fixed
+  witnesses, not general compilers for the high-level catalog signatures.
+  Several requested general compilers would need Rule mechanics not currently
+  present. G7-04 is paused at the explicit stop condition rather than shipping
+  hardcoded examples, ignored arguments, or an opaque recipe wrapper. The
+  exact evidence and two coherent repair paths are in
+  [`5-CATALOG.md`](5-CATALOG.md).
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -492,7 +507,8 @@ application results.
 
 Handoff stage: **G7-04 — Catalog assembly and exact legacy migration**
 
-Stage status: **In progress.** The live plan and evidence record is
+Stage status: **Paused at a contract-reconciliation gate.** The live evidence,
+two coherent API choices, and resumable next action are in
 [`5-CATALOG.md`](5-CATALOG.md).
 
 #### Big Picture Objective

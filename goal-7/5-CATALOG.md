@@ -25,6 +25,11 @@
 
 ## Updated Assumptions
 
+- The assumption that Goal 6 already froze implementation-ready constructor
+  and delegator signatures is false. It froze canonical keyword names and
+  semantic intent, but not accepted types, defaults, normalization, or exact
+  five-field expansion; all preset and compatibility signatures remain
+  explicitly unsettled in the shells.
 - Category constructors can share private composition helpers only when those
   helpers operate on explicit closed component inputs and never select
   behavior from SPF/F/T identity, category, constructor spelling, or metadata.
@@ -40,6 +45,79 @@
 - The one `K` adapter, `machina.extended_mobile_automaton`, must be total and
   lossless over one explicitly advertised legacy argument domain, issue a
   deprecation warning, and remain absent from flat `ca.catalog.__all__`.
+
+## Contract Reconciliation Gate
+
+The preimplementation audit established the exact inventory but disproved that
+the current documents are sufficient to implement it honestly.
+
+### What is fully frozen
+
+- Sixty canonical names and their keyword-name lists.
+- Home counts `11 / 15 / 8 / 14 / 9 / 3` and coverage `19 / 41`.
+- Two close roles and all forty-five T dispositions.
+- One hundred five callable spellings in total:
+  `60 C + 40 P + 4 A + 1 K`; 104 are flat because the sole `K` is qualified.
+- The forty presets consist of thirty-nine T-ledger presets plus the non-T
+  `look_and_say` preset.
+- Four true aliases can copy their delegates once those delegate signatures
+  exist.
+
+### What is not frozen
+
+- Concrete accepted types, defaults, normalization, and validation for any of
+  the sixty canonical semantic-parameter signatures.
+- Exact translation from those arguments into Seed, Alphabet, WritableRegion,
+  ReadableRegion, and Rule.
+- Python signatures and exact closed bindings for the forty presets.
+- The advertised legacy domain and lossless translation for
+  `extended_mobile_automaton`.
+- A few literal metadata encodings: tuple/lookup public names, import-string
+  format, source-ref tokenization, T40 branch strings, and how one
+  `LegacyTarget` plus multiple `NameEntry` values represent the two callable
+  relations attached to T01, T10, T29, and T45.
+
+The gap is operational, not cosmetic. For example,
+`synchronous_local_state_transform(*, seed, stencil, local_law, boundary,
+feedback)` does not say how to obtain its Alphabet or complete writable
+envelope. A Seed and Rule expose only a value profile, which is insufficient
+to reconstruct an exact Alphabet. Conversely, the lower-authority reference
+scaffold defines that canonical function directly over all five components
+and defines only `eca(*, rule=30, width=79)` as a concrete preset.
+
+The mechanics ledger cannot silently fill the gap. Its graph rewrite,
+first-passage, ranked erasure, maximal-run, and related cases are fixed,
+test-owned pressure witnesses. The current Rule DSL does not yet provide
+general matching, ranking-conditioned disposition selection, walk, or
+maximal-run compiler operators. Importing/copying those SPF-dispatched
+fixtures or returning one hardcoded representative would violate this stage's
+constructor, no-dispatch, and no-ignored-argument contracts.
+
+### Coherent repair choices
+
+1. **Five-component canonical profiles — recommended.**
+   - Make each canonical family function accept the five explicit component
+     values, validate the relevant structural profile, and return their
+     ordinary `SimpleProgram`.
+   - Let named presets bind or construct components explicitly; true aliases
+     delegate unchanged.
+   - Treat the migration matrix's semantic parameter lists as construction
+     intent/binding metadata rather than already-frozen Python signatures.
+   - This matches `ref/notes/ca-scaffold.py`, keeps the five-field design
+     visible, avoids a second compiler ontology, and best fits the previously
+     selected minimal API. It still requires one explicit signature/binding
+     ledger for the forty presets and the sole adapter before implementation.
+2. **High-level semantic compilers.**
+   - Retain all sixty current semantic keyword lists as public Python
+     signatures.
+   - Freeze exact closed types/defaults and implement real per-family
+     compilers from those arguments into the five components.
+   - This is substantially larger. Confirmed missing general compiler
+     mechanics would reopen G7-02 and G7-03 before catalog work could resume.
+
+A typed recipe bundle, type-scanning argument bag, family/SPF dispatch,
+ignored parameters, or a hardcoded representative per constructor is not a
+third valid choice.
 
 ## Big Picture Objective
 
@@ -164,4 +242,15 @@ manifest/helper when that keeps the expected ledger independent.
 
 ## Stage Results
 
-- Pending implementation and verification.
+- The clean G7-04 baseline and all thirteen owned skips were recorded.
+- The exact catalog inventory was independently reconciled:
+  60 canonical constructors, 40 presets, 4 aliases, 1 compatibility adapter,
+  105 qualified callables, 104 flat callables, 2 roles, and 45 legacy rows.
+- No production or test implementation was attempted after the
+  under-specification was confirmed. Catalog remains inert and unexposed;
+  completed mechanics/codecs and frozen Goal 2/Goal 5/Goal 6 sources remain
+  unchanged.
+- G7-04 is paused under the Goal 7 source-authority and earlier-stage
+  counterexample stop rules. The next action is to choose the canonical
+  constructor model above and freeze its exact signature/binding ledger before
+  writing catalog bodies or activating CT11.
