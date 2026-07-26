@@ -1,6 +1,6 @@
 # 6-CONFORMANCE
 
-Status: **IN PROGRESS — REQUIREMENT AUDIT**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -11,6 +11,8 @@ Status: **IN PROGRESS — REQUIREMENT AUDIT**
   merely because its focused tests are green.
 - The stage-entry conformance directory reports `221 passed`.
 - The stage-entry complete active suite reports `993 passed` with no skips.
+- The completed conformance directory reports `270 passed`; the completed
+  active suite reports `1042 passed`, again with no skips.
 - Active `src/` and `tests/` contain no pytest skip or xfail marker. The three
   unused scaffold helpers formerly routed through `_not_implemented()` were
   deleted: the dedicated CT09, CT10, and CT11 suites are their stronger live
@@ -20,7 +22,7 @@ Status: **IN PROGRESS — REQUIREMENT AUDIT**
   independent full-result equivalence, static ownership/no-dispatch gates, and
   an ephemeral installed-wheel smoke gate pass together.
 - G7-06 has not started. Documentation reconciliation, final release cleanup,
-  and release-candidate claims remain out of scope.
+  and release-candidate claims remain its work.
 
 ## Updated Assumptions
 
@@ -89,8 +91,8 @@ untouched.
 | CT09 serialization | `test_codec_inventory.py`, `test_serialization_contract.py`, and `test_serialization.py` | Direct |
 | CT10 representation | `test_representation_commutation.py` over the eight literal PX10 relations | Direct |
 | CT11 catalog/migration | `test_catalog_expansion.py` plus independent `g7_catalog_manifest.py` | Direct |
-| CT12 independent equivalence | `test_oracles.py` and `test_native_generic_equivalence.py` | Hardening in progress |
-| CT13 ownership/no dispatch | `test_import_and_dispatch.py` plus `installed_wheel_smoke.py` | Repaired; final wheel pending |
+| CT12 independent equivalence | `test_oracles.py` and `test_native_generic_equivalence.py`, including distinct mobile and real catalog Turing cases | Repaired |
+| CT13 ownership/no dispatch | `test_import_and_dispatch.py` plus `installed_wheel_smoke.py` | Repaired and installed |
 | CT14 observer boundary | `test_observer_boundary.py` plus catalog and codec role joins | Direct |
 | PX01–PX12 | `g7_mechanics.py` exercised by `test_family_coverage.py` | Exact |
 | SPF001–SPF060 | Independent catalog/mechanics manifests joined in `test_family_coverage.py` | Exact |
@@ -99,16 +101,15 @@ untouched.
 
 The audit found no missing pressure row, family row, secondary join, or
 migration row. Its substantive false positives were instead inside CT02,
-CT03, CT05–CT08, CT12, and CT13; every row except the still-active CT12
-hardening now has a direct repair.
+CT03, CT05–CT08, CT12, and CT13; every row now has direct evidence.
 
 ## No-Cheating Checks
 
 - [x] No test is skipped, xfailed, inert, or routed through
       `_not_implemented()`/`NotImplementedError`.
-- [ ] Independent oracles do not call the implementation, catalog constructor,
+- [x] Independent oracles do not call the implementation, catalog constructor,
       evaluator, commit helper, or codec relation they judge.
-- [ ] Full-result comparisons cover all authoritative result fields required
+- [x] Full-result comparisons cover all authoritative result fields required
       by their suite rather than comparing rendered state alone.
 - [x] Exactly one production `apply` exists; rollout demonstrably invokes it;
       blocked catalog imports cannot affect application or decoding.
@@ -116,33 +117,61 @@ hardening now has a direct repair.
       spelling, family, carrier, locus kind, or Book class.
 - [x] Catalog metadata remains callable-free, serialization catalog-free, and
       datasets/RNG/visualization remain downstream.
-- [ ] The installed-wheel smoke imports only the temporary installation, not
+- [x] The installed-wheel smoke imports only the temporary installation, not
       the source checkout, build tree, or ambient editable package.
-- [ ] Goal 2 and Goal 5 remain byte-for-byte frozen; Goal 4 machinery and
+- [x] Goal 2 and Goal 5 remain byte-for-byte frozen; Goal 4 machinery and
       G7-06 release work remain untouched.
 
 ## Completion Requirements
 
-- [ ] CT01–CT14 pass with a requirement-to-test matrix and no missing
+- [x] CT01–CT14 pass with a requirement-to-test matrix and no missing
       assertion.
-- [ ] PX01–PX12, all sixty primary SPF rows, and exactly the eight required
+- [x] PX01–PX12, all sixty primary SPF rows, and exactly the eight required
       secondary joins pass through the one family-blind application law.
-- [ ] The literal test-owned T01–T45 manifest matches production metadata,
+- [x] The literal test-owned T01–T45 manifest matches production metadata,
       callables, owners, targets, kinds, and exports exactly.
-- [ ] CT12 independent equivalence and oracle-dependency gates withstand a
+- [x] CT12 independent equivalence and oracle-dependency gates withstand a
       hostile self-reference review.
-- [ ] Static dependency, descriptor closure, single-apply, public-surface,
+- [x] Static dependency, descriptor closure, single-apply, public-surface,
       rollout-reuse, blocked-catalog, and forbidden-token checks pass.
-- [ ] The active source suite and clean ephemeral-wheel smoke suite are green.
-- [ ] `uv lock --check`, package/test compilation, `git diff --check`, and the
+- [x] The active source suite and clean ephemeral-wheel smoke suite are green.
+- [x] `uv lock --check`, package/test compilation, `git diff --check`, and the
       final G7-05 hostile review pass.
-- [ ] `0-plan.md` records exact evidence and names G7-06 as the first
+- [x] `0-plan.md` records exact evidence and names G7-06 as the first
       incomplete stage without claiming release readiness.
 
 ## Stage Results
 
-In progress. The requirement audit and the CT02/CT03/CT05–CT08/CT13 repairs
-are complete. The interim aggregate conformance slice reports `253 passed`;
-CT12 hardening, the final wheel built from the reconciled source state, the
-complete active suite, and the final hostile review remain before any
-completion claim.
+G7-05 is complete.
+
+- The requirement audit converted weak or false-passing coverage into 49
+  additional live conformance tests. Final counts are `270 passed` for
+  `tests/conformance` and `1042 passed` for `tests`, with no skips or xfails.
+- CT12 now has 17 independent cases. Mobile and Turing are distinct; the
+  Turing expected result remains standard-library-only data while the actual
+  result comes through `ca.catalog.machina.turing_machine`. Full evidence,
+  support, cardinality, probability, disposition, lineage, and fiber
+  mutations are hostile-tested in both dependency directions.
+- CT13 proves the complete import DAG, absence of root-flattened catalog
+  constructors and obsolete submodules, exactly one production `apply`,
+  rollout's static and behavioral reuse of that binding, catalog-blocked
+  apply/decode, and full deterministic and branching manual-rollout equality.
+- The two production repairs are generic: exceptions from Rule denotation now
+  reject at `rule-denotation`, and malformed probability-law records are
+  structurally revalidated and reject at `result-validation` before commit.
+- `uv lock --check`, package/test compilation, forbidden-source searches, and
+  `git diff --check` pass. Goal 2 and Goal 5 are byte-for-byte unchanged from
+  the stage-start commit; Goal 4 and G7-06 files are untouched.
+- The ephemeral `ankos-0.2.0-py3-none-any.whl` is 215674 bytes with SHA-256
+  `cbd737f94406b4065c6ccd8126f9b3b9afea9a2fd4ef54fb1fccc07b5f316731`.
+  Its archive contains `ca/py.typed` and the four visualization assets. A
+  fresh CPython 3.10 environment installed `ankos==0.2.0` with
+  `numpy==2.2.6`; dependency checking and the isolated installed-wheel smoke
+  both passed.
+- The final hostile review reproduced and closed direct attribute,
+  `__dict__`, gross probability-record, inert-test, and oracle-evidence
+  bypasses, then reported no remaining blocker.
+
+G7-06 is the first incomplete stage. This checkpoint proves aggregate
+conformance but does not claim documentation reconciliation or release
+readiness.

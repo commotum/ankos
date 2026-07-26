@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-05 CONFORMANCE AUDIT**
+Status: **IN PROGRESS — G7-06 RELEASE RECONCILIATION NEXT**
 
 ## Big-Picture Objective
 
@@ -167,9 +167,16 @@ conflict, and reconcile the plan before changing runtime behavior.
   complete active suite reports `993 passed` with no skips. The initial static
   scan nevertheless found three unused conformance helper placeholders behind
   `_not_implemented()` and `NotImplementedError`; they were removed after the
-  audit confirmed that dedicated CT09–CT11 suites supersede them. The interim
-  repaired conformance slice reports `253 passed`; CT12 hardening and final
-  aggregate gates remain.
+  audit confirmed that dedicated CT09–CT11 suites supersede them.
+- G7-05 is complete. The final conformance slice reports `270 passed`; the
+  complete active suite reports `1042 passed`, both with no skips. CT12 now
+  contains 17 independent cases with distinct mobile and real catalog Turing
+  routes. The final ephemeral wheel installed into a clean CPython 3.10
+  environment and passed dependency, import, signature, codec, catalog,
+  application, rollout, and `py.typed` checks. Exact evidence is in
+  [`6-CONFORMANCE.md`](6-CONFORMANCE.md).
+- G7-06 is the first incomplete stage. No documentation reconciliation,
+  release cleanup, or release-readiness claim has started.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -324,8 +331,8 @@ stage file and may evolve with the implementation.
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows and promised preset domains supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Complete | Exact constructors, metadata, exports, and migration |
-| `6-CONFORMANCE` | G7-05 | In progress | All normative suites and joins pass together |
-| `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
+| `6-CONFORMANCE` | G7-05 | Complete | All normative suites and joins pass together |
+| `7-RELEASE` | G7-06 | Next | Docs, packaging, cleanup, and hostile final gate |
 
 No stage file exists until that stage begins.
 
@@ -536,7 +543,8 @@ Handoff stage: **G7-04 — Catalog assembly and exact legacy migration**
 
 Stage status: **Complete.** The dependency reclosures, executable catalog
 freeze, hostile repairs, and exact verification evidence are recorded in
-[`5-CATALOG.md`](5-CATALOG.md). G7-05 remains unstarted.
+[`5-CATALOG.md`](5-CATALOG.md). G7-05 later closed under
+[`6-CONFORMANCE.md`](6-CONFORMANCE.md).
 
 #### Big Picture Objective
 
@@ -579,8 +587,9 @@ callable-free metadata over already-tested mechanics.
 
 Handoff stage: **G7-05 — Complete conformance**
 
-Stage status: **In progress.** The live requirement audit and verification
-record is [`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 remains unstarted.
+Stage status: **Complete.** The requirement audit, repaired conformance
+evidence, installed-wheel proof, and hostile closure are recorded in
+[`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 is next and remains unstarted.
 
 #### Big Picture Objective
 
