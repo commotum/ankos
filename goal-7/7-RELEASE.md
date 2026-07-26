@@ -16,6 +16,15 @@ Status: **IN PROGRESS**
 - Source and lock metadata already declare `0.2.0`, but that checkpoint did
   not reconcile the public documentation or authorize a release-candidate
   claim.
+- The reconciled worktree reports `270 passed` in `tests/conformance` and
+  `1044 passed` in the complete active suite, both with no skips or xfails.
+  The two tests added during this stage make documentation link, fence, and
+  current Python-example structure durable release checks.
+- The final decision-independent wheel is
+  `ankos-0.2.0-py3-none-any.whl`, 216540 bytes, with SHA-256
+  `8eaa83a4553a10af42d4f572e1e16cea8359a5ec29b13c20dcb167aebc60d435`.
+  It contains 36 paths and passes isolated clean-install checks under CPython
+  3.10.13.
 - G7-06 owns documentation reconciliation, release cleanup, final source and
   installed-package agreement, and the final hostile review.
 - Goal 2 and Goal 5 remain frozen. Goal 4 and Book rediscovery remain outside
@@ -106,41 +115,113 @@ must remain untouched.
 
 ## No-Cheating Checks
 
-- [ ] `SimpleProgram` stores exactly the five authorized fields.
-- [ ] Exactly one production `apply` exists and rollout reuses it.
-- [ ] No source or documentation presents `Dynamics`, `apply_rule`, a
+- [x] `SimpleProgram` stores exactly the five authorized fields.
+- [x] Exactly one production `apply` exists and rollout reuses it.
+- [x] No source or documentation presents `Dynamics`, `apply_rule`, a
       manifest decoder, a second executor, or a broad root façade as current.
-- [ ] `serialization` remains catalog-free and accepts only the canonical
+- [x] `serialization` remains catalog-free and accepts only the canonical
       expanded five-key schema.
-- [ ] Catalog counts, exports, signatures, aliases, presets, compatibility
+- [x] Catalog counts, exports, signatures, aliases, presets, compatibility
       spelling, and role boundaries remain exact.
-- [ ] Datasets, RNG, and visualization remain downstream and absent from
+- [x] Datasets, RNG, and visualization remain downstream and absent from
       eager root imports.
-- [ ] Active source/tests contain no pending stub, skip, xfail, obsolete
+- [x] Active source/tests contain no pending stub, skip, xfail, obsolete
       family dispatch, or compatibility fallback.
-- [ ] Goal 2 and Goal 5 are byte-for-byte unchanged; Goal 4 machinery is not
+- [x] Goal 2 and Goal 5 are byte-for-byte unchanged; Goal 4 machinery is not
       used.
-- [ ] The installed-wheel smoke imports only the clean installation, not the
+- [x] The installed-wheel smoke imports only the clean installation, not the
       checkout, build tree, or an ambient editable package.
 
 ## Completion Requirements
 
-- [ ] `README-V2.md`, `api.md`, `simple_programs.md`, public docstrings, and
+- [x] `README-V2.md`, `api.md`, `simple_programs.md`, public docstrings, and
       `ref/notes/ca-scaffold.py` tell one implemented API story.
-- [ ] `README-V1.md` is unmistakably historical and the 0.1 source migration
+- [x] `README-V1.md` is unmistakably historical and the 0.1 source migration
       path is explicit without a compatibility runtime or decoder.
-- [ ] Source, tests, signatures, schema version, package metadata, lockfile,
+- [x] Source, tests, signatures, schema version, package metadata, lockfile,
       wheel, exports, assets, and `py.typed` agree on `0.2.0`.
-- [ ] Documentation links and fenced examples pass structural checks; all
+- [x] Documentation links and fenced examples pass structural checks; all
       executable examples chosen for validation run against the public API.
-- [ ] `uv run pytest -q tests`, `uv lock --check`, compilation, build,
+- [x] `uv run pytest -q tests`, `uv lock --check`, compilation, build,
       clean-install smoke, and `git diff --check` pass.
-- [ ] One final hostile review finds no sixth field, second executor, family
+- [x] One final hostile review finds no sixth field, second executor, family
       dispatch, lossy migration, observer/tooling leak, missing audited
       family, or competing API story.
+- [ ] Explicit authority resolves the fifth truncation-cause conflict without
+      editing the frozen Goal 6 tree.
 - [ ] `GOALS.md` is updated only after every other requirement passes.
+
+## Verification Evidence
+
+The final decision-independent source state was verified with:
+
+| Gate | Exact command | Result |
+|---|---|---|
+| Focused release/runtime slice | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests/test_release_documentation.py tests/test_rollout.py tests/conformance/test_adversarial_runtime_edges.py tests/conformance/test_probability_replay.py tests/test_catalog_media_criteria_presets.py tests/test_public_api.py` | `56 passed` |
+| Complete conformance | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests/conformance` | `270 passed` |
+| Complete active suite | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests` | `1044 passed` |
+| Lockfile | `UV_CACHE_DIR=/tmp/uv-cache uv lock --check` | 12 packages resolved; lock current |
+| Compilation | `UV_CACHE_DIR=/tmp/uv-cache uv run python -m compileall -q src tests examples ref/notes/ca-scaffold.py` | passed |
+| Documentation structure | `UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q tests/test_release_documentation.py` | `2 passed`; 10 release documents checked, with current Python fences parsed in `README-V2.md` and `api.md` |
+| Reference walkthrough | `UV_CACHE_DIR=/tmp/uv-cache uv run python ref/notes/ca-scaffold.py` | `ca-scaffold: ok` |
+| Example CLI | `UV_CACHE_DIR=/tmp/uv-cache uv run python examples/export_viz_samples.py --help` | passed |
+| Pending/stub scan | `rg -n 'pytest\\.skip\|pytest\\.mark\\.skip\|pytest\\.mark\\.xfail\|@pytest\\.mark\\.xfail\|NotImplementedError\|_pending\\(\|_not_implemented\\(\|not implemented' src tests --glob '*.py'` | no matches |
+| Single operations | `rg -n '^def apply\\(' src/ca --glob '*.py'` and `rg -n '^def rollout\\(' src/ca --glob '*.py'` | exactly `program.py:1976` and `program.py:3588` |
+| Frozen authority | `git diff --name-only 1c92123cf3c04a421759f5acd84141a6074a6fbe..HEAD -- goal-2 goal-4 goal-5 goal-6` | empty |
+| Stage whitespace | `git diff --check 1c92123cf3c04a421759f5acd84141a6074a6fbe..HEAD` | passed |
+
+No formatter is configured in `pyproject.toml`; compilation, structural
+documentation tests, the complete suite, and stage-range `git diff --check`
+are therefore the explicit formatting/syntax/whitespace gate.
+
+The installed-package proof used:
+
+```text
+UV_CACHE_DIR=/tmp/uv-cache uv build --wheel \
+  --out-dir /tmp/ankos-g7-release-final-a776efe-dist .
+UV_CACHE_DIR=/tmp/uv-cache uv venv --python 3.10 \
+  /tmp/ankos-g7-release-final-a776efe-venv
+UV_CACHE_DIR=/tmp/uv-cache uv pip install \
+  --python /tmp/ankos-g7-release-final-a776efe-venv/bin/python \
+  /tmp/ankos-g7-release-final-a776efe-dist/ankos-0.2.0-py3-none-any.whl
+UV_CACHE_DIR=/tmp/uv-cache uv pip check \
+  --python /tmp/ankos-g7-release-final-a776efe-venv/bin/python
+```
+
+From `/tmp`, the clean interpreter then passed:
+
+```text
+/tmp/ankos-g7-release-final-a776efe-venv/bin/python -I \
+  /home/jake/Developer/ankos/tests/conformance/installed_wheel_smoke.py
+/tmp/ankos-g7-release-final-a776efe-venv/bin/python -I \
+  /home/jake/Developer/ankos/ref/notes/ca-scaffold.py
+```
+
+Direct metadata and archive inspection confirms package name `ankos`, version
+`0.2.0`, Python requirement `>=3.10`, sole runtime dependency `numpy>=2.2`,
+36 wheel paths, `ca/py.typed`, all four visualization assets, and no
+`specs.py`, `rollout.py`, `engine.py`, or `dynamics.py`.
+
+## Hostile Review
+
+Three independent hostile passes covered documentation accuracy, static
+runtime cleanup, and the complete release contract:
+
+- documentation now matches live record fields, enum names, signatures,
+  codec-envelope fields, lineage evidence, exports, and catalog counts;
+- the zero-step intensional-support precedence defect is repaired and covered
+  by unit and conformance tests;
+- six dead compatibility aliases and stale transitional wording were removed;
+- no competing API story, covert sixth field, second executor, family
+  dispatch, observer leak, missing family, or installed-package drift remains;
+  and
+- the only remaining blocker is the explicit fifth-cause authority decision
+  recorded above.
 
 ## Stage Results
 
-In progress. The first action is the release-surface audit; no release
-reconciliation claim has yet been made.
+All decision-independent G7-06 work is complete and verified. `GOALS.md`
+remains intentionally unchanged. After explicit authority is received, the
+only remaining actions are to record the narrow Goal 7 contract supersession,
+rerun the final stage-range checks, update `GOALS.md` last, and close G7-06 and
+Goal 7. No release has been published.
