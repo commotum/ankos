@@ -1314,7 +1314,7 @@ def _encode_node(value: object) -> dict[str, object]:
 def _canonical_json(value: object) -> bytes:
     rendered = json.dumps(
         value,
-        ensure_ascii=False,
+        ensure_ascii=True,
         allow_nan=False,
         separators=(",", ":"),
         sort_keys=True,

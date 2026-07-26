@@ -48,7 +48,7 @@ def _program() -> tuple[ca.SimpleProgram, loci.FiniteConfiguration]:
 def _canonical_json(value: object) -> bytes:
     return json.dumps(
         value,
-        ensure_ascii=False,
+        ensure_ascii=True,
         allow_nan=False,
         separators=(",", ":"),
         sort_keys=True,
@@ -135,6 +135,7 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
         10**10_000,
         "",
         "λ\n\u0000",
+        "\ud800",
         Fraction(-355, 113),
         (None, False, 7, Fraction(2, 3), ("nested",)),
         loci.coordinate("x", 2, scope="sample"),

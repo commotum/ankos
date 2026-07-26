@@ -19,7 +19,7 @@ from g7_codec_samples import public_sealed_types, representative_values
 def _canonical_json(value: object) -> bytes:
     return json.dumps(
         value,
-        ensure_ascii=False,
+        ensure_ascii=True,
         allow_nan=False,
         separators=(",", ":"),
         sort_keys=True,
@@ -234,6 +234,7 @@ def test_round_trip_preserves_every_exact_semantic_distinction() -> None:
         -(10**5000 + 7),
         "",
         "é/λ/𐐷",
+        "\ud800",
         Fraction(0),
         Fraction(-17, 19),
         (False, 0, Fraction(1, 2), "0"),
@@ -264,7 +265,12 @@ def test_round_trip_preserves_every_exact_semantic_distinction() -> None:
         assert serialization.dumps(result.value) == blob
 
     # Decimal text is representation, not an implicit float or rational.
-    represented = exact_values[15]
+    represented = next(
+        value
+        for value in exact_values
+        if isinstance(value, alphabets.RepresentedNumber)
+        and value.profile is alphabets.RepresentedNumberProfile.DECIMAL
+    )
     decoded_represented = _decoded(represented)
     assert isinstance(decoded_represented, alphabets.RepresentedNumber)
     assert decoded_represented.profile is (

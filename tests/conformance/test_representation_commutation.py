@@ -12,6 +12,7 @@ import ca
 from ca import alphabets, loci, program, rules, serialization
 
 from g7_fixtures import (
+    certificate,
     derivation,
     finite_record_program,
     no_successor,
@@ -37,11 +38,26 @@ def _exact_relation(row) -> alphabets.RepresentationRelation:
 
 def _transition_pair(
     relation: alphabets.RepresentationRelation,
+    *,
+    identity: str,
 ) -> tuple[program.ApplicationComplete, program.ApplicationComplete]:
-    """Build independently expanded native/represented conjugate steps."""
+    """Build a conjugate state step for one transducer-declared relation.
+
+    The PX10 family fixture itself is a transducer that establishes the
+    relation; it is not one side of a native/represented state pair.  This
+    separate pair tests the representation claim as a state conjugacy without
+    pretending the transducer and the represented dynamics are the same role.
+    """
 
     assert len(relation.relation) >= 2
     first, second = relation.relation[:2]
+    stopped = rules.Stop(
+        rules.literal_expr(f"{identity}:complete"),
+        certificate(
+            rules.CertificateKind.TERMINALITY,
+            f"{identity}:complete",
+        ),
+    )
 
     def build(
         initial: alphabets.SemanticValue,
@@ -51,8 +67,9 @@ def _transition_pair(
         def atoms(targets: tuple[loci.Locus, ...]):
             return (
                 derivation(
-                    "representation-step",
+                    identity,
                     existing=(rules.replace(targets[0], following),),
+                    continuation=stopped,
                 ),
             )
 
@@ -317,10 +334,30 @@ def test_exact_representation_is_inverse_on_its_declared_image() -> None:
 
 @pytest.mark.parametrize("row", PX10_ROWS, ids=lambda row: row.spf)
 def test_represented_and_native_one_step_results_commute_completely(row) -> None:
-    """Mapped represented application equals native application in every field."""
+    """Each real transducer establishes a relation whose conjugate step commutes."""
 
-    relation = _exact_relation(row)
-    native, represented = _transition_pair(relation)
+    execution = run_mechanics_fixture(row)
+    assert_mechanics_run(execution)
+    relation = execution.representation
+    assert relation is not None
+    assert execution.representation_source is not None
+    assert execution.representation_target is not None
+    assert relation.forward(execution.representation_source) == (
+        execution.representation_target
+    )
+    assert isinstance(execution.result, program.ApplicationComplete)
+    actual_derivation = execution.result.applied_atoms.atoms[0]
+    assert isinstance(actual_derivation, program.AppliedDerivation)
+    assert isinstance(actual_derivation.source.continuation, rules.Stop)
+
+    native, represented = _transition_pair(
+        relation,
+        identity=row.fixture,
+    )
+    for result in (native, represented):
+        atom = result.applied_atoms.atoms[0]
+        assert isinstance(atom, program.AppliedDerivation)
+        assert isinstance(atom.source.continuation, rules.Stop)
 
     assert _normalize_complete_result(
         represented,
