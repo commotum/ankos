@@ -379,10 +379,13 @@ def _assemble(
     representation_source: alphabets.SemanticValue | None = None,
     representation_target: alphabets.SemanticValue | None = None,
     representation_case_index: int = 0,
+    seed_source: Configuration | None = None,
 ) -> MechanicsRun:
+    if seed_source is None:
+        seed_source = source
     simple_program = ca.SimpleProgram(
         seeds.exact(
-            source,
+            seed_source,
             value_profile=alphabet.value_profile,
             exactness_profile=exactness,
         ),
@@ -2240,6 +2243,8 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
     custom_clauses: tuple[rules.RuleClause, ...] | None = None
     trajectory_steps = 1
     rule_condition = rules.literal_expr(1)
+    program_seed_source: Configuration | None = None
+    program_domain_values: tuple[alphabets.SemanticValue, ...] = ()
     if row.spf == "SPF012":
         native = _codec_word("source-word", "A", "A", "A", "B", "B")
         encoded = _codec_record("run-records", run0="A:3", run1="B:2")
@@ -2252,143 +2257,130 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             alternate_encoded,
             case_index,
         )
-        symbols = (
-            ("A", "A", "A", "B", "B")
-            if case_index == 0
-            else ("B",)
-        )
-        run_specs = (
-            (("A", 3), ("B", 2))
-            if case_index == 0
-            else (("B", 1),)
-        )
-        run_values = tuple(
-            _run_record(symbol, length)
-            for symbol, length in run_specs
-        )
-        source = _record_configuration(
-            (
-                *tuple(
-                    (f"symbol{index}", symbol)
-                    for index, symbol in enumerate(symbols)
-                ),
-                *tuple(
-                    (f"run{index}", unset)
-                    for index in range(len(run_values))
-                ),
-                ("cursor", 0),
+        primary_symbols = ("A", "A", "A", "B", "B")
+        alternate_symbols = ("B", "<end>", "<end>", "<end>", "<end>")
+        symbols = primary_symbols if case_index == 0 else alternate_symbols
+
+        def run_source(values: tuple[str, ...]) -> loci.FiniteConfiguration:
+            return _record_configuration(
+                (
+                    *tuple(
+                        (f"symbol{index}", symbol)
+                        for index, symbol in enumerate(values)
+                    ),
+                    ("run0", unset),
+                    ("run1", unset),
+                    ("cursor", 0),
+                )
             )
-        )
+
+        program_seed_source = run_source(primary_symbols)
+        source = run_source(symbols)
         targets = _record_targets(source)
         symbol_targets = tuple(
             targets[f"symbol{index}"]
-            for index in range(len(symbols))
+            for index in range(5)
         )
         read_targets = (
             *symbol_targets,
             targets["cursor"],
         )
+        primary_run0 = _run_record("A", 3)
+        primary_run1 = _run_record("B", 2)
+        alternate_run0 = _run_record("B", 1)
         writes = (
-            *tuple(
-                (
-                    targets[f"run{index}"],
-                    rules.literal_expr(run_value),
-                )
-                for index, run_value in enumerate(run_values)
-            ),
+            (targets["run0"], rules.literal_expr(primary_run0)),
+            (targets["run1"], rules.literal_expr(primary_run1)),
             (targets["cursor"], rules.literal_expr("done")),
         )
-        boundary_conditions = tuple(
-            (
-                rules.equal(
-                    rules.observation(index),
-                    rules.observation(index + 1),
-                )
-                if symbols[index] == symbols[index + 1]
-                else rules.equal(
+        writable_targets = tuple(target for target, _ in writes)
+
+        def symbol_case(
+            expected: tuple[str, ...],
+        ) -> rules.RuleExpr:
+            return _all_conditions(
+                *(
                     rules.equal(
                         rules.observation(index),
-                        rules.observation(index + 1),
-                    ),
-                    rules.literal_expr(False),
-                )
-            )
-            for index in range(len(symbols) - 1)
-        )
-        rule_condition = _all_conditions(
-            *(
-                rules.equal(
-                    rules.observation(index),
-                    rules.literal_expr(symbol),
-                )
-                for index, symbol in enumerate(symbols)
-            ),
-            *boundary_conditions,
-            rules.equal(
-                rules.observation(len(symbols)),
-                rules.literal_expr(0),
-            ),
-        )
-        if case_index == 0:
-            writable_targets = tuple(target for target, _ in writes)
-            aaa_record = _run_record("A", 3)
-            custom_clauses = (
-                _clause(
-                    rule_condition,
-                    _derivation_result(
-                        row.fixture,
-                        existing=_total_existing_plans(
-                            writable_targets,
-                            tuple(writes),
-                        ),
-                        stop=True,
-                    ),
+                        rules.literal_expr(symbol),
+                    )
+                    for index, symbol in enumerate(expected)
                 ),
-                _clause(
-                    _all_conditions(
-                        rules.equal(
-                            rules.observation(0),
-                            rules.observation(1),
-                        ),
-                        rules.equal(
-                            rules.observation(1),
-                            rules.observation(2),
-                        ),
-                        rules.equal(
-                            rules.observation(3),
-                            rules.literal_expr("<end>"),
-                        ),
-                        rules.equal(
-                            rules.observation(4),
-                            rules.literal_expr("<end>"),
-                        ),
-                        rules.equal(
-                            rules.observation(5),
-                            rules.literal_expr(0),
-                        ),
+                rules.equal(rules.observation(5), rules.literal_expr(0)),
+            )
+
+        custom_clauses = (
+            _clause(
+                _all_conditions(
+                    symbol_case(primary_symbols),
+                    rules.equal(rules.observation(0), rules.observation(1)),
+                    rules.equal(rules.observation(1), rules.observation(2)),
+                    rules.equal(
+                        rules.equal(rules.observation(2), rules.observation(3)),
+                        rules.literal_expr(False),
                     ),
-                    _derivation_result(
-                        f"{row.fixture}:AAA",
-                        existing=_total_existing_plans(
-                            writable_targets,
+                    rules.equal(rules.observation(3), rules.observation(4)),
+                ),
+                _derivation_result(
+                    row.fixture,
+                    existing=_total_existing_plans(
+                        writable_targets,
+                        tuple(writes),
+                    ),
+                    stop=True,
+                ),
+            ),
+            _clause(
+                symbol_case(alternate_symbols),
+                _derivation_result(
+                    f"{row.fixture}:single-B",
+                    existing=_total_existing_plans(
+                        writable_targets,
+                        (
                             (
-                                (
-                                    targets["run0"],
-                                    rules.literal_expr(aaa_record),
-                                ),
-                                (
-                                    targets["cursor"],
-                                    rules.literal_expr("done"),
-                                ),
+                                targets["run0"],
+                                rules.literal_expr(alternate_run0),
+                            ),
+                            (
+                                targets["cursor"],
+                                rules.literal_expr("done"),
                             ),
                         ),
-                        stop=True,
                     ),
+                    stop=True,
                 ),
-            )
-            additional_future_values = (*run_values, aaa_record, "<end>")
-        else:
-            additional_future_values = run_values
+            ),
+            _clause(
+                symbol_case(("A", "A", "A", "<end>", "<end>")),
+                _derivation_result(
+                    f"{row.fixture}:AAA",
+                    existing=_total_existing_plans(
+                        writable_targets,
+                        (
+                            (
+                                targets["run0"],
+                                rules.literal_expr(primary_run0),
+                            ),
+                            (
+                                targets["cursor"],
+                                rules.literal_expr("done"),
+                            ),
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+        )
+        additional_future_values = (
+            primary_run0,
+            primary_run1,
+            alternate_run0,
+            "<end>",
+        )
+        program_domain_values = (
+            alternate_run0,
+            "<end>",
+        )
     elif row.spf == "SPF054":
         native = _codec_word("prefix-block", "A")
         encoded = _codec_word("prefix-bits", 0)
@@ -2410,37 +2402,102 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             B="10",
             C="11",
         )
-        source = _structural_configuration(
-            loci.CarrierKind.TREE,
-            (
-                (block, selected_native),
-                (codebook, codebook_value),
-                (cursor, "block-0"),
-            ),
-        )
+        def prefix_source(
+            value: alphabets.SemanticValue,
+        ) -> loci.FiniteConfiguration:
+            return _structural_configuration(
+                loci.CarrierKind.TREE,
+                (
+                    (block, value),
+                    (codebook, codebook_value),
+                    (cursor, "block-0"),
+                ),
+            )
+
+        program_seed_source = prefix_source(native)
+        source = prefix_source(selected_native)
         read_targets = (block, codebook, cursor)
         writes = (
             (cursor, rules.literal_expr("done")),
         )
-        assert type(selected_encoded) is alphabets.ValueNode
         fresh_parent = block
         fresh_namespace = "g7-prefix-output"
-        fresh_keys = tuple(range(len(selected_encoded.items)))
-        fresh_values = selected_encoded.items
-        rule_condition = _all_conditions(
-            rules.equal(
-                rules.observation(0),
-                rules.literal_expr(selected_native),
+        fresh_keys = (0, 1)
+        fresh_values = (0, 0)
+        prefix_references = tuple(
+            loci.FreshReference(
+                fresh_namespace,
+                key,
+                parent=block,
+            )
+            for key in fresh_keys
+        )
+        cursor_plan = _existing_target_plan(
+            cursor,
+            rules.DispositionAction.REPLACE,
+            rules.literal_expr("done"),
+        )
+
+        def prefix_condition(
+            value: alphabets.SemanticValue,
+        ) -> rules.RuleExpr:
+            return _all_conditions(
+                rules.equal(
+                    rules.observation(0),
+                    rules.literal_expr(value),
+                ),
+                rules.equal(
+                    rules.observation(1),
+                    rules.literal_expr(codebook_value),
+                ),
+                rules.equal(
+                    rules.observation(2),
+                    rules.literal_expr("block-0"),
+                ),
+            )
+
+        custom_clauses = (
+            _clause(
+                prefix_condition(native),
+                _derivation_result(
+                    f"{row.fixture}:A",
+                    existing=(cursor_plan,),
+                    fresh=(
+                        _fresh_target_plan(
+                            prefix_references[0],
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(0),
+                        ),
+                        _fresh_target_plan(
+                            prefix_references[1],
+                            rules.DispositionAction.ABSENT,
+                        ),
+                    ),
+                    stop=True,
+                ),
             ),
-            rules.equal(
-                rules.observation(1),
-                rules.literal_expr(codebook_value),
-            ),
-            rules.equal(
-                rules.observation(2),
-                rules.literal_expr("block-0"),
+            _clause(
+                prefix_condition(alternate_native),
+                _derivation_result(
+                    f"{row.fixture}:B",
+                    existing=(cursor_plan,),
+                    fresh=(
+                        _fresh_target_plan(
+                            prefix_references[0],
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(1),
+                        ),
+                        _fresh_target_plan(
+                            prefix_references[1],
+                            rules.DispositionAction.CREATE,
+                            rules.literal_expr(0),
+                        ),
+                    ),
+                    stop=True,
+                ),
             ),
         )
+        program_domain_values = (alternate_native,)
     elif row.spf == "SPF055":
         native = _codec_word("message", "A", "B")
         encoded = _codec_record(
@@ -2481,19 +2538,23 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
                 high=Fraction(1),
             ),
         )
-        source = _structural_configuration(
-            loci.CarrierKind.FIELD,
-            (
-                (symbol0, "A"),
-                (symbol1, second_symbol),
-                (partition, partition_value),
-                (low, Fraction(0)),
-                (high, Fraction(1)),
-                (cursor, 0),
-            ),
-            rank=1,
-            axes=("x",),
-        )
+        def interval_source(second: str) -> loci.FiniteConfiguration:
+            return _structural_configuration(
+                loci.CarrierKind.FIELD,
+                (
+                    (symbol0, "A"),
+                    (symbol1, second),
+                    (partition, partition_value),
+                    (low, Fraction(0)),
+                    (high, Fraction(1)),
+                    (cursor, 0),
+                ),
+                rank=1,
+                axes=("x",),
+            )
+
+        program_seed_source = interval_source("B")
+        source = interval_source(second_symbol)
         read_targets = (symbol0, symbol1, partition, low, high, cursor)
         writes = (
             (low, rules.literal_expr(Fraction(0))),
@@ -3191,9 +3252,21 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             ),
             _clause(
                 _all_conditions(
-                    rules.equal(
-                        rules.observation(1),
-                        rules.literal_expr(second_symbol),
+                    rules.gate(
+                        rules.RuleExpr(
+                            rules.ExpressionPrimitive.TUPLE,
+                            (
+                                rules.equal(
+                                    rules.observation(1),
+                                    rules.literal_expr("A"),
+                                ),
+                                rules.equal(
+                                    rules.observation(1),
+                                    rules.literal_expr("B"),
+                                ),
+                            ),
+                        ),
+                        rules.GateKind.ANY,
                     ),
                     rules.equal(
                         rules.observation(2),

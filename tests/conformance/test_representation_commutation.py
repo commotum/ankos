@@ -9,7 +9,16 @@ from fractions import Fraction
 import pytest
 
 import ca
-from ca import alphabets, loci, program, rules, serialization
+from ca import (
+    alphabets,
+    frontiers,
+    loci,
+    neighborhoods,
+    program,
+    rules,
+    seeds,
+    serialization,
+)
 
 from g7_fixtures import (
     certificate,
@@ -217,26 +226,29 @@ def _exact_relation(row) -> alphabets.RepresentationRelation:
     return relation
 
 
-def _transition_pair(
+def _transition_system(
     relation_pairs: tuple[
         tuple[alphabets.SemanticValue, alphabets.SemanticValue],
         tuple[alphabets.SemanticValue, alphabets.SemanticValue],
     ],
     *,
-    initial_index: int,
     identity: str,
-) -> tuple[program.ApplicationComplete, program.ApplicationComplete]:
-    """Build a conjugate state step from a test-owned literal oracle.
+) -> tuple[
+    ca.SimpleProgram,
+    tuple[loci.FiniteConfiguration, loci.FiniteConfiguration],
+    ca.SimpleProgram,
+    tuple[loci.FiniteConfiguration, loci.FiniteConfiguration],
+]:
+    """Build one fixed conjugate program per side from a literal oracle.
 
     The PX10 family fixture itself is a transducer that establishes the
     relation; it is not one side of a native/represented state pair.  This
-    separate pair tests the representation claim as a state conjugacy without
-    pretending the transducer and the represented dynamics are the same role,
-    or deriving both expected sides from the relation under test.
+    separate pair of two-clause programs tests the representation claim as a
+    state conjugacy without pretending the transducer and represented
+    dynamics are the same role, deriving expectations from the relation under
+    test, or rebuilding either program for a different domain point.
     """
 
-    first = relation_pairs[initial_index]
-    second = relation_pairs[1 - initial_index]
     stopped = rules.Stop(
         rules.literal_expr(f"{identity}:complete"),
         certificate(
@@ -246,41 +258,95 @@ def _transition_pair(
     )
 
     def build(
-        initial: alphabets.SemanticValue,
-        following: alphabets.SemanticValue,
         values: tuple[alphabets.SemanticValue, ...],
-    ) -> tuple[ca.SimpleProgram, loci.FiniteConfiguration]:
-        def atoms(targets: tuple[loci.Locus, ...]):
-            return (
-                derivation(
-                    identity,
-                    existing=(rules.replace(targets[0], following),),
-                    continuation=stopped,
+    ) -> tuple[
+        ca.SimpleProgram,
+        tuple[loci.FiniteConfiguration, loci.FiniteConfiguration],
+    ]:
+        sources = tuple(
+            loci.record_configuration((("value", value),))
+            for value in values
+        )
+        first_source = sources[0]
+        target = first_source.entries[0][0]
+        assert all(source.entries[0][0] == target for source in sources)
+        alphabet = alphabets.enum(values)
+        writable = frontiers.everywhere(
+            configuration_contract=first_source.contract,
+            value_profile=alphabet.value_profile,
+            effects=(frontiers.Effect.REPLACE,),
+        )
+        readable = neighborhoods.global_view(
+            configuration_contract=first_source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        clauses = tuple(
+            rules.RuleClause(
+                rules.equal(
+                    rules.observation(0),
+                    rules.literal_expr(current),
+                ),
+                rules.DerivationClauseResult(
+                    (
+                        rules.ExistingDispositionPlan(
+                            rules.capability_target(target),
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(values[1 - index]),
+                        ),
+                    ),
+                    (),
+                    rules.Progress.ADVANCED,
+                    stopped,
+                    rules.literal_expr(f"{identity}:case-{index}"),
+                    (f"test:{identity}:case-{index}",),
+                    certificate(
+                        rules.CertificateKind.DERIVATION,
+                        f"{identity}:case-{index}:derived",
+                    ),
                 ),
             )
-
-        return finite_record_program(
-            (("value", initial),),
-            atoms,
-            alphabet=alphabets.enum(values),
-            effects=(ca.frontiers.Effect.REPLACE,),
+            for index, current in enumerate(values)
+        )
+        rule = rules.clause_kernel(
+            clauses,
+            contract=rule_contract(
+                first_source,
+                alphabet,
+                writable,
+                readable,
+            ),
+            completeness_evidence=certificate(
+                rules.CertificateKind.COMPLETENESS,
+                f"{identity}:complete-domain",
+            ),
+            selection=rules.ClauseSelection.FIRST,
+        )
+        return (
+            ca.SimpleProgram(
+                seeds.exact(
+                    first_source,
+                    value_profile=alphabet.value_profile,
+                ),
+                alphabet,
+                writable,
+                readable,
+                rule,
+            ),
+            sources,
         )
 
-    native_program, native_source = build(
-        first[0],
-        second[0],
-        tuple(pair[0] for pair in relation_pairs),
+    native_program, native_sources = build(
+        tuple(pair[0] for pair in relation_pairs)
     )
-    represented_program, represented_source = build(
-        first[1],
-        second[1],
-        tuple(pair[1] for pair in relation_pairs),
+    represented_program, represented_sources = build(
+        tuple(pair[1] for pair in relation_pairs)
     )
-    native = ca.apply(native_program, native_source)
-    represented = ca.apply(represented_program, represented_source)
-    assert isinstance(native, program.ApplicationComplete)
-    assert isinstance(represented, program.ApplicationComplete)
-    return native, represented
+    return (
+        native_program,
+        native_sources,
+        represented_program,
+        represented_sources,
+    )
 
 
 def _stochastic_pair() -> tuple[
@@ -603,72 +669,107 @@ def _terminal_px10_result(
     return terminal_result
 
 
-@pytest.mark.parametrize("case_index", (0, 1), ids=("primary", "alternate"))
 @pytest.mark.parametrize("row", PX10_ROWS, ids=lambda row: row.spf)
 def test_represented_and_native_one_step_results_commute_completely(
     row,
-    case_index: int,
 ) -> None:
-    """Both real domain points agree with an independently conjugate step."""
+    """Both domain points use one transducer and one fixed conjugate pair."""
 
-    execution = run_px10_representation_case(row, case_index)
-    assert_mechanics_run(execution)
-    relation = execution.representation
+    executions = tuple(
+        run_px10_representation_case(row, case_index)
+        for case_index in (0, 1)
+    )
+    primary, alternate = executions
+    assert (
+        primary.simple_program.canonical_identity
+        == alternate.simple_program.canonical_identity
+    )
+    assert primary.simple_program == alternate.simple_program
+    assert primary.representation == alternate.representation
+
+    relation = primary.representation
     assert relation is not None
     oracle_pairs = PX10_ORACLE_PAIRS[row.spf]
     _assert_exact_relation_matches_oracle(relation, oracle_pairs)
-    assert execution.representation_source is not None
-    assert execution.representation_target is not None
-    oracle_source, oracle_target = oracle_pairs[case_index]
-    assert alphabets.semantic_equal(
-        execution.representation_source,
-        oracle_source,
-    )
-    assert alphabets.semantic_equal(
-        execution.representation_target,
-        oracle_target,
-    )
-    actual_source = materialized_px10_source(execution)
-    assert alphabets.semantic_equal(actual_source, oracle_source)
-    assert alphabets.semantic_equal(
-        relation.forward(oracle_source),
-        oracle_target,
-    )
-    actual_target = materialized_px10_target(execution)
-    assert alphabets.semantic_equal(actual_target, oracle_target)
-    if row.spf == "SPF060":
-        assert type(actual_target) is alphabets.ValueNode
-        assert type(oracle_target) is alphabets.ValueNode
-        assert actual_target.kind is alphabets.ValueKind.WORD
-        assert actual_target.tag == oracle_target.tag == "xor-output"
-        assert actual_target.items == oracle_target.items
 
-    terminal_result = _terminal_px10_result(execution)
-    terminal_derivations = tuple(
-        atom
-        for atom in terminal_result.applied_atoms.atoms
-        if isinstance(atom, program.AppliedDerivation)
-    )
-    assert len(terminal_derivations) == 1
-    assert isinstance(
-        terminal_derivations[0].source.continuation,
-        rules.Stop,
-    )
-
-    native, represented = _transition_pair(
+    (
+        native_program,
+        native_sources,
+        represented_program,
+        represented_sources,
+    ) = _transition_system(
         oracle_pairs,
-        initial_index=case_index,
-        identity=f"{row.fixture}:case-{case_index}",
+        identity=row.fixture,
     )
-    for result in (native, represented):
-        atom = result.applied_atoms.atoms[0]
-        assert isinstance(atom, program.AppliedDerivation)
-        assert isinstance(atom.source.continuation, rules.Stop)
+    native_identity = native_program.canonical_identity
+    represented_identity = represented_program.canonical_identity
+    assert not loci.configuration_equal(native_sources[0], native_sources[1])
+    assert not loci.configuration_equal(
+        represented_sources[0],
+        represented_sources[1],
+    )
 
-    assert _normalize_complete_result(
-        represented,
-        decode_relation=relation,
-    ) == _normalize_complete_result(native)
+    for case_index, execution in enumerate(executions):
+        assert_mechanics_run(execution)
+        assert execution.representation == relation
+        assert execution.representation_source is not None
+        assert execution.representation_target is not None
+        oracle_source, oracle_target = oracle_pairs[case_index]
+        assert alphabets.semantic_equal(
+            execution.representation_source,
+            oracle_source,
+        )
+        assert alphabets.semantic_equal(
+            execution.representation_target,
+            oracle_target,
+        )
+        actual_source = materialized_px10_source(execution)
+        assert alphabets.semantic_equal(actual_source, oracle_source)
+        assert alphabets.semantic_equal(
+            relation.forward(oracle_source),
+            oracle_target,
+        )
+        actual_target = materialized_px10_target(execution)
+        assert alphabets.semantic_equal(actual_target, oracle_target)
+        if row.spf == "SPF060":
+            assert type(actual_target) is alphabets.ValueNode
+            assert type(oracle_target) is alphabets.ValueNode
+            assert actual_target.kind is alphabets.ValueKind.WORD
+            assert actual_target.tag == oracle_target.tag == "xor-output"
+            assert actual_target.items == oracle_target.items
+
+        terminal_result = _terminal_px10_result(execution)
+        terminal_derivations = tuple(
+            atom
+            for atom in terminal_result.applied_atoms.atoms
+            if isinstance(atom, program.AppliedDerivation)
+        )
+        assert len(terminal_derivations) == 1
+        assert isinstance(
+            terminal_derivations[0].source.continuation,
+            rules.Stop,
+        )
+
+        assert native_program.canonical_identity == native_identity
+        assert represented_program.canonical_identity == represented_identity
+        native = ca.apply(native_program, native_sources[case_index])
+        represented = ca.apply(
+            represented_program,
+            represented_sources[case_index],
+        )
+        assert isinstance(native, program.ApplicationComplete)
+        assert isinstance(represented, program.ApplicationComplete)
+        for result in (native, represented):
+            atom = result.applied_atoms.atoms[0]
+            assert isinstance(atom, program.AppliedDerivation)
+            assert isinstance(atom.source.continuation, rules.Stop)
+        assert native_program.canonical_identity == native_identity
+        assert represented_program.canonical_identity == represented_identity
+
+        assert _normalize_complete_result(
+            represented,
+            decode_relation=relation,
+        ) == _normalize_complete_result(native)
 
 
 def test_commutation_compares_all_outcomes_evidence_measures_and_fibers() -> None:
