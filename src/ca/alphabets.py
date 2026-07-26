@@ -255,6 +255,9 @@ class ValueKind(Enum):
     SYMBOLIC = "symbolic"
 
 
+_MAP_ENTRY_TAG = "entry"
+
+
 @dataclass(frozen=True)
 class ValueNode:
     """One closed composite value."""
@@ -288,7 +291,7 @@ class ValueNode:
         names = tuple(name for name, _ in self.fields)
         if len(names) != len(set(names)):
             raise ValueError("value-node fields must have unique names")
-        if self.kind in (ValueKind.RECORD, ValueKind.MAP):
+        if self.kind is ValueKind.RECORD:
             ordered = tuple(sorted(self.fields, key=lambda item: item[0]))
             if ordered != self.fields:
                 object.__setattr__(self, "fields", ordered)
@@ -298,8 +301,32 @@ class ValueNode:
             raise ValueError("tag values need exactly one payload item")
         if self.kind in (ValueKind.PRODUCT, ValueKind.WORD) and self.fields:
             raise ValueError(f"{self.kind.value} values cannot carry named fields")
-        if self.kind in (ValueKind.RECORD, ValueKind.MAP) and self.items:
-            raise ValueError(f"{self.kind.value} values cannot carry positional items")
+        if self.kind is ValueKind.RECORD and self.items:
+            raise ValueError("record values cannot carry positional items")
+        if self.kind is ValueKind.MAP:
+            if self.fields:
+                raise ValueError(
+                    "map values use explicit semantic-key entry items, not fields"
+                )
+            if any(
+                type(entry) is not ValueNode
+                or entry.kind is not ValueKind.PRODUCT
+                or entry.tag != _MAP_ENTRY_TAG
+                or len(entry.items) != 2
+                or entry.fields
+                for entry in self.items
+            ):
+                raise ValueError(
+                    "map values need explicit entry products with key/value items"
+                )
+            keys = tuple(_value_key(entry.items[0]) for entry in self.items)
+            if len(keys) != len(set(keys)):
+                raise ValueError("map values require semantically unique keys")
+            ordered_items = tuple(
+                sorted(self.items, key=lambda entry: _value_key(entry.items[0]))
+            )
+            if ordered_items != self.items:
+                object.__setattr__(self, "items", ordered_items)
 
 
 class RepresentedNumberProfile(Enum):
@@ -385,6 +412,233 @@ def _is_semantic_value(value: object) -> bool:
         StructuralReference,
         RepresentedNumber,
         ValueNode,
+    )
+
+
+def _require_node_kind(
+    value: SemanticValue,
+    kind: ValueKind,
+) -> ValueNode:
+    if type(value) is not ValueNode or value.kind is not kind:
+        raise TypeError(f"expected a {kind.value} ValueNode")
+    return value
+
+
+def _structured_value(
+    kind: ValueKind,
+    tag: str,
+    *,
+    items: tuple[SemanticValue, ...],
+    fields: tuple[tuple[str, SemanticValue], ...],
+) -> ValueNode:
+    """Build one canonically ordered closed structural value."""
+
+    node = ValueNode(kind, tag, items=items, fields=fields)
+    ordered_fields = tuple(sorted(node.fields, key=lambda item: item[0]))
+    if ordered_fields == node.fields:
+        return node
+    return ValueNode(kind, tag, items=node.items, fields=ordered_fields)
+
+
+def tag_value(name: str, payload: SemanticValue) -> ValueNode:
+    """Construct one tagged union value with exactly one closed payload."""
+
+    return ValueNode(ValueKind.TAG, name, items=(payload,))
+
+
+def tag_payload(value: SemanticValue) -> SemanticValue:
+    """Return the sole payload of a tagged value."""
+
+    return _require_node_kind(value, ValueKind.TAG).items[0]
+
+
+def product_value(
+    items: tuple[SemanticValue, ...],
+    *,
+    tag: str = "product",
+) -> ValueNode:
+    """Construct a nonempty ordered product value."""
+
+    if type(items) is not tuple:
+        raise TypeError("product value items must be an immutable tuple")
+    if not items:
+        raise ValueError("product value requires at least one item")
+    return ValueNode(ValueKind.PRODUCT, tag, items=items)
+
+
+def product_items(value: SemanticValue) -> tuple[SemanticValue, ...]:
+    """Return the ordered components of a product value."""
+
+    return _require_node_kind(value, ValueKind.PRODUCT).items
+
+
+def record_value(
+    fields: tuple[tuple[str, SemanticValue], ...],
+    *,
+    tag: str = "record",
+) -> ValueNode:
+    """Construct a nonempty canonical string-field record value."""
+
+    if type(fields) is not tuple:
+        raise TypeError("record value fields must be an immutable tuple")
+    if not fields:
+        raise ValueError("record value requires at least one field")
+    return ValueNode(ValueKind.RECORD, tag, fields=fields)
+
+
+def record_fields(
+    value: SemanticValue,
+) -> tuple[tuple[str, SemanticValue], ...]:
+    """Return the canonical named fields of a record value."""
+
+    return _require_node_kind(value, ValueKind.RECORD).fields
+
+
+def node_get(value: SemanticValue, name: str) -> SemanticValue:
+    """Read one named field from any structural ValueNode."""
+
+    if type(value) is not ValueNode:
+        raise TypeError("named field access needs a ValueNode")
+    if type(name) is not str or not name:
+        raise ValueError("field name must be a nonempty string")
+    for field_name, field_value in value.fields:
+        if field_name == name:
+            return field_value
+    raise KeyError(name)
+
+
+def record_get(value: SemanticValue, name: str) -> SemanticValue:
+    """Read one named field from a record value."""
+
+    return node_get(_require_node_kind(value, ValueKind.RECORD), name)
+
+
+def word_value(
+    items: tuple[SemanticValue, ...],
+    *,
+    tag: str = "word",
+) -> ValueNode:
+    """Construct an ordered, possibly empty, word value."""
+
+    if type(items) is not tuple:
+        raise TypeError("word value items must be an immutable tuple")
+    return ValueNode(ValueKind.WORD, tag, items=items)
+
+
+def word_items(value: SemanticValue) -> tuple[SemanticValue, ...]:
+    """Return the ordered symbols of a word value."""
+
+    return _require_node_kind(value, ValueKind.WORD).items
+
+
+def map_entry_value(
+    key: SemanticValue,
+    value: SemanticValue,
+) -> ValueNode:
+    """Construct one explicit semantic-key association entry."""
+
+    return ValueNode(
+        ValueKind.PRODUCT,
+        _MAP_ENTRY_TAG,
+        items=(key, value),
+    )
+
+
+def map_value(
+    entries: tuple[ValueNode, ...],
+    *,
+    tag: str = "map",
+) -> ValueNode:
+    """Construct a canonical map from explicit semantic-key entry products."""
+
+    if type(entries) is not tuple:
+        raise TypeError("map value entries must be an immutable tuple")
+    return ValueNode(ValueKind.MAP, tag, items=entries)
+
+
+def map_entries(
+    value: SemanticValue,
+) -> tuple[tuple[SemanticValue, SemanticValue], ...]:
+    """Return canonical semantic-key/value pairs from a map value."""
+
+    node = _require_node_kind(value, ValueKind.MAP)
+    return tuple((entry.items[0], entry.items[1]) for entry in node.items)
+
+
+def map_get(value: SemanticValue, key: SemanticValue) -> SemanticValue:
+    """Look up one semantic key using exact semantic equality."""
+
+    if not _is_semantic_value(key):
+        raise TypeError("map lookup key must be a closed semantic value")
+    for entry_key, entry_value in map_entries(value):
+        if semantic_equal(entry_key, key):
+            return entry_value
+    raise KeyError(_value_key(key))
+
+
+def node_items(value: SemanticValue) -> tuple[SemanticValue, ...]:
+    """Return positional items from any structural ValueNode."""
+
+    if type(value) is not ValueNode:
+        raise TypeError("positional item access needs a ValueNode")
+    return value.items
+
+
+def node_fields(
+    value: SemanticValue,
+) -> tuple[tuple[str, SemanticValue], ...]:
+    """Return named fields from any structural ValueNode."""
+
+    if type(value) is not ValueNode:
+        raise TypeError("named field access needs a ValueNode")
+    return value.fields
+
+
+def pattern_value(
+    tag: str,
+    *,
+    items: tuple[SemanticValue, ...] = (),
+    fields: tuple[tuple[str, SemanticValue], ...] = (),
+) -> ValueNode:
+    """Construct one closed pattern AST node."""
+
+    return _structured_value(
+        ValueKind.PATTERN,
+        tag,
+        items=items,
+        fields=fields,
+    )
+
+
+def symbolic_value(
+    tag: str,
+    *,
+    items: tuple[SemanticValue, ...] = (),
+    fields: tuple[tuple[str, SemanticValue], ...] = (),
+) -> ValueNode:
+    """Construct one closed symbolic expression node."""
+
+    return _structured_value(
+        ValueKind.SYMBOLIC,
+        tag,
+        items=items,
+        fields=fields,
+    )
+
+
+def field_value(
+    tag: str,
+    *,
+    items: tuple[SemanticValue, ...] = (),
+    fields: tuple[tuple[str, SemanticValue], ...] = (),
+) -> ValueNode:
+    """Construct one closed field-state value."""
+
+    return _structured_value(
+        ValueKind.FIELD,
+        tag,
+        items=items,
+        fields=fields,
     )
 
 
@@ -1209,11 +1463,15 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
         return (
             isinstance(value, ValueNode)
             and value.kind is ValueKind.MAP
-            and not value.items
+            and not value.fields
             and all(
-                _contains(descriptor.children[0], name)
-                and _contains(descriptor.children[1], item)
-                for name, item in value.fields
+                type(entry) is ValueNode
+                and entry.kind is ValueKind.PRODUCT
+                and entry.tag == _MAP_ENTRY_TAG
+                and len(entry.items) == 2
+                and _contains(descriptor.children[0], entry.items[0])
+                and _contains(descriptor.children[1], entry.items[1])
+                for entry in value.items
             )
         )
     structural_kinds = {
@@ -1446,24 +1704,43 @@ __all__ = [
     "equation",
     "exact_complexes",
     "field",
+    "field_value",
     "graph",
     "instruction",
     "int_range_alphabet",
     "integers",
+    "map_entries",
+    "map_entry_value",
+    "map_get",
+    "map_value",
     "map_values",
     "modular",
     "naturals",
+    "node_fields",
+    "node_get",
+    "node_items",
     "ordered",
     "pattern",
+    "pattern_value",
     "product",
+    "product_items",
+    "product_value",
     "rationals",
     "record",
+    "record_fields",
+    "record_get",
+    "record_value",
     "refine",
     "represented_numeric",
     "semantic_equal",
     "symbolic",
+    "symbolic_value",
     "structural_references",
     "tag",
+    "tag_payload",
+    "tag_value",
     "union",
     "word",
+    "word_items",
+    "word_value",
 ]

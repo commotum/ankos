@@ -157,11 +157,25 @@ def named(name: str, *, scope: str = "configuration") -> Locus:
 
 
 def coordinate(axis: str, value: int, *, scope: str = "offset") -> Locus:
-    if axis not in ("t", "x", "y", "z"):
-        raise ValueError("axis must be one of t, x, y, z")
+    if type(axis) is not str or not axis:
+        raise ValueError("axis must be a nonempty string")
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("coordinate value must be an integer")
     return Locus(LocusKind.COORDINATE, scope, (axis, value))
+
+
+def default_grid_axes(rank: int) -> tuple[str, ...]:
+    """Return stable default axis names for any positive finite grid rank."""
+
+    if type(rank) is not int:
+        raise TypeError("grid rank must be an integer")
+    if rank <= 0:
+        raise ValueError("grid rank must be positive")
+    familiar = ("x", "y", "z")
+    return (
+        *familiar[:rank],
+        *(f"axis{index}" for index in range(4, rank + 1)),
+    )
 
 
 def cell(coordinates: tuple[int, ...], *, axes: tuple[str, ...] | None = None) -> Locus:
@@ -172,7 +186,7 @@ def cell(coordinates: tuple[int, ...], *, axes: tuple[str, ...] | None = None) -
     if any(type(value) is not int for value in coordinates):
         raise TypeError("cell coordinates must be integers")
     if axes is None:
-        axes = ("x", "y", "z")[: len(coordinates)]
+        axes = default_grid_axes(len(coordinates))
     elif type(axes) is not tuple:
         raise TypeError("cell axes must be an immutable tuple")
     if len(axes) != len(coordinates):
@@ -1544,6 +1558,8 @@ def history_configuration(values: tuple[V, ...]) -> FiniteConfiguration[V]:
 
 
 def centered_axis_values(size: int) -> tuple[int, ...]:
+    if type(size) is not int:
+        raise TypeError("axis size must be an integer")
     if size <= 0:
         raise ValueError("axis size must be positive")
     low = -(size // 2)
@@ -1555,12 +1571,24 @@ def grid_loci(
     *,
     axes: tuple[str, ...] | None = None,
 ) -> tuple[Locus, ...]:
-    if len(shape) not in (1, 2, 3):
-        raise ValueError("grid rank must be 1, 2, or 3")
+    if type(shape) is not tuple:
+        raise TypeError("grid shape must be an immutable tuple")
+    if not shape:
+        raise ValueError("grid rank must be positive")
+    if any(type(size) is not int for size in shape):
+        raise TypeError("grid shape extents must be integers")
+    if any(size <= 0 for size in shape):
+        raise ValueError("grid shape extents must be positive")
     if axes is None:
-        axes = ("x", "y", "z")[: len(shape)]
+        axes = default_grid_axes(len(shape))
+    elif type(axes) is not tuple:
+        raise TypeError("grid axes must be an immutable tuple")
     if len(axes) != len(shape):
         raise ValueError("grid axes and shape must have equal rank")
+    if any(type(axis) is not str or not axis for axis in axes):
+        raise TypeError("grid axes must be nonempty strings")
+    if len(set(axes)) != len(axes):
+        raise ValueError("grid axes must be unique")
     return tuple(
         cell(tuple(values), axes=axes)
         for values in cartesian_product(
@@ -1574,18 +1602,21 @@ def grid_configuration(
     values: tuple[V, ...],
     *,
     boundary: Boundary[V],
+    axes: tuple[str, ...] | None = None,
 ) -> FiniteConfiguration[V]:
-    targets = grid_loci(shape)
+    if type(values) is not tuple:
+        raise TypeError("grid values must be an immutable tuple")
+    targets = grid_loci(shape, axes=axes)
     if len(values) != len(targets):
         raise ValueError(
             f"grid needs {len(targets)} values for shape {shape}, got {len(values)}"
         )
-    axes = ("x", "y", "z")[: len(shape)]
+    resolved_axes = default_grid_axes(len(shape)) if axes is None else axes
     contract = CarrierContract(
         CarrierKind.GRID,
         rank=len(shape),
         shape=shape,
-        axes=axes,
+        axes=resolved_axes,
     )
     return FiniteConfiguration(
         Carrier(contract, boundary),
@@ -2272,6 +2303,12 @@ def read_grid_value(
     contract = configuration.contract
     if contract.kind is not CarrierKind.GRID or contract.shape is None:
         raise ValueError("configuration is not a finite grid")
+    if type(coordinates) is not tuple:
+        raise TypeError("grid read coordinates must be an immutable tuple")
+    if len(coordinates) != len(contract.shape):
+        raise ValueError("grid read coordinates and carrier must have equal rank")
+    if any(type(value) is not int for value in coordinates):
+        raise TypeError("grid read coordinates must be integers")
     axes = contract.axes
     bounds = tuple(centered_axis_values(size) for size in contract.shape)
     adjusted = list(coordinates)
@@ -2656,6 +2693,7 @@ __all__ = [
     "configuration_identity",
     "coordinate",
     "current_support",
+    "default_grid_axes",
     "field_point",
     "fresh_children",
     "fresh_children_dynamic",

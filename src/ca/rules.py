@@ -101,6 +101,27 @@ class ExpressionPrimitive(Enum):
     CONDITIONAL = "expression.conditional"
     ALL = "expression.all"
     ANY = "expression.any"
+    RECORD_FIELD = "expression.record-field"
+    RECORD_UPDATE = "expression.record-update"
+    LENGTH = "expression.length"
+    ITEM_AT = "expression.item-at"
+    SLICE = "expression.slice"
+    CONCATENATE = "expression.concatenate"
+    REVERSE = "expression.reverse"
+    REPLACE_AT = "expression.replace-at"
+    MAP_LOOKUP = "expression.map-lookup"
+    MAP_UPDATE = "expression.map-update"
+    INDEX_OF = "expression.index-of"
+    INDEX_OF_TAG = "expression.index-of-tag"
+    FLOOR_DIVIDE = "expression.floor-divide"
+    ABSOLUTE = "expression.absolute"
+    FRACTIONAL_PART = "expression.fractional-part"
+    INTEGER_DIGITS = "expression.integer-digits"
+    FROM_DIGITS = "expression.from-digits"
+    MAXIMAL_RUNS = "expression.maximal-runs"
+    PRODUCT_VALUE = "expression.product-value"
+    WORD_VALUE = "expression.word-value"
+    FLAT_MAP_LOOKUP = "expression.flat-map-lookup"
 
 
 class GateKind(Enum):
@@ -224,6 +245,123 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
     ):
         require_arity(1)
         require_expression(0)
+        return
+    if primitive is ExpressionPrimitive.RECORD_FIELD:
+        require_arity(2)
+        require_expression(0)
+        if type(arguments[1]) is not str or not arguments[1]:
+            raise ValueError(
+                "record-field expression needs one nonempty literal field name"
+            )
+        return
+    if primitive is ExpressionPrimitive.RECORD_UPDATE:
+        require_arity(3)
+        require_expression(0)
+        if type(arguments[1]) is not str or not arguments[1]:
+            raise ValueError(
+                "record-update expression needs one nonempty literal field name"
+            )
+        require_expression(2)
+        return
+    if primitive in (
+        ExpressionPrimitive.LENGTH,
+        ExpressionPrimitive.REVERSE,
+        ExpressionPrimitive.ABSOLUTE,
+        ExpressionPrimitive.FRACTIONAL_PART,
+        ExpressionPrimitive.MAXIMAL_RUNS,
+    ):
+        require_arity(1)
+        require_expression(0)
+        return
+    if primitive in (
+        ExpressionPrimitive.ITEM_AT,
+        ExpressionPrimitive.SLICE,
+        ExpressionPrimitive.REPLACE_AT,
+        ExpressionPrimitive.MAP_LOOKUP,
+        ExpressionPrimitive.MAP_UPDATE,
+        ExpressionPrimitive.INDEX_OF,
+    ):
+        require_arity(3)
+        require_expression(0)
+        require_expression(1)
+        require_expression(2)
+        return
+    if primitive is ExpressionPrimitive.CONCATENATE:
+        if not arguments:
+            raise ValueError(
+                "concatenate expression requires at least one operand"
+            )
+        if any(type(argument) is not RuleExpr for argument in arguments):
+            raise TypeError(
+                "concatenate expression may contain only RuleExpr operands"
+            )
+        return
+    if primitive is ExpressionPrimitive.INDEX_OF_TAG:
+        require_arity(3)
+        require_expression(0)
+        if type(arguments[1]) is not str or not arguments[1]:
+            raise ValueError(
+                "index-of-tag expression needs one nonempty literal tag"
+            )
+        require_expression(2)
+        return
+    if primitive is ExpressionPrimitive.FLOOR_DIVIDE:
+        require_arity(2)
+        require_expression(0)
+        require_expression(1)
+        return
+    if primitive is ExpressionPrimitive.INTEGER_DIGITS:
+        if len(arguments) not in (2, 3):
+            raise ValueError(
+                "integer-digits expression requires value, base, and "
+                "optional width"
+            )
+        require_expression(0)
+        base = arguments[1]
+        if type(base) is not int or base < 2:
+            raise ValueError(
+                "integer-digits expression base must be an integer >= 2"
+            )
+        if len(arguments) == 3:
+            width = arguments[2]
+            if type(width) is not int or width <= 0:
+                raise ValueError(
+                    "integer-digits expression width must be a positive integer"
+                )
+        return
+    if primitive is ExpressionPrimitive.FROM_DIGITS:
+        require_arity(2)
+        require_expression(0)
+        base = arguments[1]
+        if type(base) is not int or base < 2:
+            raise ValueError(
+                "from-digits expression base must be an integer >= 2"
+            )
+        return
+    if primitive in (
+        ExpressionPrimitive.PRODUCT_VALUE,
+        ExpressionPrimitive.WORD_VALUE,
+    ):
+        if not arguments or type(arguments[0]) is not str or not arguments[0]:
+            raise ValueError(
+                f"{primitive.value} needs one leading nonempty literal tag"
+            )
+        if (
+            primitive is ExpressionPrimitive.PRODUCT_VALUE
+            and len(arguments) < 2
+        ):
+            raise ValueError(
+                "product-value expression needs at least one item"
+            )
+        if any(type(argument) is not RuleExpr for argument in arguments[1:]):
+            raise TypeError(
+                f"{primitive.value} items must be RuleExpr values"
+            )
+        return
+    if primitive is ExpressionPrimitive.FLAT_MAP_LOOKUP:
+        require_arity(2)
+        require_expression(0)
+        require_expression(1)
         return
     if primitive is ExpressionPrimitive.GATE:
         require_arity(3)
@@ -389,6 +527,251 @@ def conditional(
     return RuleExpr(
         ExpressionPrimitive.CONDITIONAL,
         (condition, when_true, when_false),
+    )
+
+
+def record_field(source: RuleExpr, field: str) -> RuleExpr:
+    """Read one existing named field from a semantic record value."""
+
+    if type(field) is not str or not field:
+        raise ValueError("record field name must be a nonempty string")
+    return RuleExpr(ExpressionPrimitive.RECORD_FIELD, (source, field))
+
+
+def record_update(
+    source: RuleExpr,
+    field: str,
+    value: RuleExpr,
+) -> RuleExpr:
+    """Replace one existing named field and return a new semantic record."""
+
+    if type(field) is not str or not field:
+        raise ValueError("record field name must be a nonempty string")
+    return RuleExpr(
+        ExpressionPrimitive.RECORD_UPDATE,
+        (source, field, value),
+    )
+
+
+def length(source: RuleExpr) -> RuleExpr:
+    """Return the exact length of a semantic word or runtime tuple."""
+
+    return RuleExpr(ExpressionPrimitive.LENGTH, (source,))
+
+
+def item_at(
+    source: RuleExpr,
+    index: RuleExpr,
+    default: RuleExpr,
+) -> RuleExpr:
+    """Read a dynamic nonnegative index, returning an explicit default."""
+
+    return RuleExpr(ExpressionPrimitive.ITEM_AT, (source, index, default))
+
+
+def slice_items(
+    source: RuleExpr,
+    start: RuleExpr,
+    stop: RuleExpr,
+) -> RuleExpr:
+    """Return one strict half-open slice as a semantic word."""
+
+    return RuleExpr(ExpressionPrimitive.SLICE, (source, start, stop))
+
+
+def concatenate(*sources: RuleExpr) -> RuleExpr:
+    """Concatenate semantic words/runtime tuples into one semantic word."""
+
+    if not sources:
+        raise ValueError("concatenate requires at least one expression")
+    return RuleExpr(ExpressionPrimitive.CONCATENATE, tuple(sources))
+
+
+def reverse(source: RuleExpr) -> RuleExpr:
+    """Reverse a semantic word/runtime tuple into one semantic word."""
+
+    return RuleExpr(ExpressionPrimitive.REVERSE, (source,))
+
+
+def replace_at(
+    source: RuleExpr,
+    index: RuleExpr,
+    value: RuleExpr,
+) -> RuleExpr:
+    """Strictly replace one dynamic sequence position."""
+
+    return RuleExpr(ExpressionPrimitive.REPLACE_AT, (source, index, value))
+
+
+def map_lookup(
+    source: RuleExpr,
+    key: RuleExpr,
+    default: RuleExpr,
+) -> RuleExpr:
+    """Look up one arbitrary semantic key in a sealed association value."""
+
+    return RuleExpr(ExpressionPrimitive.MAP_LOOKUP, (source, key, default))
+
+
+def map_update(
+    source: RuleExpr,
+    key: RuleExpr,
+    value: RuleExpr,
+) -> RuleExpr:
+    """Replace or insert one semantic association and return a new map."""
+
+    return RuleExpr(ExpressionPrimitive.MAP_UPDATE, (source, key, value))
+
+
+def index_of(
+    source: RuleExpr,
+    needle: RuleExpr,
+    default: RuleExpr,
+) -> RuleExpr:
+    """Return the first semantic-equality index or an explicit integer default."""
+
+    return RuleExpr(ExpressionPrimitive.INDEX_OF, (source, needle, default))
+
+
+def index_of_tag(
+    source: RuleExpr,
+    tag: str,
+    default: RuleExpr,
+) -> RuleExpr:
+    """Return the first ValueNode carrying ``tag`` or an integer default."""
+
+    if type(tag) is not str or not tag:
+        raise ValueError("searched tag must be a nonempty string")
+    return RuleExpr(ExpressionPrimitive.INDEX_OF_TAG, (source, tag, default))
+
+
+def floor_divide(left: RuleExpr, right: RuleExpr) -> RuleExpr:
+    """Return the mathematical floor of one exact quotient."""
+
+    return RuleExpr(ExpressionPrimitive.FLOOR_DIVIDE, (left, right))
+
+
+def absolute(value: RuleExpr) -> RuleExpr:
+    """Return the exact absolute value."""
+
+    return RuleExpr(ExpressionPrimitive.ABSOLUTE, (value,))
+
+
+def fractional_part(value: RuleExpr) -> RuleExpr:
+    """Return ``value - IntegerPart[value]`` exactly.
+
+    IntegerPart truncates toward zero, so negative inputs retain a negative
+    fractional part rather than silently acquiring modulo-one semantics.
+    """
+
+    return RuleExpr(ExpressionPrimitive.FRACTIONAL_PART, (value,))
+
+
+def integer_digits(
+    value: RuleExpr,
+    base: int,
+    *,
+    width: int | None = None,
+) -> RuleExpr:
+    """Encode one nonnegative integer as a semantic most-significant-first word."""
+
+    if type(base) is not int or base < 2:
+        raise ValueError("integer-digits base must be an integer >= 2")
+    arguments: tuple[RuleScalar | RuleExpr, ...] = (value, base)
+    if width is not None:
+        if type(width) is not int or width <= 0:
+            raise ValueError("integer-digits width must be a positive integer")
+        arguments = (*arguments, width)
+    return RuleExpr(ExpressionPrimitive.INTEGER_DIGITS, arguments)
+
+
+def from_digits(source: RuleExpr, base: int) -> RuleExpr:
+    """Decode one nonempty semantic digit word exactly."""
+
+    if type(base) is not int or base < 2:
+        raise ValueError("from-digits base must be an integer >= 2")
+    return RuleExpr(ExpressionPrimitive.FROM_DIGITS, (source, base))
+
+
+def maximal_runs(source: RuleExpr) -> RuleExpr:
+    """Encode maximal equal runs as a semantic word of named records."""
+
+    return RuleExpr(ExpressionPrimitive.MAXIMAL_RUNS, (source,))
+
+
+def product_value(tag: str, *items: RuleExpr) -> RuleExpr:
+    """Construct one dynamic semantic product value."""
+
+    if type(tag) is not str or not tag:
+        raise ValueError("product tag must be a nonempty string")
+    if not items:
+        raise ValueError("product value requires at least one item")
+    return RuleExpr(ExpressionPrimitive.PRODUCT_VALUE, (tag, *items))
+
+
+def word_value(tag: str, *items: RuleExpr) -> RuleExpr:
+    """Construct one dynamic semantic word value."""
+
+    if type(tag) is not str or not tag:
+        raise ValueError("word tag must be a nonempty string")
+    return RuleExpr(ExpressionPrimitive.WORD_VALUE, (tag, *items))
+
+
+def flat_map_lookup(source: RuleExpr, table: RuleExpr) -> RuleExpr:
+    """Map each semantic word item through a total word-valued association."""
+
+    return RuleExpr(ExpressionPrimitive.FLAT_MAP_LOOKUP, (source, table))
+
+
+_MAP_TAG = "map"
+_MAP_ENTRY_TAG = "entry"
+
+
+def map_entry(
+    key: RuleScalar,
+    value: RuleScalar,
+) -> alphabets.ValueNode:
+    """Construct one explicit arbitrary-semantic-key association entry."""
+
+    if not _is_rule_scalar(key) or not _is_rule_scalar(value):
+        raise TypeError("map entries require closed semantic keys and values")
+    return alphabets.ValueNode(
+        alphabets.ValueKind.PRODUCT,
+        _MAP_ENTRY_TAG,
+        items=(key, value),
+    )
+
+
+def map_value(
+    entries: tuple[tuple[RuleScalar, RuleScalar], ...],
+) -> alphabets.ValueNode:
+    """Construct a canonical sealed association from semantic key/value pairs."""
+
+    if type(entries) is not tuple or any(
+        type(entry) is not tuple or len(entry) != 2
+        for entry in entries
+    ):
+        raise TypeError(
+            "map entries must be an immutable tuple of key/value pairs"
+        )
+    normalized = tuple(map_entry(key, value) for key, value in entries)
+    keys = tuple(entry.items[0] for entry in normalized)
+    if any(
+        loci.semantic_equal(left, right)
+        for index, left in enumerate(keys)
+        for right in keys[index + 1 :]
+    ):
+        raise ValueError("map entries contain duplicate semantic keys")
+    ordered = tuple(
+        sorted(
+            normalized,
+            key=lambda entry: loci.canonical_identity(entry.items[0]),
+        )
+    )
+    return alphabets.ValueNode(
+        alphabets.ValueKind.WORD,
+        _MAP_TAG,
+        items=ordered,
     )
 
 
@@ -2980,6 +3363,194 @@ def _evaluate_value(
             evaluate(_as_expression(argument))
             for argument in arguments
         ))
+    if primitive is ExpressionPrimitive.RECORD_FIELD:
+        source = _require_value_node(
+            evaluate(_child(arguments, 0)),
+            alphabets.ValueKind.RECORD,
+            owner="record-field",
+        )
+        field = _literal_str(arguments, 1)
+        fields_by_name = dict(source.fields)
+        if field not in fields_by_name:
+            raise KeyError(f"record field {field!r} is absent")
+        return finish(fields_by_name[field])
+    if primitive is ExpressionPrimitive.RECORD_UPDATE:
+        source = _require_value_node(
+            evaluate(_child(arguments, 0)),
+            alphabets.ValueKind.RECORD,
+            owner="record-update",
+        )
+        field = _literal_str(arguments, 1)
+        fields_by_name = dict(source.fields)
+        if field not in fields_by_name:
+            raise KeyError(f"record field {field!r} is absent")
+        fields_by_name[field] = _require_semantic_value(
+            evaluate(_child(arguments, 2))
+        )
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.RECORD,
+                source.tag,
+                fields=tuple(fields_by_name.items()),
+                version=source.version,
+            )
+        )
+    if primitive is ExpressionPrimitive.LENGTH:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        return finish(len(items))
+    if primitive is ExpressionPrimitive.ITEM_AT:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        index = _require_strict_int(evaluate(_child(arguments, 1)))
+        if 0 <= index < len(items):
+            return finish(_require_semantic_value(items[index]))
+        return finish(
+            _require_semantic_value(evaluate(_child(arguments, 2)))
+        )
+    if primitive is ExpressionPrimitive.SLICE:
+        items, tag = _sequence_items(evaluate(_child(arguments, 0)))
+        start = _require_strict_int(evaluate(_child(arguments, 1)))
+        stop = _require_strict_int(evaluate(_child(arguments, 2)))
+        if start < 0 or stop < start or stop > len(items):
+            raise IndexError(
+                "slice bounds must satisfy 0 <= start <= stop <= length"
+            )
+        return finish(_word_from_items(items[start:stop], tag=tag))
+    if primitive is ExpressionPrimitive.CONCATENATE:
+        sequences = tuple(
+            _sequence_items(evaluate(_as_expression(argument)))
+            for argument in arguments
+        )
+        tags = tuple(tag for _, tag in sequences if tag is not None)
+        if tags and any(tag != tags[0] for tag in tags[1:]):
+            raise ValueError(
+                "concatenated semantic words must carry one common tag"
+            )
+        combined = tuple(
+            item
+            for items, _ in sequences
+            for item in items
+        )
+        return finish(
+            _word_from_items(
+                combined,
+                tag=tags[0] if tags else None,
+            )
+        )
+    if primitive is ExpressionPrimitive.REVERSE:
+        items, tag = _sequence_items(evaluate(_child(arguments, 0)))
+        return finish(_word_from_items(tuple(reversed(items)), tag=tag))
+    if primitive is ExpressionPrimitive.REPLACE_AT:
+        items, tag = _sequence_items(evaluate(_child(arguments, 0)))
+        index = _require_strict_int(evaluate(_child(arguments, 1)))
+        if index < 0 or index >= len(items):
+            raise IndexError("replace-at index is outside the sequence")
+        replacement = _require_semantic_value(
+            evaluate(_child(arguments, 2))
+        )
+        updated = (*items[:index], replacement, *items[index + 1 :])
+        return finish(_word_from_items(updated, tag=tag))
+    if primitive is ExpressionPrimitive.MAP_LOOKUP:
+        entries = _association_entries(evaluate(_child(arguments, 0)))
+        key = _require_semantic_value(evaluate(_child(arguments, 1)))
+        found = _association_lookup(entries, key)
+        if found is not None:
+            return finish(found)
+        return finish(
+            _require_semantic_value(evaluate(_child(arguments, 2)))
+        )
+    if primitive is ExpressionPrimitive.MAP_UPDATE:
+        entries = _association_entries(evaluate(_child(arguments, 0)))
+        key = _require_semantic_value(evaluate(_child(arguments, 1)))
+        value = _require_semantic_value(evaluate(_child(arguments, 2)))
+        updated: list[
+            tuple[alphabets.SemanticValue, alphabets.SemanticValue]
+        ] = []
+        replaced = False
+        for old_key, old_value in entries:
+            if loci.semantic_equal(old_key, key):
+                updated.append((key, value))
+                replaced = True
+            else:
+                updated.append((old_key, old_value))
+        if not replaced:
+            updated.append((key, value))
+        return finish(map_value(tuple(updated)))
+    if primitive is ExpressionPrimitive.INDEX_OF:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        needle = _require_semantic_value(evaluate(_child(arguments, 1)))
+        for index, item in enumerate(items):
+            semantic_item = _require_semantic_value(item)
+            if loci.semantic_equal(semantic_item, needle):
+                return finish(index)
+        return finish(
+            _require_strict_int(evaluate(_child(arguments, 2)))
+        )
+    if primitive is ExpressionPrimitive.INDEX_OF_TAG:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        tag = _literal_str(arguments, 1)
+        for index, item in enumerate(items):
+            if type(item) is alphabets.ValueNode and item.tag == tag:
+                return finish(index)
+        return finish(
+            _require_strict_int(evaluate(_child(arguments, 2)))
+        )
+    if primitive is ExpressionPrimitive.PRODUCT_VALUE:
+        tag = _literal_str(arguments, 0)
+        items = tuple(
+            _require_semantic_value(evaluate(_as_expression(argument)))
+            for argument in arguments[1:]
+        )
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.PRODUCT,
+                tag,
+                items=items,
+            )
+        )
+    if primitive is ExpressionPrimitive.WORD_VALUE:
+        tag = _literal_str(arguments, 0)
+        items = tuple(
+            _require_semantic_value(evaluate(_as_expression(argument)))
+            for argument in arguments[1:]
+        )
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                tag,
+                items=items,
+            )
+        )
+    if primitive is ExpressionPrimitive.FLAT_MAP_LOOKUP:
+        source = _require_value_node(
+            evaluate(_child(arguments, 0)),
+            alphabets.ValueKind.WORD,
+            owner="flat-map-lookup",
+        )
+        entries = _association_entries(evaluate(_child(arguments, 1)))
+        output: list[alphabets.SemanticValue] = []
+        for item in source.items:
+            mapped = _association_lookup(entries, item)
+            if mapped is None:
+                raise KeyError(
+                    "flat-map lookup table is not total on the source word"
+                )
+            mapped_word = _require_value_node(
+                mapped,
+                alphabets.ValueKind.WORD,
+                owner="flat-map-lookup result",
+            )
+            if mapped_word.tag != source.tag:
+                raise ValueError(
+                    "flat-map result word tag disagrees with source word tag"
+                )
+            output.extend(mapped_word.items)
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                source.tag,
+                items=tuple(output),
+            )
+        )
     if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):
         values = tuple(
             _require_exact_number(evaluate(_as_expression(argument)))
@@ -2999,12 +3570,103 @@ def _evaluate_value(
         if right == 0:
             raise ZeroDivisionError("division expression denominator is zero")
         return finish(Fraction(left, right))
+    if primitive is ExpressionPrimitive.FLOOR_DIVIDE:
+        left = _require_exact_number(evaluate(_child(arguments, 0)))
+        right = _require_exact_number(evaluate(_child(arguments, 1)))
+        if right == 0:
+            raise ZeroDivisionError(
+                "floor-divide expression denominator is zero"
+            )
+        quotient = Fraction(left) / Fraction(right)
+        return finish(quotient.numerator // quotient.denominator)
+    if primitive is ExpressionPrimitive.ABSOLUTE:
+        value = _require_exact_number(evaluate(_child(arguments, 0)))
+        return finish(abs(value))
+    if primitive is ExpressionPrimitive.FRACTIONAL_PART:
+        value = _require_exact_number(evaluate(_child(arguments, 0)))
+        return finish(value - int(value))
     if primitive is ExpressionPrimitive.MODULO:
         value = _require_int(evaluate(_child(arguments, 0)))
         modulus_value = _literal_int(arguments, 1)
         if modulus_value <= 0:
             raise ValueError("modulo expression needs positive modulus")
         return finish(value % modulus_value)
+    if primitive is ExpressionPrimitive.INTEGER_DIGITS:
+        value = _require_strict_int(evaluate(_child(arguments, 0)))
+        if value < 0:
+            raise ValueError(
+                "integer-digits expression requires a nonnegative value"
+            )
+        base = _literal_int(arguments, 1)
+        width = (
+            None
+            if len(arguments) == 2
+            else _literal_int(arguments, 2)
+        )
+        digits = _integer_digit_values(value, base)
+        if width is not None:
+            if len(digits) > width:
+                raise OverflowError(
+                    "integer value does not fit the declared digit width"
+                )
+            digits = (0,) * (width - len(digits)) + digits
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                "digits",
+                items=digits,
+            )
+        )
+    if primitive is ExpressionPrimitive.FROM_DIGITS:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        if not items:
+            raise ValueError("from-digits expression needs a nonempty word")
+        base = _literal_int(arguments, 1)
+        value = 0
+        for item in items:
+            digit = _require_strict_int(item)
+            if digit < 0 or digit >= base:
+                raise ValueError(
+                    "digit lies outside the declared positional base"
+                )
+            value = value * base + digit
+        return finish(value)
+    if primitive is ExpressionPrimitive.MAXIMAL_RUNS:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        semantic_items = tuple(
+            _require_semantic_value(item) for item in items
+        )
+        runs: list[alphabets.ValueNode] = []
+        start = 0
+        while start < len(semantic_items):
+            stop = start + 1
+            while (
+                stop < len(semantic_items)
+                and loci.semantic_equal(
+                    semantic_items[start],
+                    semantic_items[stop],
+                )
+            ):
+                stop += 1
+            runs.append(
+                alphabets.ValueNode(
+                    alphabets.ValueKind.RECORD,
+                    "run",
+                    fields=(
+                        ("value", semantic_items[start]),
+                        ("start", start),
+                        ("length", stop - start),
+                    ),
+                )
+            )
+            start = stop
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                "runs",
+                items=tuple(runs),
+            )
+        )
     if primitive is ExpressionPrimitive.COUNT:
         values = _require_tuple(evaluate(_child(arguments, 0)))
         return finish(sum(1 for value in values if _require_bit(value) == 1))
@@ -3215,6 +3877,121 @@ def _require_semantic_value(
     ):
         return value
     raise TypeError("Rule expression did not produce one semantic value")
+
+
+def _require_strict_int(value: RuleRuntimeValue) -> int:
+    if type(value) is not int:
+        raise TypeError("expected a non-Boolean integer Rule expression")
+    return value
+
+
+def _require_value_node(
+    value: RuleRuntimeValue,
+    kind: alphabets.ValueKind,
+    *,
+    owner: str,
+) -> alphabets.ValueNode:
+    if type(value) is not alphabets.ValueNode or value.kind is not kind:
+        raise TypeError(
+            f"{owner} requires a semantic {kind.value} ValueNode"
+        )
+    return value
+
+
+def _sequence_items(
+    value: RuleRuntimeValue,
+) -> tuple[tuple[RuleRuntimeValue, ...], str | None]:
+    if type(value) is tuple:
+        return value, None
+    word = _require_value_node(
+        value,
+        alphabets.ValueKind.WORD,
+        owner="sequence operation",
+    )
+    return word.items, word.tag
+
+
+def _word_from_items(
+    items: tuple[RuleRuntimeValue, ...],
+    *,
+    tag: str | None,
+) -> alphabets.ValueNode:
+    semantic_items = tuple(
+        _require_semantic_value(item) for item in items
+    )
+    return alphabets.ValueNode(
+        alphabets.ValueKind.WORD,
+        "word" if tag is None else tag,
+        items=semantic_items,
+    )
+
+
+def _association_entries(
+    value: RuleRuntimeValue,
+) -> tuple[tuple[alphabets.SemanticValue, alphabets.SemanticValue], ...]:
+    association = _require_value_node(
+        value,
+        alphabets.ValueKind.WORD,
+        owner="map operation",
+    )
+    if association.tag != _MAP_TAG:
+        raise TypeError(
+            f"map operation requires a {_MAP_TAG!r}-tagged semantic word"
+        )
+    entries: list[
+        tuple[alphabets.SemanticValue, alphabets.SemanticValue]
+    ] = []
+    for item in association.items:
+        if (
+            type(item) is not alphabets.ValueNode
+            or item.kind is not alphabets.ValueKind.PRODUCT
+            or item.tag != _MAP_ENTRY_TAG
+            or len(item.items) != 2
+        ):
+            raise TypeError(
+                "map operation requires explicit two-item entry products"
+            )
+        key, entry_value = item.items
+        entries.append((key, entry_value))
+    keys = tuple(key for key, _ in entries)
+    if any(
+        loci.semantic_equal(left, right)
+        for index, left in enumerate(keys)
+        for right in keys[index + 1 :]
+    ):
+        raise ValueError("map value contains duplicate semantic keys")
+    identities = tuple(loci.canonical_identity(key) for key in keys)
+    if identities != tuple(sorted(identities)):
+        raise ValueError("map entries are not in canonical key order")
+    return tuple(entries)
+
+
+def _association_lookup(
+    entries: tuple[
+        tuple[alphabets.SemanticValue, alphabets.SemanticValue],
+        ...,
+    ],
+    key: alphabets.SemanticValue,
+) -> alphabets.SemanticValue | None:
+    for candidate, value in entries:
+        if loci.semantic_equal(candidate, key):
+            return value
+    return None
+
+
+def _integer_digit_values(value: int, base: int) -> tuple[int, ...]:
+    if type(value) is not int or value < 0:
+        raise ValueError("digit encoding needs a nonnegative integer")
+    if type(base) is not int or base < 2:
+        raise ValueError("digit encoding base must be an integer >= 2")
+    if value == 0:
+        return (0,)
+    reversed_digits: list[int] = []
+    remaining = value
+    while remaining:
+        remaining, digit = divmod(remaining, base)
+        reversed_digits.append(digit)
+    return tuple(reversed(reversed_digits))
 
 
 # ---------------------------------------------------------------------------
@@ -3963,6 +4740,7 @@ __all__ = [
     "ValuePayload",
     "Witness",
     "absent",
+    "absolute",
     "add",
     "ar2_modular_0d",
     "capability_index",
@@ -3970,6 +4748,7 @@ __all__ = [
     "cardinality_size",
     "clause_kernel",
     "conditional",
+    "concatenate",
     "count",
     "create",
     "delete",
@@ -3988,23 +4767,44 @@ __all__ = [
     "finite_probability_law",
     "finite_rule",
     "finite_support",
+    "flat_map_lookup",
+    "floor_divide",
+    "fractional_part",
+    "from_digits",
     "gate",
     "group",
+    "index_of",
+    "index_of_tag",
+    "integer_digits",
     "intensional_support",
+    "item_at",
     "lagcounts_0d",
+    "length",
     "less_equal",
     "less_than",
     "literal",
     "literal_expr",
     "lookup",
+    "map_entry",
+    "map_lookup",
+    "map_update",
+    "map_value",
+    "maximal_runs",
     "modulo",
     "multiply",
     "observation",
     "parallel",
     "preserve",
+    "product_value",
     "project",
+    "record_field",
+    "record_update",
     "relation",
     "replace",
+    "replace_at",
+    "reverse",
+    "slice_items",
     "subtract",
     "target_reference",
+    "word_value",
 ]
