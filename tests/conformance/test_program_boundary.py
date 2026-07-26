@@ -1,37 +1,54 @@
-"""CT01 skeleton: exact five-field program boundary.
+"""CT01: the exact five-field program boundary."""
 
-The implemented suite will reject every stored semantic sidecar and confirm
-that catalog values are ordinary programs. This module remains skipped until
-its Goal 7 implementation; skips are not conformance evidence.
-"""
-
-from typing import NoReturn
+from dataclasses import fields
 
 import pytest
 
+import ca
 
-pytestmark = pytest.mark.skip(
-    reason="Goal 7 CT01 program-boundary skeleton; implementation is pending"
-)
-
-
-def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 CT01 tests are not implemented")
+from conformance.g7_fixtures import native_program
 
 
 def test_simple_program_has_exactly_the_five_settled_fields() -> None:
-    """Stored fields are seed, alphabet, frontier, neighborhood, and rule."""
+    program, _, _ = native_program("dyadlags")
 
-    _pending()
+    expected = ("seed", "alphabet", "frontier", "neighborhood", "rule")
+    assert tuple(field.name for field in fields(ca.SimpleProgram)) == expected
+    assert tuple(program.__dict__) == expected
+    assert len(program.__dict__) == 5
 
 
 def test_program_rejects_semantic_sidecars_and_constructor_receipts() -> None:
-    """Domain, policy, scheduler, RNG, observer, and catalog identity stay outside."""
+    program, _, _ = native_program("dyadlags")
 
-    _pending()
+    values = dict(program.__dict__)
+    for forbidden in (
+        "domain",
+        "policy",
+        "scheduler",
+        "rng",
+        "observer",
+        "catalog_id",
+        "compatibility_certificate",
+    ):
+        with pytest.raises(TypeError):
+            ca.SimpleProgram(**values, **{forbidden: object()})
 
 
-def test_every_catalog_constructor_returns_exact_simple_program_type() -> None:
-    """Whole-program navigation creates no subclass or alternate runtime type."""
+@pytest.mark.parametrize(
+    "case_id",
+    (
+        "ar2",
+        "dyadlags",
+        "lagcounts",
+        "dyadrads",
+        "dyadaxes-2d",
+        "dyadaxes-3d",
+    ),
+)
+def test_every_retained_native_construction_is_an_exact_simple_program(
+    case_id: str,
+) -> None:
+    program, _, _ = native_program(case_id)
 
-    _pending()
+    assert type(program) is ca.SimpleProgram

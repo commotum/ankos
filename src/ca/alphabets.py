@@ -43,8 +43,17 @@ class ValueNode:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported value-node version {self.version}")
-        if not self.tag:
+        if not isinstance(self.kind, ValueKind):
+            raise TypeError("value-node kind is not recognized")
+        if not isinstance(self.tag, str) or not self.tag:
             raise ValueError("value-node tag cannot be empty")
+        if any(not _is_semantic_value(item) for item in self.items):
+            raise TypeError("value-node items contain an opaque value")
+        if any(
+            not isinstance(name, str) or not _is_semantic_value(value)
+            for name, value in self.fields
+        ):
+            raise TypeError("value-node fields contain an opaque value")
         names = tuple(name for name, _ in self.fields)
         if len(names) != len(set(names)):
             raise ValueError("value-node fields must have unique names")
@@ -73,9 +82,25 @@ class RepresentedNumber:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported represented-number version {self.version}")
+        if not isinstance(self.profile, RepresentedNumberProfile):
+            raise TypeError("represented-number profile is not recognized")
+        value = self.representation
+        if not isinstance(value, (int, Fraction, str, tuple)) or isinstance(
+            value, bool
+        ):
+            raise TypeError("represented-number payload is not closed")
+        if isinstance(value, tuple) and (
+            len(value) != 2
+            or any(not isinstance(item, Fraction) for item in value)
+        ):
+            raise TypeError("represented interval needs two exact Fractions")
 
 
 SemanticValue: TypeAlias = ExactScalar | RepresentedNumber | ValueNode
+
+
+def _is_semantic_value(value: object) -> bool:
+    return isinstance(value, (bool, int, Fraction, str, RepresentedNumber, ValueNode))
 
 
 class AlphabetKind(Enum):
@@ -127,6 +152,27 @@ class AlphabetDescriptor:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported alphabet version {self.version}")
+        if not isinstance(self.kind, AlphabetKind):
+            raise TypeError("alphabet kind is not recognized")
+        if any(not _is_semantic_value(value) for value in self.values):
+            raise TypeError("alphabet contains an opaque semantic value")
+        if any(
+            not isinstance(name, str)
+            or not isinstance(value, (bool, int, Fraction, str))
+            for name, value in self.scalars
+        ):
+            raise TypeError("alphabet scalar parameters are not closed")
+        if any(
+            not isinstance(child, AlphabetDescriptor)
+            for child in self.children
+        ):
+            raise TypeError("alphabet children must be AlphabetDescriptor values")
+        if any(
+            not isinstance(name, str)
+            or not isinstance(child, AlphabetDescriptor)
+            for name, child in self.fields
+        ):
+            raise TypeError("alphabet fields must contain closed descriptors")
         scalar_names = tuple(name for name, _ in self.scalars)
         field_names = tuple(name for name, _ in self.fields)
         if len(scalar_names) != len(set(scalar_names)):

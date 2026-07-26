@@ -58,7 +58,9 @@ class Locus:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported locus version {self.version}")
-        if not self.scope:
+        if not isinstance(self.kind, LocusKind):
+            raise TypeError("locus kind is not recognized")
+        if not isinstance(self.scope, str) or not self.scope:
             raise ValueError("locus scope cannot be empty")
         if any(not isinstance(part, (bool, int, Fraction, str)) for part in self.path):
             raise TypeError("locus path contains an unclosed value")
@@ -77,8 +79,14 @@ class FreshReference:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported fresh-reference version {self.version}")
-        if not self.namespace:
+        if not isinstance(self.namespace, str) or not self.namespace:
             raise ValueError("fresh namespace cannot be empty")
+        if not isinstance(self.local_key, (bool, int, Fraction, str)):
+            raise TypeError("fresh-reference local key is not closed")
+        if self.parent is not None and not isinstance(self.parent, Locus):
+            raise TypeError("fresh-reference parent must be a Locus")
+        if any(not isinstance(item, Locus) for item in self.interface):
+            raise TypeError("fresh-reference interface must contain Loci")
 
 
 def _locus_token(value: Locus | FreshReference) -> str:
@@ -232,6 +240,18 @@ class SelectorExpr:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported selector version {self.version}")
+        if not isinstance(self.primitive, SelectorPrimitive):
+            raise TypeError("selector primitive is not recognized")
+        if any(
+            not isinstance(
+                argument,
+                (bool, int, Fraction, str, Locus, FreshReference),
+            )
+            for argument in self.arguments
+        ):
+            raise TypeError("selector contains an opaque or executable argument")
+        if any(not isinstance(child, SelectorExpr) for child in self.children):
+            raise TypeError("selector children must be SelectorExpr values")
 
 
 class RegionKind(Enum):
@@ -272,6 +292,22 @@ class Region:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported region version {self.version}")
+        if not isinstance(self.kind, RegionKind):
+            raise TypeError("region kind is not recognized")
+        if self.name is not None and not isinstance(self.name, str):
+            raise TypeError("region name must be a string or None")
+        if any(not isinstance(item, Locus) for item in self.loci):
+            raise TypeError("region loci must contain Locus values")
+        if any(not isinstance(item, FreshReference) for item in self.fresh):
+            raise TypeError("region fresh targets must contain FreshReference values")
+        if any(not isinstance(item, Region) for item in self.parts):
+            raise TypeError("region parts must contain Region values")
+        if any(not isinstance(item, Locus) for item in self.offsets):
+            raise TypeError("region offsets must contain Locus values")
+        if self.relation is not None and not isinstance(
+            self.relation, SelectorExpr
+        ):
+            raise TypeError("region relation must be a SelectorExpr")
         if self.kind is RegionKind.LITERAL and not (self.loci or self.fresh):
             raise ValueError("literal region cannot be empty")
         if self.kind in (RegionKind.UNION, RegionKind.PRODUCT) and not self.parts:
@@ -368,10 +404,21 @@ class CarrierContract:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported carrier-contract version {self.version}")
-        if self.rank is not None and self.rank < 0:
+        if not isinstance(self.kind, CarrierKind):
+            raise TypeError("carrier kind is not recognized")
+        if self.rank is not None and (
+            isinstance(self.rank, bool)
+            or not isinstance(self.rank, int)
+            or self.rank < 0
+        ):
             raise ValueError("carrier rank cannot be negative")
         if self.shape is not None:
-            if any(size <= 0 for size in self.shape):
+            if any(
+                isinstance(size, bool)
+                or not isinstance(size, int)
+                or size <= 0
+                for size in self.shape
+            ):
                 raise ValueError("carrier shape extents must be positive")
             if self.rank is not None and len(self.shape) != self.rank:
                 raise ValueError("carrier shape and rank disagree")
@@ -396,6 +443,8 @@ class Boundary(Generic[V]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported boundary version {self.version}")
+        if not isinstance(self.policy, BoundaryPolicy):
+            raise TypeError("boundary policy is not recognized")
         if self.policy is BoundaryPolicy.FIXED and self.exterior is None:
             raise ValueError("fixed boundary requires an exterior value")
         if self.policy is not BoundaryPolicy.FIXED and self.exterior is not None:

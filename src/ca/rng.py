@@ -14,7 +14,6 @@ participate in program identity and are not imported by the semantic core.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
 
 import numpy as np
 
@@ -32,7 +31,10 @@ def splitmix64(base_rng: int, episode_index: int = 0) -> int:
     return (value ^ (value >> 31)) & UINT64_MASK
 
 
-def derive_episode_rng(seed_stream: Mapping[str, Any] | int, episode_index: int) -> int:
+_SeedStream = Mapping[str, str | int]
+
+
+def derive_episode_rng(seed_stream: _SeedStream | int, episode_index: int) -> int:
     """Return the deterministic seed for one episode.
 
     Mapping inputs follow the compact stream seed schema:
@@ -57,7 +59,10 @@ def derive_episode_rng(seed_stream: Mapping[str, Any] | int, episode_index: int)
     return splitmix64(int(base_rng), int(episode_index))
 
 
-def numpy_rng(seed_stream: Mapping[str, Any] | int, episode_index: int | None = None) -> np.random.Generator:
+def numpy_rng(
+    seed_stream: _SeedStream | int,
+    episode_index: int | None = None,
+) -> np.random.Generator:
     """Build a deterministic NumPy generator from a stream spec or seed.
 
     When `episode_index` is provided with an integer seed, the seed is first

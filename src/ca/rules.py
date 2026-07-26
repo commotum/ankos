@@ -86,6 +86,15 @@ class RuleExpr:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported Rule expression version {self.version}")
+        if not isinstance(self.primitive, ExpressionPrimitive):
+            raise TypeError("Rule expression primitive is not recognized")
+        if any(
+            not isinstance(argument, (bool, int, Fraction, str, RuleExpr))
+            for argument in self.arguments
+        ):
+            raise TypeError(
+                "Rule expression contains an opaque or executable argument"
+            )
 
     @property
     def canonical_identity(self) -> str:
@@ -739,6 +748,7 @@ def finite_probability_law(
 class ExistingPlanKind(Enum):
     BY_INDEX = "by-index"
     BY_TARGET = "by-target"
+    BY_LOCUS = "by-locus"
     PRESERVE = "preserve"
 
 
@@ -748,15 +758,33 @@ class ExistingPlan:
 
     kind: ExistingPlanKind
     expressions: tuple[RuleExpr, ...]
+    targets: tuple[loci.Locus, ...] = ()
     version: int = 1
 
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported existing-plan version {self.version}")
+        if not isinstance(self.kind, ExistingPlanKind):
+            raise TypeError("existing-plan kind is not recognized")
+        if any(not isinstance(item, RuleExpr) for item in self.expressions):
+            raise TypeError("existing-plan expressions must be RuleExpr values")
+        if any(not isinstance(item, loci.Locus) for item in self.targets):
+            raise TypeError("existing-plan targets must be Locus values")
         if self.kind is ExistingPlanKind.BY_TARGET and len(self.expressions) != 1:
             raise ValueError("by-target plan needs exactly one expression")
-        if self.kind is ExistingPlanKind.PRESERVE and self.expressions:
-            raise ValueError("preserve plan cannot carry expressions")
+        if self.kind is ExistingPlanKind.BY_LOCUS:
+            if not self.targets or len(self.targets) != len(self.expressions):
+                raise ValueError(
+                    "by-locus plan needs one target per expression"
+                )
+            if len(set(self.targets)) != len(self.targets):
+                raise ValueError("by-locus targets must be unique")
+        elif self.targets:
+            raise ValueError("only by-locus plans carry target identities")
+        if self.kind is ExistingPlanKind.PRESERVE and (
+            self.expressions or self.targets
+        ):
+            raise ValueError("preserve plan cannot carry expressions or targets")
         if self.kind is ExistingPlanKind.BY_INDEX and not self.expressions:
             raise ValueError("by-index plan cannot be empty")
 
@@ -1014,13 +1042,36 @@ def _denote_expression(
                 strict=True,
             )
         )
-    else:
+    elif plan.kind is ExistingPlanKind.BY_TARGET:
         expression = plan.expressions[0]
         existing = tuple(
             replace(
                 target,
                 _require_semantic_value(
                     _evaluate(expression, readable, anchor=target)
+                ),
+            )
+            for target in existing_targets
+        )
+    else:
+        expression_by_target = dict(
+            zip(plan.targets, plan.expressions, strict=True)
+        )
+        if set(expression_by_target) != set(existing_targets):
+            return _rejected(
+                RuleFaultPhase.RESULT_VALIDATION,
+                RuleFaultReason.INCOMPLETE_DISPOSITION,
+                "by-locus plan targets do not equal existing capabilities",
+            )
+        existing = tuple(
+            replace(
+                target,
+                _require_semantic_value(
+                    _evaluate(
+                        expression_by_target[target],
+                        readable,
+                        anchor=target,
+                    )
                 ),
             )
             for target in existing_targets
@@ -1588,8 +1639,12 @@ def ar2_modular_0d(
     )
     return expression(
         ExistingPlan(
-            ExistingPlanKind.BY_INDEX,
+            ExistingPlanKind.BY_LOCUS,
             (observation(1), next_value),
+            (
+                loci.named("previous", scope="record"),
+                loci.named("current", scope="record"),
+            ),
         ),
         contract=_native_contract(
             carrier,

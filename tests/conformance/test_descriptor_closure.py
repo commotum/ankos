@@ -1,44 +1,169 @@
-"""CT02 skeleton: descriptor closure and cross-field compatibility.
+"""CT02: descriptor closure and five-way compatibility."""
 
-The implemented suite will inspect every component variant from all sixty
-families and generate an independent failure for each compatibility clause.
-This module remains skipped until implementation; skips are not conformance
-evidence.
-"""
-
-from typing import NoReturn
+from dataclasses import replace
+from fractions import Fraction
 
 import pytest
 
+import ca
+from ca import alphabets, frontiers, loci, neighborhoods, rules, seeds
 
-pytestmark = pytest.mark.skip(
-    reason="Goal 7 CT02 descriptor-closure skeleton; implementation is pending"
-)
+from conformance.g7_fixtures import native_program
 
 
-def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 CT02 tests are not implemented")
+def _walk(value: object) -> None:
+    """Recursively reject executable or mutable recipe payloads."""
+
+    assert not callable(value)
+    assert not isinstance(value, (dict, list, set, bytearray))
+    fields = getattr(value, "__dataclass_fields__", None)
+    if fields is not None:
+        for name in fields:
+            _walk(getattr(value, name))
+    elif isinstance(value, tuple):
+        for item in value:
+            _walk(item)
 
 
 def test_every_descriptor_is_recursively_closed_versioned_and_exact() -> None:
-    """Tags, fields, references, profiles, and local invariants are explicit."""
+    program, _, _ = native_program("dyadaxes-2d")
+    values = (
+        program.seed,
+        program.alphabet,
+        program.frontier,
+        program.neighborhood,
+        program.rule,
+        loci.path("root", 3, Fraction(1, 2)),
+        alphabets.represented_numeric(
+            alphabets.RepresentedNumberProfile.IEEE754_BINARY64
+        ),
+    )
 
-    _pending()
+    for value in values:
+        _walk(value)
 
 
 def test_program_construction_proves_all_cross_field_compatibility_clauses() -> None:
-    """C/V/R/W unification, joins, reads, effects, profiles, and entropy agree."""
+    program, _, _ = native_program("dyadlags")
 
-    _pending()
+    assert program.seed.configuration_contract == program.rule.contract.configuration_contract
+    assert program.alphabet.value_profile is program.seed.value_profile
+    assert program.frontier.effect_profile == program.rule.contract.required_effect_profile
+    assert program.neighborhood.result_shape == program.rule.contract.required_read_shape
+    assert program.neighborhood.join_shape == program.rule.contract.required_join_shape
+    assert program.seed.exactness_profile is program.rule.contract.exactness_profile
 
 
 def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
-    """No mismatch is recovered through class names or family dispatch."""
+    program, _, _ = native_program("dyadlags")
 
-    _pending()
+    wrong_profile_frontier = replace(
+        program.frontier,
+        value_profile=alphabets.ValueProfile.INTEGER,
+        target_contract=replace(
+            program.frontier.target_contract,
+            value_profile=alphabets.ValueProfile.INTEGER,
+        ),
+    )
+    with pytest.raises(ca.program.ProgramCompatibilityError, match="profiles"):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            wrong_profile_frontier,
+            program.neighborhood,
+            program.rule,
+        )
+
+    wrong_carrier = replace(
+        program.neighborhood,
+        configuration_contract=loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=1,
+            axes=("x",),
+        ),
+    )
+    with pytest.raises(ca.program.ProgramCompatibilityError, match="ReadableRegion"):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            wrong_carrier,
+            program.rule,
+        )
+
+    wrong_shape = replace(
+        program.neighborhood,
+        result_shape=neighborhoods.ResultShape(
+            (neighborhoods.ReadField("wrong", neighborhoods.ReadArity.ONE),)
+        ),
+    )
+    with pytest.raises(ca.program.ProgramCompatibilityError, match="read shape"):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            wrong_shape,
+            program.rule,
+        )
+
+    wrong_effect = replace(
+        program.rule,
+        contract=replace(
+            program.rule.contract,
+            required_effect_profile=frontiers.EffectProfile(
+                existing=(frontiers.Effect.DELETE,)
+            ),
+        ),
+    )
+    with pytest.raises(ca.program.ProgramCompatibilityError, match="effects"):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            program.neighborhood,
+            wrong_effect,
+        )
+
+    wrong_exactness = replace(
+        program.rule,
+        contract=replace(
+            program.rule.contract,
+            exactness_profile=seeds.ExactnessProfile.REPRESENTED,
+        ),
+    )
+    with pytest.raises(ca.program.ProgramCompatibilityError, match="exactness"):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            program.neighborhood,
+            wrong_exactness,
+        )
 
 
 def test_descriptors_reject_callbacks_opaque_escape_and_ambient_entropy() -> None:
-    """Host executables, iterators, mutable bags, and hidden RNG state are forbidden."""
-
-    _pending()
+    with pytest.raises(TypeError):
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.LITERAL,
+            arguments=(lambda: None,),  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        rules.RuleExpr(
+            rules.ExpressionPrimitive.LITERAL,
+            arguments=(lambda: None,),  # type: ignore[arg-type]
+        )
+    with pytest.raises((TypeError, ValueError)):
+        seeds.Construction(
+            seeds.ConstructionOp.SEQUENCE,
+            arguments=({"mutable": True},),  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        seeds.bernoulli(
+            loci.literal((loci.named("x"),)),
+            0.5,  # type: ignore[arg-type]
+            configuration_contract=loci.CarrierContract(
+                loci.CarrierKind.RECORD,
+                rank=0,
+                shape=(),
+            ),
+        )

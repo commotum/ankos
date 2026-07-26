@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import fields
+from dataclasses import fields, replace
 
 import numpy as np
 
 from ca import program
-from ca import datasets, rng
+from ca import datasets, rng, rules
 
 
 def test_registry_specs_match_pe_recipes() -> None:
@@ -170,6 +170,53 @@ def test_stream_and_batch_only_loop_and_stack_explicit_views() -> None:
         batch.rule_ids, np.array([0, 1, 2], dtype=np.int64)
     )
     assert batch.metadata == {"batch_size": 3}
+
+
+def test_projection_follows_lineage_not_support_tuple_order() -> None:
+    plan = datasets.plan_episode(
+        "1d-dyadrads",
+        shape=(5,),
+        steps=3,
+        episode_index=2,
+    )
+    exact_seed = datasets._seed_for_plan(plan)
+    simple_program = datasets._build_program(
+        plan.dataset_id,
+        rule=plan.rule_id,
+        seed=exact_seed,
+        shape=plan.shape,
+        boundary=plan.boundary,
+    )
+    result = program.rollout(simple_program, steps=2)
+    assert not isinstance(result, program.RolloutRejected)
+    expected = datasets._project_dataset_episode(
+        result,
+        domain="t+1d",
+        shape=(5,),
+        rule_id=plan.rule_id,
+        steps=3,
+    )
+
+    raw_trace = result.raw_trace
+    reordered_applications = rules.finite_support(
+        tuple(reversed(raw_trace.applications.atoms)),
+        label="reordered-for-view-test",
+    )
+    reordered = replace(
+        result,
+        raw_trace=replace(
+            raw_trace,
+            applications=reordered_applications,
+        ),
+    )
+    projected = datasets._project_dataset_episode(
+        reordered,
+        domain="t+1d",
+        shape=(5,),
+        rule_id=plan.rule_id,
+        steps=3,
+    )
+    np.testing.assert_array_equal(projected.states, expected.states)
 
 
 def test_ood_variants_remain_downstream_planning_data() -> None:

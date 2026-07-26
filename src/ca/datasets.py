@@ -756,7 +756,7 @@ def _project_dataset_episode(
 def _linear_configurations(
     result: program.RolloutResult,
 ) -> tuple[loci.FiniteConfiguration[bool], ...]:
-    """Extract the root and unique successor chain from a semantic trace."""
+    """Follow one explicit lineage from root through derivation edges."""
 
     if isinstance(result, program.RolloutRejected):
         raise ValueError(f"cannot project rejected rollout: {result.fault.reason}")
@@ -767,14 +767,23 @@ def _linear_configurations(
     root = roots[0]
     out: list[loci.FiniteConfiguration[bool]] = [root]
     current: loci.FiniteConfiguration[bool] = root
-    for application in _finite_support(result.raw_trace.applications):
-        if (
-            application.evidence.input_configuration_identity
-            != current.identity
-        ):
-            raise ValueError(
-                "dataset projection rejects disconnected trace applications"
-            )
+    current_lineage = program.TraceLineage(
+        loci.canonical_identity(("seed-root", root.identity))
+    )
+    applications = _finite_support(result.raw_trace.applications)
+    trace_atoms = _finite_support(result.raw_trace.derivation_edges)
+    lineage_edges = result.raw_trace.lineage_graph
+    if len(trace_atoms) != len(lineage_edges):
+        raise ValueError("dataset trace atoms and lineage edges disagree")
+
+    by_atom: dict[
+        str,
+        tuple[
+            program.ApplicationComplete,
+            program.AppliedDerivation,
+        ],
+    ] = {}
+    for application in applications:
         applied = _finite_support(application.applied_atoms)
         if len(applied) != 1 or not isinstance(
             applied[0], program.AppliedDerivation
@@ -782,6 +791,47 @@ def _linear_configurations(
             raise ValueError(
                 "dataset projection requires one replacement derivation"
             )
+        atom = applied[0]
+        if atom.canonical_identity in by_atom:
+            raise ValueError("dataset trace repeats an applied-atom identity")
+        by_atom[atom.canonical_identity] = (application, atom)
+
+    traced_identities = {
+        atom.canonical_identity for atom in trace_atoms
+    }
+    if traced_identities != set(by_atom):
+        raise ValueError("dataset trace omits or invents an applied derivation")
+
+    used: set[str] = set()
+    while True:
+        outgoing = tuple(
+            edge
+            for edge in lineage_edges
+            if edge.parent_lineage == current_lineage
+        )
+        if not outgoing:
+            break
+        if len(outgoing) != 1:
+            raise ValueError("dataset projection rejects branching lineages")
+        edge = outgoing[0]
+        try:
+            application, atom = by_atom[edge.applied_atom_identity]
+        except KeyError as error:
+            raise ValueError(
+                "lineage edge references an absent applied derivation"
+            ) from error
+        if edge.applied_atom_identity in used:
+            raise ValueError("dataset lineage contains a cycle")
+        used.add(edge.applied_atom_identity)
+        if (
+            application.evidence.input_configuration_identity
+            != current.identity
+        ):
+            raise ValueError(
+                "dataset projection rejects disconnected trace applications"
+            )
+        if atom.output_trace_lineage != edge.child_lineage:
+            raise ValueError("applied derivation and lineage edge disagree")
         groups = _finite_support(
             application.successor_quotient_with_derivation_fibers
         )
@@ -790,8 +840,13 @@ def _linear_configurations(
         successor = groups[0].successor
         if not isinstance(successor, loci.FiniteConfiguration):
             raise ValueError("dataset projection rejects intensional successors")
+        if not loci.semantic_equal(successor, atom.successor):
+            raise ValueError("successor quotient and lineage derivation disagree")
         out.append(successor)
         current = successor
+        current_lineage = edge.child_lineage
+    if used != set(by_atom):
+        raise ValueError("dataset trace contains a disconnected application")
     return tuple(out)
 
 

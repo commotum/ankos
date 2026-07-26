@@ -1,44 +1,75 @@
-"""CT03 skeleton: validation phase order and no-commit failure.
+"""CT03: fixed validation order and fail-closed application."""
 
-The implemented suite will use private test instrumentation around ordinary
-closed descriptors, never public observers or stateful semantic callbacks.
-This module remains skipped until implementation; skips are not conformance
-evidence.
-"""
+from ca import program as program_api, rules
 
-from typing import NoReturn
+import ca
 
-import pytest
-
-
-pytestmark = pytest.mark.skip(
-    reason="Goal 7 CT03 validation-phase skeleton; implementation is pending"
-)
-
-
-def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 CT03 tests are not implemented")
+from conformance.g7_fixtures import derivation, finite_record_program, native_program
 
 
 def test_application_runs_the_exact_generic_phase_order() -> None:
-    """Program through quotient/measure phases execute in the settled sequence."""
+    simple_program, source, _ = native_program("dyadlags")
 
-    _pending()
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program_api.ApplicationComplete)
+    assert result.evidence.phases == tuple(program_api.ApplicationPhase)
+    assert tuple(phase.value for phase in result.evidence.phases) == (
+        "program",
+        "input",
+        "frontier",
+        "neighborhood",
+        "join",
+        "rule-denotation",
+        "result-validation",
+        "fresh-binding",
+        "commit",
+        "successor",
+        "quotient-measure",
+    )
 
 
 def test_first_failing_phase_prevents_every_later_phase() -> None:
-    """Each phase fault is canonical and later semantic work is absent."""
+    simple_program, _, _ = native_program("dyadlags")
 
-    _pending()
+    result = ca.apply(simple_program, object())  # type: ignore[arg-type]
+
+    assert isinstance(result, program_api.ApplicationRejected)
+    assert result.fault.phase is program_api.ApplicationPhase.INPUT
+    assert result.fault.attempted_phases == (
+        program_api.ApplicationPhase.PROGRAM,
+        program_api.ApplicationPhase.INPUT,
+    )
 
 
 def test_one_invalid_atom_rejects_the_complete_finite_rule_space() -> None:
-    """A valid-looking subset never becomes authoritative."""
+    def atoms(targets):
+        valid = derivation(
+            "valid",
+            existing=tuple(rules.replace(target, True) for target in targets),
+        )
+        invalid = derivation("invalid", existing=())
+        return valid, invalid
 
-    _pending()
+    simple_program, source = finite_record_program((("cell", False),), atoms)
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program_api.ApplicationRejected)
+    assert result.fault.phase is program_api.ApplicationPhase.RESULT_VALIDATION
+    assert result.fault.attempted_phases[-1] is program_api.ApplicationPhase.RESULT_VALIDATION
 
 
 def test_rejection_preserves_input_and_publishes_no_authoritative_result() -> None:
-    """No candidate, successor, or cardinality leaks across a failed boundary."""
+    def atoms(_targets):
+        return (derivation("missing-totality", existing=()),)
 
-    _pending()
+    simple_program, source = finite_record_program((("cell", False),), atoms)
+    before = source.identity
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program_api.ApplicationRejected)
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
+    assert not hasattr(result, "successor_quotient_with_derivation_fibers")

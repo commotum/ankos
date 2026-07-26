@@ -7,7 +7,8 @@ import struct
 import numpy as np
 import pytest
 
-import ca
+from ca import program
+from ca.datasets import DatasetBatch, DatasetEpisode
 from ca.viz import VizBundleInfo, save_viewer_bundle
 from ca.viz.format import FORMAT_NAME, FORMAT_VERSION, HEADER_PREFIX_LENGTH, MAGIC, decode_header
 
@@ -18,55 +19,41 @@ def _bundle(path):
     return data, header, payload_base
 
 
-def _episode_for_domain(domain: str) -> ca.RawEpisode:
-    if domain == "t+0d":
-        dynamics = ca.Dynamics(
-            domain="t+0d",
-            shape=(),
-            rule=ca.ar2_modular_0d(modulus=97),
-            neighborhoods=(),
-            frontier=ca.time_slice(()),
-        )
-        return ca.rollout(dynamics, rule_id=0, seed_state=np.array([1, 2]), steps=4)
+def _coordinate_table(shape: tuple[int, ...], steps: int) -> np.ndarray:
+    axes = tuple(
+        tuple(range(-(size // 2), -(size // 2) + size))
+        for size in shape
+    )
+    spatial = tuple(np.ndindex(shape)) if shape else ((),)
+    rows = []
+    for time in range(steps):
+        for native in spatial:
+            point = tuple(axes[axis][index] for axis, index in enumerate(native))
+            padded = (*point, *(0 for _ in range(3 - len(point))))
+            rows.append((time, padded[0], padded[1], padded[2]))
+    return np.asarray(rows, dtype=np.int64)
 
-    if domain == "t+1d":
-        dynamics = ca.Dynamics(
-            domain="t+1d",
-            shape=(3,),
-            rule=ca.dyadrads_1d_rule(),
-            neighborhoods=(ca.dyadrads_1d_neighborhood(),),
-            frontier=ca.time_slice((3,)),
-            boundary={"policy": "fixed", "value": 0},
-        )
-        return ca.rollout(dynamics, rule_id=37, seed_state=np.array([1, 0, 1]), steps=3)
 
-    if domain == "t+2d":
-        dynamics = ca.Dynamics(
-            domain="t+2d",
-            shape=(3, 3),
-            rule=ca.dyadaxes_2d_rule(),
-            neighborhoods=(ca.dyadaxes_2d_neighborhood(),),
-            frontier=ca.time_slice((3, 3)),
-            boundary={"policy": "fixed", "value": 0},
-        )
-        seed = np.zeros((3, 3), dtype=np.int64)
-        seed[1, :] = 1
-        return ca.rollout(dynamics, rule_id=91, seed_state=seed, steps=3)
-
-    if domain == "t+3d":
-        dynamics = ca.Dynamics(
-            domain="t+3d",
-            shape=(3, 3, 3),
-            rule=ca.dyadaxes_3d_rule(),
-            neighborhoods=(ca.dyadaxes_3d_neighborhood(),),
-            frontier=ca.time_slice((3, 3, 3)),
-            boundary={"policy": "fixed", "value": 0},
-        )
-        seed = np.zeros((3, 3, 3), dtype=np.int64)
-        seed[1, 1, 1] = 1
-        return ca.rollout(dynamics, rule_id=173, seed_state=seed, steps=2)
-
-    raise AssertionError(domain)
+def _episode_for_domain(domain: str) -> DatasetEpisode:
+    recipes = {
+        "t+0d": ((), 4, 0),
+        "t+1d": ((3,), 3, 37),
+        "t+2d": ((3, 3), 3, 91),
+        "t+3d": ((3, 3, 3), 2, 173),
+    }
+    shape, steps, rule_id = recipes[domain]
+    states = np.arange(steps * (int(np.prod(shape)) if shape else 1))
+    states = (states % 2).reshape((steps, *shape))
+    if not shape:
+        states = states.reshape(steps)
+    return DatasetEpisode(
+        states=states.astype(np.int64),
+        coords=_coordinate_table(shape, steps),
+        domain=domain,
+        shape=shape,
+        rule_id=rule_id,
+        steps=steps,
+    )
 
 
 @pytest.mark.parametrize(
@@ -107,18 +94,18 @@ def test_raw_episode_export_for_supported_domains(tmp_path, domain: str, layout:
 
 
 def test_raw_batch_row_export_uses_episode_layout_and_selected_rule(tmp_path) -> None:
-    dynamics = ca.Dynamics(
+    batch = DatasetBatch(
+        states=np.array(
+            [
+                [[1, 0, 1], [0, 1, 0], [1, 1, 0]],
+                [[0, 1, 0], [1, 0, 1], [0, 0, 1]],
+            ],
+            dtype=np.int64,
+        ),
+        coords=_coordinate_table((3,), 3),
+        rule_ids=np.array([0, 37], dtype=np.int64),
         domain="t+1d",
         shape=(3,),
-        rule=ca.dyadrads_1d_rule(),
-        neighborhoods=(ca.dyadrads_1d_neighborhood(),),
-        frontier=ca.time_slice((3,)),
-        boundary={"policy": "fixed", "value": 0},
-    )
-    batch = ca.rollout_batch(
-        dynamics=dynamics,
-        rule_ids=np.array([0, 37], dtype=np.int64),
-        seed_states=np.array([[1, 0, 1], [0, 1, 0]], dtype=np.int64),
         steps=3,
     )
 
@@ -135,16 +122,28 @@ def test_raw_batch_row_export_uses_episode_layout_and_selected_rule(tmp_path) ->
 
 
 def test_raw_batch_requires_row_in_mvp(tmp_path) -> None:
-    batch = ca.RawBatch(
+    batch = DatasetBatch(
+        states=np.array([[0, 1]], dtype=np.int64),
+        coords=None,
+        rule_ids=np.array([0], dtype=np.int64),
         domain="t+0d",
         shape=(),
-        rule_ids=np.array([0], dtype=np.int64),
         steps=2,
-        states=np.array([[0, 1]], dtype=np.int64),
     )
 
     with pytest.raises(ValueError, match="requires row"):
         save_viewer_bundle(batch, tmp_path / "batch.ankos")
+
+
+def test_export_rejects_semantic_rollout_results(tmp_path) -> None:
+    semantic_result = program.RolloutRejected(
+        program.RolloutFault("fixture rejection")
+    )
+    with pytest.raises(TypeError, match="DatasetEpisode or ca.datasets.DatasetBatch"):
+        save_viewer_bundle(  # type: ignore[arg-type]
+            semantic_result,
+            tmp_path / "semantic-result.ankos",
+        )
 
 
 def test_export_includes_aligned_coords_when_requested(tmp_path) -> None:
@@ -168,13 +167,13 @@ def test_export_includes_aligned_coords_when_requested(tmp_path) -> None:
 
 
 def test_include_coords_requires_present_coords(tmp_path) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=np.array([0, 1], dtype=np.int64),
+        coords=None,
         domain="t+0d",
         shape=(),
         rule_id=0,
         steps=2,
-        states=np.array([0, 1], dtype=np.int64),
-        coords=None,
     )
 
     with pytest.raises(ValueError, match="coords"):
@@ -182,12 +181,13 @@ def test_include_coords_requires_present_coords(tmp_path) -> None:
 
 
 def test_sparse_integer_values_use_indexed_value_map(tmp_path) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=np.array([[10, 20, 10]], dtype=np.int64),
+        coords=None,
         domain="t+1d",
         shape=(3,),
         rule_id=0,
         steps=1,
-        states=np.array([[10, 20, 10]], dtype=np.int64),
     )
 
     save_viewer_bundle(episode, tmp_path / "indexed.ankos")
@@ -210,12 +210,13 @@ def test_sparse_integer_values_use_indexed_value_map(tmp_path) -> None:
 
 
 def test_explicit_storage_dtype_validates_range(tmp_path) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=np.array([[300]], dtype=np.int64),
+        coords=None,
         domain="t+1d",
         shape=(1,),
         rule_id=0,
         steps=1,
-        states=np.array([[300]], dtype=np.int64),
     )
 
     with pytest.raises(ValueError, match="uint8"):
@@ -230,12 +231,13 @@ def test_explicit_storage_dtype_validates_range(tmp_path) -> None:
 
 
 def test_invalid_storage_dtype_is_rejected(tmp_path) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=np.array([0], dtype=np.int64),
+        coords=None,
         domain="t+0d",
         shape=(),
         rule_id=0,
         steps=1,
-        states=np.array([0], dtype=np.int64),
     )
 
     with pytest.raises(ValueError, match="storage_dtype"):
@@ -243,13 +245,15 @@ def test_invalid_storage_dtype_is_rejected(tmp_path) -> None:
 
 
 def test_coord_int32_range_is_validated(tmp_path) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=np.array([0], dtype=np.int64),
+        coords=np.array(
+            [[0, 0, 0, np.iinfo(np.int32).max + 1]], dtype=np.int64
+        ),
         domain="t+0d",
         shape=(),
         rule_id=0,
         steps=1,
-        states=np.array([0], dtype=np.int64),
-        coords=np.array([[0, 0, 0, np.iinfo(np.int32).max + 1]], dtype=np.int64),
     )
 
     with pytest.raises(ValueError, match="int32"):
@@ -265,12 +269,13 @@ def test_coord_int32_range_is_validated(tmp_path) -> None:
     ],
 )
 def test_non_integer_state_modes_are_rejected(tmp_path, states: np.ndarray) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=states,
+        coords=None,
         domain="t+0d",
         shape=(),
         rule_id=0,
         steps=1,
-        states=states,
     )
 
     with pytest.raises(TypeError):
@@ -278,12 +283,13 @@ def test_non_integer_state_modes_are_rejected(tmp_path, states: np.ndarray) -> N
 
 
 def test_custom_palette_validation(tmp_path) -> None:
-    episode = ca.RawEpisode(
+    episode = DatasetEpisode(
+        states=np.array([[0, 1]], dtype=np.int64),
+        coords=None,
         domain="t+1d",
         shape=(2,),
         rule_id=0,
         steps=1,
-        states=np.array([[0, 1]], dtype=np.int64),
     )
 
     save_viewer_bundle(
