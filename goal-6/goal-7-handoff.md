@@ -464,7 +464,12 @@ Exit:
 - SPF IDs are exactly SPF001–SPF060 and home counts are exactly
   `11 automata / 15 substitua / 8 machina / 14 media / 9 criteria /
   3 dynamica`;
-- coverage is exactly 19 represented and 41 additions;
+- coverage is exactly 19 covered and 41 additions;
+- executable audit IDs are exactly F001–F009, F011–F038, F040–F041, and
+  F043–F063; F010/F042 are the two close roles and F039 remains unused;
+- legacy dispositions count exactly 15 retain-family, 21 retain-preset,
+  2 merge, 3 repair, 2 alias, 1 retire-role, and 1 split, with each row's
+  exact candidate and named-source join retained;
 - F010 and F042 are callable-free roles; T08 has zero targets; T40 has two
   named targets; every other T row has one;
 - the 49 callable legacy relations count exactly `C=5`, `P=39`, `A=4`,
@@ -669,17 +674,18 @@ These decisions are closed; Goal 7 does not reopen them for convenience.
 | `apply_rule` | Remove. One-step semantics are only `program.apply` |
 | `canonical_coords` | Remove from root. Coordinate/tensor materialization remains a loci/dataset/viz representation helper |
 | public `rollout.py` | Physically delete; do not merely omit from `__all__` and do not retain the old executor in a private module |
-| `Frontier` / `Neighborhood` class names | Canonical names are `WritableRegion` / `ReadableRegion`. Owner modules may expose identity aliases `Frontier` / `Neighborhood` for the 0.2.x line only; aliases are deprecated, absent from root, and removed in 0.3.0 |
+| `Frontier` / `Neighborhood` class names | Retire them at the 0.2.0 cutover. Their old meanings are not lossless spelling aliases. Canonical owner-module names are only `WritableRegion` / `ReadableRegion`; the stored field names remain `frontier` / `neighborhood` |
 | `time_slice` frontier | Do not preserve as an alias because its old firing-source/implicit-next-time meaning is not the new writable-envelope contract. Migrate callers to an exact writable-region constructor such as `everywhere` or the appropriate structural envelope |
 | `seeds.render(..., rng=None)` | Remove as semantic behavior. Explicit downstream realization requires a replay/sampler input and returns evidence; deterministic view materialization may remain downstream |
 | broad root constructors/types | Remove at G7-07. Component constructors are module-qualified; whole-program names are under `ca.catalog` |
 | current Dyad*/AR2 names | Retain only as closed component presets or catalog programs where their expansion meets the new contracts; never as root executors or family switches |
 | catalog compatibility | Implement exactly the catalog ledger. T10's `extended_mobile_automaton` is the sole `K`, category-qualified and deprecated; no additional guessed legacy callables |
-| alias lifetime | True `A` aliases and declared `P` presets are stable catalog API. Temporary component type aliases follow the 0.2.x/0.3.0 window above |
+| alias lifetime | True `A` aliases and declared `P` presets are stable catalog API. No temporary component type aliases are shipped |
 | datasets | Retain current module during Goal 7, but build explicit programs and use generic rollout; no family strings choose mechanics |
 | RNG helpers | Retain downstream only. Core laws and replay are owned by closed semantic records and application evidence |
 | visualization | Retain downstream adapters and bundle tooling; views never define semantic results or influence application |
 | invocation provenance | Optional user manifests stay outside canonical serialization and program equality |
+| unexpected external 0.1 artifacts | A separately authorized offline, version-pinned source converter may emit canonical expanded payloads if real artifacts later require it; it is never imported by `ca`, is not `ca.compat`, and cannot become a fallback decoder |
 
 There is no compatibility executor, dual decoder, silent old-manifest default,
 or `try new then fall back to old` path.
