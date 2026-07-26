@@ -279,6 +279,8 @@ ca.rules,ExpressionPrimitive,enum-member,MAP_ITEMS,ca.rules.expression-primitive
 ca.rules,ExpressionPrimitive,enum-member,FILTER_ITEMS,ca.rules.expression-primitive,1,value,expression.filter-items,Enum.__call__,enum-member
 ca.rules,ExpressionPrimitive,enum-member,FLAT_MAP_ITEMS,ca.rules.expression-primitive,1,value,expression.flat-map-items,Enum.__call__,enum-member
 ca.rules,ExpressionPrimitive,enum-member,SLIDING_WINDOWS,ca.rules.expression-primitive,1,value,expression.sliding-windows,Enum.__call__,enum-member
+ca.rules,ExpressionPrimitive,enum-member,PATTERN_REWRITE,ca.rules.expression-primitive,1,value,expression.pattern-rewrite,Enum.__call__,enum-member
+ca.rules,ExpressionPrimitive,enum-member,MOSAIC_SUBSTITUTE,ca.rules.expression-primitive,1,value,expression.mosaic-substitute,Enum.__call__,enum-member
 ca.rules,GateKind,enum-member,ANY,ca.rules.gate-kind,1,value,any,Enum.__call__,enum-member
 ca.rules,GateKind,enum-member,ALL,ca.rules.gate-kind,1,value,all,Enum.__call__,enum-member
 ca.rules,GateKind,enum-member,MAJORITY,ca.rules.gate-kind,1,value,majority,Enum.__call__,enum-member
@@ -288,6 +290,9 @@ ca.rules,GateKind,enum-member,EXACTLY,ca.rules.gate-kind,1,value,exactly,Enum.__
 ca.rules,SequenceBoundary,enum-member,FIXED,ca.rules.sequence-boundary,1,value,fixed,Enum.__call__,enum-member
 ca.rules,SequenceBoundary,enum-member,PERIODIC,ca.rules.sequence-boundary,1,value,periodic,Enum.__call__,enum-member
 ca.rules,SequenceBoundary,enum-member,REFLECTIVE,ca.rules.sequence-boundary,1,value,reflective,Enum.__call__,enum-member
+ca.rules,RewriteScan,enum-member,RULE_PRIORITY_FIRST,ca.rules.rewrite-scan,1,value,rule-priority-first,Enum.__call__,enum-member
+ca.rules,RewriteScan,enum-member,LOCATION_PRIORITY_FIRST,ca.rules.rewrite-scan,1,value,location-priority-first,Enum.__call__,enum-member
+ca.rules,RewriteScan,enum-member,LOCATION_PRIORITY_NONOVERLAPPING,ca.rules.rewrite-scan,1,value,location-priority-nonoverlapping,Enum.__call__,enum-member
 ca.rules,RuleExpr,frozen-dataclass,record,ca.rules.rule-expr,1,primitive|arguments|version,,RuleExpr.__post_init__,structural-fields
 ca.rules,RuleContract,frozen-dataclass,record,ca.rules.rule-contract,1,configuration_contract|value_profile|required_read_shape|required_join_shape|required_effect_profile|exactness_profile|entropy_interface|version,,RuleContract.__post_init__,structural-fields
 ca.rules,CertificateKind,enum-member,SOUNDNESS,ca.rules.certificate-kind,1,value,soundness,Enum.__call__,enum-member

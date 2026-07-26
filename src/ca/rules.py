@@ -132,6 +132,8 @@ class ExpressionPrimitive(Enum):
     FILTER_ITEMS = "expression.filter-items"
     FLAT_MAP_ITEMS = "expression.flat-map-items"
     SLIDING_WINDOWS = "expression.sliding-windows"
+    PATTERN_REWRITE = "expression.pattern-rewrite"
+    MOSAIC_SUBSTITUTE = "expression.mosaic-substitute"
 
 
 class GateKind(Enum):
@@ -151,6 +153,18 @@ class SequenceBoundary(Enum):
     FIXED = "fixed"
     PERIODIC = "periodic"
     REFLECTIVE = "reflective"
+
+
+class RewriteScan(Enum):
+    """Closed deterministic match-selection laws for structural rewrites."""
+
+    RULE_PRIORITY_FIRST = "rule-priority-first"
+    LOCATION_PRIORITY_FIRST = "location-priority-first"
+    LOCATION_PRIORITY_NONOVERLAPPING = "location-priority-nonoverlapping"
+
+
+_MOSAIC_OFFSETS_TAG = "mosaic-offsets"
+_MOSAIC_OFFSET_TAG = "mosaic-offset"
 
 
 @dataclass(frozen=True)
@@ -436,6 +450,79 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
         elif len(arguments) != 4:
             raise ValueError(
                 "non-fixed sliding-windows cannot carry an exterior"
+            )
+        return
+    if primitive is ExpressionPrimitive.PATTERN_REWRITE:
+        require_arity(3)
+        require_expression(0)
+        require_expression(1)
+        if type(arguments[2]) is not str:
+            raise TypeError("pattern-rewrite scan must be a literal string")
+        try:
+            RewriteScan(arguments[2])
+        except ValueError as error:
+            raise ValueError(
+                "pattern-rewrite scan is not recognized"
+            ) from error
+        return
+    if primitive is ExpressionPrimitive.MOSAIC_SUBSTITUTE:
+        if len(arguments) not in (3, 4, 5):
+            raise ValueError(
+                "mosaic-substitute requires source, productions, offsets, "
+                "and contextual boundary/exterior arguments when needed"
+            )
+        require_expression(0)
+        require_expression(1)
+        offsets = arguments[2]
+        if (
+            type(offsets) is not alphabets.ValueNode
+            or offsets.kind is not alphabets.ValueKind.WORD
+            or offsets.tag != _MOSAIC_OFFSETS_TAG
+            or offsets.fields
+        ):
+            raise TypeError(
+                "mosaic-substitute offsets must use the closed offset word"
+            )
+        for offset in offsets.items:
+            if (
+                type(offset) is not alphabets.ValueNode
+                or offset.kind is not alphabets.ValueKind.WORD
+                or offset.tag != _MOSAIC_OFFSET_TAG
+                or offset.fields
+                or not offset.items
+            ):
+                raise ValueError(
+                    "mosaic-substitute contains a malformed offset"
+                )
+            if any(type(component) is not int for component in offset.items):
+                raise TypeError(
+                    "mosaic-substitute offset components must be integers"
+                )
+        if not offsets.items:
+            if len(arguments) != 3:
+                raise ValueError(
+                    "independent mosaic substitution has no boundary or exterior"
+                )
+            return
+        if len(arguments) == 3 or type(arguments[3]) is not str:
+            raise TypeError(
+                "contextual mosaic substitution needs a literal boundary"
+            )
+        try:
+            boundary = SequenceBoundary(arguments[3])
+        except ValueError as error:
+            raise ValueError(
+                "mosaic-substitute boundary is not recognized"
+            ) from error
+        if boundary is SequenceBoundary.FIXED:
+            if len(arguments) != 5:
+                raise ValueError(
+                    "fixed mosaic substitution requires one exterior expression"
+                )
+            require_expression(4)
+        elif len(arguments) != 4:
+            raise ValueError(
+                "non-fixed mosaic substitution cannot carry an exterior"
             )
         return
     if primitive is ExpressionPrimitive.GATE:
@@ -896,6 +983,90 @@ def sliding_windows(
             )
         arguments = (source, before, after, boundary.value)
     return RuleExpr(ExpressionPrimitive.SLIDING_WINDOWS, arguments)
+
+
+def pattern_rewrite(
+    source: RuleExpr,
+    rewrite_rules: RuleExpr,
+    *,
+    scan: RewriteScan = RewriteScan.RULE_PRIORITY_FIRST,
+) -> RuleExpr:
+    """Apply one closed ordered rewrite scan to a word or symbolic tree."""
+
+    if type(scan) is not RewriteScan:
+        raise TypeError("pattern-rewrite scan is not recognized")
+    return RuleExpr(
+        ExpressionPrimitive.PATTERN_REWRITE,
+        (source, rewrite_rules, scan.value),
+    )
+
+
+def mosaic_substitute(
+    source: RuleExpr,
+    productions: RuleExpr,
+    *,
+    offsets: tuple[tuple[int, ...], ...] = (),
+    boundary: SequenceBoundary | None = None,
+    exterior: RuleExpr | None = None,
+) -> RuleExpr:
+    """Replace each dense-grid cell by one independently or contextually keyed tile."""
+
+    if type(offsets) is not tuple:
+        raise TypeError("mosaic offsets must be an immutable tuple")
+    encoded_offsets: list[alphabets.ValueNode] = []
+    for offset in offsets:
+        if type(offset) is not tuple:
+            raise TypeError("each mosaic offset must be an immutable tuple")
+        if not offset:
+            raise ValueError("mosaic offsets cannot have rank zero")
+        if any(type(component) is not int for component in offset):
+            raise TypeError("mosaic offset components must be integers")
+        encoded_offsets.append(
+            alphabets.word_value(offset, tag=_MOSAIC_OFFSET_TAG)
+        )
+    offset_value = alphabets.word_value(
+        tuple(encoded_offsets),
+        tag=_MOSAIC_OFFSETS_TAG,
+    )
+    if not encoded_offsets:
+        if boundary is not None or exterior is not None:
+            raise ValueError(
+                "independent mosaic substitution has no boundary or exterior"
+            )
+        arguments: tuple[RuleScalar | RuleExpr, ...] = (
+            source,
+            productions,
+            offset_value,
+        )
+    else:
+        if type(boundary) is not SequenceBoundary:
+            raise TypeError(
+                "contextual mosaic substitution needs a boundary law"
+            )
+        if boundary is SequenceBoundary.FIXED:
+            if type(exterior) is not RuleExpr:
+                raise ValueError(
+                    "fixed mosaic substitution requires one exterior expression"
+                )
+            arguments = (
+                source,
+                productions,
+                offset_value,
+                boundary.value,
+                exterior,
+            )
+        else:
+            if exterior is not None:
+                raise ValueError(
+                    "non-fixed mosaic substitution cannot carry an exterior"
+                )
+            arguments = (
+                source,
+                productions,
+                offset_value,
+                boundary.value,
+            )
+    return RuleExpr(ExpressionPrimitive.MOSAIC_SUBSTITUTE, arguments)
 
 
 def capability_index(index: int) -> CapabilitySelector:
@@ -2715,7 +2886,13 @@ class Rule(Generic[R, W, C]):
             tuple(envelope.existing)
             tuple(envelope.fresh)
             return _denote_descriptor(self.descriptor, view, envelope)
-        except (IndexError, KeyError, TypeError, ValueError) as exc:
+        except (
+            ArithmeticError,
+            IndexError,
+            KeyError,
+            TypeError,
+            ValueError,
+        ) as exc:
             return _rejected(
                 RuleFaultPhase.DENOTATION,
                 RuleFaultReason.EVALUATION_FAILURE,
@@ -4557,6 +4734,40 @@ def _evaluate_value(
                 alphabets.ValueKind.WORD,
                 output_tag,
                 items=tuple(windows),
+            )
+        )
+    if primitive is ExpressionPrimitive.PATTERN_REWRITE:
+        source = _require_semantic_value(evaluate(_child(arguments, 0)))
+        rewrite_rules = _require_semantic_value(
+            evaluate(_child(arguments, 1))
+        )
+        scan = RewriteScan(_literal_str(arguments, 2))
+        return finish(
+            _apply_pattern_rewrite(source, rewrite_rules, scan=scan)
+        )
+    if primitive is ExpressionPrimitive.MOSAIC_SUBSTITUTE:
+        source = _require_semantic_value(evaluate(_child(arguments, 0)))
+        productions = _require_semantic_value(
+            evaluate(_child(arguments, 1))
+        )
+        offsets = _decode_mosaic_offsets(arguments[2])
+        boundary = (
+            None
+            if not offsets
+            else SequenceBoundary(_literal_str(arguments, 3))
+        )
+        exterior = (
+            _require_semantic_value(evaluate(_child(arguments, 4)))
+            if boundary is SequenceBoundary.FIXED
+            else None
+        )
+        return finish(
+            _apply_mosaic_substitution(
+                source,
+                productions,
+                offsets=offsets,
+                boundary=boundary,
+                exterior=exterior,
             )
         )
     if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):

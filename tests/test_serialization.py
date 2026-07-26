@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
@@ -65,6 +66,14 @@ def _redigest(envelope: dict[str, object]) -> bytes:
     return _canonical_json(envelope)
 
 
+def _nested_wire_value(value: object) -> dict[str, object]:
+    """Encode one value as a nested canonical node without a root digest."""
+
+    envelope = json.loads(serialization.dumps(value))
+    del envelope["digest"]
+    return envelope
+
+
 def _assert_rejected(blob: object, reason: str | None = None) -> None:
     result = serialization.loads(blob)  # type: ignore[arg-type]
     assert isinstance(result, serialization.DecodeRejected)
@@ -119,12 +128,12 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
     """The closed registry and exact scalar algebra share one codec boundary."""
 
     schemas = serialization._schema_rows()
-    assert len(schemas) == 186
+    assert len(schemas) == 187
     assert sum(
         len(row.enum_values) if row.enum_values else 1 for row in schemas
-    ) == 436
-    assert len({row.tag for row in schemas}) == 186
-    assert len({row.value_type for row in schemas}) == 186
+    ) == 441
+    assert len({row.tag for row in schemas}) == 187
+    assert len({row.value_type for row in schemas}) == 187
 
     samples: list[object] = [
         None,
@@ -421,6 +430,128 @@ def test_unknown_lossy_noncanonical_or_forged_payloads_fail_closed() -> None:
         1,
     )
     _assert_rejected(duplicate, "duplicate-field")
+
+
+def test_hostile_value_anchored_readable_views_fail_closed() -> None:
+    source = loci.grid_configuration(
+        (3,),
+        (False, False, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        axes=("x",),
+    )
+    anchor = alphabets.ValueAnchor(
+        alphabets.value_equals(True),
+        alphabets.AnchorCardinality.ZERO_OR_MORE,
+    )
+    view = neighborhoods.value_relative(
+        anchor,
+        ((0,),),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    ).resolve(source)
+
+    wrong_region = json.loads(serialization.dumps(view))
+    dependency = wrong_region["payload"]["dependencies"]["payload"]["items"][0]
+    dependency["payload"]["region"] = _nested_wire_value(loci.all_support())
+    _assert_rejected(_redigest(wrong_region), "invalid-descriptor")
+
+    wrong_join = json.loads(serialization.dumps(view))
+    wrong_join["payload"]["join_shape"] = _nested_wire_value(
+        neighborhoods.JoinShape(
+            neighborhoods.JoinMode.GLOBAL,
+            ("value-relative",),
+        )
+    )
+    _assert_rejected(_redigest(wrong_join), "invalid-descriptor")
+
+    realized_source = loci.grid_configuration(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        axes=("x",),
+    )
+    realized = neighborhoods.value_relative(
+        alphabets.ValueAnchor(alphabets.value_equals(True)),
+        ((0,),),
+        configuration_contract=realized_source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    ).resolve(realized_source)
+    missing_source_anchor = json.loads(serialization.dumps(realized))
+    no_anchor = _nested_wire_value(None)
+    for observation in (
+        missing_source_anchor["payload"]["observations"]["payload"]["items"]
+    ):
+        observation["payload"]["anchor"] = deepcopy(no_anchor)
+    for group in missing_source_anchor["payload"]["groups"]["payload"]["items"]:
+        group["payload"]["anchor"] = deepcopy(no_anchor)
+        group["payload"]["key"]["payload"]["anchor"] = deepcopy(no_anchor)
+    _assert_rejected(
+        _redigest(missing_source_anchor),
+        "invalid-descriptor",
+    )
+
+
+def test_hostile_readable_group_identity_mutations_fail_closed() -> None:
+    source = loci.record_configuration((("a", 1), ("b", 2)))
+    first, second = tuple(target for target, _ in source.entries)
+    dependency = neighborhoods.ReadDependency(
+        "record",
+        loci.all_support(),
+        None,
+        seeds.ExactnessProfile.EXACT,
+    )
+    observations = (
+        neighborhoods.Observation(
+            first,
+            neighborhoods.Present(1),
+            anchor=first,
+        ),
+        neighborhoods.Observation(
+            second,
+            neighborhoods.Present(2),
+            anchor=first,
+        ),
+    )
+    view = neighborhoods.ReadableView(
+        source.identity,
+        observations,
+        (
+            neighborhoods.ObservationGroup(
+                neighborhoods.GroupKey(first, 0),
+                (0,),
+                anchor=first,
+            ),
+            neighborhoods.ObservationGroup(
+                neighborhoods.GroupKey(first, 1),
+                (1,),
+                anchor=first,
+            ),
+        ),
+        neighborhoods.JoinShape(
+            neighborhoods.JoinMode.ANCHOR_IDENTITY,
+            ("target", "channel"),
+        ),
+        (dependency,),
+    )
+
+    duplicate_key = json.loads(serialization.dumps(view))
+    groups = duplicate_key["payload"]["groups"]["payload"]["items"]
+    groups[1]["payload"]["key"] = deepcopy(groups[0]["payload"]["key"])
+    _assert_rejected(_redigest(duplicate_key), "invalid-descriptor")
+
+    global_view = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    ).resolve(source)
+    mismatched_none_anchor = json.loads(serialization.dumps(global_view))
+    observations_wire = (
+        mismatched_none_anchor["payload"]["observations"]["payload"]["items"]
+    )
+    observations_wire[1]["payload"]["anchor"] = _nested_wire_value(first)
+    _assert_rejected(
+        _redigest(mismatched_none_anchor),
+        "invalid-descriptor",
+    )
 
 
 def test_catalog_invocation_legacy_dynamics_and_observers_are_not_canonical() -> None:

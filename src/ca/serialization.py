@@ -254,12 +254,17 @@ _SCHEMAS = (
         "expression.word-value", "expression.flat-map-lookup",
         "expression.map-items", "expression.filter-items",
         "expression.flat-map-items", "expression.sliding-windows",
+        "expression.pattern-rewrite", "expression.mosaic-substitute",
     )),
     _enum(rules.GateKind, "ca.rules.gate-kind", (
         "any", "all", "majority", "at-least", "at-most", "exactly",
     )),
     _enum(rules.SequenceBoundary, "ca.rules.sequence-boundary", (
         "fixed", "periodic", "reflective",
+    )),
+    _enum(rules.RewriteScan, "ca.rules.rewrite-scan", (
+        "rule-priority-first", "location-priority-first",
+        "location-priority-nonoverlapping",
     )),
     _enum(rules.CertificateKind, "ca.rules.certificate-kind", (
         "soundness", "completeness", "cardinality", "totality",
@@ -1108,8 +1113,8 @@ def _validate_registry() -> None:
         program,
     )
     owners = {owner.__name__ for owner in owner_modules}
-    if len(_SCHEMAS) != 186:
-        raise RuntimeError("canonical schema registry must contain 186 owner types")
+    if len(_SCHEMAS) != 187:
+        raise RuntimeError("canonical schema registry must contain 187 owner types")
     if len({row.value_type for row in _SCHEMAS}) != len(_SCHEMAS):
         raise RuntimeError("canonical schema registry contains a duplicate type")
     if len({row.tag for row in _SCHEMAS}) != len(_SCHEMAS):
@@ -1117,8 +1122,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 436:
-        raise RuntimeError("canonical schema registry must contain 436 variants")
+    if variant_count != 441:
+        raise RuntimeError("canonical schema registry must contain 441 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:

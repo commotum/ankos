@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from ca import alphabets, frontiers, loci, neighborhoods, rules
+from ca import alphabets, frontiers, loci, neighborhoods, rules, seeds
 
 
 def test_literal_view_preserves_target_identity_and_order() -> None:
@@ -116,6 +116,79 @@ def test_product_preserves_field_group_boundaries_and_channels() -> None:
         assert {
             group.key.channel for group in view.groups if group.anchor == anchor
         } == {0, 1}
+
+
+def test_readable_view_rejects_duplicate_group_keys() -> None:
+    source = loci.record_configuration((("a", 1), ("b", 2)))
+    targets = tuple(target for target, _ in source.entries)
+    dependency = neighborhoods.ReadDependency(
+        "record",
+        loci.all_support(),
+        None,
+        seeds.ExactnessProfile.EXACT,
+    )
+    observations = tuple(
+        neighborhoods.Observation(
+            target,
+            neighborhoods.Present(source.value_at(target)),
+        )
+        for target in targets
+    )
+    duplicate = neighborhoods.GroupKey(None, 0)
+
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="group keys must be unique",
+    ):
+        neighborhoods.ReadableView(
+            source.identity,
+            observations,
+            (
+                neighborhoods.ObservationGroup(duplicate, (0,)),
+                neighborhoods.ObservationGroup(duplicate, (1,)),
+            ),
+            neighborhoods.JoinShape(neighborhoods.JoinMode.NONE, ()),
+            (dependency,),
+        )
+
+
+def test_readable_view_checks_none_group_anchor_against_every_observation() -> None:
+    source = loci.record_configuration((("a", 1), ("b", 2)))
+    targets = tuple(target for target, _ in source.entries)
+    dependency = neighborhoods.ReadDependency(
+        "record",
+        loci.all_support(),
+        None,
+        seeds.ExactnessProfile.EXACT,
+    )
+    observations = (
+        neighborhoods.Observation(
+            targets[0],
+            neighborhoods.Present(1),
+        ),
+        neighborhoods.Observation(
+            targets[1],
+            neighborhoods.Present(2),
+            anchor=targets[0],
+        ),
+    )
+
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="group and observation anchors disagree",
+    ):
+        neighborhoods.ReadableView(
+            source.identity,
+            observations,
+            (
+                neighborhoods.ObservationGroup(
+                    neighborhoods.GroupKey(None, 0),
+                    (0, 1),
+                ),
+            ),
+            neighborhoods.JoinShape(neighborhoods.JoinMode.NONE, ()),
+            (dependency,),
+        )
 
 
 @pytest.mark.parametrize(

@@ -12,6 +12,7 @@ from ca import (
     program,
     rules,
     seeds,
+    serialization,
 )
 
 
@@ -590,3 +591,116 @@ def test_unresolvable_group_item_is_a_typed_rule_rejection() -> None:
     assert isinstance(result, rules.RuleRejected)
     assert result.fault.reason is rules.RuleFaultReason.EVALUATION_FAILURE
     assert "outside channel" in result.fault.detail
+
+
+def test_rank_two_distributed_turing_transition_uses_one_atomic_rule() -> None:
+    cell_zero = alphabets.tag_value("cell", 0)
+    head_q0_one = alphabets.tag_value(
+        "head",
+        alphabets.record_value(
+            (("state", "q0"), ("symbol", 1)),
+            tag="control",
+        ),
+    )
+    head_q1_zero = alphabets.tag_value(
+        "head",
+        alphabets.record_value(
+            (("state", "q1"), ("symbol", 0)),
+            tag="control",
+        ),
+    )
+    values = [cell_zero] * 9
+    values[4] = head_q0_one
+    source = loci.grid_configuration(
+        (3, 3),
+        tuple(values),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        axes=("x", "y"),
+    )
+    alphabet = alphabets.union(
+        (
+            alphabets.tag("cell", alphabets.enum((0, 1))),
+            alphabets.tag(
+                "head",
+                alphabets.record(
+                    (
+                        ("state", alphabets.symbolic(("q0", "q1"))),
+                        ("symbol", alphabets.enum((0, 1))),
+                    )
+                ),
+            ),
+        )
+    )
+    anchor = alphabets.ValueAnchor(
+        alphabets.value_tagged("head"),
+        alphabets.AnchorCardinality.EXACTLY_ONE,
+    )
+    offsets = ((0, 0), (1, 0))
+    writable = frontiers.value_relative(
+        anchor,
+        offsets,
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.value_relative(
+        anchor,
+        offsets,
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    transition = rules.RuleClause(
+        rules.equal(
+            rules.project(rules.group(0), 0),
+            rules.literal_expr(head_q0_one),
+        ),
+        _derivation_result(
+            (cell_zero, head_q1_zero),
+            label="distributed-turing-2d",
+        ),
+    )
+    rule = rules.anchored_clause_kernel(
+        (transition,),
+        group_channel=0,
+        zero_result=_zero_result(),
+        contract=_contract(source, alphabet, writable, readable),
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "distributed-turing-2d:complete",
+        ),
+    )
+    simple = program.SimpleProgram(
+        seeds.exact(source, value_profile=alphabet.value_profile),
+        alphabet,
+        writable,
+        readable,
+        rule,
+    )
+
+    first = program.apply(simple, source)
+
+    expected_values = [cell_zero] * 9
+    expected_values[7] = head_q1_zero
+    expected = loci.grid_configuration(
+        (3, 3),
+        tuple(expected_values),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        axes=("x", "y"),
+    )
+    assert loci.configuration_equal(_only_successor(first), expected)
+    assert isinstance(first, program.ApplicationComplete)
+    atom = first.source_outcomes.support.atoms[0]
+    assert isinstance(atom, rules.Derivation)
+    assert tuple(item.target for item in atom.replacement.existing) == (
+        loci.cell((0, 0), axes=("x", "y")),
+        loci.cell((1, 0), axes=("x", "y")),
+    )
+
+    decoded = serialization.loads(serialization.dumps(simple))
+
+    assert isinstance(decoded, serialization.Decoded)
+    assert isinstance(decoded.value, program.SimpleProgram)
+    assert loci.configuration_equal(
+        _only_successor(program.apply(decoded.value, source)),
+        expected,
+    )
+    assert _values(source)[4] == head_q0_one
