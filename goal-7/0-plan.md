@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-02 MECHANICS**
+Status: **READY — G7-03 CODECS (NOT STARTED)**
 
 ## Big-Picture Objective
 
@@ -94,13 +94,19 @@ conflict, and reconcile the plan before changing runtime behavior.
   consumers of ordinary programs and explicit rollout views.
 - Source and lock metadata are at `0.2.0`, NumPy is a runtime dependency, and
   pytest is development-only. This is an internal checkpoint, not a release.
-- G7-02 began from clean commit
-  `130b230` with `uv run pytest -q tests` reporting
-  `225 passed, 36 skipped`. Every remaining skip has an explicit G7-02–G7-05
-  owner; G7-01 owns none.
-- Serialization and catalog files remain inert, unexposed shells. G7-02 has
-  started; its live plan and evidence record is
-  [`3-MECHANICS.md`](3-MECHANICS.md).
+- G7-02 is complete. It began from clean commit `130b230` with
+  `225 passed, 36 skipped` and closed at `356 passed, 26 skipped`; no
+  G7-02-owned skip remains.
+- All SPF001–SPF060 rows now have direct ordinary five-field mechanics.
+  PX01–PX12 and all eight required secondary joins execute through the one
+  family-blind application law.
+- The executable codec inventory contains 387 G7-01/G7-02 sealed
+  semantic-variant rows. It is the exhaustive starting worklist for G7-03.
+- Serialization and catalog files remain inert, unexposed shells. G7-03 has
+  not started; G7-02's durable plan, hostile-review repairs, and evidence are
+  recorded in [`3-MECHANICS.md`](3-MECHANICS.md).
+- The 26 retained skips are owned exactly by later stages: 13 by G7-03
+  serialization/representation and 13 by G7-04 catalog/metadata.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -251,7 +257,7 @@ stage file and may evolve with the implementation.
 |---|---|---|---|
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
-| `3-MECHANICS` | G7-02 | In Progress | All 60 rows supported by reusable mechanics |
+| `3-MECHANICS` | G7-02 | Complete | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Pending | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
@@ -370,6 +376,10 @@ law, and migrated downstream consumers.
 ### 3-MECHANICS
 
 Handoff stage: **G7-02 — Reusable mechanics closure**
+
+Stage status: **Complete.** The implementation, 60-family matrix, codec
+inventory, hostile-review repairs, and exact verification evidence are
+recorded in [`3-MECHANICS.md`](3-MECHANICS.md).
 
 #### Big Picture Objective
 

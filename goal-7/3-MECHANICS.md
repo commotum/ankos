@@ -221,11 +221,11 @@ The completed tree passed:
 
 ```text
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
-→ 354 passed, 26 skipped
+→ 356 passed, 26 skipped
 
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
   tests/conformance/test_family_coverage.py
-→ 65 passed, 2 skipped
+→ 67 passed, 2 skipped
 
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
   tests/conformance/test_native_generic_equivalence.py
@@ -261,9 +261,10 @@ Hostile review rejected several initially green but insufficient
 implementations. The repairs now have dedicated regressions:
 
 - pressure rows must expose their actual mechanics, not merely relabel one
-  shared toy; SPF014 and SPF024 are structurally distinct, and SPF038/SPF046
-  preserve typed graph/event topology through writable loci, interfaces,
-  payloads, and `StructuralReference` endpoints;
+  shared toy; SPF014/SPF024, SPF001/SPF032, and SPF045/SPF034 are
+  mechanically distinct, while SPF038/SPF046 preserve typed graph/event
+  topology through writable loci, interfaces, payloads, and
+  `StructuralReference` endpoints;
 - secondary pressure joins must reuse the primary construction rather than
   substitute a different fixture;
 - an intensional frontier needs a real end-to-end application boundary, not
@@ -274,10 +275,12 @@ implementations. The repairs now have dedicated regressions:
   fiber, or measure.
 
 Direct adversarial replay closed every confirmed blocker while retaining
-honest unknown/infinite controls. The five-field architecture, Frontier
-meaning, family-blind application law, and immutable configuration snapshot
-did not require revision. Structural topology is represented by typed loci
-and payload relations rather than by mutating carrier metadata.
+honest unknown/infinite controls. Its alpha/label/payload-independent
+normalization found 60 distinct signatures for the 60 family fixtures, with
+no collision. The five-field architecture, Frontier meaning, family-blind
+application law, and immutable configuration snapshot did not require
+revision. Structural topology is represented by typed loci and payload
+relations rather than by mutating carrier metadata.
 
 G7-02 is closed. The first G7-03 action is to create `4-CODECS.md`, consume
 the 387-row inventory as the exhaustive codec worklist, and implement the

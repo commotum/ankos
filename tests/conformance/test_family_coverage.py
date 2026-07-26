@@ -136,6 +136,29 @@ def test_model_search_and_inverse_reconstruction_are_not_alpha_renames() -> None
     )
 
 
+@pytest.mark.parametrize(
+    ("left_spf", "right_spf"),
+    (
+        ("SPF001", "SPF032"),
+        ("SPF045", "SPF034"),
+    ),
+)
+def test_close_families_are_not_label_or_payload_only_variants(
+    left_spf: str,
+    right_spf: str,
+) -> None:
+    """Normalized mechanics preserve each audited semantic distinction."""
+
+    rows = {row.spf: row for row in MECHANICS_ROWS}
+    left = run_mechanics_fixture(rows[left_spf])
+    right = run_mechanics_fixture(rows[right_spf])
+
+    assert (
+        normalized_mechanics_signature(left)
+        != normalized_mechanics_signature(right)
+    )
+
+
 def test_close_roles_and_retired_seed_role_are_excluded_from_sixty_rows() -> None:
     """F010, F042, and T08 are never smuggled into executable family coverage."""
 

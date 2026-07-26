@@ -540,7 +540,7 @@ def _px01_multi_active_collision(row: MechanicsRow) -> MechanicsRun:
         rules.less_than(rules.literal_expr(0), rules.observation(1)),
     )
 
-    def resolution(
+    def resolve_collision(
         label: str,
         selected_source: rules.RuleExpr,
         selected_marker: int,
@@ -585,11 +585,19 @@ def _px01_multi_active_collision(row: MechanicsRow) -> MechanicsRun:
                         rules.literal_expr(0),
                     ),
                 ),
-                resolution("source-a-wins", rules.observation(0), 1),
+                resolve_collision(
+                    "source-a-wins",
+                    rules.observation(0),
+                    1,
+                ),
             ),
             _clause(
                 _all_conditions(*active_sources),
-                resolution("source-b-wins", rules.observation(1), 2),
+                resolve_collision(
+                    "source-b-wins",
+                    rules.observation(1),
+                    2,
+                ),
             ),
         ),
         selection=rules.ClauseSelection.FIRST,
@@ -3054,6 +3062,138 @@ def assert_mechanics_run(
     )
 
     if pressure == "PX01":
+        if row.spf == "SPF032":
+            assert isinstance(execution.source, loci.FiniteConfiguration)
+            assert execution.source.contract.kind is loci.CarrierKind.GRID
+            (
+                priority,
+                source_a,
+                destination,
+                source_b,
+                resolution,
+            ) = tuple(target for target, _ in execution.source.entries)
+            assert _materialized_read_targets(execution) == (
+                source_a,
+                source_b,
+                destination,
+                priority,
+            )
+            assert _resolved_write_targets(execution) == (
+                source_a,
+                source_b,
+                destination,
+                resolution,
+            )
+            assert len(derivations) == len(successors) == 1
+            assert tuple(value for _, value in successors[0].entries) == (
+                0,
+                0,
+                1,
+                0,
+                1,
+            )
+            _assert_exact_total_replacement(
+                derivations[0],
+                existing=(
+                    (
+                        source_a,
+                        rules.DispositionAction.REPLACE,
+                        0,
+                    ),
+                    (
+                        source_b,
+                        rules.DispositionAction.REPLACE,
+                        0,
+                    ),
+                    (
+                        destination,
+                        rules.DispositionAction.REPLACE,
+                        1,
+                    ),
+                    (
+                        resolution,
+                        rules.DispositionAction.REPLACE,
+                        1,
+                    ),
+                ),
+            )
+            assert isinstance(
+                derivations[0].source.continuation,
+                rules.Continue,
+            )
+            denotation = execution.simple_program.rule.descriptor.denotation
+            assert type(denotation) is rules.ClauseKernelDenotation
+            assert denotation.selection is rules.ClauseSelection.FIRST
+            assert len(denotation.clauses) == 2
+            assert all(
+                clause.condition.primitive is rules.ExpressionPrimitive.GATE
+                for clause in denotation.clauses
+            )
+            assert all(
+                type(clause.result) is rules.DerivationClauseResult
+                and any(
+                    plan.selector.target == destination
+                    for plan in clause.result.existing_plans
+                )
+                for clause in denotation.clauses
+            )
+            assert rules.cardinality_size(result.derivation_cardinality) == 1
+            assert rules.cardinality_size(result.successor_cardinality) == 1
+            return
+
+        if row.spf == "SPF045":
+            assert isinstance(execution.source, loci.FiniteConfiguration)
+            assert execution.source.contract.kind is loci.CarrierKind.RECORD
+            targets = _record_targets(execution.source)
+            assert _materialized_read_targets(execution) == tuple(
+                targets[name]
+                for name in ("pc", "instruction", "counter", "register")
+            )
+            assert _resolved_write_targets(execution) == tuple(
+                targets[name] for name in ("pc", "counter", "register")
+            )
+            assert len(derivations) == len(successors) == 1
+            assert _record_values(successors[0]) == {
+                "pc": 1,
+                "instruction": 1,
+                "counter": 1,
+                "register": 7,
+            }
+            _assert_exact_total_replacement(
+                derivations[0],
+                existing=(
+                    (
+                        targets["pc"],
+                        rules.DispositionAction.REPLACE,
+                        1,
+                    ),
+                    (
+                        targets["counter"],
+                        rules.DispositionAction.REPLACE,
+                        1,
+                    ),
+                    (
+                        targets["register"],
+                        rules.DispositionAction.REPLACE,
+                        7,
+                    ),
+                ),
+            )
+            assert isinstance(
+                derivations[0].source.continuation,
+                rules.Continue,
+            )
+            denotation = execution.simple_program.rule.descriptor.denotation
+            assert type(denotation) is rules.ClauseKernelDenotation
+            assert len(denotation.clauses) == 1
+            assert (
+                denotation.clauses[0].condition.primitive
+                is rules.ExpressionPrimitive.GATE
+            )
+            assert rules.cardinality_size(result.derivation_cardinality) == 1
+            assert rules.cardinality_size(result.successor_cardinality) == 1
+            return
+
         fields, read_names, write_names, alternatives, stopped = _PX01_CASES[
             row.spf
         ]
@@ -3577,6 +3717,7 @@ def assert_mechanics_run(
             "SPF034": {
                 "cell": 0,
                 "mutable_rule_entry": 31,
+                "rule_version": 1,
                 "phase": 1,
             },
             "SPF048": {
@@ -3587,6 +3728,73 @@ def assert_mechanics_run(
             },
         }[row.spf]
         assert _record_values(successors[0]) == expected
+        if row.spf == "SPF034":
+            assert len(derivations) == 1
+            targets = _record_targets(execution.source)
+            assert _materialized_read_targets(execution) == tuple(
+                targets[name]
+                for name in (
+                    "cell",
+                    "mutable_rule_entry",
+                    "rule_version",
+                    "phase",
+                )
+            )
+            assert _resolved_write_targets(execution) == tuple(
+                targets[name]
+                for name in (
+                    "cell",
+                    "mutable_rule_entry",
+                    "rule_version",
+                    "phase",
+                )
+            )
+            denotation = execution.simple_program.rule.descriptor.denotation
+            assert type(denotation) is rules.ClauseKernelDenotation
+            assert len(denotation.clauses) == 1
+            clause = denotation.clauses[0]
+            assert (
+                clause.condition.primitive
+                is rules.ExpressionPrimitive.GATE
+            )
+            assert type(clause.result) is rules.DerivationClauseResult
+            plans = {
+                plan.selector.target: plan
+                for plan in clause.result.existing_plans
+            }
+            assert (
+                plans[targets["mutable_rule_entry"]].value.primitive
+                is rules.ExpressionPrimitive.ADD
+            )
+            assert (
+                plans[targets["rule_version"]].value.primitive
+                is rules.ExpressionPrimitive.ADD
+            )
+            _assert_exact_total_replacement(
+                derivations[0],
+                existing=(
+                    (
+                        targets["cell"],
+                        rules.DispositionAction.REPLACE,
+                        0,
+                    ),
+                    (
+                        targets["mutable_rule_entry"],
+                        rules.DispositionAction.REPLACE,
+                        31,
+                    ),
+                    (
+                        targets["rule_version"],
+                        rules.DispositionAction.REPLACE,
+                        1,
+                    ),
+                    (
+                        targets["phase"],
+                        rules.DispositionAction.REPLACE,
+                        1,
+                    ),
+                ),
+            )
         return
 
     if pressure == "PX08":
