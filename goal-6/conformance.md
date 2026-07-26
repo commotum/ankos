@@ -225,26 +225,29 @@ C0:
   event = Unset
 ```
 
-`W = {x, v, t, segment, event}`. `R` contains the state, exact interval
-geometry, and reflection law. The intrinsic earliest hit is the left boundary
-at `τ=1/4`. `RC` has one `Advanced + Continue` derivation replacing
+`W = {x, v, t, segment, event}`. `R` contains the state and exact interval
+geometry; the flow and reflection laws are closed Rule data. The intrinsic
+earliest hit is the left boundary at `τ=1/4`. `RC` has one
+`Advanced + Continue` derivation replacing
 `x→0`, `v→+1`, `t→1/4`, the exact segment, and `event→HitLeft`.
 Application yields `AC(1, 1, 1)`.
 
 ### F037 maximal flow
 
 For `dx/dt = 1`, `x(0)=0`, and no closed duration or event selector, `W`
-contains the solution/result slot and `R` the exact initial state and vector
-field. Rule returns the maximal solution object `x(t)=t` as
+contains the solution/result slot and `R` the exact initial state and any
+visible parameters/event predicates. The vector field is closed Rule data.
+Rule returns the maximal solution object `x(t)=t` as
 `Advanced + Stop(Completed)`. An external query may evaluate it at `t=2`;
 base application may not silently choose that endpoint.
 
 ### F041 intensional field
 
 For `du/dx=0` on `[0,1]` without boundary value, `W` is the complete unknown
-field and `R` contains the domain, differential relation, and exact germ
-contract. `RC` denotes `Replace(u, constant_field(c))` for every exact real
-`c`, with `Many(uncountable)` support and no inferred probability law.
+field and `R` contains the readable domain/side data and differential-germ
+capabilities. The differential relation is closed Rule data. `RC` denotes
+`Replace(u, constant_field(c))` for every exact real `c`, with
+`Many(uncountable)` support and no inferred probability law.
 
 Exact invariant:
 
@@ -402,15 +405,21 @@ fixed wiring and schedule do not depend on runtime values
 
 For input block `A` and prefix tree `A→0, B→10, C→11`, `W` contains the
 fresh output bit and cursor, while `R` contains the current block and complete
-tree. One `Advanced + Stop` atom creates bit `0` and advances the cursor.
+tree. `RC` is finite `ExactlyOne`: one `Advanced + Stop` atom has a total
+disposition that creates bit `0` and advances the cursor. Application yields
+`AC(1, 1, 1)`.
 
 ### F058 nested interval
 
 For input `AB`, `P(A)=P(B)=1/2`, interval `[0,1]`, and cursor `0`, `W`
 contains the shared interval and cursor. `R` contains the next symbol and
-cumulative partition. The first application replaces the interval by
-`[0,1/2]`; the second refines that same interval to `[1/4,1/2]`. The coding
-probabilities do not create a Rule probability law.
+cumulative partition. The first `RC` is finite `ExactlyOne`; its total
+`Advanced + Continue` disposition replaces the interval by `[0,1/2]` and
+advances the cursor, yielding `AC(1, 1, 1)`. The second application refines
+that same interval to `[1/4,1/2]`; its finite `ExactlyOne` `RC` has a total
+`Advanced + Stop(Completed)` disposition that sets the cursor to `Done`, and
+it also yields `AC(1, 1, 1)`. The coding probabilities do not create a Rule
+probability law.
 
 Required codec variants:
 
@@ -778,6 +787,25 @@ T40 alone has two explicitly named preset branches and no umbrella callable or
 are category-qualified and not flat. Alias/preset invocation history never
 enters program equality, serialization, or application.
 
+One parameterized expected-migration manifest must assert the ledger
+row-by-row rather than testing only those generic invariants:
+
+- legacy IDs are exactly T01–T45;
+- target cardinality is `0` for T08, `2` for T40, and `1` for each of the
+  other 43 entries;
+- the 49 callable relations count exactly `C=5`, `P=39`, `A=4`, and `K=1`;
+- each relation has the ledger's exact spelling, kind, SPF target, owner
+  module, closed binding/translation, and flat-export flag;
+- all 48 `C/P/A` names are explicit flat catalog exports, the sole `K` is
+  category-qualified only, and every `M` relation is non-callable; and
+- T32 and T44 are specifically `P`, not `A`: each binds a narrower closed
+  representation of its family rather than accepting the canonical
+  constructor's unchanged arguments.
+
+The expected manifest is test data transcribed from
+`catalog-migration.md`; it does not become a runtime registry or a second
+semantic catalog.
+
 ### CT12 — Independent native/generic equivalence
 
 Where a current implementation or canonical fixture supplies an independent
@@ -804,14 +832,18 @@ Static dependency tests assert:
 - core does not import datasets, RNG, generation, or visualization;
 - package internals do not import through root `ca`;
 - `apply` dispatches only on sealed generic descriptor/result operations; and
-- no execution branch inspects SPF/F/T ID, category, constructor name, Book
-  source, semantic family, carrier label, locus kind, or Rule tag.
+- generic application never inspects SPF/F/T ID, category, constructor name,
+  Book source, semantic family, carrier label, locus kind, or Rule tag to
+  choose a family-specific algorithm.
 
 Behavioral tests apply and decode already constructed programs while catalog
 imports are blocked. Public-surface tests assert `ca.rollout` is callable,
 there is no shadowing public `ca.rollout` submodule, catalog constructors are
 not flattened to root `ca`, and obsolete public
 `configuration/replacement/results/engine/run/updates` modules do not appear.
+Descriptor-owning modules may, of course, interpret their recognized sealed
+locus, selector, Rule-AST, and result variants; the prohibition is against the
+executor using those tags as a disguised semantic-family switch.
 
 ### CT14 — Observer boundary
 
