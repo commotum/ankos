@@ -108,8 +108,8 @@ conflict, and reconcile the plan before changing runtime behavior.
   [`3-MECHANICS.md`](3-MECHANICS.md); it required no production API change.
 - G7-03's original closure started from clean commit `d71626f`; its durable
   implementation, hostile-review repairs, and exact evidence are in
-  [`4-CODECS.md`](4-CODECS.md). The later preset-mechanics delta has reopened
-  its exhaustive coverage contract.
+  [`4-CODECS.md`](4-CODECS.md). The later preset-mechanics delta temporarily
+  reopened its exhaustive coverage contract, which is now reclosed.
 - `ca.serialization` remains one catalog-free, fail-closed canonical v1
   codec. Its live explicit registry contains 187 owner types and 441
   variants: 141 frozen-record representatives and every one of 300 enum
@@ -179,11 +179,12 @@ conflict, and reconcile the plan before changing runtime behavior.
   direct/wire tests reject impossible anchored views, and arithmetic faults
   reject through the typed Rule/application boundary.
 - G7-03's dependency reclosure is complete and recorded in
-  [`4-CODECS.md`](4-CODECS.md). It identified and repaired three fail-closed
-  graph-validation defects in anchored readable views and Rules without
-  changing the five-field API, schema version, codec algorithm, or exact PX10
-  relation set.
-- The active suite now reports `829 passed, 11 skipped`. The eleven skips are
+  [`4-CODECS.md`](4-CODECS.md). It identified and repaired six fail-closed
+  owner-boundary categories across anchored readable views, Rule graphs,
+  complete results, parallel composition, and intensional primitive/law
+  refinement without changing the five-field API, schema version, codec
+  algorithm, or exact PX10 relation set.
+- The active suite now reports `830 passed, 11 skipped`. The eleven skips are
   exactly the five CT11 catalog-expansion tests, five catalog unit tests, and
   the F010/F042 callable-free role test; all remain G7-04-owned.
 - G7-02 and G7-03 are reclosed. G7-04 is the first incomplete stage and is

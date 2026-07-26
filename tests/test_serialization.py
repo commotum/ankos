@@ -1211,6 +1211,200 @@ def test_hostile_anchored_rule_graphs_fail_closed() -> None:
         )
 
 
+def test_hostile_rule_variant_refinements_fail_closed() -> None:
+    """Signed wire data cannot bypass public Rule-constructor refinements."""
+
+    base_rule = _program()[0].rule
+    terminal = rules.NoSuccessor(
+        rules.NoSuccessorOutcome.TERMINAL,
+        rules.literal_expr("codec-terminal"),
+        rules.Witness(
+            "codec-terminal",
+            rules.literal_expr("codec-terminal"),
+        ),
+        ("codec:terminal",),
+        _certificate(
+            rules.CertificateKind.TERMINALITY,
+            "codec-terminal",
+        ),
+    )
+    literal_rule = rules.finite_rule(
+        (terminal,),
+        contract=base_rule.contract,
+    )
+    empty_literal = json.loads(serialization.dumps(literal_rule))
+    literal_denotation = empty_literal["payload"]["descriptor"]["payload"][
+        "denotation"
+    ]["payload"]
+    literal_denotation["outcomes"]["payload"]["support"] = (
+        _nested_wire_value(rules.finite_support(()))
+    )
+    _assert_rejected(_redigest(empty_literal), "invalid-descriptor")
+
+    complete = rules.RuleComplete(
+        rules.OutcomeSpace(rules.finite_support((terminal,)))
+    )
+    empty_complete = json.loads(serialization.dumps(complete))
+    empty_complete["payload"]["outcome_space"]["payload"]["support"] = (
+        _nested_wire_value(rules.finite_support(()))
+    )
+    _assert_rejected(_redigest(empty_complete), "invalid-descriptor")
+
+    parallel_rule = rules.parallel((base_rule, base_rule))
+    standalone_parallel = json.loads(
+        serialization.dumps(
+            rules.ParallelDenotation((base_rule, base_rule))
+        )
+    )
+    standalone_parts = standalone_parallel["payload"]["parts"]["payload"][
+        "items"
+    ]
+    standalone_contract = standalone_parts[0]["payload"]["contract"]["payload"]
+    standalone_contract["required_effect_profile"]["payload"]["existing"] = (
+        _nested_wire_value(())
+    )
+    _assert_rejected(
+        _redigest(standalone_parallel),
+        "invalid-descriptor",
+    )
+
+    wrong_outer_contract = json.loads(
+        serialization.dumps(parallel_rule)
+    )
+    outer_contract = wrong_outer_contract["payload"]["contract"]["payload"]
+    outer_contract["required_effect_profile"]["payload"]["existing"] = (
+        _nested_wire_value(())
+    )
+    _assert_rejected(
+        _redigest(wrong_outer_contract),
+        "invalid-descriptor",
+    )
+
+    unequal_part_contracts = json.loads(
+        serialization.dumps(parallel_rule)
+    )
+    parallel_denotation = unequal_part_contracts["payload"]["descriptor"][
+        "payload"
+    ]["denotation"]["payload"]
+    first_part = parallel_denotation["parts"]["payload"]["items"][0]["payload"]
+    first_contract = first_part["contract"]["payload"]
+    first_contract["required_effect_profile"]["payload"]["existing"] = (
+        _nested_wire_value(())
+    )
+    _assert_rejected(
+        _redigest(unequal_part_contracts),
+        "invalid-descriptor",
+    )
+
+    cardinality = rules.ExactlyOne(
+        _certificate(
+            rules.CertificateKind.CARDINALITY,
+            "codec-intensional-one",
+        )
+    )
+    complete = _certificate(
+        rules.CertificateKind.COMPLETENESS,
+        "codec-intensional-complete",
+    )
+    sound = _certificate(
+        rules.CertificateKind.SOUNDNESS,
+        "codec-intensional-sound",
+    )
+    relation_rule = rules.relation(
+        rules.literal_expr("codec-relation"),
+        cardinality,
+        contract=base_rule.contract,
+        completeness_evidence=complete,
+        soundness_evidence=sound,
+    )
+    missing_distribution_law = json.loads(
+        serialization.dumps(relation_rule)
+    )
+    relation_descriptor = missing_distribution_law["payload"]["descriptor"][
+        "payload"
+    ]
+    relation_descriptor["primitive"] = _nested_wire_value(
+        rules.RulePrimitive.DISTRIBUTION
+    )
+    _assert_rejected(
+        _redigest(missing_distribution_law),
+        "invalid-descriptor",
+    )
+
+    law = rules.ProbabilityLaw(
+        rules.ProbabilityPresentation.INTENSIONAL,
+        (),
+        rules.literal_expr("codec-measure"),
+        _certificate(
+            rules.CertificateKind.NORMALIZATION,
+            "codec-measure-normalized",
+        ),
+        _certificate(
+            rules.CertificateKind.MEASURABILITY,
+            "codec-measure-measurable",
+        ),
+    )
+    replay_contract = rules.RuleContract(
+        base_rule.contract.configuration_contract,
+        base_rule.contract.value_profile,
+        base_rule.contract.required_read_shape,
+        base_rule.contract.required_join_shape,
+        base_rule.contract.required_effect_profile,
+        exactness_profile=base_rule.contract.exactness_profile,
+        entropy_interface=seeds.EntropyInterface.REPLAY_KEY,
+    )
+    distribution_rule = rules.distribution(
+        rules.literal_expr("codec-distribution"),
+        cardinality,
+        law,
+        contract=replay_contract,
+        completeness_evidence=complete,
+        soundness_evidence=sound,
+    )
+    for primitive in (
+        rules.RulePrimitive.RELATION,
+        rules.RulePrimitive.DIFFERENTIAL,
+    ):
+        law_on_non_distribution = json.loads(
+            serialization.dumps(distribution_rule)
+        )
+        descriptor = law_on_non_distribution["payload"]["descriptor"][
+            "payload"
+        ]
+        descriptor["primitive"] = _nested_wire_value(primitive)
+        _assert_rejected(
+            _redigest(law_on_non_distribution),
+            "invalid-descriptor",
+        )
+
+    finite_law = rules.ProbabilityLaw(
+        rules.ProbabilityPresentation.FINITE,
+        (rules.AtomMass("codec-atom", Fraction(1)),),
+        None,
+        _certificate(
+            rules.CertificateKind.NORMALIZATION,
+            "codec-finite-normalized",
+        ),
+        _certificate(
+            rules.CertificateKind.MEASURABILITY,
+            "codec-finite-measurable",
+        ),
+    )
+    finite_distribution_law = json.loads(
+        serialization.dumps(distribution_rule)
+    )
+    distribution_denotation = finite_distribution_law["payload"][
+        "descriptor"
+    ]["payload"]["denotation"]["payload"]
+    distribution_denotation["probability_law"] = _nested_wire_value(
+        finite_law
+    )
+    _assert_rejected(
+        _redigest(finite_distribution_law),
+        "invalid-descriptor",
+    )
+
+
 def test_hostile_value_anchored_readable_views_fail_closed() -> None:
     source = loci.grid_configuration(
         (3,),

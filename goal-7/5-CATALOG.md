@@ -28,7 +28,7 @@
   reports `522 passed, 11 skipped`.
 - The later preset audit reopened dependencies. G7-02 reclosed its reusable
   preset mechanics at `804 passed, 11 skipped`, and G7-03 has now reclosed the
-  expanded codec surface at `829 passed, 11 skipped`. G7-04 is resumable; all
+  expanded codec surface at `830 passed, 11 skipped`. G7-04 is resumable; all
   eleven skips are its remaining catalog/role obligations.
 
 ## Updated Assumptions
@@ -362,7 +362,7 @@ manifest/helper when that keeps the expected ledger independent.
 
 G7-03 retained one catalog-free canonical v1 codec with 187 owner types and
 441 variants, added real round-trip and hostile-wire coverage for every
-reopened mechanics form, and repaired three owner-validation gaps found by
+reopened mechanics form, and repaired six owner-boundary categories found by
 that audit. It introduced no catalog tag, constructor receipt, preset
 dispatch, migration fallback, or additional representation claim.
 

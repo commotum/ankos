@@ -2204,6 +2204,14 @@ class LiteralDenotation(Generic[V]):
     def __post_init__(self) -> None:
         if type(self.outcomes) is not OutcomeSpace:
             raise TypeError("literal denotation needs an OutcomeSpace")
+        support = self.outcomes.support
+        if (
+            support.presentation is SupportPresentation.FINITE
+            and not support.atoms
+        ):
+            raise ValueError(
+                "a complete finite Rule result cannot be a bare empty support"
+            )
 
 
 @dataclass(frozen=True)
@@ -2777,6 +2785,9 @@ class ParallelDenotation(Generic[R, W, C]):
             raise ValueError("parallel Rule needs at least one part")
         if any(type(part) is not Rule for part in self.parts):
             raise TypeError("parallel Rule parts must be recognized Rules")
+        contract = self.parts[0].contract
+        if any(part.contract != contract for part in self.parts[1:]):
+            raise ValueError("parallel Rule contracts must be identical")
 
 
 RuleDenotation: TypeAlias = (
@@ -2811,6 +2822,22 @@ class RuleDescriptor(Generic[R, W, C]):
         }[self.primitive]
         if not isinstance(self.denotation, expected):
             raise ValueError("Rule primitive and denotation variant disagree")
+        if isinstance(self.denotation, IntensionalDenotation):
+            law = self.denotation.probability_law
+            if self.primitive is RulePrimitive.DISTRIBUTION:
+                if (
+                    law is None
+                    or law.presentation
+                    is not ProbabilityPresentation.INTENSIONAL
+                ):
+                    raise ValueError(
+                        "distribution Rule needs an intensional probability law"
+                    )
+            elif law is not None:
+                raise ValueError(
+                    "relation and differential Rules cannot carry "
+                    "a probability law"
+                )
 
     @property
     def canonical_identity(self) -> str:
@@ -2879,6 +2906,13 @@ class RuleComplete(Generic[C, V]):
         support = self.outcome_space.support
         if (
             support.presentation is SupportPresentation.FINITE
+            and not support.atoms
+        ):
+            raise ValueError(
+                "RuleComplete cannot carry a bare empty finite support"
+            )
+        if (
+            support.presentation is SupportPresentation.FINITE
             and any(type(atom) not in (Derivation, NoSuccessor) for atom in support.atoms)
         ):
             raise TypeError("RuleComplete support contains an unknown atom variant")
@@ -2939,6 +2973,12 @@ class Rule(Generic[R, W, C]):
             AnchoredClauseKernelDenotation,
         ):
             _validate_clause_rule_contract(denotation, self.contract)
+        if type(denotation) is ParallelDenotation and any(
+            part.contract != self.contract for part in denotation.parts
+        ):
+            raise ValueError(
+                "parallel Rule contracts must be identical"
+            )
 
     @property
     def canonical_identity(self) -> str:

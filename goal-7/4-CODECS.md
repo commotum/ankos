@@ -376,16 +376,24 @@ missing or invalid expanded fields, malformed paths and predicates, reordered
 or incomplete interval descriptors, noncanonical structural ordering,
 duplicate semantic map keys, forged window/scan/offset forms, invalid
 group-item operands, non-group anchored proposals, proposed zero-anchor
-writes, impossible anchored regions/views, and pre-delta record shapes.
+writes, impossible anchored regions/views, empty finite Rule results,
+cross-contract parallel Rules, intensional primitive/law mismatches, and
+pre-delta record shapes.
 
-The hostile review exposed three real owner-validation gaps and repaired them
-without changing the public API or codec algorithm:
+The hostile review exposed six real owner-boundary categories and repaired
+them without changing the public API or codec algorithm:
 
 - `IntensionalReadableView` now rejects finite value-anchor dependencies;
 - `ReadableView` checks the declared anchor cardinality against distinct
   realized source anchors; and
 - `Rule` itself, not only the public builders, checks ordinary and anchored
-  clause denotations' required write effects and replay-key requirements.
+  clause denotations' required write effects and replay-key requirements;
+- `LiteralDenotation` and `RuleComplete` reject a bare empty finite support,
+  while exact-zero intensional relations retain their typed runtime path;
+- `ParallelDenotation` requires equal part contracts and its enclosing `Rule`
+  requires that same contract; and
+- `RuleDescriptor` binds `DISTRIBUTION` exactly to an intensional probability
+  law and forbids probability laws on `RELATION` and `DIFFERENTIAL`.
 
 Those checks are necessary because a fail-closed decoder reconstructs public
 records directly through their owner validators. The codec still does not
@@ -414,7 +422,7 @@ UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
   tests/test_rules.py \
   tests/test_anchored_rule_kernel.py \
   tests/test_value_anchored_regions.py
--> 167 passed
+-> 168 passed
 
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
   tests/test_rule_comprehensions.py \
@@ -435,7 +443,7 @@ UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
 -> 61 passed, 1 G7-04-owned skip
 
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
--> 829 passed, 11 skipped
+-> 830 passed, 11 skipped
 
 UV_CACHE_DIR=/tmp/uv-cache uv lock --check
 -> resolved successfully
