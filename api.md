@@ -1,9 +1,10 @@
-# `ca` Target Public API
+# `ca` 0.2.0 Public API
 
-Status: **settled Goal 6 design contract; implementation is pending Goal 7**
+Status: **implemented and conformance-tested**
 
-This is the public API that Goal 7 will implement, not a claim that the current
-0.1.0 `Dynamics` runtime already provides it.
+This is the public contract shipped by ankos 0.2.0. The removed 0.1
+`Dynamics` surface is retained only as a historical source snapshot in
+[`README-V1.md`](README-V1.md).
 
 The complete validation, reconstruction, measure, and intensional contract is
 in [`goal-6/architecture.md`](goal-6/architecture.md).
@@ -63,13 +64,39 @@ explicit; machine floats never silently stand in for exact reals.
 The plural component modules construct one value for each program field:
 
 ```python
+from fractions import Fraction
+
 import ca
 
+carrier = ca.loci.CarrierContract(
+    ca.loci.CarrierKind.GRID,
+    rank=1,
+    shape=(79,),
+    axes=("x",),
+)
+alphabet = ca.alphabets.boolean()
+boundary = ca.loci.Boundary(
+    ca.loci.BoundaryPolicy.FIXED,
+    False,
+)
+
 program = ca.SimpleProgram(
-    seed=ca.seeds.bernoulli(...),
-    alphabet=ca.alphabets.boolean(),
-    frontier=ca.frontiers.everywhere(),
-    neighborhood=ca.neighborhoods.eca(),
+    seed=ca.seeds.bernoulli(
+        ca.loci.literal(ca.loci.grid_loci((79,), axes=("x",))),
+        Fraction(1, 2),
+        configuration_contract=carrier,
+        value_profile=alphabet.value_profile,
+        boundary=boundary,
+    ),
+    alphabet=alphabet,
+    frontier=ca.frontiers.everywhere(
+        configuration_contract=carrier,
+        value_profile=alphabet.value_profile,
+    ),
+    neighborhood=ca.neighborhoods.eca(
+        configuration_contract=carrier,
+        value_profile=alphabet.value_profile,
+    ),
     rule=ca.rules.elementary(30),
 )
 ```
@@ -186,7 +213,19 @@ RuleResult =
   | RuleRejected(rule_fault)
 
 ApplicationResult =
-    ApplicationComplete(applied_result)
+    ApplicationComplete(
+        source_outcomes,
+        applied_atoms,
+        no_successor_partition,
+        outcome_atom_cardinality,
+        derivation_cardinality,
+        successor_cardinality,
+        successor_quotient_with_derivation_fibers,
+        applied_atom_measure,
+        successor_submeasure,
+        no_successor_submeasure,
+        evidence,
+    )
   | ApplicationRejected(application_fault)
 ```
 
@@ -201,7 +240,7 @@ A complete Rule result has finite or intensional support containing:
 
 ```text
 Derivation(
-    TotalDisposition[W],
+    TotalDisposition,
     Advanced | Quiescent,
     Continue | Stop(reason),
     witness,
@@ -324,7 +363,7 @@ episode = ca.rollout(
 )
 ```
 
-Its minimum target signature is:
+Its exact public signature is:
 
 ```text
 rollout(program, *, steps, initial=None, replay_key=None) -> RolloutResult
@@ -339,9 +378,10 @@ RolloutResult =
   | RolloutRejected(rollout_fault)
 ```
 
-The truncation cause is typed as `DepthBound`, `ResourceExhausted`,
-`Cancelled`, or `Pruned`. A truncated result retains the raw partial trace and
-continuing derivation fibers; it makes no terminal or exact-cardinality claim.
+The truncation cause is typed as `DepthBound`, `IntensionalSupport`,
+`ResourceExhausted`, `Cancelled`, or `Pruned`. A truncated result retains the
+raw partial trace and continuing derivation fibers; it makes no terminal or
+exact-cardinality claim.
 
 With no explicit `initial`, traversal starts from the Seed result space. With
 no `replay_key`, finite or intensional Seed/Rule laws remain complete
@@ -372,11 +412,10 @@ One-shot functions, constraint completions, media transforms, and many
 continuous relations are normally consumed with `ca.apply`, not mandatory
 rollout.
 
-The public callable and its `RolloutResult`/trace records are owned
-by `ca.program`; `ca.rollout` is the convenience re-export. Goal 7 folds or
-physically renames the current tensor-oriented `rollout.py`, so no same-named
-public submodule can shadow the callable. Omitting it from `__all__` is not
-enough. There is no `run.py`.
+The public callable and its `RolloutResult`/trace records are owned by
+`ca.program`; `ca.rollout` is the convenience re-export. There is no
+same-named public submodule that can shadow the callable, and there is no
+`run.py` or second traversal implementation.
 
 ## Serialization
 
@@ -423,9 +462,43 @@ Canonical codecs:
 Python class names, object addresses, host hashes, locale, NumPy defaults, and
 machine floating behavior are never semantic identity.
 
+## Migrating Source From 0.1
+
+The 0.1 `Dynamics` dictionaries were construction recipes, not an earlier
+canonical semantic format. Reconstruct each program in source through the
+matching catalog constructor:
+
+```python
+program = ca.catalog.eca(rule=30, width=79)
+```
+
+or through explicit five-field construction as shown above. Then serialize the
+expanded value with `ca.serialization.dumps`.
+
+The old call:
+
+```text
+rollout(dynamics=..., rule_id=..., seed_state=..., steps=...)
+```
+
+becomes:
+
+```text
+rollout(program, steps=..., initial=..., replay_key=...)
+```
+
+`RawEpisode` and `RawBatch` are not semantic result types in 0.2.0. Inspect
+`ca.program.RolloutComplete`, `RolloutTruncated`, or `RolloutRejected`, and use
+the explicit downstream dataset views only when dense tensors are needed.
+
+`ca.serialization.loads` rejects old `Dynamics` manifests. There is no
+compatibility executor, fallback decoder, or “try old then new” path. The
+canonical program wire tag is `ca.simple-program` at schema version `1`;
+that schema version is independent of the package version `0.2.0`.
+
 ## Package and Import Ownership
 
-The target package surface is the locked semantic core and catalog:
+The implemented semantic package surface is:
 
 ```text
 src/ca/
@@ -460,7 +533,7 @@ src/ca/
 | `frontiers.py` | WritableRegion descriptors, capability resolution, composition, and presets |
 | `neighborhoods.py` | ReadableRegion descriptors, read resolution, composition, and presets |
 | `rules.py` | Rule descriptors, Rule results/atoms, total dispositions, composition, and presets |
-| `serialization.py` | Versioned canonical codecs, typed decode results, and migrations |
+| `serialization.py` | Versioned canonical codecs, explicit schema registry, and typed decode results |
 | `py.typed` | Static-typing package marker; no runtime behavior |
 | `catalog/entries.py` | Descriptive constructor/alias/provenance metadata |
 | six catalog modules | Canonical whole-program constructor ownership |
@@ -481,24 +554,30 @@ There is no need for public `configuration.py`, `replacement.py`, `results.py`,
 `engine.py`, `rollout.py`, or `run.py`. Their legitimate responsibilities are
 already owned by Seed-produced configurations, `rules.py`, and `program.py`.
 
-## Deliberately Deferred Auxiliaries
+## Downstream Auxiliaries
 
-Goal 6 does not promise a final internal organization for generation,
-datasets, streams, RNG helpers, visualization, observers, renderers, or
-exporters.
+The installed package retains `ca.datasets`, `ca.rng`, and `ca.viz` as
+explicit downstream submodules:
 
-Those tools may consume Seeds, programs, application results, rollout traces,
-and canonical serialization. They may not become hidden program fields,
-alternate executors, entropy authorities, or definitions of semantic
+```python
+from ca import datasets, rng, viz
+```
+
+They are not root exports and are not loaded by `import ca`. These tools may
+consume Seeds, programs, application results, rollout traces, and canonical
+serialization. They may not become hidden program fields, alternate
+executors, entropy authorities, or definitions of semantic
 configuration/result identity.
 
-No target imports such as `ca.generation`, `ca.datasets`, `ca.streams`,
-`ca.rng`, or `ca.viz` are established here. Goal 7 may evolve auxiliary code
-in place while preserving the boundaries above.
+Generation, streams, generalized solvers, observers, and additional rendering
+or export organization remain outside this semantic API. Any later tooling
+must preserve the same downstream boundary.
 
 ## Documentation Roles
 
-`api.md` is the target public contract; `goal-6/architecture.md` is the
-canonical internal specification; `simple_programs.md` supplies non-competing
-conceptual rationale; and `ref/notes/ca-scaffold.py` is the compact code-shaped
-walkthrough.
+`api.md` is the implemented public contract;
+[`goal-6/architecture.md`](goal-6/architecture.md) is the frozen internal
+specification; [`simple_programs.md`](simple_programs.md) supplies
+non-competing conceptual rationale; and
+[`ref/notes/ca-scaffold.py`](ref/notes/ca-scaffold.py) is the compact
+code-shaped walkthrough.

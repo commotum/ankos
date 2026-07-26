@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import ca
+from ca import datasets, viz
 
 
 def main() -> None:
@@ -13,9 +13,9 @@ def main() -> None:
     output_dir = Path(args.output_dir) if args.output_dir else Path(__file__).resolve().parent / "viz-samples"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    for dataset_id in ca.datasets.DATASET_IDS:
+    for dataset_id in datasets.DATASET_IDS:
         episode = next(
-            ca.datasets.stream(
+            datasets.stream(
                 dataset_id,
                 kind="held-out-seed",
                 count=1,
@@ -23,7 +23,7 @@ def main() -> None:
             )
         )
         path = output_dir / f"{dataset_id}-held-out-seed.ankos"
-        ca.viz.save_viewer_bundle(
+        viz.save_viewer_bundle(
             episode,
             path,
             include_coords=True,

@@ -1,9 +1,10 @@
-# ankos
+# ankos 0.1 historical snapshot
 
-> **Status:** This is a retained earlier runtime snapshot, not current package
-> documentation or target architecture. See [`README-V2.md`](README-V2.md)
-> for the implemented 0.1.0 runtime and [`api.md`](api.md) for the five-field
-> target pending Goal 7.
+> **Historical source-API snapshot:** Everything below describes the removed
+> 0.1 runtime. Its `Dynamics`, manifest, rollout, and root-level examples do
+> not run against ankos 0.2.0 and are retained only to explain the old source
+> surface. See [`README-V2.md`](README-V2.md) for current usage and
+> [`api.md`](api.md) for the implemented five-field contract.
 
 ANKoS ("A New Kind of Science") is a Python project for running
 cellular-automaton experiments inspired by Wolfram's book. Import it as `ca`.

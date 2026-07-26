@@ -1,364 +1,407 @@
 # ankos
 
-> **Runtime status:** This README documents the currently implemented 0.1.0
-> runtime and its tests. The settled five-field target API is specified in
-> [`api.md`](api.md) and remains pending Goal 7 implementation. The runtime
-> axes and examples below are therefore current usage, not target
-> architecture.
+ankos 0.2.0 is a Python library for constructing and applying closed simple
+programs inspired by *A New Kind of Science*. Cellular automata, substitutions,
+machines, transductions, constraints, and continuous relations share one
+program boundary:
 
-ANKoS is a small Python lab for the central experiment in *A New Kind of
-Science*: take a very simple rule, run it for a while, and look at what it
-actually does.
-
-The bet of the project is the same bet Wolfram makes in the book. Equations and
-closed-form analysis are only one way to do science. Another way is to search
-the space of simple programs directly. Some rules die out, some repeat, some
-make nested structure, some look random, and a few make persistent moving
-structures that are hard to predict without just running them.
-
-This package gives those experiments one common spine:
-
-```text
-domain:        scalar, line, plane, or volume through time
-shape:         the finite extent of the run
-alphabet:      the possible cell states
-seed:          the initial state
-boundary:      what happens at the edge
-frontier:      which cells update
-neighborhood:  what each updated cell reads
-rule:          how reads become the next state
+```python
+SimpleProgram(
+    seed=...,
+    alphabet=...,
+    frontier=...,
+    neighborhood=...,
+    rule=...,
+)
 ```
 
-Import it as `ca`.
+Every named construction expands to those five fields. One family-blind
+operation applies every program, and rollout repeats that same operation:
 
-## Quick Start
+```python
+result = ca.apply(program, configuration)
+episode = ca.rollout(program, steps=100)
+```
 
-Install dependencies:
+There are no family-specific executors, hidden update-policy field, or
+compatibility runtime.
+
+## Quick start
+
+The project requires Python 3.10 or newer. From a checkout:
 
 ```bash
 uv sync
-```
-
-Run the tests:
-
-```bash
 uv run pytest -q
 ```
 
-Roll a scalar second-order recurrence:
+Construct and traverse elementary cellular automaton rule 30:
 
 ```python
-import numpy as np
-
 import ca
 
-dynamics = ca.Dynamics(
-    domain="t+0d",
-    shape=(),
-    rule=ca.ar2_modular_0d(modulus=97),
-    neighborhoods=(),
-    frontier=ca.time_slice(()),
-)
-
+program = ca.catalog.eca(rule=30, width=79)
 episode = ca.rollout(
-    dynamics=dynamics,
-    rule_id=0,
-    seed_state=np.array([1, 2]),
-    steps=4,
+    program,
+    steps=100,
+    replay_key="readme-rule-30",
 )
 
-print(episode.states.tolist())
-# [2, 3, 4, 5]
+print(type(episode).__name__)
+print(len(episode.raw_trace.applications.atoms))
+# RolloutTruncated
+# 100
 ```
 
-Roll a two-dimensional Dyadaxes system:
+The catalog constructor supplies a Bernoulli Seed. The replay key authorizes
+one deterministic, reproducible realization of that law; it is execution
+evidence, not a sixth program field. Reaching `steps=100` is a depth bound, so
+the continuing run is correctly reported as `RolloutTruncated`, not as
+terminal.
 
-```python
-import numpy as np
-
-import ca
-
-dynamics = ca.Dynamics(
-    domain="t+2d",
-    shape=(3, 3),
-    rule=ca.dyadaxes_2d_rule(),
-    neighborhoods=(ca.dyadaxes_2d_neighborhood(),),
-    frontier=ca.time_slice((3, 3)),
-    boundary={"policy": "fixed", "value": 0},
-)
-
-seed_state = np.array(
-    [
-        [0, 1, 0],
-        [1, 1, 1],
-        [0, 1, 0],
-    ],
-    dtype=np.int64,
-)
-
-episode = ca.rollout(dynamics, rule_id=37, seed_state=seed_state, steps=8)
-
-print(episode.states.shape)
-# (8, 3, 3)
-```
-
-The important thing is not that this tiny example is impressive. The important
-thing is that the same API scales across the little families you want to sweep:
-change the rule id, seed, shape, dimension, boundary, or neighborhood, then
-look at the trajectory.
-
-## What This Is For
-
-ANKoS is not trying to be a giant CA framework. It is a fixed-grid trajectory
-generator and construction API for experiments inspired by the book:
-
-- Chapter 2's crucial experiment: simple cellular automata do not always behave
-  simply.
-- Chapter 3's broader claim: the same behavior types recur across many simple
-  program families.
-- Chapter 5's dimensional question: higher dimensions add geometry, but not a
-  totally different story.
-- Chapter 6's random-start experiments: order, randomness, and localized
-  structures can be studied systematically.
-- Chapter 7 and 8's modeling lesson: simple local rules can be explanatory
-  mechanisms, not just curve-fitting devices.
-- Chapter 10 through 12's computational lesson: perception, prediction,
-  randomness, universality, and irreducibility are part of the same story.
-
-The code is deliberately small so the moving parts stay visible. If you want to
-understand a run, read the rule, the neighborhood, the seed, and the rollout.
-There should not be much else hiding behind the curtain.
-
-## Mental Model
-
-An episode is a full-state trajectory over canonical coordinates:
-
-```text
-[t, x, y, z]
-```
-
-Unused spatial axes are fixed at zero:
-
-```text
-t+0D: [t, 0, 0, 0]
-t+1D: [t, x, 0, 0]
-t+2D: [t, x, y, 0]
-t+3D: [t, x, y, z]
-```
-
-ANKoS follows Wolfram's next-state convention:
-
-```text
-state t -> state t + 1
-```
-
-At each update time:
-
-1. The frontier selects current-state sites.
-2. The neighborhood reads offsets around each selected site.
-3. The rule maps those reads to a next value.
-4. The result is written at the same spatial coordinate on time `t + 1`.
-
-Temporal recurrences can also read earlier source times such as `t - 1`.
-
-## API
-
-The main runtime path is:
-
-```text
-ca.Dynamics + rule_id + seed_state + steps
-    -> ca.rollout(...)
-    -> ca.RawEpisode
-```
-
-`ca.Dynamics` describes the reusable mechanics:
-
-- `domain`: `t+0d`, `t+1d`, `t+2d`, or `t+3d`
-- `shape`: native spatial shape
-- `rule`: rule family
-- `neighborhoods`: read stencils
-- `frontier`: update-site selector
-- `boundary`: spatial read behavior
-- `metadata`: optional result metadata
-
-`ca.RawEpisode` returns raw states, flattened canonical coordinates, and
-metadata. State arrays keep their native rank:
-
-```text
-t+0d: (steps,)
-t+1d: (steps, x)
-t+2d: (steps, x, y)
-t+3d: (steps, x, y, z)
-```
-
-Use `ca.canonical_coords(domain, shape, steps)` when you want the flattened
-`[t, x, y, z]` coordinate table directly.
-
-For homogeneous batches, use:
-
-```python
-batch = ca.rollout_batch(
-    dynamics=dynamics,
-    rule_ids=np.array([0, 37, 255]),
-    seed_states=seed_states,
-    steps=32,
-)
-```
-
-Batch rows may use different rule ids and seeds. They share one `Dynamics`,
-shape, and horizon.
-
-## Loading From A Manifest
-
-```python
-import numpy as np
-
-import ca
-
-manifest = {
-    "domain": "t+2d",
-    "shape": [3, 3],
-    "dynamics": {
-        "neighborhood": {"family": "dyadaxes_2d"},
-        "frontier": {"family": "time_slice"},
-        "rule": {"family": "dyadaxes_2d"},
-        "boundary": {"policy": "fixed", "value": 0},
-    },
-}
-
-dynamics = ca.dynamics_from_spec(manifest)
-seed_state = np.ones((3, 3), dtype=np.int64)
-episode = ca.rollout(dynamics, rule_id=0, seed_state=seed_state, steps=2)
-```
-
-## Coordinates
-
-Spatial axes are centered:
-
-```text
-shape (3,) -> x = -1, 0, 1
-shape (4,) -> x = -1, 0, 1, 2
-```
-
-This makes odd-sized grids naturally center on zero while even-sized grids keep
-a deterministic integer convention.
-
-## Built-Ins
-
-Rules:
-
-- `ar2_modular_0d`
-- `dyadlags_0d`
-- `dyadrads_1d`
-- `dyadaxes_2d`
-- `dyadaxes_3d`
-
-Neighborhoods:
-
-- `self_at`, `literal_offsets`, `metric_radius`, `shell`, `axis_shell`
-- `l1_shell`, `change_count_shell`, `directional_line`, `directional_fov`
-- `eca`, `moore`, `von_neumann`, `history`
-- `ar2_0d`, `dyadlags_0d`, `dyadrads_1d`, `dyadaxes_2d`, `dyadaxes_3d`
-
-Seeds:
-
-- `pair`, `uniform_pair`, `uniform_bits`, `constant`, `point`, `bernoulli`,
-  `selector_seed`
-- `subspace`, `finite_segment`, `body`, `compound`, `region`, `periodic`
-- `path`, `transform`, `structured`
-
-Alphabets:
-
-- `int_range_alphabet`
-- `float_range_alphabet`
-- `boolean`
-- `symbolic`
-
-Boundary policies:
-
-```python
-{"policy": "none"}
-{"policy": "fixed", "value": 0}
-{"policy": "periodic"}
-{"policy": "reflective"}
-```
-
-## File Structure
-
-```text
-src/ca
-|-- loci.py            canonical coordinates, selectors, masks, gathering
-|-- alphabets.py       finite raw value spaces
-|-- seeds.py           seed specs and rendering
-|-- neighborhoods.py   read stencils
-|-- frontiers.py       update-site selectors
-|-- rules.py           rule channels and families
-|-- rollout.py         NumPy rollout and batched rollout
-|-- specs.py           manifests and result types
-|-- rng.py             reproducible RNG helpers
-`-- __init__.py        public exports
-```
-
-The shortest path through the code is:
-
-```text
-README-V2.md -> src/ca/specs.py -> src/ca/neighborhoods.py
-             -> src/ca/rules.py -> src/ca/rollout.py
-```
-
-For seed experiments, add `src/ca/seeds.py`. For coordinate behavior, start in
-`src/ca/loci.py`.
-
-## Reproducible Seeds
-
-Use `ca.rng` to derive NumPy generators for stochastic seed rendering:
+To apply an explicit configuration once:
 
 ```python
 import ca
 
-rng = ca.numpy_rng({"policy": "splitmix64", "base_rng": 12345}, episode_index=7)
-seed_state = ca.render(ca.bernoulli(p_low=0.5, p_high=0.5), shape=(16,), rng=rng)
+program = ca.catalog.eca(rule=30, width=5)
+configuration = ca.loci.grid_configuration(
+    (5,),
+    (False, False, True, False, False),
+    boundary=ca.loci.Boundary(
+        ca.loci.BoundaryPolicy.FIXED,
+        False,
+    ),
+)
+
+result = ca.apply(program, configuration)
+
+if isinstance(result, ca.program.ApplicationComplete):
+    successors = result.successor_quotient_with_derivation_fibers
+    next_configuration = successors.atoms[0].successor
+else:
+    raise ValueError(result.fault)
 ```
 
-Pass the rendered `seed_state` to `ca.rollout(...)`.
+Application never mutates the input. It validates and atomically reconstructs
+every alternative, retains complete derivation fibers, then groups equal
+successors.
 
-## Current Scope
+## The five fields
 
-The implemented runtime is intentionally narrower than the full generator
-schema in `ref/notes/generator.md`.
+| Field | Responsibility |
+|---|---|
+| `seed` | A closed source of valid initial configurations or a law over them |
+| `alphabet` | The closed structural universe and equality of semantic values |
+| `frontier` | The complete writable capability envelope for one application |
+| `neighborhood` | The complete identity-preserving readable view |
+| `rule` | Applicability, schedules, conflicts, stochastic laws, stopping, and complete atomic replacements |
 
-Currently supported:
+The field names *Frontier* and *Neighborhood* describe responsibilities. Their
+public component types are `ca.frontiers.WritableRegion` and
+`ca.neighborhoods.ReadableRegion`.
 
-- fixed-grid trajectories in `t+0d`, `t+1d`, `t+2d`, and `t+3d`
-- compact neighborhood reads
-- full time-slice frontiers
-- fixed, periodic, reflective, and no-boundary policies
-- named Phase 1 families: AR2, Dyadlags, Dyadrads, and Dyadaxes
-- raw NumPy rollout and same-dynamics batched rollout
+Frontier is not merely the set of loci that fire. It includes every existing
+or potential component that any permitted Rule alternative may change. A
+mobile automaton therefore authorizes the source and all possible
+destinations; the active tag and Rule select the actual move, while every
+unselected capability is preserved.
 
-Not yet the full story:
+Neighborhood is not required to be geometrically local. It may describe a
+stencil, a word span, a matched graph interface, a complete history, a global
+aggregate, a differential germ, or an intensional relation.
 
-- arbitrary state-dependent frontiers
-- fixed-support neighborhoods with masks
-- clamp boundary policy
-- generic isotropic, semi-totalistic, totalistic, formulaic, or stochastic
-  rule manifests
-- non-grid systems such as mobile automata, substitution systems, networks, or
-  multiway systems
+Support, topology, geometry, defaults, boundary behavior, invariants, and
+visible control state live in Seed-produced configurations. Scheduling,
+branching, conflict resolution, stopping, and probability laws live in Rule.
+They do not become extra fields.
 
-Those are natural extensions, but the present package keeps the first surface
-small and testable.
+See [`simple_programs.md`](simple_programs.md) for the conceptual model and
+[`api.md`](api.md) for the exact public contract.
 
-## References
+## Explicit five-field construction
+
+Catalog names are ordinary compositions. This complete expansion is exactly
+equal to `ca.catalog.eca(rule=30, width=79)`:
+
+```python
+from fractions import Fraction
+
+import ca
+
+carrier = ca.loci.CarrierContract(
+    ca.loci.CarrierKind.GRID,
+    rank=1,
+    shape=(79,),
+    axes=("x",),
+)
+alphabet = ca.alphabets.boolean()
+boundary = ca.loci.Boundary(
+    ca.loci.BoundaryPolicy.FIXED,
+    False,
+)
+
+explicit = ca.SimpleProgram(
+    seed=ca.seeds.bernoulli(
+        ca.loci.literal(ca.loci.grid_loci((79,), axes=("x",))),
+        Fraction(1, 2),
+        configuration_contract=carrier,
+        value_profile=alphabet.value_profile,
+        boundary=boundary,
+    ),
+    alphabet=alphabet,
+    frontier=ca.frontiers.everywhere(
+        configuration_contract=carrier,
+        value_profile=alphabet.value_profile,
+    ),
+    neighborhood=ca.neighborhoods.eca(
+        configuration_contract=carrier,
+        value_profile=alphabet.value_profile,
+    ),
+    rule=ca.rules.elementary(30),
+)
+
+named = ca.catalog.eca(rule=30, width=79)
+
+assert explicit == named
+assert explicit.canonical_identity == named.canonical_identity
+```
+
+The plural owner modules build singular components:
 
 ```text
-ref/A-New-Kind-of-Science/Contents.md     canonical book contents and navigation
-ref/notes/generator.md                    trajectory generator schema
-ref/notes/CA-Types.md                     construction taxonomy
+ca.loci             structural identity and region vocabulary
+ca.alphabets        Alphabet values and constructors
+ca.seeds            Seed values and constructors
+ca.frontiers        WritableRegion values and constructors
+ca.neighborhoods    ReadableRegion values and constructors
+ca.rules            Rule values, results, atoms, and constructors
 ```
 
-## Development
+They progress from closed primitives through composition to useful component
+presets. Component constructors remain module-qualified, so
+`ca.neighborhoods.eca()` means one readable component while
+`ca.catalog.eca()` means one complete program.
+
+## Catalog
+
+The catalog contains one canonical constructor for each of the 60 audited
+executable semantic families. The six namespaces organize discovery by
+dominant mechanic; they do not define runtime classes:
+
+| Namespace | Dominant mechanic |
+|---|---|
+| `ca.catalog.automata` | Persistent carriers updated in place or in parallel |
+| `ca.catalog.substitua` | Matched structure replaced, grown, deleted, or branched |
+| `ca.catalog.machina` | Visible heads, control, instructions, stacks, or schedules |
+| `ca.catalog.media` | Information transformed between representations |
+| `ca.catalog.criteria` | Admissibility, constraints, witnesses, or weighted alternatives |
+| `ca.catalog.dynamica` | Continuous differential, field, event, or flow laws |
+
+Canonical constructors are available both through their owner and through the
+collision-free catalog façade:
+
+```python
+qualified = ca.catalog.automata.eca(rule=30, width=79)
+convenient = ca.catalog.eca(rule=30, width=79)
+
+assert qualified == convenient
+```
+
+Catalog metadata in `ca.catalog.entries` is immutable and callable-free.
+Family, audit, and legacy IDs support provenance and navigation only; none can
+select application behavior. Constructor spelling and arguments are not part
+of program identity.
+
+## Application results
+
+`ca.apply(program, input)` returns one of the records owned by `ca.program`:
+
+```text
+ApplicationResult =
+    ApplicationComplete(...)
+  | ApplicationRejected(ApplicationFault(...))
+```
+
+A complete result retains:
+
+- the Rule's complete source outcome space;
+- applied derivations and typed no-successor atoms;
+- outcome, derivation, and distinct-successor cardinalities;
+- semantically equal successors with all derivation fibers;
+- probability and submeasure views; and
+- phase, identity, lineage, and reconstruction evidence.
+
+`ApplicationRejected` means no authoritative successor was committed.
+Terminality, undefinedness, declared construction failure, and certified
+divergence are instead typed Rule outcomes inside a complete application.
+
+Advanced callers may provide explicit lineage:
+
+```python
+application_input = ca.program.ApplicationInput(
+    configuration=configuration,
+)
+result = ca.apply(program, application_input)
+```
+
+## Rollout
+
+The exact convenience signature is:
+
+```text
+rollout(program, *, steps, initial=None, replay_key=None) -> RolloutResult
+```
+
+`ca.rollout` repeatedly calls the same `ca.program.apply`. It returns
+`RolloutComplete`, `RolloutTruncated`, or `RolloutRejected`, all owned by
+`ca.program`. A truncation cause is explicit: depth bound, intensional support,
+resource exhaustion, cancellation, or pruning.
+
+With no `initial`, rollout starts from the Seed denotation. A replay key
+authorizes reproducible realization when a Seed or Rule law requires a draw.
+Without a key, finite or intensional laws remain complete laws rather than
+being sampled implicitly. A depth bound is application depth, not necessarily
+physical time.
+
+One-shot functions, constraint completions, representation transforms, and
+many continuous relations are normally consumed with `ca.apply`; they do not
+need a fake trajectory.
+
+## Canonical serialization
+
+Serialization is fail-closed and catalog-free:
+
+```python
+payload = ca.serialization.dumps(program)
+decoded = ca.serialization.loads(payload)
+
+match decoded:
+    case ca.serialization.Decoded(value=restored):
+        assert restored == program
+    case ca.serialization.DecodeRejected(fault=fault):
+        raise ValueError(fault)
+```
+
+The canonical program tag is `ca.simple-program`, and its schema version is
+`1`. Its payload contains exactly:
+
+```text
+seed, alphabet, frontier, neighborhood, rule
+```
+
+The schema version is independent of the package version `0.2.0`. The same
+closed codec also serializes supported component, Rule-result, application,
+rollout, evidence, and trace records. Unknown tags, versions, fields,
+primitives, noncanonical encodings, and forged digests produce
+`DecodeRejected`; no partial value escapes.
+
+Serialized programs contain expanded components. They do not contain catalog
+IDs, constructor receipts, aliases, or invocation history.
+
+## Migrating source from 0.1
+
+The 0.1 construction surface was a source recipe, not an earlier canonical
+semantic format. Migrate source deliberately:
+
+| Removed 0.1 spelling | 0.2.0 replacement |
+|---|---|
+| `ca.Dynamics(...)` plus `rule_id` | A matching `ca.catalog.<constructor>(...)`, or explicit `ca.SimpleProgram(...)` |
+| `ca.rollout(dynamics=..., rule_id=..., seed_state=..., steps=...)` | `ca.rollout(program, steps=..., initial=..., replay_key=...)` |
+| `ca.RawEpisode` / `ca.RawBatch` | `ca.program.RolloutComplete`, `RolloutTruncated`, or `RolloutRejected`; downstream dataset views when dense tensors are needed |
+| root component helpers | Their plural owner modules, such as `ca.rules.elementary(...)` |
+| `ca.apply_rule` | `ca.apply` |
+
+Old `Dynamics` manifest dictionaries are not accepted by
+`ca.serialization.loads`. Reconstruct them in source through a catalog
+constructor or explicit five-field composition, then serialize the expanded
+program. ankos intentionally ships no fallback decoder, compatibility
+executor, or silent “try old then new” path.
+
+[`README-V1.md`](README-V1.md) preserves the old source surface only as
+historical documentation.
+
+## Package surface
+
+The root façade intentionally exposes exactly three conveniences and nine
+owner namespaces:
+
+```python
+ca.SimpleProgram
+ca.apply
+ca.rollout
+
+ca.program
+ca.catalog
+ca.loci
+ca.alphabets
+ca.seeds
+ca.frontiers
+ca.neighborhoods
+ca.rules
+ca.serialization
+```
+
+There is no public `ca.rollout` submodule: the package attribute has one
+meaning, the callable. Application and rollout records remain under
+`ca.program`; Rule records remain under `ca.rules`; components remain under
+their plural owners; complete programs remain under `ca.catalog`.
+
+Auxiliary modules are explicit downstream imports and are not loaded by
+`import ca`:
+
+```python
+from ca import datasets, rng, viz
+```
+
+They may plan, materialize, sample, or present semantic results. They do not
+define program identity, perform an alternate transition, or contribute
+ambient entropy to core semantics.
+
+The installed package is organized as:
+
+```text
+src/ca/
+├── __init__.py
+├── program.py
+├── loci.py
+├── alphabets.py
+├── seeds.py
+├── frontiers.py
+├── neighborhoods.py
+├── rules.py
+├── serialization.py
+├── py.typed
+├── catalog/
+│   ├── entries.py
+│   ├── automata.py
+│   ├── substitua.py
+│   ├── machina.py
+│   ├── media.py
+│   ├── criteria.py
+│   └── dynamica.py
+├── datasets.py
+├── rng.py
+└── viz/
+```
+
+`py.typed` is the distributed PEP 561 marker for the inline type information.
+
+## Documentation and development
+
+- [`api.md`](api.md) — exact public behavior and ownership
+- [`simple_programs.md`](simple_programs.md) — conceptual five-field model
+- [`ref/notes/ca-scaffold.py`](ref/notes/ca-scaffold.py) — compact
+  code-shaped walkthrough
+- [`goal-5/taxonomy-census.md`](goal-5/taxonomy-census.md) — audited
+  60-family taxonomy
+- [`ref/A-New-Kind-of-Science/Contents.md`](ref/A-New-Kind-of-Science/Contents.md)
+  — canonical book navigation
+
+Development gates:
 
 ```bash
-uv run pytest -q
+uv run pytest -q tests
+uv lock --check
+git diff --check
 ```
