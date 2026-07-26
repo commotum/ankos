@@ -582,6 +582,119 @@ def test_word_tree_and_nonoverlap_rewrites_execute_through_public_apply() -> Non
     )
 
 
+def test_matched_field_drives_terminal_vs_identity_derivation_policy() -> None:
+    rewrite_rules = alphabets.rewrite_rules_value(
+        (
+            _sequence_rule(
+                (alphabets.pattern_literal("B"),),
+                (alphabets.template_literal("B"),),
+            ),
+        )
+    )
+    alphabet = alphabets.word(alphabets.symbolic(("A", "B")))
+
+    def apply_with_rewrite_policy(
+        source_value: alphabets.ValueNode,
+    ) -> program.ApplicationComplete:
+        source = loci.record_configuration((("state", source_value),))
+        writable = frontiers.everywhere(
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        readable = neighborhoods.global_view(
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        rewrite = rules.pattern_rewrite(
+            rules.observation(0),
+            rules.literal_expr(rewrite_rules),
+        )
+        derivation = rules.DerivationClauseResult(
+            existing_plans=(
+                rules.ExistingDispositionPlan(
+                    rules.every_capability(),
+                    rules.DispositionAction.REPLACE,
+                    rules.record_field(rewrite, "result"),
+                ),
+            ),
+            fresh_plans=(),
+            progress=rules.Progress.ADVANCED,
+            continuation=rules.Continue(),
+            witness=rewrite,
+            provenance=("test:matched-rewrite",),
+            certificate=rules.Certificate(
+                rules.CertificateKind.DERIVATION,
+                rules.literal_expr("matched-rewrite"),
+            ),
+        )
+        terminal = rules.NoSuccessorClauseResult(
+            rules.NoSuccessorOutcome.TERMINAL,
+            rules.literal_expr("no-pattern-match"),
+            rewrite,
+            ("test:no-pattern-match",),
+            rules.Certificate(
+                rules.CertificateKind.TERMINALITY,
+                rules.literal_expr("no-pattern-match"),
+            ),
+        )
+        rule = rules.clause_kernel(
+            (
+                rules.RuleClause(
+                    rules.record_field(rewrite, "matched"),
+                    derivation,
+                ),
+                rules.RuleClause(rules.literal_expr(True), terminal),
+            ),
+            contract=rules.RuleContract(
+                source.contract,
+                alphabet.value_profile,
+                readable.result_shape,
+                readable.join_shape,
+                writable.effect_profile,
+            ),
+            completeness_evidence=rules.Certificate(
+                rules.CertificateKind.COMPLETENESS,
+                rules.literal_expr("rewrite-policy-complete"),
+            ),
+            selection=rules.ClauseSelection.FIRST,
+        )
+        simple_program = ca.SimpleProgram(
+            seeds.exact(
+                source,
+                value_profile=alphabet.value_profile,
+            ),
+            alphabet,
+            writable,
+            readable,
+            rule,
+        )
+        applied = ca.apply(simple_program, source)
+        assert type(applied) is program.ApplicationComplete
+        return applied
+
+    no_match = apply_with_rewrite_policy(_word("letters", "A"))
+    assert len(no_match.source_outcomes.support.atoms) == 1
+    terminal_atom = no_match.source_outcomes.support.atoms[0]
+    assert type(terminal_atom) is rules.NoSuccessor
+    assert terminal_atom.outcome is rules.NoSuccessorOutcome.TERMINAL
+    assert no_match.successor_quotient_with_derivation_fibers.atoms == ()
+
+    identity = apply_with_rewrite_policy(_word("letters", "B"))
+    assert len(identity.source_outcomes.support.atoms) == 1
+    derivation_atom = identity.source_outcomes.support.atoms[0]
+    assert type(derivation_atom) is rules.Derivation
+    assert len(identity.successor_quotient_with_derivation_fibers.atoms) == 1
+    successor = identity.successor_quotient_with_derivation_fibers.atoms[
+        0
+    ].successor
+    assert loci.configuration_equal(
+        successor,
+        loci.record_configuration(
+            (("state", _word("letters", "B")),)
+        ),
+    )
+
+
 def test_pattern_rewrite_constructor_rejects_unknown_scan() -> None:
     source = rules.literal_expr(_word("letters", "a"))
     rewrite_rules = rules.literal_expr(

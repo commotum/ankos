@@ -4,7 +4,16 @@ from __future__ import annotations
 
 import pytest
 
-from ca import alphabets, loci, neighborhoods, rules
+import ca
+from ca import (
+    alphabets,
+    frontiers,
+    loci,
+    neighborhoods,
+    program,
+    rules,
+    seeds,
+)
 
 
 def _readable_view():
@@ -55,6 +64,61 @@ def _context(
     *items: alphabets.SemanticValue,
 ) -> alphabets.ValueNode:
     return alphabets.word_value(items, tag="mosaic-context")
+
+
+def _public_apply_field(
+    source_field: alphabets.ValueNode,
+    expression: rules.RuleExpr,
+) -> alphabets.ValueNode:
+    source = loci.record_configuration((("field", source_field),))
+    alphabet = alphabets.field()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule = rules.expression(
+        rules.ExistingPlan(
+            rules.ExistingPlanKind.BY_INDEX,
+            (expression,),
+        ),
+        contract=rules.RuleContract(
+            source.contract,
+            alphabet.value_profile,
+            readable.result_shape,
+            readable.join_shape,
+            writable.effect_profile,
+        ),
+        witness=rules.literal_expr("mosaic-public-apply"),
+        provenance=("test:mosaic-public-apply",),
+    )
+    simple_program = ca.SimpleProgram(
+        seed=seeds.exact(
+            source,
+            value_profile=alphabet.value_profile,
+        ),
+        alphabet=alphabet,
+        frontier=writable,
+        neighborhood=readable,
+        rule=rule,
+    )
+
+    applied = ca.apply(simple_program, source)
+
+    assert type(applied) is program.ApplicationComplete
+    groups = applied.successor_quotient_with_derivation_fibers.atoms
+    assert len(groups) == 1
+    assert type(groups[0]) is program.SuccessorGroup
+    successor = groups[0].successor
+    assert type(successor) is loci.FiniteConfiguration
+    assert len(successor.entries) == 1
+    value = successor.entries[0][1]
+    assert type(value) is alphabets.ValueNode
+    assert value.kind is alphabets.ValueKind.FIELD
+    return value
 
 
 def _substitute(
@@ -228,6 +292,109 @@ def test_rank_four_fixed_exterior_context_expands_last_axis() -> None:
         axes,
         (1, 1, 1, 4),
         ("A0", "A1", "B0", "B1"),
+    )
+
+
+def test_two_dimensional_and_rank_four_mosaics_execute_through_public_apply() -> None:
+    axes_2d = ("row", "column")
+    source_2d = _grid(
+        axes_2d,
+        (2, 2),
+        ("A", "B", "C", "D"),
+        tag="public-grid",
+    )
+    productions_2d = _map(
+        ("A", _grid(axes_2d, (2, 2), ("A0", "A1", "A2", "A3"))),
+        ("B", _grid(axes_2d, (2, 2), ("B0", "B1", "B2", "B3"))),
+        ("C", _grid(axes_2d, (2, 2), ("C0", "C1", "C2", "C3"))),
+        ("D", _grid(axes_2d, (2, 2), ("D0", "D1", "D2", "D3"))),
+    )
+    result_2d = _public_apply_field(
+        source_2d,
+        rules.mosaic_substitute(
+            rules.observation(0),
+            rules.literal_expr(productions_2d),
+        ),
+    )
+    assert alphabets.grid_field_parts(result_2d) == (
+        axes_2d,
+        (4, 4),
+        (
+            "A0",
+            "A1",
+            "B0",
+            "B1",
+            "A2",
+            "A3",
+            "B2",
+            "B3",
+            "C0",
+            "C1",
+            "D0",
+            "D1",
+            "C2",
+            "C3",
+            "D2",
+            "D3",
+        ),
+    )
+
+    axes_4d = ("a", "b", "c", "d")
+    periodic_source = _grid(
+        axes_4d,
+        (1, 1, 2, 2),
+        ("A", "B", "C", "D"),
+    )
+    periodic_productions = _map(
+        (_context("A", "B"), _grid(axes_4d, (1, 1, 1, 1), ("a",))),
+        (_context("B", "A"), _grid(axes_4d, (1, 1, 1, 1), ("b",))),
+        (_context("C", "D"), _grid(axes_4d, (1, 1, 1, 1), ("c",))),
+        (_context("D", "C"), _grid(axes_4d, (1, 1, 1, 1), ("d",))),
+    )
+    periodic_result = _public_apply_field(
+        periodic_source,
+        rules.mosaic_substitute(
+            rules.observation(0),
+            rules.literal_expr(periodic_productions),
+            offsets=((0, 0, 0, 0), (0, 0, 0, 1)),
+            boundary=rules.SequenceBoundary.PERIODIC,
+        ),
+    )
+    assert alphabets.grid_field_parts(periodic_result)[2] == (
+        "a",
+        "b",
+        "c",
+        "d",
+    )
+
+    fixed_source = _grid(
+        axes_4d,
+        (1, 1, 1, 2),
+        ("A", "B"),
+    )
+    fixed_productions = _map(
+        (
+            _context("E", "A"),
+            _grid(axes_4d, (1, 1, 1, 1), ("left",)),
+        ),
+        (
+            _context("A", "B"),
+            _grid(axes_4d, (1, 1, 1, 1), ("right",)),
+        ),
+    )
+    fixed_result = _public_apply_field(
+        fixed_source,
+        rules.mosaic_substitute(
+            rules.observation(0),
+            rules.literal_expr(fixed_productions),
+            offsets=((0, 0, 0, -1), (0, 0, 0, 0)),
+            boundary=rules.SequenceBoundary.FIXED,
+            exterior=rules.literal_expr("E"),
+        ),
+    )
+    assert alphabets.grid_field_parts(fixed_result)[2] == (
+        "left",
+        "right",
     )
 
 
