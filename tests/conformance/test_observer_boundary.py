@@ -12,6 +12,7 @@ import pytest
 
 import ca
 from ca import program, serialization
+from ca.catalog import entries
 
 from g7_mechanics import (
     MECHANICS_ROWS,
@@ -39,11 +40,38 @@ def test_f004_and_f045_are_executable_ordinary_programs() -> None:
         assert isinstance(execution.result, program.ApplicationComplete)
 
 
-@pytest.mark.skip(reason="G7-04 owns callable-free F010/F042 role metadata")
 def test_f010_and_f042_are_callable_free_role_entries() -> None:
     """Interfaces and observations gain no constructor merely from naming."""
 
-    raise AssertionError("G7-04 role metadata is not active")
+    roles = entries.ROLE_ENTRIES
+
+    assert tuple(
+        (item.audit_role_id, item.slug, item.role_kind)
+        for item in roles
+    ) == (
+        (
+            "F010",
+            "encode-evolve-decode-interface",
+            "interface",
+        ),
+        (
+            "F042",
+            "percolation-connectivity-analysis",
+            "observer",
+        ),
+    )
+    assert all(item.source_refs and item.boundary for item in roles)
+    assert {"F010", "F042"}.isdisjoint(
+        item.audit_family_id for item in entries.FAMILY_ENTRIES
+    )
+    for item in roles:
+        spelling = item.slug.replace("-", "_")
+        assert not hasattr(ca.catalog, spelling)
+        assert spelling not in ca.catalog.__all__
+        assert all(
+            name.target_family_id != item.audit_role_id
+            for name in entries.NAME_ENTRIES
+        )
 
 
 def test_observers_cannot_change_identity_or_application() -> None:
