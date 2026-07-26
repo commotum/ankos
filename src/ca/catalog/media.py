@@ -7,22 +7,27 @@ mechanics, metadata, or execution dispatch.  Goal 7 implementations will make
 all work state visible and compose ordinary five-field ``SimpleProgram``
 values from the component modules.
 
-Canonical signatures are fixed by the migration matrix.  Preset signatures
-that are not fixed remain private non-callable inventory.
+Each canonical family is an explicitly typed, transparent five-component
+constructor.  Preset signatures that are not fixed remain private non-callable
+inventory.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn
+from typing import TypeVar
 
-if TYPE_CHECKING:
-    from ..program import SimpleProgram
+from ..alphabets import Alphabet
+from ..frontiers import WritableRegion
+from ..neighborhoods import ReadableRegion
+from ..program import SimpleProgram
+from ..rules import Rule
+from ..seeds import Seed
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the uniform catalog-skeleton error."""
-
-    raise NotImplementedError("catalog construction is not implemented in this scaffold")
+C = TypeVar("C")
+V = TypeVar("V")
+W = TypeVar("W")
+R = TypeVar("R")
 
 
 # ---------------------------------------------------------------------------
@@ -32,179 +37,268 @@ def _not_implemented() -> NoReturn:
 
 def event_provenance_causal_network(
     *,
-    event_trace,
-    read_sets,
-    initial_provenance,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF004 / F004: convert an event trace into direct causal provenance."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def digit_emitting_register_transduction(
     *,
-    seed,
-    register_law,
-    base,
-    digit_projection,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF008 / F008: update registers while emitting one visible digit."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def error_diffusion_transform(
     *,
-    input,
-    palette,
-    diffusion_kernel,
-    scan,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF011 / F012: quantize a sample and diffuse error to future sites."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def maximal_run_record_transduction(
     *,
-    input,
-    record_grammar,
-    direction,
-    scan,
-    feedback,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF012 / F013: translate maximal runs and self-delimiting records."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def hash_index_transform(
     *,
-    key,
-    table,
-    hash_fold,
-    collision,
-    operation,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF020 / F021: transform a key through hashing and collision paths."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def probabilistic_transition_model_fitting(
     *,
-    observations,
-    topology,
-    estimator,
-    generation_law,
-    generation_request,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF041 / F044: fit a transition model and denote generated paths."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def sampled_causal_order_network(
     *,
-    region,
-    causal_order,
-    density,
-    event_measure,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF046 / F049: sample events and transform them into a causal cover."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def weighted_prefix_block_transduction(
     *,
-    input,
-    block_partition,
-    weights_or_tree,
-    direction,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF054 / F057: encode or decode blocks through a weighted prefix tree."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def nested_interval_symbol_transduction(
     *,
-    input,
-    probability_model,
-    precision,
-    direction,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF055 / F058: refine or invert one message-wide nested interval."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def history_reference_record_transduction(
     *,
-    input,
-    match_policy,
-    dictionary,
-    record_grammar,
-    direction,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF056 / F059: emit or expand records that reference prior history."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def recursive_uniform_region_decomposition(
     *,
-    input,
-    root_region,
-    split,
-    uniformity,
-    cutoff,
-    direction,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF057 / F060: recursively split regions into a hierarchical record."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def orthogonal_basis_coefficient_transform(
     *,
-    input,
-    basis,
-    ordering,
-    retention,
-    quantization,
-    direction,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF058 / F061: map a full block to or from ordered basis coefficients."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def predictive_residual_transduction(
     *,
-    input,
-    predictor,
-    history,
-    fitting,
-    residual_code,
-    direction,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF059 / F062: translate samples through a causal predictive residual."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def aligned_xor_stream_transduction(
     *,
-    input,
-    keystream,
-    alignment,
-    generator,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF060 / F063: XOR aligned input with explicit replayable stream state."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -6,22 +6,34 @@ policy, component mechanics, metadata, application dispatch, or sampled
 approximations.  Goal 7 implementations will compose exact or intensional
 five-field ``SimpleProgram`` values whose realizations remain external.
 
-The three canonical signatures come directly from the migration matrix.  The
-one true alias copies its canonical delegate's exact parameter surface.
+The three canonical constructors expose the five component values directly.
+The migration matrix's semantic parameter lists remain descriptive metadata.
+The one true alias copies its canonical delegate's exact parameter surface.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn
-
-if TYPE_CHECKING:
-    from ..program import SimpleProgram
+from .. import alphabets, frontiers, neighborhoods, rules, seeds
+from ..program import SimpleProgram
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the uniform catalog-skeleton error."""
+def _program(
+    *,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
+) -> SimpleProgram:
+    """Compose one ordinary catalog-free program value."""
 
-    raise NotImplementedError("catalog construction is not implemented in this scaffold")
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -31,39 +43,59 @@ def _not_implemented() -> NoReturn:
 
 def continuous_event_dynamics(
     *,
-    seed,
-    geometry,
-    flow_law,
-    reset_law,
-    terminal_condition,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF006 / F006: flow to an intrinsic event and apply its reset."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def ordinary_differential_flow(
     *,
-    seed,
-    rhs,
-    parameters,
-    duration_or_event,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF036 / F037: denote a selected or maximal ordinary flow segment."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def partial_differential_relation(
     *,
-    domain,
-    coefficients,
-    differential_relation,
-    side_data,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF039 / F041: denote every field satisfying a differential relation."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -80,14 +112,21 @@ _PENDING_PRESETS: tuple[tuple[str, str], ...] = ()
 
 def pde(
     *,
-    domain,
-    coefficients,
-    differential_relation,
-    side_data,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """An alias for SPF039 with the canonical differential-relation signature."""
 
-    _not_implemented()
+    return partial_differential_relation(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 _PENDING_ALIASES: tuple[tuple[str, str], ...] = ()

@@ -25,17 +25,20 @@
 
 ## Updated Assumptions
 
-- The assumption that Goal 6 already froze implementation-ready constructor
-  and delegator signatures is false. It froze canonical keyword names and
-  semantic intent, but not accepted types, defaults, normalization, or exact
-  five-field expansion; all preset and compatibility signatures remain
-  explicitly unsettled in the shells.
+- Goal 6's semantic keyword lists are construction-intent metadata, not
+  executable compiler signatures. The canonical Python signature is the
+  explicit five-component profile frozen by `ref/notes/ca-scaffold.py`.
+- Canonical family constructors are named, typed ways to compose an already
+  explicit five-field program. They do not certify an undecidable semantic
+  family identity, attach catalog provenance, or interpret a parallel recipe
+  language.
 - Category constructors can share private composition helpers only when those
   helpers operate on explicit closed component inputs and never select
   behavior from SPF/F/T identity, category, constructor spelling, or metadata.
-- The existing reusable mechanics are sufficient. If an honest constructor
-  needs a missing semantic descriptor or application behavior, G7-02 and
-  G7-03 must be reopened before catalog implementation continues.
+- The existing reusable mechanics are sufficient for canonical profile
+  construction. A genuinely useful preset may bind only mechanics already
+  present; discovering a missing mechanic still reopens G7-02 and G7-03 before
+  that preset is exposed.
 - Metadata may provide explicit immutable tuples and descriptive lookup by ID
   or spelling, but lookup returns metadata only and cannot construct, execute,
   encode, or mutate a program.
@@ -93,31 +96,61 @@ maximal-run compiler operators. Importing/copying those SPF-dispatched
 fixtures or returning one hardcoded representative would violate this stage's
 constructor, no-dispatch, and no-ignored-argument contracts.
 
-### Coherent repair choices
+### Reconciled constructor contract
 
-1. **Five-component canonical profiles — recommended.**
-   - Make each canonical family function accept the five explicit component
-     values, validate the relevant structural profile, and return their
-     ordinary `SimpleProgram`.
-   - Let named presets bind or construct components explicitly; true aliases
-     delegate unchanged.
-   - Treat the migration matrix's semantic parameter lists as construction
-     intent/binding metadata rather than already-frozen Python signatures.
-   - This matches `ref/notes/ca-scaffold.py`, keeps the five-field design
-     visible, avoids a second compiler ontology, and best fits the previously
-     selected minimal API. It still requires one explicit signature/binding
-     ledger for the forty presets and the sole adapter before implementation.
-2. **High-level semantic compilers.**
-   - Retain all sixty current semantic keyword lists as public Python
-     signatures.
-   - Freeze exact closed types/defaults and implement real per-family
-     compilers from those arguments into the five components.
-   - This is substantially larger. Confirmed missing general compiler
-     mechanics would reopen G7-02 and G7-03 before catalog work could resume.
+The canonical constructor model is now fixed:
 
-A typed recipe bundle, type-scanning argument bag, family/SPF dispatch,
-ignored parameters, or a hardcoded representative per constructor is not a
-third valid choice.
+```python
+def canonical_family(
+    *,
+    seed: Seed,
+    alphabet: Alphabet,
+    frontier: WritableRegion,
+    neighborhood: ReadableRegion,
+    rule: Rule,
+) -> SimpleProgram:
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
+```
+
+This is the code-shaped contract already shown for
+`synchronous_local_state_transform` in `ref/notes/ca-scaffold.py`. Every
+canonical family spelling has that same explicit component boundary. The
+semantic parameter lists in the Goal 6 matrix remain immutable descriptive
+metadata and documentation prompts; they are not silently reinterpreted as
+untyped Python arguments.
+
+This resolution follows the original API intent: semantic names are aliases
+and navigation over ordinary programs, while presets provide the ergonomic
+bindings that actually construct or restrict components. A canonical wrapper
+does not claim to infer an Alphabet from a Seed or prove that arbitrary
+components deserve a Book-family label. The 60-family conformance join proves
+coverage by supplying one independently audited expanded representative to
+each named wrapper.
+
+A hostile all-family audit rejected the alternative high-level compiler
+interpretation. Across the six homes it would require a second closed language
+for schema-bearing layouts, matching, scans, ranks, dynamic structural edits,
+state-derived fresh support, evaluator programs, probability composition,
+weighted folds, and differential/event relations. The current G7-02 fixtures
+are fixed pressure witnesses, not those general compilers. Adding that shadow
+ontology would move complexity away from the five-field API and contradict the
+catalog-as-alias design.
+
+Presets, aliases, and the compatibility adapter remain stricter:
+
+- a true alias copies its delegate's exact signature and expansion;
+- a preset has its own explicit closed signature and must bind or validate
+  actual component mechanics;
+- the sole compatibility adapter must advertise a finite legacy argument
+  domain and translate it losslessly; and
+- an underspecified preset remains private rather than becoming an ignored-
+  argument wrapper, opaque recipe, or hardcoded family witness.
 
 ## Big Picture Objective
 
@@ -246,11 +279,14 @@ manifest/helper when that keeps the expected ledger independent.
 - The exact catalog inventory was independently reconciled:
   60 canonical constructors, 40 presets, 4 aliases, 1 compatibility adapter,
   105 qualified callables, 104 flat callables, 2 roles, and 45 legacy rows.
-- No production or test implementation was attempted after the
-  under-specification was confirmed. Catalog remains inert and unexposed;
-  completed mechanics/codecs and frozen Goal 2/Goal 5/Goal 6 sources remain
-  unchanged.
-- G7-04 is paused under the Goal 7 source-authority and earlier-stage
-  counterexample stop rules. The next action is to choose the canonical
-  constructor model above and freeze its exact signature/binding ledger before
-  writing catalog bodies or activating CT11.
+- The 60-family hostile compiler audit confirmed that the semantic keyword
+  lists cannot be treated as executable signatures without introducing a
+  second schema/matcher/evaluator/solver API and reopening both mechanics and
+  codecs.
+- The conflict is reconciled in favor of the explicit five-component
+  canonical profile already frozen by the reference scaffold and the original
+  catalog-as-alias design. Goal 6's semantic parameter lists remain metadata.
+- G7-04 implementation may now proceed with the canonical wrappers and
+  callable-free family/role metadata. Preset and compatibility callables are
+  exposed only after their exact closed binding domains are independently
+  frozen.

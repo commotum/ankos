@@ -6,11 +6,11 @@ the sole join between those namespaces.  It does not synthesize functions,
 dispatch by family or ID, construct programs, or attach catalog identity to a
 program.
 
-This skeleton flat-exports all 60 canonical signatures and only the three true
-aliases whose signatures are already fixed by canonical delegates.  Presets,
-the remaining alias, and the compatibility adapter stay visibly pending in
-their owner modules until Goal 7 settles their explicit parameter surfaces.
-Nothing here is re-exported from root ``ca`` by this scaffold.
+This module flat-exports all implemented canonical, preset, and true-alias
+spellings explicitly.  Remaining presets and the compatibility adapter stay
+private in their owner modules until their closed bindings are settled.
+Nothing here is re-exported from root ``ca`` until the complete catalog stage
+closes.
 """
 
 from __future__ import annotations
@@ -21,6 +21,8 @@ from .automata import (
     asynchronous_local_state_automaton,
     coupled_field_mobile_locus_evolution,
     driven_relaxation,
+    eca,
+    elementary_cellular_automaton,
     history_dependent_agent_game,
     iterated_map,
     multi_active_local_rewrite,
@@ -105,6 +107,8 @@ __all__ = (
     "asynchronous_local_state_automaton",
     "coupled_field_mobile_locus_evolution",
     "driven_relaxation",
+    "eca",
+    "elementary_cellular_automaton",
     "history_dependent_agent_game",
     "iterated_map",
     "multi_active_local_rewrite",

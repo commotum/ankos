@@ -1,29 +1,24 @@
-"""Whole-program constructors for persistent-carrier automata.
+"""Ordinary five-component constructors for persistent-carrier automata.
 
-This module owns the audited catalog spellings whose dominant mechanic is
-in-place or shared-generation evolution on a persistent carrier.  It does not
-own component mechanics, application, metadata, execution dispatch, or
-serialization.  Goal 7 implementations will compose values from ``seeds``,
-``alphabets``, ``frontiers``, ``neighborhoods``, and ``rules`` into
-``SimpleProgram`` values consumed by ``ca.apply``.
-
-Only matrix-authorized canonical signatures are declared here.  Preset and
-alias spellings whose signatures remain unsettled are recorded as private
-non-authoritative inventories rather than exposed as fake callables.
+Canonical family names are typed, family-blind assembly functions: they
+validate only through :class:`~ca.program.SimpleProgram` and attach no catalog
+identity or alternate execution behavior.  Concrete presets bind those same
+five components explicitly.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn
+from fractions import Fraction
+from typing import TypeVar
 
-if TYPE_CHECKING:
-    from ..program import SimpleProgram
+from .. import alphabets, frontiers, loci, neighborhoods, rules, seeds
+from ..program import SimpleProgram
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the uniform catalog-skeleton error."""
-
-    raise NotImplementedError("catalog construction is not implemented in this scaffold")
+C = TypeVar("C")
+V = TypeVar("V")
+W = TypeVar("W")
+R = TypeVar("R")
 
 
 # ---------------------------------------------------------------------------
@@ -33,151 +28,220 @@ def _not_implemented() -> NoReturn:
 
 def alternating_partition_local_evolution(
     *,
-    seed,
-    partition,
-    block_law,
-    boundary,
-    phase,
-) -> SimpleProgram:
-    """SPF001 / F001: evolve alternating disjoint partitions atomically."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF001 / F001 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def asynchronous_local_state_automaton(
     *,
-    seed,
-    local_law,
-    schedule,
-    boundary,
-) -> SimpleProgram:
-    """SPF003 / F003: apply scheduled local writes with immediate visibility."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF003 / F003 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def coupled_field_mobile_locus_evolution(
     *,
-    seed,
-    field_law,
-    mobile_law,
-    boundary,
-) -> SimpleProgram:
-    """SPF007 / F007: couple a distributed field update to one mobile locus."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF007 / F007 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def driven_relaxation(
     *,
-    seed,
-    drive_law,
-    toppling_law,
-    boundary,
-    relaxation_form,
-) -> SimpleProgram:
-    """SPF009 / F009: drive a stable field and expose its relaxation closure."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF009 / F009 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def history_dependent_agent_game(
     *,
-    agents,
-    histories,
-    payoff,
-    action_schema,
-    round_control,
-) -> SimpleProgram:
-    """SPF021 / F022: commit coupled agent actions, histories, and payoffs."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF021 / F022 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def iterated_map(
     *,
-    seed,
-    map_expression,
-    guards,
-    terminal_condition,
-) -> SimpleProgram:
-    """SPF026 / F027: replace an exact tuple by one guarded map image."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF026 / F027 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def multi_active_local_rewrite(
     *,
-    seed,
-    local_law,
-    collision_law,
-    schedule,
-) -> SimpleProgram:
-    """SPF032 / F033: evolve a finite active set with explicit collisions."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF032 / F033 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def mutable_rule_local_automaton(
     *,
-    seed,
-    rule_program,
-    interpreter,
-    mutation_law,
-) -> SimpleProgram:
-    """SPF034 / F035: evolve carrier state and visible rule-program state."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF034 / F035 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def population_evolutionary_search(
     *,
-    population,
-    fitness_expression,
-    selection,
-    recombination,
-    mutation,
-    size,
-) -> SimpleProgram:
-    """SPF040 / F043: replace a scored population by one evolved generation."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF040 / F043 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def synchronous_local_state_transform(
     *,
-    seed,
-    stencil,
-    local_law,
-    boundary,
-    feedback,
-) -> SimpleProgram:
-    """SPF050 / F053: apply one shared local law to an old-state snapshot."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF050 / F053 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def weighted_network_state_update(
     *,
-    network,
-    seed,
-    weights,
-    schedule,
-    learning_law,
-) -> SimpleProgram:
-    """SPF052 / F055: update network activations and optional visible weights."""
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Assemble the SPF052 / F055 structural profile."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Phase 2. Presets
 # ---------------------------------------------------------------------------
 
-# Spelling and SPF target only.  These are not callable declarations, do not
-# settle parameter surfaces, and are intentionally omitted from ``__all__``.
+# Remaining spelling/SPF inventory only. These names stay non-callable until
+# their concrete component bindings are settled.
 _PENDING_PRESETS: tuple[tuple[str, str], ...] = (
-    ("eca", "SPF050"),
     ("multicolor_cellular_automaton", "SPF050"),
     ("totalistic_cellular_automaton", "SPF050"),
     ("three_color_totalistic_cellular_automaton", "SPF050"),
@@ -196,14 +260,70 @@ _PENDING_PRESETS: tuple[tuple[str, str], ...] = (
 )
 
 
+def eca(
+    *,
+    rule: int = 30,
+    width: int = 79,
+) -> SimpleProgram[
+    loci.FiniteConfiguration[bool],
+    bool,
+    frontiers.WritableCapabilities,
+    neighborhoods.ReadableView[bool],
+]:
+    """Construct a finite binary radius-one cellular automaton."""
+
+    if type(width) is not int:
+        raise TypeError("ECA width must be an integer")
+    if width <= 0:
+        raise ValueError("ECA width must be positive")
+    carrier = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=1,
+        shape=(width,),
+        axes=("x",),
+    )
+    value_schema = alphabets.boolean()
+    boundary = loci.Boundary(loci.BoundaryPolicy.FIXED, False)
+    initial = seeds.bernoulli(
+        loci.literal(loci.grid_loci((width,), axes=("x",))),
+        Fraction(1, 2),
+        configuration_contract=carrier,
+        value_profile=value_schema.value_profile,
+        boundary=boundary,
+    )
+    return synchronous_local_state_transform(
+        seed=initial,
+        alphabet=value_schema,
+        frontier=frontiers.everywhere(
+            configuration_contract=carrier,
+            value_profile=value_schema.value_profile,
+        ),
+        neighborhood=neighborhoods.eca(
+            configuration_contract=carrier,
+            value_profile=value_schema.value_profile,
+        ),
+        rule=rules.elementary(rule),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Phase 3. True aliases
 # ---------------------------------------------------------------------------
 
-# The alias must eventually copy the still-unsettled ``eca`` signature.
-_PENDING_ALIASES: tuple[tuple[str, str], ...] = (
-    ("elementary_cellular_automaton", "eca / SPF050"),
-)
+
+def elementary_cellular_automaton(
+    *,
+    rule: int = 30,
+    width: int = 79,
+) -> SimpleProgram[
+    loci.FiniteConfiguration[bool],
+    bool,
+    frontiers.WritableCapabilities,
+    neighborhoods.ReadableView[bool],
+]:
+    """Return the exact alternate spelling of :func:`eca`."""
+
+    return eca(rule=rule, width=width)
 
 
 # ---------------------------------------------------------------------------
@@ -225,4 +345,6 @@ __all__ = (
     "population_evolutionary_search",
     "synchronous_local_state_transform",
     "weighted_network_state_update",
+    "eca",
+    "elementary_cellular_automaton",
 )

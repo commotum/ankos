@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **PAUSED — G7-04 CATALOG CONTRACT DECISION**
+Status: **IN PROGRESS — G7-04 CATALOG**
 
 ## Big-Picture Objective
 
@@ -131,21 +131,22 @@ conflict, and reconcile the plan before changing runtime behavior.
 - The 13 retained skips are owned exactly by G7-04: five CT11 catalog
   expansion tests, five catalog unit tests, two family constructor/metadata
   joins, and one callable-free role test.
-- G7-04's preimplementation audit found that Goal 6 freezes the sixty
-  canonical keyword names, forty preset names, four aliases, and one
-  compatibility spelling, but not the accepted argument types, defaults,
-  normalization, or exact argument-to-five-field expansion for the canonical
-  constructors, presets, or compatibility adapter. The current shells call
-  the delegator signatures unsettled, while the reference scaffold gives a
-  conflicting five-component canonical example and only one concrete preset.
-- The G7-02 pressure fixtures prove that the generic runtime can express one
-  honest case for every family; they are deliberately test-owned fixed
-  witnesses, not general compilers for the high-level catalog signatures.
-  Several requested general compilers would need Rule mechanics not currently
-  present. G7-04 is paused at the explicit stop condition rather than shipping
-  hardcoded examples, ignored arguments, or an opaque recipe wrapper. The
-  exact evidence and two coherent repair paths are in
-  [`5-CATALOG.md`](5-CATALOG.md).
+- G7-04's preimplementation audit found that Goal 6 freezes sixty semantic
+  parameter inventories, forty preset names, four aliases, and one
+  compatibility spelling, but does not define a closed compiler language from
+  those semantic inventories into the five fields.
+- A hostile audit across all sixty rows confirmed that treating those lists as
+  executable Python signatures would require a second schema, matcher,
+  evaluator, probability, structural-edit, and differential compiler
+  ontology. That conflicts with the catalog-as-alias design and is not implied
+  by the fixed G7-02 pressure witnesses.
+- The contract is reconciled around the explicit five-component canonical
+  profile already shown in `ref/notes/ca-scaffold.py`: every canonical family
+  function accepts `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule`
+  and returns their ordinary `SimpleProgram`. The Goal 6 semantic parameter
+  lists remain callable-free descriptive metadata. Presets still require real
+  closed bindings and may not ignore arguments or return hardcoded witnesses.
+  The full decision and audit evidence are in [`5-CATALOG.md`](5-CATALOG.md).
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.

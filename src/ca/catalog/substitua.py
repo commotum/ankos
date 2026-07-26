@@ -6,23 +6,27 @@ identity primitives, component mechanics, metadata, application, conflict
 repair, or execution dispatch.  Goal 7 implementations will compose the five
 component algebras into ordinary ``SimpleProgram`` values.
 
-Canonical declarations follow the settled matrix exactly.  Presets with
-unsettled Python signatures remain inert private inventory; only true aliases
-whose signatures are identical to canonical delegates are scaffolded.
+Each canonical family is an explicitly typed, transparent five-component
+constructor.  Presets with unsettled Python signatures remain inert private
+inventory; true aliases delegate to their canonical constructor.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn
+from typing import TypeVar
 
-if TYPE_CHECKING:
-    from ..program import SimpleProgram
+from ..alphabets import Alphabet
+from ..frontiers import WritableRegion
+from ..neighborhoods import ReadableRegion
+from ..program import SimpleProgram
+from ..rules import Rule
+from ..seeds import Seed
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the uniform catalog-skeleton error."""
-
-    raise NotImplementedError("catalog construction is not implemented in this scaffold")
+C = TypeVar("C")
+V = TypeVar("V")
+W = TypeVar("W")
+R = TypeVar("R")
 
 
 # ---------------------------------------------------------------------------
@@ -32,185 +36,287 @@ def _not_implemented() -> NoReturn:
 
 def append_only_sequence_generation(
     *,
-    seed,
-    emitter,
-    control_schema,
-    support,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF002 / F002: append finite output while preserving prior support."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def context_dependent_substitution(
     *,
-    seed,
-    productions,
-    context_shape,
-    boundary,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF005 / F005: replace items from bounded old-generation context."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def first_passage_aggregation(
     *,
-    seed,
-    walk_law,
-    contact,
-    release,
-    boundary,
-    target,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF015 / F016: attach a walker irreversibly at first contact."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def front_delete_rear_append_system(
     *,
-    seed,
-    deletion_width,
-    productions,
-    phase_cycle,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF016 / F017: delete a prefix and append its selected production."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def global_score_sequential_placement(
     *,
-    seed,
-    score_expression,
-    placement_shape,
-    depletion_kernel,
-    tie_law,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF019 / F020: score globally and commit one structural placement."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def history_dependent_growth_rewrite(
     *,
-    seed,
-    eligibility,
-    provenance_law,
-    boundary,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF022 / F023: grow support using occupancy and provenance history."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def indexed_history_recurrence(
     *,
-    prefix,
-    recurrence,
-    index_law,
-    invalidity,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF023 / F024: append a term read through value-addressed history."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def iterated_erasure_process(
     *,
-    seed,
-    erasure_predicate,
-    rank_convention,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF025 / F026: repeatedly erase selected ranked survivors."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def local_graph_rewrite(
     *,
-    seed,
-    patterns,
-    replacements,
-    match_schedule,
-    interface_schema,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF028 / F029: replace graph matches through explicit interfaces."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def moving_frontier_shell_accretion(
     *,
-    seed,
-    strip_constructor,
-    rim_law,
-    geometry,
-    terminal_condition,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF031 / F032: append geometric strips along a moving open rim."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def multiway_rewrite(
     *,
-    seed,
-    rewrites,
-    match_semantics,
-    quotient,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF033 / F034: expose every witnessed successor before quotienting."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def parallel_independent_substitution(
     *,
-    seed,
-    productions,
-    schedule,
-    geometry,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF037 / F038: assemble independent offspring in one generation."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def parallel_network_rewrite(
     *,
-    seed,
-    patches,
-    port_schema,
-    overlap_law,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF038 / F040: commit compatible graph patches in parallel."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def random_functional_graph_construction(
     *,
-    nodes,
-    successor_measure,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF043 / F046: denote a random one-successor graph construction."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def structural_pattern_rewrite(
     *,
-    expression,
-    patterns,
-    replacements,
-    scan,
-    nonoverlap,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """SPF049 / F052: rewrite structural matches with explicit scan conflicts."""
 
-    _not_implemented()
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -244,26 +350,40 @@ _PENDING_PRESETS: tuple[tuple[str, str], ...] = (
 
 def multiway_system(
     *,
-    seed,
-    rewrites,
-    match_semantics,
-    quotient,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """An alias for SPF033 with the exact ``multiway_rewrite`` signature."""
 
-    _not_implemented()
+    return multiway_rewrite(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def network_rewrite(
     *,
-    seed,
-    patches,
-    port_schema,
-    overlap_law,
-) -> SimpleProgram:
+    seed: Seed[C],
+    alphabet: Alphabet[V],
+    frontier: WritableRegion[C, W],
+    neighborhood: ReadableRegion[C, R],
+    rule: Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
     """An alias for SPF038 with the exact canonical network signature."""
 
-    _not_implemented()
+    return parallel_network_rewrite(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 _PENDING_ALIASES: tuple[tuple[str, str], ...] = ()

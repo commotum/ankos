@@ -7,22 +7,35 @@ mechanics, metadata, or numerical realization.  Goal 7 implementations will
 encode defining relations as closed Rule data and return ordinary
 ``SimpleProgram`` values.
 
-Canonical signatures follow the migration matrix exactly.  Unsettled legacy
-presets are retained only as private spelling-to-family inventory.
+Canonical constructors expose the five component values directly.  The
+migration matrix's semantic parameter lists remain descriptive metadata;
+catalog construction never interprets a parallel recipe language.  Unsettled
+legacy presets are retained only as private spelling-to-family inventory.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn
-
-if TYPE_CHECKING:
-    from ..program import SimpleProgram
+from .. import alphabets, frontiers, neighborhoods, rules, seeds
+from ..program import SimpleProgram
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the uniform catalog-skeleton error."""
+def _program(
+    *,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
+) -> SimpleProgram:
+    """Compose one ordinary catalog-free program value."""
 
-    raise NotImplementedError("catalog construction is not implemented in this scaffold")
+    return SimpleProgram(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -32,117 +45,173 @@ def _not_implemented() -> NoReturn:
 
 def finite_model_satisfaction(
     *,
-    axioms,
-    finite_domain,
-    signatures,
-    fixed_tables,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF014 / F015: denote every finite interpretation satisfying axioms."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def geometric_embedding_relation(
     *,
-    mesh,
-    growth,
-    metric_constraints,
-    boundary_embedding,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF017 / F018: denote valid embeddings under global metric constraints."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def global_equation_relation(
     *,
-    equation,
-    domain,
-    known_assignments,
-    witness_schema,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF018 / F019: denote every exact completion solving an equation."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def inverse_local_system_reconstruction(
     *,
-    observations,
-    local_law,
-    boundary,
-    unknown_schema,
-    search_order,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF024 / F025: reconstruct unknowns with witnessed branch and prune."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def local_factor_weighted_relation(
     *,
-    seed,
-    factors,
-    reduction,
-    normalization,
-    objective,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF027 / F028: combine overlapping factors into weighted completions."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def local_satisfaction_relation(
     *,
-    partial_assignment,
-    templates,
-    boundary,
-    obligations,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF029 / F030: denote jointly satisfying local-template completions."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def program_randomization_test(
     *,
-    observed,
-    surrogate_law,
-    program,
-    statistic,
-    replicates,
-    calibration,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF042 / F045: compare observed data with replayable surrogate results."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def stochastic_local_search(
     *,
-    incumbent,
-    objective,
-    constraints,
-    proposal,
-    acceptance,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF047 / F050: propose and accept stochastic incumbent replacements."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 def weighted_history_sum_relation(
     *,
-    domain,
-    side_data,
-    histories,
-    action,
-    measure,
-    observables,
+    seed: seeds.Seed,
+    alphabet: alphabets.Alphabet,
+    frontier: frontiers.WritableRegion,
+    neighborhood: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
 ) -> SimpleProgram:
     """SPF051 / F054: denote an exact weighted sum over admissible histories."""
 
-    _not_implemented()
+    return _program(
+        seed=seed,
+        alphabet=alphabet,
+        frontier=frontier,
+        neighborhood=neighborhood,
+        rule=rule,
+    )
 
 
 # ---------------------------------------------------------------------------
