@@ -99,6 +99,7 @@ ca.alphabets,AlphabetKind,enum-member,ORDERED,ca.alphabets.alphabet-kind,1,value
 ca.alphabets,AlphabetKind,enum-member,NATURALS,ca.alphabets.alphabet-kind,1,value,naturals,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,INTEGERS,ca.alphabets.alphabet-kind,1,value,integers,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,RATIONALS,ca.alphabets.alphabet-kind,1,value,rationals,Enum.__call__,enum-member
+ca.alphabets,AlphabetKind,enum-member,RATIONAL_INTERVAL,ca.alphabets.alphabet-kind,1,value,rational-interval,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,MODULAR,ca.alphabets.alphabet-kind,1,value,modular,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,ALGEBRAIC,ca.alphabets.alphabet-kind,1,value,algebraic,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,EXACT_COMPLEX,ca.alphabets.alphabet-kind,1,value,exact-complex,Enum.__call__,enum-member

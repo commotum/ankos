@@ -1707,7 +1707,7 @@ def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
         return
 
 
-def _value_key(value: SemanticValue) -> tuple[str, ...]:
+def _value_key(value: SemanticValue) -> tuple[object, ...]:
     if isinstance(value, bool):
         return ("bool", str(int(value)))
     if isinstance(value, int):
@@ -1720,16 +1720,14 @@ def _value_key(value: SemanticValue) -> tuple[str, ...]:
         assert value.root_index is not None
         return (
             "algebraic",
-            *(str(coefficient) for coefficient in value.polynomial),
-            "root-index",
-            str(value.root_index),
+            tuple(str(coefficient) for coefficient in value.polynomial),
+            ("root-index", str(value.root_index)),
         )
     if type(value) is ExactComplex:
         return (
             "exact-complex",
-            *_value_key(value.real),
-            "imaginary",
-            *_value_key(value.imaginary),
+            _value_key(value.real),
+            _value_key(value.imaginary),
         )
     if type(value) is StructuralReference:
         return (
@@ -1751,11 +1749,16 @@ def _value_key(value: SemanticValue) -> tuple[str, ...]:
         "node",
         value.kind.value,
         value.tag,
-        *(part for item in value.items for part in _value_key(item)),
-        *(
-            part
-            for name, item in value.fields
-            for part in (name, *_value_key(item))
+        (
+            "items",
+            tuple(_value_key(item) for item in value.items),
+        ),
+        (
+            "fields",
+            tuple(
+                (name, _value_key(item))
+                for name, item in value.fields
+            ),
         ),
     )
 

@@ -1069,8 +1069,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 408:
-        raise RuntimeError("canonical schema registry must contain 408 variants")
+    if variant_count != 409:
+        raise RuntimeError("canonical schema registry must contain 409 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:

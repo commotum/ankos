@@ -38,6 +38,8 @@ RuleScalar: TypeAlias = (
 RuleRuntimeValue: TypeAlias = (
     alphabets.SemanticValue | tuple["RuleRuntimeValue", ...]
 )
+_BindingFrame: TypeAlias = tuple[RuleRuntimeValue, int]
+_BindingContext: TypeAlias = tuple[_BindingFrame, ...]
 
 
 def _require_version_one(version: object, owner: str) -> None:
@@ -85,6 +87,8 @@ class ExpressionPrimitive(Enum):
     OBSERVATION = "expression.observation"
     GROUP = "expression.group"
     TARGET_REFERENCE = "expression.target-reference"
+    BOUND_VALUE = "expression.bound-value"
+    BOUND_INDEX = "expression.bound-index"
     PROJECT = "expression.project"
     TUPLE = "expression.tuple"
     ADD = "expression.add"
@@ -122,6 +126,10 @@ class ExpressionPrimitive(Enum):
     PRODUCT_VALUE = "expression.product-value"
     WORD_VALUE = "expression.word-value"
     FLAT_MAP_LOOKUP = "expression.flat-map-lookup"
+    MAP_ITEMS = "expression.map-items"
+    FILTER_ITEMS = "expression.filter-items"
+    FLAT_MAP_ITEMS = "expression.flat-map-items"
+    SLIDING_WINDOWS = "expression.sliding-windows"
 
 
 class GateKind(Enum):
@@ -133,6 +141,14 @@ class GateKind(Enum):
     AT_LEAST = "at-least"
     AT_MOST = "at-most"
     EXACTLY = "exactly"
+
+
+class SequenceBoundary(Enum):
+    """Closed boundary laws for finite sequence windows."""
+
+    FIXED = "fixed"
+    PERIODIC = "periodic"
+    REFLECTIVE = "reflective"
 
 
 @dataclass(frozen=True)
@@ -191,6 +207,13 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
             raise TypeError("literal expression requires one closed scalar")
         return
     if primitive in (ExpressionPrimitive.OBSERVATION, ExpressionPrimitive.GROUP):
+        require_arity(1)
+        require_index(0)
+        return
+    if primitive in (
+        ExpressionPrimitive.BOUND_VALUE,
+        ExpressionPrimitive.BOUND_INDEX,
+    ):
         require_arity(1)
         require_index(0)
         return
@@ -366,6 +389,53 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
         require_expression(0)
         require_expression(1)
         return
+    if primitive in (
+        ExpressionPrimitive.MAP_ITEMS,
+        ExpressionPrimitive.FLAT_MAP_ITEMS,
+    ):
+        require_arity(3)
+        require_expression(0)
+        require_expression(1)
+        if type(arguments[2]) is not str or not arguments[2]:
+            raise ValueError(
+                f"{primitive.value} needs one nonempty literal output tag"
+            )
+        return
+    if primitive is ExpressionPrimitive.FILTER_ITEMS:
+        require_arity(2)
+        require_expression(0)
+        require_expression(1)
+        return
+    if primitive is ExpressionPrimitive.SLIDING_WINDOWS:
+        if len(arguments) not in (4, 5):
+            raise ValueError(
+                "sliding-windows expression requires source, before, after, "
+                "boundary, and a fixed exterior only when needed"
+            )
+        require_expression(0)
+        require_index(1)
+        require_index(2)
+        if type(arguments[3]) is not str:
+            raise TypeError(
+                "sliding-windows boundary must be a literal string"
+            )
+        try:
+            boundary = SequenceBoundary(arguments[3])
+        except ValueError as error:
+            raise ValueError(
+                "sliding-windows boundary is not recognized"
+            ) from error
+        if boundary is SequenceBoundary.FIXED:
+            if len(arguments) != 5:
+                raise ValueError(
+                    "fixed sliding-windows requires one exterior expression"
+                )
+            require_expression(4)
+        elif len(arguments) != 4:
+            raise ValueError(
+                "non-fixed sliding-windows cannot carry an exterior"
+            )
+        return
     if primitive is ExpressionPrimitive.GATE:
         require_arity(3)
         require_expression(0)
@@ -444,6 +514,22 @@ def target_reference() -> RuleExpr:
     """Reference the existing or fresh target currently evaluating a plan."""
 
     return RuleExpr(ExpressionPrimitive.TARGET_REFERENCE)
+
+
+def bound_value(depth: int = 0) -> RuleExpr:
+    """Read the value from one enclosing lexical sequence binding."""
+
+    if type(depth) is not int or depth < 0:
+        raise ValueError("bound-value depth must be a non-negative integer")
+    return RuleExpr(ExpressionPrimitive.BOUND_VALUE, (depth,))
+
+
+def bound_index(depth: int = 0) -> RuleExpr:
+    """Read the index from one enclosing lexical sequence binding."""
+
+    if type(depth) is not int or depth < 0:
+        raise ValueError("bound-index depth must be a non-negative integer")
+    return RuleExpr(ExpressionPrimitive.BOUND_INDEX, (depth,))
 
 
 def project(source: RuleExpr, index: int) -> RuleExpr:
@@ -728,6 +814,86 @@ def flat_map_lookup(source: RuleExpr, table: RuleExpr) -> RuleExpr:
     """Map each semantic word item through a total word-valued association."""
 
     return RuleExpr(ExpressionPrimitive.FLAT_MAP_LOOKUP, (source, table))
+
+
+def map_items(
+    source: RuleExpr,
+    body: RuleExpr,
+    output_tag: str,
+) -> RuleExpr:
+    """Evaluate ``body`` once per item under one lexical value/index binding."""
+
+    if type(output_tag) is not str or not output_tag:
+        raise ValueError("map-items output tag must be a nonempty string")
+    return RuleExpr(
+        ExpressionPrimitive.MAP_ITEMS,
+        (source, body, output_tag),
+    )
+
+
+def filter_items(source: RuleExpr, predicate: RuleExpr) -> RuleExpr:
+    """Retain source items whose bound predicate evaluates to one."""
+
+    return RuleExpr(
+        ExpressionPrimitive.FILTER_ITEMS,
+        (source, predicate),
+    )
+
+
+def flat_map_items(
+    source: RuleExpr,
+    body: RuleExpr,
+    output_tag: str,
+) -> RuleExpr:
+    """Evaluate one word-valued body per item and concatenate the results."""
+
+    if type(output_tag) is not str or not output_tag:
+        raise ValueError("flat-map-items output tag must be a nonempty string")
+    return RuleExpr(
+        ExpressionPrimitive.FLAT_MAP_ITEMS,
+        (source, body, output_tag),
+    )
+
+
+def sliding_windows(
+    source: RuleExpr,
+    before: int,
+    after: int,
+    boundary: SequenceBoundary,
+    *,
+    exterior: RuleExpr | None = None,
+) -> RuleExpr:
+    """Build one fixed-width semantic window around every source item."""
+
+    if type(before) is not int or before < 0:
+        raise ValueError(
+            "sliding-windows before extent must be a non-negative integer"
+        )
+    if type(after) is not int or after < 0:
+        raise ValueError(
+            "sliding-windows after extent must be a non-negative integer"
+        )
+    if type(boundary) is not SequenceBoundary:
+        raise TypeError("sliding-windows boundary is not recognized")
+    if boundary is SequenceBoundary.FIXED:
+        if type(exterior) is not RuleExpr:
+            raise ValueError(
+                "fixed sliding-windows requires one exterior expression"
+            )
+        arguments: tuple[RuleScalar | RuleExpr, ...] = (
+            source,
+            before,
+            after,
+            boundary.value,
+            exterior,
+        )
+    else:
+        if exterior is not None:
+            raise ValueError(
+                "non-fixed sliding-windows cannot carry an exterior"
+            )
+        arguments = (source, before, after, boundary.value)
+    return RuleExpr(ExpressionPrimitive.SLIDING_WINDOWS, arguments)
 
 
 def capability_index(index: int) -> CapabilitySelector:

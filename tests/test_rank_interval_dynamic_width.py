@@ -75,7 +75,8 @@ def test_finite_grid_is_rank_generic_and_preserves_explicit_axes() -> None:
     assert configuration.contract.shape == (1, 1, 1, 2)
     assert configuration.contract.axes == axes
     assert all(
-        target.path[0] == axes
+        target.scope == "grid:" + ",".join(axes)
+        and target.path[::2] == axes
         for target, _ in configuration.entries
     )
 

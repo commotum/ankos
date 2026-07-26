@@ -124,6 +124,36 @@ def test_map_values_use_explicit_canonical_semantic_key_entries() -> None:
     )
 
 
+def test_nested_value_boundaries_remain_distinct_semantic_map_keys() -> None:
+    grouped = alphabets.word_value(
+        (
+            alphabets.word_value((1, 2), tag="inner"),
+        ),
+        tag="outer",
+    )
+    separated = alphabets.word_value(
+        (
+            alphabets.word_value((1,), tag="inner"),
+            2,
+        ),
+        tag="outer",
+    )
+
+    assert grouped != separated
+    assert not alphabets.semantic_equal(grouped, separated)
+
+    mapping = alphabets.map_value(
+        (
+            alphabets.map_entry_value(grouped, "grouped"),
+            alphabets.map_entry_value(separated, "separated"),
+        )
+    )
+
+    assert len(alphabets.map_entries(mapping)) == 2
+    assert alphabets.map_get(mapping, grouped) == "grouped"
+    assert alphabets.map_get(mapping, separated) == "separated"
+
+
 def test_map_keys_are_semantically_unique_and_bind_structural_references() -> None:
     first_key = alphabets.record_value(
         (("x", 1), ("y", 2)),
