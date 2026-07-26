@@ -286,3 +286,53 @@ G7-02 is closed. The first G7-03 action is to create `4-CODECS.md`, consume
 the 387-row inventory as the exhaustive codec worklist, and implement the
 closed tag/version/value codec kernel without importing or exposing catalog.
 No G7-03 implementation or stage file began here.
+
+### Post-closure dependency correction
+
+G7-03's hostile CT10 review reopened the PX10 evidence boundary. The original
+eight codec-family fixtures reached their expected outputs, but each retained
+at least one answer-sidecar shortcut and the two declared relation points were
+executed by different case-specialized programs. That was insufficient
+mechanics evidence even though the original G7-02 suite was green.
+
+The test-owned mechanics ledger was repaired before G7-03 closed:
+
+- SPF012 now reads a fixed symbol envelope, proves maximal run boundaries,
+  emits self-delimiting run records, and executes the required
+  `AAA -> (A,3)` PX08 secondary case through the identical primary program.
+- SPF054 uses one fixed fresh envelope, creates one or two prefix bits, marks
+  the unused fresh capability absent, and reads the complete prefix tree.
+- SPF055 uses one visible cumulative partition and two applications of the
+  same program: `Continue` after the first exact interval refinement and
+  `Stop` after the second.
+- SPF056 performs a visible three-step literal/literal/reference scan and
+  reconstructs the source from the emitted pointer record.
+- SPF057 atomically writes a real root branch and four verified fresh child
+  regions for the nonuniform case; the uniform case writes a leaf and leaves
+  the fixed child envelope absent.
+- SPF058 reads the explicit Walsh basis and exact-selection state and derives
+  its representation from the coefficient loci.
+- SPF059 performs three causal predictor steps, emitting residuals and exact
+  reconstruction from visible model/history state.
+- SPF060 reads alignment and both cursors, executes
+  `101 XOR 011 = 110`, and applies the same transform to return `101`.
+
+For every row, both points of the complete finite relation now traverse one
+identical primary-seeded `SimpleProgram`; source and target values are
+reconstructed from actual workspace loci rather than relation metadata.
+Every real trajectory step proves exactly-one deterministic result algebra,
+total dispositions, empty no-successor support, one successor fiber, absent
+measure views, exact continuation, and linked lineage/fresh evidence.
+
+This correction changed no production module or frozen Goal 2, Goal 5, or
+Goal 6 document. The repaired dependency passed:
+
+```text
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/conformance/test_representation_commutation.py \
+  tests/conformance/test_family_coverage.py
+-> 85 passed, 2 skipped
+```
+
+The two skips are G7-04 catalog obligations. G7-02 is reclosed with its
+original five-field and family-blind runtime conclusions unchanged.

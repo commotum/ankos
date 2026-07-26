@@ -162,4 +162,149 @@ under `tests/conformance/`.
 
 ## Stage Results
 
-In progress.
+### Authoritative behavior
+
+- `ca.serialization` now owns one explicit closed registry for 178 public
+  sealed owner types and 387 inventory variants. Registry initialization
+  fails if an owner type, dataclass field, enum member, tag, version, or
+  aggregate count drifts.
+- Canonical bytes distinguish `None`, booleans, arbitrary integers, strings,
+  exact `Fraction` values, tuples, enums, and frozen records. Accepted bytes
+  must be UTF-8 JSON with the canonical ordering, escaping, numeric spelling,
+  envelope shape, and recomputed SHA-256 digest.
+- `SimpleProgram` uses tag `ca.simple-program`, schema version `1`, and
+  exactly the five payload keys `seed`, `alphabet`, `frontier`,
+  `neighborhood`, and `rule`. No catalog receipt, constructor spelling,
+  alias, observer value, legacy manifest, or sixth semantic field is
+  admitted.
+- Decoding is total and fail-closed: it returns only `Decoded(value)` or
+  `DecodeRejected(DecodeFault)`. Unknown tags, versions, fields, primitives,
+  enum values, noncanonical bytes, malformed UTF-8/JSON, duplicate keys,
+  forged digests, invalid reconstructed records, and unavailable migrations
+  reject without a partial value or side effect.
+- The root façade now exposes the module-qualified `ca.serialization`
+  namespace as its eleventh name. Codec records and functions remain
+  namespace-qualified, and catalog remains blocked and unexposed.
+- CT09 exercises exactly 387 schema representatives: 137 record values and
+  all 250 members of the registered enum types, spanning all 178 owner types.
+  These are exhaustive schema/type/member representatives, not a claim to
+  enumerate every possible inhabitant of an infinite value type.
+- CT10 proves all eight exact PX10 relations over both points of their
+  declared finite domains. Each actual relation uses one shared
+  `SimpleProgram`; its source and terminal target are reconstructed from real
+  workspace loci, including fresh and multistep mechanics. A separate,
+  test-owned conjugacy uses one fixed native program and one fixed represented
+  program across both points and compares every field of their complete
+  application results after only declared value and derived-identity mapping.
+  This normalization is proof machinery, not a production mapping API.
+- Lossy, approximate, and out-of-image relations remain explicit and cannot
+  call the exact inverse.
+
+### Files and boundaries
+
+- Replaced the inert `src/ca/serialization.py` shell with the closed codec and
+  exposed only its namespace from `src/ca/__init__.py`.
+- Tightened local construction validity in `alphabets.py`, `loci.py`,
+  `rules.py`, and `program.py` where hostile codec cases demonstrated that a
+  structurally forged record could otherwise cross the encode boundary.
+  Version fields now require exact integer `1`, not equal-valued booleans or
+  rationals.
+- Refined `codec-inventory.csv` only where the executable registry established
+  the canonical `SimpleProgram` tag or a stricter local validator.
+- Added exhaustive samples and activated the serialization, CT09, CT10,
+  observer-boundary, inventory-join, and public-surface tests. No G7-03 skip
+  remains.
+- The CT10 review disproved part of the earlier PX10 mechanics evidence.
+  `tests/conformance/g7_mechanics.py` was repaired and G7-02 was reclosed; the
+  exact correction is recorded in `3-MECHANICS.md`.
+- No production catalog module, Goal 2, Goal 5, Goal 6, dataset, RNG,
+  visualization, lockfile dependency, or release surface changed.
+
+### Hostile review and repaired assumptions
+
+The hostile pass rejected several initially green shortcuts. Dedicated
+regressions now establish that:
+
+- identity normalization is field-qualified and cannot erase an ordinary
+  semantic string, a 64-hex string, caller lineage, or a semantic value equal
+  to a real derived identity;
+- context-sensitive records, invalid semantic payloads, forged enum
+  singletons, bool/rational version impostors, and bool/int-collapsed
+  structures cannot encode;
+- a newly added public sealed owner type fails registry initialization until
+  explicitly registered;
+- lone-surrogate Python strings encode canonically, and recursive
+  type-sensitive revalidation fails closed rather than using Python's loose
+  equality;
+- all exact representation profiles and the explicit lossy/approximate
+  distinctions survive the codec;
+- each actual PX10 relation point executes real mechanics through the same
+  program, while the independent expected graph is never obtained from the
+  relation under test;
+- prefix creation, interval continuation, pointer reconstruction, fresh
+  region children, explicit basis projection, causal residual
+  reconstruction, and XOR tag/order/involution cannot be replaced by a
+  precomputed answer sidecar; and
+- one fixed native/represented conjugate pair proves both domain points,
+  including complete witnesses, dispositions, cardinalities, fibers,
+  measures, continuation, fresh bindings, lineage, and application evidence.
+
+No production API correction was required by the reopened mechanics evidence.
+The valid dependency direction is codec-to-owner: serialization imports the
+seven sealed owner modules, while no owner imports serialization.
+
+### Verification
+
+The completed tree passed:
+
+```text
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
+  tests/test_serialization.py \
+  tests/test_alphabets.py \
+  tests/test_loci.py \
+  tests/test_rules.py \
+  tests/test_program.py \
+  tests/test_public_api.py \
+  tests/conformance/test_codec_inventory.py \
+  tests/conformance/test_serialization_contract.py \
+  tests/conformance/test_representation_commutation.py \
+  tests/conformance/test_observer_boundary.py
+-> 175 passed, 1 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/conformance/test_representation_commutation.py \
+  tests/conformance/test_family_coverage.py
+-> 85 passed, 2 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
+-> 410 passed, 13 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv lock --check
+-> resolved successfully
+
+deterministic hostile-byte decode probe
+-> 5,000 inputs returned a typed total result
+
+git diff --check
+-> pass
+```
+
+Static inspection additionally established:
+
+- registry counts are exactly `178 types / 387 variants / 178 unique tags`;
+- exactly one production `apply` remains, in `src/ca/program.py`;
+- no semantic owner imports serialization;
+- neither serialization nor program imports catalog;
+- serialization contains no pickle, dynamic import, unsafe evaluator, RNG,
+  or NumPy fallback;
+- no catalog path or frozen Goal 2, Goal 5, or Goal 6 path changed from the
+  G7-03 baseline; and
+- the 13 retained skips are exactly five CT11 catalog-expansion tests, five
+  catalog unit tests, two catalog portions of family coverage, and one
+  callable-free role-metadata test. All belong to G7-04.
+
+No migration was needed or implemented for the new canonical v1 schema;
+unknown and legacy versions reject. G7-03 is complete. The first G7-04 action
+is to create `5-CATALOG.md`, resync the inert catalog shells against the exact
+Goal 6 migration ledger, and activate only catalog-owned behavior. No G7-04
+file or implementation began here.
