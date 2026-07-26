@@ -36,25 +36,35 @@ Status: **IN PROGRESS**
 - `GOALS.md` must remain unchanged until every other G7-06 completion gate
   passes.
 
-## Contract Clarification
+## Open Contract Decision
 
-The hostile release audit found one implemented refinement that was not named
-in Goal 6's four-item truncation-cause sketch:
+The hostile release audit found one implemented Goal 7 addition that conflicts
+with Goal 6's exhaustive four-item truncation-cause sum at
+`goal-6/architecture.md:1724`:
 `TruncationCause.INTENSIONAL_SUPPORT`.
 
-It is retained because rollout can faithfully carry a complete intensional
-Seed or successor space but cannot enumerate and repeatedly apply its members
-without an external query/realization operation. Reporting
-`INTENSIONAL_SUPPORT` is a request-bound truncation: it preserves the
-intensional continuing support and makes no terminal, divergence,
-cardinality, or resource-exhaustion claim. Mapping this case to
-`RESOURCE_EXHAUSTED` would falsely attribute a resource failure; mapping it to
-completion or rejection would erase a valid denotation.
+The concrete case is a positive-depth rollout whose complete Seed support, or
+whose next Rule-result support, is intensional. Rollout can retain that valid
+support but cannot enumerate its members for the next generic `apply` without
+a separate query or realization operation. Calling the run complete or
+rejected would erase a valid denotation. `RESOURCE_EXHAUSTED` would invent a
+resource failure; `DEPTH_BOUND` would claim the requested application depth
+was reached; and `CANCELLED` or `PRUNED` would invent caller actions.
 
-This is a typed clarification of the already-frozen finite/intensional rollout
-boundary, not a new program field, semantic family, executor, solver, or
-realization path. It is already canonical-codec covered and directly exercised
-by unit and conformance tests. Goal 6 remains frozen.
+The fifth cause is therefore the most faithful representation, and it does not
+add a program field, semantic family, executor, solver, or realization path.
+It is nevertheless a public sum variant, not merely a wording clarification.
+Goal 6 remains byte-for-byte frozen, so closing Goal 7 with this variant
+requires explicit authority to let Goal 7 supersede only Goal 6's four-cause
+enumeration.
+
+The related zero-step precedence defect found by the same audit is repaired:
+`steps=0` now returns `DEPTH_BOUND` even for an intensional initial support,
+because no enumeration or application was requested. Focused unit and
+conformance tests cover both the zero-step and positive-depth cases.
+
+Until the contract decision is authorized, G7-06 remains in progress and no
+release-candidate or Goal 7 completion claim is permitted.
 
 ## Big Picture Objective
 

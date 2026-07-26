@@ -590,7 +590,8 @@ Handoff stage: **G7-05 — Complete conformance**
 
 Stage status: **Complete.** The requirement audit, repaired conformance
 evidence, installed-wheel proof, and hostile closure are recorded in
-[`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 is next and remains unstarted.
+[`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 is active under
+[`7-RELEASE.md`](7-RELEASE.md).
 
 #### Big Picture Objective
 
