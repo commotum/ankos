@@ -107,7 +107,10 @@ replacement:
 Existing capabilities in `W` are `b`, `a—b`, and `b—c`. Fresh capabilities
 are local keys `x`, `y`, `a—x`, `x—y`, and `y—c`. `R` contains the matched
 occurrence, its labels and incident edges, and the external endpoints and
-ports `a` and `c`.
+ports `a` and `c`. In this fixture each edge record owns its endpoint
+incidence, so replacing edge records leaves the external endpoint identities
+unchanged. If a carrier stores mutable port/incidence slots separately, those
+slots must also occur in `W` with explicit total dispositions.
 
 `RC` has one `Advanced + Continue` derivation that explicitly deletes the
 three old components, creates all five fresh components, and carries witness
@@ -243,9 +246,10 @@ base application may not silently choose that endpoint.
 
 ### F041 intensional field
 
-For `du/dx=0` on `[0,1]` without boundary value, `W` is the complete unknown
-field and `R` contains the readable domain/side data and differential-germ
-capabilities. The differential relation is closed Rule data. `RC` denotes
+For `du/dx=0` on `[0,1]` without boundary value, `W` is one capability `u`
+whose payload is the complete unknown field. `R` contains the readable
+domain/side data and differential-germ observations/views. The differential
+relation is closed Rule data. `RC` denotes
 `Replace(u, constant_field(c))` for every exact real `c`, with
 `Many(uncountable)` support and no inferred probability law.
 
@@ -338,11 +342,12 @@ C0:
   query = "a"
   result = Unset
   phase = Query
-  hash("a") = 0
+  hash_fold[v1]("a") = 0
 ```
 
 For read-only lookup, `W = {result, phase}` and `R` contains the query,
-reachable collision path, and exact key equality. `RC` has one
+reachable collision path, exact key equality, and the output of the closed,
+versioned `hash_fold` descriptor. `RC` has one
 `Advanced + Stop(Completed)` derivation replacing `result→Hit(7)` and
 `phase→Done`. Application yields `AC(1, 1, 1)`.
 
@@ -356,7 +361,24 @@ Required one-shot variants:
 | F015 | Complete finite-model relation over a one-element domain | Each exact model is a stopped successor; a certified empty model set is typed terminal zero |
 | F025 | One observed local step with one exact predecessor | Return the witnessed reconstruction once; branch/prune work, if represented, is visible state |
 | F036 | Store `{0,2}`, query `1` | Return two tied result witnesses and stop; an empty store is typed exact zero, not invalid |
-| F045 | One closed surrogate set with complete embedded results and calibration | Write the calibrated decision and stop; external replication bounds cannot alter the denotation |
+| F045 | Observed `11`, surrogate `10`, closed `SumBits` program descriptor, empty evaluator frames, phase `EvaluateObserved` | Use the Rule-owned evaluator and visible work state below; external resource/realization limits cannot alter the denotation or closed replicate count |
+
+For F045, `SumBits` is closed Rule data, not a nested `SimpleProgram`
+callback. The same immutable evaluator Rule:
+
+1. reads observed `11`, writes result `2`, and advances the visible phase;
+2. reads surrogate `10`, writes result `1`, and advances to calibration; then
+3. compares the recorded results, writes the calibrated decision, and returns
+   `Advanced + Stop(Completed)`.
+
+Each application resolves only that phase's work/result/control `W` and
+input/frame/result `R`, returns finite `ExactlyOne`, and yields
+`AC(1, 1, 1)`. If evaluation needs more microsteps, its frames and
+continuations remain in `C`; Rule never calls `apply` recursively. Provenance
+joins both results to the same program descriptor and their respective input.
+This closed-code/evaluator contract is the library meaning of Goal 5's
+arbitrary executable program; it does not narrow the family to a fixed
+statistic language or authorize callbacks.
 
 Exact invariant:
 
@@ -389,6 +411,14 @@ The suite repeats the same generic path for:
 
 The representations and gate laws remain different tagged descriptors.
 Only an explicit terminal measurement supplies a probability law.
+
+For the terminal-measurement case, use exact qubit state
+`|+⟩=(|0⟩+|1⟩)/√2` and computational-basis measurement. `W` contains the
+measured register, classical result, and cursor; `R` contains the complete old
+amplitude vector and tagged measurement gate. `RC` is a normalized finite law
+with two total `Advanced + Stop(Completed)` atoms of mass `1/2`, one for each
+collapsed state/result. Application yields `AC(2, 2, 2)` before any external
+realization chooses an atom.
 
 Exact invariant:
 
@@ -474,21 +504,25 @@ shared write and every induced injury commit atomically
 
 ```text
 C0:
-  e0 writes x=1
-  e1 reads x and writes y
-  cursor = e1
-  producer[x] = e0
-  causal graph already contains e0
+  trace/e0 writes x=1
+  trace/e1 reads x and writes y
+  cursor = trace/e1
+  producer[x] = causal/e0
+  causal graph already contains causal/e0
 ```
 
-`W` contains fresh event node `e1`, fresh edge `e0→e1`, `producer[y]`, and
-cursor/end control. `R` contains event `e1`, its read set, and the current
-producer of `x`. One `Advanced + Stop(Completed)` derivation creates the node
-and edge, updates provenance, and finishes. Application yields `AC(1, 1, 1)`.
+`W` contains fresh graph node `causal/e1`, fresh edge
+`causal/e0→causal/e1`, `producer[y]`, and cursor/end control. `R` contains
+trace event `trace/e1`, its read set, and the current producer of `x`. One
+`Advanced + Stop(Completed)` derivation creates the scoped graph node and
+edge, updates `producer[y]→causal/e1`, and finishes. Application yields
+`AC(1, 1, 1)`. Trace-event and causal-graph namespaces are distinct, so the
+fresh graph identity does not collide with its source record.
 
-F045 is also executable: surrogate generation, embedded evaluation,
-aggregation, and calibrated decision have explicit writable state and an
-invariant result commit.
+F045 is also executable: surrogate generation, Rule-owned closed evaluation,
+visible evaluator work, aggregation, and calibrated decision have explicit
+writable state and an invariant result commit. PX08 proves that this needs no
+recursive `apply`.
 
 The negative half is intentional:
 
@@ -673,9 +707,9 @@ Assert all three cardinalities independently. A bare exact empty finite
 support is invalid; `ResourceExhausted` exists only in bounded external
 query/realization/rollout results.
 
-### CT06 — Probability and replay
+### CT06 — Probability, Seed realization, and replay
 
-Run PX06 and the stochastic variants of PX01/PX09. Assert:
+Run PX06 and PX09's terminal-measurement variant. Assert:
 
 ```text
 RuleComplete contains a normalized law and no draw
@@ -689,6 +723,37 @@ version)` reproduces the same atom and evidence. Worker order, traversal
 order, ambient RNG, lazy/eager presentation, and unrelated draws cannot alter
 the law or semantic result. Trace lineage may affect a later draw coordinate;
 it cannot affect denotation or fresh identity.
+
+Seed laws cross the same explicit realization boundary. A Bernoulli Seed over
+a two-locus carrier supplies this generated case:
+
+```text
+Seed descriptor = closed normalized law, with no materialized draw
+no root replay key = retain the complete initial law/outcome space
+same root key + representation/sampler profile = same C and draw evidence
+explicit initial C = bypass Seed realization, then validate normally
+```
+
+Ambient RNG state, worker/traversal order, and unrelated draws cannot change
+the realization for the same key. A different key may select a different
+initial configuration but cannot change the Seed descriptor or law.
+Missing/invalid replay evidence cannot be silently replaced by a hidden
+generator.
+
+One intensional-law case exercises the only valid unavailable measure view.
+When the source law and full applied-atom mapping are valid and measurable,
+but measurability of the semantic-successor quotient is not established:
+
+```text
+applied_atom_measure = Available
+no_successor_submeasure = Available
+successor_submeasure = Unavailable(reason, retained mapping evidence)
+```
+
+An invalid source law, normalization, measurable atom space, reconstruction
+map, or applied mapping instead rejects the application. `Unavailable` is
+permitted only for that derived successor-quotient view; it is never a
+catch-all for malformed probability semantics.
 
 ### CT07 — Fresh identities
 
@@ -827,10 +892,14 @@ laws, and differential/intensional representations.
 
 Static dependency tests assert:
 
-- component modules do not import `program` or `catalog`;
+- component modules do not import `rules`, `program`, or `catalog`;
+- semantic owner modules do not import `serialization`; codecs depend on
+  owners, never the reverse;
 - `program.py` and `serialization.py` do not import `catalog`;
 - core does not import datasets, RNG, generation, or visualization;
 - package internals do not import through root `ca`;
+- category modules do not import `catalog.entries`; `catalog.__init__` is the
+  sole join point for constructors and metadata;
 - `apply` dispatches only on sealed generic descriptor/result operations; and
 - generic application never inspects SPF/F/T ID, category, constructor name,
   Book source, semantic family, carrier label, locus kind, or Rule tag to
@@ -840,7 +909,26 @@ Behavioral tests apply and decode already constructed programs while catalog
 imports are blocked. Public-surface tests assert `ca.rollout` is callable,
 there is no shadowing public `ca.rollout` submodule, catalog constructors are
 not flattened to root `ca`, and obsolete public
-`configuration/replacement/results/engine/run/updates` modules do not appear.
+`configuration/regions/replacement/results/engine/run/updates` modules do not
+appear. Exact signature tests admit only:
+
+```text
+apply(program, input)
+rollout(program, *, steps, initial=None, replay_key=None)
+```
+
+Solver, RNG, update, observer, renderer, branch-selection, resource, and
+result-policy keywords are forbidden on these two base operations. Qualified
+external query/realization tools may own typed requests without changing
+either signature.
+
+For one deterministic and one branching fixture, compare `rollout(...,
+steps=n)` with manual expansion by repeated calls to the owned `program.apply`,
+including raw configurations, outcomes, witnesses, lineage, continuation, and
+derivation fibers. A test-only spy on the owned `apply` binding plus static
+call-graph inspection must prove rollout has no legacy `apply_rule`, tensor,
+family, or duplicated generic-looking one-step path.
+
 Descriptor-owning modules may, of course, interpret their recognized sealed
 locus, selector, Rule-AST, and result variants; the prohibition is against the
 executor using those tags as a disguised semantic-family switch.

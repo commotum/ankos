@@ -570,6 +570,30 @@ Rule; a constraint can consume one global `R`; a graph rewrite can return
 alternative structural replacements. Conceptually the Rule relation is applied
 once to the structured `(R, W)` for the program application.
 
+Higher-order evaluation does not create a recursive application escape hatch.
+In F045, a parameter named `program` or `statistic` is a recognized closed
+evaluable AST/instruction descriptor owned by the enclosing Rule—not an
+unrestricted callback and not a `SimpleProgram` on which `rules.py` calls
+`program.apply`. A one-shot evaluator may be one closed macro-relation over
+`R` and `W`. If evaluation has observable intermediate work, the current
+input tag, frames, outputs, and phase are ordinary visible state in `C`, and
+the same immutable interpreter Rule advances them across ordinary
+applications before calibration. The same stored descriptor is used for
+observed and surrogate inputs.
+
+This is the library meaning of Goal 5's “same arbitrary program”: arbitrary
+supported closed code is data for a declared evaluator profile, whose
+universality is a property of that language/interpreter rather than permission
+to invoke a Python callback or a second engine.
+
+Accepting an independently constructed `SimpleProgram` as that higher-order
+parameter would require a total lossless compilation into a supported closed
+evaluator profile plus full-result commutation evidence. Without that proof it
+remains external orchestration, not an alias or hidden subapplication. This
+keeps the `rules -> program` dependency one-way, preserves provenance for
+nested work, and prevents a second executor from being concealed inside Rule
+denotation.
+
 ## Rule-Result Algebra
 
 The result contract separates four questions that a bare successor list
