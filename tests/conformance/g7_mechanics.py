@@ -214,6 +214,27 @@ def _fresh_target_plan(
     )
 
 
+def _total_existing_plans(
+    targets: tuple[loci.Locus, ...],
+    replacements: tuple[tuple[loci.Locus, rules.RuleExpr], ...],
+) -> tuple[rules.ExistingDispositionPlan, ...]:
+    """Preserve every writable target not replaced by one trajectory step."""
+
+    replacement_by_target = dict(replacements)
+    return tuple(
+        _existing_target_plan(
+            target,
+            (
+                rules.DispositionAction.REPLACE
+                if target in replacement_by_target
+                else rules.DispositionAction.PRESERVE
+            ),
+            replacement_by_target.get(target),
+        )
+        for target in targets
+    )
+
+
 def _certificate(kind: rules.CertificateKind, label: str) -> rules.Certificate:
     return rules.Certificate(kind, rules.literal_expr(label))
 
@@ -2154,6 +2175,26 @@ def _codec_record(
     )
 
 
+def _run_record(symbol: str, length: int) -> alphabets.ValueNode:
+    return _codec_record(
+        "run-record",
+        symbol=symbol,
+        length=length,
+    )
+
+
+def _literal_history_record(symbol: str) -> alphabets.ValueNode:
+    return _codec_record("literal-record", symbol=symbol)
+
+
+def _reference_history_record(offset: int, length: int) -> alphabets.ValueNode:
+    return _codec_record(
+        "reference-record",
+        offset=offset,
+        length=length,
+    )
+
+
 def _codec_product(
     tag: str,
     *items: alphabets.SemanticValue,
@@ -2196,6 +2237,9 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
     fresh_keys: tuple[loci.ClosedScalar, ...] = ()
     fresh_values: tuple[alphabets.SemanticValue, ...] = ()
     additional_future_values: tuple[alphabets.SemanticValue, ...] = ()
+    custom_clauses: tuple[rules.RuleClause, ...] | None = None
+    trajectory_steps = 1
+    rule_condition = rules.literal_expr(1)
     if row.spf == "SPF012":
         native = _codec_word("source-word", "A", "A", "A", "B", "B")
         encoded = _codec_record("run-records", run0="A:3", run1="B:2")
@@ -2208,15 +2252,74 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             alternate_encoded,
             case_index,
         )
+        symbols = (
+            ("A", "A", "A", "B", "B")
+            if case_index == 0
+            else ("B",)
+        )
+        run_specs = (
+            (("A", 3), ("B", 2))
+            if case_index == 0
+            else (("B", 1),)
+        )
+        run_values = tuple(
+            _run_record(symbol, length)
+            for symbol, length in run_specs
+        )
         source = _record_configuration(
-            (("input", selected_native), ("records", unset), ("phase", "scan"))
+            (
+                *tuple(
+                    (f"symbol{index}", symbol)
+                    for index, symbol in enumerate(symbols)
+                ),
+                *tuple(
+                    (f"run{index}", unset)
+                    for index in range(len(run_values))
+                ),
+                ("cursor", 0),
+            )
         )
         targets = _record_targets(source)
-        read_targets = (targets["input"], targets["phase"])
-        writes = (
-            (targets["records"], rules.literal_expr(selected_encoded)),
-            (targets["phase"], rules.literal_expr("done")),
+        symbol_targets = tuple(
+            targets[f"symbol{index}"]
+            for index in range(len(symbols))
         )
+        read_targets = (*symbol_targets, targets["cursor"])
+        writes = (
+            *tuple(
+                (
+                    targets[f"run{index}"],
+                    rules.literal_expr(run_value),
+                )
+                for index, run_value in enumerate(run_values)
+            ),
+            (targets["cursor"], rules.literal_expr("done")),
+        )
+        boundary_conditions = tuple(
+            (
+                rules.equal(
+                    rules.observation(index),
+                    rules.observation(index + 1),
+                )
+                if symbols[index] == symbols[index + 1]
+                else rules.equal(
+                    rules.equal(
+                        rules.observation(index),
+                        rules.observation(index + 1),
+                    ),
+                    rules.literal_expr(False),
+                )
+            )
+            for index in range(len(symbols) - 1)
+        )
+        rule_condition = _all_conditions(
+            *boundary_conditions,
+            rules.equal(
+                rules.observation(len(symbols)),
+                rules.literal_expr(0),
+            ),
+        )
+        additional_future_values = run_values
     elif row.spf == "SPF054":
         native = _codec_word("prefix-block", "A")
         encoded = _codec_word("prefix-bits", 0)
@@ -2317,31 +2420,120 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             alternate_encoded,
             case_index,
         )
-        raw_symbols = (
+        raw_symbols: tuple[str, ...] = (
             ("A", "B", "A", "B")
             if case_index == 0
             else ("A", "B", "C")
         )
-        history_targets = tuple(
-            loci.occurrence("history", index)
-            for index in range(len(raw_symbols) + 2)
+        input_targets = tuple(
+            loci.occurrence("codec-input", index)
+            for index in range(len(raw_symbols))
         )
+        current = loci.named("current-symbol", scope="history-workspace")
+        history_targets = tuple(
+            loci.occurrence("codec-history", index)
+            for index in range(len(raw_symbols))
+        )
+        record_targets = tuple(
+            loci.occurrence("codec-record", index)
+            for index in range(3)
+        )
+        reconstruction_targets = tuple(
+            loci.occurrence("codec-reconstruction", index)
+            for index in range(len(raw_symbols))
+        )
+        cursor = loci.named("cursor", scope="history-workspace")
         source = _structural_configuration(
             loci.CarrierKind.HISTORY,
-            tuple(
-                zip(
-                    history_targets,
-                    (*raw_symbols, unset, "search"),
-                    strict=True,
-                )
+            (
+                *tuple(zip(input_targets, raw_symbols, strict=True)),
+                (current, raw_symbols[0]),
+                *tuple((target, unset) for target in history_targets),
+                *tuple((target, unset) for target in record_targets),
+                *tuple((target, unset) for target in reconstruction_targets),
+                (cursor, 0),
             ),
             rank=1,
             axes=("history",),
         )
-        read_targets = history_targets[: len(raw_symbols)]
-        writes = (
-            (history_targets[-2], rules.literal_expr(selected_encoded)),
-            (history_targets[-1], rules.literal_expr("done")),
+        read_targets = (current, *history_targets, cursor)
+        writable_targets = (
+            current,
+            *history_targets,
+            *record_targets,
+            *reconstruction_targets,
+            cursor,
+        )
+        writes = tuple(
+            (target, rules.literal_expr(unset))
+            for target in writable_targets
+        )
+        literal_a = _literal_history_record("A")
+        literal_b = _literal_history_record("B")
+        third_record = (
+            _reference_history_record(2, 2)
+            if case_index == 0
+            else _literal_history_record("C")
+        )
+        cursor_observation = 1 + len(history_targets)
+        first_replacements = (
+            (current, rules.literal_expr(raw_symbols[1])),
+            (history_targets[0], rules.observation(0)),
+            (record_targets[0], rules.literal_expr(literal_a)),
+            (reconstruction_targets[0], rules.observation(0)),
+            (cursor, rules.literal_expr(1)),
+        )
+        second_replacements = (
+            (current, rules.literal_expr(raw_symbols[2])),
+            (history_targets[1], rules.observation(0)),
+            (record_targets[1], rules.literal_expr(literal_b)),
+            (reconstruction_targets[1], rules.observation(0)),
+            (cursor, rules.literal_expr(2)),
+        )
+        if case_index == 0:
+            third_replacements = (
+                (history_targets[2], rules.observation(1)),
+                (history_targets[3], rules.observation(2)),
+                (record_targets[2], rules.literal_expr(third_record)),
+                (reconstruction_targets[2], rules.observation(1)),
+                (reconstruction_targets[3], rules.observation(2)),
+                (cursor, rules.literal_expr("done")),
+            )
+        else:
+            third_replacements = (
+                (history_targets[2], rules.observation(0)),
+                (record_targets[2], rules.literal_expr(third_record)),
+                (reconstruction_targets[2], rules.observation(0)),
+                (cursor, rules.literal_expr("done")),
+            )
+        custom_clauses = tuple(
+            _clause(
+                rules.equal(
+                    rules.observation(cursor_observation),
+                    rules.literal_expr(step),
+                ),
+                _derivation_result(
+                    f"{row.fixture}:scan-{step}",
+                    existing=_total_existing_plans(
+                        writable_targets,
+                        replacements,
+                    ),
+                    stop=step == 2,
+                ),
+            )
+            for step, replacements in enumerate(
+                (
+                    first_replacements,
+                    second_replacements,
+                    third_replacements,
+                )
+            )
+        )
+        trajectory_steps = 3
+        additional_future_values = (
+            literal_a,
+            literal_b,
+            third_record,
         )
     elif row.spf == "SPF057":
         native = _codec_product("uniform-grid", 1, 1, 1, 1)
@@ -2414,44 +2606,80 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
         base = loci.named("basis-workspace", scope="product")
         vector0 = loci.product_locus("vector-0", (base,))
         vector1 = loci.product_locus("vector-1", (base,))
+        basis00 = loci.product_locus("basis-0-0", (base,))
+        basis01 = loci.product_locus("basis-0-1", (base,))
+        basis10 = loci.product_locus("basis-1-0", (base,))
+        basis11 = loci.product_locus("basis-1-1", (base,))
+        selection = loci.product_locus("basis-selection", (base,))
+        exact_mode = loci.product_locus("exact-mode", (base,))
         coefficient0 = loci.product_locus("coefficient-0", (base,))
         coefficient1 = loci.product_locus("coefficient-1", (base,))
-        result_target = loci.product_locus("result", (base,))
+        cursor = loci.product_locus("cursor", (base,))
         source = _structural_configuration(
             loci.CarrierKind.PRODUCT,
             (
                 (vector0, vector_values[0]),
                 (vector1, vector_values[1]),
+                (basis00, 1),
+                (basis01, 1),
+                (basis10, 1),
+                (basis11, -1),
+                (selection, "walsh-2"),
+                (exact_mode, True),
                 (coefficient0, -1),
                 (coefficient1, -1),
-                (result_target, unset),
+                (cursor, 0),
             ),
         )
-        read_targets = (vector0, vector1)
+        read_targets = (
+            vector0,
+            vector1,
+            basis00,
+            basis01,
+            basis10,
+            basis11,
+            selection,
+            exact_mode,
+            cursor,
+        )
+        dot0 = rules.add(
+            rules.multiply(rules.observation(0), rules.observation(2)),
+            rules.multiply(rules.observation(1), rules.observation(3)),
+        )
+        dot1 = rules.add(
+            rules.multiply(rules.observation(0), rules.observation(4)),
+            rules.multiply(rules.observation(1), rules.observation(5)),
+        )
+
+        def exact_walsh_coefficient(dot: rules.RuleExpr) -> rules.RuleExpr:
+            return rules.conditional(
+                rules.equal(dot, rules.literal_expr(2)),
+                rules.literal_expr(1),
+                rules.conditional(
+                    rules.equal(dot, rules.literal_expr(-2)),
+                    rules.literal_expr(-1),
+                    rules.literal_expr(0),
+                ),
+            )
+
         writes = (
-            (
-                coefficient0,
-                rules.conditional(
-                    rules.equal(rules.observation(0), rules.observation(1)),
-                    rules.literal_expr(1),
-                    rules.literal_expr(0),
-                ),
+            (coefficient0, exact_walsh_coefficient(dot0)),
+            (coefficient1, exact_walsh_coefficient(dot1)),
+            (cursor, rules.literal_expr("done")),
+        )
+        rule_condition = _all_conditions(
+            rules.equal(
+                rules.observation(6),
+                rules.literal_expr("walsh-2"),
             ),
-            (
-                coefficient1,
-                rules.conditional(
-                    rules.equal(
-                        rules.observation(0),
-                        rules.multiply(
-                            rules.literal_expr(-1),
-                            rules.observation(1),
-                        ),
-                    ),
-                    rules.literal_expr(1),
-                    rules.literal_expr(0),
-                ),
+            rules.equal(
+                rules.observation(7),
+                rules.literal_expr(True),
             ),
-            (result_target, rules.literal_expr(selected_encoded)),
+            rules.equal(
+                rules.observation(8),
+                rules.literal_expr(0),
+            ),
         )
     elif row.spf == "SPF059":
         native = _codec_word("samples", 1, 2, 3)
@@ -2466,33 +2694,99 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             case_index,
         )
         samples = (1, 2, 3) if case_index == 0 else (2, 4, 6)
-        history_targets = tuple(loci.occurrence("history", index) for index in range(8))
+        input_targets = tuple(
+            loci.occurrence("predictive-input", index)
+            for index in range(3)
+        )
+        current = loci.named("current-sample", scope="predictive-workspace")
+        previous = loci.named("previous-sample", scope="predictive-workspace")
+        model = loci.named("predictor-model", scope="predictive-workspace")
+        residual_targets = tuple(
+            loci.occurrence("residual", index)
+            for index in range(3)
+        )
+        reconstruction_targets = tuple(
+            loci.occurrence("predictive-reconstruction", index)
+            for index in range(3)
+        )
+        cursor = loci.named("cursor", scope="predictive-workspace")
         source = _structural_configuration(
             loci.CarrierKind.HISTORY,
-            tuple(
-                zip(
-                    history_targets,
-                    (*samples, 0, 0, 0, unset, "predict"),
-                    strict=True,
-                )
+            (
+                *tuple(zip(input_targets, samples, strict=True)),
+                (current, samples[0]),
+                (previous, 0),
+                (model, "previous-sample"),
+                *tuple((target, 0) for target in residual_targets),
+                *tuple((target, 0) for target in reconstruction_targets),
+                (cursor, 0),
             ),
             rank=1,
             axes=("history",),
         )
-        read_targets = history_targets[:3]
-        writes = (
-            (history_targets[3], rules.observation(0)),
-            (
-                history_targets[4],
-                rules.subtract(rules.observation(1), rules.observation(0)),
-            ),
-            (
-                history_targets[5],
-                rules.subtract(rules.observation(2), rules.observation(1)),
-            ),
-            (history_targets[6], rules.literal_expr(selected_encoded)),
-            (history_targets[7], rules.literal_expr("done")),
+        read_targets = (current, previous, model, cursor)
+        writable_targets = (
+            current,
+            previous,
+            *residual_targets,
+            *reconstruction_targets,
+            cursor,
         )
+        writes = tuple(
+            (target, rules.literal_expr(0))
+            for target in writable_targets
+        )
+        residual = rules.subtract(
+            rules.observation(0),
+            rules.observation(1),
+        )
+        reconstructed = rules.add(rules.observation(1), residual)
+        step_replacements = (
+            (
+                (current, rules.literal_expr(samples[1])),
+                (previous, rules.observation(0)),
+                (residual_targets[0], residual),
+                (reconstruction_targets[0], reconstructed),
+                (cursor, rules.literal_expr(1)),
+            ),
+            (
+                (current, rules.literal_expr(samples[2])),
+                (previous, rules.observation(0)),
+                (residual_targets[1], residual),
+                (reconstruction_targets[1], reconstructed),
+                (cursor, rules.literal_expr(2)),
+            ),
+            (
+                (previous, rules.observation(0)),
+                (residual_targets[2], residual),
+                (reconstruction_targets[2], reconstructed),
+                (cursor, rules.literal_expr("done")),
+            ),
+        )
+        custom_clauses = tuple(
+            _clause(
+                _all_conditions(
+                    rules.equal(
+                        rules.observation(2),
+                        rules.literal_expr("previous-sample"),
+                    ),
+                    rules.equal(
+                        rules.observation(3),
+                        rules.literal_expr(step),
+                    ),
+                ),
+                _derivation_result(
+                    f"{row.fixture}:sample-{step}",
+                    existing=_total_existing_plans(
+                        writable_targets,
+                        replacements,
+                    ),
+                    stop=step == 2,
+                ),
+            )
+            for step, replacements in enumerate(step_replacements)
+        )
+        trajectory_steps = 3
     elif row.spf == "SPF060":
         native = _codec_product(
             "xor-operands",
@@ -4175,8 +4469,6 @@ def assert_mechanics_run(
         return
 
     if pressure == "PX10":
-        assert len(derivations) == 1
-        assert isinstance(derivations[0].source.continuation, rules.Stop)
         assert type(execution.representation_case_index) is int
         assert execution.representation_case_index in (0, 1)
         representation = execution.representation
@@ -4187,37 +4479,154 @@ def assert_mechanics_run(
         encoded = representation.forward(execution.representation_source)
         assert encoded == execution.representation_target
         assert representation.inverse(encoded) == execution.representation_source
+        assert alphabets.semantic_equal(
+            _materialized_px10_source(execution),
+            execution.representation_source,
+        )
         expected_shapes = {
             "SPF012": (loci.CarrierKind.RECORD, 2, 2),
             "SPF054": (loci.CarrierKind.TREE, 3, 2),
-            "SPF055": (loci.CarrierKind.FIELD, 4, 4),
+            "SPF055": (loci.CarrierKind.FIELD, 4, 3),
             "SPF056": (loci.CarrierKind.HISTORY, 4, 2),
             "SPF057": (loci.CarrierKind.GRID, 4, 2),
             "SPF058": (loci.CarrierKind.PRODUCT, 2, 3),
             "SPF059": (loci.CarrierKind.HISTORY, 3, 5),
             "SPF060": (loci.CarrierKind.WORD, 6, 4),
         }[row.spf]
+        if row.spf == "SPF054" and execution.representation_case_index == 1:
+            expected_shapes = (loci.CarrierKind.TREE, 3, 3)
         if row.spf == "SPF056" and execution.representation_case_index == 1:
             expected_shapes = (loci.CarrierKind.HISTORY, 3, 2)
+        if row.spf == "SPF057" and execution.representation_case_index == 1:
+            expected_shapes = (loci.CarrierKind.GRID, 4, 5)
         carrier, read_count, write_count = expected_shapes
         assert execution.source.contract.kind is carrier
         assert len(_materialized_read_targets(execution)) == read_count
         assert len(_resolved_write_targets(execution)) == write_count
-        assert len(successors) == 1
+
+        if row.spf == "SPF055":
+            assert len(execution.trajectory) == 2
+            first_source, first_result = execution.trajectory[0]
+            second_source, second_result = execution.trajectory[1]
+            assert loci.configuration_equal(first_source, execution.source)
+            first_successors = _finite_successors(first_result)
+            second_successors = _finite_successors(second_result)
+            assert len(first_successors) == len(second_successors) == 1
+            assert loci.configuration_equal(second_source, first_successors[0])
+            first_derivations = tuple(
+                atom
+                for atom in first_result.applied_atoms.atoms
+                if isinstance(atom, program.AppliedDerivation)
+            )
+            final_derivations = tuple(
+                atom
+                for atom in second_result.applied_atoms.atoms
+                if isinstance(atom, program.AppliedDerivation)
+            )
+            assert len(first_derivations) == len(final_derivations) == 1
+            assert (
+                first_derivations[0].source.progress
+                is rules.Progress.ADVANCED
+            )
+            assert isinstance(
+                first_derivations[0].source.continuation,
+                rules.Continue,
+            )
+            assert (
+                first_successors[0].value_at(
+                    loci.field_point("codec", (0,), component="low")
+                )
+                == Fraction(0)
+            )
+            assert (
+                first_successors[0].value_at(
+                    loci.field_point("codec", (0,), component="high")
+                )
+                == Fraction(1, 2)
+            )
+            assert (
+                first_successors[0].value_at(
+                    loci.field_point("codec", (0,), component="cursor")
+                )
+                == 1
+            )
+            assert (
+                final_derivations[0].source.progress
+                is rules.Progress.ADVANCED
+            )
+            assert isinstance(
+                final_derivations[0].source.continuation,
+                rules.Stop,
+            )
+            final_result = second_result
+            final_successor = second_successors[0]
+            assert (
+                final_successor.value_at(
+                    loci.field_point("codec", (0,), component="cursor")
+                )
+                == "done"
+            )
+        else:
+            assert not execution.trajectory
+            assert len(derivations) == 1
+            assert isinstance(derivations[0].source.continuation, rules.Stop)
+            assert len(successors) == 1
+            final_result = result
+            final_successor = successors[0]
+            final_derivations = derivations
+
         materialized_target = _materialized_px10_target(
             execution,
-            successors[0],
+            final_result,
+            final_successor,
         )
         assert alphabets.semantic_equal(
             materialized_target,
             execution.representation_target,
         )
+        if row.spf == "SPF054":
+            derivation = final_derivations[0]
+            expected_fresh = 1 if execution.representation_case_index == 0 else 2
+            assert len(derivation.source.replacement.existing) == 1
+            assert len(derivation.source.replacement.fresh) == expected_fresh
+            assert len(derivation.fresh_bindings) == expected_fresh
+            assert all(
+                item.action is rules.DispositionAction.CREATE
+                for item in derivation.source.replacement.fresh
+            )
+            assert all(
+                binding.reference.namespace == "g7-prefix-output"
+                for binding in derivation.fresh_bindings
+            )
+        if row.spf == "SPF057" and execution.representation_case_index == 1:
+            derivation = final_derivations[0]
+            assert len(derivation.source.replacement.existing) == 1
+            assert len(derivation.source.replacement.fresh) == 4
+            assert len(derivation.fresh_bindings) == 4
+            assert {
+                binding.reference.local_key
+                for binding in derivation.fresh_bindings
+            } == {
+                "north-west",
+                "north-east",
+                "south-west",
+                "south-east",
+            }
+            assert all(
+                item.action is rules.DispositionAction.CREATE
+                for item in derivation.source.replacement.fresh
+            )
+            assert all(
+                type(final_successor.value_at(binding.identity))
+                is alphabets.ValueNode
+                for binding in derivation.fresh_bindings
+            )
         if row.spf == "SPF060":
             assert type(materialized_target) is alphabets.ValueNode
             assert materialized_target.kind is alphabets.ValueKind.WORD
             assert materialized_target.tag == "xor-output"
             assert materialized_target.items == encoded.items
-            assert successors[0].value_at(loci.occurrence("word", 9)) == "done"
+            assert final_successor.value_at(loci.occurrence("word", 9)) == "done"
         return
 
     if pressure == "PX09":

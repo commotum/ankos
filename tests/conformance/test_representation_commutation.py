@@ -21,6 +21,7 @@ from g7_fixtures import (
 from g7_mechanics import (
     MECHANICS_ROWS,
     assert_mechanics_run,
+    materialized_px10_target,
     run_mechanics_fixture,
     run_px10_representation_case,
 )
@@ -164,18 +165,28 @@ PX10_ORACLE_PAIRS = {
 }
 
 
-def _exact_relation(row) -> alphabets.RepresentationRelation:
-    execution = run_mechanics_fixture(row)
-    assert_mechanics_run(execution)
-    relation = execution.representation
+def _assert_exact_relation_matches_oracle(
+    relation: alphabets.RepresentationRelation,
+    oracle_pairs: tuple[
+        tuple[alphabets.SemanticValue, alphabets.SemanticValue],
+        tuple[alphabets.SemanticValue, alphabets.SemanticValue],
+    ],
+) -> None:
+    """Require the complete declared graph, image, and inverse literally."""
 
-    assert relation is not None
     assert relation.profile is alphabets.RepresentationProfile.EXACT
-    oracle_pairs = PX10_ORACLE_PAIRS[row.spf]
+    assert relation.source_schema == alphabets.enum(
+        tuple(source for source, _ in oracle_pairs)
+    ).descriptor
+    assert relation.target_schema == alphabets.enum(
+        tuple(target for _, target in oracle_pairs)
+    ).descriptor
     assert len(relation.relation) == len(oracle_pairs) == 2
     assert len(relation.inverse_evidence) == len(oracle_pairs)
     assert len(relation.image_evidence) == len(oracle_pairs)
     for source, target in oracle_pairs:
+        assert alphabets.semantic_equal(relation.forward(source), target)
+        assert alphabets.semantic_equal(relation.inverse(target), source)
         assert any(
             alphabets.semantic_equal(pair.source, source)
             and alphabets.semantic_equal(pair.target, target)
@@ -190,6 +201,18 @@ def _exact_relation(row) -> alphabets.RepresentationRelation:
             alphabets.semantic_equal(image_value, target)
             for image_value in relation.image_evidence
         )
+
+
+def _exact_relation(row) -> alphabets.RepresentationRelation:
+    execution = run_mechanics_fixture(row)
+    assert_mechanics_run(execution)
+    relation = execution.representation
+
+    assert relation is not None
+    _assert_exact_relation_matches_oracle(
+        relation,
+        PX10_ORACLE_PAIRS[row.spf],
+    )
     return relation
 
 
@@ -199,6 +222,7 @@ def _transition_pair(
         tuple[alphabets.SemanticValue, alphabets.SemanticValue],
     ],
     *,
+    initial_index: int,
     identity: str,
 ) -> tuple[program.ApplicationComplete, program.ApplicationComplete]:
     """Build a conjugate state step from a test-owned literal oracle.
@@ -210,7 +234,8 @@ def _transition_pair(
     or deriving both expected sides from the relation under test.
     """
 
-    first, second = relation_pairs
+    first = relation_pairs[initial_index]
+    second = relation_pairs[1 - initial_index]
     stopped = rules.Stop(
         rules.literal_expr(f"{identity}:complete"),
         certificate(
@@ -523,6 +548,67 @@ def test_exact_representation_is_inverse_on_its_declared_image() -> None:
             )
 
 
+@pytest.mark.parametrize(
+    "mutated_target",
+    (
+        _oracle_word("wrong-xor-tag", 1, 1, 0),
+        _oracle_word("xor-output", 0, 1, 1),
+    ),
+    ids=("wrong-tag", "wrong-order"),
+)
+def test_spf060_oracle_rejects_payload_only_relation_mutations(
+    mutated_target: alphabets.ValueNode,
+) -> None:
+    """Equal-looking bits cannot hide a wrong structural tag or bit order."""
+
+    oracle_pairs = PX10_ORACLE_PAIRS["SPF060"]
+    corrupted_pairs = (
+        (oracle_pairs[0][0], mutated_target),
+        oracle_pairs[1],
+    )
+    corrupted = alphabets.RepresentationRelation(
+        alphabets.enum(
+            tuple(source for source, _ in corrupted_pairs)
+        ).descriptor,
+        alphabets.enum(
+            tuple(target for _, target in corrupted_pairs)
+        ).descriptor,
+        alphabets.RepresentationProfile.EXACT,
+        tuple(
+            alphabets.RepresentationPair(source, target)
+            for source, target in corrupted_pairs
+        ),
+        tuple(target for _, target in corrupted_pairs),
+        inverse_evidence=tuple(
+            alphabets.RepresentationPair(target, source)
+            for source, target in corrupted_pairs
+        ),
+    )
+
+    with pytest.raises(AssertionError):
+        _assert_exact_relation_matches_oracle(corrupted, oracle_pairs)
+
+
+def _terminal_application(
+    execution,
+) -> tuple[
+    loci.FiniteConfiguration | loci.IntensionalConfiguration,
+    program.ApplicationComplete,
+]:
+    """Select the final trajectory step, or the sole application if uniterated."""
+
+    if execution.trajectory:
+        terminal_source, terminal_result = execution.trajectory[-1]
+    else:
+        terminal_source, terminal_result = execution.source, execution.result
+    assert isinstance(terminal_result, program.ApplicationComplete)
+    assert (
+        terminal_result.evidence.input_configuration_identity
+        == terminal_source.identity
+    )
+    return terminal_source, terminal_result
+
+
 @pytest.mark.parametrize("case_index", (0, 1), ids=("primary", "alternate"))
 @pytest.mark.parametrize("row", PX10_ROWS, ids=lambda row: row.spf)
 def test_represented_and_native_one_step_results_commute_completely(
@@ -535,9 +621,11 @@ def test_represented_and_native_one_step_results_commute_completely(
     assert_mechanics_run(execution)
     relation = execution.representation
     assert relation is not None
+    oracle_pairs = PX10_ORACLE_PAIRS[row.spf]
+    _assert_exact_relation_matches_oracle(relation, oracle_pairs)
     assert execution.representation_source is not None
     assert execution.representation_target is not None
-    oracle_source, oracle_target = PX10_ORACLE_PAIRS[row.spf][case_index]
+    oracle_source, oracle_target = oracle_pairs[case_index]
     assert alphabets.semantic_equal(
         execution.representation_source,
         oracle_source,
@@ -546,17 +634,29 @@ def test_represented_and_native_one_step_results_commute_completely(
         execution.representation_target,
         oracle_target,
     )
-    assert relation.forward(execution.representation_source) == (
-        execution.representation_target
+    assert alphabets.semantic_equal(
+        relation.forward(oracle_source),
+        oracle_target,
     )
-    assert isinstance(execution.result, program.ApplicationComplete)
-    actual_derivation = execution.result.applied_atoms.atoms[0]
-    assert isinstance(actual_derivation, program.AppliedDerivation)
-    assert isinstance(actual_derivation.source.continuation, rules.Stop)
+    actual_target = materialized_px10_target(execution)
+    assert alphabets.semantic_equal(actual_target, oracle_target)
+
+    _, terminal_result = _terminal_application(execution)
+    terminal_derivations = tuple(
+        atom
+        for atom in terminal_result.applied_atoms.atoms
+        if isinstance(atom, program.AppliedDerivation)
+    )
+    assert len(terminal_derivations) == 1
+    assert isinstance(
+        terminal_derivations[0].source.continuation,
+        rules.Stop,
+    )
 
     native, represented = _transition_pair(
-        PX10_ORACLE_PAIRS[row.spf],
-        identity=row.fixture,
+        oracle_pairs,
+        initial_index=case_index,
+        identity=f"{row.fixture}:case-{case_index}",
     )
     for result in (native, represented):
         atom = result.applied_atoms.atoms[0]
