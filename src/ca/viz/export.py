@@ -6,10 +6,8 @@ the existing ``ankos.viz.bundle`` wire contract and presentation metadata. It
 does not infer a tensor layout from arbitrary semantic results, define the
 canonical program codec, or participate in application.
 
-The target signature is documented but not falsely overloaded while the live
-0.1 exporter still consumes ``RawEpisode`` and ``RawBatch``. That implementation
-remains intact below the explicit legacy divider until the atomic G7-01
-downstream migration.
+The wire format retains its historical ``RawEpisode``/``RawBatch`` labels,
+but those labels are presentation metadata rather than semantic Python types.
 """
 
 from __future__ import annotations
@@ -17,54 +15,12 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import numpy as np
 
-from ..specs import RawBatch, RawEpisode
+from ..datasets import DatasetBatch, DatasetEpisode
 from .format import FORMAT_NAME, FORMAT_VERSION, align_offset, encode_bundle
-
-
-if TYPE_CHECKING:
-    from ..datasets import DatasetBatch, DatasetEpisode
-
-    DatasetViewSource = DatasetEpisode | DatasetBatch
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.1: Explicit Dataset-View Input
-# ---------------------------------------------------------------------------
-
-# Target spelling:
-#
-#     save_viewer_bundle(
-#         source: DatasetEpisode | DatasetBatch,
-#         path: str | Path,
-#         ...,
-#     ) -> VizBundleInfo
-#
-# No runtime overload is declared until that source union is actually accepted.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.2: Bundle Preparation
-# ---------------------------------------------------------------------------
-
-# Dataset payload, coordinate, palette, and presentation metadata preparation
-# stays downstream of the explicit projection boundary.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 2: Viewer-Presentation Aliases
-# ---------------------------------------------------------------------------
-
-# Legacy wire labels such as ``RawEpisode``/``RawBatch``, ``domain``, and
-# ``rule_id`` remain presentation metadata under bundle version 1.
-
-
-# ===========================================================================
-# Legacy 0.1 implementation retained until atomic G7-01 cutover
-# ===========================================================================
 
 
 _STATE_DTYPES = {
@@ -110,7 +66,7 @@ class _PreparedStates:
 
 
 def save_viewer_bundle(
-    source: RawEpisode | RawBatch,
+    source: DatasetEpisode | DatasetBatch,
     path: str | Path,
     *,
     palette: str | Sequence[Sequence[int]] = "auto",
@@ -120,7 +76,7 @@ def save_viewer_bundle(
     title: str | None = None,
     metadata: Mapping[str, Any] | None = None,
 ) -> VizBundleInfo:
-    """Write a `.ankos` static-viewer bundle for a raw episode or batch row."""
+    """Write a viewer bundle for one explicit dataset view or batch row."""
 
     prepared_source = _prepare_source(source, row=row)
     prepared_states = _prepare_states(prepared_source.states, storage_dtype=storage_dtype)
@@ -190,10 +146,13 @@ def save_viewer_bundle(
     )
 
 
-def _prepare_source(source: RawEpisode | RawBatch, row: int | None) -> _PreparedSource:
-    if isinstance(source, RawEpisode):
+def _prepare_source(
+    source: DatasetEpisode | DatasetBatch,
+    row: int | None,
+) -> _PreparedSource:
+    if isinstance(source, DatasetEpisode):
         if row is not None:
-            raise ValueError("row is only valid when exporting RawBatch")
+            raise ValueError("row is only valid when exporting DatasetBatch")
         return _PreparedSource(
             kind="RawEpisode",
             domain=source.domain,
@@ -205,9 +164,9 @@ def _prepare_source(source: RawEpisode | RawBatch, row: int | None) -> _Prepared
             metadata=source.metadata,
         )
 
-    if isinstance(source, RawBatch):
+    if isinstance(source, DatasetBatch):
         if row is None:
-            raise ValueError("RawBatch export requires row=int in the MVP")
+            raise ValueError("DatasetBatch export requires row=int in the MVP")
         if isinstance(row, bool):
             raise TypeError("row must be an integer, not bool")
         row_index = int(row)
@@ -225,7 +184,9 @@ def _prepare_source(source: RawEpisode | RawBatch, row: int | None) -> _Prepared
             metadata=source.metadata,
         )
 
-    raise TypeError("source must be ca.RawEpisode or ca.RawBatch")
+    raise TypeError(
+        "source must be ca.datasets.DatasetEpisode or ca.datasets.DatasetBatch"
+    )
 
 
 def _prepare_states(states: np.ndarray, storage_dtype: str) -> _PreparedStates:
@@ -421,13 +382,13 @@ def _validate_rgba(row: Sequence[int]) -> list[int]:
 
 def _merge_metadata(
     prepared_source: _PreparedSource,
-    original_source: RawEpisode | RawBatch,
+    original_source: DatasetEpisode | DatasetBatch,
     *,
     row: int | None,
     metadata: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     merged = dict(prepared_source.metadata or {})
-    if isinstance(original_source, RawBatch):
+    if isinstance(original_source, DatasetBatch):
         merged.setdefault("source_kind", "RawBatch")
         merged.setdefault("batch_row", int(row) if row is not None else None)
         merged.setdefault("batch_size", int(np.asarray(original_source.states).shape[0]))

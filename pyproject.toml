@@ -1,11 +1,15 @@
 [project]
 name = "ankos"
-version = "0.1.0"
-description = "A New Kind of Science cellular automata library"
+version = "0.2.0"
+description = "Closed, composable simple programs inspired by A New Kind of Science"
 readme = "README-V2.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.2",
+]
+
+[dependency-groups]
+dev = [
     "pytest>=9.0.3",
 ]
 
