@@ -10,6 +10,8 @@ from collections import Counter
 import pytest
 
 from ca import loci
+from ca.catalog import entries
+import ca.catalog as catalog
 
 from g7_mechanics import (
     MECHANICS_ROWS,
@@ -38,18 +40,45 @@ def test_primary_pressure_partition_contains_each_spf001_through_spf060_once() -
     )
 
 
-@pytest.mark.skip(reason="G7-04 owns canonical catalog constructor expansion")
 def test_every_family_constructor_returns_a_closed_compatible_simple_program() -> None:
     """One representative closed argument set expands each canonical constructor."""
 
-    raise AssertionError("G7-04 catalog constructor join is not active")
+    metadata = {item.family_id: item for item in entries.FAMILY_ENTRIES}
+
+    for row in MECHANICS_ROWS:
+        execution = run_mechanics_fixture(row)
+        entry = metadata[row.spf]
+        owner = getattr(catalog, entry.home)
+        constructor = getattr(owner, entry.constructor_name)
+        actual = constructor(
+            seed=execution.simple_program.seed,
+            alphabet=execution.simple_program.alphabet,
+            frontier=execution.simple_program.frontier,
+            neighborhood=execution.simple_program.neighborhood,
+            rule=execution.simple_program.rule,
+        )
+
+        assert type(actual) is type(execution.simple_program)
+        assert actual == execution.simple_program
+        assert getattr(catalog, entry.constructor_name) is constructor
 
 
-@pytest.mark.skip(reason="G7-04 owns callable-free catalog provenance metadata")
 def test_every_family_joins_exact_spf_f_home_source_and_pressure_metadata() -> None:
     """Callable expansion and callable-free provenance agree row by row."""
 
-    raise AssertionError("G7-04 catalog metadata join is not active")
+    metadata = {item.family_id: item for item in entries.FAMILY_ENTRIES}
+
+    assert set(metadata) == {row.spf for row in MECHANICS_ROWS}
+    for row in MECHANICS_ROWS:
+        entry = metadata[row.spf]
+
+        assert entry.audit_family_id == row.family
+        assert entry.slug == row.name
+        assert entry.constructor_name == row.name.replace("-", "_")
+        assert entry.api_pressure_ref == (
+            f"goal-5/api-pressure.md:{row.family}"
+        )
+        assert entry.source_refs
 
 
 @pytest.mark.parametrize("row", MECHANICS_ROWS, ids=lambda row: row.spf)

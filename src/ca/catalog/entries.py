@@ -10,7 +10,7 @@ The family and close-role values below are the literal, callable-free
 catalog projection of ``goal-6/catalog-migration.md``.  ``closed_parameters``
 retains the semantic construction inventory from that authority; it does not
 define the Python signature of the canonical five-component constructors.
-Legacy and public-name relations are populated separately.
+Legacy and public-name relations use the same inert record discipline below.
 """
 
 from __future__ import annotations
@@ -696,6 +696,723 @@ ROLE_ENTRIES: tuple[RoleEntry, ...] = (
         (
             "Occupation may be a Seed law, but spanning/connectivity over the "
             "completed sample is an observer or analysis result."
+        ),
+    ),
+)
+
+
+LEGACY_ENTRIES: tuple[LegacyEntry, ...] = (
+    LegacyEntry(
+        "T01",
+        "Elementary Cellular Automata",
+        "retain-family",
+        ("C090",),
+        ("CH03:L29-56",),
+        (
+            LegacyTarget(
+                None, "SPF050", "eca", "P", ("CH03:L29-56",)
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T02",
+        "Multi-Color Nearest-Neighbor Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("N03:L135-150",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "multicolor_cellular_automaton",
+                "P",
+                ("N03:L135-150",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T03",
+        "Totalistic Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("CH03:L91-96",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "totalistic_cellular_automaton",
+                "P",
+                ("CH03:L91-96",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T04",
+        "Three-Color Totalistic Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("CH03:L89-96,L109-110",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "three_color_totalistic_cellular_automaton",
+                "P",
+                ("CH03:L89-96,L109-110",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T05",
+        "Higher-Color Totalistic Cellular Automata",
+        "merge",
+        ("C090",),
+        ("N03:L164-185",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "higher_color_totalistic_cellular_automaton",
+                "P",
+                ("N03:L164-185",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T06",
+        "Quiescent-Background-Preserving Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        (
+            "Goal 2-preserved T(b,…,b)=b",
+            "CH03:L101,L649",
+            "CH06:L101",
+            "goal-1/25-T06-QUIESCENT.md",
+        ),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "quiescent_cellular_automaton",
+                "P",
+                (
+                    "Goal 2-preserved T(b,…,b)=b",
+                    "CH03:L101,L649",
+                    "CH06:L101",
+                    "goal-1/25-T06-QUIESCENT.md",
+                ),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T07",
+        "Left-Right Symmetric Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("N03:L7-10", "N05:L89-100"),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "symmetric_cellular_automaton",
+                "P",
+                ("N03:L7-10", "N05:L89-100"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T08",
+        "Initial-Condition Classes",
+        "retire-role",
+        (),
+        ("Goal 5 Seed-role decision", "no executable construction source"),
+        (),
+    ),
+    LegacyEntry(
+        "T09",
+        "Mobile Automata",
+        "retain-preset",
+        ("C047",),
+        ("CH03:L169-185",),
+        (
+            LegacyTarget(
+                None, "SPF030", "mobile_automaton", "P", ("CH03:L169-185",)
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T10",
+        "Extended Mobile Automata",
+        "repair",
+        ("C056",),
+        ("CH03:L197-207",),
+        (
+            LegacyTarget(
+                None,
+                "SPF030",
+                "neighbor_updating_mobile_automaton",
+                "P",
+                ("CH03:L197-207",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T11",
+        "Generalized Mobile Automata",
+        "retain-family",
+        ("C030",),
+        ("CH03:L231-247",),
+        (
+            LegacyTarget(
+                None,
+                "SPF032",
+                "generalized_mobile_automaton",
+                "P",
+                ("CH03:L231-247",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T12",
+        "Turing Machines",
+        "retain-family",
+        ("C049",),
+        ("N03:L294-333",),
+        (
+            LegacyTarget(
+                None, "SPF030", "turing_machine", "P", ("N03:L294-333",)
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T13",
+        "Neighbor-Independent Substitution Systems",
+        "retain-family",
+        ("C061",),
+        ("CH03:L299-307",),
+        (
+            LegacyTarget(
+                None,
+                "SPF037",
+                "neighbor_independent_substitution",
+                "P",
+                ("CH03:L299-307",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T14",
+        "Neighbor-Dependent Substitution Systems",
+        "retain-family",
+        ("C011", "C055"),
+        ("CH03:L333-337", "CH05:L211-227", "N05:L360-367"),
+        (
+            LegacyTarget(
+                None,
+                "SPF005",
+                "neighbor_dependent_substitution",
+                "P",
+                ("CH03:L333-337", "CH05:L211-227", "N05:L360-367"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T15",
+        "Creation-Destruction Substitution Systems",
+        "merge",
+        ("C061",),
+        ("CH03:L343-363",),
+        (
+            LegacyTarget(
+                None,
+                "SPF037",
+                "creation_destruction_substitution",
+                "P",
+                ("CH03:L343-363",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T16",
+        "Sequential Substitution Systems",
+        "retain-preset",
+        ("C080",),
+        ("CH03:L369-379",),
+        (
+            LegacyTarget(
+                None,
+                "SPF049",
+                "sequential_substitution",
+                "P",
+                ("CH03:L369-379",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T17",
+        "Tag Systems",
+        "retain-family",
+        ("C091",),
+        ("CH03:L423-445",),
+        (
+            LegacyTarget(
+                None, "SPF016", "tag_system", "P", ("CH03:L423-445",)
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T18",
+        "Cyclic Tag Systems",
+        "retain-preset",
+        ("C091",),
+        ("CH03:L447-471",),
+        (
+            LegacyTarget(
+                None, "SPF016", "cyclic_tag_system", "P", ("CH03:L447-471",)
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T19",
+        "Register Machines",
+        "retain-family",
+        ("C073",),
+        ("CH03:L473-509,L519-525",),
+        (
+            LegacyTarget(
+                None,
+                "SPF045",
+                "register_machine",
+                "C",
+                ("CH03:L473-509,L519-525",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T20",
+        "Symbolic Systems",
+        "retain-family",
+        ("C089",),
+        ("CH03:L531-537", "N03:L823-835", "CH10:L909-915"),
+        (
+            LegacyTarget(
+                None,
+                "SPF049",
+                "symbolic_system",
+                "P",
+                ("CH03:L531-537", "N03:L823-835", "CH10:L909-915"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T21",
+        "Two-Dimensional Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("CH05:L27-34",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "cellular_automaton_2d",
+                "P",
+                ("CH05:L27-34",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T22",
+        "Moore-Neighborhood Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("CH05:L67-86",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "moore_cellular_automaton",
+                "P",
+                ("CH05:L67-86",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T23",
+        "Three-Dimensional Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("CH05:L95-123", "N06:L55-66"),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "cellular_automaton_3d",
+                "P",
+                ("CH05:L95-123", "N06:L55-66"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T24",
+        "Higher-Dimensional Lattice Cellular Automata",
+        "retain-preset",
+        ("C090",),
+        ("N05:L36-58,L66-88",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "lattice_cellular_automaton",
+                "P",
+                ("N05:L36-58,L66-88",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T25",
+        "Two-Dimensional Turing Machines",
+        "retain-preset",
+        ("C049",),
+        ("CH05:L127-131", "N05:L211-217"),
+        (
+            LegacyTarget(
+                None,
+                "SPF030",
+                "turing_machine_2d",
+                "P",
+                ("CH05:L127-131", "N05:L211-217"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T26",
+        "Two-Dimensional Substitution Systems",
+        "retain-preset",
+        ("C061",),
+        ("CH05:L173-190",),
+        (
+            LegacyTarget(
+                None,
+                "SPF037",
+                "substitution_system_2d",
+                "P",
+                ("CH05:L173-190",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T27",
+        "Geometric Replacement And Fractal Systems",
+        "repair",
+        ("C061",),
+        ("CH05:L191-214", "N05:L286-337"),
+        (
+            LegacyTarget(
+                None,
+                "SPF037",
+                "geometric_substitution",
+                "P",
+                ("CH05:L191-214", "N05:L286-337"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T28",
+        "Neighbor-Dependent Two-Dimensional Substitution Systems",
+        "retain-preset",
+        ("C055",),
+        ("CH05:L211-227", "N05:L360-367"),
+        (
+            LegacyTarget(
+                None,
+                "SPF005",
+                "context_dependent_substitution_2d",
+                "P",
+                ("CH05:L211-227", "N05:L360-367"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T29",
+        "Network Systems",
+        "retain-family",
+        ("C062",),
+        ("CH05:L239-248,L287-331",),
+        (
+            LegacyTarget(
+                None,
+                "SPF038",
+                "parallel_network_rewrite",
+                "C",
+                ("CH05:L239-248,L287-331",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T30",
+        "Multiway Systems",
+        "retain-family",
+        ("C051",),
+        ("CH05:L355-369", "N05:L527-528,L549-578"),
+        (
+            LegacyTarget(
+                None,
+                "SPF033",
+                "multiway_system",
+                "A",
+                ("CH05:L355-369", "N05:L527-528,L549-578"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T31",
+        "Local Constraint Systems",
+        "retain-family",
+        ("C043",),
+        ("CH05:L433-479", "CH09:L595-615", "N09:L324-330"),
+        (
+            LegacyTarget(
+                None,
+                "SPF029",
+                "local_constraint_system",
+                "P",
+                ("CH05:L433-479", "CH09:L595-615", "N09:L324-330"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T32",
+        "Template Constraint Systems",
+        "alias",
+        ("C043",),
+        ("CH05:L475-488",),
+        (
+            LegacyTarget(
+                None,
+                "SPF029",
+                "template_constraint_system",
+                "P",
+                ("CH05:L475-488",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T33",
+        "Seeded Template Constraint Systems",
+        "retain-preset",
+        ("C042", "C043"),
+        ("CH05:L475-498,L535-536",),
+        (
+            LegacyTarget(
+                None,
+                "SPF029",
+                "seeded_template_constraint_system",
+                "P",
+                ("CH05:L475-498,L535-536",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T34",
+        "Arithmetic Iteration Systems",
+        "retain-preset",
+        ("C037",),
+        ("CH04:L53-54",),
+        (
+            LegacyTarget(
+                None,
+                "SPF026",
+                "arithmetic_iteration",
+                "P",
+                ("CH04:L53-54",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T35",
+        "Piecewise Integer Maps",
+        "retain-preset",
+        ("C037",),
+        ("CH04:L111-118",),
+        (
+            LegacyTarget(
+                None,
+                "SPF026",
+                "piecewise_integer_map",
+                "P",
+                ("CH04:L111-118",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T36",
+        "Digit-Reversal Arithmetic Systems",
+        "retain-preset",
+        ("C037",),
+        ("CH04:L153-162", "N04:L170-179"),
+        (
+            LegacyTarget(
+                None,
+                "SPF026",
+                "digit_reversal_map",
+                "P",
+                ("CH04:L153-162", "N04:L170-179"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T37",
+        "Recursive Sequences",
+        "retain-family",
+        ("C078",),
+        ("CH04:L169-186",),
+        (
+            LegacyTarget(
+                None,
+                "SPF023",
+                "recursive_sequence",
+                "P",
+                ("CH04:L169-186",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T38",
+        "Variable-Index Recursive Sequences",
+        "retain-preset",
+        ("C078",),
+        ("CH04:L179-186",),
+        (
+            LegacyTarget(
+                None,
+                "SPF023",
+                "variable_index_recursive_sequence",
+                "P",
+                ("CH04:L179-186",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T39",
+        "Number-Theoretic Filtering Systems",
+        "retain-family",
+        ("C035",),
+        ("CH04:L211-214", "N04:L418-430"),
+        (
+            LegacyTarget(
+                None,
+                "SPF025",
+                "number_theoretic_filtering",
+                "P",
+                ("CH04:L211-214", "N04:L418-430"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T40",
+        "Mathematical-Constant Digit Systems",
+        "split",
+        ("C003", "C017"),
+        (
+            "sequence N04:L203-210,L569-599",
+            "register CH04:L303-308,L343-350",
+            "N04:L561-562",
+        ),
+        (
+            LegacyTarget(
+                "sequence",
+                "SPF002",
+                "constant_digit_sequence",
+                "P",
+                ("N04:L203-210,L569-599",),
+            ),
+            LegacyTarget(
+                "register",
+                "SPF008",
+                "constant_digit_register",
+                "P",
+                ("CH04:L303-308,L343-350", "N04:L561-562"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T41",
+        "Function-Combination Systems",
+        "repair",
+        ("C072",),
+        ("N04:L237-268,L316-364",),
+        (
+            LegacyTarget(
+                None,
+                "SPF044",
+                "recursive_function_evaluator",
+                "C",
+                ("N04:L237-268,L316-364",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T42",
+        "Continued-Fraction-Driven Substitution Systems",
+        "retain-preset",
+        ("C061",),
+        ("CH04:L454-461", "N04:L753-754"),
+        (
+            LegacyTarget(
+                None,
+                "SPF037",
+                "continued_fraction_substitution",
+                "P",
+                ("CH04:L454-461", "N04:L753-754"),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T43",
+        "Iterated Maps",
+        "retain-family",
+        ("C037",),
+        ("CH04:L53-54,L111-118,L472-491",),
+        (
+            LegacyTarget(
+                None,
+                "SPF026",
+                "iterated_map",
+                "C",
+                ("CH04:L53-54,L111-118,L472-491",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T44",
+        "Continuous Cellular Automata",
+        "alias",
+        ("C090",),
+        ("CH04:L546-562,L565-616",),
+        (
+            LegacyTarget(
+                None,
+                "SPF050",
+                "continuous_cellular_automaton",
+                "P",
+                ("CH04:L546-562,L565-616",),
+            ),
+        ),
+    ),
+    LegacyEntry(
+        "T45",
+        "Partial Differential Equation Systems",
+        "retain-family",
+        ("C063",),
+        ("CH04:L625-674", "N04:L933-940"),
+        (
+            LegacyTarget(
+                None,
+                "SPF039",
+                "partial_differential_relation",
+                "C",
+                ("CH04:L625-674", "N04:L933-940"),
+            ),
         ),
     ),
 )
