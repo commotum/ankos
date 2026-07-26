@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **READY — G7-04 CATALOG (NOT STARTED)**
+Status: **IN PROGRESS — G7-04 CATALOG**
 
 ## Big-Picture Objective
 
@@ -121,8 +121,16 @@ conflict, and reconcile the plan before changing runtime behavior.
 - The active suite reports `413 passed, 13 skipped`. Every retained skip is
   owned by G7-04 catalog construction or callable-free metadata; no G7-03
   skip remains.
-- Catalog files remain inert and unexposed. No `5-CATALOG.md` exists and no
-  G7-04 implementation has begun.
+- G7-04 started from clean commit `cf88affc29e225f64aaeca200c6f6548ecc42512`.
+  Its live implementation and evidence record is
+  [`5-CATALOG.md`](5-CATALOG.md).
+- At G7-04 entry, all eight catalog files are inert and unexposed: the 60
+  canonical signatures raise `NotImplementedError`, authorized delegators
+  remain pending inventories, metadata records have no values, and root `ca`
+  does not expose `catalog`.
+- The 13 retained skips are owned exactly by G7-04: five CT11 catalog
+  expansion tests, five catalog unit tests, two family constructor/metadata
+  joins, and one callable-free role test.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -275,7 +283,7 @@ stage file and may evolve with the implementation.
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
-| `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
+| `5-CATALOG` | G7-04 | In Progress | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
 
@@ -483,6 +491,9 @@ application results.
 ### 5-CATALOG
 
 Handoff stage: **G7-04 — Catalog assembly and exact legacy migration**
+
+Stage status: **In progress.** The live plan and evidence record is
+[`5-CATALOG.md`](5-CATALOG.md).
 
 #### Big Picture Objective
 
