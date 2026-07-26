@@ -1,4 +1,4 @@
-"""Tests for the narrow package façade through G7-03."""
+"""Tests for the narrow package façade through G7-04."""
 
 import importlib
 import importlib.util
@@ -18,6 +18,7 @@ def test_root_exports_only_the_settled_namespaces_and_three_conveniences() -> No
         "apply",
         "rollout",
         "program",
+        "catalog",
         "loci",
         "alphabets",
         "seeds",
@@ -44,11 +45,8 @@ def test_component_constructors_are_module_qualified() -> None:
     ):
         assert broad_export not in ca.__all__
         assert not hasattr(ca, broad_export)
-    # Importing ``ca.catalog`` explicitly attaches that normal Python
-    # submodule to its parent package.  Eager root exposure is checked in the
-    # fresh-process test below rather than through order-dependent process
-    # state here.
-    assert "catalog" not in ca.__all__
+    assert "catalog" in ca.__all__
+    assert ca.catalog.__name__ == "ca.catalog"
     assert ca.serialization.__name__ == "ca.serialization"
 
 
@@ -81,8 +79,8 @@ assert "ca.rollout" not in sys.modules
 assert "ca.datasets" not in sys.modules
 assert "ca.rng" not in sys.modules
 assert "ca.viz" not in sys.modules
-assert "ca.catalog" not in sys.modules
-assert not hasattr(ca, "catalog")
+assert "ca.catalog" in sys.modules
+assert hasattr(ca, "catalog")
 assert not hasattr(ca, "Dynamics")
 assert not hasattr(ca, "RawEpisode")
 assert not hasattr(ca, "rollout_batch")

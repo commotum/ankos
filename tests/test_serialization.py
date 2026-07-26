@@ -1642,6 +1642,9 @@ def test_catalog_invocation_legacy_dynamics_and_observers_are_not_canonical() ->
             """
 import importlib.abc
 import sys
+import ca
+
+value = ca.loci.coordinate("x", 3)
 
 class BlockCatalog(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
@@ -1650,8 +1653,9 @@ class BlockCatalog(importlib.abc.MetaPathFinder):
         return None
 
 sys.meta_path.insert(0, BlockCatalog())
-import ca
-value = ca.loci.coordinate("x", 3)
+for name in tuple(sys.modules):
+    if name == "ca.catalog" or name.startswith("ca.catalog."):
+        del sys.modules[name]
 blob = ca.serialization.dumps(value)
 decoded = ca.serialization.loads(blob)
 assert decoded == ca.serialization.Decoded(value)

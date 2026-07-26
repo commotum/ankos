@@ -63,16 +63,9 @@ def test_apply_works_while_catalog_imports_are_blocked() -> None:
     script = """
 import importlib.abc
 import sys
-
-class BlockCatalog(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path=None, target=None):
-        if fullname == "ca.catalog" or fullname.startswith("ca.catalog."):
-            raise ImportError("catalog blocked")
-        return None
-
-sys.meta_path.insert(0, BlockCatalog())
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, rules, seeds
+
 source = loci.history_configuration((True, False, False))
 program = ca.SimpleProgram(
     seeds.exact(source),
@@ -84,6 +77,17 @@ program = ca.SimpleProgram(
     neighborhoods.dyadlags_0d(configuration_contract=source.contract),
     rules.dyadlags_0d(rule=150),
 )
+
+class BlockCatalog(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == "ca.catalog" or fullname.startswith("ca.catalog."):
+            raise ImportError("catalog blocked")
+        return None
+
+sys.meta_path.insert(0, BlockCatalog())
+for name in tuple(sys.modules):
+    if name == "ca.catalog" or name.startswith("ca.catalog."):
+        del sys.modules[name]
 assert isinstance(ca.apply(program, source), ca.program.ApplicationComplete)
 assert "ca.catalog" not in sys.modules
 """
@@ -119,6 +123,7 @@ def test_public_surface_submodules_and_signatures_are_exact() -> None:
         "apply",
         "rollout",
         "program",
+        "catalog",
         "loci",
         "alphabets",
         "seeds",
