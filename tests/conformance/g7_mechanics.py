@@ -1602,7 +1602,13 @@ def _px08(row: MechanicsRow) -> MechanicsRun:
             (("witness", 4), ("phase", 1)),
         ),
         "SPF020": (
-            (("query_hash", 0), ("bucket_key", 0), ("bucket_value", 7), ("result", -1), ("phase", 0)),
+            (
+                ("query_hash", 0),
+                ("bucket_key", 0),
+                ("bucket_value", 7),
+                ("result", -1),
+                ("phase", 0),
+            ),
             ("query_hash", "bucket_key", "bucket_value", "phase"),
             (("result", 7), ("phase", 1)),
         ),
@@ -3107,7 +3113,10 @@ def assert_mechanics_run(
             )
             assert len(step_derivations) == 1
             step = step_derivations[0]
-            assert step_result.evidence.program_identity == execution.simple_program.canonical_identity
+            assert (
+                step_result.evidence.program_identity
+                == execution.simple_program.canonical_identity
+            )
             assert step_result.evidence.input_configuration_identity == step_source.identity
             assert isinstance(
                 step.source.continuation,

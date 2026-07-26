@@ -1081,16 +1081,68 @@ def test_intensional_projection_cardinalities_obey_partition_and_quotient_laws()
         rules.literal_expr("unproved"),
         _certificate(rules.CertificateKind.CARDINALITY),
     )
-    with pytest.raises(ValueError, match="finite source support"):
-        rules.OutcomeSpace(
+    unknown_projection = rules.ProjectionCardinalities(
+        undetermined,
+        rules.finite_cardinality(0),
+        undetermined,
+        composition,
+    )
+    outcome = rules.OutcomeSpace(
+        source,
+        projection_cardinalities=unknown_projection,
+    )
+    assert outcome.projection_cardinalities is unknown_projection
+
+
+def test_intensional_projection_cardinalities_reject_impossible_infinite_claims() -> None:
+    cardinality = _certificate(rules.CertificateKind.CARDINALITY)
+    composition = _certificate(rules.CertificateKind.COMPOSITION)
+    zero = rules.finite_cardinality(0)
+    one = rules.finite_cardinality(1)
+    countable = rules.Many(
+        None,
+        rules.InfiniteCardinality.COUNTABLY_INFINITE,
+        cardinality,
+    )
+    uncountable = rules.Many(
+        None,
+        rules.InfiniteCardinality.UNCOUNTABLE,
+        cardinality,
+    )
+
+    def outcome(
+        source_cardinality: rules.Cardinality,
+        derivations: rules.Cardinality,
+        no_successors: rules.Cardinality,
+        successors: rules.Cardinality,
+    ) -> rules.OutcomeSpace:
+        source = rules.intensional_support(
+            rules.literal_expr("infinite-source"),
+            source_cardinality,
+            completeness_evidence=_certificate(rules.CertificateKind.COMPLETENESS),
+            soundness_evidence=_certificate(rules.CertificateKind.SOUNDNESS),
+        )
+        return rules.OutcomeSpace(
             source,
             projection_cardinalities=rules.ProjectionCardinalities(
-                undetermined,
-                rules.finite_cardinality(0),
-                undetermined,
+                derivations,
+                no_successors,
+                successors,
                 composition,
             ),
         )
+
+    with pytest.raises(ValueError, match="do not partition"):
+        outcome(countable, uncountable, zero, uncountable)
+    with pytest.raises(ValueError, match="cannot exceed countably"):
+        outcome(countable, countable, zero, uncountable)
+    with pytest.raises(ValueError, match="do not partition"):
+        outcome(uncountable, countable, zero, countable)
+    with pytest.raises(ValueError, match="do not partition"):
+        outcome(uncountable, one, countable, one)
+
+    assert outcome(countable, countable, zero, one).projection_cardinalities
+    assert outcome(uncountable, uncountable, zero, countable).projection_cardinalities
 
 
 @pytest.mark.parametrize(

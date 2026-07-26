@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 from collections import Counter
+from dataclasses import replace
 from fractions import Fraction
 from pathlib import Path
 
@@ -1410,10 +1411,177 @@ def _ct12_writable_as_oracle(
     )
 
 
+def _ct12_ordered_writable_terms(
+    case_id: str,
+) -> tuple[test_oracles.OracleTerm, ...]:
+    """Independent semantic order for each frozen non-native capability set."""
+
+    if case_id == "px01.mobile-head-branching":
+        return tuple(_term("tape-cell", index) for index in (-1, 0, 1))
+    if case_id == "px02.parallel-substitution":
+        old_a = _term("occurrence", "old", 0)
+        return (
+            old_a,
+            _term("occurrence", "old", 1),
+            _term("fresh-slot", "offspring", old_a, 0),
+            _term("fresh-slot", "offspring", old_a, 1),
+        )
+    if case_id == "px04.multiway-diamond":
+        return (_term("word-occurrence", 0),)
+    if case_id.startswith("px04.constraint-mod3-"):
+        return (_term("unknown", "x"),)
+    if case_id == "px02.graph-interface-replacement":
+        return (
+            _term("node", "b"),
+            _term("edge", "a", "b"),
+            _term("edge", "b", "c"),
+            _term("fresh-slot", "node", "x"),
+            _term("fresh-slot", "node", "y"),
+            _term("fresh-slot", "edge", "a-x"),
+            _term("fresh-slot", "edge", "x-y"),
+            _term("fresh-slot", "edge", "y-c"),
+        )
+    if case_id == "px06.stochastic-search-law":
+        return (_term("field", "x"), _term("field", "k"))
+    if case_id == "px05.exact-differential-flow":
+        return (_term("solution-slot", "x"),)
+    assert case_id == "px05.constant-field-intensional"
+    return (_term("field-capability", "u"),)
+
+
+def _ct12_atom_id(
+    case_id: str,
+    witness: test_oracles.OracleValue,
+) -> str:
+    """Derive the semantic oracle identifier from the runtime witness."""
+
+    mappings: dict[str, dict[test_oracles.OracleValue, str]] = {
+        "px01.mobile-head-branching": {
+            _term(
+                "transition-witness",
+                "q",
+                1,
+                "p",
+                0,
+                "left",
+            ): "mobile-left",
+            _term(
+                "transition-witness",
+                "q",
+                1,
+                "p",
+                0,
+                "right",
+            ): "mobile-right",
+        },
+        "px02.parallel-substitution": {
+            _term(
+                "generation-witness",
+                "A->AB",
+                "B->epsilon",
+            ): "parallel-substitution",
+        },
+        "px04.multiway-diamond": {
+            _term(
+                "rewrite-witness",
+                "rule-left",
+                "match:0",
+                "parent:a",
+            ): "diamond-rule-left",
+            _term(
+                "rewrite-witness",
+                "rule-right",
+                "match:0",
+                "parent:a",
+            ): "diamond-rule-right",
+        },
+        "px04.constraint-mod3-zero": {
+            _term(
+                "relation-witness",
+                "x^2=2",
+                "Z/3Z",
+            ): "constraint-no-solution",
+        },
+        "px04.constraint-mod3-one": {
+            _term("solution-witness", "x", 0): "constraint-x-0",
+        },
+        "px04.constraint-mod3-many": {
+            _term("solution-witness", "x", 1): "constraint-x-1",
+            _term("solution-witness", "x", 2): "constraint-x-2",
+        },
+        "px02.graph-interface-replacement": {
+            _term(
+                "match",
+                _term("node", "b"),
+                _term("ports", "a", "c"),
+            ): "graph-replacement",
+        },
+        "px06.stochastic-search-law": {
+            _term(
+                "proposal-witness",
+                1,
+                "accepted",
+            ): "search-accept",
+            _term(
+                "proposal-witness",
+                0,
+                "rejected",
+            ): "search-reject",
+            _term(
+                "proposal-witness",
+                "none",
+            ): "search-no-proposal",
+        },
+        "px05.exact-differential-flow": {
+            _term(
+                "differential-proof",
+                _term("derivative-of", "t", "t", 1),
+                _term("initial-value", 0, 0),
+                _term("coverage", "maximal-exact-real-solution"),
+            ): "exact-flow-x-equals-t",
+        },
+    }
+    try:
+        return mappings[case_id][witness]
+    except KeyError as error:
+        raise AssertionError(
+            f"unexpected CT12 witness for {case_id}: {witness!r}"
+        ) from error
+
+
+def _ct12_atom_order(case_id: str, atom_id: str) -> int:
+    orders = {
+        "px01.mobile-head-branching": ("mobile-left", "mobile-right"),
+        "px02.parallel-substitution": ("parallel-substitution",),
+        "px04.multiway-diamond": (
+            "diamond-rule-left",
+            "diamond-rule-right",
+        ),
+        "px04.constraint-mod3-zero": ("constraint-no-solution",),
+        "px04.constraint-mod3-one": ("constraint-x-0",),
+        "px04.constraint-mod3-many": (
+            "constraint-x-1",
+            "constraint-x-2",
+        ),
+        "px02.graph-interface-replacement": ("graph-replacement",),
+        "px06.stochastic-search-law": (
+            "search-accept",
+            "search-reject",
+            "search-no-proposal",
+        ),
+        "px05.exact-differential-flow": ("exact-flow-x-equals-t",),
+    }
+    try:
+        return orders[case_id].index(atom_id)
+    except (KeyError, ValueError) as error:
+        raise AssertionError(
+            f"unexpected CT12 atom identifier for {case_id}: {atom_id!r}"
+        ) from error
+
+
 def _ct12_dispositions_as_oracle(
     case_id: str,
     actual: rules.TotalDisposition,
-    expected_targets: tuple[test_oracles.OracleTerm, ...],
 ) -> tuple[test_oracles.OracleDisposition, ...]:
     assert actual.version == 1
     assert actual.totality_evidence.kind is rules.CertificateKind.TOTALITY
@@ -1431,8 +1599,9 @@ def _ct12_dispositions_as_oracle(
             item.action.value,
             payload,
         )
-    assert set(normalized) == set(expected_targets)
-    return tuple(normalized[target] for target in expected_targets)
+    ordered_targets = _ct12_ordered_writable_terms(case_id)
+    assert set(normalized) == set(ordered_targets)
+    return tuple(normalized[target] for target in ordered_targets)
 
 
 def _ct12_continuation_as_oracle(
@@ -1451,22 +1620,16 @@ def _ct12_continuation_as_oracle(
 def _ct12_normalize_fresh_bindings(
     case_id: str,
     actual: program.AppliedDerivation,
-    expected: test_oracles.OracleAppliedAtom,
     application: program.ApplicationComplete,
 ) -> tuple[
     tuple[test_oracles.OracleFreshBinding, ...],
     dict[loci.Locus, test_oracles.OracleTerm],
 ]:
-    expected_by_local_key = {
-        item.local_key: item for item in expected.fresh_bindings
-    }
     normalized = []
     bound_identities = {}
     for binding in actual.fresh_bindings:
         reference = binding.reference
         local_key = _ct12_fresh_target_as_oracle(case_id, reference)
-        assert local_key in expected_by_local_key
-        expected_binding = expected_by_local_key[local_key]
         assert binding.identity == loci.bind_fresh(
             reference,
             input_configuration_identity=application.evidence.input_configuration_identity,
@@ -1474,7 +1637,6 @@ def _ct12_normalize_fresh_bindings(
             witness_identity=actual.source.witness.canonical_identity,
         )
         semantic_identity = _ct12_bound_identity(case_id, reference)
-        assert expected_binding.identity == semantic_identity
         assert reference.namespace == case_id
         if case_id == "px02.parallel-substitution":
             assert reference.parent is not None
@@ -1484,6 +1646,21 @@ def _ct12_normalize_fresh_bindings(
                 0,
             )
             assert not reference.interface
+            ordinal = {"old:0:0": 0, "old:0:1": 1}[
+                str(reference.local_key)
+            ]
+            evidence = _term(
+                "fresh-recipe",
+                _term("input-identity", "word:old-generation"),
+                _term("rule-identity", "A->AB"),
+                _term("witness", "generation-witness"),
+                _term("namespace", case_id),
+                _term(
+                    "parent-and-ordinal",
+                    _term("occurrence", "old", 0),
+                    ordinal,
+                ),
+            )
         else:
             key = str(reference.local_key)
             if key in {"x", "y"}:
@@ -1496,13 +1673,31 @@ def _ct12_normalize_fresh_bindings(
                     ("node", "a"),
                     ("node", "c"),
                 )
-        normalized.append(expected_binding)
+            evidence = _term(
+                "fresh-recipe",
+                _term("input-identity", "graph:a-b-c"),
+                _term("rule-identity", "F029"),
+                _term("match-witness", "node:b"),
+                _term("interface", "a", "c"),
+                _term("namespace", case_id),
+                _term("local-key", key),
+            )
+        normalized.append(
+            test_oracles.OracleFreshBinding(
+                local_key,
+                semantic_identity,
+                evidence,
+            )
+        )
         bound_identities[binding.identity] = semantic_identity
-    assert set(expected_by_local_key) == {
-        item.local_key for item in normalized
-    }
+    expected_local_keys = tuple(
+        target
+        for target in _ct12_ordered_writable_terms(case_id)
+        if target.tag == "fresh-slot"
+    )
+    assert {item.local_key for item in normalized} == set(expected_local_keys)
     normalized.sort(
-        key=lambda item: tuple(expected_by_local_key).index(item.local_key)
+        key=lambda item: expected_local_keys.index(item.local_key)
     )
     return tuple(normalized), bound_identities
 
@@ -1542,35 +1737,80 @@ def _ct12_assert_applied_lineage(
     assert actual.evidence.disposition_identity == expected_disposition
 
 
-def _ct12_measure_view_exact(
+def _ct12_measure_view_as_oracle(
+    case_id: str,
+    role: str,
     actual: program.MeasureView,
-    expected: test_oracles.OracleMeasureView,
     point_mapping: dict[str, test_oracles.OracleValue],
-) -> None:
-    if expected.kind == "absent":
-        assert isinstance(actual, program.MeasureAbsent)
-        return
-    assert expected.kind == "available"
+) -> test_oracles.OracleMeasureView:
+    if isinstance(actual, program.MeasureAbsent):
+        return test_oracles.OracleMeasureView("absent", (), None, None)
+    assert case_id == "px06.stochastic-search-law"
+    assert role in {"applied-atoms", "successors", "no-successors"}
+    if isinstance(actual, program.MeasureUnavailable):
+        raise AssertionError("finite CT12 law unexpectedly lost a measure view")
     assert isinstance(actual, program.MeasureAvailable)
     measure = actual.measure
-    normalized = tuple(
-        sorted(
-            (
-                (
-                    point_mapping[item.point_identity],
-                    item.mass,
-                )
-                for item in measure.masses
-            ),
-            key=repr,
-        )
-    )
+    assert measure.intensional_descriptor is None
     assert set(point_mapping) == {
         item.point_identity for item in measure.masses
     }
-    assert normalized == tuple(sorted(expected.masses, key=repr))
-    assert measure.total_mass == expected.total_mass
-    assert measure.intensional_descriptor is None
+    normalized = tuple(
+        (
+            point_mapping[item.point_identity],
+            item.mass,
+        )
+        for item in measure.masses
+    )
+    if role in {"applied-atoms", "no-successors"}:
+        normalized = tuple(
+            sorted(
+                normalized,
+                key=lambda item: _ct12_atom_order(
+                    case_id,
+                    str(item[0]),
+                ),
+            )
+        )
+    else:
+        accept = _term(
+            "configuration.record",
+            _term("field-value", "x", 1),
+            _term("field-value", "k", 1),
+        )
+        reject = _term(
+            "configuration.record",
+            _term("field-value", "x", 0),
+            _term("field-value", "k", 1),
+        )
+        successor_order = (accept, reject)
+        normalized = tuple(
+            sorted(
+                normalized,
+                key=lambda item: successor_order.index(item[0]),
+            )
+        )
+
+    evidence = {
+        "applied-atoms": _term(
+            "law-evidence",
+            "closed-three-atom-law",
+        ),
+        "successors": _term(
+            "pushforward-evidence",
+            "derivation-atoms-only",
+        ),
+        "no-successors": _term(
+            "restriction-evidence",
+            "no-successor-atoms-only",
+        ),
+    }[role]
+    return test_oracles.OracleMeasureView(
+        "available",
+        normalized,
+        measure.total_mass,
+        evidence,
+    )
 
 
 def _ct12_tagged(
@@ -1668,6 +1908,104 @@ def _ct12_expected_projection(
     return _ct12_tagged(f"application-projection:{phase}:v1", context, *pipeline)
 
 
+def _ct12_intensional_projection_as_oracle(
+    phase: str,
+    actual: rules.RuleExpr,
+    source_relation: rules.RuleExpr,
+    evidence: program.ApplicationEvidence,
+    source_configuration: loci.FiniteConfiguration,
+) -> test_oracles.OracleTerm:
+    """Interpret the validated generic projection into frozen semantic syntax."""
+
+    assert phase in {"applied-atoms", "successor-quotient"}
+    assert actual == _ct12_expected_projection(
+        phase,
+        source_relation,
+        evidence,
+    )
+    source_term = _ct12_expression_as_oracle(source_relation)
+    assert isinstance(source_term, test_oracles.OracleTerm)
+    assert source_term.tag == "intensional-source-outcome-relation"
+    binder_term, domain_term, template = source_term.arguments
+    assert isinstance(binder_term, test_oracles.OracleTerm)
+    assert binder_term.tag == "binder"
+    assert len(binder_term.arguments) == 1
+    binder = binder_term.arguments[0]
+    assert binder == "c"
+    assert domain_term == _term("domain", "exact-real")
+    assert isinstance(template, test_oracles.OracleTerm)
+    assert template.tag == "source-derivation-template"
+    atom_term, disposition, witness, continuation = template.arguments
+    assert isinstance(atom_term, test_oracles.OracleTerm)
+    assert atom_term.tag == "atom-id"
+    parameterized = atom_term.arguments[0]
+    assert parameterized == _term("parameterized", "constant-field", binder)
+    assert disposition == _term(
+        "total-disposition",
+        _term(
+            "replace",
+            _term("field-capability", "u"),
+            _term("constant-field", binder),
+        ),
+    )
+    assert witness == _term(
+        "witness",
+        _term("derivative", "u", "x"),
+        0,
+    )
+    assert continuation == _term("stop", "completed")
+    source_configuration_term = _ct12_configuration_as_oracle(
+        "px05.constant-field-intensional",
+        source_configuration,
+    )
+    assert source_configuration_term == _term(
+        "field-state",
+        _term("domain", _term("closed-interval", 0, 1)),
+        _term("field", "u", "unknown"),
+    )
+    successor = _term(
+        "field-state",
+        _term("domain", _term("closed-interval", 0, 1)),
+        _term("field", "u", _term("constant-field", binder)),
+    )
+
+    if phase == "applied-atoms":
+        return _term(
+            "intensional-applied-atom-relation",
+            binder_term,
+            domain_term,
+            _term(
+                "applied-derivation-template",
+                _term("source-atom-id", parameterized),
+                _term("successor", successor),
+                _term("fresh-bindings", "empty"),
+                _term(
+                    "output-lineage",
+                    "px05.constant-field-intensional",
+                    binder,
+                ),
+                _term(
+                    "application-evidence",
+                    "exact-differential-proof",
+                    binder,
+                ),
+            ),
+        )
+    return _term(
+        "intensional-successor-quotient-relation",
+        binder_term,
+        domain_term,
+        _term(
+            "successor-group-template",
+            successor,
+            _term(
+                "derivation-fiber",
+                _term("applied-atom-id", parameterized),
+            ),
+        ),
+    )
+
+
 def _assert_complete_non_native_result(
     oracle_case: test_oracles.OracleCase,
     execution,
@@ -1702,22 +2040,23 @@ def _assert_complete_non_native_result(
         actual.successor_quotient_with_derivation_fibers
     )
 
-    expected = oracle_case.expected
-    if expected.support_kind == "intensional":
+    if support.presentation is rules.SupportPresentation.INTENSIONAL:
         assert support.presentation is rules.SupportPresentation.INTENSIONAL
         assert not support.atoms
         assert support.relation is not None
-        assert _ct12_expression_as_oracle(support.relation) == (
-            expected.source_intensional_relation
-        )
+        source_relation = _ct12_expression_as_oracle(support.relation)
         assert not actual.applied_atoms.atoms
         assert not actual.no_successor_partition.atoms
         assert not actual.successor_quotient_with_derivation_fibers.atoms
-        assert actual.applied_atoms.relation == _ct12_expected_projection(
+        assert actual.applied_atoms.relation is not None
+        applied_relation = _ct12_intensional_projection_as_oracle(
             "applied-atoms",
+            actual.applied_atoms.relation,
             support.relation,
             actual.evidence,
+            source,
         )
+        assert actual.no_successor_partition.relation is not None
         assert actual.no_successor_partition.relation == (
             _ct12_expected_projection(
                 "no-successor-partition",
@@ -1725,19 +2064,37 @@ def _assert_complete_non_native_result(
                 actual.evidence,
             )
         )
-        assert actual.successor_quotient_with_derivation_fibers.relation == (
-            _ct12_expected_projection(
-                "successor-quotient",
-                support.relation,
-                actual.evidence,
-            )
+        successor_relation_runtime = (
+            actual.successor_quotient_with_derivation_fibers.relation
         )
-        for view in (
-            actual.applied_atom_measure,
-            actual.successor_submeasure,
-            actual.no_successor_submeasure,
-        ):
-            assert isinstance(view, program.MeasureAbsent)
+        assert successor_relation_runtime is not None
+        successor_relation = _ct12_intensional_projection_as_oracle(
+            "successor-quotient",
+            successor_relation_runtime,
+            support.relation,
+            actual.evidence,
+            source,
+        )
+        normalized_measures = test_oracles.OracleMeasures(
+            _ct12_measure_view_as_oracle(
+                case_id,
+                "applied-atoms",
+                actual.applied_atom_measure,
+                {},
+            ),
+            _ct12_measure_view_as_oracle(
+                case_id,
+                "successors",
+                actual.successor_submeasure,
+                {},
+            ),
+            _ct12_measure_view_as_oracle(
+                case_id,
+                "no-successors",
+                actual.no_successor_submeasure,
+                {},
+            ),
+        )
         assert _application_evidence_as_oracle(
             actual.evidence,
             oracle_case=oracle_case,
@@ -1772,14 +2129,10 @@ def _assert_complete_non_native_result(
                 actual.successor_cardinality
             ),
             successor_fibers=(),
-            measures=test_oracles.ABSENT_MEASURES,
-            source_intensional_relation=_ct12_expression_as_oracle(
-                support.relation
-            ),
-            applied_intensional_relation=expected.applied_intensional_relation,
-            successor_intensional_relation=(
-                expected.successor_intensional_relation
-            ),
+            measures=normalized_measures,
+            source_intensional_relation=source_relation,
+            applied_intensional_relation=applied_relation,
+            successor_intensional_relation=successor_relation,
             evidence=normalized_evidence,
         )
 
@@ -1788,13 +2141,6 @@ def _assert_complete_non_native_result(
     assert actual.applied_atoms.relation is None
     assert actual.no_successor_partition.relation is None
     assert actual.successor_quotient_with_derivation_fibers.relation is None
-    expected_by_witness = {
-        item.witness: item for item in expected.source_outcomes
-    }
-    assert len(expected_by_witness) == len(expected.source_outcomes)
-    expected_order = {
-        item.atom_id: index for index, item in enumerate(expected.source_outcomes)
-    }
     runtime_to_oracle_id = {}
     normalized_source_atoms = []
     law = actual.source_outcomes.probability_law
@@ -1805,19 +2151,17 @@ def _assert_complete_non_native_result(
             atom.witness.descriptor
         )
         witness = _ct12_expression_as_oracle(atom.witness.descriptor)
-        assert witness in expected_by_witness
-        expected_atom = expected_by_witness[witness]
-        runtime_to_oracle_id[atom.canonical_identity] = expected_atom.atom_id
+        atom_id = _ct12_atom_id(case_id, witness)
+        runtime_to_oracle_id[atom.canonical_identity] = atom_id
         mass = None if law is None else law.mass_for(atom.canonical_identity)
         assert atom.certificate.version == 1
         certificate = _ct12_expression_as_oracle(atom.certificate.statement)
         if isinstance(atom, rules.NoSuccessor):
-            assert expected_atom.kind == "no-successor"
             assert atom.outcome is rules.NoSuccessorOutcome.TERMINAL
             assert atom.certificate.kind is rules.CertificateKind.TERMINALITY
             normalized_source_atoms.append(
                 test_oracles.OracleSourceAtom(
-                    expected_atom.atom_id,
+                    atom_id,
                     "no-successor",
                     witness,
                     atom.provenance,
@@ -1830,14 +2174,10 @@ def _assert_complete_non_native_result(
                 )
             )
         else:
-            assert expected_atom.kind == "derivation"
             assert atom.certificate.kind is rules.CertificateKind.DERIVATION
-            expected_targets = tuple(
-                item.target for item in expected_atom.dispositions
-            )
             normalized_source_atoms.append(
                 test_oracles.OracleSourceAtom(
-                    expected_atom.atom_id,
+                    atom_id,
                     "derivation",
                     witness,
                     atom.provenance,
@@ -1846,19 +2186,16 @@ def _assert_complete_non_native_result(
                     _ct12_dispositions_as_oracle(
                         case_id,
                         atom.replacement,
-                        expected_targets,
                     ),
                     None,
                     certificate,
                     mass,
                 )
             )
-    assert len(runtime_to_oracle_id) == len(expected.source_outcomes)
-    normalized_source_atoms.sort(key=lambda item: expected_order[item.atom_id])
-
-    expected_applied_by_id = {
-        item.atom_id: item for item in expected.applied_atoms
-    }
+    assert len(runtime_to_oracle_id) == len(support.atoms)
+    normalized_source_atoms.sort(
+        key=lambda item: _ct12_atom_order(case_id, item.atom_id)
+    )
     normalized_applied = []
     applied_identity_to_point = {}
     no_successor_identity_to_point = {}
@@ -1870,12 +2207,9 @@ def _assert_complete_non_native_result(
         source_id = atom.source.canonical_identity
         assert source_id in runtime_to_oracle_id
         atom_id = runtime_to_oracle_id[source_id]
-        expected_applied = expected_applied_by_id[atom_id]
         _ct12_assert_applied_lineage(atom, actual, source)
         applied_identity_to_point[atom.canonical_identity] = atom_id
         if isinstance(atom, program.AppliedNoSuccessor):
-            assert expected_applied.successor is None
-            assert not expected_applied.fresh_bindings
             no_successor_identity_to_point[atom.canonical_identity] = atom_id
             normalized = test_oracles.OracleAppliedAtom(
                 atom_id,
@@ -1889,7 +2223,6 @@ def _assert_complete_non_native_result(
             fresh_bindings, bound = _ct12_normalize_fresh_bindings(
                 case_id,
                 atom,
-                expected_applied,
                 actual,
             )
             applied_bound_identities[source_id] = bound
@@ -1906,7 +2239,9 @@ def _assert_complete_non_native_result(
                 _term("applied-atom-evidence", case_id, atom_id),
             )
         normalized_applied.append(normalized)
-    normalized_applied.sort(key=lambda item: expected_order[item.atom_id])
+    normalized_applied.sort(
+        key=lambda item: _ct12_atom_order(case_id, item.atom_id)
+    )
 
     normalized_no_successors = tuple(
         item
@@ -1923,9 +2258,6 @@ def _assert_complete_non_native_result(
         if isinstance(item, program.AppliedNoSuccessor)
     }
 
-    expected_fibers_by_successor = {
-        item.successor: item for item in expected.successor_fibers
-    }
     normalized_fibers = []
     successor_identity_to_point = {}
     for group in actual.successor_quotient_with_derivation_fibers.atoms:
@@ -1940,13 +2272,10 @@ def _assert_complete_non_native_result(
             group.successor,
             bound_identities=bound,
         )
-        assert successor in expected_fibers_by_successor
-        expected_fiber = expected_fibers_by_successor[successor]
         atom_ids = {
             runtime_to_oracle_id[item.source.canonical_identity]
             for item in group.derivations
         }
-        assert atom_ids == set(expected_fiber.atom_ids)
         for item in group.derivations:
             assert _ct12_configuration_as_oracle(
                 case_id,
@@ -1956,16 +2285,25 @@ def _assert_complete_non_native_result(
                     {},
                 ),
             ) == successor
-        normalized_fibers.append(expected_fiber)
+        ordered_atom_ids = tuple(
+            sorted(
+                atom_ids,
+                key=lambda atom_id: _ct12_atom_order(case_id, atom_id),
+            )
+        )
+        normalized_fibers.append(
+            test_oracles.OracleFiber(successor, ordered_atom_ids)
+        )
         successor_identity_to_point[group.canonical_identity] = successor
     normalized_fibers.sort(
-        key=lambda item: tuple(expected_fibers_by_successor).index(
-            item.successor
+        key=lambda item: min(
+            _ct12_atom_order(case_id, atom_id)
+            for atom_id in item.atom_ids
         )
     )
 
     if law is None:
-        assert all(item.mass is None for item in expected.source_outcomes)
+        assert all(item.mass is None for item in normalized_source_atoms)
     else:
         assert law.presentation is rules.ProbabilityPresentation.FINITE
         assert law.version == 1
@@ -1975,22 +2313,27 @@ def _assert_complete_non_native_result(
             runtime_to_oracle_id[item.atom_identity]: item.mass
             for item in law.masses
         } == {
-            item.atom_id: item.mass for item in expected.source_outcomes
+            item.atom_id: item.mass for item in normalized_source_atoms
         }
-    _ct12_measure_view_exact(
-        actual.applied_atom_measure,
-        expected.measures.applied_atoms,
-        applied_identity_to_point,
-    )
-    _ct12_measure_view_exact(
-        actual.successor_submeasure,
-        expected.measures.successors,
-        successor_identity_to_point,
-    )
-    _ct12_measure_view_exact(
-        actual.no_successor_submeasure,
-        expected.measures.no_successors,
-        no_successor_identity_to_point,
+    normalized_measures = test_oracles.OracleMeasures(
+        _ct12_measure_view_as_oracle(
+            case_id,
+            "applied-atoms",
+            actual.applied_atom_measure,
+            applied_identity_to_point,
+        ),
+        _ct12_measure_view_as_oracle(
+            case_id,
+            "successors",
+            actual.successor_submeasure,
+            successor_identity_to_point,
+        ),
+        _ct12_measure_view_as_oracle(
+            case_id,
+            "no-successors",
+            actual.no_successor_submeasure,
+            no_successor_identity_to_point,
+        ),
     )
 
     normalized_evidence = _application_evidence_as_oracle(
@@ -2016,7 +2359,7 @@ def _assert_complete_non_native_result(
             actual.successor_cardinality
         ),
         successor_fibers=tuple(normalized_fibers),
-        measures=expected.measures,
+        measures=normalized_measures,
         source_intensional_relation=None,
         applied_intensional_relation=None,
         successor_intensional_relation=None,
