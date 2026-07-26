@@ -364,16 +364,16 @@ def _zero_anchor_result() -> rules.DerivationClauseResult:
 
 
 def _terminal_transition_result() -> rules.NoSuccessorClauseResult:
-    """Return an explicit typed terminal continuation without hidden fallback."""
+    """Return a typed terminal result when no in-carrier transition applies."""
 
     return rules.NoSuccessorClauseResult(
         rules.NoSuccessorOutcome.TERMINAL,
-        rules.literal_expr("missing-transition"),
-        rules.literal_expr("missing-transition"),
-        ("mechanics:missing-transition",),
+        rules.literal_expr("no-applicable-transition"),
+        rules.literal_expr("no-applicable-transition"),
+        ("mechanics:no-applicable-transition",),
         _certificate(
             rules.CertificateKind.TERMINALITY,
-            "terminal:missing-transition",
+            "terminal:no-applicable-transition",
         ),
     )
 

@@ -390,6 +390,17 @@ def _grid_expression_program(
     boundary: loci.Boundary,
     axes: tuple[str, ...] | None,
 ) -> SimpleProgram:
+    if (
+        boundary.policy is loci.BoundaryPolicy.NONE
+        and any(
+            any(part != 0 for part in offset)
+            for offset in offsets
+        )
+    ):
+        raise ValueError(
+            "BoundaryPolicy.NONE cannot totalize a finite neighborhood "
+            "with nonzero offsets"
+        )
     source = loci.grid_configuration(
         shape,
         initial,
@@ -911,14 +922,14 @@ def generalized_mobile_automaton(
                     _anchored_result(replacements),
                 )
             )
-    zero_result = _anchored_result(
-        (),
-        continuation=rules.Stop(
-            rules.literal_expr("no-active-loci"),
-            _certificate(
-                rules.CertificateKind.TERMINALITY,
-                "terminal:no-active-loci",
-            ),
+    zero_result = rules.NoSuccessorClauseResult(
+        rules.NoSuccessorOutcome.TERMINAL,
+        rules.literal_expr("no-active-loci"),
+        rules.literal_expr("no-active-loci"),
+        ("mechanics:no-active-loci",),
+        _certificate(
+            rules.CertificateKind.TERMINALITY,
+            "terminal:no-active-loci",
         ),
     )
     rule = rules.anchored_clause_kernel(

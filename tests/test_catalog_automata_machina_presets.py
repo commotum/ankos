@@ -59,13 +59,20 @@ def _values(configuration: loci.FiniteConfiguration) -> tuple:
     return tuple(value for _, value in configuration.entries)
 
 
-def _assert_terminal(simple: program.SimpleProgram) -> program.ApplicationComplete:
-    result = program.apply(simple, _source(simple))
+def _assert_terminal(
+    simple: program.SimpleProgram,
+    source: loci.FiniteConfiguration | None = None,
+    *,
+    reason: str = "no-applicable-transition",
+) -> program.ApplicationComplete:
+    result = program.apply(simple, _source(simple) if source is None else source)
     assert isinstance(result, program.ApplicationComplete)
     assert result.successor_quotient_with_derivation_fibers.atoms == ()
     assert len(result.no_successor_partition.atoms) == 1
     terminal = result.no_successor_partition.atoms[0].source
     assert terminal.outcome is rules.NoSuccessorOutcome.TERMINAL
+    assert terminal.reason == rules.literal_expr(reason)
+    assert terminal.provenance == (f"mechanics:{reason}",)
     return result
 
 
@@ -344,6 +351,37 @@ def test_periodic_movement_presets_normalize_edge_destinations() -> None:
             "head",
             0,
         )
+
+
+def test_generalized_mobile_zero_active_state_is_explicitly_terminal() -> None:
+    initially_empty = automata.generalized_mobile_automaton(
+        initial=(0, 0, 0),
+        active=(),
+        colors=2,
+        transitions=_generalized_transitions(2),
+    )
+    deletes_active = automata.generalized_mobile_automaton(
+        initial=(0, 0, 0),
+        active=(1,),
+        colors=2,
+        transitions=tuple(
+            (key, (key[1], ()))
+            for key in cartesian_product(range(2), repeat=3)
+        ),
+    )
+
+    _assert_terminal(initially_empty, reason="no-active-loci")
+    successor = _successor(deletes_active)
+    assert all(
+        value.tag == "cell"
+        for value in _values(successor)
+        if isinstance(value, alphabets.ValueNode)
+    )
+    _assert_terminal(
+        deletes_active,
+        successor,
+        reason="no-active-loci",
+    )
 
 
 @pytest.mark.parametrize(
@@ -811,6 +849,78 @@ def test_all_new_presets_round_trip_through_the_closed_codec() -> None:
         encoded = serialization.dumps(simple)
         assert serialization.loads(encoded) == serialization.Decoded(simple)
         assert b"catalog:" not in encoded
+
+
+@pytest.mark.parametrize(
+    "constructor",
+    (
+        lambda: automata.multicolor_cellular_automaton(
+            initial=(0, 1, 0),
+            colors=2,
+            rule=(0,) * 8,
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        lambda: automata.totalistic_cellular_automaton(
+            initial=(0, 1, 0),
+            colors=2,
+            rule=(0,) * 4,
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        lambda: automata.cellular_automaton_2d(
+            shape=(1, 1),
+            initial=(0,),
+            colors=2,
+            rule=(0,) * 32,
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        lambda: automata.moore_cellular_automaton(
+            shape=(1, 1),
+            initial=(0,),
+            colors=2,
+            rule=(0,) * 512,
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        lambda: automata.cellular_automaton_3d(
+            shape=(2, 1, 1),
+            initial=(0, 0),
+            colors=2,
+            offsets=((0, 0, 0), (1, 0, 0)),
+            rule=(0,) * 4,
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        lambda: automata.lattice_cellular_automaton(
+            shape=(2, 1),
+            initial=(0, 0),
+            colors=2,
+            offsets=((0, 0), (1, 0)),
+            rule=(0,) * 4,
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        lambda: automata.continuous_cellular_automaton(
+            initial=(Fraction(0), Fraction(1)),
+            local_rule=rules.project(rules.group(0), 1),
+            boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+    ),
+)
+def test_nonzero_finite_stencils_reject_absent_boundaries(
+    constructor,
+) -> None:
+    with pytest.raises(ValueError, match="BoundaryPolicy.NONE"):
+        constructor()
+
+
+def test_zero_only_lattice_stencil_accepts_absent_boundary() -> None:
+    simple = automata.lattice_cellular_automaton(
+        shape=(1, 1),
+        initial=(1,),
+        colors=2,
+        offsets=((0, 0),),
+        rule=(0, 1),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+
+    assert _values(_successor(simple)) == (1,)
 
 
 @pytest.mark.parametrize(
