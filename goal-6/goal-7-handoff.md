@@ -90,49 +90,39 @@ or promised as part of the new root façade.
 G7-00 frozen behavior and independent test oracles
   |
   v
-G7-01 loci identities/regions + exact Alphabet values
+G7-01 atomic five-field core cutover
+       (structural kernel → component contracts → Rule algebra → apply/rollout
+        → current native presets → root/downstream/tests → delete old executor)
   |
   v
-G7-02 Seed/WritableRegion/ReadableRegion contracts + Rule result algebra
+G7-02 reusable mechanics closure for all 60 rows
+       (three mechanics workstreams; one aggregate completion barrier)
   |
   v
-G7-03 SimpleProgram + validation + family-blind apply + apply-owned rollout
+G7-03 canonical serialization and representation relations
   |
   v
-G7-04A existing-support and visible-control mechanics
+G7-04 catalog assembly and exact T migration
   |
   v
-G7-04B dynamic-structure and representation-workspace mechanics
+G7-05 complete conformance
   |
   v
-G7-04C global/law/intensional mechanics
-  |
-  v
-G7-05 canonical serialization
-  |
-  v
-G7-06 catalog assembly and T migration
-  |
-  v
-G7-07 atomic public/downstream cutover
-  |
-  v
-G7-08 complete conformance
-  |
-  v
-G7-09 documentation, packaging, and cleanup
+G7-06 documentation, packaging, and cleanup
 ```
 
-The three G7-04 waves are ordered by reusable capability, not by Book subject
-or catalog home. Each wave builds on the prior capability layer. G7-05 follows
-the closed semantic variants so codecs are not designed around temporary
-records. G7-06 composes already-tested mechanics.
+G7-01 is intentionally one atomic stage even though its work is internally
+dependency-ordered. The actual repository import chain makes smaller completed
+stages dishonest: replacing loci/component/Rule contracts while retaining
+`Dynamics`, `specs.py`, and the old executor would either break the active
+suite or require a parallel compatibility architecture. No G7-01 substep is a
+merge/release boundary.
 
-The work occurs on one non-release branch. Before G7-07, the old executor may
-remain only as a frozen baseline while the unexported target is assembled. No
-new file may call it, adapt to it, or fall back to it. G7-07 deletes it in the
-same cutover that exposes the new root surface; no intermediate state is a
-release candidate.
+G7-02 contains three mechanics workstreams, but they share one completion
+barrier. A row's workstream is its primary implementation/test owner, not a
+claim that the family has no cross-workstream dependencies. G7-03 follows the
+closed semantic variants so codecs are not designed around temporary records.
+G7-04 only composes already-tested mechanics.
 
 ## File-Level Migration
 
@@ -140,28 +130,28 @@ release candidate.
 
 | Current or target path | Action | Stage | Final responsibility |
 |---|---|---:|---|
-| `src/ca/loci.py` | Retain and revise in place | G7-01, G7-04 | Closed identities, occurrences, paths, spans, ports, selectors, lenses, region algebra, and fresh references; replace callable predicates as semantic identity, while finite tensor helpers become representations rather than the ontology |
-| `src/ca/alphabets.py` | Retain and revise in place | G7-01, G7-04 | Closed exact scalar and structural value schemas, equality, composition, and represented-number profiles; no mutable `Mapping[str, Any]` identity or silent Python-float exactness |
-| `src/ca/seeds.py` | Retain and revise in place | G7-02, G7-04 | Exact, constructive, partial, law-valued, and intensional configuration sources; move current drawing/render/dedupe/catalog-generation work downstream where it is realization rather than denotation |
-| `src/ca/frontiers.py` | Retain and replace its contract | G7-02, G7-04 | `WritableRegion`, complete possible-write envelopes, structural capability schemas, fresh namespaces, and composition |
-| `src/ca/neighborhoods.py` | Retain and generalize | G7-02, G7-04 | `ReadableRegion`, identity-preserving local/global/historical/structural/differential views, and composition |
-| `src/ca/rules.py` | Retain and generalize | G7-02, G7-04 | Closed Rule ASTs/combinators plus Rule results, atoms, total dispositions, outcomes, measures, witnesses, provenance, progress, and continuation; remove callable `fn`, `instantiate`, and `family`/`rule_id` execution dispatch |
-| `src/ca/program.py` | Add | G7-03 | Exactly-five-field `SimpleProgram`, compatibility validation, application inputs/results, family-blind `apply`, private reconstruction/commit/quotient, raw trace graph, and callable `rollout` |
-| `src/ca/serialization.py` | Add | G7-05 | Versioned fail-closed codecs for every semantic owner; typed decode results; no catalog resolution |
-| `src/ca/catalog/entries.py` | Add | G7-06 | Immutable callable-free SPF/F/T/name/source metadata |
-| six catalog category files | Add | G7-06 | Canonical whole-program constructors, presets, aliases, and the one lossless compatibility adapter; no execution logic |
-| `src/ca/catalog/__init__.py` | Add | G7-06 | Explicit namespace and collision-free convenience re-exports; the sole constructor/metadata join |
-| `src/ca/__init__.py` | Replace broad façade atomically | G7-07 | Only core namespaces plus root `SimpleProgram`, `apply`, and callable `rollout` |
-| `src/ca/specs.py` | Delete | G7-07 | `Dynamics` and family-string decoding have no target role |
-| `src/ca/rollout.py` | Delete physically | G7-07 | Prevent `ca.rollout` submodule shadowing; no old tensor/family branch or `apply_rule` survives |
-| `src/ca/datasets.py` | Retain as downstream and revise | G7-07 | Dataset planning/materialization over catalog programs and generic rollout; no family switch or semantic identity |
-| `src/ca/rng.py` | Retain as downstream and narrow | G7-07 | Dataset/external realization helpers only; Seed/Rule law identity and replay contracts do not depend on this module |
-| `src/ca/viz/__init__.py` | Retain and revise exports | G7-07 | Downstream visualization surface only |
-| `src/ca/viz/export.py` | Retain and adapt | G7-07 | Explicit views of rollout or dataset materializations; never a semantic result definition |
-| `src/ca/viz/format.py` | Retain unless its independent bundle version requires a documented bump | G7-07 | Visualization wire format only |
-| `src/ca/viz/server.py` and `viz/static/*` | Retain | G7-07 | Presentation only |
+| `src/ca/loci.py` | Retain and revise in place | G7-01, G7-02 | Closed identities, occurrences, paths, spans, ports, selectors, lenses, region algebra, and fresh references; replace callable predicates as semantic identity, while finite tensor helpers become representations rather than the ontology |
+| `src/ca/alphabets.py` | Retain and revise in place | G7-01, G7-02 | Closed exact scalar and structural value schemas, equality, composition, and represented-number profiles; no mutable `Mapping[str, Any]` identity or silent Python-float exactness |
+| `src/ca/seeds.py` | Retain and revise in place | G7-01, G7-02 | Exact, constructive, partial, law-valued, and intensional configuration sources; current drawing/render/dedupe/catalog-generation work moves to the exact downstream owners fixed below |
+| `src/ca/frontiers.py` | Retain and replace its contract | G7-01, G7-02 | `WritableRegion`, complete possible-write envelopes, structural capability schemas, fresh namespaces, and composition |
+| `src/ca/neighborhoods.py` | Retain and generalize | G7-01, G7-02 | `ReadableRegion`, identity-preserving local/global/historical/structural/differential views, and composition |
+| `src/ca/rules.py` | Retain and generalize | G7-01, G7-02 | Closed Rule ASTs/combinators plus Rule results, atoms, total dispositions, outcomes, measures, witnesses, provenance, progress, and continuation; remove callable `fn`, `instantiate`, and `family`/`rule_id` recipe bags and execution dispatch |
+| `src/ca/program.py` | Add | G7-01 | Exactly-five-field `SimpleProgram`, cross-field compatibility validation, Seed binding/realization evidence, application inputs/results, family-blind `apply`, private reconstruction/commit/quotient, raw trace graph, replay derivation, and callable `rollout` |
+| `src/ca/serialization.py` | Add | G7-03 | Versioned fail-closed codecs for every semantic owner; typed decode results; no catalog resolution |
+| `src/ca/catalog/entries.py` | Add | G7-04 | Immutable callable-free SPF/F/T/name/source metadata |
+| six catalog category files | Add | G7-04 | Canonical whole-program constructors, presets, aliases, and the one lossless compatibility adapter; no execution logic |
+| `src/ca/catalog/__init__.py` | Add | G7-04 | Explicit namespace and collision-free convenience re-exports; the sole constructor/metadata join |
+| `src/ca/__init__.py` | Replace broad façade atomically, then add catalog/codec namespaces | G7-01, G7-03–04 | Only core namespaces plus root `SimpleProgram`, `apply`, and callable `rollout` |
+| `src/ca/specs.py` | Delete | G7-01 | `Dynamics` and family-string decoding have no target role |
+| `src/ca/rollout.py` | Delete physically | G7-01 | Prevent `ca.rollout` submodule shadowing; no old tensor/family branch or `apply_rule` survives |
+| `src/ca/datasets.py` | Retain as downstream and revise | G7-01 | Four explicit dataset recipe builders, Seed realization requests, tensor projection/materialization, dataset episode/batch views, and external batching over generic rollout; no executor dispatch |
+| `src/ca/rng.py` | Retain as downstream and narrow | G7-01 | Dataset planning helpers only; core replay coordinates/evidence are owned by `program.py` |
+| `src/ca/viz/__init__.py` | Retain and revise exports | G7-01 | Downstream visualization surface only |
+| `src/ca/viz/export.py` | Retain and adapt | G7-01 | Accept explicit dataset tensor views for viewer bundle v1; never infer a tensor projection from an arbitrary semantic result |
+| `src/ca/viz/format.py` | Retain unchanged at bundle version 1 | G7-01 | Independent visualization wire format; not canonical semantic serialization |
+| `src/ca/viz/server.py` and `viz/static/*` | Retain unchanged | G7-01 | Presentation only |
 | `src/ca/py.typed` | Retain unchanged | all | PEP 561 marker |
-| `pyproject.toml` | Revise at cutover | G7-07 | Version `0.2.0`, general simple-program description, unchanged `ca` module identity, and test tooling moved out of runtime dependencies |
+| `pyproject.toml` and `uv.lock` | Revise together | G7-01, G7-06 | Version `0.2.0`, general simple-program description, unchanged `ca` module identity, and pytest moved to `[dependency-groups].dev` |
 
 The target adds no public `configuration.py`, `regions.py`, `replacement.py`,
 `results.py`, `engine.py`, `rollout.py`, `run.py`, `updates.py`, or second
@@ -242,211 +232,236 @@ Exit:
 - no runtime file changes; and
 - the oracle dependency check proves independence.
 
-### G7-01 — Structural identity and exact values
+### G7-01 — Atomic five-field core cutover
 
-Files: `loci.py`, `alphabets.py`, `tests/test_loci.py`, new
-`tests/test_alphabets.py`, and closure helpers.
-
-Implement:
-
-- recognized, versioned structural locus variants for finite coordinates,
-  occurrence identity, paths, spans, ports, interfaces, products, continuous
-  regions, and intensional references;
-- composition, semantic equality, deterministic ordering where declared,
-  stable identity, alpha-equivalence contracts, and representation relations;
-- exact Alphabet schemas for integers, rationals, modular/algebraic and
-  declared real/complex representations, finite enums, tags, products,
-  records, words, maps, graphs, fields, instructions, patterns, equations,
-  distributions, and symbolic syntax; and
-- validation that rejects opaque Python values, callbacks, unknown variants,
-  silent float exactness, and ambiguous absence/unknown values.
-
-Exit:
-
-- CT02's primitive closure and negative exactness cases pass;
-- canonical equality does not depend on Python object identity, hash order, or
-  display form;
-- no new file imports `program`, `catalog`, datasets, RNG, or visualization;
-  and
-- existing finite tensor behavior retained as an explicit representation still
-  passes its focused tests.
-
-### G7-02 — Five component contracts and Rule result algebra
-
-Files: `seeds.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, their
-focused tests, and new `tests/test_frontiers.py`.
-
-Implement:
-
-- closed Seed descriptors for exact, constructive, partial, probability-law,
-  and intensional initial configurations;
-- `WritableRegion` resolution with complete existing/fresh capability
-  envelopes, total write schemas, and no read authority;
-- `ReadableRegion` resolution from the same immutable snapshot, with no write
-  authority;
-- sealed Rule descriptors and combinators whose denotation consumes only
-  `(R, W)`;
-- `RuleComplete`, `RuleRejected`, `RuleFault`, finite/intensional support,
-  exact cardinalities, probability laws, `Derivation`/`NoSuccessor`, complete
-  dispositions, progress, continuation, witnesses, and provenance; and
-- structural compatibility declarations linking Seed output, Alphabet values,
-  Frontier capabilities, Neighborhood reads, and Rule's typed join.
-
-Exit:
-
-- component-level CT02 cases and CT05 Rule-side cases pass;
-- a bare empty finite Rule support is rejected;
-- every omission in a disposition has an explicit closed default;
-- Seed and Rule laws contain no draw; and
-- component modules remain upstream of `program` and `catalog`.
-
-### G7-03 — Universal application and traversal
-
-Files: new `program.py`, new `tests/test_program.py`, and the application-side
-conformance tests.
-
-Implement:
-
-- frozen `SimpleProgram` with exactly the five fields and construction-time
-  compatibility validation;
-- `ApplicationInput`, canonical lineage, application result sums, applied
-  atoms, fresh bindings, reconstruction evidence, successor fibers,
-  submeasures, and faults;
-- the exact phase order:
+This stage is one non-splittable migration transaction. Its internal order is:
 
 ```text
-Program → Input → Frontier → Neighborhood → Join → Rule denotation
-→ Result validation → Fresh binding → Commit → Successor → Quotient/measure
+loci + Alphabet kernel
+→ local Seed/WritableRegion/ReadableRegion contracts
+→ Rule denotation/result algebra
+→ SimpleProgram/application/Seed binding/rollout
+→ current native component presets
+→ root + datasets/RNG/viz + active tests
+→ physical old-executor deletion
 ```
 
-- old-snapshot resolution, complete-result validation, deterministic fresh
-  binding, per-derivation reconstruction, atomic commit, preserve-outside,
-  successor validation, and witness-preserving quotient;
-- callable `rollout(program, *, steps, initial=None, replay_key=None)` and raw
-  trace records implemented solely by repeated calls to the owned `apply`; and
-- typed complete, truncated, and rejected rollout results without confusing a
-  horizon or resource bound with terminality.
+Files:
+
+- revise `loci.py`, `alphabets.py`, `seeds.py`, `frontiers.py`,
+  `neighborhoods.py`, `rules.py`, `__init__.py`, `datasets.py`, `rng.py`,
+  `viz/__init__.py`, and `viz/export.py`;
+- add `program.py`, `tests/test_alphabets.py`, `tests/test_frontiers.py`,
+  `tests/test_program.py`, and the initial CT01–CT08/CT12/CT13 tests;
+- delete `specs.py`, `rollout.py`, and `tests/test_specs.py`;
+- rewrite the obsolete portions of `tests/test_seeds.py`,
+  `tests/test_rules.py`, `tests/test_rollout.py`, `tests/test_datasets.py`,
+  and `tests/test_viz_export.py`; and
+- update `pyproject.toml` and `uv.lock` together.
+
+Implement the structural kernel:
+
+- recognized, versioned identities for finite coordinates, occurrences, paths,
+  spans, ports, interfaces, products, continuous regions, and intensional
+  references;
+- exact Alphabet schemas for scalar, represented numeric, tag, product,
+  record, word, map, graph, field, instruction, pattern, equation,
+  distribution, and symbolic values; and
+- semantic equality independent of object identity, hash order, storage order,
+  or display form.
+
+Implement local component contracts:
+
+- exact, constructive, partial, law-valued, and intensional Seeds;
+- `WritableRegion` complete existing/fresh capability envelopes;
+- `ReadableRegion` identity-preserving views from the same immutable snapshot;
+- sealed Rule ASTs/combinators, finite/intensional support, exact
+  cardinalities, laws, total dispositions, derivations/no-successor atoms,
+  progress, continuation, witnesses, provenance, and Rule faults; and
+- local schema/requirement declarations only. Components do not import one
+  another downstream to perform five-way validation.
+
+Implement `program.py`:
+
+- frozen `SimpleProgram` with exactly five fields;
+- cross-field unification and ephemeral compatibility evidence;
+- `ApplicationInput`, application result sums, reconstruction evidence,
+  fresh bindings, successor fibers, measures, lineage, and faults;
+- the exact validation/commit/quotient phase order from `architecture.md`;
+- family-blind `apply` with old-snapshot resolution, total-result validation,
+  per-derivation reconstruction, atomic preserve-outside commit, successor
+  validation, and witness-preserving quotient; and
+- callable `rollout(program, *, steps, initial=None, replay_key=None)` that
+  traverses only through the owned `apply`.
+
+`rollout(initial=None)` first denotes and validates the program Seed source
+space. With no key it retains the complete finite/intensional initial
+space/law. With an authorized key it realizes only a realizable Seed law using
+closed sampler/profile data and structurally derived replay coordinates,
+recording the chosen source and evidence. An explicit `initial` bypasses Seed
+realization and is validated normally. Replay derivation lives in
+`program.py`; core never imports current `rng.py`.
+
+Preserve the useful current experiments only as module-qualified component
+presets:
+
+```text
+rules:
+  ar2_modular_0d, dyadlags_0d, lagcounts_0d,
+  dyadrads_1d, dyadaxes_2d, dyadaxes_3d
+
+neighborhoods:
+  ar2_0d, dyadlags_0d, lagcounts_0d,
+  dyadrads_1d, dyadaxes_2d, dyadaxes_3d
+```
+
+Each Rule constructor receives its concrete `rule=` construction data before
+application. None becomes a root export or an unaudited catalog entry.
+`datasets.py` owns four explicit recipe builders keyed by the four existing
+dataset IDs; recipe selection chooses constructors, never an executor. Every
+builder returns an ordinary validated program before rollout.
+
+Fix downstream ownership in the same transaction:
+
+- remove public `seeds.render`, `seeds.dedupe`, and bulk `seeds.structured`;
+  dataset-only structured recipe enumeration/deduplication moves to private
+  `datasets._structured_seed_recipes` helpers, while semantic Seed
+  denotation/realization remains in `program.py`;
+- keep finite selector/materializer internals private to `loci.py`; move the
+  current trajectory tensor projection and canonical coordinate-table helper
+  to private dataset view code;
+- define non-root `datasets.DatasetEpisode` and `DatasetBatch` as explicit
+  tensor views produced from rollout traces; downstream batching loops/stacks
+  generic rollout and never owns one-step semantics;
+- preserve `ankos.viz.bundle` version 1 exactly. `viz.export` accepts only
+  explicit `DatasetEpisode`/`DatasetBatch` tensor views and keeps legacy wire
+  labels `RawEpisode`/`RawBatch`, `domain`, `rule_id`, shape, and coordinates
+  as presentation metadata. It rejects an arbitrary `RolloutResult` until a
+  caller supplies a supported explicit dataset projection; and
+- keep `viz/format.py`, viewer JavaScript, server, and static assets unchanged.
+
+Perform the cutover:
+
+- narrow root to the available target core namespaces plus
+  `SimpleProgram`, `apply`, and callable `rollout`; add serialization/catalog
+  namespaces only when those files land;
+- remove root `Dynamics`, `RawEpisode`, `RawBatch`, `dynamics_from_spec`,
+  `rollout_batch`, `apply_rule`, `canonical_coords`, and flattened component
+  constructors;
+- physically delete `specs.py` and `rollout.py`;
+- set package version `0.2.0`, update the general description, and move
+  `pytest>=9.0.3` from runtime dependencies to
+  `[dependency-groups].dev`; and
+- replace every obsolete active test in this same stage. No knowingly red test
+  interval or preserved compatibility structure is allowed.
 
 Exit:
 
-- CT01, CT03, CT04, CT05, CT07, and CT08 pass for generic fixtures;
-- deterministic and branching rollout equal manual repeated `apply`;
-- a spy and static inspection prove no second one-step path;
-- no application branch observes family, carrier, catalog, constructor, Book,
-  SPF/F/T, or semantic-category data; and
-- no partial branch commits when any atom or phase is invalid.
+- the complete active suite is green;
+- there is exactly one executable one-step law and no production copy of the
+  current tensor/family kernels;
+- current native fixtures match independent complete-result oracles;
+- `ca.rollout` is callable and `import ca.rollout` fails because the physical
+  submodule is gone;
+- initial root import does not load datasets, RNG, or visualization;
+- component schemas contain no callback, opaque `Any`, mutable recipe bag,
+  ambient entropy, or semantic `family`/`name`/`params` dispatch;
+- sealed generic AST/result-variant interpretation remains allowed in its
+  owning semantic module, but `apply` contains no family/carrier/catalog
+  algorithm switch; and
+- CT01 and the kernel cases of CT02–CT08, CT12, and CT13 pass.
 
-### G7-04A — Existing-support and visible-control mechanics
+### G7-02 — Reusable mechanics closure
 
-Implement reusable descriptors/combinators in the plural component modules
-for:
+This stage changes `loci.py`, the five plural component modules, and focused
+conformance tests. `program.py` changes only to correct a generic contract bug;
+it never acquires family behavior. No catalog file exists yet.
 
-- finite and fixed-support carriers;
-- whole-region and coupled writes over already described support;
-- local, historical, indexed, and fixed-wiring reads;
-- table, totalistic, guarded, phased, instruction, and gate Rules;
-- visible head, phase, schedule, cursor, instruction, and mutable-program
-  state; and
-- one-shot stopped successors.
+Three primary workstreams assign every row exactly once:
 
-This wave owns 15 SPF rows listed in the mechanics-assignment table below.
-PX09 closes here; other pressure groups close only when their last required
-structural or intensional mechanic lands.
+- **M-A — coupled/existing-support/control:** finite and fixed carriers,
+  whole-region/local/historical/indexed/fixed-wiring reads, coupled
+  source/destination effects, tables, gates, instructions, visible phase/head/
+  cursor/program state, and stopped one-shot successors;
+- **M-B — dynamic structure/branching/representation work:** words, splices,
+  generations, trees, graphs, ports, fresh/delete support, matches, overlap,
+  structural output workspaces, and witnessed branching; and
+- **M-C — global/intensional/law:** metric and whole-history dependency views,
+  finite/intensional solution relations, continuous domains/events/flows/
+  fields, probability laws, explicit realization evidence, exact/lossy
+  representation relations, closed evaluators, priority, and injury.
 
-Exit:
+Defining predicates, constraints, equations, objectives, flow laws, and
+differential relations are closed Rule data. Neighborhoods expose only the
+values, dependency scopes, geometry, side data, factor inputs, and differential
+germs those Rules read.
 
-- those pressure fixtures pass through generic `apply`;
-- fixed wiring does not become runtime dispatch;
-- mutable code is data in `C` under an immutable interpreter Rule; and
-- one-shot success returns a real stopped successor rather than a fake
-  trajectory or empty result.
+Every new sealed variant must enter a codec-inventory checklist with its tag,
+version, exact fields, local validator, equality law, and intended owner.
+G7-03 implements the cross-cutting codecs; no variant may reach the catalog
+without passing that inventory.
 
-### G7-04B — Dynamic structure, representation workspaces, and branching
+Stage-local tests:
 
-Implement reusable mechanics for:
+- M-A: `test_atomic_application.py`, `test_outcome_cardinality.py`, current
+  native oracle cases, and its assigned PX fixtures;
+- M-B: `test_atomic_application.py`, `test_fresh_identity.py`,
+  `test_witness_quotient.py`, `test_representation_commutation.py`, and its PX
+  fixtures; and
+- M-C: `test_outcome_cardinality.py`, `test_probability_replay.py`,
+  `test_representation_commutation.py`, `test_observer_boundary.py`, and its
+  PX fixtures.
 
-- words, occurrence-preserving splices, generation replacement, graph/tree
-  patches, ports/interfaces, fresh children, deletion, and dynamic support;
-- match, overlap, collision, ordering, priority, and injury as closed Rule
-  data/results rather than commit behavior, except that global priority/injury
-  closure lands in G7-04C;
-- zero/one/many relational support, witness-bearing branches, and semantic
-  successor quotient where finite structural presentation is closed; and
-- exact record, tree, interval, history-pointer, region, basis, predictor, and
-  aligned-XOR workspaces as distinct Rule skeletons, with the global basis
-  exactness boundary completed in G7-04C.
-
-This wave owns 30 SPF rows listed below. It closes PX01, PX02, PX07, and the
-primary PX08 set.
-
-Exit:
-
-- fresh identities are traversal, worker, and materialization independent;
-- every structural side effect and interface repair is authorized and
-  explicit;
-- the multiway diamond retains both derivations in one successor fiber; and
-- “codec” or “rewrite” purpose creates no shared executor.
-
-### G7-04C — Nonlocal, exact continuous, intensional, and composed-law mechanics
-
-Implement reusable mechanics for:
-
-- global, metric, whole-history, factor, constraint, equation, objective, and
-  differential read views;
-- exact finite and intensional solution relations;
-- probability laws, explicit realization/replay evidence, and tagged
-  submeasures;
-- event-selected continuous segments, maximal flows, differential fields, and
-  explicit represented numerical relations; and
-- Rule-owned closed evaluators with visible frames/work state, without
-  recursive `apply`; and
-- global exact representation transforms plus fair dovetailing, shared
-  approximations, priority, and injury.
-
-This wave owns 15 SPF rows listed below. It closes PX03–PX06 and PX10–PX12,
-plus all required secondary pressure joins.
+The stage has one aggregate completion barrier: all three workstreams, all
+twelve PX categories, and all required secondary joins pass through the same
+generic application before G7-02 is complete. A workstream assignment is a
+primary ownership/test destination, not a claim that a family has no
+cross-workstream dependency.
 
 Exit:
 
-- no Rule performs a draw, solver search, numerical integration, or ambient
-  lookup;
-- event time or endpoint is selected only by closed semantics;
-- intensional completeness is not confused with enumeration or a cardinality
-  guess;
-- the unavailable-measure case is limited to the derived measurable quotient;
-  and
-- F004/F045 have executable commits while F010/F042 remain roles.
+- all 60 mechanics assignments below are implemented without a family-named
+  runtime class or executor;
+- dynamic identities, interfaces, conflicts, schedules, laws, global reads,
+  continuous/intensional results, mutable program state, and one-shot outcomes
+  satisfy their pressure invariants;
+- no Rule performs a draw, solver search, numerical integration, recursive
+  `apply`, or ambient lookup;
+- F004/F045 have executable commits while F010/F042 remain roles; and
+- the full active suite remains green with exactly one application path.
 
-### G7-05 — Canonical serialization and representation relations
+### G7-03 — Canonical serialization and representation relations
 
-Files: new `serialization.py`, new `tests/test_serialization.py`, CT09, and
-CT10.
+Files: new `serialization.py`, root namespace update, new
+`tests/test_serialization.py`, CT09, and CT10.
 
 Implement:
 
 - canonical tag `ca.simple-program` at schema version `1`;
 - a payload with exactly the keys `seed`, `alphabet`, `frontier`,
   `neighborhood`, and `rule`;
-- versioned encoding for every public descriptor, Rule/Application/result,
+- versioned encoding for every codec-inventory entry, Rule/Application/result,
   evidence, law, trace, exact value, structural identity, and intensional AST;
 - `Decoded`, `DecodeRejected`, and `DecodeFault`;
 - canonical re-encoding, unknown-tag/version/field/primitive rejection,
   forged-digest rejection, and only total validated lossless migrations; and
-- explicit inverse-on-image and full-result commutation records for exact
+- inverse-on-image and full-result commutation records for exact
   representations.
 
 Exit:
 
-- CT09 and CT10 pass over every public variant;
-- catalog import is blocked during encode/decode tests;
+- every G7-01/02 codec-inventory entry is covered and CT09/CT10 pass;
+- semantic owners do not import serialization;
+- catalog import is impossible because the package does not yet exist;
 - SPF/F/T IDs, source metadata, invoked spelling, constructor arguments, and
   invocation receipts are absent from program payloads; and
 - no 0.1 `Dynamics` manifest is accepted as a canonical program.
 
-### G7-06 — Catalog assembly and exact legacy migration
+### G7-04 — Catalog assembly and exact legacy migration
 
-Files: all eight `catalog/` files, new `tests/test_catalog.py`, CT11, CT14, and
-the constructor half of `test_family_coverage.py`.
+Files: all eight `catalog/` files, root catalog namespace, new
+`tests/test_catalog.py`, CT11, CT14, and the constructor half of
+`test_family_coverage.py`.
 
 Implement:
 
@@ -481,43 +496,7 @@ Exit:
 - there is no `construct(id)`, umbrella `kind=`, registration hook, callable
   metadata, or catalog execution path.
 
-### G7-07 — Atomic public and downstream cutover
-
-Files: `__init__.py`, `datasets.py`, `rng.py`, `viz/`, `pyproject.toml`,
-current runtime tests, and deletion of `specs.py` and `rollout.py`.
-
-Perform one cutover:
-
-1. migrate the current scalar/Dyad* constructions to direct or catalog
-   five-field construction and prove their independent one-step equivalence;
-   old `rule_id` values become Rule-constructor data, old
-   domain/shape/boundary values become configuration/support/topology data, and
-   plural old neighborhoods compose into one `ReadableRegion`;
-2. adapt datasets to build programs, supply replay input externally, invoke
-   generic rollout, and materialize downstream arrays without a family switch;
-3. move dense episode/batch view records to `datasets.py` as
-   `DatasetEpisode` and `DatasetBatch`, not semantic core results or root
-   exports;
-4. adapt visualization to `RolloutResult` and those explicit downstream views;
-5. remove root `Dynamics`, `RawEpisode`, `RawBatch`, `dynamics_from_spec`,
-   `rollout_batch`, `apply_rule`, `canonical_coords`, and component-constructor
-   clutter;
-6. delete `specs.py` and physically delete `rollout.py`;
-7. export only the agreed root façade and catalog surface; and
-8. bump the package to `0.2.0`.
-
-Exit:
-
-- there is exactly one runtime application path;
-- `ca.rollout` is callable before and after supported imports, and
-  `import ca.rollout` fails because no such submodule exists;
-- dataset, RNG, and visualization modules are not imported by semantic core or
-  initial root import;
-- no current family string or `Rule.family` branch selects behavior;
-- current useful native behavior passes through generic application; and
-- the obsolete public names and modules fail the explicit negative tests.
-
-### G7-08 — Complete conformance
+### G7-05 — Complete conformance
 
 Complete the normative `tests/conformance/` layout and run:
 
@@ -541,11 +520,11 @@ Exit:
 - no expected unsupported backend is disguised as semantic undefinedness,
   exact zero, divergence, or completion.
 
-### G7-09 — Documentation, packaging, and cleanup
+### G7-06 — Documentation, packaging, and cleanup
 
 Files: `README-V2.md`, `api.md`, `simple_programs.md`, public docstrings,
-`ref/notes/ca-scaffold.py`, packaging metadata, and the goal index when Goal 7
-itself closes.
+`ref/notes/ca-scaffold.py`, `pyproject.toml`, `uv.lock`, and the goal index when
+Goal 7 itself closes.
 
 Actions:
 
@@ -557,49 +536,51 @@ Actions:
 - generate no second API reference or taxonomy document;
 - remove dead imports, obsolete family switches, compatibility scaffolding,
   and stale current-runtime examples; and
-- run the full test, import, packaging, link, code-fence, formatting, and
-  whitespace gates.
+- run the full test, import, lockfile, packaging, link, code-fence, formatting,
+  and whitespace gates.
 
 Exit:
 
 - a fresh reader sees one implemented API story;
-- source, tests, docs, and installed-wheel behavior agree;
+- source, tests, lockfile, docs, and installed-wheel behavior agree;
 - no obsolete module or second executor remains; and
 - Goal 7 may be marked complete only under its own separately authorized
   completion contract.
 
 ## Exact 60-Family Mechanics Assignment
 
-Every canonical row receives one primary implementation wave. This assignment
-tracks the deepest reusable capability required by the family, not its catalog
-home or its primary conformance pressure.
+Every canonical row receives one primary G7-02 workstream owner. This is the
+dominant implementation/test destination, not a claim that the family has no
+dependency on another workstream. No workstream is independently complete;
+all three share the G7-02 aggregate barrier.
 
-| Mechanics wave | Capability boundary | Exact canonical rows |
+| G7-02 workstream | Primary capability ownership | Exact canonical rows |
 |---|---|---|
-| G7-04A | Existing support, local/fixed topology, and visible finite control | SPF001, SPF003, SPF007, SPF009, SPF010, SPF011, SPF013, SPF026, SPF030, SPF032, SPF035, SPF045, SPF048, SPF050, SPF052 |
-| G7-04B | Fresh/deleted support, structural replacement, representation workspaces, and witnessed structural branching | SPF002, SPF004, SPF005, SPF008, SPF012, SPF015, SPF016, SPF019, SPF020, SPF021, SPF022, SPF023, SPF025, SPF028, SPF031, SPF033, SPF034, SPF037, SPF038, SPF040, SPF043, SPF044, SPF046, SPF049, SPF054, SPF055, SPF056, SPF057, SPF059, SPF060 |
-| G7-04C | Intensional/global/continuous relations, composed laws, priority/injury, and global representation exactness | SPF006, SPF014, SPF017, SPF018, SPF024, SPF027, SPF029, SPF036, SPF039, SPF041, SPF042, SPF047, SPF051, SPF053, SPF058 |
+| M-A | Existing support, local/fixed topology, coupled effects, and visible finite control | SPF001, SPF003, SPF007, SPF009, SPF010, SPF011, SPF013, SPF026, SPF030, SPF032, SPF035, SPF045, SPF048, SPF050, SPF052 |
+| M-B | Fresh/deleted support, structural replacement, representation workspaces, and witnessed structural branching | SPF002, SPF004, SPF005, SPF008, SPF012, SPF015, SPF016, SPF019, SPF020, SPF021, SPF022, SPF023, SPF025, SPF028, SPF031, SPF033, SPF034, SPF037, SPF038, SPF040, SPF043, SPF044, SPF046, SPF049, SPF054, SPF055, SPF056, SPF057, SPF059, SPF060 |
+| M-C | Intensional/global/continuous relations, composed laws, priority/injury, and global representation exactness | SPF006, SPF014, SPF017, SPF018, SPF024, SPF027, SPF029, SPF036, SPF039, SPF041, SPF042, SPF047, SPF051, SPF053, SPF058 |
 
-Counts are `15 + 30 + 15 = 60`, with no duplicate or omission. G7-06 then
+Counts are `15 + 30 + 15 = 60`, with no duplicate or omission. G7-04 then
 assembles the canonical constructor for every row from its implemented
 mechanics.
 
-The conformance pressures close at these mechanics gates:
+The conformance pressures have these lead workstreams, but all close only at
+the single G7-02 barrier:
 
-| Pressure | Mechanics-ready stage |
-|---|---:|
-| PX01 coupled writes | G7-04B |
-| PX02 variable structure | G7-04B |
-| PX03 nonlocal reads | G7-04C |
-| PX04 zero/one/many | G7-04C |
-| PX05 continuous | G7-04C |
-| PX06 stochastic | G7-04C |
-| PX07 mutable program state | G7-04B |
-| PX08 one-shot primary set | G7-04B |
-| PX09 fixed gates | G7-04A |
-| PX10 distinct codecs | G7-04C |
-| PX11 shared priority | G7-04C |
-| PX12 observer boundary | G7-04C |
+| Pressure | Lead workstream | Completion stage |
+|---|---|---:|
+| PX01 coupled writes | M-A with M-B structural support | G7-02 |
+| PX02 variable structure | M-B | G7-02 |
+| PX03 nonlocal reads | M-C | G7-02 |
+| PX04 zero/one/many | M-C with M-B branching | G7-02 |
+| PX05 continuous | M-C | G7-02 |
+| PX06 stochastic | M-C | G7-02 |
+| PX07 mutable program state | M-A + M-B | G7-02 |
+| PX08 one-shot | M-A + M-B, with M-C secondary cases | G7-02 |
+| PX09 fixed gates | M-A | G7-02 |
+| PX10 distinct codecs | M-B + M-C | G7-02 |
+| PX11 shared priority | M-C | G7-02 |
+| PX12 observer boundary | M-B + M-C | G7-02 |
 
 Required secondary tests remain:
 
@@ -615,23 +596,23 @@ count.
 
 | Suite | First authoritative stage | Final obligation |
 |---|---:|---|
-| CT01 exact five-field boundary | G7-03; public half G7-07 | Exactly five dataclass fields; catalog values are ordinary programs; root signatures exact |
-| CT02 descriptor closure/compatibility | G7-01–02; all variants G7-06 | Recursive closed tags/versions/exactness and every positive/negative cross-field compatibility clause |
-| CT03 validation/no-commit failure | G7-03 | Exact phase order; first fault wins; no partial result or commit |
-| CT04 atomic application | G7-03; pressures G7-04A/B | Total dispositions, authorized writes, preserve-outside, no hidden collision/repair |
-| CT05 outcomes/cardinalities | G7-02–03; relations G7-04B/C | All outcome distinctions and three independent cardinalities |
-| CT06 probability/Seed replay | G7-04C | Law/draw separation, Seed realization, replay evidence, submeasures, narrow unavailable view |
-| CT07 fresh identities | G7-03; structures G7-04B | Deterministic binding, collision rejection, traversal independence, retained raw identities |
-| CT08 witnesses/quotient | G7-03; branching G7-04B | Pre-quotient witnesses/fibers, semantic equality, measure aggregation |
-| CT09 serialization | G7-05; full variants G7-06 | Exact fail-closed round trip of every public semantic record; five-key payload |
-| CT10 representation commutation | G7-05; mechanics G7-04B/C | Inverse-on-image and complete one-step result commutation |
-| CT11 catalog/T migration | G7-06 | Exact row manifest, callable kinds, targets, bindings, owners, and exports |
-| CT12 independent equivalence | Oracles G7-00; execution G7-07–08 | Independent complete-result reference cases across required mechanics |
-| CT13 imports/no dispatch | Each stage; final G7-07–08 | Dependency DAG, blocked catalog, one apply path, root/submodule/signature contract |
-| CT14 observer boundary | G7-04C and G7-06 | F004/F045 executable; F010/F042 roles; tooling cannot affect identity/application |
-| 60-family coverage | Mechanics G7-04; constructors G7-06; execution G7-08 | Exact constructor, descriptor, metadata, provenance, and generic fixture join |
+| CT01 exact five-field boundary | G7-01; catalog assertion G7-04 | Exactly five dataclass fields; catalog values are ordinary programs; root signatures exact |
+| CT02 descriptor closure/compatibility | G7-01; all mechanics variants G7-02 | Recursive closed tags/versions/exactness and every positive/negative cross-field compatibility clause |
+| CT03 validation/no-commit failure | G7-01 | Exact phase order; first fault wins; no partial result or commit |
+| CT04 atomic application | G7-01; all pressure variants G7-02 | Total dispositions, authorized writes, preserve-outside, no hidden collision/repair |
+| CT05 outcomes/cardinalities | G7-01; all relation variants G7-02 | All outcome distinctions and three independent cardinalities |
+| CT06 probability/Seed replay | Generic boundary G7-01; mechanics G7-02 | Law/draw separation, Seed realization, replay evidence, submeasures, narrow unavailable view |
+| CT07 fresh identities | G7-01; structural variants G7-02 | Deterministic binding, collision rejection, traversal independence, retained raw identities |
+| CT08 witnesses/quotient | G7-01; branching variants G7-02 | Pre-quotient witnesses/fibers, semantic equality, measure aggregation |
+| CT09 serialization | G7-03 | Exact fail-closed round trip of every public semantic record; five-key payload |
+| CT10 representation commutation | Mechanics claims G7-02; codecs/full proof G7-03 | Inverse-on-image and complete one-step result commutation |
+| CT11 catalog/T migration | G7-04 | Exact row manifest, callable kinds, targets, bindings, owners, and exports |
+| CT12 independent equivalence | Oracles G7-00; core G7-01; final G7-05 | Independent complete-result reference cases across required mechanics |
+| CT13 imports/no dispatch | Every stage; final G7-05 | Dependency DAG, blocked catalog, one apply path, root/submodule/signature contract |
+| CT14 observer boundary | Mechanics G7-02; role/catalog surface G7-04 | F004/F045 executable; F010/F042 roles; tooling cannot affect identity/application |
+| 60-family coverage | Mechanics G7-02; constructors G7-04; final G7-05 | Exact constructor, descriptor, metadata, provenance, and generic fixture join |
 
-G7-08 reruns all obligations together; it does not postpone their first
+G7-05 reruns all obligations together; it does not postpone their first
 implementation until the end.
 
 ## Goal 2 Strengths: Explicit Destinations
