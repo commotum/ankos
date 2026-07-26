@@ -428,6 +428,55 @@ def _stochastic_pair() -> tuple[
     return relation, native, represented
 
 
+def _clause_read_evidence_identities(
+    witness: rules.Witness,
+) -> tuple[str, ...]:
+    """Extract only runtime read IDs from a clause-kernel witness proof."""
+
+    descriptor = witness.descriptor
+    if (
+        descriptor.primitive is not rules.ExpressionPrimitive.TUPLE
+        or len(descriptor.arguments) < 5
+        or type(descriptor.arguments[0]) is not rules.RuleExpr
+        or descriptor.arguments[0].primitive
+        is not rules.ExpressionPrimitive.LITERAL
+        or descriptor.arguments[0].arguments
+        != ("clause-kernel-witness-v1",)
+        or type(descriptor.arguments[4]) is not rules.RuleExpr
+    ):
+        return ()
+
+    evidence: list[str] = []
+
+    def visit(expression: rules.RuleExpr) -> None:
+        if (
+            expression.primitive is rules.ExpressionPrimitive.TUPLE
+            and expression.arguments
+            and type(expression.arguments[0]) is rules.RuleExpr
+            and expression.arguments[0].primitive
+            is rules.ExpressionPrimitive.LITERAL
+            and expression.arguments[0].arguments == ("read-evidence",)
+        ):
+            for item in expression.arguments[1:]:
+                assert type(item) is rules.RuleExpr
+                assert (
+                    item.primitive
+                    is rules.ExpressionPrimitive.LITERAL
+                )
+                assert (
+                    len(item.arguments) == 1
+                    and type(item.arguments[0]) is str
+                )
+                evidence.append(item.arguments[0])
+            return
+        for item in expression.arguments:
+            if type(item) is rules.RuleExpr:
+                visit(item)
+
+    visit(descriptor.arguments[4])
+    return tuple(evidence)
+
+
 def _identity_aliases(
     result: program.ApplicationComplete,
 ) -> dict[str, str]:
@@ -441,16 +490,27 @@ def _identity_aliases(
         result.evidence.input_trace_lineage_identity: "@input-lineage",
     }
     for atom in result.source_outcomes.support.atoms:
-        aliases[atom.canonical_identity] = f"@source:{atom.witness.identity}"
+        source_label = ":".join(
+            (type(atom).__name__, *atom.provenance)
+        )
+        aliases[atom.canonical_identity] = f"@source:{source_label}"
+        for index, identity in enumerate(
+            dict.fromkeys(_clause_read_evidence_identities(atom.witness))
+        ):
+            aliases[identity] = (
+                f"@read-evidence:{source_label}:{index}"
+            )
     for atom in result.applied_atoms.atoms:
-        witness = atom.source.witness.identity
-        aliases[atom.canonical_identity] = f"@applied:{witness}"
+        source_alias = aliases[atom.source.canonical_identity]
+        aliases[atom.canonical_identity] = f"@applied:{source_alias}"
         aliases[atom.evidence.application_identity] = "@application"
-        aliases[atom.evidence.disposition_identity] = f"@disposition:{witness}"
+        aliases[atom.evidence.disposition_identity] = (
+            f"@disposition:{source_alias}"
+        )
         if isinstance(atom, program.AppliedDerivation):
             for index, binding in enumerate(atom.fresh_bindings):
                 aliases[loci.canonical_identity(binding.identity)] = (
-                    f"@fresh:{witness}:{index}"
+                    f"@fresh:{source_alias}:{index}"
                 )
         if isinstance(atom, program.AppliedDerivation):
             aliases[loci.configuration_identity(atom.successor)] = "@successor"
@@ -460,6 +520,8 @@ def _identity_aliases(
 _IDENTITY_FIELDS = frozenset(
     {
         (rules.AtomMass, "atom_identity"),
+        (rules.Witness, "identity"),
+        (rules.Witness, "descriptor"),
         (program.FreshBinding, "identity"),
         (program.AppliedEvidence, "application_identity"),
         (program.AppliedEvidence, "disposition_identity"),
@@ -489,7 +551,7 @@ def _normalize_complete_result(
             atom.output_trace_lineage.path,
         ): (
             atom.input_trace_lineage.path,
-            atom.source.witness.identity,
+            aliases[atom.source.canonical_identity],
         )
         for atom in result.applied_atoms.atoms
     }
@@ -566,8 +628,8 @@ def _normalize_complete_result(
         for field in fields(value):
             field_value = normalize(
                 getattr(value, field.name),
-                identity_bearing=(type(value), field.name)
-                in _IDENTITY_FIELDS,
+                identity_bearing=identity_bearing
+                or (type(value), field.name) in _IDENTITY_FIELDS,
             )
             if (
                 type(value) is rules.SupportSpace
@@ -703,6 +765,14 @@ def test_represented_and_native_one_step_results_commute_completely(
     )
     native_identity = native_program.canonical_identity
     represented_identity = represented_program.canonical_identity
+    for fixed_program in (native_program, represented_program):
+        denotation = fixed_program.rule.descriptor.denotation
+        assert type(denotation) is rules.ClauseKernelDenotation
+        assert len(denotation.clauses) == 2
+        assert all(
+            clause.condition.primitive is rules.ExpressionPrimitive.EQUAL
+            for clause in denotation.clauses
+        )
     assert not loci.configuration_equal(native_sources[0], native_sources[1])
     assert not loci.configuration_equal(
         represented_sources[0],
