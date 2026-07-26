@@ -7,9 +7,8 @@ does not own Seed laws, Rule laws, canonical replay coordinates, application
 evidence, or any transition behavior; those remain closed semantic data and
 ``program.py`` responsibilities.
 
-No new runtime surface is needed for the scaffold. The existing deterministic
-helpers remain intact below the legacy divider and can be narrowed in place
-during the atomic G7-01 downstream migration.
+These helpers are intentionally ordinary downstream utilities. They do not
+participate in program identity and are not imported by the semantic core.
 """
 
 from __future__ import annotations
@@ -18,35 +17,6 @@ from collections.abc import Mapping
 from typing import Any
 
 import numpy as np
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.1: Dataset Planning Derivation
-# ---------------------------------------------------------------------------
-
-# Stable plan-key derivation remains downstream and receives already chosen
-# stream inputs.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.2: Downstream Realization Adapters
-# ---------------------------------------------------------------------------
-
-# NumPy generator construction is an auxiliary realization adapter, never a
-# semantic entropy or replay authority.
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 2: Stream Integration
-# ---------------------------------------------------------------------------
-
-# ``datasets.py`` is the only intended package consumer after the root façade
-# is narrowed.
-
-
-# ===========================================================================
-# Legacy 0.1 implementation retained until atomic G7-01 cutover
-# ===========================================================================
 
 
 UINT64_MASK = 0xFFFFFFFFFFFFFFFF
