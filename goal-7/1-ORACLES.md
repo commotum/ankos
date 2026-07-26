@@ -55,6 +55,9 @@ Status: **COMPLETE**
 - Closed frozen dataclasses, tagged structural terms, tuples, strings,
   integers, and `Fraction` values are sufficient oracle data. No callback,
   evaluator, solver, draw, catalog lookup, or runtime result is needed.
+- Pre-binding Rule outcomes and post-binding applied atoms must be distinct
+  records. Fresh bindings, successors, output lineage, and application
+  evidence belong to each applied atom, not to a joined or case-global record.
 
 ## Big Picture Objective
 
@@ -70,11 +73,14 @@ The completed implementation adds
 - an exact pre-cutover snapshot containing commits, trees, environment,
   package metadata, ordered root exports, public-manifest hash, eager imports,
   obsolete modules/sites, and selected Git-blob and SHA-256 identities;
-- a neutral complete-result schema for source outcomes, applied atoms,
-  typed no-successor partitions, total dispositions, progress, continuation,
-  successors, all three cardinalities, witnesses, provenance, lineage,
-  certificates, fresh bindings, quotient fibers, evidence, and three explicit
-  measure views;
+- a neutral complete-result schema that separately preserves pre-binding
+  source outcomes and post-binding applied atoms, plus typed no-successor
+  partitions, total dispositions, progress, continuation, successors, all
+  three cardinalities, witnesses, provenance, per-atom fresh bindings,
+  lineage, certificates, quotient fibers, application evidence, and three
+  explicit measure views;
+- separate source-outcome, applied-atom, and successor-quotient intensional
+  relations, so F041 does not reconstruct one semantic boundary from another;
 - exact `absent`, `available`, and `unavailable` measure states so absence is
   never inferred from a nullable probability;
 - 16 closed fixtures:
@@ -109,8 +115,8 @@ tests/conformance/test_oracles.py
 The oracle fixture source itself is frozen at close with:
 
 ```text
-Git blob:  83f0926ddc5ce7e1ab0a1482a9e6441fc29b6d77
-SHA-256:   addb4bc2c630b6822ec871bccbd31ede153d1387ba54939d5f52768ef4dbe3b5
+Git blob:  51d98f6913bca8ffee633fda1517eb9e63b8d10b
+SHA-256:   2b4cfd74900824ca829a0357ee2e6942afc8e73a5f9630206cbcfdde4bf1c166
 ```
 
 ## No-Cheating Checks
@@ -125,10 +131,13 @@ SHA-256:   addb4bc2c630b6822ec871bccbd31ede153d1387ba54939d5f52768ef4dbe3b5
   snapshot or any fixture.
 - The reverse dependency is checked too: every `src/ca/**/*.py` file is
   parsed, and production may not import or mention the test oracle.
-- Finite fixtures must enumerate exact source/applied atom IDs, the
-  no-successor partition, total writable dispositions, exact cardinalities,
-  complete successor fibers, unique fresh bindings, and structurally valid
-  measures.
+- Finite fixtures must enumerate exact source and applied records, source-ID
+  joins, the no-successor partition, total writable dispositions, exact
+  cardinalities, complete successor fibers, per-atom unique fresh bindings,
+  and structurally valid measures.
+- Source Rule dispositions may contain local fresh slots and references but
+  no post-binding `fresh-id`; applied records must bind every created slot
+  exactly once.
 - The frozen 16-case ID tuple prevents later quiet deletion or substitution
   of an oracle.
 - The complete diff is compared with execution start and must touch only the
@@ -166,7 +175,10 @@ SHA-256:   addb4bc2c630b6822ec871bccbd31ede153d1387ba54939d5f52768ef4dbe3b5
     passed.
 - No Goal 7 obligation skip was removed. The remaining 96 skips are owned by
   G7-01 through G7-05 and remain non-evidence.
-- No assumption was invalidated and no earlier obligation reopened.
+- Hostile review corrected one draft assumption before closure: joined
+  Rule/application atoms were insufficient. The final oracle schema keeps the
+  two boundaries distinct and gives intensional source, applied, and quotient
+  relations separate closed ASTs. No earlier stage obligation was reopened.
 - First next action: create `goal-7/2-CUTOVER.md`, resync the exact G7-01
   cutover contract, and perform the single atomic five-field runtime
   replacement. No G7-01 implementation began in this stage.
