@@ -9,6 +9,7 @@ import ca
 from ca import alphabets, frontiers, loci, neighborhoods, rules, seeds
 
 from g7_fixtures import native_program
+from helpers import assert_closed_descriptor
 
 
 def _walk(value: object) -> None:
@@ -41,6 +42,7 @@ def test_every_descriptor_is_recursively_closed_versioned_and_exact() -> None:
 
     for value in values:
         _walk(value)
+        assert_closed_descriptor(value)
 
 
 def test_program_construction_proves_all_cross_field_compatibility_clauses() -> None:

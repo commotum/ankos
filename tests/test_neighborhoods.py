@@ -149,7 +149,7 @@ def test_retained_native_presets_publish_exact_rule_facing_shapes(
     region = factory()
 
     assert tuple(field.key for field in region.result_shape.fields) == fields
-    assert region.version if hasattr(region, "version") else True
+    assert isinstance(region, neighborhoods.ReadableRegion)
 
 
 def test_neighborhood_grants_no_write_authority() -> None:

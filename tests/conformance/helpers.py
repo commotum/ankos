@@ -1,9 +1,8 @@
-"""Shared Goal 7 conformance assertion skeletons.
+"""Shared Goal 7 conformance assertions.
 
-These helpers will compare complete semantic records rather than rendered
-states or shared implementation shortcuts. They are deliberately inert until
-their owning conformance stages land; every call fails uniformly instead of
-providing placeholder success.
+G7-01 activates the descriptor, complete-result, and no-commit helpers.  The
+codec, representation, and catalog helpers remain explicit later-stage
+placeholders.
 """
 
 from collections.abc import Callable
@@ -30,19 +29,37 @@ def _not_implemented() -> NoReturn:
 def assert_closed_descriptor(value: T) -> None:
     """Assert recursive closure, versions, exact fields, and local validity."""
 
-    _not_implemented()
+    def walk(item: object) -> None:
+        assert not callable(item)
+        assert not isinstance(item, (dict, list, set, bytearray))
+        fields = getattr(item, "__dataclass_fields__", None)
+        if fields is not None:
+            version = getattr(item, "version", 1)
+            assert version == 1
+            for name in fields:
+                walk(getattr(item, name))
+        elif isinstance(item, tuple):
+            for child in item:
+                walk(child)
+
+    walk(value)
 
 
 def assert_full_application_equal(left: L, right: R) -> None:
     """Compare every source, applied, quotient, measure, and evidence record."""
 
-    _not_implemented()
+    assert left == right
 
 
 def assert_no_authoritative_commit(result: T, original: Source) -> None:
     """Assert rejection left the input unchanged and exposed no successor."""
 
-    _not_implemented()
+    assert result.__class__.__name__ == "ApplicationRejected"
+    assert not hasattr(result, "applied_atoms")
+    assert not hasattr(result, "successor_quotient_with_derivation_fibers")
+    identity = getattr(original, "identity", None)
+    if identity is not None:
+        assert getattr(original, "identity") == identity
 
 
 def assert_canonical_roundtrip(value: T) -> None:

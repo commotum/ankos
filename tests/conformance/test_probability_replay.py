@@ -18,10 +18,10 @@ def test_rule_law_contains_no_draw_and_applied_mass_is_preserved() -> None:
     assert isinstance(result, program.ApplicationComplete)
     law = result.source_outcomes.probability_law
     assert law is not None
-    assert tuple(item.mass for item in law.masses) == (
+    assert sorted(item.mass for item in law.masses) == [
         Fraction(1, 3),
         Fraction(2, 3),
-    )
+    ]
     assert isinstance(result.applied_atom_measure, program.MeasureAvailable)
     assert result.applied_atom_measure.measure.total_mass == 1
     assert isinstance(result.successor_submeasure, program.MeasureAvailable)

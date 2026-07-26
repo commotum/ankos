@@ -1,10 +1,13 @@
 """Tests for the narrow G7-01 package façade."""
 
+import importlib
 import importlib.util
 import inspect
 from pathlib import Path
 import subprocess
 import sys
+
+import pytest
 
 import ca
 
@@ -60,6 +63,8 @@ def test_rollout_is_callable_and_has_no_shadowing_public_submodule() -> None:
     assert callable(ca.rollout)
     assert importlib.util.find_spec("ca.rollout") is None
     assert not (Path(ca.__file__).parent / "rollout.py").exists()
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("ca.rollout")
 
 
 def test_obsolete_modules_exports_and_eager_auxiliaries_are_absent() -> None:

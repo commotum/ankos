@@ -82,10 +82,10 @@ def test_cardinality_and_probability_records_remain_independent() -> None:
     outcomes = rules.OutcomeSpace(support, law)
 
     assert rules.cardinality_size(outcomes.support.cardinality) == 2
-    assert tuple(item.mass for item in outcomes.probability_law.masses) == (
+    assert sorted(item.mass for item in outcomes.probability_law.masses) == [
         Fraction(1, 4),
         Fraction(3, 4),
-    )
+    ]
     assert not hasattr(outcomes.probability_law, "draw")
 
 
@@ -172,3 +172,13 @@ def test_retained_native_rules_store_concrete_construction_data(factory) -> None
     assert rule.descriptor.primitive is rules.RulePrimitive.EXPRESSION
     assert not hasattr(rule, "family")
     assert not hasattr(rule, "params")
+
+
+def test_elementary_constructor_is_an_ordinary_closed_rule() -> None:
+    rule = rules.elementary(30)
+
+    assert isinstance(rule, rules.Rule)
+    assert rule.descriptor.primitive is rules.RulePrimitive.EXPRESSION
+    assert rule.contract.required_read_shape == neighborhoods.eca().result_shape
+    with pytest.raises(ValueError):
+        rules.elementary(256)

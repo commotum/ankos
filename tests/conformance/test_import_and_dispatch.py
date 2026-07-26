@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import ast
+import importlib
 import importlib.util
 import inspect
 from pathlib import Path
 import subprocess
 import sys
+
+import pytest
 
 import ca
 from ca import program
@@ -132,6 +135,10 @@ def test_public_surface_submodules_and_signatures_are_exact() -> None:
     assert callable(ca.rollout)
     assert importlib.util.find_spec("ca.rollout") is None
     assert importlib.util.find_spec("ca.specs") is None
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("ca.rollout")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("ca.specs")
 
 
 def test_rollout_matches_manual_repeated_apply_for_deterministic_and_branching_cases(

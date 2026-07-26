@@ -233,6 +233,10 @@ class Certificate:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported certificate version {self.version}")
+        if not isinstance(self.kind, CertificateKind):
+            raise TypeError("certificate kind is not recognized")
+        if type(self.statement) is not RuleExpr:
+            raise TypeError("certificate statement must be a closed RuleExpr")
 
     @property
     def canonical_identity(self) -> str:
@@ -347,6 +351,24 @@ class Disposition(Generic[W, V]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported disposition version {self.version}")
+        if not isinstance(self.action, DispositionAction):
+            raise TypeError("disposition action is not recognized")
+        if self.action in (
+            DispositionAction.PRESERVE,
+            DispositionAction.REPLACE,
+            DispositionAction.DELETE,
+        ):
+            if type(self.target) is not loci.Locus:
+                raise TypeError("existing disposition target must be a Locus")
+        elif type(self.target) is not loci.FreshReference:
+            raise TypeError("fresh disposition target must be a FreshReference")
+        if type(self.payload) not in (NoPayload, ValuePayload):
+            raise TypeError("disposition payload variant is not recognized")
+        if (
+            type(self.evidence) is not Certificate
+            or self.evidence.kind is not CertificateKind.TOTALITY
+        ):
+            raise ValueError("disposition needs totality evidence")
         has_value = isinstance(self.payload, ValuePayload)
         requires_value = self.action in (
             DispositionAction.REPLACE,
@@ -376,6 +398,13 @@ class TotalDisposition(Generic[V]):
             raise ValueError(
                 f"unsupported total-disposition version {self.version}"
             )
+        if any(type(item) is not Disposition for item in self.entries):
+            raise TypeError("total disposition contains an unknown entry variant")
+        if (
+            type(self.totality_evidence) is not Certificate
+            or self.totality_evidence.kind is not CertificateKind.TOTALITY
+        ):
+            raise ValueError("total disposition needs totality evidence")
         existing_targets = tuple(item.target for item in self.existing)
         fresh_targets = tuple(item.target for item in self.fresh)
         if len(existing_targets) != len(set(existing_targets)):
@@ -495,6 +524,13 @@ class Stop:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported continuation version {self.version}")
+        if type(self.reason) is not RuleExpr:
+            raise TypeError("stopping reason must be a RuleExpr")
+        if (
+            type(self.certificate) is not Certificate
+            or self.certificate.kind is not CertificateKind.TERMINALITY
+        ):
+            raise ValueError("Stop needs terminality evidence")
 
 
 Continuation: TypeAlias = Continue | Stop
@@ -511,8 +547,10 @@ class Witness:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported witness version {self.version}")
-        if not self.identity:
+        if not isinstance(self.identity, str) or not self.identity:
             raise ValueError("witness identity cannot be empty")
+        if type(self.descriptor) is not RuleExpr:
+            raise TypeError("witness descriptor must be a RuleExpr")
 
     @property
     def canonical_identity(self) -> str:
@@ -535,8 +573,24 @@ class Derivation(Generic[V]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported derivation version {self.version}")
-        if not self.provenance:
+        if type(self.replacement) is not TotalDisposition:
+            raise TypeError("derivation replacement is not recognized")
+        if not isinstance(self.progress, Progress):
+            raise TypeError("derivation progress is not recognized")
+        if type(self.continuation) not in (Continue, Stop):
+            raise TypeError("derivation continuation is not recognized")
+        if type(self.witness) is not Witness:
+            raise TypeError("derivation witness is not recognized")
+        if (
+            not self.provenance
+            or any(not isinstance(item, str) or not item for item in self.provenance)
+        ):
             raise ValueError("derivation provenance cannot be empty")
+        if (
+            type(self.certificate) is not Certificate
+            or self.certificate.kind is not CertificateKind.DERIVATION
+        ):
+            raise ValueError("derivation needs derivation evidence")
 
     @property
     def canonical_identity(self) -> str:
@@ -555,13 +609,27 @@ class NoSuccessor:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported no-successor version {self.version}")
-        if not self.provenance:
+        if not isinstance(self.outcome, NoSuccessorOutcome):
+            raise TypeError("no-successor outcome is not recognized")
+        if type(self.reason) is not RuleExpr:
+            raise TypeError("no-successor reason must be a RuleExpr")
+        if type(self.witness) is not Witness:
+            raise TypeError("no-successor witness is not recognized")
+        if (
+            not self.provenance
+            or any(not isinstance(item, str) or not item for item in self.provenance)
+        ):
             raise ValueError("no-successor provenance cannot be empty")
         if (
             self.outcome is NoSuccessorOutcome.DIVERGENT
             and self.certificate.kind is not CertificateKind.DIVERGENCE
         ):
             raise ValueError("Divergent needs a divergence certificate")
+        if (
+            self.outcome is not NoSuccessorOutcome.DIVERGENT
+            and self.certificate.kind is not CertificateKind.TERMINALITY
+        ):
+            raise ValueError("no-successor atom needs terminality evidence")
 
     @property
     def canonical_identity(self) -> str:
@@ -596,6 +664,18 @@ class SupportSpace(Generic[A]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported support version {self.version}")
+        if not isinstance(self.presentation, SupportPresentation):
+            raise TypeError("support presentation is not recognized")
+        if (
+            type(self.completeness_evidence) is not Certificate
+            or self.completeness_evidence.kind is not CertificateKind.COMPLETENESS
+        ):
+            raise ValueError("support needs completeness evidence")
+        if (
+            type(self.soundness_evidence) is not Certificate
+            or self.soundness_evidence.kind is not CertificateKind.SOUNDNESS
+        ):
+            raise ValueError("support needs soundness evidence")
         if self.presentation is SupportPresentation.FINITE:
             if self.relation is not None:
                 raise ValueError("finite support cannot carry an intensional relation")
@@ -605,6 +685,15 @@ class SupportSpace(Generic[A]):
             identities = tuple(_atom_identity(atom) for atom in self.atoms)
             if len(identities) != len(set(identities)):
                 raise ValueError("finite support repeats a canonical atom identity")
+            ordered = tuple(
+                atom
+                for _, atom in sorted(
+                    zip(identities, self.atoms, strict=True),
+                    key=lambda item: item[0],
+                )
+            )
+            if ordered != self.atoms:
+                object.__setattr__(self, "atoms", ordered)
         else:
             if self.atoms:
                 raise ValueError("intensional support cannot carry enumerated atoms")
@@ -675,6 +764,19 @@ class ProbabilityLaw:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported probability-law version {self.version}")
+        if not isinstance(self.presentation, ProbabilityPresentation):
+            raise TypeError("probability presentation is not recognized")
+        if (
+            type(self.normalization_evidence) is not Certificate
+            or self.normalization_evidence.kind is not CertificateKind.NORMALIZATION
+        ):
+            raise ValueError("probability law needs normalization evidence")
+        if (
+            type(self.measurable_space_evidence) is not Certificate
+            or self.measurable_space_evidence.kind
+            is not CertificateKind.MEASURABILITY
+        ):
+            raise ValueError("probability law needs measurability evidence")
         if self.presentation is ProbabilityPresentation.FINITE:
             if self.measure is not None:
                 raise ValueError("finite probability law cannot carry a measure AST")
@@ -685,6 +787,11 @@ class ProbabilityLaw:
                 raise ValueError("finite probability law repeats an atom identity")
             if sum((item.mass for item in self.masses), Fraction(0)) != Fraction(1):
                 raise ValueError("finite probability law must normalize exactly to one")
+            ordered = tuple(
+                sorted(self.masses, key=lambda item: item.atom_identity)
+            )
+            if ordered != self.masses:
+                object.__setattr__(self, "masses", ordered)
         else:
             if self.masses:
                 raise ValueError("intensional probability law cannot enumerate masses")
@@ -707,6 +814,12 @@ class OutcomeSpace(Generic[A]):
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported outcome-space version {self.version}")
+        if type(self.support) is not SupportSpace:
+            raise TypeError("outcome support variant is not recognized")
+        if self.probability_law is not None and type(
+            self.probability_law
+        ) is not ProbabilityLaw:
+            raise TypeError("outcome probability law is not recognized")
         law = self.probability_law
         if law is None:
             return

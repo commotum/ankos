@@ -354,6 +354,7 @@ class AppliedDerivation(Generic[C]):
     successor: C
     source: rules.Derivation[alphabets.SemanticValue]
     fresh_bindings: tuple[FreshBinding, ...]
+    input_trace_lineage: TraceLineage
     output_trace_lineage: TraceLineage
     evidence: AppliedEvidence
 
@@ -364,6 +365,7 @@ class AppliedDerivation(Generic[C]):
                 self.source.canonical_identity,
                 loci.configuration_identity(self.successor),
                 self.fresh_bindings,
+                self.input_trace_lineage,
                 self.output_trace_lineage,
             )
         )
@@ -372,6 +374,7 @@ class AppliedDerivation(Generic[C]):
 @dataclass(frozen=True)
 class AppliedNoSuccessor:
     source: rules.NoSuccessor
+    input_trace_lineage: TraceLineage
     output_trace_lineage: TraceLineage
     evidence: AppliedEvidence
 
@@ -380,6 +383,7 @@ class AppliedNoSuccessor:
         return loci.canonical_identity(
             (
                 self.source.canonical_identity,
+                self.input_trace_lineage,
                 self.output_trace_lineage,
             )
         )
@@ -1000,8 +1004,19 @@ def apply(
     attempted.append(ApplicationPhase.RULE_DENOTATION)
     rule_result = program.rule.denote(readable, cast(W, writable))
     if isinstance(rule_result, rules.RuleRejected):
+        fault_phase = (
+            ApplicationPhase.RESULT_VALIDATION
+            if rule_result.fault.phase
+            in (
+                rules.RuleFaultPhase.RESULT_VALIDATION,
+                rules.RuleFaultPhase.COMPOSITION,
+            )
+            else ApplicationPhase.RULE_DENOTATION
+        )
+        if fault_phase is ApplicationPhase.RESULT_VALIDATION:
+            attempted.append(ApplicationPhase.RESULT_VALIDATION)
         return _rejection(
-            ApplicationPhase.RULE_DENOTATION,
+            fault_phase,
             rule_result.fault.detail,
             attempted,
             rule_result.fault.reason.value,
@@ -1114,6 +1129,7 @@ def apply(
                 applied.append(
                     AppliedNoSuccessor(
                         atom,
+                        input_lineage,
                         output_lineage,
                         AppliedEvidence(
                             application_identity,
@@ -1136,11 +1152,12 @@ def apply(
                 atom.progress.value,
             )
             applied.append(
-                AppliedDerivation(
-                    successor,
-                    atom,
-                    bindings,
-                    output_lineage,
+                    AppliedDerivation(
+                        successor,
+                        atom,
+                        bindings,
+                        input_lineage,
+                        output_lineage,
                     AppliedEvidence(
                         application_identity,
                         atom.replacement.canonical_identity,
@@ -1459,9 +1476,10 @@ def _finite_seed_space(
         )
         return (cast(C, configuration),), None
     if isinstance(source, seeds.PartialSource):
-        raise ValueError(
-            "partial Seed has unresolved roles; supply a complete explicit initial"
-        )
+        # Partiality is semantic data, not a request for generic filling.  It
+        # may advance when its explicit unresolved values are admitted by the
+        # Alphabet and the Rule reads/completes them.
+        return (source.configuration,), None
     if isinstance(source, seeds.LawSource):
         if isinstance(source.law, seeds.UniformTupleLaw):
             configurations, weights = _enumerate_uniform_tuple(

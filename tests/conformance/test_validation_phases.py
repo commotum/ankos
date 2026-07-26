@@ -5,6 +5,7 @@ from ca import program as program_api, rules
 import ca
 
 from g7_fixtures import derivation, finite_record_program, native_program
+from helpers import assert_no_authoritative_commit
 
 
 def test_application_runs_the_exact_generic_phase_order() -> None:
@@ -73,3 +74,4 @@ def test_rejection_preserves_input_and_publishes_no_authoritative_result() -> No
     assert source.identity == before
     assert not hasattr(result, "applied_atoms")
     assert not hasattr(result, "successor_quotient_with_derivation_fibers")
+    assert_no_authoritative_commit(result, source)

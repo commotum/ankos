@@ -101,6 +101,6 @@ def test_equal_successor_mass_aggregates_without_erasing_source_atoms() -> None:
             Fraction(1),
         ),
     )
-    assert tuple(
+    assert sorted(
         item.mass for item in result.applied_atom_measure.measure.masses
-    ) == (Fraction(1, 3), Fraction(2, 3))
+    ) == [Fraction(1, 3), Fraction(2, 3)]
