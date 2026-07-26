@@ -65,6 +65,7 @@ class RulePrimitive(Enum):
 
     LITERAL = "rule.literal"
     EXPRESSION = "rule.expression"
+    CLAUSE_KERNEL = "rule.clause-kernel"
     RELATION = "rule.relation"
     DISTRIBUTION = "rule.distribution"
     PARALLEL = "rule.parallel"
@@ -80,12 +81,17 @@ class ExpressionPrimitive(Enum):
     PROJECT = "expression.project"
     TUPLE = "expression.tuple"
     ADD = "expression.add"
+    SUBTRACT = "expression.subtract"
     MULTIPLY = "expression.multiply"
+    DIVIDE = "expression.divide"
     MODULO = "expression.modulo"
     COUNT = "expression.count"
     GATE = "expression.gate"
     LOOKUP = "expression.lookup"
     EQUAL = "expression.equal"
+    LESS = "expression.less"
+    LESS_EQUAL = "expression.less-equal"
+    CONDITIONAL = "expression.conditional"
     ALL = "expression.all"
     ANY = "expression.any"
 
@@ -177,6 +183,23 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
                 f"{primitive.value} may contain only RuleExpr operands"
             )
         return
+    if primitive in (
+        ExpressionPrimitive.SUBTRACT,
+        ExpressionPrimitive.DIVIDE,
+        ExpressionPrimitive.EQUAL,
+        ExpressionPrimitive.LESS,
+        ExpressionPrimitive.LESS_EQUAL,
+    ):
+        require_arity(2)
+        require_expression(0)
+        require_expression(1)
+        return
+    if primitive is ExpressionPrimitive.CONDITIONAL:
+        require_arity(3)
+        require_expression(0)
+        require_expression(1)
+        require_expression(2)
+        return
     if primitive is ExpressionPrimitive.MODULO:
         require_arity(2)
         require_expression(0)
@@ -205,7 +228,7 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
         if type(arguments[2]) is not int:
             raise TypeError("gate expression threshold must be an integer")
         return
-    if primitive in (ExpressionPrimitive.LOOKUP, ExpressionPrimitive.EQUAL):
+    if primitive is ExpressionPrimitive.LOOKUP:
         require_arity(2)
         require_expression(0)
         require_expression(1)
@@ -280,10 +303,18 @@ def add(*parts: RuleExpr) -> RuleExpr:
     return RuleExpr(ExpressionPrimitive.ADD, tuple(parts))
 
 
+def subtract(left: RuleExpr, right: RuleExpr) -> RuleExpr:
+    return RuleExpr(ExpressionPrimitive.SUBTRACT, (left, right))
+
+
 def multiply(*parts: RuleExpr) -> RuleExpr:
     if not parts:
         raise ValueError("multiply requires at least one expression")
     return RuleExpr(ExpressionPrimitive.MULTIPLY, tuple(parts))
+
+
+def divide(left: RuleExpr, right: RuleExpr) -> RuleExpr:
+    return RuleExpr(ExpressionPrimitive.DIVIDE, (left, right))
 
 
 def modulo(value: RuleExpr, modulus: int) -> RuleExpr:
@@ -320,6 +351,29 @@ def lookup(table_values: tuple[RuleScalar, ...], index: RuleExpr) -> RuleExpr:
         tuple(literal_expr(value) for value in table_values),
     )
     return RuleExpr(ExpressionPrimitive.LOOKUP, (table_node, index))
+
+
+def equal(left: RuleExpr, right: RuleExpr) -> RuleExpr:
+    return RuleExpr(ExpressionPrimitive.EQUAL, (left, right))
+
+
+def less_than(left: RuleExpr, right: RuleExpr) -> RuleExpr:
+    return RuleExpr(ExpressionPrimitive.LESS, (left, right))
+
+
+def less_equal(left: RuleExpr, right: RuleExpr) -> RuleExpr:
+    return RuleExpr(ExpressionPrimitive.LESS_EQUAL, (left, right))
+
+
+def conditional(
+    condition: RuleExpr,
+    when_true: RuleExpr,
+    when_false: RuleExpr,
+) -> RuleExpr:
+    return RuleExpr(
+        ExpressionPrimitive.CONDITIONAL,
+        (condition, when_true, when_false),
+    )
 
 
 # ---------------------------------------------------------------------------
