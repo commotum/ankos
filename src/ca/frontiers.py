@@ -319,9 +319,22 @@ class WritableRegion(Generic[C, W]):
                 raise WritableResolutionError(
                     "writable composition needs a union or product descriptor"
                 )
-            if len(self.parts) != len(self.descriptor.parts):
+            if self.descriptor.kind is loci.RegionKind.UNION:
+                descriptor_parts = {
+                    loci.canonical_identity(part)
+                    for part in self.descriptor.parts
+                }
+                writable_parts = {
+                    loci.canonical_identity(part.descriptor)
+                    for part in self.parts
+                }
+                if descriptor_parts != writable_parts:
+                    raise WritableResolutionError(
+                        "writable union parts disagree with its descriptor"
+                    )
+            elif len(self.parts) != len(self.descriptor.parts):
                 raise WritableResolutionError(
-                    "writable composition parts disagree with its descriptor"
+                    "writable product parts disagree with its descriptor"
                 )
             if any(
                 part.exactness_profile is not self.exactness_profile
@@ -364,8 +377,8 @@ class WritableRegion(Generic[C, W]):
             has_fresh_effect
             and not self.parts
             and self.target_contract.locus_kind not in (
-            None,
-            loci.LocusKind.FRESH,
+                None,
+                loci.LocusKind.FRESH,
             )
         ):
             raise WritableResolutionError(
@@ -464,7 +477,11 @@ class WritableRegion(Generic[C, W]):
             fresh.append(capability)
             lenses.append(ReconstructionLens(target, self.target_contract.frame))
 
-        if self.effect_profile.fresh and not fresh:
+        if (
+            self.effect_profile.fresh
+            and not fresh
+            and not _contains_fresh_template(self.descriptor)
+        ):
             raise WritableResolutionError(
                 "fresh effect profile resolved no fresh capabilities"
             )
@@ -570,6 +587,12 @@ def _resolve_targets(
         return existing, fresh_targets
     except ValueError as error:
         raise WritableResolutionError(str(error)) from error
+
+
+def _contains_fresh_template(region: loci.Region) -> bool:
+    return bool(region.templates) or any(
+        _contains_fresh_template(part) for part in region.parts
+    )
 
 
 def _combined_effect_profile(
@@ -790,15 +813,23 @@ def union(
     ordered = tuple(
         sorted(
             parts,
-            key=lambda part: loci.canonical_identity(part.descriptor),
+            key=loci.canonical_identity,
         )
     )
     profile = _combined_effect_profile(ordered)  # type: ignore[arg-type]
     namespaces = _part_fresh_namespaces(ordered)  # type: ignore[arg-type]
     namespace = namespaces[0] if len(namespaces) == 1 else None
     value_profile = _common_value_profile(ordered)  # type: ignore[arg-type]
+    descriptors: list[loci.Region] = []
+    descriptor_identities: set[str] = set()
+    for part in ordered:
+        identity = loci.canonical_identity(part.descriptor)
+        if identity in descriptor_identities:
+            continue
+        descriptor_identities.add(identity)
+        descriptors.append(part.descriptor)
     return WritableRegion(
-        descriptor=loci.union(tuple(part.descriptor for part in ordered)),
+        descriptor=loci.union(tuple(descriptors)),
         configuration_contract=_common_configuration_contract(ordered),  # type: ignore[arg-type]
         value_profile=value_profile,
         effect_profile=profile,

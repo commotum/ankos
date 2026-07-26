@@ -226,3 +226,48 @@ def test_dynamic_fresh_union_supports_multiple_namespaces() -> None:
         for capability in resolved.fresh
         if capability.namespace.namespace == "edges"
     } == {(a, b)}
+
+
+def test_union_merges_overlapping_permissions_without_losing_part_data() -> None:
+    source = _source()
+    target = source.entries[0][0]
+    replace = frontiers.literal(
+        (target,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    delete = frontiers.literal(
+        (target,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        effects=(frontiers.Effect.DELETE,),
+    )
+
+    combined = frontiers.union((delete, replace))
+    resolved = combined.resolve(source)
+
+    assert len(combined.descriptor.parts) == 1
+    assert len(combined.parts) == 2
+    assert resolved.existing[0].effects == (
+        frontiers.Effect.REPLACE,
+        frontiers.Effect.DELETE,
+    )
+
+
+def test_dynamic_fresh_template_may_resolve_no_current_capabilities() -> None:
+    source = _source()
+    dynamic = frontiers.dynamic_fresh(
+        loci.fresh_children_dynamic(
+            loci.literal((loci.named("absent", scope="record"),)),
+            "children",
+            ("child",),
+        ),
+        namespace=frontiers.FreshNamespace("children"),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+
+    resolved = dynamic.resolve(source)
+
+    assert resolved.fresh == ()
+    assert resolved.targets == ()

@@ -565,7 +565,7 @@ class SuccessorGroup(Generic[C]):
         if not self.derivations:
             raise ValueError("successor group needs a derivation fiber")
         if any(
-            not loci.semantic_equal(item.successor, self.successor)
+            not loci.configuration_equal(item.successor, self.successor)
             for item in self.derivations
         ):
             raise ValueError("successor fiber contains a different successor")
@@ -1068,6 +1068,18 @@ def _commit(
         disposition.target: disposition
         for disposition in atom.replacement.existing
     }
+    structural_bindings = tuple(
+        (binding.reference, binding.identity) for binding in bindings
+    )
+
+    def bind_value(
+        value: alphabets.SemanticValue,
+    ) -> alphabets.SemanticValue:
+        return alphabets.bind_structural_references(
+            value,
+            structural_bindings,
+        )
+
     entries: list[tuple[loci.Locus, alphabets.SemanticValue]] = []
     for target, old_value in configuration.entries:
         disposition = replacement_by_target.get(target)
@@ -1078,7 +1090,7 @@ def _commit(
             entries.append((target, cast(alphabets.SemanticValue, old_value)))
         elif disposition.action is rules.DispositionAction.REPLACE:
             payload = cast(rules.ValuePayload[alphabets.SemanticValue], disposition.payload)
-            entries.append((target, payload.value))
+            entries.append((target, bind_value(payload.value)))
         elif disposition.action is rules.DispositionAction.DELETE:
             continue
         else:
@@ -1096,7 +1108,7 @@ def _commit(
         if bound is None:
             raise ValueError("fresh creation has no deterministic binding")
         payload = cast(rules.ValuePayload[alphabets.SemanticValue], disposition.payload)
-        entries.append((bound, payload.value))
+        entries.append((bound, bind_value(payload.value)))
 
     successor = configuration.with_entries(
         tuple(entries),
@@ -1190,7 +1202,7 @@ def _quotient(
     groups: list[SuccessorGroup[C]] = []
     for derivation in derivations:
         for index, group in enumerate(groups):
-            if loci.semantic_equal(group.successor, derivation.successor):
+            if loci.configuration_equal(group.successor, derivation.successor):
                 groups[index] = SuccessorGroup(
                     group.successor,
                     (*group.derivations, derivation),
@@ -2066,7 +2078,7 @@ def apply(
             _validate_configuration(successor, program)
             if (
                 atom.progress is rules.Progress.QUIESCENT
-                and not loci.semantic_equal(configuration, successor)
+                and not loci.configuration_equal(configuration, successor)
             ):
                 raise ValueError("Quiescent derivation changed the configuration")
             output_lineage = _lineage_after(

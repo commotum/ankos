@@ -1696,7 +1696,14 @@ def resolve_fresh_references(
         for template in region.templates:
             if template.kind is FreshTemplateKind.CHILDREN:
                 assert template.parent_region is not None
-                parents = resolve_region(template.parent_region, configuration)
+                parents = tuple(
+                    parent
+                    for parent in resolve_region(
+                        template.parent_region,
+                        configuration,
+                    )
+                    if configuration.contains(parent)
+                )
                 out.extend(
                     FreshReference(template.namespace, local_key, parent)
                     for parent in parents
@@ -1704,7 +1711,14 @@ def resolve_fresh_references(
                 )
             else:
                 interfaces = tuple(
-                    resolve_region(interface_region, configuration)
+                    tuple(
+                        target
+                        for target in resolve_region(
+                            interface_region,
+                            configuration,
+                        )
+                        if configuration.contains(target)
+                    )
                     for interface_region in template.interface_regions
                 )
                 out.extend(
@@ -2046,20 +2060,25 @@ def _l1_distance(left: Locus, right: Locus) -> int | Fraction | None:
         and right.kind is LocusKind.COORDINATE
         and left.scope == right.scope
     ):
-        left_values = (
-            grid_coordinates(left)
-            if left.scope.startswith("grid:")
-            else tuple(
-                value for value in left.path if type(value) is int
-            )
-        )
-        right_values = (
-            grid_coordinates(right)
-            if right.scope.startswith("grid:")
-            else tuple(
-                value for value in right.path if type(value) is int
-            )
-        )
+        if left.scope.startswith("grid:"):
+            left_values = grid_coordinates(left)
+            right_values = grid_coordinates(right)
+        elif (
+            len(left.path) == 2
+            and len(right.path) == 2
+            and type(left.path[0]) is str
+            and type(right.path[0]) is str
+            and left.path[0] == right.path[0]
+            and type(left.path[1]) is int
+            and type(right.path[1]) is int
+        ):
+            left_values = (left.path[1],)
+            right_values = (right.path[1],)
+        elif all(type(value) is int for value in (*left.path, *right.path)):
+            left_values = left.path
+            right_values = right.path
+        else:
+            return None
     elif (
         left.kind is LocusKind.FIELD_POINT
         and right.kind is LocusKind.FIELD_POINT
@@ -2067,6 +2086,14 @@ def _l1_distance(left: Locus, right: Locus) -> int | Fraction | None:
         and right.path
         and left.path[0] == right.path[0]
     ):
+        left_component = tuple(
+            value for value in left.path[1:] if type(value) is str
+        )
+        right_component = tuple(
+            value for value in right.path[1:] if type(value) is str
+        )
+        if left_component != right_component:
+            return None
         left_values = tuple(
             value
             for value in left.path[1:]

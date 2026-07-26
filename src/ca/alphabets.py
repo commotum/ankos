@@ -766,7 +766,11 @@ class RepresentationRelation:
                 (_value_key(pair.source), _value_key(pair.target))
                 for pair in self.inverse_evidence
             }
-            if not self.inverse_evidence or actual_inverse != expected_inverse:
+            if (
+                not self.inverse_evidence
+                or len(actual_inverse) != len(self.inverse_evidence)
+                or actual_inverse != expected_inverse
+            ):
                 raise ValueError(
                     "exact representation needs complete inverse-on-image evidence"
                 )
@@ -1383,7 +1387,11 @@ def _value_key(value: SemanticValue) -> tuple[str, ...]:
     if type(value) is StructuralReference:
         return (
             "structural-reference",
-            type(value.reference).__name__,
+            (
+                "locus"
+                if type(value.reference) is loci.Locus
+                else "fresh-reference"
+            ),
             loci.canonical_identity(value.reference),
         )
     if isinstance(value, RepresentedNumber):

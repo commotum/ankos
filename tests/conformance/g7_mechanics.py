@@ -1213,3 +1213,116 @@ def assert_mechanics_run(
         return
 
     raise AssertionError(f"missing pressure assertion for {pressure}")
+
+
+def _ct12_stochastic() -> MechanicsRun:
+    """The frozen stochastic-search case: accept, reject, or no proposal."""
+
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF047")
+    source, alphabet, writable, readable = _finite_history_components((0, 0))
+    accepted = _derivation_result(
+        "ct12-stochastic:accepted",
+        existing=(
+            _existing_plan(
+                0,
+                rules.DispositionAction.REPLACE,
+                rules.literal_expr(1),
+            ),
+        ),
+    )
+    rejected = _derivation_result("ct12-stochastic:rejected-continue")
+    absent_proposal = _no_successor_result(
+        "ct12-stochastic:no-proposal",
+        rules.NoSuccessorOutcome.DECLARED_FAILURE,
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(rules.literal_expr(1), accepted, mass=Fraction(1, 2)),
+            _clause(rules.literal_expr(1), rejected, mass=Fraction(1, 4)),
+            _clause(rules.literal_expr(1), absent_proposal, mass=Fraction(1, 4)),
+        ),
+        stochastic=True,
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _ct12_flow() -> MechanicsRun:
+    """The frozen exact-flow shape: one whole solution object and a stop."""
+
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF036")
+    initial = alphabets.ValueNode(
+        alphabets.ValueKind.FIELD,
+        "ode-state",
+        fields=(("equation", "dx/dt=1"), ("initial", 0)),
+    )
+    solution = alphabets.ValueNode(
+        alphabets.ValueKind.FIELD,
+        "ode-solution",
+        fields=(("domain", "[0,1]"), ("expression", "x(t)=t")),
+    )
+    source = loci.history_configuration((initial,))
+    alphabet = alphabets.field()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.literal_expr(1),
+                _derivation_result(
+                    "ct12-exact-flow",
+                    existing=(
+                        _existing_plan(
+                            0,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(solution),
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def runtime_ct12_fixture(case_id: str) -> MechanicsRun:
+    """Build one of the ten frozen non-native CT12 mechanics cases."""
+
+    rows = {row.spf: row for row in MECHANICS_ROWS}
+    builders = {
+        "px01.mobile-head-branching": lambda: _px01(rows["SPF030"]),
+        "px02.parallel-substitution": lambda: _px02(rows["SPF037"]),
+        "px04.multiway-diamond": lambda: _px04(rows["SPF033"]),
+        "px04.constraint-mod3-zero": lambda: _px04(rows["SPF026"]),
+        "px04.constraint-mod3-one": lambda: _px04(rows["SPF014"]),
+        "px04.constraint-mod3-many": lambda: _px04(rows["SPF018"]),
+        "px02.graph-interface-replacement": lambda: _px02(rows["SPF028"]),
+        "px06.stochastic-search-law": _ct12_stochastic,
+        "px05.exact-differential-flow": _ct12_flow,
+        "px05.constant-field-intensional": lambda: _px05_intensional(
+            rows["SPF039"]
+        ),
+    }
+    try:
+        execution = builders[case_id]()
+    except KeyError as error:
+        raise ValueError(f"unknown CT12 mechanics case {case_id!r}") from error
+    if not isinstance(execution.result, program.ApplicationComplete):
+        raise AssertionError(
+            f"{case_id} rejected: {execution.result.fault.reason}"
+        )
+    return execution

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 from collections import Counter
+from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
 
@@ -14,7 +15,8 @@ from ca import frontiers, loci, neighborhoods, program, rules
 
 import test_oracles
 from g7_fixtures import native_program, successor_values
-from helpers import assert_full_application_equal
+from g7_mechanics import runtime_ct12_fixture
+from helpers import assert_closed_descriptor, assert_full_application_equal
 
 
 NATIVE_CASES = (
@@ -995,11 +997,205 @@ def test_finite_native_fixtures_match_complete_generic_results(
     )
 
 
-@pytest.mark.skip(reason="variable-structure/stochastic catalog fixtures belong to G7-02/G7-04")
+@dataclass(frozen=True)
+class CompleteMechanicsFingerprint:
+    """Representation-independent projection of every result-algebra facet."""
+
+    support_kind: str
+    source_atoms: tuple[
+        tuple[str, str | None, str | None, int, Fraction | None], ...
+    ]
+    applied_atom_count: int
+    fresh_binding_counts: tuple[int, ...]
+    no_successor_count: int
+    cardinalities: tuple[tuple[str, int | None], ...]
+    successor_fiber_sizes: tuple[int, ...]
+    measures: tuple[tuple[str, tuple[Fraction, ...], Fraction | None], ...]
+    intensional_relations: tuple[bool, bool, bool]
+
+
+def _oracle_mechanics_fingerprint(
+    expected: test_oracles.OracleExpected,
+) -> CompleteMechanicsFingerprint:
+    source_atoms = tuple(
+        sorted(
+            (
+                atom.kind,
+                atom.progress,
+                None if atom.continuation is None else atom.continuation.tag,
+                len(atom.dispositions),
+                atom.mass,
+            )
+            for atom in expected.source_outcomes
+        )
+    )
+    measures = tuple(
+        (
+            view.kind,
+            tuple(sorted(mass for _, mass in view.masses)),
+            view.total_mass,
+        )
+        for view in (
+            expected.measures.applied_atoms,
+            expected.measures.successors,
+            expected.measures.no_successors,
+        )
+    )
+    return CompleteMechanicsFingerprint(
+        expected.support_kind,
+        source_atoms,
+        len(expected.applied_atoms),
+        tuple(
+            sorted(len(atom.fresh_bindings) for atom in expected.applied_atoms)
+        ),
+        len(expected.no_successor_partition),
+        (
+            (
+                expected.outcome_cardinality.kind,
+                expected.outcome_cardinality.value,
+            ),
+            (
+                expected.derivation_cardinality.kind,
+                expected.derivation_cardinality.value,
+            ),
+            (
+                expected.successor_cardinality.kind,
+                expected.successor_cardinality.value,
+            ),
+        ),
+        tuple(sorted(len(fiber.atom_ids) for fiber in expected.successor_fibers)),
+        measures,
+        (
+            expected.source_intensional_relation is not None,
+            expected.applied_intensional_relation is not None,
+            expected.successor_intensional_relation is not None,
+        ),
+    )
+
+
+def _runtime_cardinality(
+    cardinality: rules.Cardinality,
+) -> tuple[str, int | None]:
+    size = rules.cardinality_size(cardinality)
+    if size is not None:
+        return ("exact", size)
+    if isinstance(cardinality, rules.Many):
+        assert cardinality.infinite is rules.InfiniteCardinality.UNCOUNTABLE
+        return ("uncountable", None)
+    return ("undetermined", None)
+
+
+def _runtime_measure(
+    value: program.MeasureView,
+) -> tuple[str, tuple[Fraction, ...], Fraction | None]:
+    if isinstance(value, program.MeasureAbsent):
+        return ("absent", (), None)
+    if isinstance(value, program.MeasureUnavailable):
+        return ("unavailable", (), None)
+    assert isinstance(value, program.MeasureAvailable)
+    return (
+        "available",
+        tuple(sorted(item.mass for item in value.measure.masses)),
+        value.measure.total_mass,
+    )
+
+
+def _runtime_mechanics_fingerprint(
+    actual: program.ApplicationComplete,
+) -> CompleteMechanicsFingerprint:
+    support = actual.source_outcomes.support
+    law = actual.source_outcomes.probability_law
+
+    def atom_shape(
+        atom: rules.Derivation | rules.NoSuccessor,
+    ) -> tuple[str, str | None, str | None, int, Fraction | None]:
+        mass = None if law is None else law.mass_for(atom.canonical_identity)
+        if isinstance(atom, rules.NoSuccessor):
+            return ("no-successor", None, None, 0, mass)
+        continuation = (
+            "stop" if isinstance(atom.continuation, rules.Stop) else "continue"
+        )
+        return (
+            "derivation",
+            atom.progress.value,
+            continuation,
+            len(atom.replacement.entries),
+            mass,
+        )
+
+    source_atoms = tuple(sorted(atom_shape(atom) for atom in support.atoms))
+    fresh_binding_counts = tuple(
+        sorted(
+            len(atom.fresh_bindings)
+            if isinstance(atom, program.AppliedDerivation)
+            else 0
+            for atom in actual.applied_atoms.atoms
+        )
+    )
+    return CompleteMechanicsFingerprint(
+        support.presentation.value,
+        source_atoms,
+        len(actual.applied_atoms.atoms),
+        fresh_binding_counts,
+        len(actual.no_successor_partition.atoms),
+        (
+            _runtime_cardinality(actual.outcome_atom_cardinality),
+            _runtime_cardinality(actual.derivation_cardinality),
+            _runtime_cardinality(actual.successor_cardinality),
+        ),
+        tuple(
+            sorted(
+                len(fiber.derivations)
+                for fiber in actual.successor_quotient_with_derivation_fibers.atoms
+            )
+        ),
+        (
+            _runtime_measure(actual.applied_atom_measure),
+            _runtime_measure(actual.successor_submeasure),
+            _runtime_measure(actual.no_successor_submeasure),
+        ),
+        (
+            support.relation is not None,
+            actual.applied_atoms.relation is not None,
+            actual.successor_quotient_with_derivation_fibers.relation is not None,
+        ),
+    )
+
+
+def _assert_non_native_case(case_id: str) -> None:
+    oracle = _ORACLES_BY_ID[case_id]
+    execution = runtime_ct12_fixture(case_id)
+    actual = execution.result
+
+    assert isinstance(actual, program.ApplicationComplete)
+    assert_closed_descriptor(execution.simple_program)
+    assert_closed_descriptor(actual)
+    assert actual.evidence.phases == tuple(program.ApplicationPhase)
+    assert actual.evidence.program_identity == execution.simple_program.canonical_identity
+    assert actual.evidence.input_configuration_identity == execution.source.identity
+    assert _runtime_mechanics_fingerprint(actual) == _oracle_mechanics_fingerprint(
+        oracle.expected
+    )
+
+    for atom in actual.source_outcomes.support.atoms:
+        assert atom.provenance
+        assert atom.witness.descriptor.version == 1
+        assert atom.certificate.version == 1
+        if isinstance(atom, rules.Derivation):
+            assert atom.replacement.totality_evidence.kind is rules.CertificateKind.TOTALITY
+    for atom in actual.applied_atoms.atoms:
+        assert (
+            len(atom.output_trace_lineage.path)
+            == len(atom.input_trace_lineage.path) + 1
+        )
+        assert atom.evidence.application_identity == actual.evidence.application_identity
+
+
 def test_variable_structure_and_stochastic_fixtures_match_completely() -> None:
-    pass
+    for case in test_oracles.CT12_CASES[6:14]:
+        _assert_non_native_case(case.case_id)
 
 
-@pytest.mark.skip(reason="differential/intensional catalog fixtures belong to G7-02/G7-04")
 def test_differential_and_intensional_fixtures_use_exact_tiny_oracles() -> None:
-    pass
+    for case in test_oracles.CT12_CASES[14:]:
+        _assert_non_native_case(case.case_id)

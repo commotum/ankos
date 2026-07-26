@@ -124,3 +124,85 @@ def test_raw_bindings_remain_available_before_alpha_equivalence() -> None:
     assert len({binding.identity for binding in applied.fresh_bindings}) == 2
     fiber = result.successor_quotient_with_derivation_fibers.atoms[0]
     assert fiber.derivations[0].fresh_bindings == applied.fresh_bindings
+
+
+def test_created_values_bind_same_derivation_structural_references() -> None:
+    source_value = alphabets.ValueNode(
+        alphabets.ValueKind.GRAPH,
+        "root-node",
+    )
+    source = loci.record_configuration((("root", source_value),))
+    parent = source.entries[0][0]
+    references = (
+        loci.fresh_reference("graph-patch", "left", parent=parent),
+        loci.fresh_reference("graph-patch", "right", parent=parent),
+        loci.FreshReference(
+            "graph-patch",
+            "edge",
+            parent=parent,
+            interface=(parent,),
+        ),
+    )
+    writable = frontiers.fresh(
+        loci.literal(fresh=references),
+        namespace=frontiers.FreshNamespace("graph-patch", parent),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.STRUCTURAL,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.STRUCTURAL,
+    )
+    node = alphabets.ValueNode(alphabets.ValueKind.GRAPH, "node")
+    edge = alphabets.ValueNode(
+        alphabets.ValueKind.GRAPH,
+        "edge",
+        items=(
+            alphabets.StructuralReference(references[0]),
+            alphabets.StructuralReference(references[1]),
+        ),
+    )
+    atom = derivation(
+        "graph-patch",
+        existing=(),
+        fresh=(
+            rules.create(references[0], node),
+            rules.create(references[1], node),
+            rules.create(references[2], edge),
+        ),
+    )
+    alphabet = alphabets.graph()
+    rule = rules.finite_rule(
+        (atom,),
+        contract=rule_contract(source, alphabet, writable, readable),
+    )
+    simple_program = ca.SimpleProgram(
+        seeds.exact(
+            source,
+            value_profile=alphabets.ValueProfile.STRUCTURAL,
+        ),
+        alphabet,
+        writable,
+        readable,
+        rule,
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    applied = result.applied_atoms.atoms[0]
+    assert isinstance(applied, program.AppliedDerivation)
+    bound = {
+        binding.reference: binding.identity for binding in applied.fresh_bindings
+    }
+    edge_identity = bound[references[2]]
+    edge_value = applied.successor.value_at(edge_identity)
+    assert isinstance(edge_value, alphabets.ValueNode)
+    assert edge_value.items == (
+        alphabets.StructuralReference(bound[references[0]]),
+        alphabets.StructuralReference(bound[references[1]]),
+    )
+    assert all(
+        isinstance(item, alphabets.StructuralReference) and item.is_bound
+        for item in edge_value.items
+    )

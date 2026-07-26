@@ -1082,6 +1082,11 @@ def differential_germ(
 ) -> ReadableRegion[C, IntensionalReadableView]:
     """Expose an exact differential dependency without inventing a stencil."""
 
+    carrier = (
+        loci.CarrierContract(loci.CarrierKind.FIELD)
+        if configuration_contract is None
+        else configuration_contract
+    )
     selector = loci.selector_differential_germ(
         field,
         order,
@@ -1089,7 +1094,7 @@ def differential_germ(
     )
     return _dependency_region(
         loci.differential(field, selector),
-        configuration_contract=configuration_contract,
+        configuration_contract=carrier,
         value_profile=value_profile,
         key=key,
         arity=ReadArity.INTENSIONAL,

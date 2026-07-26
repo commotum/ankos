@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from ca import alphabets, loci, neighborhoods
+from ca import alphabets, frontiers, loci, neighborhoods, rules
 
 
 def test_literal_view_preserves_target_identity_and_order() -> None:
@@ -479,3 +479,70 @@ def test_intensional_dependencies_fail_in_materialized_identity_products() -> No
         match="cannot silently discard",
     ):
         mixed.resolve(source)
+
+
+def test_intensional_read_view_is_usable_by_closed_relation_rules() -> None:
+    field_contract = loci.CarrierContract(loci.CarrierKind.FIELD, rank=1)
+    point = loci.field_point("u", (Fraction(0),))
+    field_value = alphabets.ValueNode(
+        alphabets.ValueKind.FIELD,
+        "partial-field",
+        fields=(("value", 1),),
+    )
+    source = loci.FiniteConfiguration(
+        loci.Carrier(
+            field_contract,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        ((point, field_value),),
+    )
+    alphabet = alphabets.field()
+    neighborhood = neighborhoods.differential_germ(
+        "u",
+        1,
+        configuration_contract=field_contract,
+        value_profile=alphabet.value_profile,
+    )
+    frontier = frontiers.everywhere(
+        configuration_contract=field_contract,
+        value_profile=alphabet.value_profile,
+    )
+    view = neighborhood.resolve(source)
+    writable = frontier.resolve(source)
+
+    def certificate(
+        kind: rules.CertificateKind,
+        label: str,
+    ) -> rules.Certificate:
+        return rules.Certificate(kind, rules.literal_expr(label))
+
+    rule = rules.differential(
+        rules.literal_expr("du/dx=0"),
+        rules.ExactlyOne(
+            certificate(rules.CertificateKind.CARDINALITY, "one-family")
+        ),
+        contract=rules.RuleContract(
+            field_contract,
+            alphabet.value_profile,
+            neighborhood.result_shape,
+            neighborhood.join_shape,
+            frontier.effect_profile,
+        ),
+        completeness_evidence=certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "complete",
+        ),
+        soundness_evidence=certificate(
+            rules.CertificateKind.SOUNDNESS,
+            "sound",
+        ),
+    )
+
+    result = rule.denote(view, writable)
+
+    assert isinstance(view, neighborhoods.IntensionalReadableView)
+    assert isinstance(result, rules.RuleComplete)
+    assert (
+        result.outcome_space.support.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
