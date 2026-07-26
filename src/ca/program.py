@@ -608,6 +608,8 @@ class ApplicationEvidence:
     readable_binding_identity: str
     writable_binding_identity: str
     application_identity: str
+    canonical_rule_identity: str
+    input_trace_lineage_identity: str
 
     def __post_init__(self) -> None:
         if type(self.phases) is not tuple or any(
@@ -622,9 +624,23 @@ class ApplicationEvidence:
             self.readable_binding_identity,
             self.writable_binding_identity,
             self.application_identity,
+            self.canonical_rule_identity,
+            self.input_trace_lineage_identity,
         )
         if any(not isinstance(item, str) or not item for item in identities):
             raise ValueError("application evidence identities cannot be empty")
+        expected_application_identity = loci.canonical_identity(
+            (
+                self.program_identity,
+                self.input_configuration_identity,
+                self.readable_binding_identity,
+                self.writable_binding_identity,
+            )
+        )
+        if self.application_identity != expected_application_identity:
+            raise ValueError(
+                "application identity disagrees with its program/input/R/W bindings"
+            )
 
 
 @dataclass(frozen=True)
