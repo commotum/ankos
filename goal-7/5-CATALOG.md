@@ -155,7 +155,7 @@ Presets, aliases, and the compatibility adapter remain stricter:
 - an underspecified preset remains private rather than becoming an ignored-
   argument wrapper, opaque recipe, or hardcoded family witness.
 
-## Preset Contract Decision Required
+## Preset Contract Decision
 
 The detailed named-construction audit now makes the remaining choice concrete.
 It does not challenge the five stored fields or generic application law.
@@ -181,12 +181,23 @@ round-trips arbitrary components would be an `A`, not a `P`. Small,
 fully-frozen conveniences such as `eca` may still compile their compact native
 parameters.
 
-Goal 6 fixes the names, kinds, target families, and binding summaries, but it
-does not choose between these two Python domains. Choosing the first expands
-the core and codec substantially. Choosing the second fixes a lean public
-contract that matches the catalog-as-alias intent but is less convenient than
-the historical source-facing constructors. No remaining preset or compatibility
-callable will be exposed until this choice is explicit.
+The cross-family audit resolves the choice by construction kind:
+
+- T06/T07 and T31–T33 are validated refinements because their defining
+  content is a property or a strict relation profile over an already-expanded
+  program.
+- Small fully frozen conveniences such as `eca`, the finite CA/table/map
+  presets, and other source-facing rows compile their compact native
+  parameters.
+- The remaining machine, substitution, recurrence, lattice, numeric, and
+  transduction presets require reusable closed mechanics before their
+  source-facing signatures can be exposed.
+
+Using the validated-refinement signature for every `P` would be a false
+resolution: it cannot establish continued-fraction or mathematical-constant
+provenance, and it changes the audited input domain of the mobile, Turing,
+substitution, recurrence, and related constructions. Per the Goal 6 handoff,
+G7-02 and G7-03 are reopened before G7-04 resumes.
 
 ## Big Picture Objective
 
@@ -336,7 +347,7 @@ manifest/helper when that keeps the expected ledger independent.
   catalog/public/family slice and `522 passed, 11 skipped` for the complete
   active suite. `git diff --check` is clean and the worktree is clean at
   `db48ebd`.
-- The detailed preset audit establishes the source-facing-compiler versus
-  validated-refinement decision above. Stage completion is paused at that
-  public-contract boundary; no fake preset, guessed adapter, or new mechanics
-  has been introduced.
+- The detailed preset audit establishes the hybrid source-facing versus
+  validated-refinement contract above. G7-02 and G7-03 are reopened in
+  dependency order; G7-04 remains paused with no fake preset or guessed
+  adapter exposed.

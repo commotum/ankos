@@ -315,3 +315,16 @@ unknown and legacy versions reject. G7-03 is complete. The first G7-04 action
 is to create `5-CATALOG.md`, resync the inert catalog shells against the exact
 Goal 6 migration ledger, and activate only catalog-owned behavior. No G7-04
 file or implementation began here.
+
+### G7-04 dependency reopening
+
+The later preset-domain audit reopened G7-02 for reusable closed mechanics
+that were not present in the original 387-row inventory. G7-03 is consequently
+reopened-pending: once the mechanics delta closes, every new sealed type,
+field, enum member, expression primitive, evidence value, and exact
+representation must be added to the explicit codec registry and inventory,
+round-tripped, mutation-tested, and included in the hostile fail-closed gate.
+
+The existing schema version remains `1` unless the new mechanics force a wire
+incompatibility. This reopening does not authorize catalog tags, constructor
+receipts, permissive migration, or a second codec.

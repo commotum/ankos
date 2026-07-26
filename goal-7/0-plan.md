@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **PAUSED — G7-04 PRESET CONTRACT**
+Status: **IN PROGRESS — G7-02 REOPENED MECHANICS**
 
 ## Big-Picture Objective
 
@@ -156,14 +156,19 @@ conflict, and reconcile the plan before changing runtime behavior.
 - The active suite reports `522 passed, 11 skipped`; the eleven skips are the
   five CT11 expansion tests, five catalog callable/export tests, and the
   F010/F042 role-boundary test. The worktree is clean at `db48ebd`.
-- The remaining preset audit exposed a choice not frozen by Goal 6. A
-  source-facing interpretation of the 39 legacy presets requires general
-  tagged-head, structural-matching, variable-support, lattice-incidence,
-  recurrence, positional-number, and property-evidence mechanics absent from
-  G7-02 and therefore reopens G7-02/G7-03. A lean validated-refinement
-  interpretation can stay over existing five-field programs, but must be
-  explicitly accepted as the public preset contract rather than smuggled in
-  as zero-delta aliases.
+- The remaining preset audit exposed missing reusable mechanics that the
+  original G7-02 pressure fixtures did not prove. Validated refinements are
+  authoritative for property-defined T06/T07 and relation-defined
+  T31–T33, but using them for source-facing T02–T05, T09–T12, T21–T25,
+  T34–T44, substitution, recurrence, and transduction rows would change
+  their audited argument domains into false aliases.
+- G7-02 and G7-03 are therefore reopened in dependency order. The reopened
+  mechanics work is limited to reusable closed component operations:
+  tagged/control state, computed structural access, ordered variable-value
+  transforms, matching and reconstruction, rank-generic incidence, exact
+  positional arithmetic, and proof-bearing named-source obligations. It may
+  not add a sixth field, catalog dispatch, callbacks, or a parallel compiler
+  package.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -314,8 +319,8 @@ stage file and may evolve with the implementation.
 |---|---|---|---|
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
-| `3-MECHANICS` | G7-02 | Complete | All 60 rows supported by reusable mechanics |
-| `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
+| `3-MECHANICS` | G7-02 | Reopened | All 60 rows and promised preset domains supported by reusable mechanics |
+| `4-CODECS` | G7-03 | Reopened Pending | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Paused | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |

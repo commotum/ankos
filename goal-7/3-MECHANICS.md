@@ -336,3 +336,45 @@ UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
 
 The two skips are G7-04 catalog obligations. G7-02 is reclosed with its
 original five-field and family-blind runtime conclusions unchanged.
+
+### G7-04 dependency reopening
+
+G7-04's constructor audit found a second, narrower dependency defect. The
+original 60 pressure fixtures prove that every audited family has at least one
+ordinary five-field representative, but they do not provide the reusable
+closed operations promised to the 39 legacy preset domains.
+
+The counterexamples are construction-bearing:
+
+- mobile automata and Turing machines need tagged/control state, computed
+  source/destination access, and one atomic state/tape result;
+- string, tree, two-dimensional, and geometric substitutions need closed
+  matching plus ordered, ranked, or multiplicity-preserving reconstruction;
+- tag systems, recurrences, constant-digit systems, and look-and-say need
+  inspectable sequence operations rather than fixed fresh witnesses;
+- general lattices need rank-generic axes/incidence;
+- digit reversal and continuous cellular automata need exact positional,
+  floor, and fractional-part operations; and
+- property/source-defined presets need inspectable restriction or evidence
+  terms rather than an unverified catalog label.
+
+A blanket `P(program) -> program` shortcut was rejected. It is semantically
+correct for T06/T07 and T31–T33 only when it validates their strict closed
+subdomains. For the source-facing rows it would change the audited constructor
+domain and make the callable a disguised alias. Hardcoded G7 mechanics
+fixtures likewise do not implement a preset family.
+
+G7-02 is reopened with the following bounded plan:
+
+1. Add the smallest closed, reusable structural and exact-arithmetic
+   operations inside the existing component owners.
+2. Prefer composition over one operation per catalog spelling. Program state
+   may use ordinary closed `ValueNode` words, records, maps, patterns, and
+   fields when that yields an exact construction.
+3. Add focused positive and hostile mechanics tests using no catalog import.
+4. Update the codec inventory for every new enum member or sealed record.
+5. Re-run the full mechanics, single-apply, no-dispatch, and five-field gates.
+
+`program.apply` remains family-blind. No new top-level module, executor,
+runtime family tag, callback, opaque recipe bag, or sixth program field is
+authorized. G7-03 remains reopened-pending until this mechanics delta closes.
