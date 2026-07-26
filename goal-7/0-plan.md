@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **SCAFFOLDED — NOT STARTED**
+Status: **IN PROGRESS — G7-00 COMPLETE**
 
 ## Big-Picture Objective
 
@@ -68,6 +68,8 @@ conflict, and reconcile the plan before changing runtime behavior.
 - Goal 6 is complete and its Goal 7 handoff is frozen.
 - The implementation-start baseline is commit
   `1562041e4dab0a6d9e51d730222de0a4f1b52038`.
+- The clean Goal 7 scaffold and actual execution-start commit is
+  `95ba134ee8f9671181c237cd2975004f3442efbe`.
 - At that baseline, `uv run pytest -q tests` reports
   `102 passed, 96 skipped`.
 - The 96 skipped tests are Goal 7 obligation shells. A skip is not evidence
@@ -94,6 +96,15 @@ conflict, and reconcile the plan before changing runtime behavior.
 - General numerical solvers and integrators are not core runtime services.
   Exact or intensional denotations are core; optional realization tooling is
   external and evidence-producing.
+- G7-00 is complete. It froze the exact pre-cutover surface and 16 independent
+  complete-result fixtures covering all six retained native presets plus
+  mobile/Turing, substitution, multiway, constraint zero/one/many, variable
+  support, stochastic laws, exact differential completion, and an intensional
+  differential relation.
+- Stage 1 added 12 active oracle consistency and bidirectional independence
+  checks without changing `src/ca`, packaging, or frozen Goal 2/5/6 content.
+  The original suite remains `102 passed, 96 skipped`; the reconciled full
+  suite is `114 passed, 96 skipped`.
 
 ## Working Assumptions
 
@@ -234,7 +245,7 @@ stage file and may evolve with the implementation.
 
 | Stage | Handoff stage | Status | Completion boundary |
 |---|---|---|---|
-| `1-ORACLES` | G7-00 | Pending | Frozen behavior and independent expected results |
+| `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Pending | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Pending | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Pending | Canonical serialization and representation proofs |
@@ -247,6 +258,9 @@ No stage file exists until that stage begins.
 ### 1-ORACLES
 
 Handoff stage: **G7-00 — Freeze behavior and independent oracles**
+
+Stage status: **Complete.** Durable evidence and the exact 16-case inventory
+are recorded in [`1-ORACLES.md`](1-ORACLES.md). G7-01 has not started.
 
 #### Big Picture Objective
 

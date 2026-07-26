@@ -152,6 +152,7 @@ class PreCutoverSnapshot:
     execution_start_tests_tree: str
     goal2_tree: str
     goal5_tree: str
+    goal6_tree: str
     python_version: str
     numpy_version: str
     package_version: str
@@ -213,6 +214,7 @@ PRE_CUTOVER = PreCutoverSnapshot(
     execution_start_tests_tree="a77a8f6092c9b3f907a1bd6aee7c6b09c1055fa7",
     goal2_tree="48b6309655ec7c1d3aaa1a0ec5dfb700385e16d1",
     goal5_tree="ba62f20b8c620094a0ad683906a803c5404be5f2",
+    goal6_tree="dfeaa1d302acceb274a6dec815ae587dada7ac78",
     python_version="3.10.13",
     numpy_version="2.2.6",
     package_version="0.1.0",
@@ -608,8 +610,18 @@ LINE_1 = _term("cell1d", 1)
 LINE_2 = _term("cell1d", 2)
 LINE_3 = _term("cell1d", 3)
 LINE_4 = _term("cell1d", 4)
-LINE_SOURCE = _term("line1d", _term("values", 1, 0, 1, 0, 0))
-LINE_SUCCESSOR = _term("line1d", _term("values", 0, 1, 0, 1, 1))
+LINE_SOURCE = _term(
+    "line1d",
+    _term("topology", "finite-line", 5),
+    _term("default", 0),
+    _term("values", 1, 0, 1, 0, 0),
+)
+LINE_SUCCESSOR = _term(
+    "line1d",
+    _term("topology", "finite-line", 5),
+    _term("default", 0),
+    _term("values", 0, 1, 0, 1, 1),
+)
 LINE_ATOM = OracleAtom(
     atom_id="dyadrads-rule-30",
     kind="derivation",
@@ -645,11 +657,7 @@ LINE_CASE = OracleCase(
     current_native=True,
     source=LINE_SOURCE,
     writable=(LINE_0, LINE_1, LINE_2, LINE_3, LINE_4),
-    readable=_term(
-        "old-snapshot-stencils",
-        _term("values", 1, 0, 1, 0, 0),
-        _term("boundary", "fixed", 0),
-    ),
+    readable=_term("old-snapshot-stencils", LINE_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
         atoms=(LINE_ATOM,),
@@ -680,12 +688,16 @@ GRID_S = _term("cell2d", 1, 0)
 GRID_SE = _term("cell2d", 1, 1)
 GRID_SOURCE = _term(
     "grid2d",
+    _term("topology", "finite-grid", 3, 3),
+    _term("default", 0),
     _term("row", 1, 1, 1),
     _term("row", 1, 1, 1),
     _term("row", 1, 1, 1),
 )
 GRID_SUCCESSOR = _term(
     "grid2d",
+    _term("topology", "finite-grid", 3, 3),
+    _term("default", 0),
     _term("row", 0, 0, 0),
     _term("row", 0, 1, 0),
     _term("row", 0, 0, 0),
@@ -745,11 +757,7 @@ GRID_CASE = OracleCase(
     current_native=True,
     source=GRID_SOURCE,
     writable=GRID_WRITABLE,
-    readable=_term(
-        "old-snapshot-2d-stencils",
-        GRID_SOURCE,
-        _term("boundary", "fixed", 0),
-    ),
+    readable=_term("old-snapshot-2d-stencils", GRID_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
         atoms=(GRID_ATOM,),
@@ -832,6 +840,8 @@ CUBE_WRITABLE = (
 )
 CUBE_SOURCE = _term(
     "grid3d",
+    _term("topology", "finite-grid", 3, 3, 3),
+    _term("default", 0),
     _term(
         "layer",
         _term("row", 1, 1, 1),
@@ -853,6 +863,8 @@ CUBE_SOURCE = _term(
 )
 CUBE_SUCCESSOR = _term(
     "grid3d",
+    _term("topology", "finite-grid", 3, 3, 3),
+    _term("default", 0),
     _term(
         "layer",
         _term("row", 0, 0, 0),
@@ -933,11 +945,7 @@ CUBE_CASE = OracleCase(
     current_native=True,
     source=CUBE_SOURCE,
     writable=CUBE_WRITABLE,
-    readable=_term(
-        "old-snapshot-3d-stencils",
-        CUBE_SOURCE,
-        _term("boundary", "fixed", 0),
-    ),
+    readable=_term("old-snapshot-3d-stencils", CUBE_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
         atoms=(CUBE_ATOM,),
@@ -2123,7 +2131,10 @@ def test_exact_differential_oracle_stops_with_the_maximal_solution_ast() -> None
     assert expected.outcome_cardinality == EXACT_ONE
     assert FLOW_ATOM.continuation == _term("stop", "completed")
     assert FLOW_ATOM.successor == FLOW_SUCCESSOR
-    assert "duration-or-event-selector" in FLOW_CASE.readable.arguments[-1].tag
+    assert FLOW_CASE.readable.arguments[-1] == _term(
+        "duration-or-event-selector",
+        "none",
+    )
 
 
 def test_intensional_oracle_is_closed_relation_data_without_a_solver() -> None:
