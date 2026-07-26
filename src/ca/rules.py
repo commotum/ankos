@@ -2565,7 +2565,13 @@ def lagcounts_0d(
     )
     output = lookup(_sampled_lag_table(number), context)
     hash_word = lookup(_sampled_lag_hashes(number), context)
-    prior = tuple(observation(index) for index in range(8, -1, -1))
+    # The readable contract presents each temporal band in chronological
+    # order. Select the prior nine values by their semantic history position
+    # so the successor remains the one-step left shift plus the new output.
+    prior = tuple(
+        observation(index)
+        for index in (8, 9, 4, 5, 6, 1, 2, 3, 0)
+    )
     carrier = loci.CarrierContract(
         loci.CarrierKind.HISTORY,
         rank=1,

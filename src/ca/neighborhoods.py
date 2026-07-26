@@ -979,7 +979,10 @@ def lagcounts_0d(
             (
                 f"band-{band}",
                 history(
-                    tuple(-offset for offset in range(start, start + band_size)),
+                    tuple(
+                        -offset
+                        for offset in reversed(range(start, start + band_size))
+                    ),
                     configuration_contract=carrier,
                     value_profile=value_profile,
                     key=f"band-{band}",

@@ -225,18 +225,28 @@ def test_native_resolved_groups_match_declared_field_arities(
 def test_lagcount_shape_tracks_the_requested_band_size() -> None:
     region = neighborhoods.lagcounts_0d(band_size=2)
     source = loci.history_configuration(
-        (True, False, True, False, True, False, True)
+        (False, True, True, False, False, True, True)
     )
+    view = region.resolve(source)
 
     assert tuple(
         1 if field.arity is neighborhoods.ReadArity.ONE else field.size
         for field in region.result_shape.fields
     ) == (1, 2, 2, 2)
-    assert tuple(len(group.indices) for group in region.resolve(source).groups) == (
+    assert tuple(len(group.indices) for group in view.groups) == (
         1,
         2,
         2,
         2,
+    )
+    assert tuple(
+        tuple(view.observations[index].value for index in group.indices)
+        for group in view.groups
+    ) == (
+        (True,),
+        (False, True),
+        (True, False),
+        (False, True),
     )
     with pytest.raises(neighborhoods.ReadableResolutionError):
         neighborhoods.lagcounts_0d(band_count=2)
