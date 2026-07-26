@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-05 CONFORMANCE NEXT**
+Status: **IN PROGRESS — G7-05 CONFORMANCE AUDIT**
 
 ## Big-Picture Objective
 
@@ -160,8 +160,14 @@ conflict, and reconcile the plan before changing runtime behavior.
   the F010/F042 role boundary are active. The focused catalog/conformance slice
   reports `356 passed`; the complete active suite reports `993 passed` with no
   skips.
-- G7-04 is complete. G7-05 is the first incomplete stage; no G7-05
-  implementation has started.
+- G7-04 is complete. G7-05 began from clean commit
+  `0be468cbb27718ee5aad5c0f4cda1c3ee63a452d`; its live record is
+  [`6-CONFORMANCE.md`](6-CONFORMANCE.md).
+- The G7-05 stage-entry conformance directory reports `221 passed`, and the
+  complete active suite reports `993 passed` with no skips. The initial static
+  scan nevertheless found three unused conformance helper placeholders behind
+  `_not_implemented()` and `NotImplementedError`; they must be removed or
+  replaced before aggregate conformance can close.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -316,7 +322,7 @@ stage file and may evolve with the implementation.
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows and promised preset domains supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Complete | Exact constructors, metadata, exports, and migration |
-| `6-CONFORMANCE` | G7-05 | Next | All normative suites and joins pass together |
+| `6-CONFORMANCE` | G7-05 | In progress | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
 
 No stage file exists until that stage begins.
@@ -570,6 +576,9 @@ callable-free metadata over already-tested mechanics.
 ### 6-CONFORMANCE
 
 Handoff stage: **G7-05 — Complete conformance**
+
+Stage status: **In progress.** The live requirement audit and verification
+record is [`6-CONFORMANCE.md`](6-CONFORMANCE.md). G7-06 remains unstarted.
 
 #### Big Picture Objective
 
