@@ -1155,6 +1155,8 @@ def test_intensional_projection_cardinalities_reject_impossible_infinite_claims(
         outcome(one, unknown, zero, zero)
     with pytest.raises(ValueError, match="cannot exceed the source"):
         outcome(countable, unknown, unknown, uncountable)
+    with pytest.raises(ValueError, match="zero derivations"):
+        outcome(one, unknown, one, one)
 
     assert outcome(countable, countable, zero, one).projection_cardinalities
     assert outcome(uncountable, uncountable, zero, countable).projection_cardinalities
