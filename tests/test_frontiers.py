@@ -1,50 +1,101 @@
-"""Goal 7 unit-contract skeleton for writable capability envelopes.
-
-These tests will exercise ``WritableRegion`` as the complete possible-write
-envelope while keeping read authority, applicability, and conflict semantics
-outside the component. The module is skipped until G7-01 implementation; no
-skipped assertion is evidence of conformance.
-"""
-
-from typing import NoReturn
+"""Unit tests for writable capability envelopes."""
 
 import pytest
 
-
-pytestmark = pytest.mark.skip(
-    reason="Goal 7 WritableRegion contract skeleton; implementation is pending"
-)
+from ca import alphabets, frontiers, loci
 
 
-def _pending() -> NoReturn:
-    raise NotImplementedError("Goal 7 WritableRegion tests are not implemented")
+def _source():
+    return loci.record_configuration((("a", False), ("b", True)))
 
 
 def test_writable_region_resolves_the_complete_possible_write_envelope() -> None:
-    """Every permitted existing, destination, and structural target is present."""
+    source = _source()
+    region = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        effects=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
+    )
 
-    _pending()
+    resolved = region.resolve(source)
+
+    assert resolved.snapshot_identity == source.identity
+    assert tuple(item.target for item in resolved.existing) == tuple(
+        target for target, _ in source.entries
+    )
+    assert all(
+        item.effects
+        == (frontiers.Effect.REPLACE, frontiers.Effect.DELETE)
+        for item in resolved.existing
+    )
+    assert resolved.reconstruction.preserves_outside
+    assert resolved.reconstruction.complete
 
 
 def test_writable_region_distinguishes_existing_and_fresh_capabilities() -> None:
-    """Replace/delete and absent/create targets retain separate closed schemas."""
+    source = _source()
+    parent = source.entries[0][0]
+    reference = loci.fresh_reference("children", "child", parent=parent)
+    existing = frontiers.literal(
+        (parent,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    fresh = frontiers.fresh(
+        loci.literal(fresh=(reference,)),
+        namespace=frontiers.FreshNamespace("children", parent),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    combined = frontiers.union((existing, fresh)).resolve(source)
 
-    _pending()
+    assert tuple(item.target for item in combined.existing) == (parent,)
+    assert tuple(item.target for item in combined.fresh) == (reference,)
+    assert combined.existing[0].effects == (frontiers.Effect.REPLACE,)
+    assert combined.fresh[0].namespace.namespace == "children"
 
 
 def test_writable_region_composition_returns_one_component() -> None:
-    """Union, product, relative, matched, and intensional forms compose explicitly."""
+    source = _source()
+    parts = tuple(
+        (
+            target.path[-1],
+            frontiers.literal(
+                (target,),
+                configuration_contract=source.contract,
+                value_profile=alphabets.ValueProfile.BOOLEAN,
+            ),
+        )
+        for target, _ in source.entries
+    )
 
-    _pending()
+    product = frontiers.product(parts)
+
+    assert isinstance(product, frontiers.WritableRegion)
+    assert product.resolve(source).targets == tuple(
+        target for target, _ in source.entries
+    )
 
 
 def test_frontier_grants_no_implicit_read_authority() -> None:
-    """Writable capability alone never exposes an old value to Rule."""
+    source = _source()
+    resolved = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    ).resolve(source)
 
-    _pending()
+    assert all(not hasattr(item, "value") for item in resolved.existing)
+    assert not hasattr(resolved, "observations")
+    assert not hasattr(resolved, "read")
 
 
 def test_frontier_does_not_select_firing_sites_or_conflict_winners() -> None:
-    """Applicability, scheduling, and actual change remain Rule semantics."""
+    region = frontiers.everywhere(
+        value_profile=alphabets.ValueProfile.BOOLEAN
+    )
 
-    _pending()
+    assert not hasattr(region, "schedule")
+    assert not hasattr(region, "applicability")
+    assert not hasattr(region, "winner")
+    with pytest.raises(frontiers.WritableResolutionError):
+        region.resolve(object())

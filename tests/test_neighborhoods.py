@@ -1,288 +1,162 @@
-"""Tests for neighborhood factory behavior."""
+"""Unit tests for identity-preserving readable regions."""
 
-import numpy as np
 import pytest
 
-from ca import loci, neighborhoods
+from ca import alphabets, loci, neighborhoods
 
 
-def _coords(neighborhood: neighborhoods.Neighborhood, component: int = 0) -> list[list[int]]:
-    selection = loci.select(neighborhood.components[component])
-    assert selection.coords is not None
-    return selection.coords.tolist()
+def test_literal_view_preserves_target_identity_and_order() -> None:
+    source = loci.record_configuration((("a", 1), ("b", 2)))
+    targets = tuple(target for target, _ in source.entries)
+    region = neighborhoods.literal(
+        targets,
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    )
+
+    view = region.resolve(source)
+
+    assert view.snapshot_identity == source.identity
+    assert tuple(item.target for item in view.observations) == targets
+    assert tuple(item.value for item in view.observations) == (1, 2)
+    assert all(
+        isinstance(item.state, neighborhoods.Present)
+        for item in view.observations
+    )
+    assert view.groups[0].indices == (0, 1)
 
 
-def test_literal_offsets_returns_lex_ordered_offsets() -> None:
-    neighborhood = neighborhoods.literal_offsets(
+def test_relative_view_distinguishes_present_boundary_default_and_absent() -> None:
+    fixed = loci.grid_configuration(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.FIXED, False),
+    )
+    no_boundary = loci.grid_configuration(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    region = neighborhoods.eca(configuration_contract=fixed.contract)
+
+    fixed_view = region.resolve(fixed)
+    absent_view = region.resolve(no_boundary)
+
+    assert any(
+        isinstance(item.state, neighborhoods.Present)
+        for item in fixed_view.observations
+    )
+    assert any(
+        isinstance(item.state, neighborhoods.BoundaryDefault)
+        for item in fixed_view.observations
+    )
+    assert any(
+        isinstance(item.state, neighborhoods.Absent)
+        for item in absent_view.observations
+    )
+    with pytest.raises(neighborhoods.ReadableResolutionError):
+        next(
+            item
+            for item in absent_view.observations
+            if isinstance(item.state, neighborhoods.Absent)
+        ).value
+
+
+def test_relative_groups_join_by_anchor_identity() -> None:
+    source = loci.grid_configuration(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+    )
+    view = neighborhoods.eca(configuration_contract=source.contract).resolve(
+        source
+    )
+
+    assert len(view.groups) == 3
+    assert all(len(group.indices) == 3 for group in view.groups)
+    assert tuple(group.anchor for group in view.groups) == loci.grid_loci((3,))
+    assert view.join_shape.mode is neighborhoods.JoinMode.ANCHOR_IDENTITY
+
+
+def test_product_preserves_field_group_boundaries_and_channels() -> None:
+    source = loci.grid_configuration(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+    )
+    contract = source.contract
+    product = neighborhoods.product(
         (
-            (0, 1, 0, 0),
-            (0, -1, 0, 0),
-            (0, 0, 0, 0),
+            (
+                "self",
+                neighborhoods.grid_relative(
+                    ((0,),),
+                    configuration_contract=contract,
+                    value_profile=alphabets.ValueProfile.BOOLEAN,
+                ),
+            ),
+            (
+                "sides",
+                neighborhoods.grid_relative(
+                    ((-1,), (1,)),
+                    configuration_contract=contract,
+                    value_profile=alphabets.ValueProfile.BOOLEAN,
+                ),
+            ),
         )
     )
 
-    assert _coords(neighborhood) == [
-        [0, -1, 0, 0],
-        [0, 0, 0, 0],
-        [0, 1, 0, 0],
-    ]
+    view = product.resolve(source)
+
+    assert product.join_shape.mode is neighborhoods.JoinMode.PRODUCT
+    assert len(view.groups) == 6
+    for anchor in loci.grid_loci((3,)):
+        assert {
+            group.key.channel for group in view.groups if group.anchor == anchor
+        } == {0, 1}
 
 
-def test_literal_offsets_rejects_invalid_offsets() -> None:
-    with pytest.raises(ValueError):
-        neighborhoods.literal_offsets(())
+@pytest.mark.parametrize(
+    ("factory", "fields"),
+    (
+        (neighborhoods.ar2_0d, ("ar2",)),
+        (
+            neighborhoods.dyadlags_0d,
+            ("older", "previous", "current"),
+        ),
+        (
+            neighborhoods.lagcounts_0d,
+            ("history", "recent", "middle", "oldest"),
+        ),
+        (
+            neighborhoods.dyadrads_1d,
+            ("self", "primary", "secondary"),
+        ),
+        (
+            neighborhoods.dyadaxes_2d,
+            ("self", "primary", "secondary"),
+        ),
+        (
+            neighborhoods.dyadaxes_3d,
+            ("self", "primary", "secondary"),
+        ),
+    ),
+)
+def test_retained_native_presets_publish_exact_rule_facing_shapes(
+    factory,
+    fields: tuple[str, ...],
+) -> None:
+    region = factory()
 
-    with pytest.raises(ValueError):
-        neighborhoods.literal_offsets(((0, 1, 0),))
-
-    with pytest.raises(ValueError):
-        neighborhoods.literal_offsets(((0, 1, 0, 0), (0, 1, 0, 0)))
-
-
-def test_history_preserves_temporal_components() -> None:
-    neighborhood = neighborhoods.history((0, -1, -2))
-
-    assert len(neighborhood.components) == 3
-    assert _coords(neighborhood, component=0) == [[0, 0, 0, 0]]
-    assert _coords(neighborhood, component=1) == [[-1, 0, 0, 0]]
-    assert _coords(neighborhood, component=2) == [[-2, 0, 0, 0]]
-
-
-def test_dyadlags_0d_preserves_temporal_lag_components() -> None:
-    neighborhood = neighborhoods.dyadlags_0d()
-
-    assert neighborhood.name == "dyadlags_0d"
-    assert neighborhood.params == {"time_offsets": (0, -1, -2)}
-    assert len(neighborhood.components) == 3
-    assert _coords(neighborhood, component=0) == [[0, 0, 0, 0]]
-    assert _coords(neighborhood, component=1) == [[-1, 0, 0, 0]]
-    assert _coords(neighborhood, component=2) == [[-2, 0, 0, 0]]
-
-
-def test_lagcounts_0d_preserves_self_and_temporal_count_bands() -> None:
-    neighborhood = neighborhoods.lagcounts_0d()
-
-    assert neighborhood.name == "lagcounts_0d"
-    assert neighborhood.params == {"band_size": 3, "band_count": 3}
-    assert len(neighborhood.components) == 4
-    assert _coords(neighborhood, component=0) == [[0, 0, 0, 0]]
-    assert _coords(neighborhood, component=1) == [
-        [-3, 0, 0, 0],
-        [-2, 0, 0, 0],
-        [-1, 0, 0, 0],
-    ]
-    assert _coords(neighborhood, component=2) == [
-        [-6, 0, 0, 0],
-        [-5, 0, 0, 0],
-        [-4, 0, 0, 0],
-    ]
-    assert _coords(neighborhood, component=3) == [
-        [-9, 0, 0, 0],
-        [-8, 0, 0, 0],
-        [-7, 0, 0, 0],
-    ]
+    assert tuple(field.key for field in region.result_shape.fields) == fields
+    assert region.version if hasattr(region, "version") else True
 
 
-def test_metric_radius_builds_eca_stencil() -> None:
-    neighborhood = neighborhoods.metric_radius(
-        axes=("x",),
-        metric="linf",
-        region="filled",
-        radius=1,
+def test_neighborhood_grants_no_write_authority() -> None:
+    region = neighborhoods.global_view(
+        value_profile=alphabets.ValueProfile.BOOLEAN
     )
 
-    assert _coords(neighborhood) == [
-        [0, -1, 0, 0],
-        [0, 0, 0, 0],
-        [0, 1, 0, 0],
-    ]
-
-
-def test_eca_alias_builds_standard_stencil() -> None:
-    neighborhood = neighborhoods.eca(radius=2, time_offset=-1)
-
-    assert neighborhood.params == {
-        "axes": ("x",),
-        "metric": "linf",
-        "region": "filled",
-        "radius": 2,
-        "time_offset": -1,
-        "include_center": True,
-        "read_mode": "compact",
-    }
-    assert _coords(neighborhood) == [
-        [-1, -2, 0, 0],
-        [-1, -1, 0, 0],
-        [-1, 0, 0, 0],
-        [-1, 1, 0, 0],
-        [-1, 2, 0, 0],
-    ]
-
-
-def test_metric_radius_builds_moore_without_center() -> None:
-    neighborhood = neighborhoods.metric_radius(
-        axes=("x", "y"),
-        metric="linf",
-        region="filled",
-        radius=1,
-        include_center=False,
-    )
-
-    assert _coords(neighborhood) == [
-        [0, -1, -1, 0],
-        [0, -1, 0, 0],
-        [0, -1, 1, 0],
-        [0, 0, -1, 0],
-        [0, 0, 1, 0],
-        [0, 1, -1, 0],
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-    ]
-
-
-def test_moore_alias_matches_linf_filled_without_center() -> None:
-    direct = neighborhoods.metric_radius(
-        axes=("x", "y"),
-        metric="linf",
-        region="filled",
-        radius=1,
-        include_center=False,
-    )
-    alias = neighborhoods.moore()
-
-    assert alias.params == direct.params
-    assert _coords(alias) == _coords(direct)
-
-
-def test_metric_radius_builds_von_neumann_shells() -> None:
-    neighborhood_2d = neighborhoods.metric_radius(
-        axes=("x", "y"),
-        metric="l1",
-        region="shell",
-        radius=1,
-    )
-    neighborhood_3d = neighborhoods.metric_radius(
-        axes=("x", "y", "z"),
-        metric="l1",
-        region="shell",
-        radius=1,
-    )
-
-    assert _coords(neighborhood_2d) == [
-        [0, -1, 0, 0],
-        [0, 0, -1, 0],
-        [0, 0, 1, 0],
-        [0, 1, 0, 0],
-    ]
-    assert _coords(neighborhood_3d) == [
-        [0, -1, 0, 0],
-        [0, 0, -1, 0],
-        [0, 0, 0, -1],
-        [0, 0, 0, 1],
-        [0, 0, 1, 0],
-        [0, 1, 0, 0],
-    ]
-
-
-def test_von_neumann_alias_uses_filled_l1_region() -> None:
-    neighborhood = neighborhoods.von_neumann(radius=2)
-
-    assert neighborhood.params == {
-        "axes": ("x", "y"),
-        "metric": "l1",
-        "region": "filled",
-        "radius": 2,
-        "time_offset": 0,
-        "include_center": False,
-        "read_mode": "compact",
-    }
-    assert _coords(neighborhood) == [
-        [0, -2, 0, 0],
-        [0, -1, -1, 0],
-        [0, -1, 0, 0],
-        [0, -1, 1, 0],
-        [0, 0, -2, 0],
-        [0, 0, -1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 2, 0],
-        [0, 1, -1, 0],
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 2, 0, 0],
-    ]
-
-
-def test_shell_matches_radius_shell_without_center() -> None:
-    direct = neighborhoods.metric_radius(
-        axes=("x", "y"),
-        metric="l1",
-        region="shell",
-        radius=1,
-        include_center=False,
-    )
-    wrapped = neighborhoods.shell(("x", "y"), metric="l1", radius=1)
-
-    assert _coords(wrapped) == _coords(direct)
-    assert wrapped.name == "shell"
-
-
-def test_directional_line_offsets() -> None:
-    neighborhood = neighborhoods.directional_line("x", (1, 2, 3))
-    fixed_neighborhood = neighborhoods.directional_line("x", (-2, -1), fixed={"y": 1})
-
-    assert _coords(neighborhood) == [
-        [0, 1, 0, 0],
-        [0, 2, 0, 0],
-        [0, 3, 0, 0],
-    ]
-    assert _coords(fixed_neighborhood) == [
-        [0, -2, 1, 0],
-        [0, -1, 1, 0],
-    ]
-
-
-def test_directional_line_rejects_invalid_inputs() -> None:
-    with pytest.raises(ValueError):
-        neighborhoods.directional_line("x", ())
-
-    with pytest.raises(ValueError):
-        neighborhoods.directional_line("q", (1,))
-
-    with pytest.raises(ValueError):
-        neighborhoods.directional_line("x", (1,), fixed={"x": 2})
-
-
-def test_directional_fov_selects_bounded_cone() -> None:
-    neighborhood = neighborhoods.directional_fov(
-        axes=("x", "y"),
-        reference=(0, 0),
-        direction=(1, 0),
-        aperture=np.pi / 6,
-        radius=2,
-    )
-
-    assert _coords(neighborhood) == [
-        [0, 0, 0, 0],
-        [0, 1, 0, 0],
-        [0, 2, 0, 0],
-    ]
-
-
-def test_directional_fov_rejects_invalid_inputs() -> None:
-    with pytest.raises(ValueError):
-        neighborhoods.directional_fov(
-            axes=("x", "y"),
-            reference=(0, 0),
-            direction=(0, 0),
-            aperture=np.pi / 3,
-            radius=2,
-        )
-
-    with pytest.raises(ValueError):
-        neighborhoods.directional_fov(
-            axes=("x", "y"),
-            reference=(0, 3),
-            direction=(1, 0),
-            aperture=np.pi / 3,
-            radius=2,
-        )
+    assert not hasattr(region, "effects")
+    assert not hasattr(region, "commit")
+    assert not hasattr(region, "write")

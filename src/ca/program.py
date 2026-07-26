@@ -59,6 +59,10 @@ class SimpleProgram(Generic[C, V, W, R]):
 def _require_compatible_five_fields(
     program: SimpleProgram[C, V, W, R],
 ) -> CompatibilityEvidence:
+    if type(program) is not SimpleProgram:
+        raise ProgramCompatibilityError(
+            "SimpleProgram is sealed; semantic sidecar subclasses are invalid"
+        )
     if tuple(field.name for field in fields(SimpleProgram)) != (
         "seed",
         "alphabet",
@@ -67,17 +71,17 @@ def _require_compatible_five_fields(
         "rule",
     ):
         raise ProgramCompatibilityError("SimpleProgram field contract is corrupted")
-    if not isinstance(program.seed, seeds.Seed):
+    if type(program.seed) is not seeds.Seed:
         raise ProgramCompatibilityError("seed is not a recognized Seed")
-    if not isinstance(program.alphabet, alphabets.Alphabet):
+    if type(program.alphabet) is not alphabets.Alphabet:
         raise ProgramCompatibilityError("alphabet is not a recognized Alphabet")
-    if not isinstance(program.frontier, frontiers.WritableRegion):
+    if type(program.frontier) is not frontiers.WritableRegion:
         raise ProgramCompatibilityError("frontier is not a recognized WritableRegion")
-    if not isinstance(program.neighborhood, neighborhoods.ReadableRegion):
+    if type(program.neighborhood) is not neighborhoods.ReadableRegion:
         raise ProgramCompatibilityError(
             "neighborhood is not a recognized ReadableRegion"
         )
-    if not isinstance(program.rule, rules.Rule):
+    if type(program.rule) is not rules.Rule:
         raise ProgramCompatibilityError("rule is not a recognized Rule")
 
     seed_contract = program.seed.output_contract
@@ -113,8 +117,15 @@ def _require_compatible_five_fields(
         raise ProgramCompatibilityError("Rule read shape does not match Neighborhood")
     if program.neighborhood.join_shape != rule_contract.required_join_shape:
         raise ProgramCompatibilityError("Rule join shape does not match Neighborhood")
-    if program.frontier.effect_profile != rule_contract.required_effect_profile:
-        raise ProgramCompatibilityError("Rule effects do not match Frontier")
+    required_effects = rule_contract.required_effect_profile
+    available_effects = program.frontier.effect_profile
+    if not (
+        set(required_effects.existing).issubset(available_effects.existing)
+        and set(required_effects.fresh).issubset(available_effects.fresh)
+    ):
+        raise ProgramCompatibilityError(
+            "Rule effects are not included in Frontier capabilities"
+        )
     if (
         seed_contract.exactness_profile is not program.frontier.exactness_profile
         or seed_contract.exactness_profile is not program.neighborhood.exactness_profile
@@ -130,6 +141,8 @@ def _require_compatible_five_fields(
         # always available to rollout, so this is not a mismatch.
         pass
 
+    _require_seed_values_conform(program)
+
     return CompatibilityEvidence(
         carrier,
         value_profile,
@@ -144,6 +157,135 @@ def _require_compatible_five_fields(
             "exactness-and-entropy-explicit",
         ),
     )
+
+
+def _require_seed_values_conform(
+    program: SimpleProgram[C, V, W, R],
+) -> None:
+    """Prove every explicit Seed value admitted at construction time."""
+
+    def require_configuration(configuration: object) -> None:
+        if not isinstance(
+            configuration,
+            (loci.FiniteConfiguration, loci.IntensionalConfiguration),
+        ):
+            raise ProgramCompatibilityError(
+                "Seed contains an unrecognized configuration"
+            )
+        if not program.seed.configuration_contract.accepts(
+            configuration.contract
+        ):
+            raise ProgramCompatibilityError(
+                "Seed configuration violates its output contract"
+            )
+        if isinstance(configuration, loci.FiniteConfiguration):
+            for _, value in configuration.entries:
+                try:
+                    program.alphabet.require(
+                        cast(alphabets.SemanticValue, value)
+                    )
+                except ValueError as error:
+                    raise ProgramCompatibilityError(
+                        "Seed value does not conform to Alphabet"
+                    ) from error
+            boundary = configuration.carrier.boundary
+            if boundary.policy is loci.BoundaryPolicy.FIXED:
+                try:
+                    program.alphabet.require(
+                        cast(alphabets.SemanticValue, boundary.exterior)
+                    )
+                except ValueError as error:
+                    raise ProgramCompatibilityError(
+                        "Seed boundary value does not conform to Alphabet"
+                    ) from error
+
+    def require_construction(construction: seeds.Construction) -> None:
+        arguments = construction.arguments
+        values: tuple[alphabets.SemanticValue, ...] = ()
+        if construction.operation is seeds.ConstructionOp.FILL and arguments:
+            values = (cast(alphabets.SemanticValue, arguments[0]),)
+        elif construction.operation is seeds.ConstructionOp.POINT and arguments:
+            values = (cast(alphabets.SemanticValue, arguments[-1]),)
+        elif construction.operation is seeds.ConstructionOp.SEQUENCE and arguments:
+            values = cast(tuple[alphabets.SemanticValue, ...], arguments[0])
+        elif construction.operation is seeds.ConstructionOp.RECORD and arguments:
+            fields_value = cast(
+                tuple[tuple[str, alphabets.SemanticValue], ...],
+                arguments[0],
+            )
+            values = tuple(value for _, value in fields_value)
+        elif construction.operation is seeds.ConstructionOp.GRID and len(arguments) >= 2:
+            values = cast(tuple[alphabets.SemanticValue, ...], arguments[1])
+        for value in values:
+            try:
+                program.alphabet.require(value)
+            except ValueError as error:
+                raise ProgramCompatibilityError(
+                    "constructive Seed value does not conform to Alphabet"
+                ) from error
+
+    def require_source(source: seeds.SeedSource[object]) -> None:
+        if isinstance(source, (seeds.ExactSource, seeds.PartialSource)):
+            require_configuration(source.configuration)
+        elif isinstance(source, seeds.ConstructiveSource):
+            require_construction(source.construction)
+        elif isinstance(source, seeds.LawSource):
+            if isinstance(source.law, seeds.BernoulliLaw):
+                for value in (source.law.false_value, source.law.true_value):
+                    try:
+                        program.alphabet.require(value)
+                    except ValueError as error:
+                        raise ProgramCompatibilityError(
+                            "Bernoulli Seed value does not conform to Alphabet"
+                        ) from error
+                if source.law.boundary.policy is loci.BoundaryPolicy.FIXED:
+                    try:
+                        program.alphabet.require(
+                            cast(
+                                alphabets.SemanticValue,
+                                source.law.boundary.exterior,
+                            )
+                        )
+                    except ValueError as error:
+                        raise ProgramCompatibilityError(
+                            "Bernoulli boundary does not conform to Alphabet"
+                        ) from error
+            elif isinstance(source.law, seeds.UniformTupleLaw):
+                candidates: tuple[alphabets.SemanticValue, ...] = (
+                    (False, True)
+                    if (
+                        source.law.value_count == 2
+                        and program.alphabet.value_profile
+                        is alphabets.ValueProfile.BOOLEAN
+                    )
+                    else tuple(range(source.law.value_count))
+                )
+                for value in candidates:
+                    try:
+                        program.alphabet.require(value)
+                    except ValueError as error:
+                        raise ProgramCompatibilityError(
+                            "uniform Seed value does not conform to Alphabet"
+                        ) from error
+            if source.construction is not None:
+                require_construction(source.construction)
+        elif isinstance(
+            source,
+            (
+                seeds.ProductSource,
+                seeds.MixtureSource,
+                seeds.ProductLawSource,
+            ),
+        ):
+            for part in source.parts:
+                require_source(cast(seeds.SeedSource[object], part.seed.source))
+        elif isinstance(source, seeds.OverlaySource):
+            for part in source.parts:
+                require_source(cast(seeds.SeedSource[object], part.source))
+        elif isinstance(source, seeds.RefinedSource):
+            require_source(cast(seeds.SeedSource[object], source.source.source))
+
+    require_source(cast(seeds.SeedSource[object], program.seed.source))
 
 
 class ApplicationPhase(Enum):
@@ -174,8 +316,10 @@ class TraceLineage:
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported trace-lineage version {self.version}")
-        if not self.root_identity:
+        if not isinstance(self.root_identity, str) or not self.root_identity:
             raise ValueError("trace lineage requires a root identity")
+        if any(not isinstance(edge, str) or not edge for edge in self.path):
+            raise ValueError("trace lineage path must contain nonempty identities")
 
     @property
     def canonical_identity(self) -> str:
@@ -186,6 +330,10 @@ class TraceLineage:
 class ApplicationInput(Generic[C]):
     configuration: C
     trace_lineage: TraceLineage | None = None
+
+    def __post_init__(self) -> None:
+        if self.trace_lineage is not None and type(self.trace_lineage) is not TraceLineage:
+            raise TypeError("trace_lineage must be a recognized TraceLineage")
 
 
 @dataclass(frozen=True)
