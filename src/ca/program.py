@@ -947,7 +947,18 @@ def _validate_join(
         # Requiring equality here would incorrectly turn Frontier into the
         # firing/read set.  Every realized anchor must still be writable when
         # this join mode claims an R-to-W identity relation.
-        if not anchors or not anchors.issubset(set(existing_targets)):
+        #
+        # A closed ZERO_OR_MORE value anchor may legitimately resolve no
+        # groups and no writable targets.  The component resolvers validate
+        # that declaration before this family-blind join; accept only the
+        # aligned empty case here, never an empty read view over a nonempty
+        # write envelope (or vice versa).
+        if not anchors:
+            if readable.groups or existing_targets:
+                raise ValueError(
+                    "read anchors do not belong to the writable envelope"
+                )
+        elif not anchors.issubset(set(existing_targets)):
             raise ValueError("read anchors do not belong to the writable envelope")
 
 

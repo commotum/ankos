@@ -119,12 +119,12 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
     """The closed registry and exact scalar algebra share one codec boundary."""
 
     schemas = serialization._schema_rows()
-    assert len(schemas) == 179
+    assert len(schemas) == 184
     assert sum(
         len(row.enum_values) if row.enum_values else 1 for row in schemas
-    ) == 418
-    assert len({row.tag for row in schemas}) == 179
-    assert len({row.value_type for row in schemas}) == 179
+    ) == 429
+    assert len({row.tag for row in schemas}) == 184
+    assert len({row.value_type for row in schemas}) == 184
 
     samples: list[object] = [
         None,

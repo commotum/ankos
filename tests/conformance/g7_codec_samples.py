@@ -212,6 +212,10 @@ def _resolved_samples() -> tuple[object, ...]:
         loci.selector_literal(a),
         seeds.ExactnessProfile.EXACT,
     )
+    value_anchor = alphabets.ValueAnchor(
+        alphabets.value_tagged("head"),
+        alphabets.AnchorCardinality.ZERO_OR_MORE,
+    )
     return (
         source,
         structural,
@@ -223,6 +227,7 @@ def _resolved_samples() -> tuple[object, ...]:
         intensional_read,
         intensional_write,
         dependency,
+        value_anchor,
         neighborhoods.ReadableField(
             "field",
             neighborhoods.global_view(

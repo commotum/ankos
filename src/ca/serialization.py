@@ -188,6 +188,16 @@ _SCHEMAS = (
         "ca.alphabets.representation-profile",
         ("exact", "lossy", "approximate"),
     ),
+    _enum(
+        alphabets.ValuePredicateKind,
+        "ca.alphabets.value-predicate-kind",
+        ("equal", "tagged", "and", "or", "not"),
+    ),
+    _enum(
+        alphabets.AnchorCardinality,
+        "ca.alphabets.anchor-cardinality",
+        ("exactly-one", "one-or-more", "zero-or-more"),
+    ),
     # seeds/frontiers/neighborhoods enums
     _enum(seeds.ExactnessProfile, "ca.seeds.exactness-profile", (
         "exact", "represented", "symbolic",
@@ -406,6 +416,21 @@ _SCHEMAS = (
         ("profile", "representation", "version"),
     ),
     _record(
+        alphabets.ValuePath,
+        "ca.alphabets.value-path",
+        ("segments", "version"),
+    ),
+    _record(
+        alphabets.ValuePredicate,
+        "ca.alphabets.value-predicate",
+        ("kind", "path", "expected", "tag", "children", "version"),
+    ),
+    _record(
+        alphabets.ValueAnchor,
+        "ca.alphabets.value-anchor",
+        ("predicate", "cardinality", "version"),
+    ),
+    _record(
         alphabets.AlphabetDescriptor,
         "ca.alphabets.alphabet-descriptor",
         (
@@ -580,7 +605,7 @@ _SCHEMAS = (
         (
             "descriptor", "configuration_contract", "value_profile",
             "effect_profile", "target_contract", "fresh_namespace",
-            "exactness_profile", "parts", "version",
+            "exactness_profile", "parts", "value_anchor", "version",
         ),
     ),
     # neighborhood records
@@ -597,7 +622,10 @@ _SCHEMAS = (
     _record(
         neighborhoods.ReadDependency,
         "ca.neighborhoods.read-dependency",
-        ("key", "region", "selector", "exactness_profile", "version"),
+        (
+            "key", "region", "selector", "exactness_profile",
+            "value_anchor", "version",
+        ),
     ),
     _record(
         neighborhoods.JoinShape,
@@ -658,7 +686,7 @@ _SCHEMAS = (
         (
             "descriptor", "configuration_contract", "value_profile",
             "result_shape", "join_shape", "grouping", "parts",
-            "exactness_profile", "selector", "version",
+            "exactness_profile", "selector", "value_anchor", "version",
         ),
     ),
     # rule records
@@ -1066,8 +1094,8 @@ def _validate_registry() -> None:
         program,
     )
     owners = {owner.__name__ for owner in owner_modules}
-    if len(_SCHEMAS) != 179:
-        raise RuntimeError("canonical schema registry must contain 179 owner types")
+    if len(_SCHEMAS) != 184:
+        raise RuntimeError("canonical schema registry must contain 184 owner types")
     if len({row.value_type for row in _SCHEMAS}) != len(_SCHEMAS):
         raise RuntimeError("canonical schema registry contains a duplicate type")
     if len({row.tag for row in _SCHEMAS}) != len(_SCHEMAS):
@@ -1075,8 +1103,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 418:
-        raise RuntimeError("canonical schema registry must contain 418 variants")
+    if variant_count != 429:
+        raise RuntimeError("canonical schema registry must contain 429 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:
