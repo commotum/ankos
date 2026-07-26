@@ -89,7 +89,7 @@ class RuleExpr:
 
     @property
     def canonical_identity(self) -> str:
-        return self.identity
+        return loci.canonical_identity(self)
 
 
 @dataclass(frozen=True)
@@ -507,7 +507,7 @@ class Witness:
 
     @property
     def canonical_identity(self) -> str:
-        return loci.canonical_identity(self)
+        return self.identity
 
 
 Provenance: TypeAlias = tuple[str, ...]
@@ -593,6 +593,9 @@ class SupportSpace(Generic[A]):
             expected = cardinality_size(self.cardinality)
             if expected is None or expected != len(self.atoms):
                 raise ValueError("finite support cardinality must equal atom count")
+            identities = tuple(_atom_identity(atom) for atom in self.atoms)
+            if len(identities) != len(set(identities)):
+                raise ValueError("finite support repeats a canonical atom identity")
         else:
             if self.atoms:
                 raise ValueError("intensional support cannot carry enumerated atoms")

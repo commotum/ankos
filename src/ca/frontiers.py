@@ -245,6 +245,17 @@ class WritableRegion(Generic[C, W]):
                 raise WritableResolutionError(
                     "fresh target lies outside the declared namespace"
                 )
+            if target.parent is not None and not configuration.contains(target.parent):
+                raise WritableResolutionError(
+                    "fresh target parent is absent from the input configuration"
+                )
+            if (
+                self.fresh_namespace.parent is not None
+                and target.parent != self.fresh_namespace.parent
+            ):
+                raise WritableResolutionError(
+                    "fresh target parent lies outside the declared namespace"
+                )
             capability = FreshCapability(
                 target, self.target_contract, self.fresh_namespace
             )

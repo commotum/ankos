@@ -68,6 +68,8 @@ class BoundarySpec:
             raise ValueError("a fixed boundary requires a value")
         if self.policy != "fixed" and self.value is not None:
             raise ValueError("only a fixed boundary carries a value")
+        if self.policy == "fixed" and self.value not in (False, True, 0, 1):
+            raise ValueError("binary dataset boundaries must be 0 or 1")
 
 
 @dataclass(frozen=True)

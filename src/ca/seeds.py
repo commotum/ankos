@@ -11,13 +11,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
-from typing import Generic, TypeVar
+from typing import Generic, TypeAlias, TypeVar
 
 from . import alphabets, loci
 
 
 C = TypeVar("C")
-ExactSeedValue = bool | int | Fraction | str
+ExactSeedValue: TypeAlias = alphabets.SemanticValue
 
 
 class SeedValidationError(ValueError):
@@ -80,6 +80,26 @@ class Construction:
     operation: ConstructionOp
     arguments: tuple[ConstructionArgument, ...] = ()
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.operation, ConstructionOp):
+            raise TypeError("construction operation is not recognized")
+        if any(not _closed_construction_argument(item) for item in self.arguments):
+            raise SeedValidationError(
+                "construction contains an unclosed argument"
+            )
+        if self.operation is ConstructionOp.EMPTY and self.arguments:
+            raise SeedValidationError("EMPTY construction takes no arguments")
+        if self.operation is ConstructionOp.SEQUENCE:
+            if len(self.arguments) not in (0, 1):
+                raise SeedValidationError(
+                    "SEQUENCE construction takes one tuple or a law-supplied tuple"
+                )
+            if self.arguments and (
+                not isinstance(self.arguments[0], tuple)
+                or not self.arguments[0]
+            ):
+                raise SeedValidationError("SEQUENCE values cannot be empty")
+
 
 @dataclass(frozen=True)
 class ExactSource(Generic[C]):
@@ -118,6 +138,9 @@ class BernoulliLaw:
     probability_true: Fraction
     false_value: ExactSeedValue = False
     true_value: ExactSeedValue = True
+    boundary: loci.Boundary[ExactSeedValue] = loci.Boundary(
+        loci.BoundaryPolicy.NONE
+    )
 
     def __post_init__(self) -> None:
         probability = self.probability_true
@@ -303,6 +326,21 @@ class Seed(Generic[C]):
 
     def __post_init__(self) -> None:
         _validate_source(self.source)
+        if isinstance(self.source, (ExactSource, PartialSource)):
+            configuration = self.source.configuration
+            if not isinstance(
+                configuration,
+                (loci.FiniteConfiguration, loci.IntensionalConfiguration),
+            ):
+                raise SeedValidationError(
+                    "exact/partial sources require a recognized configuration"
+                )
+            if not self.output_contract.configuration_contract.accepts(
+                configuration.contract
+            ):
+                raise SeedValidationError(
+                    "source configuration violates its output contract"
+                )
         has_entropy = _has_probability_law(self.source)
         expected = (
             EntropyInterface.REPLAY_KEY if has_entropy else EntropyInterface.NONE
@@ -348,6 +386,26 @@ _SOURCE_TYPES = (
     RefinedSource,
 )
 _LAW_TYPES = (BernoulliLaw, UniformTupleLaw, IntensionalProbabilityLaw)
+
+
+def _closed_construction_argument(value: object) -> bool:
+    if isinstance(
+        value,
+        (
+            bool,
+            int,
+            Fraction,
+            str,
+            alphabets.RepresentedNumber,
+            alphabets.ValueNode,
+            loci.Locus,
+            loci.Region,
+        ),
+    ):
+        return True
+    if isinstance(value, tuple):
+        return all(_closed_construction_argument(item) for item in value)
+    return False
 
 
 def _validate_keys(parts: tuple[ProductPart[C], ...]) -> None:
@@ -524,7 +582,7 @@ def product(parts: tuple[tuple[str, Seed[C]], ...]) -> Seed[C]:
     """Compose named structural source parts."""
 
     normalized = tuple(ProductPart(key, seed) for key, seed in parts)
-    contract = _common_contract(tuple(part.seed for part in normalized))
+    contract = _product_contract(tuple(part.seed for part in normalized))
     return Seed(ProductSource(normalized), contract)
 
 
@@ -557,7 +615,7 @@ def product_law(parts: tuple[tuple[str, Seed[C]], ...]) -> Seed[C]:
     """Compose named probability laws while declaring independence."""
 
     normalized = tuple(ProductPart(key, seed) for key, seed in parts)
-    common = _common_contract(tuple(part.seed for part in normalized))
+    common = _product_contract(tuple(part.seed for part in normalized))
     contract = SeedOutputContract(
         common.configuration_contract,
         common.value_profile,
@@ -581,11 +639,26 @@ def bernoulli(
     value_profile: alphabets.ValueProfile = alphabets.ValueProfile.BOOLEAN,
     false_value: ExactSeedValue = False,
     true_value: ExactSeedValue = True,
+    boundary: loci.Boundary[ExactSeedValue] = loci.Boundary(
+        loci.BoundaryPolicy.NONE
+    ),
 ) -> Seed[C]:
     """Build an exact Bernoulli law; floats and ambient RNGs are rejected."""
 
+    if value_profile is alphabets.ValueProfile.BOOLEAN and not (
+        isinstance(false_value, bool) and isinstance(true_value, bool)
+    ):
+        raise SeedValidationError(
+            "boolean Bernoulli laws require boolean outcomes"
+        )
     return law(
-        BernoulliLaw(support, probability_true, false_value, true_value),
+        BernoulliLaw(
+            support,
+            probability_true,
+            false_value,
+            true_value,
+            boundary,
+        ),
         configuration_contract=configuration_contract,
         value_profile=value_profile,
     )
@@ -630,11 +703,16 @@ def uniform_pair(
     """Build a replayable uniform law over two finite values."""
 
     excluded = ((0, 0),) if reject_zero_zero else ()
+    operation = (
+        ConstructionOp.RECORD
+        if configuration_contract.kind is loci.CarrierKind.RECORD
+        else ConstructionOp.SEQUENCE
+    )
     return law(
         UniformTupleLaw(2, value_count, excluded),
         configuration_contract=configuration_contract,
         value_profile=value_profile,
-        construction=Construction(ConstructionOp.SEQUENCE),
+        construction=Construction(operation),
     )
 
 
@@ -702,6 +780,12 @@ def _infer_value_profile(
     if isinstance(configuration, loci.IntensionalConfiguration):
         return alphabets.ValueProfile.SYMBOLIC
     values = tuple(value for _, value in configuration.entries)
+    if values and all(
+        isinstance(value, alphabets.RepresentedNumber) for value in values
+    ):
+        return alphabets.ValueProfile.REPRESENTED
+    if values and all(isinstance(value, alphabets.ValueNode) for value in values):
+        return alphabets.ValueProfile.STRUCTURAL
     if values and all(isinstance(value, bool) for value in values):
         return alphabets.ValueProfile.BOOLEAN
     if values and all(
@@ -713,7 +797,10 @@ def _infer_value_profile(
         for value in values
     ):
         return alphabets.ValueProfile.RATIONAL
-    if values and all(isinstance(value, (int, str)) for value in values):
+    if values and all(
+        isinstance(value, (int, str)) and not isinstance(value, bool)
+        for value in values
+    ):
         return alphabets.ValueProfile.SYMBOLIC
     return alphabets.ValueProfile.STRUCTURAL
 
@@ -738,5 +825,26 @@ def _common_contract(seeds: tuple[Seed[C], ...]) -> SeedOutputContract:
         first.configuration_contract,
         first.value_profile,
         first.exactness_profile,
+        EntropyInterface.REPLAY_KEY if entropy else EntropyInterface.NONE,
+    )
+
+
+def _product_contract(seeds: tuple[Seed[C], ...]) -> SeedOutputContract:
+    if not seeds:
+        raise SeedValidationError("product needs at least one Seed")
+    exactnesses = tuple(seed.exactness_profile for seed in seeds)
+    if ExactnessProfile.SYMBOLIC in exactnesses:
+        exactness = ExactnessProfile.SYMBOLIC
+    elif ExactnessProfile.REPRESENTED in exactnesses:
+        exactness = ExactnessProfile.REPRESENTED
+    else:
+        exactness = ExactnessProfile.EXACT
+    entropy = any(
+        seed.entropy_interface is EntropyInterface.REPLAY_KEY for seed in seeds
+    )
+    return SeedOutputContract(
+        loci.CarrierContract(loci.CarrierKind.PRODUCT),
+        alphabets.ValueProfile.STRUCTURAL,
+        exactness,
         EntropyInterface.REPLAY_KEY if entropy else EntropyInterface.NONE,
     )
