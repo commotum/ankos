@@ -128,6 +128,7 @@ ca.alphabets,AlphabetKind,enum-member,PATTERN,ca.alphabets.alphabet-kind,1,value
 ca.alphabets,AlphabetKind,enum-member,EQUATION,ca.alphabets.alphabet-kind,1,value,equation,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,DISTRIBUTION,ca.alphabets.alphabet-kind,1,value,distribution,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,SYMBOLIC,ca.alphabets.alphabet-kind,1,value,symbolic,Enum.__call__,enum-member
+ca.alphabets,AlphabetKind,enum-member,SYMBOLIC_EXPRESSION,ca.alphabets.alphabet-kind,1,value,symbolic-expression,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,STRUCTURAL_REFERENCE,ca.alphabets.alphabet-kind,1,value,structural-reference,Enum.__call__,enum-member
 ca.alphabets,AlphabetKind,enum-member,REFINEMENT,ca.alphabets.alphabet-kind,1,value,refinement,Enum.__call__,enum-member
 ca.alphabets,ValueProfile,enum-member,BOOLEAN,ca.alphabets.value-profile,1,value,boolean,Enum.__call__,enum-member

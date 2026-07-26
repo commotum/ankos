@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
+from itertools import product as cartesian_product
 from string import Formatter
 from typing import Generic, Protocol, TypeAlias, TypeVar, cast
 
@@ -74,6 +75,7 @@ class RulePrimitive(Enum):
     LITERAL = "rule.literal"
     EXPRESSION = "rule.expression"
     CLAUSE_KERNEL = "rule.clause-kernel"
+    ANCHORED_CLAUSE_KERNEL = "rule.anchored-clause-kernel"
     RELATION = "rule.relation"
     DISTRIBUTION = "rule.distribution"
     PARALLEL = "rule.parallel"
@@ -908,6 +910,16 @@ def capability_target(
     """Select one resolved writable capability by exact target identity."""
 
     return CapabilitySelector(CapabilitySelectorKind.TARGET, target=target)
+
+
+def capability_group_item(channel: int, item: int) -> CapabilitySelector:
+    """Select W by the exact target observed at one anchor-local group item."""
+
+    return CapabilitySelector(
+        CapabilitySelectorKind.GROUP_ITEM,
+        channel=channel,
+        item=item,
+    )
 
 
 def every_capability() -> CapabilitySelector:
@@ -2105,6 +2117,7 @@ class CapabilitySelectorKind(Enum):
 
     INDEX = "index"
     TARGET = "target"
+    GROUP_ITEM = "group-item"
     EVERY = "every"
 
 
@@ -2115,6 +2128,8 @@ class CapabilitySelector:
     kind: CapabilitySelectorKind
     index: int | None = None
     target: loci.Locus | loci.FreshReference | None = None
+    channel: int | None = None
+    item: int | None = None
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -2126,18 +2141,45 @@ class CapabilitySelector:
                 raise ValueError(
                     "index capability selector needs a non-negative integer"
                 )
-            if self.target is not None:
-                raise ValueError("index capability selector cannot carry a target")
+            if any(
+                value is not None
+                for value in (self.target, self.channel, self.item)
+            ):
+                raise ValueError(
+                    "index capability selector cannot carry another operand"
+                )
             return
         if self.kind is CapabilitySelectorKind.TARGET:
-            if self.index is not None:
-                raise ValueError("target capability selector cannot carry an index")
+            if any(
+                value is not None
+                for value in (self.index, self.channel, self.item)
+            ):
+                raise ValueError(
+                    "target capability selector cannot carry another operand"
+                )
             if type(self.target) not in (loci.Locus, loci.FreshReference):
                 raise TypeError(
                     "target capability selector needs a Locus or FreshReference"
                 )
             return
-        if self.index is not None or self.target is not None:
+        if self.kind is CapabilitySelectorKind.GROUP_ITEM:
+            if self.index is not None or self.target is not None:
+                raise ValueError(
+                    "group-item capability selector cannot carry an index or target"
+                )
+            if type(self.channel) is not int or self.channel < 0:
+                raise ValueError(
+                    "group-item capability selector needs a non-negative channel"
+                )
+            if type(self.item) is not int or self.item < 0:
+                raise ValueError(
+                    "group-item capability selector needs a non-negative item"
+                )
+            return
+        if any(
+            value is not None
+            for value in (self.index, self.target, self.channel, self.item)
+        ):
             raise ValueError("every capability selector carries no index or target")
 
 
@@ -2190,6 +2232,10 @@ class FreshDispositionPlan:
             and type(self.selector.target) is not loci.FreshReference
         ):
             raise TypeError("fresh target selector needs a FreshReference")
+        if self.selector.kind is CapabilitySelectorKind.GROUP_ITEM:
+            raise TypeError(
+                "group-item selectors address existing capabilities only"
+            )
         if self.action not in (
             DispositionAction.ABSENT,
             DispositionAction.CREATE,
@@ -2397,6 +2443,94 @@ class ClauseKernelDenotation:
             )
 
 
+class ProposalConflictPolicy(Enum):
+    """How anchor-local proposals to one writable identity are reduced."""
+
+    REQUIRE_EQUAL = "require-equal"
+    FIRST = "first"
+    LAST = "last"
+
+
+@dataclass(frozen=True)
+class AnchoredClauseKernelDenotation:
+    """One closed clause kernel evaluated independently at ordered read anchors."""
+
+    clauses: tuple[RuleClause, ...]
+    group_channel: int
+    selection: ClauseSelection
+    conflict_policy: ProposalConflictPolicy
+    zero_result: ClauseResult
+    completeness_evidence: Certificate
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "anchored clause-kernel denotation")
+        if type(self.clauses) is not tuple or any(
+            type(clause) is not RuleClause for clause in self.clauses
+        ):
+            raise TypeError(
+                "anchored clause kernel needs an immutable RuleClause tuple"
+            )
+        if not self.clauses:
+            raise ValueError("anchored clause kernel needs at least one clause")
+        if type(self.group_channel) is not int or self.group_channel < 0:
+            raise ValueError(
+                "anchored clause kernel needs a non-negative group channel"
+            )
+        if type(self.selection) is not ClauseSelection:
+            raise TypeError("anchored clause selection is not recognized")
+        if type(self.conflict_policy) is not ProposalConflictPolicy:
+            raise TypeError("anchored proposal conflict policy is not recognized")
+        if type(self.zero_result) not in (
+            DerivationClauseResult,
+            NoSuccessorClauseResult,
+        ):
+            raise TypeError("anchored zero result is not a closed ClauseResult")
+        if (
+            type(self.completeness_evidence) is not Certificate
+            or self.completeness_evidence.kind
+            is not CertificateKind.COMPLETENESS
+        ):
+            raise ValueError(
+                "anchored clause kernel needs completeness evidence"
+            )
+
+        for clause in self.clauses:
+            if not isinstance(clause.result, DerivationClauseResult):
+                raise ValueError(
+                    "anchor-local NoSuccessor outcomes cannot be composed"
+                )
+            if clause.result.fresh_plans:
+                raise ValueError(
+                    "anchored clause proposals cannot address fresh capabilities"
+                )
+            if any(
+                plan.selector.kind is not CapabilitySelectorKind.GROUP_ITEM
+                for plan in clause.result.existing_plans
+            ):
+                raise ValueError(
+                    "anchored clause proposals require group-item selectors"
+                )
+
+        if isinstance(self.zero_result, DerivationClauseResult) and (
+            self.zero_result.existing_plans or self.zero_result.fresh_plans
+        ):
+            raise ValueError(
+                "anchored zero derivation cannot carry capability proposals"
+            )
+
+        weighted = tuple(clause.mass is not None for clause in self.clauses)
+        if any(weighted) and not all(weighted):
+            raise ValueError(
+                "anchored clause masses must be present on every clause or none"
+            )
+        if any(weighted):
+            if self.selection is not ClauseSelection.ALL:
+                raise ValueError(
+                    "weighted anchored clauses require ALL selection"
+                )
+
+
 @dataclass(frozen=True)
 class ParallelDenotation(Generic[R, W, C]):
     parts: tuple["Rule[R, W, C]", ...]
@@ -2414,6 +2548,7 @@ RuleDenotation: TypeAlias = (
     LiteralDenotation[alphabets.SemanticValue]
     | ExpressionDenotation
     | ClauseKernelDenotation
+    | AnchoredClauseKernelDenotation
     | IntensionalDenotation
     | ParallelDenotation[R, W, C]
 )
@@ -2433,6 +2568,7 @@ class RuleDescriptor(Generic[R, W, C]):
             RulePrimitive.LITERAL: LiteralDenotation,
             RulePrimitive.EXPRESSION: ExpressionDenotation,
             RulePrimitive.CLAUSE_KERNEL: ClauseKernelDenotation,
+            RulePrimitive.ANCHORED_CLAUSE_KERNEL: AnchoredClauseKernelDenotation,
             RulePrimitive.RELATION: IntensionalDenotation,
             RulePrimitive.DISTRIBUTION: IntensionalDenotation,
             RulePrimitive.DIFFERENTIAL: IntensionalDenotation,
@@ -2614,6 +2750,12 @@ def _denote_descriptor(
         return _denote_expression(denotation, readable, writable)
     if isinstance(denotation, ClauseKernelDenotation):
         return _denote_clause_kernel(denotation, readable, writable)
+    if isinstance(denotation, AnchoredClauseKernelDenotation):
+        return _denote_anchored_clause_kernel(
+            denotation,
+            readable,
+            writable,
+        )
     if isinstance(denotation, IntensionalDenotation):
         support: SupportSpace[RuleAtom[alphabets.SemanticValue]] = (
             intensional_support(
@@ -2795,6 +2937,10 @@ def _capability_indices(
 ) -> tuple[int, ...]:
     if selector.kind is CapabilitySelectorKind.EVERY:
         return tuple(range(len(targets)))
+    if selector.kind is CapabilitySelectorKind.GROUP_ITEM:
+        raise ValueError(
+            "group-item capability selectors require an anchored Rule context"
+        )
     if selector.kind is CapabilitySelectorKind.INDEX:
         assert selector.index is not None
         if selector.index >= len(targets):
@@ -3112,6 +3258,583 @@ def _denote_clause_kernel(
                 RuleFaultPhase.RESULT_VALIDATION,
                 RuleFaultReason.INVALID_PROBABILITY_LAW,
                 f"invalid clause-kernel probability law: {error}",
+            )
+    return RuleComplete(OutcomeSpace(support, probability_law))
+
+
+@dataclass(frozen=True)
+class _AnchoredChoice:
+    """One internal, fully evaluated anchor-local clause choice."""
+
+    anchor: loci.Locus
+    clause_index: int
+    proposals: tuple[
+        Disposition[loci.Locus, alphabets.SemanticValue],
+        ...,
+    ]
+    progress: Progress
+    continuation: Continuation
+    witness: RuleExpr
+    provenance: Provenance
+    certificate: Certificate
+    mass: Fraction | None
+
+
+def _ordered_anchored_groups(
+    readable: _ReadableView,
+    channel: int,
+) -> tuple[loci.Locus, ...]:
+    anchors: list[loci.Locus] = []
+    for group in readable.groups:
+        if group.key.channel != channel:
+            continue
+        anchor = group.key.anchor
+        if type(anchor) is not loci.Locus:
+            raise ValueError(
+                "anchored clause groups require a bound source identity"
+            )
+        if anchor in anchors:
+            raise ValueError(
+                "anchored clause channel repeats one source identity"
+            )
+        anchors.append(anchor)
+    if not anchors and readable.groups:
+        raise ValueError(
+            "declared anchored clause channel is absent from the readable view"
+        )
+    return tuple(anchors)
+
+
+def _anchored_capability_index(
+    selector: CapabilitySelector,
+    *,
+    anchor: loci.Locus,
+    readable: _ReadableView,
+    existing_targets: tuple[loci.Locus, ...],
+) -> int:
+    if selector.kind is not CapabilitySelectorKind.GROUP_ITEM:
+        raise ValueError(
+            "anchor-local proposals require a group-item capability selector"
+        )
+    assert selector.channel is not None and selector.item is not None
+    indices = _group_indices(readable, anchor, selector.channel)
+    if selector.item >= len(indices):
+        raise IndexError(
+            f"group item {selector.item} is outside channel {selector.channel}"
+        )
+    observation = readable.observations[indices[selector.item]]
+    target = observation.target
+    if type(target) is not loci.Locus:
+        raise TypeError("group-item observation target is not a bound Locus")
+    matches = tuple(
+        index
+        for index, candidate in enumerate(existing_targets)
+        if candidate == target
+    )
+    if len(matches) != 1:
+        raise KeyError(
+            "group-item observation target does not resolve to exactly one "
+            "existing writable capability"
+        )
+    return matches[0]
+
+
+def _materialize_anchored_evidence_term(
+    term: EvidenceTerm,
+    *,
+    readable: _ReadableView,
+    anchor: loci.Locus,
+    proposal_targets: tuple[loci.Locus, ...],
+    proofs: list[EvaluationProof],
+) -> RuleExpr:
+    arguments: list[RuleExpr] = [literal_expr(term.tag)]
+    for argument in term.arguments:
+        if isinstance(argument, EvidenceTerm):
+            arguments.append(
+                _materialize_anchored_evidence_term(
+                    argument,
+                    readable=readable,
+                    anchor=anchor,
+                    proposal_targets=proposal_targets,
+                    proofs=proofs,
+                )
+            )
+        elif isinstance(argument, EvidenceExpression):
+            targets: tuple[loci.Locus, ...] = (
+                (anchor,)
+                if argument.scope is EvaluationScope.ONCE
+                else proposal_targets
+            )
+            for target in targets:
+                value, proof = _evaluate_proven(
+                    argument.expression,
+                    readable,
+                    anchor=anchor,
+                    target=target,
+                )
+                proofs.append(proof)
+                arguments.append(_runtime_as_expr(value))
+        elif isinstance(argument, FormattedEvidence):
+            value, proof = _evaluate_proven(
+                argument.expression,
+                readable,
+                anchor=anchor,
+                target=anchor,
+            )
+            proofs.append(proof)
+            if isinstance(value, tuple):
+                raise TypeError("formatted evidence expression must be scalar")
+            normalized = int(value) if isinstance(value, bool) else value
+            arguments.append(literal_expr(argument.template.format(normalized)))
+        else:
+            arguments.append(literal_expr(argument))
+    return RuleExpr(ExpressionPrimitive.TUPLE, tuple(arguments))
+
+
+def _materialize_anchored_provenance(
+    template: ProvenanceTemplate,
+    *,
+    readable: _ReadableView,
+    anchor: loci.Locus,
+    proofs: list[EvaluationProof],
+) -> str:
+    values: list[RuleScalar] = []
+    for expression in template.expressions:
+        value, proof = _evaluate_proven(
+            expression,
+            readable,
+            anchor=anchor,
+            target=anchor,
+        )
+        proofs.append(proof)
+        if isinstance(value, tuple):
+            raise TypeError("provenance template expression must be scalar")
+        values.append(int(value) if isinstance(value, bool) else value)
+    return template.template.format(*values)
+
+
+def _materialize_anchored_choice(
+    clause: RuleClause,
+    *,
+    clause_index: int,
+    anchor: loci.Locus,
+    selection_proofs: tuple[EvaluationProof, ...],
+    readable: _ReadableView,
+    writable: _WritableCapabilities,
+) -> _AnchoredChoice:
+    result = clause.result
+    if not isinstance(result, DerivationClauseResult):
+        raise ValueError("anchor-local NoSuccessor outcomes cannot be composed")
+    existing_targets = tuple(item.target for item in writable.existing)
+    proofs = list(selection_proofs)
+
+    def evaluate(
+        expression: RuleExpr,
+        *,
+        target: loci.Locus = anchor,
+    ) -> RuleRuntimeValue:
+        value, proof = _evaluate_proven(
+            expression,
+            readable,
+            anchor=anchor,
+            target=target,
+        )
+        proofs.append(proof)
+        return value
+
+    proposals: list[
+        Disposition[loci.Locus, alphabets.SemanticValue]
+    ] = []
+    for plan in result.existing_plans:
+        index = _anchored_capability_index(
+            plan.selector,
+            anchor=anchor,
+            readable=readable,
+            existing_targets=existing_targets,
+        )
+        target = existing_targets[index]
+        if plan.action is DispositionAction.PRESERVE:
+            proposal = preserve(target)
+        elif plan.action is DispositionAction.DELETE:
+            proposal = delete(target)
+        else:
+            assert plan.action is DispositionAction.REPLACE
+            assert plan.value is not None
+            proposal = replace(
+                target,
+                _require_semantic_value(
+                    evaluate(plan.value, target=target)
+                ),
+            )
+        proposals.append(proposal)
+
+    continuation = result.continuation
+    if isinstance(continuation, Stop):
+        continuation = Stop(
+            _runtime_as_expr(evaluate(continuation.reason)),
+            continuation.certificate,
+        )
+    witness_value = evaluate(result.witness)
+    proposal_targets = tuple(proposal.target for proposal in proposals)
+    certificate = (
+        result.certificate
+        if result.certificate_template is None
+        else Certificate(
+            result.certificate.kind,
+            _materialize_anchored_evidence_term(
+                result.certificate_template,
+                readable=readable,
+                anchor=anchor,
+                proposal_targets=proposal_targets,
+                proofs=proofs,
+            ),
+        )
+    )
+    dynamic_provenance = tuple(
+        _materialize_anchored_provenance(
+            template,
+            readable=readable,
+            anchor=anchor,
+            proofs=proofs,
+        )
+        for template in result.provenance_templates
+    )
+    anchor_provenance = (
+        result.provenance[0],
+        f"anchor:{loci.canonical_identity(anchor)}",
+        *result.provenance[1:],
+        *dynamic_provenance,
+    )
+    proof_expression = _evaluation_proofs_as_expr(tuple(proofs))
+    proposal_expression = RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("proposals"),
+            *(
+                literal_expr(proposal.canonical_identity)
+                for proposal in proposals
+            ),
+        ),
+    )
+    witness_descriptor = RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("anchored-clause-choice-v1"),
+            literal_expr(loci.canonical_identity(anchor)),
+            literal_expr(clause_index),
+            result.witness,
+            _runtime_as_expr(witness_value),
+            proposal_expression,
+            proof_expression,
+            certificate.statement,
+        ),
+    )
+    return _AnchoredChoice(
+        anchor,
+        clause_index,
+        tuple(proposals),
+        result.progress,
+        continuation,
+        witness_descriptor,
+        anchor_provenance,
+        certificate,
+        clause.mass,
+    )
+
+
+def _dispositions_semantically_equal(
+    left: Disposition[loci.Locus, alphabets.SemanticValue],
+    right: Disposition[loci.Locus, alphabets.SemanticValue],
+) -> bool:
+    if left.target != right.target or left.action is not right.action:
+        return False
+    if left.action is not DispositionAction.REPLACE:
+        return True
+    if not isinstance(left.payload, ValuePayload) or not isinstance(
+        right.payload,
+        ValuePayload,
+    ):
+        return False
+    return alphabets.semantic_equal(left.payload.value, right.payload.value)
+
+
+def _compose_anchored_choices(
+    choices: tuple[_AnchoredChoice, ...],
+    *,
+    conflict_policy: ProposalConflictPolicy,
+    completeness_evidence: Certificate,
+    readable: _ReadableView,
+    writable: _WritableCapabilities,
+) -> Derivation[alphabets.SemanticValue] | RuleRejected:
+    if not choices:
+        return _rejected(
+            RuleFaultPhase.COMPOSITION,
+            RuleFaultReason.INVALID_DESCRIPTOR,
+            "anchored choice product cannot be empty",
+        )
+    existing_targets = tuple(item.target for item in writable.existing)
+    proposals_by_target: dict[
+        loci.Locus,
+        list[Disposition[loci.Locus, alphabets.SemanticValue]],
+    ] = {target: [] for target in existing_targets}
+    for choice in choices:
+        for proposal in choice.proposals:
+            if proposal.target not in proposals_by_target:
+                return _rejected(
+                    RuleFaultPhase.COMPOSITION,
+                    RuleFaultReason.INCOMPATIBLE_WRITABLE,
+                    "anchor-local proposal lies outside the writable envelope",
+                )
+            proposals_by_target[proposal.target].append(proposal)
+
+    existing: list[
+        Disposition[loci.Locus, alphabets.SemanticValue]
+    ] = []
+    for target in existing_targets:
+        candidates = tuple(proposals_by_target[target])
+        if not candidates:
+            existing.append(preserve(target))
+            continue
+        if conflict_policy is ProposalConflictPolicy.REQUIRE_EQUAL:
+            first = candidates[0]
+            if any(
+                not _dispositions_semantically_equal(first, candidate)
+                for candidate in candidates[1:]
+            ):
+                return _rejected(
+                    RuleFaultPhase.COMPOSITION,
+                    RuleFaultReason.CONFLICTING_EFFECT,
+                    "anchor-local proposals disagree under REQUIRE_EQUAL",
+                )
+            existing.append(first)
+        elif conflict_policy is ProposalConflictPolicy.FIRST:
+            existing.append(candidates[0])
+        elif conflict_policy is ProposalConflictPolicy.LAST:
+            existing.append(candidates[-1])
+        else:
+            return _rejected(
+                RuleFaultPhase.COMPOSITION,
+                RuleFaultReason.INVALID_DESCRIPTOR,
+                "anchored proposal conflict policy is not implemented",
+            )
+
+    fresh = tuple(
+        absent(item.target)
+        for item in writable.fresh
+    )
+    total = TotalDisposition(
+        tuple(existing),
+        fresh,
+        _certificate(
+            CertificateKind.TOTALITY,
+            "anchored-clause-kernel:merged-total",
+        ),
+    )
+    progress = (
+        Progress.ADVANCED
+        if any(choice.progress is Progress.ADVANCED for choice in choices)
+        else Progress.QUIESCENT
+    )
+    stops = tuple(
+        choice.continuation
+        for choice in choices
+        if isinstance(choice.continuation, Stop)
+    )
+    continuation: Continuation = Continue()
+    if stops:
+        if len(set(stops)) != 1:
+            return _rejected(
+                RuleFaultPhase.COMPOSITION,
+                RuleFaultReason.CONFLICTING_EFFECT,
+                "anchor-local clauses declare incompatible stopping reasons",
+            )
+        continuation = stops[0]
+
+    certificate_statement = RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("anchored-clause-composition-v1"),
+            completeness_evidence.statement,
+            *(
+                choice.certificate.statement
+                for choice in choices
+            ),
+        ),
+    )
+    certificate = Certificate(
+        CertificateKind.DERIVATION,
+        certificate_statement,
+    )
+    witness_descriptor = RuleExpr(
+        ExpressionPrimitive.TUPLE,
+        (
+            literal_expr("anchored-clause-kernel-witness-v1"),
+            literal_expr(conflict_policy.value),
+            *(choice.witness for choice in choices),
+            literal_expr(total.canonical_identity),
+        ),
+    )
+    provenance = tuple(
+        item
+        for choice in choices
+        for item in choice.provenance
+    )
+    boundary = _boundary_provenance(readable)
+    if boundary:
+        provenance = (
+            provenance[0],
+            *boundary,
+            *provenance[1:],
+        )
+    return Derivation(
+        total,
+        progress,
+        continuation,
+        Witness(
+            loci.canonical_identity(witness_descriptor),
+            witness_descriptor,
+        ),
+        provenance,
+        certificate,
+    )
+
+
+def _denote_anchored_clause_kernel(
+    denotation: AnchoredClauseKernelDenotation,
+    readable: _ReadableView,
+    writable: _WritableCapabilities,
+) -> RuleResult[C, alphabets.SemanticValue]:
+    anchors = _ordered_anchored_groups(
+        readable,
+        denotation.group_channel,
+    )
+    existing_targets = tuple(item.target for item in writable.existing)
+    if not anchors:
+        if existing_targets:
+            return _rejected(
+                RuleFaultPhase.DENOTATION,
+                RuleFaultReason.INCOMPATIBLE_WRITABLE,
+                "zero anchored groups require an empty existing write envelope",
+            )
+        if isinstance(denotation.zero_result, DerivationClauseResult):
+            atom: RuleAtom[alphabets.SemanticValue] = (
+                _materialize_clause_derivation(
+                    denotation.zero_result,
+                    clause_index=len(denotation.clauses),
+                    selection_proofs=(),
+                    readable=readable,
+                    writable=writable,
+                )
+            )
+        else:
+            atom = _materialize_clause_no_successor(
+                denotation.zero_result,
+                clause_index=len(denotation.clauses),
+                selection_proofs=(),
+                readable=readable,
+                writable=writable,
+            )
+        support = finite_support(
+            (atom,),
+            label="anchored-clause-kernel-zero",
+        )
+        probability_law = (
+            finite_probability_law(((atom, Fraction(1)),))
+            if all(clause.mass is not None for clause in denotation.clauses)
+            else None
+        )
+        return RuleComplete(OutcomeSpace(support, probability_law))
+
+    if any(anchor not in existing_targets for anchor in anchors):
+        return _rejected(
+            RuleFaultPhase.DENOTATION,
+            RuleFaultReason.INCOMPATIBLE_WRITABLE,
+            "anchored read source is absent from the writable envelope",
+        )
+
+    choices_by_anchor: list[tuple[_AnchoredChoice, ...]] = []
+    for anchor in anchors:
+        selected: list[tuple[int, RuleClause]] = []
+        selection_proofs: list[EvaluationProof] = []
+        for index, clause in enumerate(denotation.clauses):
+            condition, proof = _evaluate_proven(
+                clause.condition,
+                readable,
+                anchor=anchor,
+                target=anchor,
+            )
+            selection_proofs.append(proof)
+            if _require_bit(condition):
+                selected.append((index, clause))
+                if denotation.selection is ClauseSelection.FIRST:
+                    break
+        if not selected:
+            return _rejected(
+                RuleFaultPhase.DENOTATION,
+                RuleFaultReason.NO_MATCHING_CLAUSE,
+                "complete anchored clause kernel had no match for one source",
+            )
+        retained_proofs = tuple(selection_proofs)
+        choices_by_anchor.append(
+            tuple(
+                _materialize_anchored_choice(
+                    clause,
+                    clause_index=index,
+                    anchor=anchor,
+                    selection_proofs=retained_proofs,
+                    readable=readable,
+                    writable=writable,
+                )
+                for index, clause in selected
+            )
+        )
+
+    atoms: list[RuleAtom[alphabets.SemanticValue]] = []
+    masses: list[Fraction] = []
+    weighted = all(
+        clause.mass is not None for clause in denotation.clauses
+    )
+    for combination in cartesian_product(*choices_by_anchor):
+        choices = tuple(combination)
+        atom_or_fault = _compose_anchored_choices(
+            choices,
+            conflict_policy=denotation.conflict_policy,
+            completeness_evidence=denotation.completeness_evidence,
+            readable=readable,
+            writable=writable,
+        )
+        if isinstance(atom_or_fault, RuleRejected):
+            return atom_or_fault
+        atoms.append(atom_or_fault)
+        if weighted:
+            mass = Fraction(1)
+            for choice in choices:
+                assert choice.mass is not None
+                mass *= choice.mass
+            masses.append(mass)
+
+    try:
+        support = finite_support(
+            tuple(atoms),
+            label="anchored-clause-kernel",
+        )
+    except (TypeError, ValueError) as error:
+        return _rejected(
+            RuleFaultPhase.RESULT_VALIDATION,
+            RuleFaultReason.INVALID_DESCRIPTOR,
+            f"invalid anchored clause support: {error}",
+        )
+    probability_law: ProbabilityLaw | None = None
+    if masses:
+        try:
+            probability_law = finite_probability_law(
+                tuple(zip(atoms, masses, strict=True))
+            )
+        except (TypeError, ValueError) as error:
+            return _rejected(
+                RuleFaultPhase.RESULT_VALIDATION,
+                RuleFaultReason.INVALID_PROBABILITY_LAW,
+                f"invalid anchored clause probability law: {error}",
             )
     return RuleComplete(OutcomeSpace(support, probability_law))
 
@@ -4442,6 +5165,67 @@ def clause_kernel(
     return Rule(descriptor, contract)
 
 
+def anchored_clause_kernel(
+    clauses: tuple[RuleClause, ...],
+    *,
+    group_channel: int,
+    zero_result: ClauseResult,
+    contract: RuleContract,
+    completeness_evidence: Certificate,
+    conflict_policy: ProposalConflictPolicy = (
+        ProposalConflictPolicy.REQUIRE_EQUAL
+    ),
+    selection: ClauseSelection = ClauseSelection.FIRST,
+) -> Rule[R, W, C]:
+    """Evaluate one closed clause relation per ordered source-anchor group.
+
+    Each anchor-local result may make sparse existing-target proposals only
+    through :func:`capability_group_item`.  The denotation resolves those
+    selectors by exact observed identity, reduces overlaps under the declared
+    conflict policy, and returns one total atomic disposition.
+    """
+
+    if type(contract) is not RuleContract:
+        raise TypeError("anchored clause kernel contract is not recognized")
+    denotation = AnchoredClauseKernelDenotation(
+        clauses,
+        group_channel,
+        selection,
+        conflict_policy,
+        zero_result,
+        completeness_evidence,
+    )
+    required_existing: set[frontiers.Effect] = set()
+    for clause in clauses:
+        result = clause.result
+        assert isinstance(result, DerivationClauseResult)
+        for plan in result.existing_plans:
+            if plan.action is DispositionAction.REPLACE:
+                required_existing.add(frontiers.Effect.REPLACE)
+            elif plan.action is DispositionAction.DELETE:
+                required_existing.add(frontiers.Effect.DELETE)
+    declared = contract.required_effect_profile
+    if not required_existing.issubset(declared.existing):
+        missing = required_existing.difference(declared.existing)
+        raise ValueError(
+            "anchored clause kernel contract omits required existing effects: "
+            + ", ".join(sorted(effect.value for effect in missing))
+        )
+    if (
+        any(clause.mass is not None for clause in clauses)
+        and contract.entropy_interface
+        is not seeds.EntropyInterface.REPLAY_KEY
+    ):
+        raise ValueError(
+            "probabilistic anchored clause kernel requires replay-key entropy"
+        )
+    descriptor: RuleDescriptor[R, W, C] = RuleDescriptor(
+        RulePrimitive.ANCHORED_CLAUSE_KERNEL,
+        denotation,
+    )
+    return Rule(descriptor, contract)
+
+
 def relation(
     relation_ast: RuleExpr,
     cardinality: Cardinality,
@@ -5001,6 +5785,7 @@ def elementary(number: int) -> Rule[R, W, C]:
 
 
 __all__ = [
+    "AnchoredClauseKernelDenotation",
     "AtomMass",
     "CapabilitySelector",
     "CapabilitySelectorKind",
@@ -5039,6 +5824,7 @@ __all__ = [
     "OutcomeSpace",
     "ProbabilityLaw",
     "ProbabilityPresentation",
+    "ProposalConflictPolicy",
     "Progress",
     "ProjectionCardinalities",
     "Provenance",
@@ -5067,9 +5853,11 @@ __all__ = [
     "absent",
     "absolute",
     "add",
+    "anchored_clause_kernel",
     "ar2_modular_0d",
     "bound_index",
     "bound_value",
+    "capability_group_item",
     "capability_index",
     "capability_target",
     "cardinality_size",

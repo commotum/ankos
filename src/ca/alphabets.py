@@ -904,6 +904,196 @@ def pattern_value(
     )
 
 
+_MATCH_PATTERN_TAGS = frozenset(
+    (
+        "match.literal",
+        "match.bind",
+        "match.node",
+        "match.sequence",
+    )
+)
+_TEMPLATE_PATTERN_TAGS = frozenset(
+    (
+        "template.literal",
+        "template.binding",
+        "template.node",
+        "template.sequence",
+    )
+)
+
+
+def _validate_pattern_tree(
+    value: object,
+    *,
+    template: bool,
+) -> ValueNode:
+    owner = "template" if template else "match pattern"
+    if type(value) is not ValueNode or value.kind is not ValueKind.PATTERN:
+        raise TypeError(f"{owner} must be a PATTERN ValueNode")
+    if value.fields:
+        raise ValueError(f"{owner} nodes cannot carry named fields")
+    admitted_tags = (
+        _TEMPLATE_PATTERN_TAGS if template else _MATCH_PATTERN_TAGS
+    )
+    if value.tag not in admitted_tags:
+        raise ValueError(f"{owner} node tag is not recognized")
+
+    literal_tag = "template.literal" if template else "match.literal"
+    binding_tag = "template.binding" if template else "match.bind"
+    node_tag = "template.node" if template else "match.node"
+    sequence_tag = (
+        "template.sequence" if template else "match.sequence"
+    )
+    if value.tag == literal_tag:
+        if len(value.items) != 1:
+            raise ValueError(f"{literal_tag} needs exactly one literal value")
+        return value
+    if value.tag == binding_tag:
+        if (
+            len(value.items) != 1
+            or type(value.items[0]) is not str
+            or not value.items[0]
+        ):
+            raise ValueError(
+                f"{binding_tag} needs exactly one nonempty string name"
+            )
+        return value
+    if value.tag == node_tag:
+        if (
+            not value.items
+            or type(value.items[0]) is not str
+            or not value.items[0]
+        ):
+            raise ValueError(
+                f"{node_tag} needs one leading nonempty string head"
+            )
+        children = value.items[1:]
+    elif value.tag == sequence_tag:
+        children = value.items
+        if not template and not children:
+            raise ValueError("match.sequence cannot be empty")
+    else:
+        raise AssertionError(f"unhandled closed pattern tag {value.tag}")
+    for child in children:
+        _validate_pattern_tree(child, template=template)
+    return value
+
+
+def pattern_literal(value: SemanticValue) -> ValueNode:
+    """Match one closed semantic value by exact equality."""
+
+    node = pattern_value("match.literal", items=(value,))
+    return _validate_pattern_tree(node, template=False)
+
+
+def pattern_bind(name: str) -> ValueNode:
+    """Match one value and bind it under a closed nonempty name."""
+
+    node = pattern_value("match.bind", items=(name,))
+    return _validate_pattern_tree(node, template=False)
+
+
+def pattern_node(
+    head: str,
+    children: tuple[ValueNode, ...],
+) -> ValueNode:
+    """Match one positional symbolic node with an exact head and arity."""
+
+    if type(children) is not tuple:
+        raise TypeError("pattern node children must be an immutable tuple")
+    node = pattern_value("match.node", items=(head, *children))
+    return _validate_pattern_tree(node, template=False)
+
+
+def pattern_sequence(
+    elements: tuple[ValueNode, ...],
+) -> ValueNode:
+    """Match one nonempty contiguous sequence of pattern elements."""
+
+    if type(elements) is not tuple:
+        raise TypeError("pattern sequence elements must be an immutable tuple")
+    node = pattern_value("match.sequence", items=elements)
+    return _validate_pattern_tree(node, template=False)
+
+
+def template_literal(value: SemanticValue) -> ValueNode:
+    """Emit one closed semantic value literally."""
+
+    node = pattern_value("template.literal", items=(value,))
+    return _validate_pattern_tree(node, template=True)
+
+
+def template_binding(name: str) -> ValueNode:
+    """Emit the value associated with one closed binding name."""
+
+    node = pattern_value("template.binding", items=(name,))
+    return _validate_pattern_tree(node, template=True)
+
+
+def template_node(
+    head: str,
+    children: tuple[ValueNode, ...],
+) -> ValueNode:
+    """Emit one positional symbolic node with an exact head."""
+
+    if type(children) is not tuple:
+        raise TypeError("template node children must be an immutable tuple")
+    node = pattern_value("template.node", items=(head, *children))
+    return _validate_pattern_tree(node, template=True)
+
+
+def template_sequence(
+    elements: tuple[ValueNode, ...],
+) -> ValueNode:
+    """Emit a possibly empty sequence of template elements."""
+
+    if type(elements) is not tuple:
+        raise TypeError("template sequence elements must be an immutable tuple")
+    node = pattern_value("template.sequence", items=elements)
+    return _validate_pattern_tree(node, template=True)
+
+
+def _validate_rewrite_rule_value(value: object) -> ValueNode:
+    if (
+        type(value) is not ValueNode
+        or value.kind is not ValueKind.PRODUCT
+        or value.tag != "rewrite"
+        or value.fields
+        or len(value.items) != 2
+    ):
+        raise ValueError(
+            "rewrite rules must be two-item PRODUCT values tagged rewrite"
+        )
+    _validate_pattern_tree(value.items[0], template=False)
+    _validate_pattern_tree(value.items[1], template=True)
+    return value
+
+
+def rewrite_rule_value(
+    pattern: ValueNode,
+    template: ValueNode,
+) -> ValueNode:
+    """Pair one closed match pattern and replacement template."""
+
+    _validate_pattern_tree(pattern, template=False)
+    _validate_pattern_tree(template, template=True)
+    return product_value((pattern, template), tag="rewrite")
+
+
+def rewrite_rules_value(
+    rules: tuple[ValueNode, ...],
+) -> ValueNode:
+    """Preserve a nonempty ordered rewrite-rule sequence."""
+
+    if type(rules) is not tuple:
+        raise TypeError("rewrite rules must be an immutable tuple")
+    if not rules:
+        raise ValueError("rewrite rules cannot be empty")
+    for rule in rules:
+        _validate_rewrite_rule_value(rule)
+    return word_value(rules, tag="rewrite-rules")
+
+
 def symbolic_value(
     tag: str,
     *,
@@ -2248,6 +2438,10 @@ __all__ = [
     "node_items",
     "ordered",
     "pattern",
+    "pattern_bind",
+    "pattern_literal",
+    "pattern_node",
+    "pattern_sequence",
     "pattern_value",
     "product",
     "product_items",
@@ -2261,6 +2455,8 @@ __all__ = [
     "refine",
     "represented_numeric",
     "resolve_value_path",
+    "rewrite_rule_value",
+    "rewrite_rules_value",
     "select_value_anchors",
     "semantic_equal",
     "symbolic",
@@ -2270,6 +2466,10 @@ __all__ = [
     "tag",
     "tag_payload",
     "tag_value",
+    "template_binding",
+    "template_literal",
+    "template_node",
+    "template_sequence",
     "union",
     "value_and",
     "value_equals",

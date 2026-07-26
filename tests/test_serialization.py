@@ -122,7 +122,7 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
     assert len(schemas) == 184
     assert sum(
         len(row.enum_values) if row.enum_values else 1 for row in schemas
-    ) == 429
+    ) == 430
     assert len({row.tag for row in schemas}) == 184
     assert len({row.value_type for row in schemas}) == 184
 

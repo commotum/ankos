@@ -177,7 +177,8 @@ _SCHEMAS = (
         "rational-interval", "modular", "algebraic", "exact-complex",
         "represented-number", "tag", "union", "product", "record", "word",
         "map", "graph", "field", "instruction", "pattern", "equation",
-        "distribution", "symbolic", "structural-reference", "refinement",
+        "distribution", "symbolic", "symbolic-expression",
+        "structural-reference", "refinement",
     )),
     _enum(alphabets.ValueProfile, "ca.alphabets.value-profile", (
         "boolean", "integer", "rational", "algebraic", "complex",
@@ -1103,8 +1104,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 429:
-        raise RuntimeError("canonical schema registry must contain 429 variants")
+    if variant_count != 430:
+        raise RuntimeError("canonical schema registry must contain 430 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:
