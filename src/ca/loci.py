@@ -780,22 +780,40 @@ def read_locus(
     raise LocusAbsentError(target)
 
 
-def canonical_order_key(value: Locus | FreshReference) -> tuple[str, ...]:
+OrderPart: TypeAlias = tuple[int, int | Fraction | str]
+
+
+def canonical_order_key(
+    value: Locus | FreshReference,
+) -> tuple[OrderPart, ...]:
     """Return an exact, cross-type ordering key for structural identities."""
 
     if isinstance(value, FreshReference):
         return (
-            "fresh-reference",
-            value.namespace,
-            _canonical_scalar(value.local_key),
-            "" if value.parent is None else canonical_identity(value.parent),
-            *(canonical_identity(item) for item in value.interface),
+            (0, "fresh-reference"),
+            (0, value.namespace),
+            _scalar_order_part(value.local_key),
+            (
+                0,
+                "" if value.parent is None else canonical_identity(value.parent),
+            ),
+            *((0, canonical_identity(item)) for item in value.interface),
         )
     return (
-        value.kind.value,
-        value.scope,
-        *(_canonical_scalar(part) for part in value.path),
+        (0, value.kind.value),
+        (0, value.scope),
+        *(_scalar_order_part(part) for part in value.path),
     )
+
+
+def _scalar_order_part(value: ClosedScalar) -> OrderPart:
+    if isinstance(value, bool):
+        return (1, int(value))
+    if isinstance(value, int):
+        return (2, value)
+    if isinstance(value, Fraction):
+        return (3, value)
+    return (4, value)
 
 
 def _canonical_scalar(value: ClosedScalar) -> str:

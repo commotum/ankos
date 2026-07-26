@@ -612,10 +612,10 @@ def pair(
     *,
     value_profile: alphabets.ValueProfile | None = None,
 ) -> Seed[loci.FiniteConfiguration[ExactSeedValue]]:
-    """Construct the two-value history used by second-order recurrences."""
+    """Construct the ordered ``previous``/``current`` recurrence record."""
 
-    return sequence(
-        (previous, current),
+    return record(
+        (("previous", previous), ("current", current)),
         value_profile=value_profile,
     )
 

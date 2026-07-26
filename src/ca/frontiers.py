@@ -419,21 +419,46 @@ def union(
         if (
             part.configuration_contract != first.configuration_contract
             or part.value_profile != first.value_profile
-            or part.effect_profile != first.effect_profile
-            or part.target_contract != first.target_contract
-            or part.fresh_namespace != first.fresh_namespace
+            or part.target_contract.value_profile
+            != first.target_contract.value_profile
+            or part.target_contract.frame is not first.target_contract.frame
             or part.exactness_profile is not first.exactness_profile
         ):
             raise WritableResolutionError(
                 "union parts have incompatible writable declarations"
             )
+    namespaces = tuple(
+        part.fresh_namespace
+        for part in parts
+        if part.fresh_namespace is not None
+    )
+    if len(set(namespaces)) > 1:
+        raise WritableResolutionError(
+            "one WritableRegion cannot merge distinct fresh namespaces"
+        )
+    existing_effects = tuple(
+        effect
+        for effect in Effect
+        if any(effect in part.effect_profile.existing for part in parts)
+    )
+    fresh_effects = tuple(
+        effect
+        for effect in Effect
+        if any(effect in part.effect_profile.fresh for part in parts)
+    )
+    profile = EffectProfile(existing_effects, fresh_effects)
+    namespace = namespaces[0] if namespaces else None
     return WritableRegion(
         loci.union(tuple(part.descriptor for part in parts)),
         first.configuration_contract,
         first.value_profile,
-        first.effect_profile,
-        first.target_contract,
-        first.fresh_namespace,
+        profile,
+        TargetContract(
+            None,
+            first.value_profile,
+            first.target_contract.frame,
+        ),
+        namespace,
         first.exactness_profile,
     )
 

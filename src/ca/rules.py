@@ -14,7 +14,7 @@ from enum import Enum
 from fractions import Fraction
 from typing import Generic, Protocol, TypeAlias, TypeVar, cast
 
-from . import alphabets, loci
+from . import alphabets, frontiers, loci, neighborhoods, seeds
 
 
 C = TypeVar("C")
@@ -89,7 +89,7 @@ class RuleExpr:
 
     @property
     def canonical_identity(self) -> str:
-        return loci.canonical_identity(self)
+        return self.identity
 
 
 @dataclass(frozen=True)
@@ -98,22 +98,20 @@ class RuleContract:
 
     configuration_contract: loci.CarrierContract
     value_profile: alphabets.ValueProfile
-    required_read_shape: tuple[str, ...]
-    required_join_shape: tuple[str, ...]
-    required_effect_profile: tuple[str, ...]
-    exactness_profile: str = "exact"
-    entropy_interface: str | None = None
+    required_read_shape: neighborhoods.ResultShape
+    required_join_shape: neighborhoods.JoinShape
+    required_effect_profile: frontiers.EffectProfile
+    exactness_profile: seeds.ExactnessProfile = seeds.ExactnessProfile.EXACT
+    entropy_interface: seeds.EntropyInterface = seeds.EntropyInterface.NONE
     version: int = 1
 
     def __post_init__(self) -> None:
         if self.version != 1:
             raise ValueError(f"unsupported Rule contract version {self.version}")
-        if not self.exactness_profile:
-            raise ValueError("Rule exactness profile cannot be empty")
-        if len(self.required_effect_profile) != len(
-            set(self.required_effect_profile)
-        ):
-            raise ValueError("Rule effect profile cannot contain duplicates")
+        if not isinstance(self.exactness_profile, seeds.ExactnessProfile):
+            raise TypeError("Rule exactness_profile must be seeds.ExactnessProfile")
+        if not isinstance(self.entropy_interface, seeds.EntropyInterface):
+            raise TypeError("Rule entropy_interface must be seeds.EntropyInterface")
 
 
 def literal_expr(value: RuleScalar) -> RuleExpr:
@@ -879,8 +877,13 @@ class _Observation(Protocol):
     value: alphabets.SemanticValue
 
 
+class _GroupKey(Protocol):
+    anchor: loci.Locus | None
+    channel: int
+
+
 class _ObservationGroup(Protocol):
-    key: tuple[loci.Locus | None, int]
+    key: _GroupKey
     indices: tuple[int, ...]
 
 
@@ -1282,7 +1285,8 @@ def _group_indices(
     matches = tuple(
         item.indices
         for item in readable.groups
-        if item.key == (anchor, channel)
+        if item.key.channel == channel
+        and (anchor is None or item.key.anchor == anchor)
     )
     if len(matches) != 1:
         raise ValueError(
@@ -1522,14 +1526,17 @@ def finite_rule(
 def _native_contract(
     carrier: loci.CarrierContract,
     *,
-    read_shape: tuple[str, ...],
+    readable: neighborhoods.ReadableRegion[object, object],
+    value_profile: alphabets.ValueProfile = alphabets.ValueProfile.BOOLEAN,
 ) -> RuleContract:
     return RuleContract(
         configuration_contract=carrier,
-        value_profile=alphabets.ValueProfile.BOOLEAN,
-        required_read_shape=read_shape,
-        required_join_shape=("target", "channel"),
-        required_effect_profile=("replace-existing",),
+        value_profile=value_profile,
+        required_read_shape=readable.result_shape,
+        required_join_shape=readable.join_shape,
+        required_effect_profile=frontiers.EffectProfile(
+            existing=(frontiers.Effect.REPLACE,),
+        ),
     )
 
 
@@ -1572,17 +1579,19 @@ def ar2_modular_0d(
         modulus,
     )
     carrier = loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=())
+    readable = neighborhoods.ar2_0d(
+        configuration_contract=carrier,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    )
     return expression(
         ExistingPlan(
             ExistingPlanKind.BY_INDEX,
             (observation(1), next_value),
         ),
-        contract=RuleContract(
+        contract=_native_contract(
             carrier,
-            alphabets.ValueProfile.INTEGER,
-            ("previous", "current"),
-            ("field",),
-            ("replace-existing",),
+            readable=readable,
+            value_profile=alphabets.ValueProfile.INTEGER,
         ),
         witness=RuleExpr(
             ExpressionPrimitive.TUPLE,
@@ -1618,6 +1627,10 @@ def dyadlags_0d(*, rule: int) -> Rule[R, W, C]:
         shape=(3,),
         axes=("history",),
     )
+    readable = neighborhoods.dyadlags_0d(
+        configuration_contract=carrier,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
     return expression(
         ExistingPlan(
             ExistingPlanKind.BY_INDEX,
@@ -1625,7 +1638,7 @@ def dyadlags_0d(*, rule: int) -> Rule[R, W, C]:
         ),
         contract=_native_contract(
             carrier,
-            read_shape=("older", "previous", "current"),
+            readable=readable,
         ),
         witness=RuleExpr(
             ExpressionPrimitive.TUPLE,
@@ -1636,14 +1649,11 @@ def dyadlags_0d(*, rule: int) -> Rule[R, W, C]:
 
 
 _UINT64_MASK = (1 << 64) - 1
-_LAGCOUNTS_HASH_KEY = 0x6A09E667F3BCC909
+_LAGCOUNTS_HASH_KEY = 0xD1B54A32D192ED03
 
 
 def _splitmix64(seed: int, stream: int) -> int:
-    value = (
-        seed
-        + 0x9E3779B97F4A7C15 * (stream + 1)
-    ) & _UINT64_MASK
+    value = (seed + stream + 0x9E3779B97F4A7C15) & _UINT64_MASK
     value = (value ^ (value >> 30)) * 0xBF58476D1CE4E5B9 & _UINT64_MASK
     value = (value ^ (value >> 27)) * 0x94D049BB133111EB & _UINT64_MASK
     return (value ^ (value >> 31)) & _UINT64_MASK
@@ -1666,24 +1676,30 @@ def lagcounts_0d(
     if band_size != 3 or band_count != 3:
         raise ValueError("G7-01 native lagcounts uses exactly three bands of three")
     context = add(
-        observation(9),
+        observation(0),
         multiply(literal_expr(2), count(group(1))),
         multiply(literal_expr(8), count(group(2))),
         multiply(literal_expr(32), count(group(3))),
     )
     output = lookup(_sampled_lag_table(number), context)
-    prior = tuple(observation(index) for index in range(1, 10))
+    prior = tuple(observation(index) for index in range(8, -1, -1))
     carrier = loci.CarrierContract(
         loci.CarrierKind.HISTORY,
         rank=1,
         shape=(10,),
         axes=("history",),
     )
+    readable = neighborhoods.lagcounts_0d(
+        band_size,
+        band_count,
+        configuration_contract=carrier,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
     return expression(
         ExistingPlan(ExistingPlanKind.BY_INDEX, (*prior, output)),
         contract=_native_contract(
             carrier,
-            read_shape=("history", "recent", "middle", "oldest"),
+            readable=readable,
         ),
         witness=RuleExpr(
             ExpressionPrimitive.TUPLE,
@@ -1700,6 +1716,7 @@ def _spatial_lookup(
     secondary_gate: GateKind,
     secondary_threshold: int,
     label: str,
+    readable: neighborhoods.ReadableRegion[object, object],
 ) -> Rule[R, W, C]:
     number = _rule_number(rule)
     primary = gate(group(1), GateKind.MAJORITY)
@@ -1723,7 +1740,7 @@ def _spatial_lookup(
         ExistingPlan(ExistingPlanKind.BY_TARGET, (output,)),
         contract=_native_contract(
             carrier,
-            read_shape=("self", "primary", "secondary"),
+            readable=readable,
         ),
         witness=RuleExpr(
             ExpressionPrimitive.TUPLE,
@@ -1748,11 +1765,15 @@ def dyadrads_1d(*, rule: int) -> Rule[R, W, C]:
         rank=1,
         axes=("x",),
     )
+    readable = neighborhoods.dyadrads_1d(
+        configuration_contract=carrier,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
     return expression(
         ExistingPlan(ExistingPlanKind.BY_TARGET, (output,)),
         contract=_native_contract(
             carrier,
-            read_shape=("self", "radius-1", "radius-2"),
+            readable=readable,
         ),
         witness=RuleExpr(
             ExpressionPrimitive.TUPLE,
@@ -1765,24 +1786,42 @@ def dyadrads_1d(*, rule: int) -> Rule[R, W, C]:
 def dyadaxes_2d(*, rule: int) -> Rule[R, W, C]:
     """Compile one concrete 2-D Dyadaxes lookup."""
 
+    carrier = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=2,
+        axes=("x", "y"),
+    )
     return _spatial_lookup(
         rule=rule,
         rank=2,
         secondary_gate=GateKind.MAJORITY,
         secondary_threshold=0,
         label="dyadaxes-2d",
+        readable=neighborhoods.dyadaxes_2d(
+            configuration_contract=carrier,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
     )
 
 
 def dyadaxes_3d(*, rule: int) -> Rule[R, W, C]:
     """Compile one concrete 3-D Dyadaxes lookup."""
 
+    carrier = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=3,
+        axes=("x", "y", "z"),
+    )
     return _spatial_lookup(
         rule=rule,
         rank=3,
         secondary_gate=GateKind.AT_LEAST,
         secondary_threshold=10,
         label="dyadaxes-3d",
+        readable=neighborhoods.dyadaxes_3d(
+            configuration_contract=carrier,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
     )
 
 
@@ -1800,12 +1839,19 @@ def elementary(number: int) -> Rule[R, W, C]:
         rank=1,
         axes=("x",),
     )
+    readable = neighborhoods.eca(
+        configuration_contract=carrier,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
     return expression(
         ExistingPlan(
             ExistingPlanKind.BY_TARGET,
             (lookup(_binary_table(number), index),),
         ),
-        contract=_native_contract(carrier, read_shape=("left-self-right",)),
+        contract=_native_contract(
+            carrier,
+            readable=readable,
+        ),
         witness=RuleExpr(
             ExpressionPrimitive.TUPLE,
             (literal_expr("elementary"), literal_expr(number), index),

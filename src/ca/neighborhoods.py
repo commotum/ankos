@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Generic, TypeAlias, TypeVar
+from typing import Generic, TypeVar
 
 from . import alphabets, loci
 from .seeds import ExactnessProfile
@@ -140,7 +140,16 @@ class Observation(Generic[V]):
         return self.state.value
 
 
-GroupKey: TypeAlias = tuple[loci.Locus | None, int]
+@dataclass(frozen=True)
+class GroupKey:
+    """Stable Rule-facing key for one anchor/channel read group."""
+
+    anchor: loci.Locus | None
+    channel: int
+
+    def __post_init__(self) -> None:
+        if isinstance(self.channel, bool) or self.channel < 0:
+            raise ReadableResolutionError("group channel cannot be negative")
 
 
 @dataclass(frozen=True)
@@ -152,13 +161,10 @@ class ObservationGroup:
     anchor: loci.Locus | None = None
 
     def __post_init__(self) -> None:
-        if len(self.key) != 2:
-            raise ReadableResolutionError("group key must be (anchor, channel)")
-        anchor, channel = self.key
-        if anchor is not None and not isinstance(anchor, loci.Locus):
+        if self.key.anchor is not None and not isinstance(
+            self.key.anchor, loci.Locus
+        ):
             raise TypeError("group anchor must be a Locus or None")
-        if isinstance(channel, bool) or not isinstance(channel, int) or channel < 0:
-            raise ReadableResolutionError("group channel cannot be negative")
         if not self.indices:
             raise ReadableResolutionError("observation groups cannot be empty")
         if any(index < 0 for index in self.indices):
@@ -267,6 +273,22 @@ class ReadableRegion(Generic[C, R]):
     def required_join_shape(self) -> JoinShape:
         return self.join_shape
 
+    @property
+    def compatibility_read_shape(self) -> tuple[str, ...]:
+        """Normalized spelling compared directly with ``RuleContract``."""
+
+        return tuple(field.key for field in self.result_shape.fields)
+
+    @property
+    def compatibility_join_shape(self) -> tuple[str, ...]:
+        """Normalized spelling compared directly with ``RuleContract``."""
+
+        return self.join_shape.fields
+
+    @property
+    def compatibility_exactness_profile(self) -> str:
+        return self.exactness_profile.value
+
     def resolve(self, configuration: C) -> ReadableView[V]:
         """Resolve independently against one immutable configuration."""
 
@@ -348,7 +370,7 @@ class ReadableRegion(Generic[C, R]):
                 next_channel[group.anchor] = channel + 1
                 groups.append(
                     ObservationGroup(
-                        (group.anchor, channel),
+                        GroupKey(group.anchor, channel),
                         indices,
                         group.anchor,
                     )
@@ -371,7 +393,7 @@ def _groups_for(
         anchor = observations[0].anchor
         return (
             ObservationGroup(
-                (anchor, 0),
+                GroupKey(anchor, 0),
                 tuple(range(len(observations))),
                 anchor,
             ),
@@ -388,7 +410,7 @@ def _groups_for(
             anchor = observations[start].anchor
             groups.append(
                 ObservationGroup(
-                    (anchor, 0),
+                    GroupKey(anchor, 0),
                     indices,
                     anchor,
                 )
@@ -462,7 +484,7 @@ def grid_relative(
         configuration_contract,
         value_profile,
         ResultShape((ReadField(key, ReadArity.FIXED, len(offsets)),)),
-        JoinShape(JoinMode.ANCHOR_IDENTITY, (key,)),
+        JoinShape(JoinMode.ANCHOR_IDENTITY, ("target", "channel")),
         GroupingPlan(GroupingKind.FIXED_CHUNKS, key, len(offsets)),
     )
 
@@ -522,10 +544,31 @@ def product(
         first.configuration_contract,
         first.value_profile,
         ResultShape(shape_fields),
-        JoinShape(JoinMode.PRODUCT, keys),
+        JoinShape(JoinMode.PRODUCT, ("target", "channel")),
         GroupingPlan(GroupingKind.PRODUCT, "product"),
         parts,
         first.exactness_profile,
+    )
+
+
+def _with_compatibility_shape(
+    region: ReadableRegion[C, R],
+    read_fields: tuple[str, ...],
+    join_fields: tuple[str, ...] = ("target", "channel"),
+) -> ReadableRegion[C, R]:
+    """Retain mechanics while assigning the exact Rule-facing shape."""
+
+    return ReadableRegion(
+        region.descriptor,
+        region.configuration_contract,
+        region.value_profile,
+        ResultShape(
+            tuple(ReadField(key, ReadArity.VARIABLE) for key in read_fields)
+        ),
+        JoinShape(region.join_shape.mode, join_fields),
+        region.grouping,
+        region.parts,
+        region.exactness_profile,
     )
 
 
@@ -575,9 +618,18 @@ def eca(
 
     if isinstance(radius, bool) or radius <= 0:
         raise ReadableResolutionError("ECA radius must be positive")
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=1,
+            axes=("x",),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
     return grid_relative(
         tuple((offset,) for offset in range(-radius, radius + 1)),
-        configuration_contract=configuration_contract,
+        configuration_contract=carrier,
         value_profile=value_profile,
         key="eca",
     )
@@ -590,9 +642,16 @@ def ar2_0d(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read current and previous scalar values."""
 
-    return history(
-        (0, -1),
-        configuration_contract=configuration_contract,
+    previous = loci.named("previous", scope="record")
+    current = loci.named("current", scope="record")
+    carrier = (
+        loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=())
+        if configuration_contract is None
+        else configuration_contract
+    )
+    return literal(
+        (previous, current),
+        configuration_contract=carrier,
         value_profile=value_profile,
         key="ar2",
     )
@@ -605,11 +664,25 @@ def dyadlags_0d(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read current and two previous binary values."""
 
-    return history(
-        (0, -1, -2),
-        configuration_contract=configuration_contract,
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.HISTORY,
+            rank=1,
+            shape=(3,),
+            axes=("history",),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
+    region = history(
+        (-2, -1, 0),
+        configuration_contract=carrier,
         value_profile=value_profile,
         key="dyadlags",
+    )
+    return _with_compatibility_shape(
+        region,
+        ("older", "previous", "current"),
     )
 
 
@@ -626,12 +699,22 @@ def lagcounts_0d(
         raise ReadableResolutionError("band_size must be positive")
     if isinstance(band_count, bool) or band_count <= 0:
         raise ReadableResolutionError("band_count must be positive")
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.HISTORY,
+            rank=1,
+            shape=(1 + band_size * band_count,),
+            axes=("history",),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
     fields: list[tuple[str, ReadableRegion[C, ReadableView[V]]]] = [
         (
             "self",
             history(
                 (0,),
-                configuration_contract=configuration_contract,
+                configuration_contract=carrier,
                 value_profile=value_profile,
                 key="self",
             ),
@@ -644,13 +727,16 @@ def lagcounts_0d(
                 f"band-{band}",
                 history(
                     tuple(-offset for offset in range(start, start + band_size)),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key=f"band-{band}",
                 ),
             )
         )
-    return product(tuple(fields))
+    return _with_compatibility_shape(
+        product(tuple(fields)),
+        ("history", "recent", "middle", "oldest"),
+    )
 
 
 def dyadrads_1d(
@@ -660,13 +746,22 @@ def dyadrads_1d(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read self, radius-one, and radius-two one-dimensional groups."""
 
-    return product(
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=1,
+            axes=("x",),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
+    region = product(
         (
             (
                 "self",
                 grid_relative(
                     ((0,),),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="self",
                 ),
@@ -675,7 +770,7 @@ def dyadrads_1d(
                 "radius-1",
                 grid_relative(
                     ((-1,), (1,)),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="radius-1",
                 ),
@@ -684,12 +779,16 @@ def dyadrads_1d(
                 "radius-2",
                 grid_relative(
                     ((-2,), (2,)),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="radius-2",
                 ),
             ),
         )
+    )
+    return _with_compatibility_shape(
+        region,
+        ("self", "primary", "secondary"),
     )
 
 
@@ -700,13 +799,22 @@ def dyadaxes_2d(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read self, four cardinal neighbors, and four diagonals."""
 
-    return product(
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=2,
+            axes=("x", "y"),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
+    region = product(
         (
             (
                 "self",
                 grid_relative(
                     ((0, 0),),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="self",
                 ),
@@ -715,7 +823,7 @@ def dyadaxes_2d(
                 "faces",
                 grid_relative(
                     ((-1, 0), (0, -1), (0, 1), (1, 0)),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="faces",
                 ),
@@ -724,12 +832,16 @@ def dyadaxes_2d(
                 "diagonals",
                 grid_relative(
                     ((-1, -1), (-1, 1), (1, -1), (1, 1)),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="diagonals",
                 ),
             ),
         )
+    )
+    return _with_compatibility_shape(
+        region,
+        ("self", "primary", "secondary"),
     )
 
 
@@ -740,6 +852,15 @@ def dyadaxes_3d(
 ) -> ReadableRegion[C, ReadableView[V]]:
     """Read self, six face neighbors, and twenty edge/corner neighbors."""
 
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=3,
+            axes=("x", "y", "z"),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
     faces = tuple(
         offset
         for offset in (
@@ -758,13 +879,13 @@ def dyadaxes_3d(
         for z in (-1, 0, 1)
         if (x, y, z) != (0, 0, 0) and (x, y, z) not in faces
     )
-    return product(
+    region = product(
         (
             (
                 "self",
                 grid_relative(
                     ((0, 0, 0),),
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="self",
                 ),
@@ -773,7 +894,7 @@ def dyadaxes_3d(
                 "faces",
                 grid_relative(
                     faces,
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="faces",
                 ),
@@ -782,10 +903,14 @@ def dyadaxes_3d(
                 "edges-corners",
                 grid_relative(
                     outer,
-                    configuration_contract=configuration_contract,
+                    configuration_contract=carrier,
                     value_profile=value_profile,
                     key="edges-corners",
                 ),
             ),
         )
+    )
+    return _with_compatibility_shape(
+        region,
+        ("self", "primary", "secondary"),
     )

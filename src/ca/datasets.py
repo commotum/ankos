@@ -1,15 +1,9 @@
-"""Downstream program recipes, streams, and explicit dataset tensor views.
+"""Deterministic downstream datasets built from ordinary simple programs.
 
-The Goal 7 target layer in this module owns four closed experiment recipes,
-deterministic stream planning, dataset-only Seed recipe preparation, generic
-rollout consumption, and explicit ``DatasetEpisode``/``DatasetBatch`` tensor
-projections. It may use ``rng.py`` for downstream planning. It does not own
-one-step semantics, Seed denotation, replay identity, catalog dispatch, or
-semantic serialization.
-
-The target declarations are phase-ordered and inert. The PE-compatible 0.1
-planning, rendering, Dynamics construction, and tensor rollout pipeline remains
-complete below the explicit legacy divider until the atomic G7-01 cutover.
+This module owns experiment planning and explicit NumPy views.  A dataset ID
+selects one of four program constructors; it never selects an executor, Rule
+interpreter, semantic family, or catalog entry.  Every episode is traversed by
+``ca.program.rollout`` and batching is only a loop-and-stack convenience.
 """
 
 from __future__ import annotations
@@ -18,34 +12,110 @@ import hashlib
 import itertools
 import json
 from collections.abc import Iterator, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from math import ceil, prod
-from typing import TYPE_CHECKING, Any, Literal, NoReturn
+from types import MappingProxyType
+from typing import Literal, TypeAlias
 
 import numpy as np
 
-from . import frontiers, rng, rules, seeds
-from .neighborhoods import dyadlags_0d, dyadrads_1d, dyadaxes_2d, dyadaxes_3d
-from .rollout import rollout, rollout_batch
-from .specs import Dynamics, RawBatch, RawEpisode
+from . import alphabets, frontiers, loci, neighborhoods, program, rng, rules, seeds
 
 
-if TYPE_CHECKING:
-    from .program import RolloutResult, SimpleProgram
+DatasetId = Literal[
+    "0d-dyadlags",
+    "1d-dyadrads",
+    "2d-dyadaxes",
+    "3d-dyadaxes",
+]
+StreamKind = Literal[
+    "train",
+    "held-out-rule",
+    "held-out-seed",
+    "ood-horizon",
+    "ood-scale",
+    "ood-boundary",
+    "invariance",
+]
+StreamProfile = Literal["compact", "pe"]
+BoundaryPolicy = Literal["none", "fixed", "periodic", "reflective"]
+DatasetMetadataValue: TypeAlias = str | int | float | bool | None
+
+DEFAULT_SPLIT = 0.8
+DEFAULT_MAX_TOKENS = 2048
+DEFAULT_COMPACT_COUNT = 8
+DEFAULT_PE_COUNT = 64
+DEFAULT_COMPACT_SPATIAL_STEPS = 17
+DEFAULT_COMPACT_0D_STEPS = 128
+DEFAULT_COMPACT_RULE_LIMIT = 8
+SPECIAL_TOKENS_PER_EPISODE = 2
+OOD_HORIZON_TOKEN_MULTIPLIER = 2
+OOD_SCALE_TOKEN_MULTIPLIER = 2
+OOD_SCALE_FACTORS_BY_RANK = MappingProxyType({1: 2.0, 2: 1.35, 3: 1.4})
+RULE_IDS = tuple(range(256))
 
 
-DatasetMetadataValue = str | int | float | bool | None
+@dataclass(frozen=True)
+class BoundarySpec:
+    """One closed dataset-level finite boundary choice."""
+
+    policy: BoundaryPolicy
+    value: bool | int | None = None
+
+    def __post_init__(self) -> None:
+        if self.policy == "fixed" and self.value is None:
+            raise ValueError("a fixed boundary requires a value")
+        if self.policy != "fixed" and self.value is not None:
+            raise ValueError("only a fixed boundary carries a value")
 
 
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.1: Explicit Downstream Dataset Views
-# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class AffineTransform:
+    """Presentation-only coordinate-transform identity."""
+
+    id: str
+
+    def __post_init__(self) -> None:
+        if not self.id:
+            raise ValueError("transform id cannot be empty")
+
+
+@dataclass(frozen=True)
+class DatasetSpec:
+    """One immutable downstream experiment recipe."""
+
+    id: DatasetId
+    domain: str
+    shape: tuple[int, ...]
+    seed_families: tuple[str, ...]
+    boundary: BoundarySpec
+
+
+@dataclass(frozen=True)
+class EpisodePlan:
+    """One deterministic construction decision before semantic rollout."""
+
+    id: str
+    dataset_id: DatasetId
+    split: str
+    kind: StreamKind
+    profile: StreamProfile
+    episode_index: int
+    rule_id: int
+    episode_rng: int
+    seed_stream_family: str
+    seed_family: str
+    seed_index: int | None
+    shape: tuple[int, ...]
+    steps: int
+    boundary: BoundarySpec
+    transform: AffineTransform | None = None
 
 
 @dataclass(frozen=True)
 class DatasetEpisode:
-    """One explicit tensor projection of a semantic rollout trace."""
+    """One explicit dense tensor projection of a linear finite rollout."""
 
     states: np.ndarray
     coords: np.ndarray | None
@@ -58,7 +128,7 @@ class DatasetEpisode:
 
 @dataclass(frozen=True)
 class DatasetBatch:
-    """A downstream stack of compatible dataset-episode projections."""
+    """A downstream stack of compatible explicit episode projections."""
 
     states: np.ndarray
     coords: np.ndarray | None
@@ -69,254 +139,71 @@ class DatasetBatch:
     metadata: Mapping[str, DatasetMetadataValue] | None = None
 
 
-def _not_implemented() -> NoReturn:
-    """Raise the standard error for an unfinished Goal 7 dataset factory."""
-
-    raise NotImplementedError("Goal 7 dataset scaffold is not implemented")
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 1.2: Four Explicit Program Recipes
-# ---------------------------------------------------------------------------
-
-
-def _build_0d_dyadlags_program(
-    *,
-    rule: int,
-    seed: "seeds.Seed",
-    shape: tuple[int, ...],
-    boundary: Mapping[str, DatasetMetadataValue],
-) -> "SimpleProgram":
-    """Build the ordinary five-field program for ``0d-dyadlags``."""
-
-    _not_implemented()
-
-
-def _build_1d_dyadrads_program(
-    *,
-    rule: int,
-    seed: "seeds.Seed",
-    shape: tuple[int, ...],
-    boundary: Mapping[str, DatasetMetadataValue],
-) -> "SimpleProgram":
-    """Build the ordinary five-field program for ``1d-dyadrads``."""
-
-    _not_implemented()
-
-
-def _build_2d_dyadaxes_program(
-    *,
-    rule: int,
-    seed: "seeds.Seed",
-    shape: tuple[int, ...],
-    boundary: Mapping[str, DatasetMetadataValue],
-) -> "SimpleProgram":
-    """Build the ordinary five-field program for ``2d-dyadaxes``."""
-
-    _not_implemented()
-
-
-def _build_3d_dyadaxes_program(
-    *,
-    rule: int,
-    seed: "seeds.Seed",
-    shape: tuple[int, ...],
-    boundary: Mapping[str, DatasetMetadataValue],
-) -> "SimpleProgram":
-    """Build the ordinary five-field program for ``3d-dyadaxes``."""
-
-    _not_implemented()
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 2: Source Preparation and Tensor Projection
-# ---------------------------------------------------------------------------
-
-
-def _structured_seed_recipes(shape: tuple[int, ...]) -> tuple["seeds.Seed", ...]:
-    """Enumerate dataset-only structured Seed recipes for one shape."""
-
-    _not_implemented()
-
-
-def _dedupe_seed_recipes(
-    recipes: tuple["seeds.Seed", ...],
-    shape: tuple[int, ...],
-) -> tuple["seeds.Seed", ...]:
-    """Deduplicate dataset recipes by their explicit finite projection."""
-
-    _not_implemented()
-
-
-def _project_dataset_episode(
-    result: "RolloutResult",
-    *,
-    domain: str,
-    shape: tuple[int, ...],
-    rule_id: int,
-    steps: int,
-) -> DatasetEpisode:
-    """Project one semantic rollout into an explicit dataset tensor view."""
-
-    _not_implemented()
-
-
-def _project_dataset_batch(
-    episodes: tuple[DatasetEpisode, ...],
-) -> DatasetBatch:
-    """Stack compatible explicit episode views without owning application."""
-
-    _not_implemented()
-
-
-def _canonical_coordinate_table(
-    shape: tuple[int, ...],
-    steps: int,
-) -> np.ndarray:
-    """Materialize the private coordinate table for one dataset view."""
-
-    _not_implemented()
-
-
-# ---------------------------------------------------------------------------
-# Goal 7 Phase 3: Streams and Batching
-# ---------------------------------------------------------------------------
-
-# Streams plan programs, call only ``program.rollout``, filter downstream, and
-# build the explicit views above. No dataset ID ever selects an executor.
-
-
-# ===========================================================================
-# Legacy 0.1 implementation retained until atomic G7-01 cutover
-# ===========================================================================
-
-
-DatasetId = Literal["0d-dyadlags", "1d-dyadrads", "2d-dyadaxes", "3d-dyadaxes"]
-StreamKind = Literal[
-    "train",
-    "held-out-rule",
-    "held-out-seed",
-    "ood-horizon",
-    "ood-scale",
-    "ood-boundary",
-    "invariance",
-]
-StreamProfile = Literal["compact", "pe"]
-
-DEFAULT_SPLIT = 0.8
-DEFAULT_MAX_TOKENS = 2048
-DEFAULT_COMPACT_COUNT = 8
-DEFAULT_PE_COUNT = 64
-DEFAULT_COMPACT_SPATIAL_STEPS = 17
-DEFAULT_COMPACT_0D_STEPS = 128
-DEFAULT_COMPACT_RULE_LIMIT = 8
-SPECIAL_TOKENS_PER_EPISODE = 2
-OOD_HORIZON_TOKEN_MULTIPLIER = 2
-OOD_SCALE_TOKEN_MULTIPLIER = 2
-OOD_SCALE_FACTORS_BY_RANK = {
-    1: 2.0,
-    2: 1.35,
-    3: 1.4,
-}
-
-
-@dataclass(frozen=True)
-class DatasetSpec:
-    """PE-compatible raw CA dataset recipe."""
-
-    id: str
-    domain: str
-    shape: tuple[int, ...]
-    rule_family: str
-    neighborhood_family: str
-    seed_families: tuple[str, ...]
-    boundary: Mapping[str, Any]
-
-
-@dataclass(frozen=True)
-class EpisodePlan:
-    """One deterministic raw episode decision before seed rendering."""
-
-    id: str
-    dataset_id: str
-    split: str
-    kind: str
-    profile: str
-    episode_index: int
-    rule_id: int
-    episode_rng: int
-    seed_stream_family: str
-    seed_family: str
-    seed_index: int | None
-    shape: tuple[int, ...]
-    steps: int
-    boundary: Mapping[str, Any]
-    transform: Mapping[str, Any] | None = None
-
-
-DATASET_SPECS: dict[str, DatasetSpec] = {
-    "0d-dyadlags": DatasetSpec(
-        id="0d-dyadlags",
-        domain="t+0d",
-        shape=(),
-        rule_family="dyadlags_0d",
-        neighborhood_family="dyadlags_0d",
-        seed_families=("uniform_bits",),
-        boundary={"policy": "none"},
+_SPECS = (
+    DatasetSpec(
+        "0d-dyadlags",
+        "t+0d",
+        (),
+        ("uniform_bits",),
+        BoundarySpec("none"),
     ),
-    "1d-dyadrads": DatasetSpec(
-        id="1d-dyadrads",
-        domain="t+1d",
-        shape=(123,),
-        rule_family="dyadrads_1d",
-        neighborhood_family="dyadrads_1d",
-        seed_families=("bernoulli", "structured"),
-        boundary={"policy": "fixed", "value": 0},
+    DatasetSpec(
+        "1d-dyadrads",
+        "t+1d",
+        (123,),
+        ("bernoulli", "structured"),
+        BoundarySpec("fixed", 0),
     ),
-    "2d-dyadaxes": DatasetSpec(
-        id="2d-dyadaxes",
-        domain="t+2d",
-        shape=(11, 11),
-        rule_family="dyadaxes_2d",
-        neighborhood_family="dyadaxes_2d",
-        seed_families=("bernoulli", "structured"),
-        boundary={"policy": "fixed", "value": 0},
+    DatasetSpec(
+        "2d-dyadaxes",
+        "t+2d",
+        (11, 11),
+        ("bernoulli", "structured"),
+        BoundarySpec("fixed", 0),
     ),
-    "3d-dyadaxes": DatasetSpec(
-        id="3d-dyadaxes",
-        domain="t+3d",
-        shape=(5, 5, 5),
-        rule_family="dyadaxes_3d",
-        neighborhood_family="dyadaxes_3d",
-        seed_families=("bernoulli", "structured"),
-        boundary={"policy": "fixed", "value": 0},
+    DatasetSpec(
+        "3d-dyadaxes",
+        "t+3d",
+        (5, 5, 5),
+        ("bernoulli", "structured"),
+        BoundarySpec("fixed", 0),
     ),
-}
-DATASET_IDS = tuple(DATASET_SPECS)
+)
+DATASET_SPECS: Mapping[str, DatasetSpec] = MappingProxyType(
+    {item.id: item for item in _SPECS}
+)
+DATASET_IDS = tuple(item.id for item in _SPECS)
 
 
 def get_spec(dataset_id: str) -> DatasetSpec:
-    """Return one PE-compatible raw CA dataset spec."""
+    """Return one of the four closed dataset recipes."""
 
     try:
         return DATASET_SPECS[str(dataset_id)]
-    except KeyError as exc:
-        raise KeyError(f"unknown dataset {dataset_id!r}; expected one of {DATASET_IDS}") from exc
+    except KeyError as error:
+        raise KeyError(
+            f"unknown dataset {dataset_id!r}; expected one of {DATASET_IDS}"
+        ) from error
 
 
-def rule_pools(dataset_id: str, *, split: float = DEFAULT_SPLIT) -> dict[str, tuple[int, ...]]:
-    """Return PE-style train and held-out rule-id pools."""
+def rule_pools(
+    dataset_id: str,
+    *,
+    split: float = DEFAULT_SPLIT,
+) -> dict[str, tuple[int, ...]]:
+    """Return explicit train and held-out subsets of the finite 0..255 domain."""
 
-    spec = get_spec(dataset_id)
-    rule_count = rules.rule_count(_rule(spec))
-    train_count = max(1, min(rule_count - 1, int(rule_count * float(split))))
-    train = tuple(range(train_count))
-    held_out_rule = tuple(range(train_count, rule_count)) or train[-1:]
+    get_spec(dataset_id)
+    if not 0.0 < float(split) < 1.0:
+        raise ValueError("split must lie strictly between zero and one")
+    train_count = max(1, min(255, int(256 * float(split))))
+    train = RULE_IDS[:train_count]
+    held_out = RULE_IDS[train_count:]
     return {
-        "all": tuple(range(rule_count)),
+        "all": RULE_IDS,
         "train": train,
-        "held_out_rule": held_out_rule,
-        "eval": held_out_rule,
+        "held_out_rule": held_out,
+        "eval": held_out,
     }
 
 
@@ -329,84 +216,108 @@ def plan_episode(
     profile: StreamProfile = "compact",
     steps: int | None = None,
     shape: Sequence[int] | None = None,
-    boundary: Mapping[str, Any] | None = None,
+    boundary: BoundarySpec | Mapping[str, str | int | bool] | None = None,
     max_tokens: int = DEFAULT_MAX_TOKENS,
     split_fraction: float = DEFAULT_SPLIT,
     rule_limit: int | None = None,
 ) -> EpisodePlan:
-    """Plan one deterministic episode without rendering its seed or rollout."""
+    """Plan one episode without constructing or applying its program."""
 
     spec = get_spec(dataset_id)
-    profile = _validate_profile(profile)
-    kind = _normalize_kind(kind)
-    episode_index = int(episode_index)
-    if episode_index < 0:
-        raise ValueError(f"episode_index must be non-negative, got {episode_index}")
+    resolved_profile = _validate_profile(profile)
+    resolved_kind = _normalize_kind(kind)
+    index = int(episode_index)
+    if index < 0:
+        raise ValueError(f"episode_index must be non-negative, got {index}")
 
-    split = "train" if kind == "train" else str(split)
-    stream_shape = _resolve_shape(spec, kind, shape)
-    stream_boundary = _resolve_boundary(spec, kind, episode_index, boundary)
-    stream_steps = _resolve_steps(spec, kind, profile, stream_shape, steps, max_tokens)
-    pool_name = _rule_pool_for_kind(kind)
+    resolved_split = "train" if resolved_kind == "train" else str(split)
+    resolved_shape = _resolve_shape(spec, resolved_kind, shape)
+    resolved_boundary = _resolve_boundary(
+        spec, resolved_kind, index, boundary
+    )
+    resolved_steps = _resolve_steps(
+        spec,
+        resolved_kind,
+        resolved_profile,
+        resolved_shape,
+        steps,
+        max_tokens,
+    )
+    pool_name = "held_out_rule" if resolved_kind == "held-out-rule" else "train"
     selected_rules = _selected_rule_ids(
         spec.id,
         pool_name=pool_name,
-        profile=profile,
+        profile=resolved_profile,
         split=split_fraction,
         rule_limit=rule_limit,
     )
-    rule_id = selected_rules[episode_index % len(selected_rules)]
-    seed_stream_family = _seed_stream_family(kind, split)
-    episode_rng = rng.derive_episode_rng(
-        {
-            "policy": "splitmix64",
-            "base_rng": stable_hash64(spec.id, split, seed_stream_family),
-        },
-        episode_index,
+    rule_id = selected_rules[index % len(selected_rules)]
+    seed_stream_family = (
+        "train"
+        if resolved_split == "train" or resolved_kind == "train"
+        else resolved_kind
     )
-    seed_family = _seed_family_for_episode(spec, episode_rng)
-    seed_index = _structured_seed_index(seed_family, stream_shape, episode_rng)
-    transform = _transform_for_kind(spec, kind, episode_index)
+    episode_rng = rng.derive_episode_rng(
+        stable_hash64(spec.id, resolved_split, seed_stream_family),
+        index,
+    )
+    seed_family = spec.seed_families[episode_rng % len(spec.seed_families)]
+    seed_index = _structured_seed_index(
+        seed_family, resolved_shape, episode_rng
+    )
+    transform = _transform_for_kind(spec, resolved_kind, index)
 
     return EpisodePlan(
-        id=f"{spec.id}/{split}/{kind}/{episode_index:012d}",
+        id=f"{spec.id}/{resolved_split}/{resolved_kind}/{index:012d}",
         dataset_id=spec.id,
-        split=split,
-        kind=kind,
-        profile=profile,
-        episode_index=episode_index,
-        rule_id=int(rule_id),
-        episode_rng=int(episode_rng),
+        split=resolved_split,
+        kind=resolved_kind,
+        profile=resolved_profile,
+        episode_index=index,
+        rule_id=rule_id,
+        episode_rng=episode_rng,
         seed_stream_family=seed_stream_family,
         seed_family=seed_family,
         seed_index=seed_index,
-        shape=tuple(stream_shape),
-        steps=int(stream_steps),
-        boundary=dict(stream_boundary),
+        shape=resolved_shape,
+        steps=resolved_steps,
+        boundary=resolved_boundary,
         transform=transform,
     )
 
 
-def realize_episode(plan: EpisodePlan, *, return_coords: bool = True) -> RawEpisode:
-    """Realize one planned episode as a ``RawEpisode``."""
+def realize_episode(
+    plan: EpisodePlan,
+    *,
+    return_coords: bool = True,
+) -> DatasetEpisode:
+    """Construct one ordinary program, traverse it, and project a dense view."""
 
-    spec = get_spec(plan.dataset_id)
-    seed_state = render_seed_state(plan)
-    result = rollout(
-        dynamics=_dynamics(spec, plan.shape, plan.boundary),
-        rule_id=plan.rule_id,
-        seed_state=seed_state,
-        steps=plan.steps,
-        return_coords=return_coords,
+    if plan.steps <= 0:
+        raise ValueError("dataset episodes require at least one projected state")
+    initial_seed = _seed_for_plan(plan)
+    simple_program = _build_program(
+        plan.dataset_id,
+        rule=plan.rule_id,
+        seed=initial_seed,
+        shape=plan.shape,
+        boundary=plan.boundary,
     )
-    return RawEpisode(
-        domain=result.domain,
-        shape=result.shape,
-        rule_id=result.rule_id,
-        steps=result.steps,
-        states=result.states,
-        coords=result.coords,
-        metadata={**_plan_metadata(plan), **dict(result.metadata or {})},
+    # Dataset ``steps`` counts projected states.  Semantic rollout counts
+    # applications, so a root plus ``steps - 1`` successors has that length.
+    result = program.rollout(simple_program, steps=plan.steps - 1)
+    episode = _project_dataset_episode(
+        result,
+        domain=get_spec(plan.dataset_id).domain,
+        shape=plan.shape,
+        rule_id=plan.rule_id,
+        steps=plan.steps,
+    )
+    metadata = MappingProxyType(_plan_metadata(plan))
+    return replace(
+        episode,
+        coords=episode.coords if return_coords else None,
+        metadata=metadata,
     )
 
 
@@ -419,31 +330,33 @@ def stream(
     profile: StreamProfile = "compact",
     steps: int | None = None,
     shape: Sequence[int] | None = None,
-    boundary: Mapping[str, Any] | None = None,
+    boundary: BoundarySpec | Mapping[str, str | int | bool] | None = None,
     max_tokens: int = DEFAULT_MAX_TOKENS,
     split_fraction: float = DEFAULT_SPLIT,
     rule_limit: int | None = None,
     start: int = 0,
     return_coords: bool = True,
-) -> Iterator[RawEpisode]:
-    """Yield deterministic raw episodes from a compact or PE-style stream."""
+) -> Iterator[DatasetEpisode]:
+    """Yield deterministic explicit views, one generic rollout at a time."""
 
     total = _resolve_count(count, profile)
     for offset in range(total):
-        plan = plan_episode(
-            dataset_id,
-            episode_index=int(start) + offset,
-            split=split,
-            kind=kind,
-            profile=profile,
-            steps=steps,
-            shape=shape,
-            boundary=boundary,
-            max_tokens=max_tokens,
-            split_fraction=split_fraction,
-            rule_limit=rule_limit,
+        yield realize_episode(
+            plan_episode(
+                dataset_id,
+                episode_index=int(start) + offset,
+                split=split,
+                kind=kind,
+                profile=profile,
+                steps=steps,
+                shape=shape,
+                boundary=boundary,
+                max_tokens=max_tokens,
+                split_fraction=split_fraction,
+                rule_limit=rule_limit,
+            ),
+            return_coords=return_coords,
         )
-        yield realize_episode(plan, return_coords=return_coords)
 
 
 def stream_batch(
@@ -455,20 +368,21 @@ def stream_batch(
     profile: StreamProfile = "compact",
     steps: int | None = None,
     shape: Sequence[int] | None = None,
-    boundary: Mapping[str, Any] | None = None,
+    boundary: BoundarySpec | Mapping[str, str | int | bool] | None = None,
     max_tokens: int = DEFAULT_MAX_TOKENS,
     split_fraction: float = DEFAULT_SPLIT,
     rule_limit: int | None = None,
     batch_size: int | None = None,
     start: int = 0,
     return_coords: bool = True,
-) -> Iterator[RawBatch]:
-    """Yield deterministic raw episode batches where dynamics are shared."""
+) -> Iterator[DatasetBatch]:
+    """Yield loop-and-stack batches without a semantic batch executor."""
 
-    spec = get_spec(dataset_id)
     total = _resolve_count(count, profile)
-    rows = total if batch_size is None else max(1, int(batch_size))
-    plans = [
+    rows = total if batch_size is None else int(batch_size)
+    if rows <= 0:
+        raise ValueError("batch_size must be positive")
+    planned = tuple(
         plan_episode(
             dataset_id,
             episode_index=int(start) + offset,
@@ -483,51 +397,473 @@ def stream_batch(
             rule_limit=rule_limit,
         )
         for offset in range(total)
+    )
+    for chunk_start in range(0, len(planned), rows):
+        episodes = tuple(
+            realize_episode(plan, return_coords=return_coords)
+            for plan in planned[chunk_start : chunk_start + rows]
+        )
+        yield _project_dataset_batch(episodes)
+
+
+# ---------------------------------------------------------------------------
+# Explicit ordinary program construction
+# ---------------------------------------------------------------------------
+
+
+def _build_program(
+    dataset_id: DatasetId,
+    *,
+    rule: int,
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    shape: tuple[int, ...],
+    boundary: BoundarySpec,
+) -> program.SimpleProgram[
+    loci.FiniteConfiguration[bool],
+    bool,
+    frontiers.WritableCapabilities,
+    neighborhoods.ReadableView[bool],
+]:
+    if dataset_id == "0d-dyadlags":
+        return _build_0d_dyadlags_program(
+            rule=rule, seed=seed, shape=shape, boundary=boundary
+        )
+    if dataset_id == "1d-dyadrads":
+        return _build_1d_dyadrads_program(
+            rule=rule, seed=seed, shape=shape, boundary=boundary
+        )
+    if dataset_id == "2d-dyadaxes":
+        return _build_2d_dyadaxes_program(
+            rule=rule, seed=seed, shape=shape, boundary=boundary
+        )
+    if dataset_id == "3d-dyadaxes":
+        return _build_3d_dyadaxes_program(
+            rule=rule, seed=seed, shape=shape, boundary=boundary
+        )
+    raise AssertionError(f"unreachable dataset id {dataset_id!r}")
+
+
+def _build_0d_dyadlags_program(
+    *,
+    rule: int,
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    shape: tuple[int, ...],
+    boundary: BoundarySpec,
+) -> program.SimpleProgram:
+    """Build the five-field temporal binary lookup experiment."""
+
+    if shape or boundary.policy != "none":
+        raise ValueError("0d-dyadlags requires shape () and boundary none")
+    contract = seed.configuration_contract
+    return program.SimpleProgram(
+        seed=seed,
+        alphabet=alphabets.boolean(),
+        frontier=frontiers.everywhere(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        neighborhood=neighborhoods.dyadlags_0d(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        rule=rules.dyadlags_0d(rule=rule),
+    )
+
+
+def _build_1d_dyadrads_program(
+    *,
+    rule: int,
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    shape: tuple[int, ...],
+    boundary: BoundarySpec,
+) -> program.SimpleProgram:
+    """Build the five-field radius-one binary line experiment."""
+
+    _require_grid_rank(shape, 1)
+    contract = seed.configuration_contract
+    return program.SimpleProgram(
+        seed=seed,
+        alphabet=alphabets.boolean(),
+        frontier=frontiers.everywhere(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        neighborhood=neighborhoods.dyadrads_1d(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        rule=rules.dyadrads_1d(rule=rule),
+    )
+
+
+def _build_2d_dyadaxes_program(
+    *,
+    rule: int,
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    shape: tuple[int, ...],
+    boundary: BoundarySpec,
+) -> program.SimpleProgram:
+    """Build the five-field binary square-grid experiment."""
+
+    _require_grid_rank(shape, 2)
+    contract = seed.configuration_contract
+    return program.SimpleProgram(
+        seed=seed,
+        alphabet=alphabets.boolean(),
+        frontier=frontiers.everywhere(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        neighborhood=neighborhoods.dyadaxes_2d(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        rule=rules.dyadaxes_2d(rule=rule),
+    )
+
+
+def _build_3d_dyadaxes_program(
+    *,
+    rule: int,
+    seed: seeds.Seed[loci.FiniteConfiguration[bool]],
+    shape: tuple[int, ...],
+    boundary: BoundarySpec,
+) -> program.SimpleProgram:
+    """Build the five-field binary cubic-grid experiment."""
+
+    _require_grid_rank(shape, 3)
+    contract = seed.configuration_contract
+    return program.SimpleProgram(
+        seed=seed,
+        alphabet=alphabets.boolean(),
+        frontier=frontiers.everywhere(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        neighborhood=neighborhoods.dyadaxes_3d(
+            configuration_contract=contract,
+            value_profile=alphabets.ValueProfile.BOOLEAN,
+        ),
+        rule=rules.dyadaxes_3d(rule=rule),
+    )
+
+
+def _require_grid_rank(shape: tuple[int, ...], rank: int) -> None:
+    if len(shape) != rank or any(size <= 0 for size in shape):
+        raise ValueError(f"expected a positive rank-{rank} grid shape, got {shape}")
+
+
+# ---------------------------------------------------------------------------
+# Exact source preparation
+# ---------------------------------------------------------------------------
+
+
+def _seed_for_plan(
+    plan: EpisodePlan,
+) -> seeds.Seed[loci.FiniteConfiguration[bool]]:
+    generator = rng.numpy_rng(plan.episode_rng)
+    if plan.seed_family == "uniform_bits":
+        values = tuple(bool(value) for value in generator.integers(2, size=3))
+        configuration = loci.history_configuration(values)
+        return seeds.exact(
+            configuration, value_profile=alphabets.ValueProfile.BOOLEAN
+        )
+    if plan.seed_family == "bernoulli":
+        probability = float(generator.random())
+        values = tuple(
+            bool(value)
+            for value in (generator.random(int(prod(plan.shape))) < probability)
+        )
+        configuration = loci.grid_configuration(
+            plan.shape,
+            values,
+            boundary=_loci_boundary(plan.boundary),
+        )
+        return seeds.exact(
+            configuration, value_profile=alphabets.ValueProfile.BOOLEAN
+        )
+    if plan.seed_family == "structured":
+        recipes = _structured_seed_recipes(plan.shape)
+        index = 0 if plan.seed_index is None else plan.seed_index
+        chosen = recipes[index % len(recipes)]
+        source = chosen.denote().exact_configuration
+        targets = loci.grid_loci(plan.shape)
+        configuration = loci.grid_configuration(
+            plan.shape,
+            tuple(bool(source.value_at(target)) for target in targets),
+            boundary=_loci_boundary(plan.boundary),
+        )
+        return seeds.exact(
+            configuration, value_profile=alphabets.ValueProfile.BOOLEAN
+        )
+    raise ValueError(f"unknown seed family {plan.seed_family!r}")
+
+
+@lru_cache(maxsize=None)
+def _structured_seed_recipes(
+    shape: tuple[int, ...],
+) -> tuple[seeds.Seed[loci.FiniteConfiguration[bool]], ...]:
+    """Enumerate a compact, dimension-polymorphic exact pattern catalog."""
+
+    _require_grid_rank(shape, len(shape))
+    coordinates = tuple(
+        loci.grid_coordinates(target) for target in loci.grid_loci(shape)
+    )
+    predicates = [
+        lambda point: all(value == 0 for value in point),
+        lambda point: sum(abs(value) for value in point) <= 1,
+        lambda point: max(abs(value) for value in point) <= 1,
+        lambda point: sum(point) % 2 == 0,
+        lambda point: point[0] >= 0,
     ]
-    for chunk_start in range(0, len(plans), rows):
-        chunk = plans[chunk_start : chunk_start + rows]
-        for group in _contiguous_plan_groups(chunk):
-            seed_states = np.stack([render_seed_state(plan) for plan in group], axis=0)
-            result = rollout_batch(
-                dynamics=_dynamics(spec, group[0].shape, group[0].boundary),
-                rule_ids=np.asarray([plan.rule_id for plan in group], dtype=np.int64),
-                seed_states=seed_states,
-                steps=group[0].steps,
-                return_coords=return_coords,
+    predicates.extend(
+        (lambda point, axis=axis: point[axis] == 0)
+        for axis in range(len(shape))
+    )
+    if len(shape) >= 2:
+        predicates.append(lambda point: point[0] == point[1])
+        predicates.append(lambda point: point[0] == -point[1])
+
+    boundary = loci.Boundary(loci.BoundaryPolicy.FIXED, False)
+    candidates: list[seeds.Seed[loci.FiniteConfiguration[bool]]] = []
+    for predicate in predicates:
+        values = tuple(bool(predicate(point)) for point in coordinates)
+        for pattern in (values, tuple(not value for value in values)):
+            configuration = loci.grid_configuration(
+                shape, pattern, boundary=boundary
             )
-            yield RawBatch(
-                domain=result.domain,
-                shape=result.shape,
-                rule_ids=result.rule_ids,
-                steps=result.steps,
-                states=result.states,
-                coords=result.coords,
-                metadata={
-                    "episodes": [_plan_metadata(plan) for plan in group],
-                    **dict(result.metadata or {}),
-                },
+            candidates.append(
+                seeds.exact(
+                    configuration,
+                    value_profile=alphabets.ValueProfile.BOOLEAN,
+                )
             )
+    return _dedupe_seed_recipes(tuple(candidates), shape)
 
 
-def render_seed_state(plan: EpisodePlan) -> np.ndarray:
-    """Render the initial seed state for one planned episode."""
+def _dedupe_seed_recipes(
+    recipes: tuple[seeds.Seed[loci.FiniteConfiguration[bool]], ...],
+    shape: tuple[int, ...],
+) -> tuple[seeds.Seed[loci.FiniteConfiguration[bool]], ...]:
+    """Deduplicate exact patterns by canonical ordered Boolean values."""
 
-    seed = _seed_for_plan(plan)
-    return np.asarray(seeds.render(seed, plan.shape, rng=rng.numpy_rng(plan.episode_rng)), dtype=np.int64)
+    expected = int(prod(shape))
+    kept: list[seeds.Seed[loci.FiniteConfiguration[bool]]] = []
+    seen: set[tuple[bool, ...]] = set()
+    targets = loci.grid_loci(shape)
+    for recipe in recipes:
+        configuration = recipe.denote().exact_configuration
+        values = tuple(
+            bool(configuration.value_at(target)) for target in targets
+        )
+        if len(values) != expected:
+            raise ValueError("structured recipe has the wrong grid size")
+        if values in seen:
+            continue
+        seen.add(values)
+        kept.append(recipe)
+    if not kept:
+        raise ValueError(f"structured seed catalog is empty for shape {shape}")
+    return tuple(kept)
 
 
-def stable_hash64(*parts: Any) -> int:
-    """Return PE-compatible deterministic unsigned 64-bit hash."""
+def _structured_seed_index(
+    seed_family: str,
+    shape: tuple[int, ...],
+    episode_rng: int,
+) -> int | None:
+    if seed_family != "structured":
+        return None
+    return episode_rng % len(_structured_seed_recipes(shape))
 
-    payload = json.dumps(_json_ready(parts), sort_keys=True, separators=(",", ":"))
-    digest = hashlib.blake2b(payload.encode("utf-8"), digest_size=8).digest()
-    return int.from_bytes(digest, "little")
+
+def _loci_boundary(spec: BoundarySpec) -> loci.Boundary[bool]:
+    policies = {
+        "none": loci.BoundaryPolicy.NONE,
+        "fixed": loci.BoundaryPolicy.FIXED,
+        "periodic": loci.BoundaryPolicy.PERIODIC,
+        "reflective": loci.BoundaryPolicy.REFLECTIVE,
+    }
+    exterior = bool(spec.value) if spec.policy == "fixed" else None
+    return loci.Boundary(policies[spec.policy], exterior)
+
+
+# ---------------------------------------------------------------------------
+# Tensor projection
+# ---------------------------------------------------------------------------
+
+
+def _project_dataset_episode(
+    result: program.RolloutResult,
+    *,
+    domain: str,
+    shape: tuple[int, ...],
+    rule_id: int,
+    steps: int,
+) -> DatasetEpisode:
+    """Project one finite, nonbranching rollout; reject every lossy case."""
+
+    configurations = _linear_configurations(result)
+    if len(configurations) != steps:
+        raise ValueError(
+            f"rollout contains {len(configurations)} states, expected {steps}"
+        )
+    states = np.stack(
+        tuple(_configuration_tensor(item, shape) for item in configurations),
+        axis=0,
+    )
+    if not shape:
+        states = states.reshape(steps)
+    return DatasetEpisode(
+        states=states,
+        coords=_canonical_coordinate_table(shape, steps),
+        domain=domain,
+        shape=shape,
+        rule_id=rule_id,
+        steps=steps,
+    )
+
+
+def _linear_configurations(
+    result: program.RolloutResult,
+) -> tuple[loci.FiniteConfiguration[bool], ...]:
+    """Extract the root and unique successor chain from a semantic trace."""
+
+    if isinstance(result, program.RolloutRejected):
+        raise ValueError(f"cannot project rejected rollout: {result.fault.reason}")
+    roots = _finite_support(result.raw_trace.roots.support)
+    if len(roots) != 1 or not isinstance(roots[0], loci.FiniteConfiguration):
+        raise ValueError("dataset projection requires one finite root")
+
+    out: list[loci.FiniteConfiguration[bool]] = [roots[0]]
+    for application in _finite_support(result.raw_trace.applications):
+        groups = _finite_support(
+            application.successor_quotient_with_derivation_fibers
+        )
+        if len(groups) != 1:
+            raise ValueError("dataset projection rejects branching rollouts")
+        successor = groups[0].successor
+        if not isinstance(successor, loci.FiniteConfiguration):
+            raise ValueError("dataset projection rejects intensional successors")
+        out.append(successor)
+    return tuple(out)
+
+
+def _finite_support(space: rules.SupportSpace) -> tuple[object, ...]:
+    if space.presentation is not rules.SupportPresentation.FINITE:
+        raise ValueError("dataset projection requires explicitly finite support")
+    return space.atoms
+
+
+def _configuration_tensor(
+    configuration: loci.FiniteConfiguration[bool],
+    shape: tuple[int, ...],
+) -> np.ndarray:
+    if not shape:
+        if configuration.contract.kind is not loci.CarrierKind.HISTORY:
+            raise ValueError("0d dataset projection requires history configurations")
+        history_size = configuration.contract.shape
+        if history_size is None or len(history_size) != 1:
+            raise ValueError("history configuration has no finite length")
+        target = loci.occurrence("history", history_size[0] - 1)
+        return np.asarray(int(configuration.value_at(target)), dtype=np.int64)
+
+    expected = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=len(shape),
+        shape=shape,
+        axes=("x", "y", "z")[: len(shape)],
+    )
+    if not expected.accepts(configuration.contract):
+        raise ValueError("grid configuration does not match the dataset shape")
+    expected_targets = set(loci.grid_loci(shape))
+    actual_targets = {target for target, _ in configuration.entries}
+    if actual_targets != expected_targets:
+        raise ValueError("grid configuration is not a complete exact grid")
+    output = np.empty(shape, dtype=np.int64)
+    axis_values = tuple(loci.centered_axis_values(size) for size in shape)
+    axis_index = tuple(
+        {coordinate: index for index, coordinate in enumerate(values)}
+        for values in axis_values
+    )
+    for target, value in configuration.entries:
+        coordinates = loci.grid_coordinates(target)
+        native = tuple(
+            axis_index[axis][coordinate]
+            for axis, coordinate in enumerate(coordinates)
+        )
+        output[native] = int(value)
+    return output
+
+
+def _project_dataset_batch(
+    episodes: tuple[DatasetEpisode, ...],
+) -> DatasetBatch:
+    """Stack compatible views without defining a second transition path."""
+
+    if not episodes:
+        raise ValueError("cannot project an empty dataset batch")
+    first = episodes[0]
+    for episode in episodes[1:]:
+        if (
+            episode.domain != first.domain
+            or episode.shape != first.shape
+            or episode.steps != first.steps
+        ):
+            raise ValueError("dataset batch episodes are incompatible")
+        if (episode.coords is None) != (first.coords is None):
+            raise ValueError("dataset batch coordinate choices disagree")
+        if (
+            first.coords is not None
+            and episode.coords is not None
+            and not np.array_equal(episode.coords, first.coords)
+        ):
+            raise ValueError("dataset batch coordinate tables disagree")
+    return DatasetBatch(
+        states=np.stack(tuple(episode.states for episode in episodes), axis=0),
+        coords=None if first.coords is None else first.coords.copy(),
+        rule_ids=np.asarray(
+            tuple(episode.rule_id for episode in episodes), dtype=np.int64
+        ),
+        domain=first.domain,
+        shape=first.shape,
+        steps=first.steps,
+        metadata=MappingProxyType({"batch_size": len(episodes)}),
+    )
+
+
+def _canonical_coordinate_table(
+    shape: tuple[int, ...],
+    steps: int,
+) -> np.ndarray:
+    """Return flattened time-major ``[t, x, y, z]`` coordinates."""
+
+    if steps <= 0:
+        raise ValueError("steps must be positive")
+    spatial = tuple(
+        itertools.product(
+            *(loci.centered_axis_values(size) for size in shape)
+        )
+    )
+    if not shape:
+        spatial = ((),)
+    rows: list[tuple[int, int, int, int]] = []
+    for time in range(steps):
+        for point in spatial:
+            padded = (*point, *(0 for _ in range(3 - len(point))))
+            rows.append((time, padded[0], padded[1], padded[2]))
+    return np.asarray(rows, dtype=np.int64)
+
+
+# ---------------------------------------------------------------------------
+# Planning helpers and presentation-only OOD metadata
+# ---------------------------------------------------------------------------
 
 
 def _validate_profile(profile: str) -> StreamProfile:
-    if profile not in {"compact", "pe"}:
+    if profile not in ("compact", "pe"):
         raise ValueError("profile must be 'compact' or 'pe'")
-    return profile  # type: ignore[return-value]
+    return profile
 
 
 def _normalize_kind(kind: str) -> StreamKind:
@@ -539,8 +875,8 @@ def _normalize_kind(kind: str) -> StreamKind:
         "ood_scale": "ood-scale",
         "ood_boundary": "ood-boundary",
     }
-    kind = aliases.get(str(kind), str(kind))
-    valid = {
+    resolved = aliases.get(str(kind), str(kind))
+    valid = (
         "train",
         "held-out-rule",
         "held-out-seed",
@@ -548,16 +884,18 @@ def _normalize_kind(kind: str) -> StreamKind:
         "ood-scale",
         "ood-boundary",
         "invariance",
-    }
-    if kind not in valid:
+    )
+    if resolved not in valid:
         raise ValueError(f"unknown stream kind {kind!r}")
-    return kind  # type: ignore[return-value]
+    return resolved  # type: ignore[return-value]
 
 
 def _resolve_count(count: int | None, profile: str) -> int:
-    resolved = DEFAULT_COMPACT_COUNT if count is None and profile == "compact" else count
-    resolved = DEFAULT_PE_COUNT if resolved is None else resolved
-    resolved = int(resolved)
+    resolved = (
+        DEFAULT_COMPACT_COUNT
+        if count is None and profile == "compact"
+        else DEFAULT_PE_COUNT if count is None else int(count)
+    )
     if resolved <= 0:
         raise ValueError(f"count must be positive, got {resolved}")
     return resolved
@@ -565,11 +903,16 @@ def _resolve_count(count: int | None, profile: str) -> int:
 
 def _resolve_shape(
     spec: DatasetSpec,
-    kind: str,
+    kind: StreamKind,
     override: Sequence[int] | None,
 ) -> tuple[int, ...]:
     if override is not None:
-        return tuple(int(size) for size in override)
+        resolved = tuple(int(size) for size in override)
+        if len(resolved) != len(spec.shape) or any(size <= 0 for size in resolved):
+            raise ValueError(
+                f"{spec.id} requires a positive rank-{len(spec.shape)} shape"
+            )
+        return resolved
     if kind == "ood-scale" and spec.shape:
         return ood_scale_shape(spec.shape)
     return spec.shape
@@ -577,43 +920,46 @@ def _resolve_shape(
 
 def _resolve_boundary(
     spec: DatasetSpec,
-    kind: str,
+    kind: StreamKind,
     episode_index: int,
-    override: Mapping[str, Any] | None,
-) -> Mapping[str, Any]:
+    override: BoundarySpec | Mapping[str, str | int | bool] | None,
+) -> BoundarySpec:
     if override is not None:
         return _normalize_boundary(override)
     if kind == "ood-boundary" and spec.shape:
         variants = ood_boundary_variants(spec)
-        if variants:
-            return variants[int(episode_index) % len(variants)]["boundary"]
-    return dict(spec.boundary)
+        return variants[episode_index % len(variants)]
+    return spec.boundary
 
 
 def _resolve_steps(
     spec: DatasetSpec,
-    kind: str,
-    profile: str,
-    shape: Sequence[int],
+    kind: StreamKind,
+    profile: StreamProfile,
+    shape: tuple[int, ...],
     override: int | None,
     max_tokens: int,
 ) -> int:
     if override is not None:
-        steps = int(override)
+        resolved = int(override)
     elif profile == "pe":
         tokens = int(max_tokens)
         if kind == "ood-horizon":
             tokens *= OOD_HORIZON_TOKEN_MULTIPLIER
         elif kind == "ood-scale" and shape:
             tokens *= OOD_SCALE_TOKEN_MULTIPLIER
-        steps = token_window_steps(shape, tokens)
+        resolved = token_window_steps(shape, tokens)
     else:
-        steps = DEFAULT_COMPACT_0D_STEPS if not spec.shape else DEFAULT_COMPACT_SPATIAL_STEPS
+        resolved = (
+            DEFAULT_COMPACT_0D_STEPS
+            if not spec.shape
+            else DEFAULT_COMPACT_SPATIAL_STEPS
+        )
         if kind == "ood-horizon":
-            steps *= OOD_HORIZON_TOKEN_MULTIPLIER
-    if steps <= 0:
-        raise ValueError(f"steps must be positive, got {steps}")
-    return steps
+            resolved *= OOD_HORIZON_TOKEN_MULTIPLIER
+    if resolved <= 0:
+        raise ValueError(f"steps must be positive, got {resolved}")
+    return resolved
 
 
 def token_window_steps(
@@ -621,7 +967,7 @@ def token_window_steps(
     max_tokens: int = DEFAULT_MAX_TOKENS,
     special_tokens_per_episode: int = SPECIAL_TOKENS_PER_EPISODE,
 ) -> int:
-    """Return PE raw-state count for one serialized episode window."""
+    """Return the number of raw states fitting one serialized token window."""
 
     shape_tuple = tuple(int(size) for size in shape)
     shape_size = int(prod(shape_tuple)) if shape_tuple else 1
@@ -630,130 +976,171 @@ def token_window_steps(
         raise ValueError("max_tokens must exceed special_tokens_per_episode")
     source_states = available // shape_size
     if source_states <= 0:
-        raise ValueError(f"max_tokens={max_tokens} cannot fit one state for shape {shape_tuple}")
-    return int(source_states + 1)
-
-
-def _rule_pool_for_kind(kind: str) -> str:
-    return "held_out_rule" if kind == "held-out-rule" else "train"
+        raise ValueError(
+            f"max_tokens={max_tokens} cannot fit one state for shape {shape_tuple}"
+        )
+    return source_states + 1
 
 
 def _selected_rule_ids(
     dataset_id: str,
     *,
     pool_name: str,
-    profile: str,
+    profile: StreamProfile,
     split: float,
     rule_limit: int | None,
 ) -> tuple[int, ...]:
     pool = rule_pools(dataset_id, split=split)[pool_name]
-    limit = rule_limit
-    if limit is None and profile == "compact":
-        limit = DEFAULT_COMPACT_RULE_LIMIT
+    limit = (
+        DEFAULT_COMPACT_RULE_LIMIT
+        if rule_limit is None and profile == "compact"
+        else rule_limit
+    )
     if limit is not None:
-        limit = int(limit)
-        if limit <= 0:
-            raise ValueError(f"rule_limit must be positive, got {limit}")
-        pool = pool[:limit]
+        resolved_limit = int(limit)
+        if resolved_limit <= 0:
+            raise ValueError("rule_limit must be positive")
+        pool = pool[:resolved_limit]
     if not pool:
         raise ValueError(f"rule pool {pool_name!r} is empty")
     return pool
 
 
-def _seed_stream_family(kind: str, split: str) -> str:
-    if str(split) == "train" or kind == "train":
-        return "train"
-    return kind
+def stable_hash64(*parts: object) -> int:
+    """Return a deterministic unsigned 64-bit hash for planning values."""
+
+    payload = json.dumps(
+        _json_ready(parts), sort_keys=True, separators=(",", ":")
+    )
+    digest = hashlib.blake2b(payload.encode("utf-8"), digest_size=8).digest()
+    return int.from_bytes(digest, "little")
 
 
-def _seed_family_for_episode(spec: DatasetSpec, episode_rng: int) -> str:
-    families = spec.seed_families
-    return families[int(episode_rng) % len(families)]
+def _json_ready(value: object) -> object:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, Mapping):
+        return {
+            str(key): _json_ready(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, Sequence) and not isinstance(
+        value, (str, bytes, bytearray)
+    ):
+        return [_json_ready(item) for item in value]
+    raise TypeError(f"cannot convert {type(value).__name__} to JSON")
 
 
-def _structured_seed_index(seed_family: str, shape: Sequence[int], episode_rng: int) -> int | None:
-    if seed_family != "structured":
-        return None
-    catalog = _structured_catalog(tuple(int(size) for size in shape))
-    if not catalog:
-        raise ValueError(f"structured seed catalog is empty for shape {tuple(shape)}")
-    return int(episode_rng) % len(catalog)
+def ood_scale_shape(shape: Sequence[int]) -> tuple[int, ...]:
+    """Return the larger PE-style spatial shape for an OOD-scale stream."""
 
-
-def _seed_for_plan(plan: EpisodePlan) -> seeds.Seed:
-    if plan.seed_family == "uniform_bits":
-        return seeds.uniform_bits(length=3)
-    if plan.seed_family == "bernoulli":
-        return seeds.bernoulli(p_low=0.0, p_high=1.0)
-    if plan.seed_family == "structured":
-        catalog = _structured_catalog(plan.shape)
-        seed_index = 0 if plan.seed_index is None else int(plan.seed_index)
-        return catalog[seed_index % len(catalog)]
-    raise ValueError(f"unknown seed family {plan.seed_family!r}")
-
-
-@lru_cache(maxsize=None)
-def _structured_catalog(shape: tuple[int, ...]) -> tuple[seeds.Seed, ...]:
-    return tuple(seeds.structured(shape))
-
-
-def _dynamics(spec: DatasetSpec, shape: Sequence[int], boundary: Mapping[str, Any]) -> Dynamics:
-    return Dynamics(
-        domain=spec.domain,
-        shape=tuple(int(size) for size in shape),
-        rule=_rule(spec),
-        neighborhoods=(_neighborhood(spec),),
-        frontier=frontiers.time_slice(shape),
-        boundary=boundary,
-        metadata={"dataset_id": spec.id},
+    shape_tuple = tuple(int(size) for size in shape)
+    if not shape_tuple:
+        return ()
+    factor = OOD_SCALE_FACTORS_BY_RANK.get(len(shape_tuple))
+    if factor is None:
+        raise ValueError(f"cannot scale rank-{len(shape_tuple)} shape")
+    return tuple(
+        _odd_ceil(max(size + 1, size * factor)) for size in shape_tuple
     )
 
 
-def _rule(spec: DatasetSpec) -> rules.Rule:
-    if spec.rule_family == "dyadlags_0d":
-        return rules.dyadlags_0d()
-    if spec.rule_family == "dyadrads_1d":
-        return rules.dyadrads_1d()
-    if spec.rule_family == "dyadaxes_2d":
-        return rules.dyadaxes_2d()
-    if spec.rule_family == "dyadaxes_3d":
-        return rules.dyadaxes_3d()
-    raise ValueError(f"unsupported rule family {spec.rule_family!r}")
+def ood_boundary_variants(
+    spec: DatasetSpec | str,
+) -> tuple[BoundarySpec, ...]:
+    """Return the non-baseline periodic and reflective boundary choices."""
+
+    resolved = get_spec(spec) if isinstance(spec, str) else spec
+    if not resolved.shape:
+        return ()
+    return (BoundarySpec("periodic"), BoundarySpec("reflective"))
 
 
-def _neighborhood(spec: DatasetSpec) -> Any:
-    if spec.neighborhood_family == "dyadlags_0d":
-        return dyadlags_0d()
-    if spec.neighborhood_family == "dyadrads_1d":
-        return dyadrads_1d()
-    if spec.neighborhood_family == "dyadaxes_2d":
-        return dyadaxes_2d()
-    if spec.neighborhood_family == "dyadaxes_3d":
-        return dyadaxes_3d()
-    raise ValueError(f"unsupported neighborhood family {spec.neighborhood_family!r}")
+def invariance_transforms(
+    spec: DatasetSpec | str,
+) -> tuple[AffineTransform, ...]:
+    """Return compact presentation-only transform identities."""
+
+    resolved = get_spec(spec) if isinstance(spec, str) else spec
+    rank = len(resolved.shape)
+    if rank == 0:
+        return (AffineTransform("time-shift-pos-17"),)
+    if rank == 1:
+        return (
+            AffineTransform("reflect-x"),
+            AffineTransform("shift-x-half-pos"),
+            AffineTransform("shift-x-full-pos"),
+        )
+    if rank == 2:
+        return tuple(
+            AffineTransform(name)
+            for name in (
+                "rot-xy-90",
+                "rot-xy-180",
+                "rot-xy-270",
+                "shift-x-full-pos",
+                "shift-y-full-pos",
+                "shift-xy-full-pos-pos",
+            )
+        )
+    return tuple(
+        AffineTransform(name)
+        for name in (
+            "rot-x-90",
+            "rot-y-90",
+            "rot-z-90",
+            "shift-x-full-pos",
+            "shift-y-full-pos",
+            "shift-z-full-pos",
+            "shift-xyz-full-pos-pos-pos",
+        )
+    )
 
 
-def _contiguous_plan_groups(plans: Sequence[EpisodePlan]) -> Iterator[list[EpisodePlan]]:
-    group: list[EpisodePlan] = []
-    group_key: tuple[Any, ...] | None = None
-    for plan in plans:
-        key = _plan_dynamics_key(plan)
-        if group and key != group_key:
-            yield group
-            group = []
-        group.append(plan)
-        group_key = key
-    if group:
-        yield group
+def affine_transform(
+    transform_id: str,
+    *,
+    matrix: Sequence[Sequence[int]] | None = None,
+    offset: Sequence[int] = (0, 0, 0, 0),
+) -> AffineTransform:
+    """Retain the planning helper while treating matrices as view metadata."""
+
+    if matrix is not None and (
+        len(matrix) != 4 or any(len(row) != 4 for row in matrix)
+    ):
+        raise ValueError("transform matrix must be 4 by 4")
+    if len(offset) != 4:
+        raise ValueError("transform offset must have four entries")
+    return AffineTransform(str(transform_id))
 
 
-def _plan_dynamics_key(plan: EpisodePlan) -> tuple[Any, ...]:
-    boundary_key = tuple(sorted(dict(plan.boundary).items()))
-    return plan.dataset_id, plan.shape, plan.steps, boundary_key
+def _transform_for_kind(
+    spec: DatasetSpec,
+    kind: StreamKind,
+    episode_index: int,
+) -> AffineTransform | None:
+    if kind != "invariance":
+        return None
+    transforms = invariance_transforms(spec)
+    return transforms[episode_index % len(transforms)]
 
 
-def _plan_metadata(plan: EpisodePlan) -> dict[str, Any]:
-    metadata = {
+def _normalize_boundary(
+    boundary: BoundarySpec | Mapping[str, str | int | bool],
+) -> BoundarySpec:
+    if isinstance(boundary, BoundarySpec):
+        return boundary
+    policy = str(boundary.get("policy", "none")).lower()
+    if policy not in ("none", "fixed", "periodic", "reflective"):
+        raise ValueError(f"unknown boundary policy {policy!r}")
+    value = boundary.get("value") if policy == "fixed" else None
+    if value is not None and not isinstance(value, (bool, int)):
+        raise TypeError("fixed boundary value must be Boolean or integer")
+    return BoundarySpec(policy, value)  # type: ignore[arg-type]
+
+
+def _plan_metadata(plan: EpisodePlan) -> dict[str, DatasetMetadataValue]:
+    metadata: dict[str, DatasetMetadataValue] = {
         "dataset_id": plan.dataset_id,
         "episode_id": plan.id,
         "split": plan.split,
@@ -764,217 +1151,18 @@ def _plan_metadata(plan: EpisodePlan) -> dict[str, Any]:
         "seed_stream_family": plan.seed_stream_family,
         "seed_family": plan.seed_family,
         "seed_index": plan.seed_index,
-        "boundary": dict(plan.boundary),
+        "boundary_policy": plan.boundary.policy,
     }
+    if plan.boundary.value is not None:
+        metadata["boundary_value"] = int(plan.boundary.value)
     if plan.transform is not None:
-        metadata["transform"] = dict(plan.transform)
+        metadata["transform_id"] = plan.transform.id
     return metadata
 
 
-def ood_scale_shape(shape: Sequence[int]) -> tuple[int, ...]:
-    """Return PE-style larger spatial shape for OOD-scale streams."""
-
-    shape_tuple = tuple(int(size) for size in shape)
-    if not shape_tuple:
-        return shape_tuple
-    factor = OOD_SCALE_FACTORS_BY_RANK.get(len(shape_tuple))
-    if factor is None:
-        raise ValueError(f"cannot build OOD-scale shape for rank {len(shape_tuple)}")
-    return tuple(_odd_ceil(max(size + 1, size * factor)) for size in shape_tuple)
-
-
-def ood_boundary_variants(spec: DatasetSpec | str) -> tuple[dict[str, Any], ...]:
-    """Return PE-style OOD boundary variants for one spatial dataset."""
-
-    if isinstance(spec, str):
-        spec = get_spec(spec)
-    if not spec.shape:
-        return ()
-    base = _normalize_boundary(spec.boundary)
-    variants = []
-    for boundary in ({"policy": "periodic"}, {"policy": "reflective"}):
-        normalized = _normalize_boundary(boundary)
-        if normalized != base:
-            variants.append({"id": f"boundary-{normalized['policy']}", "boundary": normalized})
-    return tuple(variants)
-
-
-def invariance_transforms(spec: DatasetSpec | str) -> tuple[dict[str, Any], ...]:
-    """Return PE-style coordinate transform metadata for invariance streams."""
-
-    if isinstance(spec, str):
-        spec = get_spec(spec)
-    shape = spec.shape
-    axes = ("x", "y", "z")[: len(shape)]
-    if not axes:
-        return (affine_transform("time-shift-pos-17", offset=(17, 0, 0, 0)),)
-
-    transforms: list[dict[str, Any]] = []
-    if len(axes) == 1:
-        transforms.append(affine_transform("reflect-x", matrix=reflection_matrix(("x",))))
-    elif len(axes) == 2:
-        transforms.extend(
-            affine_transform(f"rot-xy-{quarter_turns * 90}", matrix=rotation_matrix("xy", quarter_turns))
-            for quarter_turns in (1, 2, 3)
-        )
-    else:
-        for plane, axis in (("yz", "x"), ("xz", "y"), ("xy", "z")):
-            transforms.extend(
-                affine_transform(f"rot-{axis}-{quarter_turns * 90}", matrix=rotation_matrix(plane, quarter_turns))
-                for quarter_turns in (1, 2, 3)
-            )
-    transforms.extend(axis_shift_transforms(shape))
-    transforms.extend(diagonal_shift_transforms(shape))
-    return tuple(_dedupe_affine_transforms(transforms))
-
-
-def _transform_for_kind(spec: DatasetSpec, kind: str, episode_index: int) -> Mapping[str, Any] | None:
-    if kind != "invariance":
-        return None
-    transforms = invariance_transforms(spec)
-    if not transforms:
-        return None
-    return transforms[int(episode_index) % len(transforms)]
-
-
-AXIS_COLUMNS = {"t": 0, "x": 1, "y": 2, "z": 3}
-
-
-def affine_transform(
-    transform_id: str,
-    *,
-    matrix: Sequence[Sequence[int]] | None = None,
-    offset: Sequence[int] = (0, 0, 0, 0),
-) -> dict[str, Any]:
-    matrix = identity_matrix() if matrix is None else matrix
-    return {
-        "id": str(transform_id),
-        "family": "affine",
-        "matrix": [[int(value) for value in row] for row in matrix],
-        "offset": [int(value) for value in offset],
-    }
-
-
-def identity_matrix() -> list[list[int]]:
-    return [[1 if row == column else 0 for column in range(4)] for row in range(4)]
-
-
-def reflection_matrix(axes: Sequence[str]) -> list[list[int]]:
-    matrix = identity_matrix()
-    for axis in axes:
-        matrix[AXIS_COLUMNS[str(axis)]][AXIS_COLUMNS[str(axis)]] = -1
-    return matrix
-
-
-def rotation_matrix(plane: str, quarter_turns: int) -> list[list[int]]:
-    first = AXIS_COLUMNS[plane[0]]
-    second = AXIS_COLUMNS[plane[1]]
-    step = identity_matrix()
-    step[first][first] = 0
-    step[first][second] = -1
-    step[second][first] = 1
-    step[second][second] = 0
-    matrix = identity_matrix()
-    for _ in range(int(quarter_turns) % 4):
-        matrix = multiply_matrices(step, matrix)
-    return matrix
-
-
-def multiply_matrices(left: Sequence[Sequence[int]], right: Sequence[Sequence[int]]) -> list[list[int]]:
-    return [
-        [
-            sum(int(left[row][inner]) * int(right[inner][column]) for inner in range(4))
-            for column in range(4)
-        ]
-        for row in range(4)
-    ]
-
-
-def axis_shift_transforms(shape: Sequence[int]) -> tuple[dict[str, Any], ...]:
-    transforms = []
-    for axis, size in zip(("x", "y", "z")[: len(shape)], shape, strict=True):
-        half = ceil(int(size) / 2)
-        for distance_name, amount in (("half", half), ("full", int(size))):
-            for sign_name, sign in (("pos", 1), ("neg", -1)):
-                transforms.append(
-                    affine_transform(
-                        f"shift-{axis}-{distance_name}-{sign_name}",
-                        offset=axis_offset({axis: sign * amount}),
-                    )
-                )
-    return tuple(transforms)
-
-
-def diagonal_shift_transforms(shape: Sequence[int]) -> tuple[dict[str, Any], ...]:
-    shape_by_axis = {
-        axis: int(size)
-        for axis, size in zip(("x", "y", "z")[: len(shape)], shape, strict=True)
-    }
-    transforms = []
-    axes = tuple(shape_by_axis)
-    for combo_size in range(2, len(axes) + 1):
-        for axis_combo in itertools.combinations(axes, combo_size):
-            for signs in itertools.product((-1, 1), repeat=combo_size):
-                sign_label = "-".join("pos" if sign > 0 else "neg" for sign in signs)
-                offsets = {
-                    axis: int(sign) * shape_by_axis[axis]
-                    for axis, sign in zip(axis_combo, signs, strict=True)
-                }
-                transforms.append(
-                    affine_transform(
-                        f"shift-{''.join(axis_combo)}-full-{sign_label}",
-                        offset=axis_offset(offsets),
-                    )
-                )
-    return tuple(transforms)
-
-
-def axis_offset(offsets: Mapping[str, int]) -> tuple[int, int, int, int]:
-    out = [0, 0, 0, 0]
-    for axis, amount in offsets.items():
-        out[AXIS_COLUMNS[str(axis)]] = int(amount)
-    return tuple(out)
-
-
-def _dedupe_affine_transforms(transforms: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    out = []
-    seen = set()
-    for transform in transforms:
-        matrix = tuple(tuple(int(value) for value in row) for row in transform["matrix"])
-        offset = tuple(int(value) for value in transform["offset"])
-        key = (matrix, offset)
-        if key in seen:
-            continue
-        seen.add(key)
-        out.append(dict(transform))
-    return out
-
-
-def _normalize_boundary(boundary: Mapping[str, Any] | None) -> dict[str, Any]:
-    if not boundary:
-        return {"policy": "none"}
-    policy = str(boundary.get("policy", "none")).lower()
-    if policy not in {"none", "fixed", "periodic", "reflective"}:
-        raise ValueError(f"unknown boundary policy {policy!r}")
-    out: dict[str, Any] = {"policy": policy}
-    if policy == "fixed":
-        out["value"] = int(boundary.get("value", 0))
-    return out
-
-
 def _odd_ceil(value: float) -> int:
-    out = int(ceil(float(value)))
-    return out + 1 if out % 2 == 0 else out
-
-
-def _json_ready(value: Any) -> Any:
-    if value is None or isinstance(value, str | int | float | bool):
-        return value
-    if isinstance(value, Mapping):
-        return {str(key): _json_ready(item) for key, item in value.items()}
-    if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
-        return [_json_ready(item) for item in value]
-    raise TypeError(f"cannot convert {type(value).__name__} to JSON")
+    resolved = int(ceil(float(value)))
+    return resolved + 1 if resolved % 2 == 0 else resolved
 
 
 __all__ = [
@@ -987,8 +1175,12 @@ __all__ = [
     "DEFAULT_MAX_TOKENS",
     "DEFAULT_PE_COUNT",
     "DEFAULT_SPLIT",
-    "DatasetSpec",
+    "AffineTransform",
+    "BoundarySpec",
+    "DatasetBatch",
+    "DatasetEpisode",
     "DatasetId",
+    "DatasetSpec",
     "EpisodePlan",
     "StreamKind",
     "StreamProfile",
@@ -999,7 +1191,6 @@ __all__ = [
     "ood_scale_shape",
     "plan_episode",
     "realize_episode",
-    "render_seed_state",
     "rule_pools",
     "stable_hash64",
     "stream",
