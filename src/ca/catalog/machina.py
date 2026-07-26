@@ -869,8 +869,8 @@ def turing_machine(
         count=None,
         label="Turing tape",
     )
-    if len(values) < 3:
-        raise ValueError("Turing tape needs at least three cells")
+    if not values:
+        raise ValueError("Turing tape cannot be empty")
     if type(head) is not int:
         raise TypeError("Turing head position must be an integer")
     if head < 0 or head >= len(values):

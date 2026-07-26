@@ -518,6 +518,41 @@ def test_turing_reflective_aliases_commit_one_normalized_destination() -> None:
     )
 
 
+def test_one_cell_turing_carriers_preserve_global_boundary_semantics() -> None:
+    arguments = dict(
+        tape=(0,),
+        head=0,
+        initial_state="q0",
+        states=("q0", "q1"),
+        symbols=1,
+        transitions=((("q0", 0), ("q1", 0, 1)),),
+    )
+    periodic = machina.turing_machine(
+        **arguments,
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+    )
+    reflective = machina.turing_machine(
+        **arguments,
+        boundary=loci.Boundary(loci.BoundaryPolicy.REFLECTIVE),
+    )
+    finite = machina.turing_machine(**arguments)
+
+    expected = (alphabets.tag_value("head:q1", 0),)
+    assert _values(_successor(periodic)) == expected
+    assert _values(_successor(reflective)) == expected
+    _assert_terminal(finite)
+
+    with pytest.raises(ValueError, match="cannot be empty"):
+        machina.turing_machine(
+            tape=(),
+            head=0,
+            initial_state="q0",
+            states=("q0",),
+            symbols=1,
+            transitions=(),
+        )
+
+
 def test_extended_mobile_adapter_warns_and_delegates_losslessly() -> None:
     arguments = dict(
         initial=(0, 0, 1, 0, 0),
