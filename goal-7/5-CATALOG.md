@@ -24,8 +24,8 @@ Status: **COMPLETE — EXACT CATALOG, MIGRATION, AND HOSTILE GATES CLOSED**
 - Every public callable is explicit, keyword-only, annotated, nonvariadic, and
   free of `Any`.
 - All thirteen G7-04-owned skips are removed. The focused catalog/conformance
-  slice reports `338 passed`; the complete active suite reports
-  `975 passed` with no skips.
+  slice reports `348 passed`; the complete active suite reports
+  `985 passed` with no skips.
 - Goal 2, Goal 5, and Goal 6 remain frozen. G7-05 has not started.
 
 ## Updated Assumptions
@@ -211,6 +211,8 @@ active positions, a total table over every symbol triple, unique destination
 offsets in `{-1, 0, 1}`, a recognized conflict policy, and a periodic carrier.
 Grid shapes have positive extents and shape-product initial size. Arbitrary
 offsets are nonempty, unique, rank-correct, and include the source offset.
+`BoundaryPolicy.NONE` is rejected whenever a finite stencil contains a
+nonzero offset; a zero-only declared lattice remains valid.
 Piecewise maps require at least one positive-modulus/in-range-residue branch
 and an explicit fallback. Digit reversal accepts a nonnegative integer and
 `base >= 2`. Continuous CA values and any fixed exterior are exact
@@ -391,7 +393,8 @@ symbol, while the neighbor-updating form commits the complete three-cell block
 atomically.
 
 Turing states are unique nonempty strings, the initial state is declared,
-symbol counts are positive, tapes are palette-valid, and heads are in bounds.
+symbol counts are positive, one-dimensional tapes are nonempty, all tapes are
+palette-valid, and heads are in bounds.
 Transition tables may be partial: a missing transition produces an explicit
 terminal no-successor result. One-dimensional movement is `-1/+1`; 2D movement
 is one cardinal unit offset. The 2D shape has two positive extents and
@@ -553,13 +556,18 @@ to the target, and is available only as
   `105 qualified / 104 flat / 111 catalog __all__ / 12 root`.
 - Every alias has the delegate's exact signature. K has the exact
   neighbor-updating signature and expansion.
-- Hostile review found and closed four real defects:
+- Hostile review found and closed seven real defect classes:
   - preset-specific witness/provenance strings leaked invocation identity;
   - rational recurrences silently coerced an explicit integer zero bias;
-  - missing Turing transitions returned an unchanged successor rather than a
-    typed terminal result; and
+  - Turing terminal handling first returned an unchanged successor for a
+    missing transition, then mislabeled other inapplicable cases as missing;
   - anchored movement could reject at Frontier before Rule-owned boundary
-    semantics ran.
+    semantics ran;
+  - zero-active generalized mobile state returned an identity successor;
+  - nonzero finite CA stencils accepted absent boundaries that could not
+    produce a total readable view; and
+  - the global one-dimensional Turing compiler retained an obsolete
+    three-cell minimum from the anchored implementation.
 - The repaired source uses mechanics-level evidence, omission-derived exact
   recurrence zero, global finite Turing clause tables with terminal fallback,
   periodic anchored mobile carriers, and explicit normalized Turing
@@ -570,13 +578,13 @@ to the target, and is available only as
 - Focused catalog/conformance verification:
 
   ```text
-  338 passed in 15.77s
+  348 passed in 15.81s
   ```
 
 - Complete active verification:
 
   ```text
-  975 passed
+  985 passed
   ```
 
 - Static reconciliation proves `60 / 2 / 45 / 105`, all 105 explicit

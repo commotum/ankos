@@ -147,13 +147,15 @@ conflict, and reconcile the plan before changing runtime behavior.
   byte-identical canonical payloads. Canonical serialization contains no
   catalog/SPF/F/T identity or invocation receipt.
 - Hostile closure repaired constructor-spelling leakage, an implicit
-  integer-to-rational recurrence bias, missing-transition Turing quiescence,
-  and movement-boundary preemption. Missing Turing transitions and outward
-  fixed-boundary moves are typed terminal results; anchored mobile presets use
-  an explicitly periodic carrier and normalize edge destinations.
+  integer-to-rational recurrence bias, false identity successors at Turing and
+  zero-active mobile termination, movement-boundary preemption, absent
+  finite-stencil reads, and a stale one-dimensional Turing tape restriction.
+  Missing or inapplicable Turing transitions and outward fixed-boundary moves
+  are typed terminal results; anchored mobile presets use an explicitly
+  periodic carrier and normalize edge destinations.
 - CT11, the catalog unit surface, the constructor/metadata family joins, and
   the F010/F042 role boundary are active. The focused catalog/conformance slice
-  reports `338 passed`; the complete active suite reports `975 passed` with no
+  reports `348 passed`; the complete active suite reports `985 passed` with no
   skips.
 - G7-04 is complete. G7-05 is the first incomplete stage; no G7-05
   implementation has started.
