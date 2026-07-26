@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-02 REOPENED MECHANICS**
+Status: **IN PROGRESS — G7-03 REOPENED CODECS**
 
 ## Big-Picture Objective
 
@@ -94,9 +94,9 @@ conflict, and reconcile the plan before changing runtime behavior.
   consumers of ordinary programs and explicit rollout views.
 - Source and lock metadata are at `0.2.0`, NumPy is a runtime dependency, and
   pytest is development-only. This is an internal checkpoint, not a release.
-- G7-02 is complete. It began from clean commit `130b230` with
+- G7-02's original closure began from clean commit `130b230` with
   `225 passed, 36 skipped` and closed at `356 passed, 26 skipped`; no
-  G7-02-owned skip remains.
+  originally scoped G7-02 skip remained.
 - All SPF001–SPF060 rows now have direct ordinary five-field mechanics.
   PX01–PX12 and all eight required secondary joins execute through the one
   family-blind application law.
@@ -106,13 +106,15 @@ conflict, and reconcile the plan before changing runtime behavior.
   multistep, reconstruction, basis, predictor, and involution mechanics are
   asserted without answer sidecars. The correction is recorded in
   [`3-MECHANICS.md`](3-MECHANICS.md); it required no production API change.
-- G7-03 is complete. It started from clean commit `d71626f`; its durable
+- G7-03's original closure started from clean commit `d71626f`; its durable
   implementation, hostile-review repairs, and exact evidence are in
-  [`4-CODECS.md`](4-CODECS.md).
-- `ca.serialization` is one catalog-free, fail-closed canonical v1 codec with
-  178 explicit stable tags and 387 executable inventory representatives.
-  CT09 covers all 137 record representatives and 250 enum members. Unknown,
-  legacy, and unavailable migration paths reject.
+  [`4-CODECS.md`](4-CODECS.md). The later preset-mechanics delta has reopened
+  its exhaustive coverage contract.
+- `ca.serialization` remains one catalog-free, fail-closed canonical v1
+  codec. Its live explicit registry now contains 187 owner types and 441
+  variants: 141 frozen-record representatives and 300 enum members. Unknown,
+  legacy, and unavailable migration paths reject. G7-03 must still audit the
+  new forms exhaustively before reclosure.
 - CT10 proves the eight exact PX10 representation relations over both points
   of each declared domain. For each relation, it compares complete results
   through one fixed native/represented conjugate pair shared across that
@@ -162,13 +164,25 @@ conflict, and reconcile the plan before changing runtime behavior.
   T31–T33, but using them for source-facing T02–T05, T09–T12, T21–T25,
   T34–T44, substitution, recurrence, and transduction rows would change
   their audited argument domains into false aliases.
-- G7-02 and G7-03 are therefore reopened in dependency order. The reopened
-  mechanics work is limited to reusable closed component operations:
-  tagged/control state, computed structural access, ordered variable-value
-  transforms, matching and reconstruction, rank-generic incidence, exact
-  positional arithmetic, and proof-bearing named-source obligations. It may
-  not add a sixth field, catalog dispatch, callbacks, or a parallel compiler
-  package.
+- The bounded reopened G7-02 work is complete and recorded in
+  [`3-MECHANICS.md`](3-MECHANICS.md). Composite structural values,
+  rank-generic grids, exact arithmetic, sequence comprehensions,
+  value-relative read/write regions, an anchored clause kernel, exact
+  word/tree pattern rewriting, and rank-N mosaic substitution close the 31
+  already-ready plus 9 formerly missing preset domains without a sixth field
+  or catalog compiler.
+- Public application evidence includes mobile motion, a distributed
+  rank-two Turing transition, ordered and nonoverlapping word/tree rewrites,
+  typed no-match versus identity-match behavior, nontrivial two-dimensional
+  tile assembly, and rank-four periodic/fixed contextual mosaics. Hostile
+  direct/wire tests reject impossible anchored views, and arithmetic faults
+  reject through the typed Rule/application boundary.
+- The active suite now reports `804 passed, 11 skipped`. The eleven skips are
+  exactly the five CT11 catalog-expansion tests, five catalog unit tests, and
+  the F010/F042 callable-free role test; all remain G7-04-owned.
+- G7-02 is reclosed. G7-03 is the first incomplete stage: it must consume the
+  441-row inventory, add representative and mutation coverage for every new
+  sealed form, and rerun the hostile codec gate. G7-04 remains paused.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -319,8 +333,8 @@ stage file and may evolve with the implementation.
 |---|---|---|---|
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
-| `3-MECHANICS` | G7-02 | Reopened | All 60 rows and promised preset domains supported by reusable mechanics |
-| `4-CODECS` | G7-03 | Reopened Pending | Canonical serialization and representation proofs |
+| `3-MECHANICS` | G7-02 | Complete | All 60 rows and promised preset domains supported by reusable mechanics |
+| `4-CODECS` | G7-03 | Reopened | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Paused | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
@@ -439,11 +453,12 @@ law, and migrated downstream consumers.
 
 Handoff stage: **G7-02 — Reusable mechanics closure**
 
-Stage status: **Complete.** The implementation, 60-family matrix, codec
-inventory, hostile-review repairs, and exact verification evidence are
-recorded in [`3-MECHANICS.md`](3-MECHANICS.md). G7-03 later reopened only
-the PX10 evidence boundary, repaired it without a production API change, and
-reclosed the stage in that same record.
+Stage status: **Complete after two dependency reclosures.** The
+implementation, 60-family matrix, preset-domain mechanics, codec inventory,
+hostile-review repairs, and exact verification evidence are recorded in
+[`3-MECHANICS.md`](3-MECHANICS.md). G7-03 first repaired the PX10 evidence
+boundary; G7-04 later exposed and drove closure of the missing reusable preset
+operations. Neither reclosure added a semantic-family runtime path.
 
 #### Big Picture Objective
 
@@ -488,10 +503,12 @@ adding family-specific runtime types or behavior to `program.py`.
 
 Handoff stage: **G7-03 — Canonical serialization and representation relations**
 
-Stage status: **Complete.** The closed registry, canonical codec, typed
-failure boundary, CT09 schema coverage, CT10 representation proofs,
-reopened-mechanics correction, hostile review, and exact verification evidence
-are recorded in [`4-CODECS.md`](4-CODECS.md).
+Stage status: **Reopened.** The original closed registry, canonical codec,
+typed failure boundary, CT09 schema coverage, CT10 representation proofs,
+hostile review, and exact verification evidence are recorded in
+[`4-CODECS.md`](4-CODECS.md). G7-02's preset-domain mechanics added sealed
+forms and expanded records that now require the same exhaustive round-trip,
+malformed-wire, and hostile fail-closed treatment.
 
 #### Big Picture Objective
 

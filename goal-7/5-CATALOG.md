@@ -9,9 +9,10 @@
 - At entry, all thirteen skips were owned by this stage: five CT11 tests, five
   catalog unit tests, two constructor/metadata family joins, and one
   F010/F042 role test.
-- G7-00 through G7-03 are complete. Exactly five stored program fields, one
-  family-blind `apply`, reusable mechanics for all sixty audited families,
-  and the closed catalog-free codec are authoritative prerequisites.
+- At stage entry, G7-00 through G7-03 were complete. Exactly five stored
+  program fields, one family-blind `apply`, reusable mechanics for all sixty
+  audited families, and the closed catalog-free codec were authoritative
+  prerequisites.
 - All sixty canonical exact-slug constructors are now explicit typed
   five-component assembly functions, all four true aliases delegate exactly,
   and `eca` is a concrete closed preset. The remaining 39 presets and sole
@@ -25,6 +26,9 @@
 - Both family constructor/metadata joins are active. The current focused
   catalog/public/family slice reports `181 passed`; the complete active suite
   reports `522 passed, 11 skipped`.
+- The later preset audit reopened dependencies. G7-02 has since reclosed its
+  reusable preset mechanics at `804 passed, 11 skipped`; G7-03 is now the
+  first incomplete stage, and G7-04 remains paused until codecs reclose.
 
 ## Updated Assumptions
 
@@ -348,6 +352,7 @@ manifest/helper when that keeps the expected ledger independent.
   active suite. `git diff --check` is clean and the worktree is clean at
   `db48ebd`.
 - The detailed preset audit establishes the hybrid source-facing versus
-  validated-refinement contract above. G7-02 and G7-03 are reopened in
-  dependency order; G7-04 remains paused with no fake preset or guessed
-  adapter exposed.
+  validated-refinement contract above. Its bounded mechanics dependency is
+  now reclosed in G7-02; G7-03 remains reopened for exhaustive codec
+  reconciliation. G7-04 stays paused with no fake preset or guessed adapter
+  exposed until that dependency re-closes.

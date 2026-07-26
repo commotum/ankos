@@ -378,3 +378,122 @@ G7-02 is reopened with the following bounded plan:
 `program.apply` remains family-blind. No new top-level module, executor,
 runtime family tag, callback, opaque recipe bag, or sixth program field is
 authorized. G7-03 remains reopened-pending until this mechanics delta closes.
+
+### G7-04 dependency reclosure
+
+The bounded preset audit was completed without introducing a catalog compiler
+or changing the five-field application law. Its exact last nine unresolved
+source-facing domains were the five mobile/Turing constructions, two
+one-dimensional/tree rewrite constructions, and two ranked mosaic
+substitution constructions. They now compose from generic component
+mechanics:
+
+- Alphabet admits recursive closed records, words, maps, symbolic
+  expressions, canonical rank-N dense fields, and a sealed match/template
+  pattern convention. Finite symbolic alphabets remain distinct from the new
+  recursive symbolic-expression schema.
+- Loci, configurations, Seeds, relative regions, and grid reads are
+  rank-generic. Rational intervals, semantic map keys, dynamic integer widths,
+  and exact record/sequence/numeric expression operations cover the remaining
+  recurrence, tag, digit, continuous-map, and transduction domains.
+- Rule's comprehension algebra provides immutable bound value/index terms,
+  map/filter/flat-map operations, and fixed/periodic/reflective sliding
+  windows. It is ordinary closed AST interpretation, not a stored callback.
+- A value predicate and `ValueAnchor` select source identities from visible
+  configuration values. `frontiers.value_relative` resolves and deduplicates
+  the complete possible-write envelope; `neighborhoods.value_relative`
+  preserves one ordered read group per source. Periodic and reflective
+  aliases resolve to the actual existing locus identity.
+- `anchored_clause_kernel` applies one ordered closed clause relation per
+  source group, resolves sparse `capability_group_item(channel, item)`
+  proposals back into the writable envelope, reduces overlaps under the
+  explicit `REQUIRE_EQUAL`, `FIRST`, or `LAST` policy, forms exact Cartesian
+  alternatives and product masses, and emits one total atomic disposition.
+  Public tests cover multiple sources, overlaps, periodic aliases, zero
+  sources, a mobile move, and a distributed rank-two Turing transition.
+- `pattern_rewrite` implements ordered exact word and positional-symbolic-tree
+  matching, repeated bindings, reconstruction, rule/location priority, and
+  maximal nonoverlapping preorder selection. Its result retains `matched`,
+  the reconstructed value, and exact match path/span/rule/binding evidence.
+  Clause-kernel composition proves that no match can become a typed terminal
+  result while an identity match remains a genuine derivation.
+- `mosaic_substitute` performs independent or contextual rank-N substitution
+  over canonical dense fields. Production tiles must share source rank, axes,
+  and one positive tile shape; contextual keys preserve declared offset order
+  and use explicit fixed, periodic, or reflective boundaries. Product
+  coordinate assembly, rather than parent-major flattening, is proven by a
+  nontrivial `2×2 -> 4×4` case and rank-four periodic/fixed cases.
+
+Hostile review also closed three fail-closed defects discovered during this
+work. Anchored `ReadDependency` and `ReadableView` records now reject
+impossible descriptor, join, group-key, and anchor combinations even when
+they arrive through a correctly redigested wire payload. Rule arithmetic
+faults such as exact division by zero and digit-width overflow become typed
+`EVALUATION_FAILURE`/`ApplicationRejected` results rather than escaping as
+Python exceptions. The generic join accepts an empty anchored read/write pair
+only when both resolved sides are coherently empty.
+
+No preset, SPF/F/T identity, semantic family, catalog spelling, callback,
+solver, integrator, ambient draw, or recursive application entered these
+mechanics. The 31 preset domains that were already composable remain so, and
+the exact nine construction-bearing gaps now have public generic evidence.
+This establishes mechanics sufficiency; it does not implement or expose the
+paused preset callables.
+
+The sealed surface grew to 187 registered owner types and 441 variants:
+300 enum members and 141 frozen-record representatives. The inventory has 441
+data rows. These registrations keep the live tree importable and
+round-trippable, but G7-03 remains reopened so its exhaustive codec,
+malformed-wire, and hostile-byte completion contract can judge the entire
+delta independently.
+
+The reclosed mechanics tree passed:
+
+```text
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/test_pattern_rewrite.py \
+  tests/test_mosaic_substitution.py \
+  tests/test_anchored_rule_kernel.py \
+  tests/test_rule_comprehensions.py \
+  tests/test_rule_composite_expressions.py \
+  tests/test_reopened_mechanics_apply.py \
+  tests/test_value_anchored_regions.py \
+  tests/test_structural_values.py \
+  tests/test_rank_interval_dynamic_width.py \
+  tests/test_composite_values.py
+-> 256 passed
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/conformance/test_codec_inventory.py \
+  tests/test_serialization.py \
+  tests/conformance/test_serialization_contract.py
+-> 64 passed
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
+  tests/conformance/test_family_coverage.py \
+  tests/conformance/test_native_generic_equivalence.py \
+  tests/conformance/test_representation_commutation.py
+-> 109 passed
+
+UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
+-> 804 passed, 11 skipped
+
+UV_CACHE_DIR=/tmp/uv-cache uv run python -m compileall -q src/ca tests
+-> pass
+
+git diff --check
+-> pass
+```
+
+The eleven retained skips are exactly five G7-04 catalog-expansion tests, five
+G7-04 catalog unit tests, and the G7-04 callable-free F010/F042 role test.
+Static inspection finds exactly five `SimpleProgram` fields, exactly one
+production `apply` definition, rollout calling that operation, no forbidden
+core dependency or semantic-family dispatch, and no change to Goal 2, Goal 5,
+or Goal 6.
+
+G7-02 is reclosed. The first next action is the reopened G7-03 codec audit:
+consume the 441-row inventory, add real representatives for every new sealed
+record and enum member, round-trip the new expression forms and expanded
+programs, exercise malformed mutations, and rerun the hostile fail-closed
+gate. G7-04 remains paused until that stage re-closes.
