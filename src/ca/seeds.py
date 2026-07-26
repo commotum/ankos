@@ -170,6 +170,7 @@ class Construction:
                 if (
                     type(shape) is not tuple
                     or not shape
+                    or not 1 <= len(shape) <= 3
                     or any(type(size) is not int or size <= 0 for size in shape)
                     or type(values) is not tuple
                     or any(not _is_exact_seed_value(value) for value in values)
@@ -185,6 +186,49 @@ class Construction:
                 ):
                     raise SeedValidationError(
                         "GRID construction contains malformed closed fields"
+                    )
+                cell_count = 1
+                for size in shape:
+                    cell_count *= size
+                if len(values) != cell_count:
+                    raise SeedValidationError(
+                        "GRID construction values do not fill its declared shape"
+                    )
+                field_names = tuple(name for name, _ in boundary_fields)
+                if len(field_names) != len(set(field_names)):
+                    raise SeedValidationError(
+                        "GRID boundary fields must have unique names"
+                    )
+                fields = dict(boundary_fields)
+                if set(fields) not in ({"policy"}, {"policy", "exterior"}):
+                    raise SeedValidationError(
+                        "GRID boundary fields must contain policy and optional exterior"
+                    )
+                policy_value = fields["policy"]
+                if type(policy_value) is not str:
+                    raise SeedValidationError(
+                        "GRID boundary policy must be its closed string value"
+                    )
+                try:
+                    policy = loci.BoundaryPolicy(policy_value)
+                except ValueError as error:
+                    raise SeedValidationError(
+                        "GRID boundary policy is not recognized"
+                    ) from error
+                has_exterior = "exterior" in fields
+                if (
+                    policy is loci.BoundaryPolicy.FIXED
+                    and not has_exterior
+                ):
+                    raise SeedValidationError(
+                        "a fixed GRID boundary requires an exterior value"
+                    )
+                if (
+                    policy is not loci.BoundaryPolicy.FIXED
+                    and has_exterior
+                ):
+                    raise SeedValidationError(
+                        "only a fixed GRID boundary carries an exterior value"
                     )
 
 
@@ -495,6 +539,7 @@ class SeedDenotation(Generic[C]):
         _validate_source(self.source)
         if type(self.output_contract) is not SeedOutputContract:
             raise TypeError("seed denotation output contract is not recognized")
+        _validate_source_output(self.source, self.output_contract)
 
     @property
     def exact_configuration(self) -> C:
@@ -519,6 +564,7 @@ class Seed(Generic[C]):
         _validate_source(self.source)
         if type(self.output_contract) is not SeedOutputContract:
             raise TypeError("Seed output contract is not recognized")
+        _validate_source_output(self.source, self.output_contract)
         if isinstance(self.source, (ExactSource, PartialSource)):
             configuration = self.source.configuration
             if type(configuration) not in (
@@ -616,6 +662,207 @@ def _validate_source(source: SeedSource[C]) -> None:
             _validate_source(seed.source)
     if isinstance(source, RefinedSource):
         _validate_source(source.source.source)
+
+
+def _carrier_size(contract: loci.CarrierContract) -> int | None:
+    if contract.shape is None:
+        return None
+    size = 1
+    for extent in contract.shape:
+        size *= extent
+    return size
+
+
+def _construction_kind_for_contract(
+    contract: loci.CarrierContract,
+) -> ConstructionOp | None:
+    if contract.kind is loci.CarrierKind.HISTORY:
+        return ConstructionOp.SEQUENCE
+    if contract.kind is loci.CarrierKind.RECORD:
+        return ConstructionOp.RECORD
+    if contract.kind is loci.CarrierKind.GRID:
+        return ConstructionOp.GRID
+    return None
+
+
+def _validate_construction_output(
+    construction: Construction,
+    contract: loci.CarrierContract,
+    *,
+    law_supplied: bool,
+) -> None:
+    """Prove a closed construction can produce the declared carrier."""
+
+    operation = construction.operation
+    arguments = construction.arguments
+    if law_supplied:
+        if arguments:
+            raise SeedValidationError(
+                "a law-supplied construction cannot also contain output values"
+            )
+        expected = _construction_kind_for_contract(contract)
+        if expected is None or operation is not expected:
+            raise SeedValidationError(
+                "law construction does not match its output carrier"
+            )
+        return
+
+    if operation in (
+        ConstructionOp.SEQUENCE,
+        ConstructionOp.RECORD,
+        ConstructionOp.GRID,
+    ) and not arguments:
+        raise SeedValidationError(
+            "a constructive source cannot omit construction values"
+        )
+
+    if operation is ConstructionOp.SEQUENCE:
+        if contract.kind is not loci.CarrierKind.HISTORY:
+            raise SeedValidationError(
+                "SEQUENCE construction requires a history carrier"
+            )
+        values = arguments[0]
+        if contract.shape is not None and contract.shape != (len(values),):
+            raise SeedValidationError(
+                "SEQUENCE values disagree with the declared history carrier"
+            )
+        return
+
+    if operation is ConstructionOp.RECORD:
+        if contract.kind is not loci.CarrierKind.RECORD:
+            raise SeedValidationError(
+                "RECORD construction requires a record carrier"
+            )
+        return
+
+    if operation is ConstructionOp.GRID:
+        if contract.kind is not loci.CarrierKind.GRID:
+            raise SeedValidationError("GRID construction requires a grid carrier")
+        shape = arguments[0]
+        if contract.rank is not None and contract.rank != len(shape):
+            raise SeedValidationError(
+                "GRID rank disagrees with the declared grid carrier"
+            )
+        if contract.shape is not None and contract.shape != shape:
+            raise SeedValidationError(
+                "GRID shape disagrees with the declared grid carrier"
+            )
+        if contract.axes and len(contract.axes) != len(shape):
+            raise SeedValidationError(
+                "GRID axes disagree with the declared grid carrier"
+            )
+        return
+
+    if operation is ConstructionOp.FILL:
+        if contract.kind not in (
+            loci.CarrierKind.HISTORY,
+            loci.CarrierKind.GRID,
+        ) or contract.shape is None:
+            raise SeedValidationError(
+                "FILL requires a concrete history or grid carrier"
+            )
+        return
+
+    if operation is ConstructionOp.POINT:
+        if contract.kind is loci.CarrierKind.INTENSIONAL:
+            raise SeedValidationError(
+                "POINT cannot realize an intensional carrier"
+            )
+        target = arguments[0]
+        if contract.kind is loci.CarrierKind.HISTORY and contract.shape is not None:
+            expected = (
+                loci.occurrence("history", 0),
+            )
+            if contract.shape != (1,) or target not in expected:
+                raise SeedValidationError(
+                    "POINT does not equal the declared history carrier"
+                )
+        if contract.kind is loci.CarrierKind.GRID and contract.shape is not None:
+            expected = loci.grid_loci(
+                contract.shape,
+                axes=contract.axes or None,
+            )
+            if len(expected) != 1 or target not in expected:
+                raise SeedValidationError(
+                    "POINT does not equal the declared grid carrier"
+                )
+        return
+
+    if operation is ConstructionOp.EMPTY:
+        if contract.kind is loci.CarrierKind.INTENSIONAL:
+            raise SeedValidationError(
+                "EMPTY cannot realize an intensional carrier"
+            )
+        if (
+            contract.kind in (
+                loci.CarrierKind.HISTORY,
+                loci.CarrierKind.GRID,
+            )
+            and contract.shape is not None
+        ):
+            raise SeedValidationError(
+                "EMPTY cannot satisfy a nonempty concrete carrier"
+            )
+        return
+
+    raise SeedValidationError("construction operation is not realizable")
+
+
+def _validate_uniform_tuple_output(
+    law: UniformTupleLaw,
+    construction: Construction | None,
+    contract: loci.CarrierContract,
+) -> None:
+    expected = _construction_kind_for_contract(contract)
+    if expected is None:
+        raise SeedValidationError(
+            "uniform tuple laws require record, history, or grid carriers"
+        )
+    if construction is not None:
+        _validate_construction_output(
+            construction,
+            contract,
+            law_supplied=True,
+        )
+    if contract.kind is loci.CarrierKind.HISTORY:
+        if contract.shape is not None and contract.shape != (law.length,):
+            raise SeedValidationError(
+                "uniform tuple length disagrees with its history carrier"
+            )
+    elif contract.kind is loci.CarrierKind.GRID:
+        size = _carrier_size(contract)
+        if size is None:
+            raise SeedValidationError(
+                "uniform tuple grid laws require a concrete shape"
+            )
+        if not 1 <= len(contract.shape) <= 3 or size != law.length:
+            raise SeedValidationError(
+                "uniform tuple length disagrees with its grid carrier"
+            )
+
+
+def _validate_source_output(
+    source: SeedSource[C],
+    output_contract: SeedOutputContract,
+) -> None:
+    contract = output_contract.configuration_contract
+    if isinstance(source, ConstructiveSource):
+        _validate_construction_output(
+            source.construction,
+            contract,
+            law_supplied=False,
+        )
+    elif isinstance(source, LawSource):
+        if isinstance(source.law, UniformTupleLaw):
+            _validate_uniform_tuple_output(
+                source.law,
+                source.construction,
+                contract,
+            )
+        elif source.construction is not None:
+            raise SeedValidationError(
+                "only a uniform tuple law accepts a law-supplied construction"
+            )
 
 
 def _has_probability_law(source: SeedSource[C]) -> bool:

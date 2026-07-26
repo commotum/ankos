@@ -159,6 +159,82 @@ def _require_compatible_five_fields(
     )
 
 
+def _integer_intervals(
+    descriptor: alphabets.AlphabetDescriptor,
+    upper: int,
+) -> tuple[tuple[int, int], ...]:
+    """Describe accepted integer intervals within ``[0, upper]`` structurally."""
+
+    kind = descriptor.kind
+    intervals: list[tuple[int, int]] = []
+    if kind in (
+        alphabets.AlphabetKind.ENUM,
+        alphabets.AlphabetKind.ORDERED,
+        alphabets.AlphabetKind.SYMBOLIC,
+    ):
+        points = sorted(
+            {
+                value
+                for value in descriptor.values
+                if type(value) is int and 0 <= value <= upper
+            }
+        )
+        for point in points:
+            if intervals and point == intervals[-1][1] + 1:
+                intervals[-1] = (intervals[-1][0], point)
+            else:
+                intervals.append((point, point))
+    elif kind in (
+        alphabets.AlphabetKind.NATURALS,
+        alphabets.AlphabetKind.RATIONALS,
+    ):
+        intervals.append((0, upper))
+    elif kind is alphabets.AlphabetKind.INTEGERS:
+        parameters = dict(descriptor.scalars)
+        minimum = cast(int | None, parameters.get("minimum"))
+        maximum = cast(int | None, parameters.get("maximum"))
+        low = max(0, minimum if minimum is not None else 0)
+        high = min(upper, maximum if maximum is not None else upper)
+        if low <= high:
+            intervals.append((low, high))
+    elif kind is alphabets.AlphabetKind.MODULAR:
+        modulus = cast(int, dict(descriptor.scalars)["modulus"])
+        high = min(upper, modulus - 1)
+        if high >= 0:
+            intervals.append((0, high))
+    elif kind is alphabets.AlphabetKind.UNION:
+        for child in descriptor.children:
+            intervals.extend(_integer_intervals(child, upper))
+    return tuple(intervals)
+
+
+def _alphabet_accepts_uniform_values(
+    alphabet: alphabets.Alphabet[object],
+    law: seeds.UniformTupleLaw,
+) -> bool:
+    """Prove the law's full value range without enumerating ``range(n)``."""
+
+    if alphabet.value_profile is alphabets.ValueProfile.BOOLEAN:
+        return (
+            law.value_count == 2
+            and alphabet.contains(False)
+            and alphabet.contains(True)
+        )
+    upper = law.value_count - 1
+    intervals = sorted(
+        _integer_intervals(alphabet.descriptor, upper),
+        key=lambda interval: (interval[0], interval[1]),
+    )
+    covered_through = -1
+    for low, high in intervals:
+        if low > covered_through + 1:
+            break
+        covered_through = max(covered_through, high)
+        if covered_through >= upper:
+            return True
+    return False
+
+
 def _require_seed_values_conform(
     program: SimpleProgram[C, V, W, R],
 ) -> None:
@@ -251,22 +327,13 @@ def _require_seed_values_conform(
                             "Bernoulli boundary does not conform to Alphabet"
                         ) from error
             elif isinstance(source.law, seeds.UniformTupleLaw):
-                candidates: tuple[alphabets.SemanticValue, ...] = (
-                    (False, True)
-                    if (
-                        source.law.value_count == 2
-                        and program.alphabet.value_profile
-                        is alphabets.ValueProfile.BOOLEAN
+                if not _alphabet_accepts_uniform_values(
+                    cast(alphabets.Alphabet[object], program.alphabet),
+                    source.law,
+                ):
+                    raise ProgramCompatibilityError(
+                        "uniform Seed value range does not conform to Alphabet"
                     )
-                    else tuple(range(source.law.value_count))
-                )
-                for value in candidates:
-                    try:
-                        program.alphabet.require(value)
-                    except ValueError as error:
-                        raise ProgramCompatibilityError(
-                            "uniform Seed value does not conform to Alphabet"
-                        ) from error
             if source.construction is not None:
                 require_construction(source.construction)
         elif isinstance(
@@ -709,35 +776,7 @@ class ApplicationComplete(Generic[C]):
             raise TypeError("application measure view is not recognized")
         if type(self.evidence) is not ApplicationEvidence:
             raise TypeError("application evidence is not recognized")
-        if (
-            self.applied_atoms.presentation
-            is rules.SupportPresentation.FINITE
-        ):
-            derivations = tuple(
-                item
-                for item in self.applied_atoms.atoms
-                if type(item) is AppliedDerivation
-            )
-            no_successors = tuple(
-                item
-                for item in self.applied_atoms.atoms
-                if type(item) is AppliedNoSuccessor
-            )
-            if len(derivations) + len(no_successors) != len(
-                self.applied_atoms.atoms
-            ):
-                raise TypeError("application support contains an unknown atom")
-            if rules.cardinality_size(self.derivation_cardinality) != len(
-                derivations
-            ):
-                raise ValueError("derivation cardinality disagrees with applied atoms")
-            if tuple(
-                item.canonical_identity for item in no_successors
-            ) != tuple(
-                item.canonical_identity
-                for item in self.no_successor_partition.atoms
-            ):
-                raise ValueError("no-successor partition disagrees with applied atoms")
+        _validate_complete_application(self)
 
 
 @dataclass(frozen=True)
@@ -1078,41 +1117,7 @@ def _finite_measures(
         absent = MeasureAbsent()
         return absent, absent, absent
     if law.presentation is not rules.ProbabilityPresentation.FINITE:
-        descriptor = law.measure or rules.literal_expr("intensional-rule-law")
-        applied_measure = MeasureAvailable(
-            ProgramMeasure(
-                (),
-                None,
-                rules.RuleExpr(
-                    rules.ExpressionPrimitive.TUPLE,
-                    (
-                        rules.literal_expr("applied-measure-pushforward"),
-                        descriptor,
-                    ),
-                ),
-            )
-        )
-        no_successor = MeasureAvailable(
-            ProgramMeasure(
-                (),
-                None,
-                rules.RuleExpr(
-                    rules.ExpressionPrimitive.TUPLE,
-                    (
-                        rules.literal_expr("no-successor-measure-restriction"),
-                        descriptor,
-                    ),
-                ),
-            )
-        )
-        successor = MeasureUnavailable(
-            "semantic successor quotient measurability is not established",
-            (
-                law.normalization_evidence.canonical_identity,
-                law.measurable_space_evidence.canonical_identity,
-            ),
-        )
-        return applied_measure, successor, no_successor
+        raise ValueError("finite measure projection needs a finite probability law")
 
     applied_masses = tuple(
         MeasureMass(
@@ -1213,15 +1218,134 @@ def _phase_certificate(
     )
 
 
+def _tagged_relation(
+    label: str,
+    *arguments: rules.RuleExpr,
+) -> rules.RuleExpr:
+    return rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (rules.literal_expr(label), *arguments),
+    )
+
+
+def _application_context(
+    evidence: ApplicationEvidence,
+) -> rules.RuleExpr:
+    """Closed invocation data needed to interpret every mapped relation."""
+
+    return _tagged_relation(
+        "application-context:v1",
+        rules.literal_expr(evidence.program_identity),
+        rules.literal_expr(evidence.canonical_rule_identity),
+        rules.literal_expr(evidence.input_configuration_identity),
+        rules.literal_expr(evidence.readable_binding_identity),
+        rules.literal_expr(evidence.writable_binding_identity),
+        rules.literal_expr(evidence.input_trace_lineage_identity),
+        rules.literal_expr(evidence.application_identity),
+    )
+
+
+def _intensional_projection_relation(
+    *,
+    phase: str,
+    source_relation: rules.RuleExpr,
+    evidence: ApplicationEvidence,
+) -> rules.RuleExpr:
+    """Describe one application-bound projection of a Rule relation.
+
+    The three projections deliberately do not share a generic wrapper.  A
+    no-successor partition filters only terminal/failure atoms, while the
+    successor quotient filters only derivations before fresh binding, commit,
+    validation, lineage extension, and semantic quotienting.
+    """
+
+    context = _application_context(evidence)
+    source = _tagged_relation("source-rule-relation", source_relation)
+    source_conformance = _tagged_relation(
+        "map:source-conformance",
+        rules.literal_expr(evidence.input_configuration_identity),
+        rules.literal_expr(evidence.readable_binding_identity),
+        rules.literal_expr(evidence.writable_binding_identity),
+    )
+    fresh_binding = _tagged_relation(
+        "map:fresh-bindings-by-source-witness",
+        rules.literal_expr(evidence.input_configuration_identity),
+        rules.literal_expr(evidence.canonical_rule_identity),
+        rules.literal_expr(evidence.writable_binding_identity),
+    )
+    commit = _tagged_relation(
+        "map:atomic-commit-and-successor-validation",
+        rules.literal_expr(evidence.input_configuration_identity),
+        rules.literal_expr(evidence.writable_binding_identity),
+    )
+    lineage = _tagged_relation(
+        "map:extend-trace-lineage",
+        rules.literal_expr(evidence.input_trace_lineage_identity),
+        rules.literal_expr(evidence.application_identity),
+    )
+
+    if phase == "applied-atoms":
+        pipeline = (
+            _tagged_relation("filter:all-rule-atoms", source),
+            _tagged_relation(
+                "union:typed-applied-atom-branches",
+                _tagged_relation(
+                    "branch:derivation-to-applied",
+                    _tagged_relation("filter:derivation", source),
+                    source_conformance,
+                    fresh_binding,
+                    commit,
+                    lineage,
+                    _tagged_relation("map:typed-applied-derivation"),
+                ),
+                _tagged_relation(
+                    "branch:no-successor-to-applied",
+                    _tagged_relation("filter:no-successor", source),
+                    source_conformance,
+                    lineage,
+                    _tagged_relation("map:typed-applied-no-successor"),
+                ),
+            ),
+        )
+    elif phase == "no-successor-partition":
+        pipeline = (
+            _tagged_relation("filter:no-successor", source),
+            source_conformance,
+            lineage,
+            _tagged_relation("map:typed-applied-no-successor"),
+        )
+    elif phase == "successor-quotient":
+        pipeline = (
+            _tagged_relation("filter:derivation", source),
+            source_conformance,
+            fresh_binding,
+            commit,
+            lineage,
+            _tagged_relation(
+                "quotient:semantic-successor-with-derivation-fibers"
+            ),
+        )
+    else:
+        raise ValueError(f"unknown intensional application projection {phase!r}")
+
+    return _tagged_relation(
+        f"application-projection:{phase}:v1",
+        context,
+        *pipeline,
+    )
+
+
 def _mapped_intensional_support(
     *,
     phase: str,
-    relation: rules.RuleExpr,
+    source_relation: rules.RuleExpr,
     cardinality: rules.Cardinality,
+    evidence: ApplicationEvidence,
 ) -> rules.SupportSpace[object]:
-    mapped_relation = rules.RuleExpr(
-        rules.ExpressionPrimitive.TUPLE,
-        (rules.literal_expr(f"application-map:{phase}"), relation),
+    mapped_relation = _intensional_projection_relation(
+        phase=phase,
+        source_relation=source_relation,
+        evidence=evidence,
     )
     return rules.intensional_support(
         mapped_relation,
@@ -1239,6 +1363,367 @@ def _mapped_intensional_support(
     )
 
 
+def _projection_cardinality(
+    *,
+    phase: str,
+    source_relation: rules.RuleExpr,
+    evidence: ApplicationEvidence,
+) -> rules.Undetermined:
+    obligation = _tagged_relation(
+        f"application-cardinality:{phase}:v1",
+        _application_context(evidence),
+        _tagged_relation("source-rule-relation", source_relation),
+    )
+    return rules.Undetermined(
+        obligation,
+        rules.Certificate(
+            rules.CertificateKind.CARDINALITY,
+            obligation,
+        ),
+    )
+
+
+def _expected_intensional_spaces(
+    source_support: rules.SupportSpace[object],
+    evidence: ApplicationEvidence,
+) -> tuple[
+    rules.SupportSpace[object],
+    rules.SupportSpace[object],
+    rules.Cardinality,
+    rules.Cardinality,
+    rules.SupportSpace[object],
+]:
+    if source_support.presentation is not rules.SupportPresentation.INTENSIONAL:
+        raise ValueError("intensional application needs intensional source support")
+    source_relation = cast(rules.RuleExpr, source_support.relation)
+    derivation_cardinality = _projection_cardinality(
+        phase="derivation",
+        source_relation=source_relation,
+        evidence=evidence,
+    )
+    no_successor_cardinality = _projection_cardinality(
+        phase="no-successor",
+        source_relation=source_relation,
+        evidence=evidence,
+    )
+    successor_cardinality = _projection_cardinality(
+        phase="successor-quotient",
+        source_relation=source_relation,
+        evidence=evidence,
+    )
+    applied = _mapped_intensional_support(
+        phase="applied-atoms",
+        source_relation=source_relation,
+        cardinality=source_support.cardinality,
+        evidence=evidence,
+    )
+    no_successor = _mapped_intensional_support(
+        phase="no-successor-partition",
+        source_relation=source_relation,
+        cardinality=no_successor_cardinality,
+        evidence=evidence,
+    )
+    successors = _mapped_intensional_support(
+        phase="successor-quotient",
+        source_relation=source_relation,
+        cardinality=successor_cardinality,
+        evidence=evidence,
+    )
+    return (
+        applied,
+        no_successor,
+        derivation_cardinality,
+        successor_cardinality,
+        successors,
+    )
+
+
+def _intensional_measures(
+    law: rules.ProbabilityLaw | None,
+    applied: rules.SupportSpace[object],
+    no_successor: rules.SupportSpace[object],
+    successors: rules.SupportSpace[object],
+    evidence: ApplicationEvidence,
+) -> tuple[MeasureView, MeasureView, MeasureView]:
+    if law is None:
+        absent = MeasureAbsent()
+        return absent, absent, absent
+    if law.presentation is not rules.ProbabilityPresentation.INTENSIONAL:
+        raise ValueError("intensional support needs an intensional probability law")
+    descriptor = cast(rules.RuleExpr, law.measure)
+    context = _application_context(evidence)
+    applied_relation = cast(rules.RuleExpr, applied.relation)
+    no_successor_relation = cast(rules.RuleExpr, no_successor.relation)
+    successor_relation = cast(rules.RuleExpr, successors.relation)
+    applied_measure = MeasureAvailable(
+        ProgramMeasure(
+            (),
+            None,
+            _tagged_relation(
+                "applied-measure-pushforward:v1",
+                context,
+                descriptor,
+                applied_relation,
+            ),
+        )
+    )
+    no_successor_measure = MeasureAvailable(
+        ProgramMeasure(
+            (),
+            None,
+            _tagged_relation(
+                "no-successor-measure-restriction:v1",
+                context,
+                descriptor,
+                no_successor_relation,
+            ),
+        )
+    )
+    successor_measure = MeasureUnavailable(
+        "semantic successor quotient measurability is not established",
+        (
+            law.normalization_evidence.canonical_identity,
+            law.measurable_space_evidence.canonical_identity,
+            evidence.application_identity,
+            successor_relation.canonical_identity,
+        ),
+    )
+    return applied_measure, successor_measure, no_successor_measure
+
+
+def _validate_finite_application(
+    result: ApplicationComplete[object],
+) -> None:
+    source_support = result.source_outcomes.support
+    finite_spaces = (
+        result.applied_atoms,
+        result.no_successor_partition,
+        result.successor_quotient_with_derivation_fibers,
+    )
+    if any(
+        space.presentation is not rules.SupportPresentation.FINITE
+        for space in finite_spaces
+    ):
+        raise ValueError(
+            "finite source outcomes require finite application projections"
+        )
+    if rules.cardinality_size(result.applied_atoms.cardinality) != len(
+        source_support.atoms
+    ):
+        raise ValueError(
+            "applied-atom cardinality disagrees with source outcomes"
+        )
+
+    source_by_identity: dict[
+        str,
+        rules.Derivation[alphabets.SemanticValue] | rules.NoSuccessor,
+    ] = {}
+    for source in source_support.atoms:
+        if type(source) not in (rules.Derivation, rules.NoSuccessor):
+            raise TypeError("source outcome support contains an unknown atom")
+        source_by_identity[source.canonical_identity] = source
+
+    applied = result.applied_atoms.atoms
+    if any(
+        type(item) not in (AppliedDerivation, AppliedNoSuccessor)
+        for item in applied
+    ):
+        raise TypeError("application support contains an unknown atom")
+    applied_source_identities = tuple(
+        item.source.canonical_identity for item in applied
+    )
+    if (
+        len(applied_source_identities) != len(set(applied_source_identities))
+        or set(applied_source_identities) != set(source_by_identity)
+    ):
+        raise ValueError(
+            "applied atoms are not a one-to-one image of source outcomes"
+        )
+
+    for item in applied:
+        expected_source = source_by_identity.get(item.source.canonical_identity)
+        if expected_source is None or item.source != expected_source:
+            raise ValueError(
+                "applied atom source does not equal its source-outcome atom"
+            )
+        if item.evidence.application_identity != result.evidence.application_identity:
+            raise ValueError(
+                "applied evidence belongs to a different application"
+            )
+        if (
+            item.input_trace_lineage.canonical_identity
+            != result.evidence.input_trace_lineage_identity
+        ):
+            raise ValueError(
+                "applied atom input lineage disagrees with application evidence"
+            )
+        if type(item) is AppliedDerivation:
+            if type(expected_source) is not rules.Derivation:
+                raise ValueError(
+                    "a source no-successor atom mapped to an applied derivation"
+                )
+            if (
+                item.evidence.disposition_identity
+                != item.source.replacement.canonical_identity
+            ):
+                raise ValueError(
+                    "applied derivation evidence names the wrong disposition"
+                )
+        else:
+            if type(expected_source) is not rules.NoSuccessor:
+                raise ValueError(
+                    "a source derivation mapped to applied no-successor"
+                )
+            if item.evidence.disposition_identity != "no-disposition":
+                raise ValueError(
+                    "applied no-successor evidence names a disposition"
+                )
+
+    derivations = tuple(
+        cast(AppliedDerivation[object], item)
+        for item in applied
+        if type(item) is AppliedDerivation
+    )
+    no_successors = tuple(
+        cast(AppliedNoSuccessor, item)
+        for item in applied
+        if type(item) is AppliedNoSuccessor
+    )
+    if rules.cardinality_size(result.derivation_cardinality) != len(
+        derivations
+    ):
+        raise ValueError(
+            "derivation cardinality disagrees with applied derivations"
+        )
+
+    expected_applied = rules.finite_support(
+        applied,
+        label="applied-atoms",
+    )
+    if result.applied_atoms != expected_applied:
+        raise ValueError("applied-atom support evidence is not canonical")
+    expected_no_successor = rules.finite_support(
+        no_successors,
+        label="no-successor-partition",
+    )
+    if result.no_successor_partition != expected_no_successor:
+        raise ValueError(
+            "no-successor partition is not the exact filtered projection"
+        )
+
+    expected_groups = _quotient(derivations)
+    expected_successors = rules.finite_support(
+        expected_groups,
+        label="successor-quotient",
+    )
+    if (
+        result.successor_quotient_with_derivation_fibers
+        != expected_successors
+    ):
+        raise ValueError(
+            "successor quotient does not exactly cover derivation fibers"
+        )
+    if rules.cardinality_size(result.successor_cardinality) != len(
+        expected_groups
+    ):
+        raise ValueError(
+            "successor cardinality disagrees with semantic quotient"
+        )
+
+    expected_measures = _finite_measures(
+        result.source_outcomes.probability_law,
+        cast(tuple[AppliedAtom[object], ...], applied),
+        expected_groups,
+    )
+    actual_measures = (
+        result.applied_atom_measure,
+        result.successor_submeasure,
+        result.no_successor_submeasure,
+    )
+    if actual_measures != expected_measures:
+        raise ValueError(
+            "finite application measures disagree with source law and projections"
+        )
+
+
+def _validate_intensional_application(
+    result: ApplicationComplete[object],
+) -> None:
+    source_support = result.source_outcomes.support
+    if source_support.presentation is not rules.SupportPresentation.INTENSIONAL:
+        raise ValueError("intensional validation received finite source support")
+    (
+        expected_applied,
+        expected_no_successor,
+        expected_derivation_cardinality,
+        expected_successor_cardinality,
+        expected_successors,
+    ) = _expected_intensional_spaces(
+        cast(rules.SupportSpace[object], source_support),
+        result.evidence,
+    )
+    if result.applied_atoms != expected_applied:
+        raise ValueError(
+            "intensional applied relation is not bound to this application"
+        )
+    if result.no_successor_partition != expected_no_successor:
+        raise ValueError(
+            "intensional no-successor relation is not its filtered projection"
+        )
+    if (
+        result.successor_quotient_with_derivation_fibers
+        != expected_successors
+    ):
+        raise ValueError(
+            "intensional successor relation is not its derivation quotient"
+        )
+    if result.outcome_atom_cardinality != source_support.cardinality:
+        raise ValueError(
+            "intensional outcome cardinality disagrees with source support"
+        )
+    if result.applied_atoms.cardinality != source_support.cardinality:
+        raise ValueError(
+            "intensional applied mapping is not cardinality-preserving"
+        )
+    if result.derivation_cardinality != expected_derivation_cardinality:
+        raise ValueError(
+            "intensional derivation cardinality is not source-filter bound"
+        )
+    if result.successor_cardinality != expected_successor_cardinality:
+        raise ValueError(
+            "intensional successor cardinality is not quotient bound"
+        )
+
+    expected_measures = _intensional_measures(
+        result.source_outcomes.probability_law,
+        expected_applied,
+        expected_no_successor,
+        expected_successors,
+        result.evidence,
+    )
+    actual_measures = (
+        result.applied_atom_measure,
+        result.successor_submeasure,
+        result.no_successor_submeasure,
+    )
+    if actual_measures != expected_measures:
+        raise ValueError(
+            "intensional measures are not bound to application projections"
+        )
+
+
+def _validate_complete_application(
+    result: ApplicationComplete[object],
+) -> None:
+    source_support = result.source_outcomes.support
+    if result.outcome_atom_cardinality != source_support.cardinality:
+        raise ValueError("outcome cardinality disagrees with source support")
+    if source_support.presentation is rules.SupportPresentation.FINITE:
+        _validate_finite_application(result)
+    else:
+        _validate_intensional_application(result)
+
+
 def _intensional_application(
     outcome_space: rules.OutcomeSpace[
         rules.Derivation[alphabets.SemanticValue] | rules.NoSuccessor
@@ -1246,50 +1731,39 @@ def _intensional_application(
     evidence: ApplicationEvidence,
 ) -> ApplicationComplete[C]:
     support = outcome_space.support
-    relation = cast(rules.RuleExpr, support.relation)
-    unknown = rules.Undetermined(
-        rules.literal_expr("application-intensional-cardinality"),
-        rules.Certificate(
-            rules.CertificateKind.CARDINALITY,
-            rules.literal_expr("application-cardinality-obligation"),
-        ),
+    (
+        untyped_applied,
+        untyped_no_successor,
+        derivation_cardinality,
+        successor_cardinality,
+        untyped_successors,
+    ) = _expected_intensional_spaces(
+        cast(rules.SupportSpace[object], support),
+        evidence,
     )
     applied_support = cast(
-        rules.SupportSpace[AppliedAtom[C]],
-        _mapped_intensional_support(
-            phase="validated-application",
-            relation=relation,
-            cardinality=support.cardinality,
-        ),
+        rules.SupportSpace[AppliedAtom[C]], untyped_applied
     )
     no_successor = cast(
-        rules.SupportSpace[AppliedNoSuccessor],
-        _mapped_intensional_support(
-            phase="no-successor-partition",
-            relation=relation,
-            cardinality=unknown,
-        ),
+        rules.SupportSpace[AppliedNoSuccessor], untyped_no_successor
     )
     successors = cast(
-        rules.SupportSpace[SuccessorGroup[C]],
-        _mapped_intensional_support(
-            phase="successor-quotient",
-            relation=relation,
-            cardinality=unknown,
-        ),
+        rules.SupportSpace[SuccessorGroup[C]], untyped_successors
     )
-    applied_measure, successor_measure, no_successor_measure = _finite_measures(
+    applied_measure, successor_measure, no_successor_measure = _intensional_measures(
         outcome_space.probability_law,
-        (),
-        (),
+        untyped_applied,
+        untyped_no_successor,
+        untyped_successors,
+        evidence,
     )
     return ApplicationComplete(
         outcome_space,
         applied_support,
         no_successor,
         support.cardinality,
-        unknown,
-        unknown,
+        derivation_cardinality,
+        successor_cardinality,
         successors,
         applied_measure,
         successor_measure,
@@ -1433,6 +1907,8 @@ def apply(
             readable_identity,
             writable_identity,
             application_identity,
+            program.rule.canonical_identity,
+            input_lineage.canonical_identity,
         )
         return _intensional_application(outcome_space, evidence)
 
@@ -1582,6 +2058,8 @@ def apply(
             readable_identity,
             writable_identity,
             application_identity,
+            program.rule.canonical_identity,
+            input_lineage.canonical_identity,
         )
     except (TypeError, ValueError) as error:
         return _rejection(
@@ -1942,6 +2420,8 @@ ReplayKey: TypeAlias = bool | int | Fraction | str
 def _configuration_from_values(
     contract: loci.CarrierContract,
     values: tuple[alphabets.SemanticValue, ...],
+    *,
+    boundary: loci.Boundary[alphabets.SemanticValue] | None = None,
 ) -> loci.FiniteConfiguration[alphabets.SemanticValue]:
     if contract.kind is loci.CarrierKind.HISTORY:
         if contract.shape is not None and contract.shape != (len(values),):
@@ -1955,8 +2435,57 @@ def _configuration_from_values(
         return loci.record_configuration(
             tuple((f"field-{index}", value) for index, value in enumerate(values))
         )
+    if contract.kind is loci.CarrierKind.GRID:
+        if contract.shape is None:
+            raise ValueError("tuple grid realization requires a concrete shape")
+        targets = loci.grid_loci(
+            contract.shape,
+            axes=contract.axes or None,
+        )
+        if len(values) != len(targets):
+            raise ValueError(
+                "realized tuple length disagrees with its grid carrier"
+            )
+        axes = contract.axes or ("x", "y", "z")[: len(contract.shape)]
+        concrete_contract = loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=len(contract.shape),
+            shape=contract.shape,
+            axes=axes,
+        )
+        return loci.FiniteConfiguration(
+            loci.Carrier(
+                concrete_contract,
+                boundary
+                if boundary is not None
+                else loci.Boundary(loci.BoundaryPolicy.NONE),
+            ),
+            tuple(zip(targets, values, strict=True)),
+        )
     raise ValueError(
         f"tuple realization is unsupported for {contract.kind.value}"
+    )
+
+
+def _construction_targets(
+    contract: loci.CarrierContract,
+) -> tuple[loci.Locus, ...]:
+    if contract.kind is loci.CarrierKind.HISTORY:
+        if contract.shape is None or len(contract.shape) != 1:
+            raise ValueError("history construction requires a concrete length")
+        return tuple(
+            loci.occurrence("history", index)
+            for index in range(contract.shape[0])
+        )
+    if contract.kind is loci.CarrierKind.GRID:
+        if contract.shape is None:
+            raise ValueError("grid construction requires a concrete shape")
+        return loci.grid_loci(
+            contract.shape,
+            axes=contract.axes or None,
+        )
+    raise ValueError(
+        f"carrier {contract.kind.value} has no closed fill target set"
     )
 
 
@@ -1966,30 +2495,78 @@ def _realize_construction(
 ) -> loci.FiniteConfiguration[alphabets.SemanticValue]:
     operation = construction.operation
     arguments = construction.arguments
+    if operation is seeds.ConstructionOp.EMPTY:
+        return loci.FiniteConfiguration(
+            loci.Carrier(
+                contract,
+                loci.Boundary(loci.BoundaryPolicy.NONE),
+            ),
+            (),
+        )
+    if operation is seeds.ConstructionOp.FILL:
+        value = cast(alphabets.SemanticValue, arguments[0])
+        targets = _construction_targets(contract)
+        return loci.FiniteConfiguration(
+            loci.Carrier(
+                contract,
+                loci.Boundary(loci.BoundaryPolicy.NONE),
+            ),
+            tuple((target, value) for target in targets),
+        )
+    if operation is seeds.ConstructionOp.POINT:
+        target = cast(loci.Locus, arguments[0])
+        value = cast(alphabets.SemanticValue, arguments[1])
+        return loci.FiniteConfiguration(
+            loci.Carrier(
+                contract,
+                loci.Boundary(loci.BoundaryPolicy.NONE),
+            ),
+            ((target, value),),
+        )
     if operation is seeds.ConstructionOp.SEQUENCE:
         if not arguments:
             raise ValueError("sequence construction has no values")
         values = cast(tuple[alphabets.SemanticValue, ...], arguments[0])
         return _configuration_from_values(contract, values)
     if operation is seeds.ConstructionOp.RECORD:
+        if not arguments:
+            raise ValueError("record construction has no fields")
         fields_value = cast(
             tuple[tuple[str, alphabets.SemanticValue], ...],
             arguments[0],
         )
         return loci.record_configuration(fields_value)
     if operation is seeds.ConstructionOp.GRID:
+        if not arguments:
+            raise ValueError("grid construction has no values")
         shape = cast(tuple[int, ...], arguments[0])
         values = cast(tuple[alphabets.SemanticValue, ...], arguments[1])
         boundary_fields = dict(
             cast(tuple[tuple[str, alphabets.SemanticValue], ...], arguments[2])
         )
-        policy = loci.BoundaryPolicy(str(boundary_fields["policy"]))
+        policy = loci.BoundaryPolicy(
+            cast(str, boundary_fields["policy"])
+        )
         exterior = boundary_fields.get("exterior")
         boundary = loci.Boundary(
             policy,
             exterior if policy is loci.BoundaryPolicy.FIXED else None,
         )
-        return loci.grid_configuration(shape, values, boundary=boundary)
+        if contract.shape is not None and contract.shape != shape:
+            raise ValueError("grid construction shape disagrees with its contract")
+        concrete_contract = loci.CarrierContract(
+            loci.CarrierKind.GRID,
+            rank=len(shape),
+            shape=shape,
+            axes=contract.axes or ("x", "y", "z")[: len(shape)],
+        )
+        if not contract.accepts(concrete_contract):
+            raise ValueError("grid construction violates its output contract")
+        return _configuration_from_values(
+            concrete_contract,
+            values,
+            boundary=boundary,
+        )
     raise ValueError(f"construction {operation.value} has no finite realizer")
 
 
@@ -2235,10 +2812,6 @@ def _denote_seed_space(
             ),
         )
         return _finite_seed_outcome((configuration,), None), denotation
-    if isinstance(source, seeds.PartialSource):
-        # Partiality remains explicit semantic data. Generic realization does
-        # not fill unresolved roles.
-        return _finite_seed_outcome((source.configuration,), None), denotation
     if isinstance(source, seeds.LawSource):
         support_size = _law_support_size(source.law)
         if (
@@ -2422,6 +2995,46 @@ def _select_weighted(
     raise AssertionError("weighted selection failed")
 
 
+def _select_uniform_integer(
+    upper_bound: int,
+    *,
+    law_identity: str,
+    application_identity: str,
+    replay_key_identity: str,
+    coordinate: tuple[str, ...],
+) -> tuple[int, DrawEvidence]:
+    """Draw directly from ``range(upper_bound)`` without materializing it."""
+
+    subkey_identity = loci.canonical_identity(
+        (
+            replay_key_identity,
+            application_identity,
+            law_identity,
+            coordinate,
+            SamplerProfile.SHA256_REJECTION_V1.value,
+            NumericProfile.FRACTION_TICKETS_V1.value,
+        )
+    )
+    selected, rejection_rounds = _uniform_index(
+        upper_bound,
+        subkey_identity=subkey_identity,
+    )
+    return (
+        selected,
+        DrawEvidence(
+            law_identity,
+            application_identity,
+            replay_key_identity,
+            subkey_identity,
+            coordinate,
+            SamplerProfile.SHA256_REJECTION_V1,
+            NumericProfile.FRACTION_TICKETS_V1,
+            _point_identity(selected),
+            rejection_rounds,
+        ),
+    )
+
+
 def _realize_uniform_tuple(
     seed: seeds.Seed[C],
     source: seeds.LawSource,
@@ -2438,10 +3051,8 @@ def _realize_uniform_tuple(
         digits: list[int] = []
         attempt_draws: list[DrawEvidence] = []
         for position in range(law.length):
-            values = tuple(range(law.value_count))
-            selected, evidence = _select_weighted(
-                values,
-                (Fraction(1, law.value_count),) * law.value_count,
+            selected, evidence = _select_uniform_integer(
+                law.value_count,
                 law_identity=law_identity,
                 application_identity=application_identity,
                 replay_key_identity=replay_key_identity,
@@ -2530,7 +3141,10 @@ def _realize_seed_with_key(
             (),
         )
     if isinstance(source, seeds.PartialSource):
-        return source.configuration, ()
+        raise ValueError(
+            "a partial Seed retains unresolved roles and cannot be realized "
+            "as a complete finite configuration"
+        )
     if isinstance(source, seeds.LawSource):
         if isinstance(source.law, seeds.UniformTupleLaw):
             return _realize_uniform_tuple(
