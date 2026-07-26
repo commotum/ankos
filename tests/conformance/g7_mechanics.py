@@ -363,7 +363,7 @@ _PX02_SHAPES = {
     "SPF022": (0, 1),
     "SPF023": (0, 1),
     "SPF025": (1, 0),
-    "SPF028": (2, 3),
+    "SPF028": (3, 5),
     "SPF031": (1, 2),
     "SPF037": (2, 2),
     "SPF038": (1, 2),
@@ -387,7 +387,7 @@ def _px02(row: MechanicsRow) -> MechanicsRun:
     """Apply one input-derived total delete/create structural patch."""
 
     delete_count, create_count = _PX02_SHAPES[row.spf]
-    source = _word_configuration((1, 2))
+    source = _word_configuration((1, 2, 3) if row.spf == "SPF028" else (1, 2))
     alphabet = alphabets.integers()
     existing = frontiers.everywhere(
         configuration_contract=source.contract,
@@ -524,7 +524,13 @@ def _px04(row: MechanicsRow) -> MechanicsRun:
                         ),
                     ),
                 ),
-                stop=row.spf in {"SPF014", "SPF024", "SPF026", "SPF029"},
+                stop=row.spf in {
+                    "SPF014",
+                    "SPF018",
+                    "SPF024",
+                    "SPF026",
+                    "SPF029",
+                },
             ),
         )
         for solution in range(2)
@@ -591,6 +597,70 @@ def _px05_finite(row: MechanicsRow) -> MechanicsRun:
         ),
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px05_intensional(row: MechanicsRow) -> MechanicsRun:
+    """Retain an exact uncountable differential solution relation."""
+
+    field_value = alphabets.ValueNode(
+        alphabets.ValueKind.FIELD,
+        "partial-field",
+        fields=(("domain", "closed-interval:[0,1]"), ("derivative", 0)),
+    )
+    source = loci.history_configuration((field_value,))
+    alphabet = alphabets.field()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    relation = rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (
+            rules.literal_expr("constant-field-solution-relation"),
+            rules.literal_expr("binder:c"),
+            rules.literal_expr("du/dx=0"),
+            rules.literal_expr("domain:[0,1]"),
+        ),
+    )
+    uncountable = rules.Many(
+        None,
+        rules.InfiniteCardinality.UNCOUNTABLE,
+        _certificate(
+            rules.CertificateKind.CARDINALITY,
+            "constant-field:uncountable",
+        ),
+    )
+    rule = rules.differential(
+        relation,
+        uncountable,
+        contract=_contract(source, alphabet, writable, readable),
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "constant-field:complete",
+        ),
+        soundness_evidence=_certificate(
+            rules.CertificateKind.SOUNDNESS,
+            "constant-field:sound",
+        ),
+        projection_cardinalities=rules.ProjectionCardinalities(
+            uncountable,
+            rules.finite_cardinality(0),
+            uncountable,
+            _certificate(
+                rules.CertificateKind.COMPOSITION,
+                "constant-field:injective-total-projection",
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px05(row: MechanicsRow) -> MechanicsRun:
+    return _px05_intensional(row) if row.spf == "SPF039" else _px05_finite(row)
 
 
 def _px06(row: MechanicsRow) -> MechanicsRun:
@@ -917,7 +987,7 @@ def run_mechanics_fixture(row: MechanicsRow) -> MechanicsRun:
         "PX02": _px02,
         "PX03": _px03,
         "PX04": _px04,
-        "PX05": _px05_finite,
+        "PX05": _px05,
         "PX06": _px06,
         "PX07": _px07,
         "PX08": _px08,
@@ -1054,6 +1124,26 @@ def assert_mechanics_run(
         return
 
     if pressure == "PX05":
+        if row.spf == "SPF039":
+            assert (
+                result.source_outcomes.support.presentation
+                is rules.SupportPresentation.INTENSIONAL
+            )
+            for cardinality in (
+                result.outcome_atom_cardinality,
+                result.derivation_cardinality,
+                result.successor_cardinality,
+            ):
+                assert isinstance(cardinality, rules.Many)
+                assert (
+                    cardinality.infinite
+                    is rules.InfiniteCardinality.UNCOUNTABLE
+                )
+            assert (
+                result.successor_quotient_with_derivation_fibers.relation
+                is not None
+            )
+            return
         assert len(derivations) == 1
         assert isinstance(derivations[0].source.continuation, rules.Stop)
         successor = successors[0]

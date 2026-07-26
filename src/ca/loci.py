@@ -1828,11 +1828,12 @@ def resolve_selector(
         anchor, radius = arguments
         assert type(anchor) is Locus
         assert type(radius) in (int, Fraction)
-        return tuple(
-            target
-            for target in candidates
-            if _l1_distance(anchor, target) <= radius
-        )
+        selected: list[Locus] = []
+        for target in candidates:
+            distance = _l1_distance(anchor, target)
+            if distance is not None and distance <= radius:
+                selected.append(target)
+        return tuple(selected)
     if primitive is SelectorPrimitive.PATH:
         prefix = arguments[0]
         assert type(prefix) is Locus
@@ -1883,6 +1884,7 @@ def resolve_selector(
             for target in candidates
             if target.kind is LocusKind.OCCURRENCE
             and len(target.path) >= 2
+            and target.path[0] == "history"
             and type(target.path[-1]) is int
             and (
                 start is None
@@ -2038,7 +2040,7 @@ def _reachable_loci(
     return reached
 
 
-def _l1_distance(left: Locus, right: Locus) -> int | Fraction:
+def _l1_distance(left: Locus, right: Locus) -> int | Fraction | None:
     if (
         left.kind is LocusKind.COORDINATE
         and right.kind is LocusKind.COORDINATE
@@ -2076,9 +2078,9 @@ def _l1_distance(left: Locus, right: Locus) -> int | Fraction:
             if type(value) in (int, Fraction)
         )
     else:
-        return Fraction(10**18)
+        return None
     if len(left_values) != len(right_values):
-        return Fraction(10**18)
+        return None
     return sum(
         (abs(left_value - right_value) for left_value, right_value in zip(
             left_values, right_values
@@ -2319,20 +2321,49 @@ def _canonical_term(value: object) -> str:
     raise TypeError(f"{type(value).__name__} is not closed structural data")
 
 
-def _bound_fresh_key(target: Locus) -> tuple[str, str] | None:
+def _bound_fresh_key(
+    target: Locus,
+) -> tuple[str, str, tuple[str, ...]] | None:
     if target.kind is not LocusKind.FRESH:
         return None
     if (
-        len(target.path) != 2
+        len(target.path) < 2
         or type(target.path[0]) is not str
         or not target.path[0]
         or type(target.path[1]) not in (bool, int, Fraction, str)
     ):
         raise ValueError(
             "bound-fresh alpha identity requires bound loci with "
-            "(binding-scope, local-key) paths"
+            "(binding-scope, local-key, optional-anchor) paths"
         )
-    return target.scope, _canonical_scalar(target.path[1])
+    anchor = target.path[2:]
+    index = 0
+    if index < len(anchor) and anchor[index] == "parent":
+        if index + 1 >= len(anchor) or type(anchor[index + 1]) is not str:
+            raise ValueError("bound-fresh parent anchor is malformed")
+        index += 2
+    if index < len(anchor) and anchor[index] == "interface":
+        if (
+            index + 1 >= len(anchor)
+            or type(anchor[index + 1]) is not int
+            or anchor[index + 1] <= 0
+        ):
+            raise ValueError("bound-fresh interface anchor is malformed")
+        interface_size = anchor[index + 1]
+        interface_tokens = anchor[index + 2 :]
+        if (
+            len(interface_tokens) != interface_size
+            or any(type(token) is not str for token in interface_tokens)
+        ):
+            raise ValueError("bound-fresh interface anchor is malformed")
+        index = len(anchor)
+    if index != len(anchor):
+        raise ValueError("bound-fresh alpha anchor is malformed")
+    return (
+        target.scope,
+        _canonical_scalar(target.path[1]),
+        tuple(_canonical_scalar(part) for part in anchor),
+    )
 
 
 def _validate_bound_fresh_identity_targets(
@@ -2345,7 +2376,8 @@ def _validate_bound_fresh_identity_targets(
     )
     if len(keys) != len(set(keys)):
         raise ValueError(
-            "bound-fresh alpha identity requires unique namespace/local-key pairs"
+            "bound-fresh alpha identity requires unique "
+            "namespace/local-key/anchor tuples"
         )
 
 
@@ -2355,11 +2387,12 @@ def _alpha_term(value: object) -> str:
     if type(value) is Locus and value.kind is LocusKind.FRESH:
         key = _bound_fresh_key(value)
         assert key is not None
-        namespace, local_key = key
+        namespace, local_key, anchor = key
         return (
             "BoundFreshAlpha("
             f"namespace={_canonical_scalar(namespace)},"
-            f"local_key={local_key}"
+            f"local_key={local_key},"
+            "anchor=tuple[" + ",".join(anchor) + "]"
             ")"
         )
     if isinstance(value, (bool, int, Fraction, str)):
@@ -2443,6 +2476,15 @@ def semantic_equal(left: object, right: object) -> bool:
     return type(left) is type(right) and _canonical_term(left) == _canonical_term(right)
 
 
+def _alpha_locus_reference_token(target: Locus) -> str:
+    """Encode a parent/interface identity without a fresh binding-scope name."""
+
+    key = _bound_fresh_key(target)
+    if key is None:
+        return canonical_identity(target)
+    return canonical_identity(("bound-fresh-alpha-reference", key))
+
+
 def bind_fresh(
     reference: FreshReference,
     *,
@@ -2463,10 +2505,27 @@ def bind_fresh(
             reference.interface,
         )
     )
+    alpha_anchor: tuple[ClosedScalar, ...] = ()
+    if reference.parent is not None:
+        alpha_anchor = (
+            *alpha_anchor,
+            "parent",
+            _alpha_locus_reference_token(reference.parent),
+        )
+    if reference.interface:
+        alpha_anchor = (
+            *alpha_anchor,
+            "interface",
+            len(reference.interface),
+            *(
+                _alpha_locus_reference_token(target)
+                for target in reference.interface
+            ),
+        )
     return Locus(
         LocusKind.FRESH,
         reference.namespace,
-        (scope, reference.local_key),
+        (scope, reference.local_key, *alpha_anchor),
     )
 
 

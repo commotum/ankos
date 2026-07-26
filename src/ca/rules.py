@@ -1068,6 +1068,7 @@ class ProbabilityLaw:
 class OutcomeSpace(Generic[A]):
     support: SupportSpace[A]
     probability_law: ProbabilityLaw | None = None
+    projection_cardinalities: "ProjectionCardinalities | None" = None
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -1079,6 +1080,17 @@ class OutcomeSpace(Generic[A]):
             self.probability_law
         ) is not ProbabilityLaw:
             raise TypeError("outcome probability law is not recognized")
+        if self.projection_cardinalities is not None and type(
+            self.projection_cardinalities
+        ) is not ProjectionCardinalities:
+            raise TypeError("outcome projection cardinalities are not recognized")
+        if (
+            self.projection_cardinalities is not None
+            and self.support.presentation is not SupportPresentation.INTENSIONAL
+        ):
+            raise ValueError(
+                "finite supports derive projection cardinalities from their atoms"
+            )
         law = self.probability_law
         if law is None:
             return
@@ -1088,6 +1100,43 @@ class OutcomeSpace(Generic[A]):
                 raise ValueError("probability-law support does not equal atom support")
         elif law.presentation is not ProbabilityPresentation.INTENSIONAL:
             raise ValueError("intensional support needs an intensional law")
+
+
+@dataclass(frozen=True)
+class ProjectionCardinalities:
+    """Exact cardinalities proved for intensional application projections.
+
+    A source relation may mix derivations and typed no-successor atoms, and
+    distinct derivations may quotient to one successor.  These claims are
+    therefore independent of the source-atom cardinality and are accepted
+    only with closed composition evidence.
+    """
+
+    derivations: Cardinality
+    no_successors: Cardinality
+    successors: Cardinality
+    mapping_evidence: Certificate
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "projection cardinalities")
+        cardinality_types = (ExactlyZero, ExactlyOne, Many, Undetermined)
+        if any(
+            type(value) not in cardinality_types
+            for value in (
+                self.derivations,
+                self.no_successors,
+                self.successors,
+            )
+        ):
+            raise TypeError("projection cardinality claim is not recognized")
+        if (
+            type(self.mapping_evidence) is not Certificate
+            or self.mapping_evidence.kind is not CertificateKind.COMPOSITION
+        ):
+            raise ValueError(
+                "projection cardinalities need closed composition evidence"
+            )
 
 
 def _atom_identity(atom: object) -> str:
@@ -1318,6 +1367,7 @@ class IntensionalDenotation:
     completeness_evidence: Certificate
     soundness_evidence: Certificate
     probability_law: ProbabilityLaw | None = None
+    projection_cardinalities: ProjectionCardinalities | None = None
 
     def __post_init__(self) -> None:
         if type(self.relation) is not RuleExpr:
@@ -1344,6 +1394,12 @@ class IntensionalDenotation:
             self.probability_law
         ) is not ProbabilityLaw:
             raise TypeError("intensional probability law is not recognized")
+        if self.projection_cardinalities is not None and type(
+            self.projection_cardinalities
+        ) is not ProjectionCardinalities:
+            raise TypeError(
+                "intensional projection cardinalities are not recognized"
+            )
 
 
 class ClauseSelection(Enum):
@@ -1877,7 +1933,13 @@ def _denote_descriptor(
                 soundness_evidence=denotation.soundness_evidence,
             )
         )
-        return RuleComplete(OutcomeSpace(support, denotation.probability_law))
+        return RuleComplete(
+            OutcomeSpace(
+                support,
+                denotation.probability_law,
+                denotation.projection_cardinalities,
+            )
+        )
     if isinstance(denotation, ParallelDenotation):
         return _denote_parallel(denotation, readable, writable)
     return _rejected(
@@ -3100,6 +3162,7 @@ def relation(
     contract: RuleContract,
     completeness_evidence: Certificate,
     soundness_evidence: Certificate,
+    projection_cardinalities: ProjectionCardinalities | None = None,
 ) -> Rule[R, W, C]:
     """Build a complete intensional atom relation without running a solver."""
 
@@ -3110,6 +3173,7 @@ def relation(
             cardinality,
             completeness_evidence,
             soundness_evidence,
+            projection_cardinalities=projection_cardinalities,
         ),
     )
     return Rule(descriptor, contract)
@@ -3123,6 +3187,7 @@ def distribution(
     contract: RuleContract,
     completeness_evidence: Certificate,
     soundness_evidence: Certificate,
+    projection_cardinalities: ProjectionCardinalities | None = None,
 ) -> Rule[R, W, C]:
     """Build an intensional law-valued Rule without drawing from the law."""
 
@@ -3136,6 +3201,7 @@ def distribution(
             completeness_evidence,
             soundness_evidence,
             law,
+            projection_cardinalities,
         ),
     )
     return Rule(descriptor, contract)
@@ -3148,6 +3214,7 @@ def differential(
     contract: RuleContract,
     completeness_evidence: Certificate,
     soundness_evidence: Certificate,
+    projection_cardinalities: ProjectionCardinalities | None = None,
 ) -> Rule[R, W, C]:
     """Build an exact/intensional differential solution relation."""
 
@@ -3158,6 +3225,7 @@ def differential(
             cardinality,
             completeness_evidence,
             soundness_evidence,
+            projection_cardinalities=projection_cardinalities,
         ),
     )
     return Rule(descriptor, contract)
@@ -3685,6 +3753,7 @@ __all__ = [
     "ProbabilityLaw",
     "ProbabilityPresentation",
     "Progress",
+    "ProjectionCardinalities",
     "Provenance",
     "ProvenanceTemplate",
     "Rule",

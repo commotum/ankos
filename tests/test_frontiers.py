@@ -147,3 +147,82 @@ def test_frontier_does_not_select_firing_sites_or_conflict_winners() -> None:
     assert not hasattr(region, "winner")
     with pytest.raises(frontiers.WritableResolutionError):
         region.resolve(object())
+
+
+def test_heterogeneous_union_preserves_each_target_contract_and_effect() -> None:
+    source = _source()
+    a, b = tuple(target for target, _ in source.entries)
+    current_delete = frontiers.literal(
+        (a,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        effects=(frontiers.Effect.DELETE,),
+        frame=frontiers.WriteFrame.CURRENT,
+    )
+    successor_replace = frontiers.literal(
+        (b,),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+        effects=(frontiers.Effect.REPLACE,),
+        frame=frontiers.WriteFrame.SUCCESSOR,
+    )
+
+    combined = frontiers.union((successor_replace, current_delete))
+    resolved = combined.resolve(source)
+    by_target = {capability.target: capability for capability in resolved.existing}
+
+    assert combined.parts
+    assert by_target[a].effects == (frontiers.Effect.DELETE,)
+    assert by_target[a].contract.frame is frontiers.WriteFrame.CURRENT
+    assert by_target[b].effects == (frontiers.Effect.REPLACE,)
+    assert by_target[b].contract.frame is frontiers.WriteFrame.SUCCESSOR
+    assert combined.effect_profile.existing == (
+        frontiers.Effect.REPLACE,
+        frontiers.Effect.DELETE,
+    )
+
+
+def test_dynamic_fresh_union_supports_multiple_namespaces() -> None:
+    source = _source()
+    a, b = tuple(target for target, _ in source.entries)
+    children = frontiers.dynamic_fresh(
+        loci.fresh_children_dynamic(
+            loci.literal((a, b)),
+            "children",
+            ("child",),
+        ),
+        namespace=frontiers.FreshNamespace("children"),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    edges = frontiers.dynamic_fresh(
+        loci.fresh_edges_dynamic(
+            (loci.literal((a,)), loci.literal((b,))),
+            "edges",
+            ("edge",),
+        ),
+        namespace=frontiers.FreshNamespace("edges"),
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+
+    combined = frontiers.union((children, edges))
+    resolved = combined.resolve(source)
+
+    assert combined.fresh_namespace is None
+    assert tuple(
+        namespace.namespace for namespace in combined.fresh_namespaces
+    ) == ("children", "edges")
+    assert {
+        capability.namespace.namespace for capability in resolved.fresh
+    } == {"children", "edges"}
+    assert {
+        capability.target.parent
+        for capability in resolved.fresh
+        if capability.namespace.namespace == "children"
+    } == {a, b}
+    assert {
+        capability.target.interface
+        for capability in resolved.fresh
+        if capability.namespace.namespace == "edges"
+    } == {(a, b)}

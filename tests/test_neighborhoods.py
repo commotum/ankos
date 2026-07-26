@@ -1,5 +1,7 @@
 """Unit tests for identity-preserving readable regions."""
 
+from fractions import Fraction
+
 import pytest
 
 from ca import alphabets, loci, neighborhoods
@@ -260,3 +262,220 @@ def test_neighborhood_grants_no_write_authority() -> None:
     assert not hasattr(region, "effects")
     assert not hasattr(region, "commit")
     assert not hasattr(region, "write")
+
+
+def test_metric_and_history_dependencies_materialize_only_selected_values() -> None:
+    grid = loci.grid_configuration(
+        (5,),
+        (0, 1, 2, 3, 4),
+        boundary=loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    metric = neighborhoods.metric(
+        loci.cell((0,)),
+        1,
+        configuration_contract=grid.contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    )
+    metric_view = metric.resolve(grid)
+
+    assert isinstance(metric_view, neighborhoods.ReadableView)
+    assert tuple(
+        loci.grid_coordinates(item.target) for item in metric_view.observations
+    ) == ((-1,), (0,), (1,))
+    assert tuple(item.value for item in metric_view.observations) == (1, 2, 3)
+    assert (
+        metric_view.dependencies[0].selector.primitive
+        is loci.SelectorPrimitive.METRIC
+    )
+
+    history = loci.history_configuration((0, 1, 2, 3, 4))
+    history_view = neighborhoods.history_dependency(
+        1,
+        4,
+        configuration_contract=history.contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    ).resolve(history)
+
+    assert isinstance(history_view, neighborhoods.ReadableView)
+    assert tuple(item.value for item in history_view.observations) == (1, 2, 3)
+    assert (
+        history_view.dependencies[0].selector.primitive
+        is loci.SelectorPrimitive.HISTORY
+    )
+
+
+def test_path_and_matched_interface_dependencies_preserve_structure() -> None:
+    tree_contract = loci.CarrierContract(loci.CarrierKind.TREE)
+    tree = loci.FiniteConfiguration(
+        loci.Carrier(
+            tree_contract,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        (
+            (loci.path("other"), 0),
+            (loci.path("root"), 1),
+            (loci.path("root", "left"), 2),
+        ),
+    )
+    path_view = neighborhoods.path(
+        loci.path("root"),
+        configuration_contract=tree_contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    ).resolve(tree)
+
+    assert isinstance(path_view, neighborhoods.ReadableView)
+    assert tuple(item.value for item in path_view.observations) == (1, 2)
+    assert path_view.dependencies[0].region.kind is loci.RegionKind.PATH
+
+    left = loci.graph_element("node", "left")
+    right = loci.graph_element("node", "right")
+    edge = loci.graph_element("edge", "edge")
+    graph_contract = loci.CarrierContract(loci.CarrierKind.GRAPH)
+    graph = loci.FiniteConfiguration(
+        loci.Carrier(
+            graph_contract,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        ((left, 1), (right, 2), (edge, 3)),
+        (loci.StructuralRelation("interface", (left, edge, right)),),
+    )
+    interface_view = neighborhoods.matched_interface(
+        loci.literal((left,)),
+        loci.literal((right,)),
+        configuration_contract=graph_contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    ).resolve(graph)
+
+    assert isinstance(interface_view, neighborhoods.ReadableView)
+    assert tuple(item.target for item in interface_view.observations) == (edge,)
+    assert interface_view.observations[0].value == 3
+    assert (
+        interface_view.dependencies[0].region.kind
+        is loci.RegionKind.MATCHED_INTERFACE
+    )
+
+
+def test_field_restriction_and_differential_germ_do_not_hide_reads() -> None:
+    field_contract = loci.CarrierContract(loci.CarrierKind.FIELD, rank=1)
+    points = tuple(
+        loci.field_point("u", (Fraction(coordinate),))
+        for coordinate in (-1, 0, 1)
+    )
+    source = loci.FiniteConfiguration(
+        loci.Carrier(
+            field_contract,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        tuple(zip(points, (10, 20, 30))),
+    )
+    restriction = neighborhoods.field_restriction(
+        "u",
+        (0, 1),
+        configuration_contract=field_contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    )
+    finite_view = restriction.resolve(source)
+
+    assert isinstance(finite_view, neighborhoods.ReadableView)
+    assert tuple(item.target for item in finite_view.observations) == points[1:]
+    assert tuple(item.value for item in finite_view.observations) == (20, 30)
+
+    differential = neighborhoods.differential_germ(
+        "u",
+        2,
+        configuration_contract=field_contract,
+        value_profile=alphabets.ValueProfile.INTEGER,
+    )
+    dependency_view = differential.resolve(source)
+
+    assert isinstance(
+        dependency_view,
+        neighborhoods.IntensionalReadableView,
+    )
+    assert dependency_view.observations == ()
+    assert dependency_view.groups == ()
+    assert (
+        dependency_view.dependencies[0].region.kind
+        is loci.RegionKind.DIFFERENTIAL
+    )
+    assert (
+        dependency_view.dependencies[0].region.relation.primitive
+        is loci.SelectorPrimitive.DIFFERENTIAL_GERM
+    )
+
+
+def test_intensional_read_view_retains_source_and_dependency_relations() -> None:
+    source_relation = loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP)
+    contract = loci.CarrierContract(loci.CarrierKind.INTENSIONAL)
+    source = loci.IntensionalConfiguration(
+        contract,
+        source_relation,
+        "all-real-field-configurations",
+    )
+    dependency_relation = loci.SelectorExpr(
+        loci.SelectorPrimitive.AND,
+        children=(
+            source_relation,
+            loci.SelectorExpr(
+                loci.SelectorPrimitive.NOT,
+                children=(
+                    loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP),
+                ),
+            ),
+        ),
+    )
+    region = neighborhoods.intensional(
+        "field",
+        dependency_relation,
+        configuration_contract=contract,
+        value_profile=alphabets.ValueProfile.EXACT,
+    )
+
+    view = region.resolve(source)
+
+    assert isinstance(view, neighborhoods.IntensionalReadableView)
+    assert view.snapshot_identity == source.identity
+    assert view.configuration_relation == source_relation
+    assert view.dependencies[0].region.relation == dependency_relation
+    assert view.observations == ()
+    assert view.groups == ()
+
+
+def test_intensional_dependencies_fail_in_materialized_identity_products() -> None:
+    field_contract = loci.CarrierContract(loci.CarrierKind.FIELD, rank=1)
+    point = loci.field_point("u", (Fraction(0),))
+    source = loci.FiniteConfiguration(
+        loci.Carrier(
+            field_contract,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        ((point, 1),),
+    )
+    mixed = neighborhoods.product(
+        (
+            (
+                "value",
+                neighborhoods.field_restriction(
+                    "u",
+                    (0, 0),
+                    configuration_contract=field_contract,
+                    value_profile=alphabets.ValueProfile.INTEGER,
+                ),
+            ),
+            (
+                "germ",
+                neighborhoods.differential_germ(
+                    "u",
+                    1,
+                    configuration_contract=field_contract,
+                    value_profile=alphabets.ValueProfile.INTEGER,
+                ),
+            ),
+        )
+    )
+
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="cannot silently discard",
+    ):
+        mixed.resolve(source)

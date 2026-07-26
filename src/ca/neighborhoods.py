@@ -471,6 +471,7 @@ class ReadableRegion(Generic[C, R]):
     grouping: GroupingPlan
     parts: tuple[ReadableField[C, R], ...] = ()
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
+    selector: loci.SelectorExpr | None = None
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -500,6 +501,10 @@ class ReadableRegion(Generic[C, R]):
             raise TypeError("readable parts must be an immutable tuple")
         if type(self.exactness_profile) is not ExactnessProfile:
             raise TypeError("readable exactness profile is not recognized")
+        if self.selector is not None and type(
+            self.selector
+        ) is not loci.SelectorExpr:
+            raise TypeError("readable selector is not recognized")
         is_product = self.grouping.kind is GroupingKind.PRODUCT
         if is_product != bool(self.parts):
             raise ReadableResolutionError(
@@ -510,6 +515,10 @@ class ReadableRegion(Generic[C, R]):
                 "product grouping and product join mode must agree"
             )
         if is_product:
+            if self.selector is not None:
+                raise ReadableResolutionError(
+                    "product readable regions cannot add a hidden outer selector"
+                )
             if self.descriptor.kind is not loci.RegionKind.PRODUCT:
                 raise ReadableResolutionError(
                     "product grouping requires a product region descriptor"
@@ -550,6 +559,13 @@ class ReadableRegion(Generic[C, R]):
                 raise ReadableResolutionError(
                     "fixed grouping and result-field counts disagree"
                 )
+        if (
+            self.selector is not None
+            and self.descriptor.kind is loci.RegionKind.RELATIVE
+        ):
+            raise ReadableResolutionError(
+                "relative grouping cannot be filtered after anchor resolution"
+            )
 
     @property
     def required_read_shape(self) -> ResultShape:
@@ -575,16 +591,19 @@ class ReadableRegion(Generic[C, R]):
     def compatibility_exactness_profile(self) -> str:
         return self.exactness_profile.value
 
-    def resolve(self, configuration: C) -> ReadableView[V]:
+    def resolve(self, configuration: C) -> ResolvedReadableView[V]:
         """Resolve independently against one immutable configuration."""
 
         if self.parts:
             return self._resolve_product(configuration)
 
         try:
-            if type(configuration) is not loci.FiniteConfiguration:
+            if type(configuration) not in (
+                loci.FiniteConfiguration,
+                loci.IntensionalConfiguration,
+            ):
                 raise ReadableResolutionError(
-                    "finite ReadableRegion resolution needs FiniteConfiguration"
+                    "ReadableRegion resolution needs a recognized configuration"
                 )
             if (
                 self.configuration_contract is not None
@@ -594,7 +613,35 @@ class ReadableRegion(Generic[C, R]):
                     "ReadableRegion does not accept this carrier contract"
                 )
             snapshot_identity = loci.configuration_identity(configuration)
+            dependency = ReadDependency(
+                self.grouping.key,
+                self.descriptor,
+                self.selector,
+                self.exactness_profile,
+            )
+            if type(configuration) is loci.IntensionalConfiguration:
+                return IntensionalReadableView(
+                    snapshot_identity,
+                    (dependency,),
+                    self.join_shape,
+                    configuration.relation,
+                )
+            if _requires_intensional_resolution(
+                self.descriptor,
+                self.selector,
+            ):
+                return IntensionalReadableView(
+                    snapshot_identity,
+                    (dependency,),
+                    self.join_shape,
+                )
             targets = loci.resolve_region(self.descriptor, configuration)
+            if self.selector is not None:
+                targets = loci.resolve_selector(
+                    self.selector,
+                    configuration,
+                    candidates=targets,
+                )
             if self.descriptor.kind is loci.RegionKind.RELATIVE:
                 anchors = loci.resolve_relative_anchors(
                     self.descriptor, configuration
@@ -638,12 +685,18 @@ class ReadableRegion(Generic[C, R]):
             tuple(observations),
             groups,
             self.join_shape,
+            (dependency,),
         )
         _validate_view_shape(view, self.result_shape)
         return view
 
     def _resolve_product(self, configuration: C) -> ReadableView[V]:
         views = tuple(field.region.resolve(configuration) for field in self.parts)
+        if any(type(view) is IntensionalReadableView for view in views):
+            raise ReadableResolutionError(
+                "materialized product reads cannot silently discard an "
+                "intensional dependency; declare one global intensional read"
+            )
         snapshot_ids = tuple(view.snapshot_identity for view in views)
         if len(set(snapshot_ids)) != 1:
             raise ReadableResolutionError(
@@ -652,10 +705,21 @@ class ReadableRegion(Generic[C, R]):
 
         observations: list[Observation[V]] = []
         groups: list[ObservationGroup] = []
+        dependencies: list[ReadDependency] = []
         next_channel: dict[loci.Locus | None, int] = {}
         for field, view in zip(self.parts, views):
+            assert type(view) is ReadableView
             start = len(observations)
             observations.extend(view.observations)
+            dependencies.extend(
+                ReadDependency(
+                    f"{field.key}.{dependency.key}",
+                    dependency.region,
+                    dependency.selector,
+                    dependency.exactness_profile,
+                )
+                for dependency in view.dependencies
+            )
             for group in view.groups:
                 indices = tuple(start + index for index in group.indices)
                 channel = next_channel.get(group.anchor, 0)
@@ -672,9 +736,45 @@ class ReadableRegion(Generic[C, R]):
             tuple(observations),
             tuple(groups),
             self.join_shape,
+            tuple(dependencies),
         )
         _validate_view_shape(view, self.result_shape)
         return view
+
+
+def _selector_requires_intensional_resolution(
+    selector: loci.SelectorExpr,
+) -> bool:
+    if selector.primitive in (
+        loci.SelectorPrimitive.MEMBERSHIP,
+        loci.SelectorPrimitive.DIFFERENTIAL_GERM,
+    ):
+        return True
+    return any(
+        _selector_requires_intensional_resolution(child)
+        for child in selector.children
+    )
+
+
+def _requires_intensional_resolution(
+    region: loci.Region,
+    selector: loci.SelectorExpr | None,
+) -> bool:
+    if region.kind in (
+        loci.RegionKind.CONTINUOUS,
+        loci.RegionKind.DIFFERENTIAL,
+        loci.RegionKind.INTENSIONAL,
+    ):
+        return True
+    if any(
+        _requires_intensional_resolution(part, None)
+        for part in region.parts
+    ):
+        return True
+    return (
+        selector is not None
+        and _selector_requires_intensional_resolution(selector)
+    )
 
 
 def _groups_for(
@@ -777,6 +877,247 @@ def global_view(
     )
 
 
+def _dependency_region(
+    region: loci.Region,
+    *,
+    selector: loci.SelectorExpr | None = None,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str,
+    arity: ReadArity = ReadArity.VARIABLE,
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    if type(region) is not loci.Region:
+        raise TypeError("dependency region is not recognized")
+    if selector is not None and type(selector) is not loci.SelectorExpr:
+        raise TypeError("dependency selector is not recognized")
+    return ReadableRegion(
+        region,
+        configuration_contract,
+        value_profile,
+        ResultShape((ReadField(key, arity),)),
+        JoinShape(JoinMode.GLOBAL, (key,)),
+        GroupingPlan(GroupingKind.SINGLE, key),
+        exactness_profile=exactness_profile,
+        selector=selector,
+    )
+
+
+def metric(
+    anchor: loci.Locus,
+    radius: int | Fraction,
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "metric",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read exactly the finite support within an L1 metric radius."""
+
+    return _dependency_region(
+        loci.all_support(),
+        selector=loci.selector_metric(anchor, radius),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def history_dependency(
+    start: int | None = None,
+    stop: int | None = None,
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "history",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read a complete history or one explicit half-open occurrence range."""
+
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.HISTORY,
+            rank=1,
+            axes=("history",),
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
+    return _dependency_region(
+        loci.all_support(),
+        selector=loci.selector_history(start, stop),
+        configuration_contract=carrier,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def path(
+    prefix: loci.Locus,
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "path",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read existing path identities beneath one explicit path prefix."""
+
+    return _dependency_region(
+        loci.path_region(prefix),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def incidence(
+    anchor: loci.Locus,
+    *,
+    relation_tag: str = "incidence",
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "incidence",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read values at finite identities incident to one explicit anchor."""
+
+    return _dependency_region(
+        loci.all_support(),
+        selector=loci.selector_incidence(anchor, relation_tag),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def reachable(
+    anchor: loci.Locus,
+    max_depth: int,
+    *,
+    relation_tag: str = "incidence",
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "reachable",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read a bounded finite reachability dependency."""
+
+    return _dependency_region(
+        loci.all_support(),
+        selector=loci.selector_reachable(
+            anchor,
+            max_depth,
+            relation_tag,
+        ),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def matched_interface(
+    left: loci.Region,
+    right: loci.Region,
+    *,
+    relation_tag: str = "interface",
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "interface",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read only interface identities joining two explicit finite regions."""
+
+    return _dependency_region(
+        loci.matched_interface(left, right, relation_tag),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def field_restriction(
+    field: str,
+    bounds: tuple[int | Fraction, ...],
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "field",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ResolvedReadableView[V]]:
+    """Read one explicit exact restriction of a finite field carrier."""
+
+    carrier = (
+        loci.CarrierContract(
+            loci.CarrierKind.FIELD,
+            rank=len(bounds) // 2,
+        )
+        if configuration_contract is None
+        else configuration_contract
+    )
+    return _dependency_region(
+        loci.all_support(),
+        selector=loci.selector_field_restriction(field, bounds),
+        configuration_contract=carrier,
+        value_profile=value_profile,
+        key=key,
+        exactness_profile=exactness_profile,
+    )
+
+
+def differential_germ(
+    field: str,
+    order: int,
+    *,
+    component: str | None = None,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "differential-germ",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, IntensionalReadableView]:
+    """Expose an exact differential dependency without inventing a stencil."""
+
+    selector = loci.selector_differential_germ(
+        field,
+        order,
+        component=component,
+    )
+    return _dependency_region(
+        loci.differential(field, selector),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        arity=ReadArity.INTENSIONAL,
+        exactness_profile=exactness_profile,
+    )
+
+
+def continuous(
+    name: str,
+    bounds: tuple[Fraction, ...],
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "continuous",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, IntensionalReadableView]:
+    """Expose a closed continuous domain without finite materialization."""
+
+    return _dependency_region(
+        loci.continuous(name, bounds),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        arity=ReadArity.INTENSIONAL,
+        exactness_profile=exactness_profile,
+    )
+
+
 def grid_relative(
     offsets: tuple[tuple[int, ...], ...],
     *,
@@ -821,21 +1162,21 @@ def intensional(
     configuration_contract: loci.CarrierContract | None = None,
     value_profile: alphabets.ValueProfile | None = None,
     key: str = "intensional",
-) -> ReadableRegion[C, ReadableView[V]]:
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, IntensionalReadableView]:
     """Describe a closed non-enumerated read view."""
 
     if type(binder) is not str or not binder:
         raise ReadableResolutionError("intensional binder cannot be empty")
     if type(relation) is not loci.SelectorExpr:
         raise TypeError("intensional relation is not recognized")
-    return ReadableRegion(
+    return _dependency_region(
         loci.intensional(binder, relation),
-        configuration_contract,
-        value_profile,
-        ResultShape((ReadField(key, ReadArity.INTENSIONAL),)),
-        JoinShape(JoinMode.GLOBAL, (key,)),
-        GroupingPlan(GroupingKind.SINGLE, key),
-        exactness_profile=ExactnessProfile.SYMBOLIC,
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        key=key,
+        arity=ReadArity.INTENSIONAL,
+        exactness_profile=exactness_profile,
     )
 
 
@@ -933,6 +1274,7 @@ def _with_compatibility_shape(
         grouping,
         region.parts,
         region.exactness_profile,
+        region.selector,
     )
 
 

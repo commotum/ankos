@@ -375,3 +375,268 @@ def test_region_variants_reject_irrelevant_or_ambiguous_fields_locally() -> None
             name="field",
             parts=(base, base),
         )
+
+
+def test_finite_set_span_path_interface_and_dynamic_address_resolution() -> None:
+    left = loci.graph_element("node", "left")
+    right = loci.graph_element("node", "right")
+    edge = loci.graph_element("edge", "edge")
+    address = loci.named("cursor", scope="graph")
+    word_0 = loci.occurrence("word", 0)
+    word_1 = loci.occurrence("word", 1)
+    root = loci.path("root")
+    child = loci.path("root", "child")
+    carrier = loci.Carrier(
+        loci.CarrierContract(loci.CarrierKind.GRAPH),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    configuration = loci.FiniteConfiguration(
+        carrier,
+        tuple(
+            (target, 0)
+            for target in (
+                left,
+                right,
+                edge,
+                address,
+                word_0,
+                word_1,
+                root,
+                child,
+            )
+        ),
+        (
+            loci.StructuralRelation(
+                "interface",
+                (left, right, edge),
+            ),
+            loci.StructuralRelation("address", (address, right)),
+            loci.StructuralRelation("incidence", (left, edge, right)),
+        ),
+    )
+
+    selected = loci.union(
+        (
+            loci.literal((left, right)),
+            loci.literal((edge,)),
+        )
+    )
+    assert loci.resolve_region(
+        loci.intersection((selected, loci.literal((right, edge)))),
+        configuration,
+    ) == tuple(sorted((right, edge), key=loci.canonical_order_key))
+    assert loci.resolve_region(
+        loci.difference(selected, loci.literal((right,))),
+        configuration,
+    ) == tuple(sorted((left, edge), key=loci.canonical_order_key))
+    assert loci.resolve_region(
+        loci.span_region("word", 1, 2),
+        configuration,
+    ) == (word_1,)
+    assert loci.resolve_region(
+        loci.path_region(root),
+        configuration,
+    ) == tuple(sorted((root, child), key=loci.canonical_order_key))
+    assert loci.resolve_region(
+        loci.matched_interface(
+            loci.literal((left,)),
+            loci.literal((right,)),
+        ),
+        configuration,
+    ) == (edge,)
+    assert loci.resolve_region(
+        loci.dynamic_address(loci.literal((address,))),
+        configuration,
+    ) == (right,)
+    assert loci.resolve_selector(
+        loci.selector_incidence(left),
+        configuration,
+    ) == tuple(
+        target
+        for target, _ in configuration.entries
+        if target in (edge, right)
+    )
+    assert set(
+        loci.resolve_selector(
+            loci.selector_reachable(left, 1),
+            configuration,
+        )
+    ) == {left, edge, right}
+
+
+def test_closed_non_enumerated_regions_and_selectors_fail_without_approximation() -> None:
+    configuration = loci.record_configuration((("u", 0),))
+    regions = (
+        loci.continuous(
+            "interval",
+            (Fraction(0), Fraction(1)),
+        ),
+        loci.differential(
+            "u",
+            loci.selector_differential_germ("u", 1),
+        ),
+        loci.intensional(
+            "solution",
+            loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP),
+        ),
+    )
+
+    for region in regions:
+        with pytest.raises(loci.LociResolutionError, match="non-enumerated"):
+            loci.resolve_region(region, configuration)
+    for selector in (
+        loci.selector_differential_germ("u", 1),
+        loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP),
+    ):
+        with pytest.raises(loci.LociResolutionError, match="non-enumerated"):
+            loci.resolve_selector(selector, configuration)
+
+
+def test_dynamic_fresh_templates_resolve_from_each_current_configuration() -> None:
+    first = loci.record_configuration((("a", 0), ("b", 0)))
+    second = loci.record_configuration((("c", 0),))
+    children = loci.fresh_children_dynamic(
+        loci.all_support(),
+        "children",
+        ("left", "right"),
+    )
+
+    first_references = loci.resolve_fresh_references(children, first)
+    second_references = loci.resolve_fresh_references(children, second)
+
+    assert {reference.parent for reference in first_references} == {
+        target for target, _ in first.entries
+    }
+    assert {reference.local_key for reference in first_references} == {
+        "left",
+        "right",
+    }
+    assert {reference.parent for reference in second_references} == {
+        target for target, _ in second.entries
+    }
+    assert not {
+        reference.parent for reference in first_references
+    }.intersection(reference.parent for reference in second_references)
+
+    a, b = tuple(target for target, _ in first.entries)
+    edges = loci.fresh_edges_dynamic(
+        (loci.literal((a,)), loci.literal((b,))),
+        "edges",
+        ("edge",),
+    )
+    assert loci.resolve_fresh_references(edges, first) == (
+        loci.FreshReference("edges", "edge", interface=(a, b)),
+    )
+    with pytest.raises(loci.LociResolutionError, match="needs a configuration"):
+        loci.resolve_fresh_references(children)
+
+
+def test_configuration_identity_law_supports_exact_or_bound_fresh_alpha() -> None:
+    alpha_contract = loci.CarrierContract(
+        loci.CarrierKind.GRAPH,
+        identity_law=loci.ConfigurationIdentityLaw.BOUND_FRESH_ALPHA,
+    )
+    alpha_carrier = loci.Carrier(
+        alpha_contract,
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    left_a = loci.Locus(loci.LocusKind.FRESH, "nodes", ("a", "left"))
+    left_b = loci.Locus(loci.LocusKind.FRESH, "nodes", ("z", "right"))
+    right_a = loci.Locus(loci.LocusKind.FRESH, "nodes", ("z", "left"))
+    right_b = loci.Locus(loci.LocusKind.FRESH, "nodes", ("a", "right"))
+    left = loci.FiniteConfiguration(
+        alpha_carrier,
+        ((left_a, 1), (left_b, 2)),
+        (loci.StructuralRelation("edge", (left_a, left_b)),),
+    )
+    right = loci.FiniteConfiguration(
+        alpha_carrier,
+        ((right_a, 1), (right_b, 2)),
+        (loci.StructuralRelation("edge", (right_a, right_b)),),
+    )
+
+    assert left.identity == right.identity
+    assert loci.configuration_equal(left, right)
+    assert loci.semantic_equal(left, right)
+
+    different_key = loci.FiniteConfiguration(
+        alpha_carrier,
+        (
+            (loci.Locus(loci.LocusKind.FRESH, "nodes", ("a", "other")), 1),
+            (right_b, 2),
+        ),
+    )
+    assert not loci.configuration_equal(left, different_key)
+
+    exact_carrier = loci.Carrier(
+        loci.CarrierContract(loci.CarrierKind.GRAPH),
+        loci.Boundary(loci.BoundaryPolicy.NONE),
+    )
+    exact_left = loci.FiniteConfiguration(exact_carrier, ((left_a, 1),))
+    exact_right = loci.FiniteConfiguration(exact_carrier, ((right_a, 1),))
+    assert not loci.configuration_equal(exact_left, exact_right)
+
+    parent_a = loci.named("a", scope="graph")
+    parent_b = loci.named("b", scope="graph")
+    binding_arguments = {
+        "input_configuration_identity": "source",
+        "canonical_rule_identity": "rule",
+    }
+    children_left = tuple(
+        loci.bind_fresh(
+            loci.fresh_reference("children", "child", parent=parent),
+            witness_identity="left-witness",
+            **binding_arguments,
+        )
+        for parent in (parent_a, parent_b)
+    )
+    children_right = tuple(
+        loci.bind_fresh(
+            loci.fresh_reference("children", "child", parent=parent),
+            witness_identity="right-witness",
+            **binding_arguments,
+        )
+        for parent in (parent_a, parent_b)
+    )
+    anchored_left = loci.FiniteConfiguration(
+        alpha_carrier,
+        (
+            (parent_a, 0),
+            (parent_b, 0),
+            (children_left[0], 1),
+            (children_left[1], 1),
+        ),
+    )
+    anchored_right = loci.FiniteConfiguration(
+        alpha_carrier,
+        (
+            (parent_a, 0),
+            (parent_b, 0),
+            (children_right[0], 1),
+            (children_right[1], 1),
+        ),
+    )
+    assert loci.configuration_equal(anchored_left, anchored_right)
+
+    with pytest.raises(ValueError, match="unique namespace/local-key/anchor"):
+        loci.FiniteConfiguration(
+            alpha_carrier,
+            (
+                (
+                    loci.Locus(
+                        loci.LocusKind.FRESH,
+                        "nodes",
+                        ("scope-a", "same"),
+                    ),
+                    1,
+                ),
+                (
+                    loci.Locus(
+                        loci.LocusKind.FRESH,
+                        "nodes",
+                        ("scope-b", "same"),
+                    ),
+                    2,
+                ),
+            ),
+        )

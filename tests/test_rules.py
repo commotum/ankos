@@ -1005,6 +1005,39 @@ def test_clause_kernel_constructor_rejects_undeclared_effects_and_entropy() -> N
         )
 
 
+def test_intensional_projection_cardinalities_are_explicit_and_evidenced() -> None:
+    claims = rules.ProjectionCardinalities(
+        rules.finite_cardinality(1),
+        rules.finite_cardinality(0),
+        rules.finite_cardinality(1),
+        _certificate(rules.CertificateKind.COMPOSITION),
+    )
+    support = rules.intensional_support(
+        rules.literal_expr("closed-relation"),
+        rules.finite_cardinality(1),
+        completeness_evidence=_certificate(rules.CertificateKind.COMPLETENESS),
+        soundness_evidence=_certificate(rules.CertificateKind.SOUNDNESS),
+    )
+    outcome = rules.OutcomeSpace(
+        support,
+        projection_cardinalities=claims,
+    )
+
+    assert outcome.projection_cardinalities is claims
+    with pytest.raises(ValueError, match="composition"):
+        rules.ProjectionCardinalities(
+            rules.finite_cardinality(1),
+            rules.finite_cardinality(0),
+            rules.finite_cardinality(1),
+            _certificate(rules.CertificateKind.CARDINALITY),
+        )
+    with pytest.raises(ValueError, match="finite supports"):
+        rules.OutcomeSpace(
+            rules.finite_support((rules.literal_expr("atom"),)),
+            projection_cardinalities=claims,
+        )
+
+
 @pytest.mark.parametrize(
     "factory",
     (

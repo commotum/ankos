@@ -1400,6 +1400,7 @@ def _projection_cardinality(
 def _expected_intensional_spaces(
     source_support: rules.SupportSpace[object],
     evidence: ApplicationEvidence,
+    projection_cardinalities: rules.ProjectionCardinalities | None = None,
 ) -> tuple[
     rules.SupportSpace[object],
     rules.SupportSpace[object],
@@ -1410,21 +1411,26 @@ def _expected_intensional_spaces(
     if source_support.presentation is not rules.SupportPresentation.INTENSIONAL:
         raise ValueError("intensional application needs intensional source support")
     source_relation = cast(rules.RuleExpr, source_support.relation)
-    derivation_cardinality = _projection_cardinality(
-        phase="derivation",
-        source_relation=source_relation,
-        evidence=evidence,
-    )
-    no_successor_cardinality = _projection_cardinality(
-        phase="no-successor",
-        source_relation=source_relation,
-        evidence=evidence,
-    )
-    successor_cardinality = _projection_cardinality(
-        phase="successor-quotient",
-        source_relation=source_relation,
-        evidence=evidence,
-    )
+    if projection_cardinalities is None:
+        derivation_cardinality = _projection_cardinality(
+            phase="derivation",
+            source_relation=source_relation,
+            evidence=evidence,
+        )
+        no_successor_cardinality = _projection_cardinality(
+            phase="no-successor",
+            source_relation=source_relation,
+            evidence=evidence,
+        )
+        successor_cardinality = _projection_cardinality(
+            phase="successor-quotient",
+            source_relation=source_relation,
+            evidence=evidence,
+        )
+    else:
+        derivation_cardinality = projection_cardinalities.derivations
+        no_successor_cardinality = projection_cardinalities.no_successors
+        successor_cardinality = projection_cardinalities.successors
     applied = _mapped_intensional_support(
         phase="applied-atoms",
         source_relation=source_relation,
@@ -1724,6 +1730,7 @@ def _validate_intensional_application(
     ) = _expected_intensional_spaces(
         cast(rules.SupportSpace[object], source_support),
         result.evidence,
+        result.source_outcomes.projection_cardinalities,
     )
     if result.applied_atoms != expected_applied:
         raise ValueError(
@@ -1803,6 +1810,7 @@ def _intensional_application(
     ) = _expected_intensional_spaces(
         cast(rules.SupportSpace[object], support),
         evidence,
+        outcome_space.projection_cardinalities,
     )
     applied_support = cast(
         rules.SupportSpace[AppliedAtom[C]], untyped_applied
