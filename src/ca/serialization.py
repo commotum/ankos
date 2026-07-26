@@ -1037,15 +1037,16 @@ _SCHEMAS = (
 
 
 def _validate_registry() -> None:
-    owners = {
-        "ca.loci",
-        "ca.alphabets",
-        "ca.seeds",
-        "ca.frontiers",
-        "ca.neighborhoods",
-        "ca.rules",
-        "ca.program",
-    }
+    owner_modules = (
+        loci,
+        alphabets,
+        seeds,
+        frontiers,
+        neighborhoods,
+        rules,
+        program,
+    )
+    owners = {owner.__name__ for owner in owner_modules}
     if len(_SCHEMAS) != 178:
         raise RuntimeError("canonical schema registry must contain 178 owner types")
     if len({row.value_type for row in _SCHEMAS}) != len(_SCHEMAS):
@@ -1057,6 +1058,41 @@ def _validate_registry() -> None:
     )
     if variant_count != 387:
         raise RuntimeError("canonical schema registry must contain 387 variants")
+
+    public_sealed_types: set[type[object]] = set()
+    for owner in owner_modules:
+        for name, value in vars(owner).items():
+            if (
+                name.startswith("_")
+                or not isinstance(value, type)
+                or value.__module__ != owner.__name__
+            ):
+                continue
+            parameters = getattr(value, "__dataclass_params__", None)
+            if issubclass(value, Enum) or (
+                is_dataclass(value)
+                and parameters is not None
+                and parameters.frozen
+            ):
+                public_sealed_types.add(value)
+    registered_types = {row.value_type for row in _SCHEMAS}
+    if public_sealed_types != registered_types:
+        missing = tuple(
+            sorted(
+                f"{value.__module__}.{value.__name__}"
+                for value in public_sealed_types - registered_types
+            )
+        )
+        stale = tuple(
+            sorted(
+                f"{value.__module__}.{value.__name__}"
+                for value in registered_types - public_sealed_types
+            )
+        )
+        raise RuntimeError(
+            "canonical schema registry does not match the public sealed "
+            f"owner surface; missing={missing!r}, stale={stale!r}"
+        )
 
     for row in _SCHEMAS:
         value_type = row.value_type

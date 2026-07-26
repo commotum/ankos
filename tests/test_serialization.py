@@ -162,6 +162,22 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
         assert serialization.dumps(decoded.value) == encoded
 
 
+def test_registry_fails_closed_when_an_owner_gains_an_unregistered_type(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Owner-surface reflection detects drift but never selects a wire path."""
+
+    @dataclass(frozen=True)
+    class FutureSealed:
+        marker: int
+
+    FutureSealed.__module__ = loci.__name__
+    monkeypatch.setattr(loci, "FutureSealed", FutureSealed, raising=False)
+
+    with pytest.raises(RuntimeError, match="missing=.*FutureSealed"):
+        serialization._validate_registry()
+
+
 def test_unknown_lossy_noncanonical_or_forged_payloads_fail_closed() -> None:
     """Hostile schema and integrity mutations cannot default or migrate."""
 

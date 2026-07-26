@@ -578,6 +578,49 @@ def test_program_mutations_do_not_default_or_admit_a_sixth_field() -> None:
         ).fault.reason == "extra-field"
 
 
+def test_context_validated_records_cannot_cross_the_codec_alone_invalid() -> None:
+    """Registered sum/evidence records retain their owner-level invariants."""
+
+    compatibility = next(
+        value
+        for value in representative_values()
+        if type(value) is program.CompatibilityEvidence
+    )
+    with pytest.raises(TypeError, match="semantic alphabet value"):
+        rules.ValuePayload(rules.NoPayload())
+    with pytest.raises(ValueError, match="canonical proof"):
+        program.CompatibilityEvidence(
+            compatibility.configuration_contract,
+            compatibility.value_profile,
+            (1,),  # type: ignore[arg-type]
+        )
+
+    no_payload = _parsed(rules.NoPayload())
+    no_payload.pop("digest")
+
+    def invalid_value_payload(envelope: dict[str, object]) -> None:
+        _payload(envelope)["value"] = no_payload
+
+    bad_value_payload = _mutate(
+        rules.ValuePayload(False),
+        invalid_value_payload,
+    )
+    assert _rejected(bad_value_payload).fault.reason == "invalid-descriptor"
+
+    integer = _parsed(1)
+    integer.pop("digest")
+
+    def invalid_compatibility(envelope: dict[str, object]) -> None:
+        clauses = _payload(envelope)["clauses"]
+        _node_payload(clauses)["items"] = [integer]
+
+    bad_compatibility = _mutate(
+        compatibility,
+        invalid_compatibility,
+    )
+    assert _rejected(bad_compatibility).fault.reason == "invalid-descriptor"
+
+
 def test_legacy_dynamics_manifest_is_not_a_canonical_program() -> None:
     """There is no version-zero, alias, recipe, or compatibility fallback."""
 

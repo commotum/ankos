@@ -175,6 +175,8 @@ def _identity_aliases(
         aliases[atom.evidence.disposition_identity] = f"@disposition:{witness}"
         aliases[atom.input_trace_lineage.root_identity] = "@lineage-root"
         aliases[atom.output_trace_lineage.root_identity] = "@lineage-root"
+        for index, binding in enumerate(atom.fresh_bindings):
+            aliases[binding.identity] = f"@fresh:{witness}:{index}"
         for index, identity in enumerate(atom.input_trace_lineage.path):
             aliases.setdefault(identity, f"@input-path:{index}")
         for index, identity in enumerate(atom.output_trace_lineage.path):
@@ -182,6 +184,26 @@ def _identity_aliases(
         if isinstance(atom, program.AppliedDerivation):
             aliases[loci.configuration_identity(atom.successor)] = "@successor"
     return aliases
+
+
+_IDENTITY_FIELDS = frozenset(
+    {
+        (rules.AtomMass, "atom_identity"),
+        (program.TraceLineage, "root_identity"),
+        (program.TraceLineage, "path"),
+        (program.FreshBinding, "identity"),
+        (program.AppliedEvidence, "application_identity"),
+        (program.AppliedEvidence, "disposition_identity"),
+        (program.MeasureMass, "point_identity"),
+        (program.ApplicationEvidence, "program_identity"),
+        (program.ApplicationEvidence, "input_configuration_identity"),
+        (program.ApplicationEvidence, "readable_binding_identity"),
+        (program.ApplicationEvidence, "writable_binding_identity"),
+        (program.ApplicationEvidence, "application_identity"),
+        (program.ApplicationEvidence, "canonical_rule_identity"),
+        (program.ApplicationEvidence, "input_trace_lineage_identity"),
+    }
+)
 
 
 def _normalize_complete_result(
@@ -193,7 +215,11 @@ def _normalize_complete_result(
 
     aliases = _identity_aliases(result)
 
-    def normalize(value: object) -> object:
+    def normalize(
+        value: object,
+        *,
+        identity_bearing: bool = False,
+    ) -> object:
         if (
             decode_relation is not None
             and isinstance(value, alphabets.ValueNode)
@@ -206,7 +232,7 @@ def _normalize_complete_result(
         if type(value) is Fraction:
             return ("fraction", value.numerator, value.denominator)
         if type(value) is str:
-            if value in aliases:
+            if identity_bearing and value in aliases:
                 return aliases[value]
             return value
         if isinstance(value, Enum):
@@ -217,14 +243,21 @@ def _normalize_complete_result(
                 value.value,
             )
         if type(value) is tuple:
-            return tuple(normalize(item) for item in value)
+            return tuple(
+                normalize(item, identity_bearing=identity_bearing)
+                for item in value
+            )
         if not is_dataclass(value):
             raise AssertionError(
                 f"unhandled complete-result value {type(value).__name__}"
             )
         normalized_fields: list[tuple[str, object]] = []
         for field in fields(value):
-            field_value = normalize(getattr(value, field.name))
+            field_value = normalize(
+                getattr(value, field.name),
+                identity_bearing=(type(value), field.name)
+                in _IDENTITY_FIELDS,
+            )
             if (
                 type(value) is rules.SupportSpace
                 and field.name == "atoms"
@@ -333,6 +366,40 @@ def test_commutation_never_erases_hex_shaped_semantic_strings() -> None:
 
     left = result("a" * 64, "b" * 64)
     right = result("c" * 64, "d" * 64)
+
+    assert _normalize_complete_result(left) != _normalize_complete_result(right)
+
+
+def test_commutation_normalizes_ids_only_in_identity_bearing_fields() -> None:
+    """A lineage ID equal to a cell value cannot erase that semantic value."""
+
+    def result(value: str) -> program.ApplicationComplete:
+        def atoms(targets: tuple[loci.Locus, ...]):
+            return (
+                derivation(
+                    "identity-shaped-semantic-value",
+                    existing=(rules.replace(targets[0], value),),
+                ),
+            )
+
+        simple_program, source = finite_record_program(
+            (("value", value),),
+            atoms,
+            alphabet=alphabets.enum((value,)),
+            effects=(ca.frontiers.Effect.REPLACE,),
+        )
+        application = ca.apply(
+            simple_program,
+            program.ApplicationInput(
+                source,
+                program.TraceLineage(value),
+            ),
+        )
+        assert isinstance(application, program.ApplicationComplete)
+        return application
+
+    left = result("semantic-left")
+    right = result("semantic-right")
 
     assert _normalize_complete_result(left) != _normalize_complete_result(right)
 
