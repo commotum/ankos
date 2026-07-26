@@ -1,6 +1,6 @@
 # 3-MECHANICS
 
-## Current Facts
+## Stage-Start Facts
 
 - G7-02 started from clean commit `130b230`.
 - The owned baseline command, `uv run pytest -q tests`, reports

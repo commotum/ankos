@@ -193,11 +193,12 @@ under `tests/conformance/`.
 - CT10 proves all eight exact PX10 relations over both points of their
   declared finite domains. Each actual relation uses one shared
   `SimpleProgram`; its source and terminal target are reconstructed from real
-  workspace loci, including fresh and multistep mechanics. A separate,
-  test-owned conjugacy uses one fixed native program and one fixed represented
-  program across both points and compares every field of their complete
-  application results after only declared value and derived-identity mapping.
-  This normalization is proof machinery, not a production mapping API.
+  workspace loci, including fresh and multistep mechanics. For each relation,
+  a separate test-owned conjugacy uses one fixed native program and one fixed
+  represented program across both points and compares every field of their
+  complete application results after only declared value and derived-identity
+  mapping. This normalization is proof machinery, not a production mapping
+  API.
 - Lossy, approximate, and out-of-image relations remain explicit and cannot
   call the exact inverse.
 

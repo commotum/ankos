@@ -114,9 +114,10 @@ conflict, and reconcile the plan before changing runtime behavior.
   CT09 covers all 137 record representatives and 250 enum members. Unknown,
   legacy, and unavailable migration paths reject.
 - CT10 proves the eight exact PX10 representation relations over both points
-  of each declared domain and compares complete results through one fixed
-  native/represented conjugate pair. Lossy, approximate, and out-of-image
-  cases remain explicitly qualified.
+  of each declared domain. For each relation, it compares complete results
+  through one fixed native/represented conjugate pair shared across that
+  relation's two points. Lossy, approximate, and out-of-image cases remain
+  explicitly qualified.
 - The active suite reports `413 passed, 13 skipped`. Every retained skip is
   owned by G7-04 catalog construction or callable-free metadata; no G7-03
   skip remains.
