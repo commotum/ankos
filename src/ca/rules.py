@@ -3902,7 +3902,7 @@ def _compose_anchored_choices(
             return _rejected(
                 RuleFaultPhase.COMPOSITION,
                 RuleFaultReason.INVALID_DESCRIPTOR,
-                "anchored proposal conflict policy is not implemented",
+                "anchored proposal conflict policy is not recognized",
             )
 
     fresh = tuple(

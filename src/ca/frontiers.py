@@ -555,7 +555,7 @@ class WritableRegion(Generic[C, W]):
             ):
                 if self.fresh_namespaces or self.effect_profile.fresh:
                     raise WritableResolutionError(
-                        "non-enumerated fresh capabilities are not implemented"
+                        "non-enumerated fresh capabilities require a finite realization"
                     )
                 reconstruction = IntensionalReconstructionEvidence(
                     snapshot_identity,
@@ -680,7 +680,7 @@ class WritableRegion(Generic[C, W]):
         ):
             if self.fresh_namespaces or self.effect_profile.fresh:
                 raise WritableResolutionError(
-                    "non-enumerated fresh capabilities are not implemented"
+                    "non-enumerated fresh capabilities require a finite realization"
                 )
             reconstruction = IntensionalReconstructionEvidence(
                 snapshot_identity,
