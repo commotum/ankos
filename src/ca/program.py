@@ -1784,10 +1784,55 @@ class RawTrace(Generic[C]):
             raise TypeError("raw trace application space is not recognized")
         if type(self.derivation_edges) is not rules.SupportSpace:
             raise TypeError("raw trace edge space is not recognized")
+        if (
+            self.roots.support.presentation
+            is rules.SupportPresentation.FINITE
+            and any(
+                type(item)
+                not in (
+                    loci.FiniteConfiguration,
+                    loci.IntensionalConfiguration,
+                )
+                for item in self.roots.support.atoms
+            )
+        ):
+            raise TypeError("raw trace root support contains an unknown value")
+        if (
+            self.applications.presentation
+            is rules.SupportPresentation.FINITE
+            and any(
+                type(item) is not ApplicationComplete
+                for item in self.applications.atoms
+            )
+        ):
+            raise TypeError("raw trace application support contains an unknown value")
+        if (
+            self.derivation_edges.presentation
+            is rules.SupportPresentation.FINITE
+            and any(
+                type(item) not in (AppliedDerivation, AppliedNoSuccessor)
+                for item in self.derivation_edges.atoms
+            )
+        ):
+            raise TypeError("raw trace derivation support contains an unknown value")
         if type(self.lineage_graph) is not tuple or any(
             type(item) is not TraceEdge for item in self.lineage_graph
         ):
             raise TypeError("raw lineage graph is not recognized")
+        if (
+            self.derivation_edges.presentation
+            is rules.SupportPresentation.FINITE
+        ):
+            edge_identities = {
+                item.canonical_identity for item in self.derivation_edges.atoms
+            }
+            if len(self.lineage_graph) != len(self.derivation_edges.atoms) or any(
+                edge.applied_atom_identity not in edge_identities
+                for edge in self.lineage_graph
+            ):
+                raise ValueError(
+                    "raw lineage graph must cover every retained derivation edge"
+                )
         if type(self.seed_evidence) is not SeedRealizationEvidence:
             raise TypeError("raw trace Seed evidence is not recognized")
         if type(self.draw_evidence) is not tuple or any(
@@ -1806,6 +1851,15 @@ class RolloutComplete(Generic[C]):
             raise TypeError("complete rollout trace is not recognized")
         if type(self.closed_leaves) is not rules.SupportSpace:
             raise TypeError("closed-leaf support is not recognized")
+        if (
+            self.closed_leaves.presentation
+            is not rules.SupportPresentation.FINITE
+            or any(
+                type(item) is not ClosedLeaf
+                for item in self.closed_leaves.atoms
+            )
+        ):
+            raise TypeError("complete rollout needs finite closed leaves")
 
 
 class TruncationCause(Enum):
@@ -1827,6 +1881,15 @@ class RolloutTruncated(Generic[C]):
             raise TypeError("truncated rollout trace is not recognized")
         if type(self.continuing_leaves) is not rules.SupportSpace:
             raise TypeError("continuing-leaf support is not recognized")
+        if (
+            self.continuing_leaves.presentation
+            is rules.SupportPresentation.FINITE
+            and any(
+                type(item) is not ContinuingLeaf
+                for item in self.continuing_leaves.atoms
+            )
+        ):
+            raise TypeError("continuing-leaf support contains an unknown value")
         if type(self.cause) is not TruncationCause:
             raise TypeError("truncation cause is not recognized")
 

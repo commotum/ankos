@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 import ca
-from ca import loci, neighborhoods, program, rules
+from ca import frontiers, loci, neighborhoods, program, rules
 
 import test_oracles
 from g7_fixtures import native_program, successor_values
@@ -216,118 +216,441 @@ def _results_for_expression(
     return tuple(sorted(selected))
 
 
-def _oracle_sequence_values(term: test_oracles.OracleTerm) -> tuple[object, ...]:
-    if term.tag == "history":
-        values = term.arguments[0]
-        assert isinstance(values, test_oracles.OracleTerm)
-        assert values.tag == "values"
-        return values.arguments
-    if term.tag == "line1d":
-        values = next(
-            item
-            for item in term.arguments
-            if isinstance(item, test_oracles.OracleTerm) and item.tag == "values"
-        )
-        return values.arguments
-    if term.tag == "grid2d":
-        return tuple(
-            value
-            for item in term.arguments
-            if isinstance(item, test_oracles.OracleTerm) and item.tag == "row"
-            for value in item.arguments
-        )
-    if term.tag == "grid3d":
-        return tuple(
-            value
-            for layer in term.arguments
-            if isinstance(layer, test_oracles.OracleTerm) and layer.tag == "layer"
-            for row in layer.arguments
-            if isinstance(row, test_oracles.OracleTerm) and row.tag == "row"
-            for value in row.arguments
-        )
-    raise AssertionError(f"unsupported native oracle configuration {term.tag}")
-
-
-def _assert_configuration_matches(
+def _configuration_as_oracle(
+    case_id: str,
     actual: loci.FiniteConfiguration,
-    expected: test_oracles.OracleTerm,
-) -> None:
-    if expected.tag == "configuration.record":
-        expected_fields = {
-            str(field.arguments[0]): field.arguments[1]
-            for field in expected.arguments
-            if isinstance(field, test_oracles.OracleTerm)
-            and field.tag == "field-value"
+) -> test_oracles.OracleTerm:
+    if case_id == "ar2":
+        assert actual.contract.kind is loci.CarrierKind.RECORD
+        fields = {
+            str(target.path[-1]): _oracle_scalar(value)
+            for target, value in actual.entries
         }
-        actual_fields = {
-            str(target.path[-1]): value for target, value in actual.entries
-        }
-        assert actual_fields == expected_fields
-        return
-    assert tuple(value for _, value in actual.entries) == _oracle_sequence_values(
-        expected
-    )
-
-
-def _target_mapping(
-    source: loci.FiniteConfiguration,
-    oracle_case: test_oracles.OracleCase,
-) -> dict[loci.Locus, test_oracles.OracleTerm]:
-    if source.contract.kind is loci.CarrierKind.RECORD:
-        by_name = {
-            str(target.arguments[0]): target for target in oracle_case.writable
-        }
-        return {
-            target: by_name[str(target.path[-1])] for target, _ in source.entries
-        }
-    return dict(
-        zip(
-            (target for target, _ in source.entries),
-            oracle_case.writable,
-            strict=True,
+        assert set(fields) == {"previous", "current"}
+        return _term(
+            "configuration.record",
+            _term("field-value", "previous", fields["previous"]),
+            _term("field-value", "current", fields["current"]),
         )
+
+    if case_id in ("dyadlags", "lagcounts"):
+        assert actual.contract.kind is loci.CarrierKind.HISTORY
+        indexed = {
+            int(target.path[-1]): _oracle_scalar(value)
+            for target, value in actual.entries
+        }
+        assert set(indexed) == set(range(len(indexed)))
+        return _term(
+            "history",
+            _term(
+                "values",
+                *(indexed[index] for index in range(len(indexed))),
+            ),
+        )
+
+    assert actual.contract.kind is loci.CarrierKind.GRID
+    assert actual.contract.shape is not None
+    boundary = actual.carrier.boundary
+    assert boundary.policy is loci.BoundaryPolicy.FIXED
+    default = _oracle_scalar(boundary.exterior)
+    assert default == 0
+    values = {
+        loci.grid_coordinates(target): _oracle_scalar(value)
+        for target, value in actual.entries
+    }
+    axes = tuple(
+        loci.centered_axis_values(size)
+        for size in actual.contract.shape
+    )
+    if case_id == "dyadrads":
+        assert actual.contract.shape == (5,)
+        return _term(
+            "line1d",
+            _term("topology", "finite-line", 5),
+            _term("default", default),
+            _term("values", *(values[(x,)] for x in axes[0])),
+        )
+    if case_id == "dyadaxes-2d":
+        assert actual.contract.shape == (3, 3)
+        return _term(
+            "grid2d",
+            _term("topology", "finite-grid", 3, 3),
+            _term("default", default),
+            *(
+                _term("row", *(values[(x, y)] for y in axes[1]))
+                for x in axes[0]
+            ),
+        )
+    assert case_id == "dyadaxes-3d"
+    assert actual.contract.shape == (3, 3, 3)
+    return _term(
+        "grid3d",
+        _term("topology", "finite-grid", 3, 3, 3),
+        _term("default", default),
+        *(
+            _term(
+                "layer",
+                *(
+                    _term(
+                        "row",
+                        *(values[(x, y, z)] for z in axes[2]),
+                    )
+                    for y in axes[1]
+                ),
+            )
+            for x in axes[0]
+        ),
     )
 
 
-def _normalized_dispositions(
+def _target_as_oracle(
+    case_id: str,
+    source: loci.FiniteConfiguration,
+    target: loci.Locus,
+) -> test_oracles.OracleTerm:
+    if case_id == "ar2":
+        assert target.kind is loci.LocusKind.NAMED
+        assert target.scope == "record"
+        return _term("field", str(target.path[-1]))
+    if case_id in ("dyadlags", "lagcounts"):
+        assert target.kind is loci.LocusKind.OCCURRENCE
+        assert target.path[0] == "history"
+        index = int(target.path[-1])
+        if case_id == "dyadlags":
+            role = {0: "older", 1: "previous", 2: "current"}[index]
+            return _term("history-slot", role)
+        return _term("history-index", index)
+
+    coordinates = loci.grid_coordinates(target)
+    if case_id == "dyadrads":
+        assert source.contract.shape == (5,)
+        axis = loci.centered_axis_values(5)
+        return _term("cell1d", axis.index(coordinates[0]))
+    if case_id == "dyadaxes-2d":
+        assert len(coordinates) == 2
+        return _term("cell2d", *coordinates)
+    assert case_id == "dyadaxes-3d"
+    assert len(coordinates) == 3
+    return _term("cell3d", *coordinates)
+
+
+def _target_order_key(
+    case_id: str,
+    target: loci.Locus,
+) -> tuple[int, ...]:
+    if case_id == "ar2":
+        return ({"previous": 0, "current": 1}[str(target.path[-1])],)
+    if case_id in ("dyadlags", "lagcounts"):
+        return (int(target.path[-1]),)
+    return loci.grid_coordinates(target)
+
+
+def _writable_as_oracle(
+    case_id: str,
+    source: loci.FiniteConfiguration,
+    writable: frontiers.WritableCapabilities,
+) -> tuple[test_oracles.OracleTerm, ...]:
+    assert writable.snapshot_identity == source.identity
+    assert not writable.fresh
+    assert tuple(item.target for item in writable.existing) == tuple(
+        lens.target for lens in writable.reconstruction.lenses
+    )
+    ordered = sorted(
+        writable.existing,
+        key=lambda item: _target_order_key(case_id, item.target),
+    )
+    return tuple(
+        _target_as_oracle(case_id, source, item.target)
+        for item in ordered
+    )
+
+
+def _dispositions_as_oracle(
+    case_id: str,
+    source: loci.FiniteConfiguration,
     actual: rules.TotalDisposition,
-    mapping: dict[loci.Locus, test_oracles.OracleTerm],
-    expected: tuple[test_oracles.OracleDisposition, ...],
+    writable_targets: tuple[loci.Locus, ...],
 ) -> tuple[test_oracles.OracleDisposition, ...]:
-    expected_order = {
-        item.target: index for index, item in enumerate(expected)
-    }
-    normalized = []
-    for item in actual.existing:
+    assert {item.target for item in actual.existing} == set(writable_targets)
+    normalized: list[test_oracles.OracleDisposition] = []
+    ordered = sorted(
+        actual.existing,
+        key=lambda item: _target_order_key(case_id, item.target),
+    )
+    for item in ordered:
         payload = (
-            item.payload.value
+            _oracle_scalar(item.payload.value)
             if isinstance(item.payload, rules.ValuePayload)
             else None
         )
         normalized.append(
             test_oracles.OracleDisposition(
-                mapping[item.target],
+                _target_as_oracle(case_id, source, item.target),
                 item.action.value,
                 payload,
             )
         )
     assert not actual.fresh
-    return tuple(
-        sorted(normalized, key=lambda item: expected_order[item.target])
+    return tuple(normalized)
+
+
+def _observation_value(
+    observation: neighborhoods.Observation,
+) -> test_oracles.OracleValue:
+    assert not isinstance(observation.state, neighborhoods.Absent)
+    return _oracle_scalar(observation.value)
+
+
+def _readable_as_oracle(
+    case_id: str,
+    source: loci.FiniteConfiguration,
+    readable: neighborhoods.ReadableView,
+) -> test_oracles.OracleTerm:
+    assert readable.snapshot_identity == source.identity
+    assert all(
+        type(observation.target) is loci.Locus
+        and not isinstance(observation.state, neighborhoods.Absent)
+        for observation in readable.observations
+    )
+    if case_id == "ar2":
+        fields = {
+            str(observation.target.path[-1]): _observation_value(observation)
+            for observation in readable.observations
+        }
+        assert set(fields) == {"previous", "current"}
+        return _term(
+            "read.record",
+            _term("field-value", "previous", fields["previous"]),
+            _term("field-value", "current", fields["current"]),
+        )
+    if case_id == "dyadlags":
+        indexed = {
+            int(observation.target.path[-1]): _observation_value(observation)
+            for observation in readable.observations
+        }
+        assert set(indexed) == {0, 1, 2}
+        return _term(
+            "temporal-lag-view",
+            _term("values", *(indexed[index] for index in range(3))),
+        )
+    if case_id == "lagcounts":
+        groups = {}
+        for group in readable.groups:
+            observations = sorted(
+                (readable.observations[index] for index in group.indices),
+                key=lambda observation: int(observation.target.path[-1]),
+            )
+            groups[group.key.channel] = tuple(
+                _observation_value(observation)
+                for observation in observations
+            )
+        assert set(groups) == {0, 1, 2, 3}
+        assert tuple(map(len, (groups[0], groups[1], groups[2], groups[3]))) == (
+            1,
+            3,
+            3,
+            3,
+        )
+        return _term(
+            "count-banded-history-view",
+            _term("current", *groups[0]),
+            _term("recent", *groups[1]),
+            _term("middle", *groups[2]),
+            _term("oldest", *groups[3]),
+        )
+
+    expected_sizes = {
+        "dyadrads": (1, 2, 2),
+        "dyadaxes-2d": (1, 4, 4),
+        "dyadaxes-3d": (1, 6, 20),
+    }[case_id]
+    for target, _ in source.entries:
+        groups = sorted(
+            (
+                group
+                for group in readable.groups
+                if group.key.anchor == target
+            ),
+            key=lambda group: group.key.channel,
+        )
+        assert tuple(group.key.channel for group in groups) == (0, 1, 2)
+        assert tuple(len(group.indices) for group in groups) == expected_sizes
+    source_term = _configuration_as_oracle(case_id, source)
+    tag = {
+        "dyadrads": "old-snapshot-stencils",
+        "dyadaxes-2d": "old-snapshot-2d-stencils",
+        "dyadaxes-3d": "old-snapshot-3d-stencils",
+    }[case_id]
+    return _term(tag, source_term)
+
+
+def _static_witness_parts(
+    expression: rules.RuleExpr,
+) -> tuple[rules.RuleScalar | rules.RuleExpr, ...]:
+    assert expression.primitive is rules.ExpressionPrimitive.TUPLE
+    assert expression.arguments
+    return expression.arguments
+
+
+def _literal_part(
+    parts: tuple[rules.RuleScalar | rules.RuleExpr, ...],
+    index: int,
+) -> test_oracles.OracleScalar:
+    expression = parts[index]
+    assert isinstance(expression, rules.RuleExpr)
+    return _oracle_scalar(_literal_value(expression))
+
+
+def _index_by_target(
+    facts: tuple[EvaluationFact, ...],
+    index_expression: rules.RuleExpr,
+    targets: tuple[loci.Locus, ...],
+) -> dict[loci.Locus, int]:
+    target_by_anchor = {
+        loci.canonical_identity(target): target for target in targets
+    }
+    results: dict[loci.Locus, set[int]] = {}
+    for anchor, evaluated, result, _ in facts:
+        if evaluated != index_expression:
+            continue
+        assert anchor in target_by_anchor
+        assert type(result) is int
+        results.setdefault(target_by_anchor[anchor], set()).add(result)
+    assert set(results) == set(targets)
+    assert all(len(values) == 1 for values in results.values())
+    return {
+        target: next(iter(values))
+        for target, values in results.items()
+    }
+
+
+def _native_witness_as_oracle(
+    case_id: str,
+    source: loci.FiniteConfiguration,
+    static_witness: rules.RuleExpr,
+    facts: tuple[EvaluationFact, ...],
+    writable_targets: tuple[loci.Locus, ...],
+) -> test_oracles.OracleTerm:
+    parts = _static_witness_parts(static_witness)
+    observations = _single_results_by_observation(facts)
+
+    if case_id == "ar2":
+        static = tuple(_literal_part(parts, index) for index in range(len(parts)))
+        assert static == ("ar2-modular", 17, 2, 1, 1, 97)
+        assert observations[0] == 3
+        assert observations[1] == 5
+        modulo_results = {
+            result
+            for _, expression, result, _ in facts
+            if expression.primitive is rules.ExpressionPrimitive.MODULO
+        }
+        assert modulo_results == {14}
+        return _term("witness.rule", "ar2-modular", "rule-id", 17)
+
+    label = _literal_part(parts, 0)
+    rule_number = _literal_part(parts, 1)
+    index_expression = parts[2]
+    assert isinstance(label, str)
+    assert type(rule_number) is int
+    assert isinstance(index_expression, rules.RuleExpr)
+
+    if case_id == "dyadlags":
+        assert (label, rule_number) == ("dyadlags-0d", 150)
+        index_results = _results_for_expression(facts, index_expression)
+        assert index_results == (("none", 4),)
+        return _term(
+            "lookup-witness",
+            label,
+            _term(
+                "context",
+                observations[0],
+                observations[1],
+                observations[2],
+            ),
+            _term("index", 4),
+            _term("rule-id", rule_number),
+        )
+
+    if case_id == "lagcounts":
+        assert (label, rule_number) == ("lagcounts-0d", 91)
+        index_results = _results_for_expression(facts, index_expression)
+        assert index_results == (("none", 77),)
+        counts = _single_results_by_counted_group(facts)
+        assert set(counts) >= {1, 2, 3}
+        return _term(
+            "count-band-witness",
+            _term("current", observations[0]),
+            _term("band-counts", counts[1], counts[2], counts[3]),
+            _term("context", 77),
+            _term("rule-id", rule_number),
+        )
+
+    indices = _index_by_target(facts, index_expression, writable_targets)
+    if case_id == "dyadrads":
+        assert (label, rule_number) == ("dyadrads-1d", 30)
+        axis = loci.centered_axis_values(5)
+        by_coordinate = {
+            loci.grid_coordinates(target)[0]: value
+            for target, value in indices.items()
+        }
+        ordered = tuple(by_coordinate[coordinate] for coordinate in axis)
+        return _term(
+            "lookup-witness",
+            label,
+            _term("indices", *ordered),
+            _term("rule-id", rule_number),
+        )
+    if case_id == "dyadaxes-2d":
+        assert (label, rule_number) == ("dyadaxes-2d", 128)
+        by_coordinate = {
+            loci.grid_coordinates(target): value
+            for target, value in indices.items()
+        }
+        axis = loci.centered_axis_values(3)
+        return _term(
+            "lookup-witness",
+            label,
+            _term(
+                "index-grid",
+                *(
+                    _term(
+                        "row",
+                        *(by_coordinate[(x, y)] for y in axis),
+                    )
+                    for x in axis
+                ),
+            ),
+            _term("rule-id", rule_number),
+        )
+
+    assert case_id == "dyadaxes-3d"
+    assert (label, rule_number) == ("dyadaxes-3d", 128)
+    multiplicity = Counter(indices.values())
+    assert set(multiplicity) == {1, 3, 7}
+    return _term(
+        "lookup-witness",
+        label,
+        _term(
+            "index-multiplicity",
+            _term("index", 7, multiplicity[7]),
+            _term("index", 3, multiplicity[3]),
+            _term("index", 1, multiplicity[1]),
+        ),
+        _term("rule-id", rule_number),
     )
 
 
-def _assert_cardinality_matches(
+def _cardinality_as_oracle(
     actual: rules.Cardinality,
-    expected: test_oracles.OracleCardinality,
-) -> None:
-    if expected.kind == "exact":
-        assert rules.cardinality_size(actual) == expected.value
-        assert actual.evidence.kind is rules.CertificateKind.CARDINALITY
-    else:
-        assert isinstance(actual, rules.Many)
-        assert actual.infinite is rules.InfiniteCardinality.UNCOUNTABLE
-        assert actual.evidence.kind is rules.CertificateKind.CARDINALITY
+) -> test_oracles.OracleCardinality:
+    assert actual.evidence.kind is rules.CertificateKind.CARDINALITY
+    assert actual.evidence.version == 1
+    size = rules.cardinality_size(actual)
+    if size is not None:
+        return test_oracles.OracleCardinality("exact", size)
+    assert isinstance(actual, rules.Many)
+    assert actual.infinite is rules.InfiniteCardinality.UNCOUNTABLE
+    return test_oracles.OracleCardinality("uncountable", None)
 
 
 def _assert_support_evidence(support: rules.SupportSpace) -> None:
@@ -341,12 +664,56 @@ def _assert_support_evidence(support: rules.SupportSpace) -> None:
     assert support.soundness_evidence.version == 1
 
 
-def _assert_absent_measure(
+def _measure_as_oracle(
     actual: program.MeasureView,
-    expected: test_oracles.OracleMeasureView,
-) -> None:
-    assert expected == test_oracles.ABSENT_MEASURE
+) -> test_oracles.OracleMeasureView:
     assert isinstance(actual, program.MeasureAbsent)
+    return test_oracles.OracleMeasureView("absent", (), None, None)
+
+
+def _application_evidence_as_oracle(
+    actual: program.ApplicationEvidence,
+    *,
+    oracle_case: test_oracles.OracleCase,
+    simple_program: ca.SimpleProgram,
+    source: loci.FiniteConfiguration,
+    readable: neighborhoods.ReadableView,
+    writable: frontiers.WritableCapabilities,
+) -> test_oracles.OracleTerm:
+    assert actual.phases == tuple(program.ApplicationPhase)
+    runtime_identities = (
+        actual.program_identity,
+        actual.input_configuration_identity,
+        actual.readable_binding_identity,
+        actual.writable_binding_identity,
+        actual.application_identity,
+    )
+    assert all(type(identity) is str and identity for identity in runtime_identities)
+    assert actual.program_identity == simple_program.canonical_identity
+    assert actual.input_configuration_identity == source.identity
+    assert actual.readable_binding_identity == loci.canonical_identity(readable)
+    assert actual.writable_binding_identity == loci.canonical_identity(writable)
+    assert actual.application_identity == loci.canonical_identity(
+        (
+            simple_program.canonical_identity,
+            source.identity,
+            actual.readable_binding_identity,
+            actual.writable_binding_identity,
+        )
+    )
+    # The frozen oracle names an application semantically; runtime identity
+    # fields are hashes.  Project only after validating every hashed field.
+    return _term("application-evidence", oracle_case.case_id)
+
+
+def _optional_relation_as_oracle(
+    relation: rules.RuleExpr | None,
+) -> test_oracles.OracleTerm | None:
+    if relation is None:
+        return None
+    converted = _rule_expr_as_oracle_term(relation)
+    assert isinstance(converted, test_oracles.OracleTerm)
+    return converted
 
 
 def _assert_complete_native_result(
@@ -355,117 +722,120 @@ def _assert_complete_native_result(
     source: loci.FiniteConfiguration,
     actual: program.ApplicationComplete,
 ) -> test_oracles.OracleExpected:
-    """Normalize every retained runtime field onto the frozen oracle schema."""
+    """Construct a complete oracle representation from runtime semantics."""
 
     oracle_case = ORACLE_CASES[case_id]
-    expected = oracle_case.expected
-    _assert_configuration_matches(source, oracle_case.source)
+    assert _configuration_as_oracle(case_id, source) == oracle_case.source
     writable = simple_program.frontier.resolve(source)
     readable = simple_program.neighborhood.resolve(source)
-    mapping = _target_mapping(source, oracle_case)
-    assert tuple(mapping[target] for target in writable.targets) == tuple(
-        mapping[target] for target, _ in source.entries
-    )
-    assert readable.snapshot_identity == source.identity
-    assert all(
-        not isinstance(observation.state, neighborhoods.Absent)
-        for observation in readable.observations
-    )
+    assert _writable_as_oracle(case_id, source, writable) == oracle_case.writable
+    assert _readable_as_oracle(case_id, source, readable) == oracle_case.readable
 
-    assert expected.support_kind == "finite"
-    assert actual.source_outcomes.support.presentation is rules.SupportPresentation.FINITE
+    source_support = actual.source_outcomes.support
+    assert source_support.presentation is rules.SupportPresentation.FINITE
     assert actual.source_outcomes.probability_law is None
     assert actual.source_outcomes.version == 1
-    _assert_support_evidence(actual.source_outcomes.support)
-    _assert_cardinality_matches(
-        actual.source_outcomes.support.cardinality,
-        expected.outcome_cardinality,
+    _assert_support_evidence(source_support)
+    source_cardinality = _cardinality_as_oracle(source_support.cardinality)
+    assert source_cardinality == _cardinality_as_oracle(
+        actual.outcome_atom_cardinality
     )
-    assert len(actual.source_outcomes.support.atoms) == len(expected.source_outcomes)
 
-    runtime_by_oracle_id: dict[
-        str, rules.Derivation | rules.NoSuccessor
-    ] = {}
-    for runtime_atom, expected_atom in zip(
-        actual.source_outcomes.support.atoms,
-        expected.source_outcomes,
-        strict=True,
-    ):
-        assert expected_atom.kind == "derivation"
-        assert expected_atom.reason is None
+    expected_by_witness = {
+        atom.witness: atom for atom in oracle_case.expected.source_outcomes
+    }
+    assert len(expected_by_witness) == len(
+        oracle_case.expected.source_outcomes
+    )
+    runtime_to_oracle_id: dict[str, str] = {}
+    normalized_source_atoms: list[test_oracles.OracleSourceAtom] = []
+    writable_targets = tuple(item.target for item in writable.existing)
+    for runtime_atom in source_support.atoms:
         assert isinstance(runtime_atom, rules.Derivation)
-        runtime_by_oracle_id[expected_atom.atom_id] = runtime_atom
-        assert runtime_atom.progress.value == expected_atom.progress
-        assert isinstance(runtime_atom.continuation, rules.Continue)
-        assert runtime_atom.continuation.version == 1
-        assert expected_atom.continuation == test_oracles.OracleTerm("continue")
-        assert runtime_atom.provenance == expected_atom.provenance
-        assert _normalized_dispositions(
-            runtime_atom.replacement,
-            mapping,
-            expected_atom.dispositions,
-        ) == expected_atom.dispositions
-        assert runtime_atom.replacement.totality_evidence.kind is rules.CertificateKind.TOTALITY
-        assert runtime_atom.replacement.version == 1
         assert runtime_atom.version == 1
+        assert runtime_atom.replacement.version == 1
+        assert (
+            runtime_atom.replacement.totality_evidence.kind
+            is rules.CertificateKind.TOTALITY
+        )
         assert runtime_atom.witness.version == 1
         assert runtime_atom.certificate.version == 1
-        assert (
-            runtime_atom.certificate.kind
-            is rules.CertificateKind.DERIVATION
-        )
-        assert runtime_atom.witness.canonical_identity == loci.canonical_identity(
+        assert runtime_atom.certificate.kind is rules.CertificateKind.DERIVATION
+        assert runtime_atom.witness.identity == loci.canonical_identity(
             runtime_atom.witness.descriptor
         )
-        witness_descriptor = runtime_atom.witness.descriptor
-        assert witness_descriptor.primitive is rules.ExpressionPrimitive.TUPLE
-        assert len(witness_descriptor.arguments) == 3
-        static_witness = witness_descriptor.arguments[0]
-        evaluation_proof = witness_descriptor.arguments[1]
-        disposition_identity = witness_descriptor.arguments[2]
+        descriptor = runtime_atom.witness.descriptor
+        assert descriptor.primitive is rules.ExpressionPrimitive.TUPLE
+        assert len(descriptor.arguments) == 3
+        static_witness, evaluation_proof, disposition_identity = (
+            descriptor.arguments
+        )
         assert isinstance(static_witness, rules.RuleExpr)
         assert isinstance(evaluation_proof, rules.RuleExpr)
         assert isinstance(disposition_identity, rules.RuleExpr)
-        _assert_evaluation_proof(
+        facts = _evaluation_facts(
             evaluation_proof,
             readable,
-            tuple(item.target for item in writable.existing),
+            writable_targets,
         )
+        normalized_witness = _native_witness_as_oracle(
+            case_id,
+            source,
+            static_witness,
+            facts,
+            writable_targets,
+        )
+        assert normalized_witness in expected_by_witness
+        expected_atom = expected_by_witness[normalized_witness]
+        runtime_identity = runtime_atom.canonical_identity
+        assert runtime_identity not in runtime_to_oracle_id
+        runtime_to_oracle_id[runtime_identity] = expected_atom.atom_id
         assert _rule_expr_as_oracle_term(disposition_identity) == (
             runtime_atom.replacement.canonical_identity
         )
-        literals = _rule_expr_literals(static_witness)
-        for fact in NATIVE_WITNESS_FACTS[case_id]:
-            assert fact in literals
-        # The descriptor plus evaluated total disposition is the runtime's
-        # closed refinement of the oracle's semantic witness term.
-        assert expected_atom.witness.tag
-        assert (
-            _rule_expr_as_oracle_term(runtime_atom.certificate.statement)
-            == expected_atom.certificate
+        assert isinstance(runtime_atom.continuation, rules.Continue)
+        assert runtime_atom.continuation.version == 1
+        normalized_source_atoms.append(
+            test_oracles.OracleSourceAtom(
+                atom_id=expected_atom.atom_id,
+                kind="derivation",
+                witness=normalized_witness,
+                provenance=runtime_atom.provenance,
+                progress=runtime_atom.progress.value,
+                continuation=_term("continue"),
+                dispositions=_dispositions_as_oracle(
+                    case_id,
+                    source,
+                    runtime_atom.replacement,
+                    writable_targets,
+                ),
+                reason=None,
+                certificate=_rule_expr_as_oracle_term(
+                    runtime_atom.certificate.statement
+                ),
+                mass=None,
+            )
         )
-        assert expected_atom.mass is None
+    normalized_source_atoms.sort(key=lambda atom: atom.atom_id)
 
-    assert len(actual.applied_atoms.atoms) == len(expected.applied_atoms)
     _assert_support_evidence(actual.applied_atoms)
-    for runtime_applied, expected_applied in zip(
-        actual.applied_atoms.atoms,
-        expected.applied_atoms,
-        strict=True,
-    ):
+    applied_cardinality = _cardinality_as_oracle(
+        actual.applied_atoms.cardinality
+    )
+    derivation_cardinality = _cardinality_as_oracle(
+        actual.derivation_cardinality
+    )
+    assert applied_cardinality == derivation_cardinality
+    normalized_applied: list[test_oracles.OracleAppliedAtom] = []
+    for runtime_applied in actual.applied_atoms.atoms:
         assert isinstance(runtime_applied, program.AppliedDerivation)
-        assert expected_applied.atom_id == expected_applied.source_atom_id
-        assert runtime_applied.source is runtime_by_oracle_id[
-            expected_applied.source_atom_id
-        ]
-        assert runtime_applied.source.witness.identity
+        source_identity = runtime_applied.source.canonical_identity
+        assert source_identity in runtime_to_oracle_id
+        oracle_atom_id = runtime_to_oracle_id[source_identity]
         assert not runtime_applied.fresh_bindings
-        assert expected_applied.fresh_bindings == ()
-        assert expected_applied.successor is not None
-        _assert_configuration_matches(
-            runtime_applied.successor,
-            expected_applied.successor,
-        )
+        assert runtime_applied.evidence.version == 1
+        assert type(runtime_applied.evidence.application_identity) is str
+        assert type(runtime_applied.evidence.disposition_identity) is str
         assert runtime_applied.evidence.application_identity == (
             actual.evidence.application_identity
         )
@@ -480,105 +850,104 @@ def _assert_complete_native_result(
         )
         assert runtime_applied.output_trace_lineage.root_identity == direct_root
         assert runtime_applied.output_trace_lineage.version == 1
-        assert runtime_applied.evidence.version == 1
         expected_edge = loci.canonical_identity(
             (
-                loci.canonical_identity(
-                    program.TraceLineage(direct_root)
-                ),
+                loci.canonical_identity(program.TraceLineage(direct_root)),
                 actual.evidence.application_identity,
-                runtime_applied.source.canonical_identity,
+                source_identity,
                 runtime_applied.source.progress.value,
             )
         )
         assert runtime_applied.output_trace_lineage.path == (expected_edge,)
+        normalized_applied.append(
+            test_oracles.OracleAppliedAtom(
+                atom_id=oracle_atom_id,
+                source_atom_id=oracle_atom_id,
+                successor=_configuration_as_oracle(
+                    case_id,
+                    runtime_applied.successor,
+                ),
+                fresh_bindings=(),
+                output_trace_lineage=_term(
+                    "lineage",
+                    oracle_case.case_id,
+                    oracle_atom_id,
+                ),
+                evidence=_term(
+                    "applied-atom-evidence",
+                    oracle_case.case_id,
+                    oracle_atom_id,
+                ),
+            )
+        )
+    normalized_applied.sort(key=lambda atom: atom.atom_id)
 
     assert actual.no_successor_partition.atoms == ()
     _assert_support_evidence(actual.no_successor_partition)
-    _assert_cardinality_matches(
-        actual.no_successor_partition.cardinality,
-        test_oracles.EXACT_ZERO,
+    assert _cardinality_as_oracle(
+        actual.no_successor_partition.cardinality
+    ) == test_oracles.OracleCardinality("exact", 0)
+
+    successor_support = actual.successor_quotient_with_derivation_fibers
+    _assert_support_evidence(successor_support)
+    successor_cardinality = _cardinality_as_oracle(
+        actual.successor_cardinality
     )
-    assert expected.no_successor_partition == ()
-    _assert_cardinality_matches(
-        actual.outcome_atom_cardinality,
-        expected.outcome_cardinality,
+    assert successor_cardinality == _cardinality_as_oracle(
+        successor_support.cardinality
     )
-    _assert_cardinality_matches(
-        actual.derivation_cardinality,
-        expected.derivation_cardinality,
-    )
-    _assert_cardinality_matches(
-        actual.applied_atoms.cardinality,
-        expected.derivation_cardinality,
-    )
-    _assert_cardinality_matches(
-        actual.successor_cardinality,
-        expected.successor_cardinality,
-    )
-    assert len(actual.successor_quotient_with_derivation_fibers.atoms) == len(
-        expected.successor_fibers
-    )
-    _assert_support_evidence(
-        actual.successor_quotient_with_derivation_fibers
-    )
-    _assert_cardinality_matches(
-        actual.successor_quotient_with_derivation_fibers.cardinality,
-        expected.successor_cardinality,
-    )
-    for runtime_fiber, expected_fiber in zip(
-        actual.successor_quotient_with_derivation_fibers.atoms,
-        expected.successor_fibers,
-        strict=True,
-    ):
-        _assert_configuration_matches(
-            runtime_fiber.successor,
-            expected_fiber.successor,
-        )
-        assert tuple(
-            next(
-                oracle_id
-                for oracle_id, source_atom in runtime_by_oracle_id.items()
-                if source_atom is item.source
-            )
+    normalized_fibers: list[test_oracles.OracleFiber] = []
+    for runtime_fiber in successor_support.atoms:
+        atom_ids = tuple(
+            runtime_to_oracle_id[item.source.canonical_identity]
             for item in runtime_fiber.derivations
-        ) == expected_fiber.atom_ids
-
-    _assert_absent_measure(
-        actual.applied_atom_measure,
-        expected.measures.applied_atoms,
-    )
-    _assert_absent_measure(
-        actual.successor_submeasure,
-        expected.measures.successors,
-    )
-    _assert_absent_measure(
-        actual.no_successor_submeasure,
-        expected.measures.no_successors,
-    )
-    assert expected.source_intensional_relation is None
-    assert expected.applied_intensional_relation is None
-    assert expected.successor_intensional_relation is None
-
-    evidence = actual.evidence
-    assert evidence.phases == tuple(program.ApplicationPhase)
-    assert evidence.program_identity == simple_program.canonical_identity
-    assert evidence.input_configuration_identity == source.identity
-    assert evidence.readable_binding_identity == loci.canonical_identity(readable)
-    assert evidence.writable_binding_identity == loci.canonical_identity(writable)
-    assert evidence.application_identity == loci.canonical_identity(
-        (
-            simple_program.canonical_identity,
-            source.identity,
-            evidence.readable_binding_identity,
-            evidence.writable_binding_identity,
         )
+        normalized_fibers.append(
+            test_oracles.OracleFiber(
+                _configuration_as_oracle(
+                    case_id,
+                    runtime_fiber.successor,
+                ),
+                atom_ids,
+            )
+        )
+    normalized_fibers.sort(
+        key=lambda fiber: (repr(fiber.successor), fiber.atom_ids)
     )
-    assert expected.evidence.tag == "application-evidence"
 
-    # Every actual field has been validated above; returning the corresponding
-    # frozen semantic record makes the normalization boundary explicit.
-    return expected
+    normalized_evidence = _application_evidence_as_oracle(
+        actual.evidence,
+        oracle_case=oracle_case,
+        simple_program=simple_program,
+        source=source,
+        readable=readable,
+        writable=writable,
+    )
+    return test_oracles.OracleExpected(
+        support_kind="finite",
+        source_outcomes=tuple(normalized_source_atoms),
+        applied_atoms=tuple(normalized_applied),
+        no_successor_partition=(),
+        outcome_cardinality=source_cardinality,
+        derivation_cardinality=derivation_cardinality,
+        successor_cardinality=successor_cardinality,
+        successor_fibers=tuple(normalized_fibers),
+        measures=test_oracles.OracleMeasures(
+            applied_atoms=_measure_as_oracle(actual.applied_atom_measure),
+            successors=_measure_as_oracle(actual.successor_submeasure),
+            no_successors=_measure_as_oracle(actual.no_successor_submeasure),
+        ),
+        source_intensional_relation=_optional_relation_as_oracle(
+            source_support.relation
+        ),
+        applied_intensional_relation=_optional_relation_as_oracle(
+            actual.applied_atoms.relation
+        ),
+        successor_intensional_relation=_optional_relation_as_oracle(
+            successor_support.relation
+        ),
+        evidence=normalized_evidence,
+    )
 
 
 def test_reference_oracles_are_statically_independent_of_runtime_semantics() -> None:
