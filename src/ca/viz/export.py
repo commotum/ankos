@@ -1,16 +1,70 @@
-"""Export raw ANKoS rollouts to compact static-viewer bundles."""
+"""Export explicit downstream dataset views to viewer bundle version 1.
+
+The Goal 7 target layer in this module accepts only ``DatasetEpisode`` and
+``DatasetBatch`` tensor projections prepared by ``datasets.py``. It preserves
+the existing ``ankos.viz.bundle`` wire contract and presentation metadata. It
+does not infer a tensor layout from arbitrary semantic results, define the
+canonical program codec, or participate in application.
+
+The target signature is documented but not falsely overloaded while the live
+0.1 exporter still consumes ``RawEpisode`` and ``RawBatch``. That implementation
+remains intact below the explicit legacy divider until the atomic G7-01
+downstream migration.
+"""
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ..specs import RawBatch, RawEpisode
 from .format import FORMAT_NAME, FORMAT_VERSION, align_offset, encode_bundle
+
+
+if TYPE_CHECKING:
+    from ..datasets import DatasetBatch, DatasetEpisode
+
+    DatasetViewSource = DatasetEpisode | DatasetBatch
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Explicit Dataset-View Input
+# ---------------------------------------------------------------------------
+
+# Target spelling:
+#
+#     save_viewer_bundle(
+#         source: DatasetEpisode | DatasetBatch,
+#         path: str | Path,
+#         ...,
+#     ) -> VizBundleInfo
+#
+# No runtime overload is declared until that source union is actually accepted.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Bundle Preparation
+# ---------------------------------------------------------------------------
+
+# Dataset payload, coordinate, palette, and presentation metadata preparation
+# stays downstream of the explicit projection boundary.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: Viewer-Presentation Aliases
+# ---------------------------------------------------------------------------
+
+# Legacy wire labels such as ``RawEpisode``/``RawBatch``, ``domain``, and
+# ``rule_id`` remain presentation metadata under bundle version 1.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 _STATE_DTYPES = {

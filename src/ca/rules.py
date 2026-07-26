@@ -1,30 +1,252 @@
-"""Rule catalog factories for next-state update laws.
+"""Closed Rule denotations and their complete result algebra.
 
-This module defines rule-type primitives and named rule families for
-cellular-automata style next-state generation. A rule is the update interface:
-it receives already-gathered neighborhood component reads and returns the next
-raw value for one update site.
+The Goal 7 target layer in this module owns sealed Rule ASTs/combinators,
+finite or intensional outcome support, exact cardinality and probability-law
+records, total writable dispositions, witnesses, provenance, progress,
+continuation, and Rule-level rejection. It does not commit configurations,
+draw samples, run solvers, traverse rollouts, or dispatch through catalog or
+family identities. ``program.py`` maps these complete Rule results through the
+single generic reconstruction and commit law.
 
-The construction hierarchy mirrors `neighborhoods.py`:
-
-- Rule-type primitives describe how one neighborhood component is summarized,
-  such as exhaustive, totalistic, or gated totalistic channels.
-- Output rules consume one or more summarized channels, either through a lookup
-  family or through a formulaic callable.
-- Named experiment families are built by composing the primitives rather than
-  duplicating component logic.
-
-This keeps spatial construction in neighborhoods/frontiers, value-space
-construction in alphabets, and rollout mechanics in `rollout.py`. Callers
-choose the alphabet, neighborhood, frontier, seed, shape, horizon, and named
-rule family.
+The target ``Rule(descriptor=...)`` class cannot coexist truthfully with the
+current callable recipe class. Non-colliding target records and factories are
+therefore inert above the complete 0.1 implementation until the atomic G7-01
+cutover.
 """
 
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Literal
+from enum import Enum
+from fractions import Fraction
+from typing import Any, Generic, Literal, NoReturn, TypeAlias, TypeVar
+
+
+C = TypeVar("C")
+W = TypeVar("W")
+A = TypeVar("A")
+
+RuleScalar: TypeAlias = bool | int | Fraction | str
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Singular Rule Primitives
+# ---------------------------------------------------------------------------
+
+
+class RulePrimitive(Enum):
+    """Closed Rule-denotation primitives."""
+
+    PRODUCT = "rule.product"
+    LOOKUP = "rule.lookup"
+    PARALLEL = "rule.parallel"
+    RELATION = "rule.relation"
+    DISTRIBUTION = "rule.distribution"
+    DIFFERENTIAL = "rule.differential"
+
+
+class RuleResultPrimitive(Enum):
+    """Closed Rule-result primitives."""
+
+    TOTAL_DISPOSITION = "rule-result.total-disposition"
+    FINITE_SUPPORT = "rule-result.finite-support"
+    INTENSIONAL_SUPPORT = "rule-result.intensional-support"
+    CARDINALITY = "rule-result.cardinality"
+    PROBABILITY_LAW = "rule-result.probability-law"
+    WITNESS = "rule-result.witness"
+    MEASURE = "rule-result.measure"
+
+
+@dataclass(frozen=True)
+class RuleDescriptor:
+    """Compact rules-owned node shell for the unfinished closed AST."""
+
+    primitive: RulePrimitive | RuleResultPrimitive
+    arguments: tuple[RuleScalar | "RuleDescriptor", ...]
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 Rule factory."""
+
+    raise NotImplementedError("Goal 7 Rule scaffold is not implemented")
+
+
+def table(
+    input_shape: tuple[int, ...],
+    outputs: tuple[RuleScalar, ...],
+) -> "Rule":
+    """Build one closed lookup-table denotation."""
+
+    _not_implemented()
+
+
+# The target frozen ``Rule`` stores one closed descriptor. Its class name
+# remains owned by the incompatible 0.1 callable recipe until G7-01.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Complete Rule Results and Composition
+# ---------------------------------------------------------------------------
+
+
+class Progress(Enum):
+    """Whether a replacement records semantic progress."""
+
+    ADVANCED = "advanced"
+    QUIESCENT = "quiescent"
+
+
+class NoSuccessorOutcome(Enum):
+    """Closed reasons for a valid result with no replacement successor."""
+
+    TERMINAL = "terminal"
+    UNDEFINED = "undefined"
+    DECLARED_FAILURE = "declared-failure"
+    DIVERGENT = "divergent"
+
+
+@dataclass(frozen=True)
+class TotalDisposition(Generic[W]):
+    """Closed total Preserve/Replace/Delete and Absent/Create meaning."""
+
+    descriptor: RuleDescriptor
+    totality_evidence: RuleDescriptor
+
+
+CardinalityClaim: TypeAlias = RuleDescriptor
+Witness: TypeAlias = RuleDescriptor
+Provenance: TypeAlias = tuple[str, ...]
+ProbabilityLaw: TypeAlias = RuleDescriptor
+
+
+@dataclass(frozen=True)
+class SupportSpace(Generic[A]):
+    """Closed finite or intensional support with coverage evidence."""
+
+    descriptor: RuleDescriptor
+
+
+@dataclass(frozen=True)
+class OutcomeSpace(Generic[A]):
+    """Complete support plus an optional, separately declared probability law."""
+
+    support: SupportSpace[A]
+    probability_law: ProbabilityLaw | None
+
+
+@dataclass(frozen=True)
+class Continue:
+    """Continue this witnessed derivation during rollout."""
+
+
+@dataclass(frozen=True)
+class Stop:
+    """Stop this witnessed derivation for a closed semantic reason."""
+
+    reason: RuleDescriptor
+
+
+Continuation: TypeAlias = Continue | Stop
+
+
+@dataclass(frozen=True)
+class Derivation(Generic[W]):
+    """One witnessed, complete replacement alternative."""
+
+    replacement: TotalDisposition[W]
+    progress: Progress
+    continuation: Continuation
+    witness: Witness
+    provenance: Provenance
+
+
+@dataclass(frozen=True)
+class NoSuccessor:
+    """One witnessed semantic outcome without a replacement."""
+
+    outcome: NoSuccessorOutcome
+    reason: RuleDescriptor
+    witness: Witness
+    provenance: Provenance
+
+
+RuleAtom: TypeAlias = Derivation[W] | NoSuccessor
+
+
+@dataclass(frozen=True)
+class RuleFault:
+    """Closed Rule-denotation or result-validation fault."""
+
+    phase: str
+    reason: str
+    evidence: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class RuleRejected:
+    """Rejected Rule denotation with no authoritative result space."""
+
+    fault: RuleFault
+
+
+@dataclass(frozen=True)
+class RuleComplete(Generic[C, W]):
+    """Authoritative complete Rule outcome space."""
+
+    outcome_space: OutcomeSpace[RuleAtom[W]]
+
+
+RuleResult: TypeAlias = RuleComplete[C, W] | RuleRejected
+
+
+def parallel(parts: tuple["Rule", ...]) -> "Rule":
+    """Compose Rule denotations over one immutable read/write binding."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: General Rule Families
+# ---------------------------------------------------------------------------
+
+
+def relation(descriptor: RuleDescriptor) -> "Rule":
+    """Build a finite or intensional closed relation."""
+
+    _not_implemented()
+
+
+def distribution(descriptor: RuleDescriptor) -> "Rule":
+    """Build a probability law without drawing from it."""
+
+    _not_implemented()
+
+
+def differential(descriptor: RuleDescriptor) -> "Rule":
+    """Build an exact or intensional differential relation."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Presets and Aliases
+# ---------------------------------------------------------------------------
+
+
+def elementary(number: int) -> "Rule":
+    """Build the elementary binary lookup preset."""
+
+    _not_implemented()
+
+
+# The six retained native presets remain implemented below for the 0.1
+# executor. They acquire concrete closed ``rule=`` data only at G7-01.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 UpdateFn = Callable[..., Any]

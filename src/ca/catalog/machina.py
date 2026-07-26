@@ -154,7 +154,10 @@ _PENDING_ALIASES: tuple[tuple[str, str], ...] = ()
 # The sole K spelling is category-qualified and deprecated.  Its exact legacy
 # argument domain is unsettled, so this is deliberately not a callable.
 _PENDING_COMPATIBILITY: tuple[tuple[str, str], ...] = (
-    ("extended_mobile_automaton", "SPF030"),
+    (
+        "extended_mobile_automaton",
+        "neighbor_updating_mobile_automaton / SPF030",
+    ),
 )
 
 

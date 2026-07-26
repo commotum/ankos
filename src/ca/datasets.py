@@ -1,9 +1,15 @@
-"""Small PE-compatible dataset streams for raw CA episode exploration.
+"""Downstream program recipes, streams, and explicit dataset tensor views.
 
-This module mirrors the dataset recipes used by the PE experiments without
-copying their training-budget machinery. The default stream profile is compact
-and visualization-friendly; callers can opt into PE-style rule pools and token
-window sizing with ``profile="pe"``.
+The Goal 7 target layer in this module owns four closed experiment recipes,
+deterministic stream planning, dataset-only Seed recipe preparation, generic
+rollout consumption, and explicit ``DatasetEpisode``/``DatasetBatch`` tensor
+projections. It may use ``rng.py`` for downstream planning. It does not own
+one-step semantics, Seed denotation, replay identity, catalog dispatch, or
+semantic serialization.
+
+The target declarations are phase-ordered and inert. The PE-compatible 0.1
+planning, rendering, Dynamics construction, and tensor rollout pipeline remains
+complete below the explicit legacy divider until the atomic G7-01 cutover.
 """
 
 from __future__ import annotations
@@ -15,7 +21,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from math import ceil, prod
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, NoReturn
 
 import numpy as np
 
@@ -23,6 +29,166 @@ from . import frontiers, rng, rules, seeds
 from .neighborhoods import dyadlags_0d, dyadrads_1d, dyadaxes_2d, dyadaxes_3d
 from .rollout import rollout, rollout_batch
 from .specs import Dynamics, RawBatch, RawEpisode
+
+
+if TYPE_CHECKING:
+    from .program import RolloutResult, SimpleProgram
+
+
+DatasetMetadataValue = str | int | float | bool | None
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Explicit Downstream Dataset Views
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DatasetEpisode:
+    """One explicit tensor projection of a semantic rollout trace."""
+
+    states: np.ndarray
+    coords: np.ndarray | None
+    domain: str
+    shape: tuple[int, ...]
+    rule_id: int
+    steps: int
+    metadata: Mapping[str, DatasetMetadataValue] | None = None
+
+
+@dataclass(frozen=True)
+class DatasetBatch:
+    """A downstream stack of compatible dataset-episode projections."""
+
+    states: np.ndarray
+    coords: np.ndarray | None
+    rule_ids: np.ndarray
+    domain: str
+    shape: tuple[int, ...]
+    steps: int
+    metadata: Mapping[str, DatasetMetadataValue] | None = None
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 dataset factory."""
+
+    raise NotImplementedError("Goal 7 dataset scaffold is not implemented")
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Four Explicit Program Recipes
+# ---------------------------------------------------------------------------
+
+
+def _build_0d_dyadlags_program(
+    *,
+    rule: int,
+    seed: "seeds.Seed",
+    shape: tuple[int, ...],
+    boundary: Mapping[str, DatasetMetadataValue],
+) -> "SimpleProgram":
+    """Build the ordinary five-field program for ``0d-dyadlags``."""
+
+    _not_implemented()
+
+
+def _build_1d_dyadrads_program(
+    *,
+    rule: int,
+    seed: "seeds.Seed",
+    shape: tuple[int, ...],
+    boundary: Mapping[str, DatasetMetadataValue],
+) -> "SimpleProgram":
+    """Build the ordinary five-field program for ``1d-dyadrads``."""
+
+    _not_implemented()
+
+
+def _build_2d_dyadaxes_program(
+    *,
+    rule: int,
+    seed: "seeds.Seed",
+    shape: tuple[int, ...],
+    boundary: Mapping[str, DatasetMetadataValue],
+) -> "SimpleProgram":
+    """Build the ordinary five-field program for ``2d-dyadaxes``."""
+
+    _not_implemented()
+
+
+def _build_3d_dyadaxes_program(
+    *,
+    rule: int,
+    seed: "seeds.Seed",
+    shape: tuple[int, ...],
+    boundary: Mapping[str, DatasetMetadataValue],
+) -> "SimpleProgram":
+    """Build the ordinary five-field program for ``3d-dyadaxes``."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: Source Preparation and Tensor Projection
+# ---------------------------------------------------------------------------
+
+
+def _structured_seed_recipes(shape: tuple[int, ...]) -> tuple["seeds.Seed", ...]:
+    """Enumerate dataset-only structured Seed recipes for one shape."""
+
+    _not_implemented()
+
+
+def _dedupe_seed_recipes(
+    recipes: tuple["seeds.Seed", ...],
+    shape: tuple[int, ...],
+) -> tuple["seeds.Seed", ...]:
+    """Deduplicate dataset recipes by their explicit finite projection."""
+
+    _not_implemented()
+
+
+def _project_dataset_episode(
+    result: "RolloutResult",
+    *,
+    domain: str,
+    shape: tuple[int, ...],
+    rule_id: int,
+    steps: int,
+) -> DatasetEpisode:
+    """Project one semantic rollout into an explicit dataset tensor view."""
+
+    _not_implemented()
+
+
+def _project_dataset_batch(
+    episodes: tuple[DatasetEpisode, ...],
+) -> DatasetBatch:
+    """Stack compatible explicit episode views without owning application."""
+
+    _not_implemented()
+
+
+def _canonical_coordinate_table(
+    shape: tuple[int, ...],
+    steps: int,
+) -> np.ndarray:
+    """Materialize the private coordinate table for one dataset view."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Streams and Batching
+# ---------------------------------------------------------------------------
+
+# Streams plan programs, call only ``program.rollout``, filter downstream, and
+# build the explicit views above. No dataset ID ever selects an executor.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 DatasetId = Literal["0d-dyadlags", "1d-dyadrads", "2d-dyadaxes", "3d-dyadaxes"]
