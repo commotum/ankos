@@ -331,7 +331,7 @@ Goal 6 document. The repaired dependency passed:
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
   tests/conformance/test_representation_commutation.py \
   tests/conformance/test_family_coverage.py
--> 85 passed, 2 skipped
+-> 87 passed, 2 skipped
 ```
 
 The two skips are G7-04 catalog obligations. G7-02 is reclosed with its

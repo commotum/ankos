@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-03 CODECS**
+Status: **READY — G7-04 CATALOG (NOT STARTED)**
 
 ## Big-Picture Objective
 
@@ -78,9 +78,9 @@ conflict, and reconcile the plan before changing runtime behavior.
   exactly `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule`;
   `program.apply` is the sole family-blind step law; and callable root
   `rollout` traverses only through it.
-- The root exposes exactly ten names: the three operations/value names and
-  seven core namespaces. It does not eagerly import datasets, RNG,
-  visualization, serialization, or catalog.
+- The root exposes exactly eleven names: the three operations/value names,
+  seven pre-codec core namespaces, and `serialization`. It does not eagerly
+  import datasets, RNG, visualization, or catalog.
 - `src/ca` has 28 tracked paths. `specs.py` and public `rollout.py` are
   physically absent, as is `tests/test_specs.py`; `ca.rollout` and `ca.specs`
   have no importable submodule spec.
@@ -100,13 +100,28 @@ conflict, and reconcile the plan before changing runtime behavior.
 - All SPF001–SPF060 rows now have direct ordinary five-field mechanics.
   PX01–PX12 and all eight required secondary joins execute through the one
   family-blind application law.
-- The executable codec inventory contains 387 G7-01/G7-02 sealed
-  semantic-variant rows. It is the exhaustive starting worklist for G7-03.
-- Serialization and catalog files remain inert, unexposed shells. G7-03 has
-  started from clean commit `d71626f`; its live plan and evidence record is
+- G7-03's CT10 review reopened and repaired the test-owned PX10 evidence
+  boundary before reclosure: all eight exact relations now execute both
+  domain points through one shared program, and the required fresh,
+  multistep, reconstruction, basis, predictor, and involution mechanics are
+  asserted without answer sidecars. The correction is recorded in
+  [`3-MECHANICS.md`](3-MECHANICS.md); it required no production API change.
+- G7-03 is complete. It started from clean commit `d71626f`; its durable
+  implementation, hostile-review repairs, and exact evidence are in
   [`4-CODECS.md`](4-CODECS.md).
-- The 26 retained skips are owned exactly by later stages: 13 by G7-03
-  serialization/representation and 13 by G7-04 catalog/metadata.
+- `ca.serialization` is one catalog-free, fail-closed canonical v1 codec with
+  178 explicit stable tags and 387 executable inventory representatives.
+  CT09 covers all 137 record representatives and 250 enum members. Unknown,
+  legacy, and unavailable migration paths reject.
+- CT10 proves the eight exact PX10 representation relations over both points
+  of each declared domain and compares complete results through one fixed
+  native/represented conjugate pair. Lossy, approximate, and out-of-image
+  cases remain explicitly qualified.
+- The active suite reports `413 passed, 13 skipped`. Every retained skip is
+  owned by G7-04 catalog construction or callable-free metadata; no G7-03
+  skip remains.
+- Catalog files remain inert and unexposed. No `5-CATALOG.md` exists and no
+  G7-04 implementation has begun.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -258,7 +273,7 @@ stage file and may evolve with the implementation.
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows supported by reusable mechanics |
-| `4-CODECS` | G7-03 | In Progress | Canonical serialization and representation proofs |
+| `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
@@ -379,7 +394,9 @@ Handoff stage: **G7-02 — Reusable mechanics closure**
 
 Stage status: **Complete.** The implementation, 60-family matrix, codec
 inventory, hostile-review repairs, and exact verification evidence are
-recorded in [`3-MECHANICS.md`](3-MECHANICS.md).
+recorded in [`3-MECHANICS.md`](3-MECHANICS.md). G7-03 later reopened only
+the PX10 evidence boundary, repaired it without a production API change, and
+reclosed the stage in that same record.
 
 #### Big Picture Objective
 
@@ -424,6 +441,11 @@ adding family-specific runtime types or behavior to `program.py`.
 
 Handoff stage: **G7-03 — Canonical serialization and representation relations**
 
+Stage status: **Complete.** The closed registry, canonical codec, typed
+failure boundary, CT09 schema coverage, CT10 representation proofs,
+reopened-mechanics correction, hostile review, and exact verification evidence
+are recorded in [`4-CODECS.md`](4-CODECS.md).
+
 #### Big Picture Objective
 
 Implement lossless, versioned, fail-closed serialization for every closed
@@ -447,7 +469,8 @@ application results.
 
 #### Completion Requirements
 
-- CT09 and CT10 pass for every inventory entry.
+- CT09 passes every inventory representative, and CT10 passes every exact
+  PX10 relation over its complete declared finite domain.
 - Decode failure is typed and exposes no partially restored authoritative
   value.
 - Semantic owner modules do not import serialization.

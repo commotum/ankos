@@ -1,6 +1,6 @@
 # 4-CODECS
 
-## Current Facts
+## Stage-Start Facts
 
 - G7-03 starts from clean commit
   `d71626fcd6d649d630473f8f3d5bda098fabc790`.
@@ -109,7 +109,7 @@ under `tests/conformance/`.
 ## No-Cheating Checks
 
 - Semantic owner modules do not import `serialization`; dependency direction
-  is owners to codec only.
+  is codec-to-owner only.
 - `serialization.py` and `program.py` do not import catalog, and decoding
   succeeds while catalog imports are blocked.
 - The wire never stores SPF/F/T IDs, catalog category/name, constructor
@@ -166,8 +166,9 @@ under `tests/conformance/`.
 
 - `ca.serialization` now owns one explicit closed registry for 178 public
   sealed owner types and 387 inventory variants. Registry initialization
-  fails if an owner type, dataclass field, enum member, tag, version, or
-  aggregate count drifts.
+  fails if an owner type, dataclass field, enum member, tag syntax/uniqueness,
+  version, or aggregate count drifts; the executable inventory join freezes
+  each explicit tag independently of Python class/module spelling.
 - Canonical bytes distinguish `None`, booleans, arbitrary integers, strings,
   exact `Fraction` values, tuples, enums, and frozen records. Accepted bytes
   must be UTF-8 JSON with the canonical ordering, escaping, numeric spelling,
@@ -228,6 +229,11 @@ regressions now establish that:
 - identity normalization is field-qualified and cannot erase an ordinary
   semantic string, a 64-hex string, caller lineage, or a semantic value equal
   to a real derived identity;
+- atom and successor aliases use representation-stable structural keys plus
+  occurrence disambiguation; distinct same-provenance witnesses and swapped
+  probability masses cannot collide during complete-result comparison;
+- explicit wire tags survive a simulated Python type rename/module move,
+  while a genuinely new unregistered sealed owner type still fails closed;
 - context-sensitive records, invalid semantic payloads, forged enum
   singletons, bool/rational version impostors, and bool/int-collapsed
   structures cannot encode;
@@ -269,15 +275,15 @@ UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs \
   tests/conformance/test_serialization_contract.py \
   tests/conformance/test_representation_commutation.py \
   tests/conformance/test_observer_boundary.py
--> 175 passed, 1 skipped
+-> 178 passed, 1 skipped
 
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q \
   tests/conformance/test_representation_commutation.py \
   tests/conformance/test_family_coverage.py
--> 85 passed, 2 skipped
+-> 87 passed, 2 skipped
 
 UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q -rs tests
--> 410 passed, 13 skipped
+-> 413 passed, 13 skipped
 
 UV_CACHE_DIR=/tmp/uv-cache uv lock --check
 -> resolved successfully
