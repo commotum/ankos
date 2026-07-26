@@ -11,7 +11,12 @@ import pytest
 import ca
 from ca import alphabets, loci, program, rules, serialization
 
-from g7_fixtures import derivation, finite_record_program, no_successor
+from g7_fixtures import (
+    derivation,
+    finite_record_program,
+    no_successor,
+    rule_contract,
+)
 from g7_mechanics import (
     MECHANICS_ROWS,
     assert_mechanics_run,
@@ -175,8 +180,11 @@ def _identity_aliases(
         aliases[atom.evidence.disposition_identity] = f"@disposition:{witness}"
         aliases[atom.input_trace_lineage.root_identity] = "@lineage-root"
         aliases[atom.output_trace_lineage.root_identity] = "@lineage-root"
-        for index, binding in enumerate(atom.fresh_bindings):
-            aliases[binding.identity] = f"@fresh:{witness}:{index}"
+        if isinstance(atom, program.AppliedDerivation):
+            for index, binding in enumerate(atom.fresh_bindings):
+                aliases[loci.canonical_identity(binding.identity)] = (
+                    f"@fresh:{witness}:{index}"
+                )
         for index, identity in enumerate(atom.input_trace_lineage.path):
             aliases.setdefault(identity, f"@input-path:{index}")
         for index, identity in enumerate(atom.output_trace_lineage.path):
@@ -227,6 +235,10 @@ def _normalize_complete_result(
             for pair in decode_relation.relation:
                 if alphabets.semantic_equal(value, pair.target):
                     return normalize(pair.source)
+        if type(value) is loci.Locus and value.kind is loci.LocusKind.FRESH:
+            identity = loci.canonical_identity(value)
+            if identity in aliases:
+                return ("bound-fresh-locus", aliases[identity])
         if value is None or type(value) in (bool, int):
             return value
         if type(value) is Fraction:
@@ -402,6 +414,109 @@ def test_commutation_normalizes_ids_only_in_identity_bearing_fields() -> None:
     right = result("semantic-right")
 
     assert _normalize_complete_result(left) != _normalize_complete_result(right)
+
+
+def test_commutation_maps_fresh_bindings_and_bound_structural_loci() -> None:
+    """Related fresh writes commute without erasing raw binding evidence."""
+
+    encoded_false = alphabets.ValueNode(
+        alphabets.ValueKind.TAG,
+        "encoded-fresh-bit",
+        items=(0,),
+    )
+    encoded_true = alphabets.ValueNode(
+        alphabets.ValueKind.TAG,
+        "encoded-fresh-bit",
+        items=(1,),
+    )
+    relation = alphabets.RepresentationRelation(
+        alphabets.boolean().descriptor,
+        alphabets.enum((encoded_false, encoded_true)).descriptor,
+        alphabets.RepresentationProfile.EXACT,
+        (
+            alphabets.RepresentationPair(False, encoded_false),
+            alphabets.RepresentationPair(True, encoded_true),
+        ),
+        (encoded_false, encoded_true),
+        inverse_evidence=(
+            alphabets.RepresentationPair(encoded_false, False),
+            alphabets.RepresentationPair(encoded_true, True),
+        ),
+    )
+
+    def result(
+        initial: alphabets.SemanticValue,
+        following: alphabets.SemanticValue,
+        alphabet: alphabets.Alphabet,
+    ) -> program.ApplicationComplete:
+        source = loci.record_configuration((("parent", initial),))
+        parent = source.entries[0][0]
+        reference = loci.fresh_reference(
+            "representation-children",
+            "child",
+            parent=parent,
+        )
+        writable = ca.frontiers.fresh(
+            loci.literal(fresh=(reference,)),
+            namespace=ca.frontiers.FreshNamespace(
+                "representation-children",
+                parent,
+            ),
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        readable = ca.neighborhoods.global_view(
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        atom = derivation(
+            "fresh-representation",
+            existing=(),
+            fresh=(rules.create(reference, following),),
+        )
+        simple_program = ca.SimpleProgram(
+            ca.seeds.exact(
+                source,
+                value_profile=alphabet.value_profile,
+            ),
+            alphabet,
+            writable,
+            readable,
+            rules.finite_rule(
+                (atom,),
+                contract=rule_contract(
+                    source,
+                    alphabet,
+                    writable,
+                    readable,
+                ),
+            ),
+        )
+        application = ca.apply(simple_program, source)
+        assert isinstance(application, program.ApplicationComplete)
+        return application
+
+    native = result(False, True, alphabets.boolean())
+    represented = result(
+        encoded_false,
+        encoded_true,
+        alphabets.enum((encoded_false, encoded_true)),
+    )
+    native_atom = native.applied_atoms.atoms[0]
+    represented_atom = represented.applied_atoms.atoms[0]
+    assert isinstance(native_atom, program.AppliedDerivation)
+    assert isinstance(represented_atom, program.AppliedDerivation)
+    assert len(native_atom.fresh_bindings) == 1
+    assert len(represented_atom.fresh_bindings) == 1
+    assert (
+        native_atom.fresh_bindings[0].identity
+        != represented_atom.fresh_bindings[0].identity
+    )
+
+    assert _normalize_complete_result(
+        represented,
+        decode_relation=relation,
+    ) == _normalize_complete_result(native)
 
 
 def test_lossy_approximate_or_out_of_image_translation_remains_explicit() -> None:
