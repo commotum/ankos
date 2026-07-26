@@ -85,7 +85,7 @@ def pde(
     differential_relation,
     side_data,
 ) -> SimpleProgram:
-    """A alias for SPF039 with the canonical differential-relation signature."""
+    """An alias for SPF039 with the canonical differential-relation signature."""
 
     _not_implemented()
 

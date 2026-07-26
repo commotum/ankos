@@ -28,9 +28,12 @@
 
 ## Next Goal — Not Started
 
-7. **Goal 7 — implementation.** Next, but not scaffolded or authorized.
-   Implement the completed Goal 6 handoff only after a separate user
-   instruction establishes its own scaffold and completion contract.
+7. **Goal 7 — implementation.** Next, but its execution goal is not scaffolded
+   or authorized. Inert source declarations and explicitly skipped test
+   obligations now make the Goal 6 target shape concrete; they do not implement
+   behavior or provide conformance evidence. Implement the completed Goal 6
+   handoff only after a separate user instruction establishes Goal 7's own
+   scaffold and completion contract.
 
 The current order is Goal 5 (completed semantic authority) → Goal 6 (completed
 architecture and handoff) → Goal 7 (future implementation). Goal 2 remains

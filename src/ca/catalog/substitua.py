@@ -249,7 +249,7 @@ def multiway_system(
     match_semantics,
     quotient,
 ) -> SimpleProgram:
-    """A alias for SPF033 with the exact ``multiway_rewrite`` signature."""
+    """An alias for SPF033 with the exact ``multiway_rewrite`` signature."""
 
     _not_implemented()
 
@@ -261,7 +261,7 @@ def network_rewrite(
     port_schema,
     overlap_law,
 ) -> SimpleProgram:
-    """A alias for SPF038 with the exact canonical network signature."""
+    """An alias for SPF038 with the exact canonical network signature."""
 
     _not_implemented()
 
