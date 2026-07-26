@@ -974,6 +974,31 @@ def _validate_rule_space(
     law = outcome_space.probability_law
     if law is not None:
         try:
+            if type(law) is not rules.ProbabilityLaw:
+                raise TypeError("probability law has an unknown record type")
+            if type(law.masses) is not tuple or any(
+                type(item) is not rules.AtomMass
+                for item in law.masses
+            ):
+                raise TypeError(
+                    "probability masses are not exact AtomMass records"
+                )
+            if law.measure is not None and type(
+                law.measure
+            ) is not rules.RuleExpr:
+                raise TypeError("probability measure is not a RuleExpr")
+            if type(
+                law.normalization_evidence
+            ) is not rules.Certificate or type(
+                law.normalization_evidence.statement
+            ) is not rules.RuleExpr:
+                raise TypeError("normalization evidence is not closed")
+            if type(
+                law.measurable_space_evidence
+            ) is not rules.Certificate or type(
+                law.measurable_space_evidence.statement
+            ) is not rules.RuleExpr:
+                raise TypeError("measurability evidence is not closed")
             rebuilt_law = rules.ProbabilityLaw(
                 law.presentation,
                 tuple(

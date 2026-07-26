@@ -426,7 +426,7 @@ def test_unavailable_is_narrowly_limited_to_successor_quotient_measure() -> None
 
 @pytest.mark.parametrize(
     "corruption",
-    ("measurability", "atom-space", "normalization"),
+    ("record-type", "measurability", "atom-space", "normalization"),
 )
 def test_malformed_rule_law_rejects_application_without_partial_output(
     corruption: str,
@@ -440,7 +440,13 @@ def test_malformed_rule_law_rejects_application_without_partial_output(
     law = rule_result.outcome_space.probability_law
     assert law is not None
 
-    if corruption == "measurability":
+    if corruption == "record-type":
+        object.__setattr__(
+            law,
+            "masses",
+            (("not-an-atom-mass", Fraction(1)),),
+        )
+    elif corruption == "measurability":
         object.__setattr__(
             law.measurable_space_evidence,
             "kind",
