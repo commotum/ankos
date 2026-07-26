@@ -752,8 +752,7 @@ class Continue:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported continuation version {self.version}")
+        _require_version_one(self.version, "continuation")
 
 
 @dataclass(frozen=True)
@@ -763,8 +762,7 @@ class Stop:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported continuation version {self.version}")
+        _require_version_one(self.version, "continuation")
         if type(self.reason) is not RuleExpr:
             raise TypeError("stopping reason must be a RuleExpr")
         if (
@@ -786,8 +784,7 @@ class Witness:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported witness version {self.version}")
+        _require_version_one(self.version, "witness")
         if not isinstance(self.identity, str) or not self.identity:
             raise ValueError("witness identity cannot be empty")
         if type(self.descriptor) is not RuleExpr:
@@ -1078,8 +1075,7 @@ class OutcomeSpace(Generic[A]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported outcome-space version {self.version}")
+        _require_version_one(self.version, "outcome-space")
         if type(self.support) is not SupportSpace:
             raise TypeError("outcome support variant is not recognized")
         if self.probability_law is not None and type(
@@ -1926,8 +1922,7 @@ class RuleDescriptor(Generic[R, W, C]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported Rule descriptor version {self.version}")
+        _require_version_one(self.version, "Rule descriptor")
         if not isinstance(self.primitive, RulePrimitive):
             raise TypeError("Rule primitive is not recognized")
         expected = {

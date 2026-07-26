@@ -1343,8 +1343,7 @@ class Carrier(Generic[V]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported carrier version {self.version}")
+        _require_version_one(self.version, "carrier")
         if not isinstance(self.contract, CarrierContract):
             raise TypeError("carrier contract is not recognized")
         if not isinstance(self.boundary, Boundary):
@@ -1393,8 +1392,7 @@ class FiniteConfiguration(Generic[V]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported configuration version {self.version}")
+        _require_version_one(self.version, "configuration")
         if not isinstance(self.carrier, Carrier):
             raise TypeError("configuration carrier is not recognized")
         if type(self.entries) is not tuple or type(self.structure) is not tuple:
@@ -1491,8 +1489,7 @@ class IntensionalConfiguration:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported configuration version {self.version}")
+        _require_version_one(self.version, "configuration")
         if not self.identity_evidence:
             raise ValueError("intensional configuration needs identity evidence")
         if type(self.contract) is not CarrierContract:

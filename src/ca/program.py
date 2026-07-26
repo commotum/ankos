@@ -412,7 +412,7 @@ class TraceLineage:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
+        if type(self.version) is not int or self.version != 1:
             raise ValueError(f"unsupported trace-lineage version {self.version}")
         if not isinstance(self.root_identity, str) or not self.root_identity:
             raise ValueError("trace lineage requires a root identity")
@@ -2239,7 +2239,7 @@ class DrawEvidence:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
+        if type(self.version) is not int or self.version != 1:
             raise ValueError(f"unsupported draw-evidence version {self.version}")
         strings = (
             self.law_identity,

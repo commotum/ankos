@@ -266,7 +266,7 @@ class ValueNode:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
+        if type(self.version) is not int or self.version != 1:
             raise ValueError(f"unsupported value-node version {self.version}")
         if not isinstance(self.kind, ValueKind):
             raise TypeError("value-node kind is not recognized")
@@ -319,7 +319,7 @@ class RepresentedNumber:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
+        if type(self.version) is not int or self.version != 1:
             raise ValueError(f"unsupported represented-number version {self.version}")
         if not isinstance(self.profile, RepresentedNumberProfile):
             raise TypeError("represented-number profile is not recognized")
@@ -497,7 +497,7 @@ class AlphabetDescriptor:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
+        if type(self.version) is not int or self.version != 1:
             raise ValueError(f"unsupported alphabet version {self.version}")
         if not isinstance(self.kind, AlphabetKind):
             raise TypeError("alphabet kind is not recognized")

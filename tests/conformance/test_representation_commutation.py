@@ -195,17 +195,11 @@ def _identity_aliases(
         aliases[atom.canonical_identity] = f"@applied:{witness}"
         aliases[atom.evidence.application_identity] = "@application"
         aliases[atom.evidence.disposition_identity] = f"@disposition:{witness}"
-        aliases[atom.input_trace_lineage.root_identity] = "@lineage-root"
-        aliases[atom.output_trace_lineage.root_identity] = "@lineage-root"
         if isinstance(atom, program.AppliedDerivation):
             for index, binding in enumerate(atom.fresh_bindings):
                 aliases[loci.canonical_identity(binding.identity)] = (
                     f"@fresh:{witness}:{index}"
                 )
-        for index, identity in enumerate(atom.input_trace_lineage.path):
-            aliases.setdefault(identity, f"@input-path:{index}")
-        for index, identity in enumerate(atom.output_trace_lineage.path):
-            aliases.setdefault(identity, f"@output-path:{index}")
         if isinstance(atom, program.AppliedDerivation):
             aliases[loci.configuration_identity(atom.successor)] = "@successor"
     return aliases
@@ -214,8 +208,6 @@ def _identity_aliases(
 _IDENTITY_FIELDS = frozenset(
     {
         (rules.AtomMass, "atom_identity"),
-        (program.TraceLineage, "root_identity"),
-        (program.TraceLineage, "path"),
         (program.FreshBinding, "identity"),
         (program.AppliedEvidence, "application_identity"),
         (program.AppliedEvidence, "disposition_identity"),
@@ -239,6 +231,22 @@ def _normalize_complete_result(
     """Normalize every stored field, changing only declared values and IDs."""
 
     aliases = _identity_aliases(result)
+    output_lineages = {
+        (
+            atom.output_trace_lineage.root_identity,
+            atom.output_trace_lineage.path,
+        ): (
+            atom.input_trace_lineage.path,
+            atom.source.witness.identity,
+        )
+        for atom in result.applied_atoms.atoms
+    }
+    default_lineage_root = loci.canonical_identity(
+        (
+            "direct-application-root",
+            result.evidence.input_configuration_identity,
+        )
+    )
 
     def normalize(
         value: object,
@@ -256,6 +264,28 @@ def _normalize_complete_result(
             identity = loci.canonical_identity(value)
             if identity in aliases:
                 return ("bound-fresh-locus", aliases[identity])
+        if type(value) is program.TraceLineage:
+            root = value.root_identity
+            if root == default_lineage_root:
+                root = "@default-lineage-root"
+            path: tuple[str, ...] = value.path
+            output = output_lineages.get(
+                (value.root_identity, value.path)
+            )
+            if output is not None:
+                input_path, witness = output
+                assert path[:-1] == input_path
+                path = (*input_path, f"@output-edge:{witness}")
+            return (
+                "record",
+                value.__class__.__module__,
+                value.__class__.__name__,
+                (
+                    ("root_identity", root),
+                    ("path", path),
+                    ("version", value.version),
+                ),
+            )
         if value is None or type(value) in (bool, int):
             return value
         if type(value) is Fraction:
@@ -449,6 +479,42 @@ def test_commutation_normalizes_ids_only_in_identity_bearing_fields() -> None:
 
     left = result("semantic-left")
     right = result("semantic-right")
+
+    assert _normalize_complete_result(left) != _normalize_complete_result(right)
+
+
+def test_commutation_retains_caller_supplied_lineage_prefixes() -> None:
+    """Only the newly derived lineage edge is representation-relative."""
+
+    def atoms(targets: tuple[loci.Locus, ...]):
+        return (
+            derivation(
+                "retained-lineage",
+                existing=(rules.replace(targets[0], True),),
+            ),
+        )
+
+    simple_program, source = finite_record_program(
+        (("value", False),),
+        atoms,
+    )
+    left = ca.apply(
+        simple_program,
+        program.ApplicationInput(
+            source,
+            program.TraceLineage("root-left", ("retained-left",)),
+        ),
+    )
+    right = ca.apply(
+        simple_program,
+        program.ApplicationInput(
+            source,
+            program.TraceLineage("root-right", ("retained-right",)),
+        ),
+    )
+    assert isinstance(left, program.ApplicationComplete)
+    assert isinstance(right, program.ApplicationComplete)
+    assert left != right
 
     assert _normalize_complete_result(left) != _normalize_complete_result(right)
 
