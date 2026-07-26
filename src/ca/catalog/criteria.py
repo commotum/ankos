@@ -3,14 +3,14 @@
 This module owns audited constructions whose result is defined by constraints,
 objectives, witnesses, solution relations, or weighted alternatives.  It does
 not own solver policy, searches hidden inside application, component
-mechanics, metadata, or numerical realization.  Goal 7 implementations will
-encode defining relations as closed Rule data and return ordinary
-``SimpleProgram`` values.
+mechanics, metadata, or numerical realization.  Defining relations remain
+closed Rule data inside ordinary ``SimpleProgram`` values.
 
 Canonical constructors expose the five component values directly.  The
 migration matrix's semantic parameter lists remain descriptive metadata;
-catalog construction never interprets a parallel recipe language.  Unsettled
-legacy presets are retained only as private spelling-to-family inventory.
+catalog construction never interprets a parallel recipe language.  Constraint
+presets bind explicit closed source presentations to that same relation
+mechanic.
 """
 
 from __future__ import annotations

@@ -389,6 +389,7 @@ def _grid_expression_program(
     boundary: loci.Boundary,
     axes: tuple[str, ...] | None,
     label: str,
+    provenance: tuple[str, ...] = (),
 ) -> SimpleProgram:
     source = loci.grid_configuration(
         shape,
@@ -418,7 +419,7 @@ def _grid_expression_program(
             writable.effect_profile,
         ),
         witness=rules.literal_expr(label),
-        provenance=(f"catalog:{label}",),
+        provenance=(f"catalog:{label}", *provenance),
     )
     return synchronous_local_state_transform(
         seed=seeds.exact(source, value_profile=alphabet.value_profile),
@@ -440,6 +441,7 @@ def _finite_table_program(
     axes: tuple[str, ...] | None,
     label: str,
     totalistic: bool = False,
+    provenance: tuple[str, ...] = (),
 ) -> SimpleProgram:
     alphabet = alphabets.int_range_alphabet(colors)
     index = (
@@ -458,6 +460,7 @@ def _finite_table_program(
         boundary=boundary,
         axes=axes,
         label=label,
+        provenance=provenance,
     )
 
 
@@ -647,6 +650,7 @@ def quiescent_cellular_automaton(
         boundary=resolved_boundary,
         axes=("x",),
         label="quiescent-cellular-automaton",
+        provenance=(f"background:{background}",),
     )
 
 
@@ -1348,9 +1352,6 @@ def elementary_cellular_automaton(
 # ---------------------------------------------------------------------------
 # Phase 4. Compatibility adapters
 # ---------------------------------------------------------------------------
-
-_PENDING_COMPATIBILITY: tuple[tuple[str, str], ...] = ()
-
 
 __all__ = (
     "alternating_partition_local_evolution",

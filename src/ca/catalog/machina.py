@@ -873,6 +873,10 @@ def _turing_transitions_2d(
             raise ValueError("2D Turing output symbol is outside the alphabet")
         if type(movement) is not tuple:
             raise TypeError("2D Turing movement must be a coordinate tuple")
+        if len(movement) != 2 or any(type(part) is not int for part in movement):
+            raise TypeError(
+                "2D Turing movement must contain two integer coordinates"
+            )
         if movement not in movements:
             raise ValueError("2D Turing movement must be a cardinal unit offset")
         parsed.append((resolved_key, (next_state, write_symbol, movement)))
@@ -896,7 +900,7 @@ def turing_machine_2d(
     ],
     boundary: loci.Boundary[int] = _ZERO_INTEGER_BOUNDARY,
 ) -> SimpleProgram:
-    """Construct a square-grid Turing machine with cardinal head motion.
+    """Construct a rectangular-grid Turing machine with cardinal head motion.
 
     ``head`` is a zero-based row-major array coordinate within ``shape``.
     """
@@ -996,9 +1000,6 @@ def turing_machine_2d(
 # ---------------------------------------------------------------------------
 # Phase 3. True aliases
 # ---------------------------------------------------------------------------
-
-_PENDING_ALIASES: tuple[tuple[str, str], ...] = ()
-
 
 # ---------------------------------------------------------------------------
 # Phase 4. Compatibility adapters

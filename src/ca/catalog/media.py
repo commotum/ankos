@@ -3,13 +3,13 @@
 This module owns audited constructions that transform information, events, or
 signals from one explicit representation into another.  It does not own
 dataset views, serialization, codecs for semantic identity, component
-mechanics, metadata, or execution dispatch.  Goal 7 implementations will make
-all work state visible and compose ordinary five-field ``SimpleProgram``
-values from the component modules.
+mechanics, metadata, or execution dispatch.  Its constructors make all work
+state visible and compose ordinary five-field ``SimpleProgram`` values from
+the component modules.
 
 Each canonical family is an explicitly typed, transparent five-component
-constructor.  Preset signatures that are not fixed remain private non-callable
-inventory.
+constructor.  Presets compile their bounded source-facing data into the same
+five components.
 """
 
 from __future__ import annotations

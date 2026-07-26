@@ -3,8 +3,8 @@
 This module owns audited constructions defined by continuous flow, event, or
 differential-field laws.  It does not own numerical solvers, integration
 policy, component mechanics, metadata, application dispatch, or sampled
-approximations.  Goal 7 implementations will compose exact or intensional
-five-field ``SimpleProgram`` values whose realizations remain external.
+approximations.  Its constructors compose exact or intensional five-field
+``SimpleProgram`` values whose realizations remain external.
 
 The three canonical constructors expose the five component values directly.
 The migration matrix's semantic parameter lists remain descriptive metadata.
@@ -99,13 +99,6 @@ def partial_differential_relation(
 
 
 # ---------------------------------------------------------------------------
-# Phase 2. Presets
-# ---------------------------------------------------------------------------
-
-_PENDING_PRESETS: tuple[tuple[str, str], ...] = ()
-
-
-# ---------------------------------------------------------------------------
 # Phase 3. True aliases
 # ---------------------------------------------------------------------------
 
@@ -127,16 +120,6 @@ def pde(
         neighborhood=neighborhood,
         rule=rule,
     )
-
-
-_PENDING_ALIASES: tuple[tuple[str, str], ...] = ()
-
-
-# ---------------------------------------------------------------------------
-# Phase 4. Compatibility adapters
-# ---------------------------------------------------------------------------
-
-_PENDING_COMPATIBILITY: tuple[tuple[str, str], ...] = ()
 
 
 __all__ = (

@@ -854,7 +854,7 @@ def neighbor_dependent_substitution(
         rules.SequenceBoundary.FIXED,
         exterior=rules.literal_expr(symbols[0]),
     )
-    open_right_pairs = rules.slice(
+    open_right_pairs = rules.slice_items(
         windows,
         rules.literal_expr(0),
         rules.subtract(rules.length(source_expr), rules.literal_expr(1)),
@@ -953,12 +953,12 @@ def tag_system(
     )
     source = alphabets.word_value(initial, tag="symbols")
     source_expr = rules.observation(0)
-    prefix = rules.slice(
+    prefix = rules.slice_items(
         source_expr,
         rules.literal_expr(0),
         rules.literal_expr(n),
     )
-    tail = rules.slice(
+    tail = rules.slice_items(
         source_expr,
         rules.literal_expr(n),
         rules.length(source_expr),
@@ -1037,7 +1037,7 @@ def cyclic_tag_system(
         rules.literal_expr(0),
         rules.literal_expr(False),
     )
-    tail = rules.slice(
+    tail = rules.slice_items(
         word,
         rules.literal_expr(1),
         rules.length(word),
@@ -1600,7 +1600,7 @@ def continued_fraction_substitution(
             ),
             ("cursor", alphabets.naturals()),
             ("schedule", alphabets.word(alphabets.naturals())),
-            ("word", alphabets.word(alphabets.boolean())),
+            ("word", alphabets.word(alphabets.enum((0, 1)))),
         )
     )
     exact_seed, alphabet, frontier, neighborhood, rule = (
@@ -1715,12 +1715,12 @@ def symbolic_system(
         raise TypeError(
             "symbolic-system rewrites must be a rewrite-rules WORD ValueNode"
         )
-    rewrites = alphabets.rewrite_rules_value(
-        tuple(
-            item
-            for item in rewrites.items
-            if type(item) is alphabets.ValueNode
+    if any(type(item) is not alphabets.ValueNode for item in rewrites.items):
+        raise TypeError(
+            "symbolic-system rewrite entries must be ValueNodes"
         )
+    rewrites = alphabets.rewrite_rules_value(
+        tuple(item for item in rewrites.items if type(item) is alphabets.ValueNode)
     )
     if len(rewrites.items) == 0:
         raise ValueError("symbolic-system rewrites cannot be empty")
