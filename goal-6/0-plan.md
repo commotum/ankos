@@ -292,7 +292,18 @@ streams, RNG helpers, or visualization.
   terminology, import/signature, scaffold parse/run, whitespace, and scoped
   frozen-tree checks pass; the runtime suite was not rerun because behavioral
   trees are identical to the 102-test baseline.
-- Stage 7 (`7-HANDOFF`) is the first incomplete stage and has not begun.
+- Stage 7 (`7-HANDOFF`) began from clean autosave commit
+  `c544caaef9022ce39d562b93b5d5b907592925ad`. The frozen `src/ca`,
+  `tests`, `goal-2`, and `goal-5` tree identities still match the Stage 1
+  baseline.
+- The Stage 7 runtime inventory confirms one in-place cutover: retain and
+  generalize the five plural component modules and `loci.py`; replace
+  `specs.py`/`Dynamics`; fold the public traversal contract out of
+  `rollout.py`; add `program.py`, `serialization.py`, and `catalog/`; then
+  adapt `datasets.py`, `rng.py`, and `viz/` without allowing them into the
+  semantic core.
+- Stage 7 (`7-HANDOFF`) is in progress. Its only new durable design output is
+  `goal-6/goal-7-handoff.md`; it does not create or begin Goal 7.
 
 ## Assumptions To Challenge
 
