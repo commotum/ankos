@@ -2568,7 +2568,7 @@ def _configuration_from_values(
             raise ValueError(
                 "realized tuple length disagrees with its grid carrier"
             )
-        axes = contract.axes or ("x", "y", "z")[: len(contract.shape)]
+        axes = contract.axes or loci.default_grid_axes(len(contract.shape))
         concrete_contract = loci.CarrierContract(
             loci.CarrierKind.GRID,
             rank=len(contract.shape),
@@ -2680,7 +2680,7 @@ def _realize_construction(
             loci.CarrierKind.GRID,
             rank=len(shape),
             shape=shape,
-            axes=contract.axes or ("x", "y", "z")[: len(shape)],
+            axes=contract.axes or loci.default_grid_axes(len(shape)),
         )
         if not contract.accepts(concrete_contract):
             raise ValueError("grid construction violates its output contract")

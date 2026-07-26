@@ -173,11 +173,11 @@ _SCHEMAS = (
         ),
     ),
     _enum(alphabets.AlphabetKind, "ca.alphabets.alphabet-kind", (
-        "enum", "ordered", "naturals", "integers", "rationals", "modular",
-        "algebraic", "exact-complex", "represented-number", "tag", "union",
-        "product", "record", "word", "map", "graph", "field", "instruction",
-        "pattern", "equation", "distribution", "symbolic",
-        "structural-reference", "refinement",
+        "enum", "ordered", "naturals", "integers", "rationals",
+        "rational-interval", "modular", "algebraic", "exact-complex",
+        "represented-number", "tag", "union", "product", "record", "word",
+        "map", "graph", "field", "instruction", "pattern", "equation",
+        "distribution", "symbolic", "structural-reference", "refinement",
     )),
     _enum(alphabets.ValueProfile, "ca.alphabets.value-profile", (
         "boolean", "integer", "rational", "algebraic", "complex",

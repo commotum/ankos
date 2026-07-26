@@ -53,6 +53,38 @@ def test_public_composite_constructors_match_their_schemas_and_accessors() -> No
     assert alphabets.node_get(field, "component") == "u"
 
 
+@pytest.mark.parametrize(
+    "kind",
+    (
+        alphabets.ValueKind.RECORD,
+        alphabets.ValueKind.GRAPH,
+        alphabets.ValueKind.FIELD,
+        alphabets.ValueKind.INSTRUCTION,
+        alphabets.ValueKind.PATTERN,
+        alphabets.ValueKind.EQUATION,
+        alphabets.ValueKind.DISTRIBUTION,
+        alphabets.ValueKind.SYMBOLIC,
+    ),
+)
+def test_named_value_node_fields_have_one_canonical_order(
+    kind: alphabets.ValueKind,
+) -> None:
+    left = alphabets.ValueNode(
+        kind,
+        "fixture",
+        fields=(("zeta", 2), ("alpha", 1)),
+    )
+    right = alphabets.ValueNode(
+        kind,
+        "fixture",
+        fields=(("alpha", 1), ("zeta", 2)),
+    )
+
+    assert left.fields == (("alpha", 1), ("zeta", 2))
+    assert left == right
+    assert alphabets.semantic_equal(left, right)
+
+
 def test_map_values_use_explicit_canonical_semantic_key_entries() -> None:
     coordinate_key = alphabets.product_value(
         (2, -1),
@@ -240,6 +272,26 @@ def test_finite_grid_helpers_support_arbitrary_positive_rank_and_custom_axes() -
     )
 
 
+def test_realized_finite_grids_materialize_default_axes_without_mutating_wildcards() -> None:
+    wildcard = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=2,
+        shape=(1, 1),
+    )
+    configuration = loci.FiniteConfiguration(
+        loci.Carrier(
+            wildcard,
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+        ),
+        ((loci.cell((0, 0)), 7),),
+    )
+
+    assert wildcard.axes == ()
+    assert wildcard.accepts(configuration.contract)
+    assert configuration.contract.axes == ("x", "y")
+    assert loci.read_grid_value(configuration, (0, 0)) == 7
+
+
 @pytest.mark.parametrize("rank", (0, -1, True, 1.5, "4"))
 def test_default_grid_axes_reject_nonpositive_or_inexact_rank(rank: object) -> None:
     with pytest.raises((TypeError, ValueError), match="grid rank"):
@@ -295,3 +347,25 @@ def test_grid_helpers_reject_malformed_axes_values_and_read_coordinates() -> Non
             configuration,
             [0, 0, 0, 0],  # type: ignore[arg-type]
         )
+
+
+@pytest.mark.parametrize(
+    ("scope", "path", "error"),
+    (
+        ("grid:x", ("other", 0), ValueError),
+        ("grid:x", ("x", "0"), TypeError),
+        ("grid:x", ("x", True), TypeError),
+        ("grid:x,y", ("x", 0), ValueError),
+        ("grid:x,x", ("x", 0, "x", 1), ValueError),
+        ("grid:x", (), ValueError),
+    ),
+)
+def test_grid_coordinates_reject_forged_or_inexact_loci(
+    scope: str,
+    path: tuple[loci.ClosedScalar, ...],
+    error: type[Exception],
+) -> None:
+    forged = loci.Locus(loci.LocusKind.COORDINATE, scope, path)
+
+    with pytest.raises(error):
+        loci.grid_coordinates(forged)

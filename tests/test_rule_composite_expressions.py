@@ -36,12 +36,14 @@ def _product(tag: str, *items: alphabets.SemanticValue) -> alphabets.ValueNode:
 
 def _map(
     *entries: tuple[alphabets.SemanticValue, alphabets.SemanticValue],
+    tag: str = "map",
 ) -> alphabets.ValueNode:
     return alphabets.map_value(
         tuple(
             alphabets.map_entry_value(key, value)
             for key, value in entries
-        )
+        ),
+        tag=tag,
     )
 
 
@@ -130,6 +132,9 @@ def test_word_and_tuple_sequence_operations_are_exact_and_tag_preserving() -> No
         rules.item_at(source, rules.literal_expr(9), rules.literal_expr("x"))
     )[0] == "x"
     assert _evaluate(
+        rules.item_at(source, rules.literal_expr(-1), rules.literal_expr("x"))
+    )[0] == "x"
+    assert _evaluate(
         rules.slice_items(
             source,
             rules.literal_expr(1),
@@ -215,6 +220,7 @@ def test_semantic_key_maps_support_products_lookup_update_and_defaults() -> None
     table = _map(
         (key_q1, _word("tape", "R")),
         (key_q0, _word("tape", "L")),
+        tag="transitions",
     )
     dynamic_key = rules.product_value(
         "transition-key",
@@ -245,6 +251,7 @@ def test_semantic_key_maps_support_products_lookup_update_and_defaults() -> None
         )
     )
     assert type(changed) is alphabets.ValueNode
+    assert changed.tag == "transitions"
     assert _evaluate(
         rules.map_lookup(
             rules.literal_expr(changed),
@@ -267,6 +274,73 @@ def test_semantic_key_maps_support_products_lookup_update_and_defaults() -> None
             rules.literal_expr("missing"),
         )
     )[0] == "seven"
+    assert inserted.tag == "transitions"
+
+
+def test_rule_comparisons_use_alphabet_semantics_for_exact_values() -> None:
+    first = alphabets.AlgebraicNumber(
+        (1, 0, -2),
+        (Fraction(1), Fraction(2)),
+    )
+    equivalent = alphabets.AlgebraicNumber(
+        (2, 0, -4),
+        (Fraction(4, 3), Fraction(3, 2)),
+    )
+    assert first != equivalent
+    assert alphabets.semantic_equal(first, equivalent)
+
+    assert _evaluate(
+        rules.equal(
+            rules.literal_expr(first),
+            rules.literal_expr(equivalent),
+        )
+    )[0] is True
+    left_tuple = rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (rules.literal_expr(first), rules.literal_expr("tail")),
+    )
+    right_tuple = rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (rules.literal_expr(equivalent), rules.literal_expr("tail")),
+    )
+    assert _evaluate(rules.equal(left_tuple, right_tuple))[0] is True
+
+    source = _word("values", first, "separator")
+    assert _evaluate(
+        rules.index_of(
+            rules.literal_expr(source),
+            rules.literal_expr(equivalent),
+            rules.literal_expr(-1),
+        )
+    )[0] == 0
+
+    runs, _ = _evaluate(
+        rules.maximal_runs(
+            rules.literal_expr(_word("values", first, equivalent))
+        )
+    )
+    run_items = alphabets.word_items(runs)
+    assert len(run_items) == 1
+    assert alphabets.record_get(run_items[0], "length") == 2
+
+    table = _map((first, "old"), tag="algebraic-keys")
+    assert _evaluate(
+        rules.map_lookup(
+            rules.literal_expr(table),
+            rules.literal_expr(equivalent),
+            rules.literal_expr("missing"),
+        )
+    )[0] == "old"
+    updated, _ = _evaluate(
+        rules.map_update(
+            rules.literal_expr(table),
+            rules.literal_expr(equivalent),
+            rules.literal_expr("new"),
+        )
+    )
+    assert updated.tag == "algebraic-keys"
+    assert len(alphabets.map_entries(updated)) == 1
+    assert alphabets.map_get(updated, first) == "new"
 
 
 def test_semantic_key_maps_reject_duplicate_or_malformed_entries() -> None:

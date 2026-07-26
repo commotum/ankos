@@ -705,6 +705,7 @@ class AlphabetKind(Enum):
     NATURALS = "naturals"
     INTEGERS = "integers"
     RATIONALS = "rationals"
+    RATIONAL_INTERVAL = "rational-interval"
     MODULAR = "modular"
     ALGEBRAIC = "algebraic"
     EXACT_COMPLEX = "exact-complex"
@@ -1140,6 +1141,36 @@ def rationals() -> Alphabet[Fraction]:
     return Alphabet(AlphabetDescriptor(AlphabetKind.RATIONALS))
 
 
+def rational_interval(
+    lower: Fraction,
+    upper: Fraction,
+    *,
+    lower_closed: bool = True,
+    upper_closed: bool = True,
+) -> Alphabet[Fraction]:
+    """Construct one nonempty exact interval of rational values."""
+
+    if type(lower) is not Fraction or type(upper) is not Fraction:
+        raise TypeError("rational-interval bounds must be exact Fractions")
+    if type(lower_closed) is not bool or type(upper_closed) is not bool:
+        raise TypeError("rational-interval endpoint flags must be booleans")
+    if lower > upper:
+        raise ValueError("rational-interval lower bound cannot exceed its upper")
+    if lower == upper and not (lower_closed and upper_closed):
+        raise ValueError("rational interval cannot be empty")
+    return Alphabet(
+        AlphabetDescriptor(
+            AlphabetKind.RATIONAL_INTERVAL,
+            scalars=(
+                ("lower", lower),
+                ("upper", upper),
+                ("lower_closed", lower_closed),
+                ("upper_closed", upper_closed),
+            ),
+        )
+    )
+
+
 def algebraics() -> Alphabet[AlgebraicNumber]:
     return Alphabet(AlphabetDescriptor(AlphabetKind.ALGEBRAIC))
 
@@ -1353,7 +1384,10 @@ def _profile(descriptor: AlphabetDescriptor) -> ValueProfile:
         AlphabetKind.MODULAR,
     ):
         return ValueProfile.INTEGER
-    if descriptor.kind is AlphabetKind.RATIONALS:
+    if descriptor.kind in (
+        AlphabetKind.RATIONALS,
+        AlphabetKind.RATIONAL_INTERVAL,
+    ):
         return ValueProfile.RATIONAL
     if descriptor.kind is AlphabetKind.ALGEBRAIC:
         return ValueProfile.ALGEBRAIC
@@ -1402,6 +1436,25 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
         return (
             isinstance(value, (int, Fraction))
             and not isinstance(value, bool)
+        )
+    if kind is AlphabetKind.RATIONAL_INTERVAL:
+        if not isinstance(value, (int, Fraction)) or isinstance(value, bool):
+            return False
+        lower = _scalar_parameter(descriptor, "lower")
+        upper = _scalar_parameter(descriptor, "upper")
+        lower_closed = _scalar_parameter(descriptor, "lower_closed")
+        upper_closed = _scalar_parameter(descriptor, "upper_closed")
+        assert type(lower) is Fraction and type(upper) is Fraction
+        assert type(lower_closed) is bool and type(upper_closed) is bool
+        exact_value = Fraction(value)
+        return (
+            exact_value >= lower
+            if lower_closed
+            else exact_value > lower
+        ) and (
+            exact_value <= upper
+            if upper_closed
+            else exact_value < upper
         )
     if kind is AlphabetKind.ALGEBRAIC:
         return type(value) is AlgebraicNumber
@@ -1532,6 +1585,42 @@ def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
             raise ValueError("integer alphabet carries irrelevant fields")
         if any(name not in ("minimum", "maximum") for name, _ in descriptor.scalars):
             raise ValueError("integer alphabet has an unknown bound")
+        return
+    if kind is AlphabetKind.RATIONAL_INTERVAL:
+        expected_names = (
+            "lower",
+            "upper",
+            "lower_closed",
+            "upper_closed",
+        )
+        if (
+            values
+            or children
+            or fields
+            or profile
+            or tuple(name for name, _ in descriptor.scalars) != expected_names
+        ):
+            raise ValueError(
+                "rational-interval alphabet has an invalid descriptor shape"
+            )
+        lower = _scalar_parameter(descriptor, "lower")
+        upper = _scalar_parameter(descriptor, "upper")
+        lower_closed = _scalar_parameter(descriptor, "lower_closed")
+        upper_closed = _scalar_parameter(descriptor, "upper_closed")
+        if type(lower) is not Fraction or type(upper) is not Fraction:
+            raise TypeError(
+                "rational-interval bounds must be exact Fractions"
+            )
+        if type(lower_closed) is not bool or type(upper_closed) is not bool:
+            raise TypeError(
+                "rational-interval endpoint flags must be booleans"
+            )
+        if lower > upper:
+            raise ValueError(
+                "rational-interval lower bound cannot exceed its upper"
+            )
+        if lower == upper and not (lower_closed and upper_closed):
+            raise ValueError("rational interval cannot be empty")
         return
     if kind is AlphabetKind.MODULAR:
         if (
@@ -1725,6 +1814,7 @@ __all__ = [
     "product",
     "product_items",
     "product_value",
+    "rational_interval",
     "rationals",
     "record",
     "record_fields",

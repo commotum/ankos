@@ -324,9 +324,12 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
             )
         if len(arguments) == 3:
             width = arguments[2]
+            if type(width) is RuleExpr:
+                return
             if type(width) is not int or width <= 0:
                 raise ValueError(
-                    "integer-digits expression width must be a positive integer"
+                    "integer-digits expression width must be a positive "
+                    "integer or RuleExpr"
                 )
         return
     if primitive is ExpressionPrimitive.FROM_DIGITS:
@@ -671,16 +674,20 @@ def integer_digits(
     value: RuleExpr,
     base: int,
     *,
-    width: int | None = None,
+    width: int | RuleExpr | None = None,
 ) -> RuleExpr:
-    """Encode one nonnegative integer as a semantic most-significant-first word."""
+    """Encode an integer using canonical or expression-selected positive width."""
 
     if type(base) is not int or base < 2:
         raise ValueError("integer-digits base must be an integer >= 2")
     arguments: tuple[RuleScalar | RuleExpr, ...] = (value, base)
     if width is not None:
-        if type(width) is not int or width <= 0:
-            raise ValueError("integer-digits width must be a positive integer")
+        if type(width) is not RuleExpr and (
+            type(width) is not int or width <= 0
+        ):
+            raise ValueError(
+                "integer-digits width must be a positive integer or RuleExpr"
+            )
         arguments = (*arguments, width)
     return RuleExpr(ExpressionPrimitive.INTEGER_DIGITS, arguments)
 
@@ -3565,8 +3572,16 @@ def _evaluate_value(
         width = (
             None
             if len(arguments) == 2
-            else _literal_int(arguments, 2)
+            else (
+                _require_strict_int(evaluate(_child(arguments, 2)))
+                if type(arguments[2]) is RuleExpr
+                else _literal_int(arguments, 2)
+            )
         )
+        if width is not None and width <= 0:
+            raise ValueError(
+                "integer-digits expression width must evaluate positive"
+            )
         digits = _integer_digit_values(value, base)
         if width is not None:
             if len(digits) > width:

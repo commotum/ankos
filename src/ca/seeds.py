@@ -170,7 +170,6 @@ class Construction:
                 if (
                     type(shape) is not tuple
                     or not shape
-                    or not 1 <= len(shape) <= 3
                     or any(type(size) is not int or size <= 0 for size in shape)
                     or type(values) is not tuple
                     or any(not _is_exact_seed_value(value) for value in values)
@@ -783,7 +782,7 @@ def _validate_construction_output(
             )
             or (
                 contract.kind is loci.CarrierKind.GRID
-                and not 1 <= len(contract.shape) <= 3
+                and not contract.shape
             )
         ):
             raise SeedValidationError(
@@ -880,7 +879,7 @@ def _validate_uniform_tuple_output(
             raise SeedValidationError(
                 "uniform tuple grid laws require a concrete shape"
             )
-        if not 1 <= len(contract.shape) <= 3 or size != law.length:
+        if not contract.shape or size != law.length:
             raise SeedValidationError(
                 "uniform tuple length disagrees with its grid carrier"
             )
@@ -1212,14 +1211,30 @@ def finite_grid(
     values: tuple[ExactSeedValue, ...],
     *,
     boundary: loci.Boundary[ExactSeedValue],
+    axes: tuple[str, ...] | None = None,
     value_profile: alphabets.ValueProfile | None = None,
 ) -> Seed[loci.FiniteConfiguration[ExactSeedValue]]:
-    """Construct a rank-1/2/3 finite grid without rendering machinery."""
+    """Construct a positive-rank finite grid without rendering machinery."""
 
-    if not 1 <= len(shape) <= 3:
-        raise SeedValidationError("finite-grid rank must be 1, 2, or 3")
-    if any(isinstance(size, bool) or size <= 0 for size in shape):
+    if type(shape) is not tuple:
+        raise TypeError("finite-grid shape must be an immutable tuple")
+    if not shape:
+        raise SeedValidationError("finite-grid rank must be positive")
+    if any(type(size) is not int or size <= 0 for size in shape):
         raise SeedValidationError("finite-grid extents must be positive")
+    if type(values) is not tuple:
+        raise TypeError("finite-grid values must be an immutable tuple")
+    if axes is not None:
+        if type(axes) is not tuple:
+            raise TypeError("finite-grid axes must be an immutable tuple")
+        if len(axes) != len(shape):
+            raise SeedValidationError(
+                "finite-grid axes and shape must have equal rank"
+            )
+        if any(type(axis) is not str or not axis for axis in axes):
+            raise TypeError("finite-grid axes must be nonempty strings")
+        if len(set(axes)) != len(axes):
+            raise SeedValidationError("finite-grid axes must be unique")
     cell_count = 1
     for size in shape:
         cell_count *= size
@@ -1228,7 +1243,12 @@ def finite_grid(
             f"finite-grid needs {cell_count} values, got {len(values)}"
         )
     return exact(
-        loci.grid_configuration(shape, values, boundary=boundary),
+        loci.grid_configuration(
+            shape,
+            values,
+            boundary=boundary,
+            axes=axes,
+        ),
         value_profile=value_profile,
     )
 
