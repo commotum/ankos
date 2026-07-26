@@ -2714,31 +2714,46 @@ class AnchoredClauseKernelDenotation:
                 )
 
 
-def _validate_anchored_rule_contract(
-    denotation: AnchoredClauseKernelDenotation,
+def _validate_clause_rule_contract(
+    denotation: ClauseKernelDenotation | AnchoredClauseKernelDenotation,
     contract: RuleContract,
 ) -> None:
     """Validate cross-record obligations shared by construction and decoding."""
 
-    required_existing = {
-        frontiers.Effect.REPLACE
-        if plan.action is DispositionAction.REPLACE
-        else frontiers.Effect.DELETE
+    derivations = tuple(
+        clause.result
         for clause in denotation.clauses
-        for plan in clause.result.existing_plans
-        if plan.action in (
-            DispositionAction.REPLACE,
-            DispositionAction.DELETE,
-        )
-    }
+        if type(clause.result) is DerivationClauseResult
+    )
+    required_existing: set[frontiers.Effect] = set()
+    required_fresh: set[frontiers.Effect] = set()
+    for result in derivations:
+        for plan in result.existing_plans:
+            if plan.action is DispositionAction.REPLACE:
+                required_existing.add(frontiers.Effect.REPLACE)
+            elif plan.action is DispositionAction.DELETE:
+                required_existing.add(frontiers.Effect.DELETE)
+        if any(
+            plan.action is DispositionAction.CREATE
+            for plan in result.fresh_plans
+        ):
+            required_fresh.add(frontiers.Effect.CREATE)
+
+    declared = contract.required_effect_profile
     if not required_existing.issubset(
-        contract.required_effect_profile.existing
+        declared.existing
     ):
         missing = required_existing.difference(
-            contract.required_effect_profile.existing
+            declared.existing
         )
         raise ValueError(
-            "anchored Rule contract omits required existing effects: "
+            "clause Rule contract omits required existing effects: "
+            + ", ".join(sorted(effect.value for effect in missing))
+        )
+    if not required_fresh.issubset(declared.fresh):
+        missing = required_fresh.difference(declared.fresh)
+        raise ValueError(
+            "clause Rule contract omits required fresh effects: "
             + ", ".join(sorted(effect.value for effect in missing))
         )
     if (
@@ -2747,7 +2762,7 @@ def _validate_anchored_rule_contract(
         is not seeds.EntropyInterface.REPLAY_KEY
     ):
         raise ValueError(
-            "probabilistic anchored Rule requires replay-key entropy"
+            "probabilistic clause Rule requires replay-key entropy"
         )
 
 
@@ -2919,8 +2934,11 @@ class Rule(Generic[R, W, C]):
         if type(self.contract) is not RuleContract:
             raise TypeError("Rule contract is not recognized")
         denotation = self.descriptor.denotation
-        if type(denotation) is AnchoredClauseKernelDenotation:
-            _validate_anchored_rule_contract(denotation, self.contract)
+        if type(denotation) in (
+            ClauseKernelDenotation,
+            AnchoredClauseKernelDenotation,
+        ):
+            _validate_clause_rule_contract(denotation, self.contract)
 
     @property
     def canonical_identity(self) -> str:
@@ -6299,43 +6317,7 @@ def clause_kernel(
         selection,
         completeness_evidence,
     )
-    required_existing: set[frontiers.Effect] = set()
-    required_fresh: set[frontiers.Effect] = set()
-    for clause in clauses:
-        result = clause.result
-        if not isinstance(result, DerivationClauseResult):
-            continue
-        for plan in result.existing_plans:
-            if plan.action is DispositionAction.REPLACE:
-                required_existing.add(frontiers.Effect.REPLACE)
-            elif plan.action is DispositionAction.DELETE:
-                required_existing.add(frontiers.Effect.DELETE)
-        if any(
-            plan.action is DispositionAction.CREATE
-            for plan in result.fresh_plans
-        ):
-            required_fresh.add(frontiers.Effect.CREATE)
-    declared = contract.required_effect_profile
-    if not required_existing.issubset(declared.existing):
-        missing = required_existing.difference(declared.existing)
-        raise ValueError(
-            "clause kernel contract omits required existing effects: "
-            + ", ".join(sorted(effect.value for effect in missing))
-        )
-    if not required_fresh.issubset(declared.fresh):
-        missing = required_fresh.difference(declared.fresh)
-        raise ValueError(
-            "clause kernel contract omits required fresh effects: "
-            + ", ".join(sorted(effect.value for effect in missing))
-        )
-    if (
-        any(clause.mass is not None for clause in clauses)
-        and contract.entropy_interface
-        is not seeds.EntropyInterface.REPLAY_KEY
-    ):
-        raise ValueError(
-            "probabilistic clause kernel requires a replay-key entropy interface"
-        )
+    _validate_clause_rule_contract(denotation, contract)
     descriptor: RuleDescriptor[R, W, C] = RuleDescriptor(
         RulePrimitive.CLAUSE_KERNEL,
         denotation,
@@ -6373,7 +6355,7 @@ def anchored_clause_kernel(
         zero_result,
         completeness_evidence,
     )
-    _validate_anchored_rule_contract(denotation, contract)
+    _validate_clause_rule_contract(denotation, contract)
     descriptor: RuleDescriptor[R, W, C] = RuleDescriptor(
         RulePrimitive.ANCHORED_CLAUSE_KERNEL,
         denotation,

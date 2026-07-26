@@ -384,8 +384,8 @@ without changing the public API or codec algorithm:
 - `IntensionalReadableView` now rejects finite value-anchor dependencies;
 - `ReadableView` checks the declared anchor cardinality against distinct
   realized source anchors; and
-- `Rule` itself, not only the public builder, checks an anchored denotation's
-  required write effects and replay-key requirement.
+- `Rule` itself, not only the public builders, checks ordinary and anchored
+  clause denotations' required write effects and replay-key requirements.
 
 Those checks are necessary because a fail-closed decoder reconstructs public
 records directly through their owner validators. The codec still does not

@@ -1151,6 +1151,65 @@ def test_hostile_anchored_rule_graphs_fail_closed() -> None:
     denotation["zero_result"] = deepcopy(clause["result"])
     _assert_rejected(_redigest(proposed_zero), "invalid-descriptor")
 
+    standard_result = rules.DerivationClauseResult(
+        (
+            rules.ExistingDispositionPlan(
+                rules.capability_index(0),
+                rules.DispositionAction.REPLACE,
+                rules.literal_expr(False),
+            ),
+        ),
+        (
+            rules.FreshDispositionPlan(
+                rules.capability_index(0),
+                rules.DispositionAction.CREATE,
+                rules.literal_expr(True),
+            ),
+        ),
+        rules.Progress.ADVANCED,
+        rules.Continue(),
+        rules.literal_expr("standard-clause-codec"),
+        ("codec:standard-clause",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "standard-clause-codec",
+        ),
+    )
+    standard_contract = rules.RuleContract(
+        anchored_rule.contract.configuration_contract,
+        anchored_rule.contract.value_profile,
+        anchored_rule.contract.required_read_shape,
+        anchored_rule.contract.required_join_shape,
+        frontiers.EffectProfile(
+            existing=(frontiers.Effect.REPLACE,),
+            fresh=(frontiers.Effect.CREATE,),
+        ),
+    )
+    standard_rule = rules.clause_kernel(
+        (
+            rules.RuleClause(
+                rules.literal_expr(True),
+                standard_result,
+            ),
+        ),
+        contract=standard_contract,
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "standard-clause-complete",
+        ),
+    )
+    for effect_side in ("existing", "fresh"):
+        missing_standard_effect = json.loads(
+            serialization.dumps(standard_rule)
+        )
+        contract = missing_standard_effect["payload"]["contract"]["payload"]
+        effect_profile = contract["required_effect_profile"]["payload"]
+        effect_profile[effect_side] = _nested_wire_value(())
+        _assert_rejected(
+            _redigest(missing_standard_effect),
+            "invalid-descriptor",
+        )
+
 
 def test_hostile_value_anchored_readable_views_fail_closed() -> None:
     source = loci.grid_configuration(
