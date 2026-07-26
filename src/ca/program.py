@@ -3608,6 +3608,20 @@ def rollout(
     roots, initial_leaf_space, seed_evidence = roots_result
 
     rule_draws: list[DrawEvidence] = []
+    if steps == 0:
+        trace = _raw_trace(
+            roots,
+            [],
+            [],
+            [],
+            seed_evidence,
+            rule_draws,
+        )
+        return RolloutTruncated(
+            trace,
+            initial_leaf_space,
+            TruncationCause.DEPTH_BOUND,
+        )
     if (
         initial_leaf_space.presentation
         is rules.SupportPresentation.INTENSIONAL

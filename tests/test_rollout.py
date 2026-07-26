@@ -121,7 +121,7 @@ def test_constructive_seed_realizes_at_zero_steps_but_partiality_does_not() -> N
     partial = ca.rollout(partial_program, steps=0)
 
     assert isinstance(partial, program.RolloutTruncated)
-    assert partial.cause is program.TruncationCause.INTENSIONAL_SUPPORT
+    assert partial.cause is program.TruncationCause.DEPTH_BOUND
     assert (
         partial.raw_trace.roots.support.presentation
         is rules.SupportPresentation.INTENSIONAL

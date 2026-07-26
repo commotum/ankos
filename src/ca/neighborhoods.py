@@ -671,30 +671,6 @@ class ReadableRegion(Generic[C, R]):
                 "relative grouping cannot be filtered after anchor resolution"
             )
 
-    @property
-    def required_read_shape(self) -> ResultShape:
-        return self.result_shape
-
-    @property
-    def required_join_shape(self) -> JoinShape:
-        return self.join_shape
-
-    @property
-    def compatibility_read_shape(self) -> tuple[str, ...]:
-        """Normalized spelling compared directly with ``RuleContract``."""
-
-        return tuple(field.key for field in self.result_shape.fields)
-
-    @property
-    def compatibility_join_shape(self) -> tuple[str, ...]:
-        """Normalized spelling compared directly with ``RuleContract``."""
-
-        return self.join_shape.fields
-
-    @property
-    def compatibility_exactness_profile(self) -> str:
-        return self.exactness_profile.value
-
     def resolve(self, configuration: C) -> ResolvedReadableView[V]:
         """Resolve independently against one immutable configuration."""
 

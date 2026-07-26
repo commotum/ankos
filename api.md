@@ -175,6 +175,7 @@ record:
 ```python
 application_input = ca.program.ApplicationInput(
     configuration=configuration,
+    trace_lineage=ca.program.TraceLineage("caller-root"),
 )
 
 result = ca.apply(program, application_input)
@@ -242,14 +243,29 @@ A complete Rule result has finite or intensional support containing:
 
 ```text
 Derivation(
-    TotalDisposition,
-    Advanced | Quiescent,
-    Continue | Stop(reason),
-    witness,
-    provenance,
+    replacement=TotalDisposition(...),
+    progress=Progress.ADVANCED | Progress.QUIESCENT,
+    continuation=Continue() | Stop(reason, terminality_certificate),
+    witness=Witness(...),
+    provenance=(...),
+    certificate=derivation_certificate,
+    version=1,
 )
-NoSuccessor(Terminal | Undefined | DeclaredFailure | Divergent, reason, witness, provenance)
+NoSuccessor(
+    outcome=NoSuccessorOutcome.TERMINAL
+          | NoSuccessorOutcome.UNDEFINED
+          | NoSuccessorOutcome.DECLARED_FAILURE
+          | NoSuccessorOutcome.DIVERGENT,
+    reason=...,
+    witness=Witness(...),
+    provenance=(...),
+    certificate=outcome_certificate,
+    version=1,
+)
 ```
+
+The shown `version=1` values are constructor defaults, but they are mandatory
+semantic record fields and mandatory codec fields.
 
 Each derivation gives a total disposition:
 
@@ -267,14 +283,14 @@ missing structural effect.
 
 | Case | Required representation |
 |---|---|
-| Ordinary change | `Advanced` derivation |
-| Stable no-event identity | `Quiescent` identity derivation |
-| Eventful same-state result | `Advanced` derivation with retained witness |
-| Completed one-shot result | `Advanced + Stop(Completed)` |
-| Exact halt or no solution | Typed `Terminal` atom |
-| Partial mathematical domain | Typed `Undefined` atom |
-| Construction-defined failure | Typed `DeclaredFailure` atom |
-| Proven semantic noncompletion | Typed `Divergent` atom with certificate |
+| Ordinary change | `Derivation(progress=Progress.ADVANCED, ...)` |
+| Stable no-event identity | `Derivation(progress=Progress.QUIESCENT, ...)` |
+| Eventful same-state result | `Derivation(progress=Progress.ADVANCED, ...)` with retained witness |
+| Completed one-shot result | `Derivation(progress=Progress.ADVANCED, continuation=Stop(...), ...)` |
+| Exact halt or no solution | `NoSuccessor(outcome=NoSuccessorOutcome.TERMINAL, ...)` |
+| Partial mathematical domain | `NoSuccessor(outcome=NoSuccessorOutcome.UNDEFINED, ...)` |
+| Construction-defined failure | `NoSuccessor(outcome=NoSuccessorOutcome.DECLARED_FAILURE, ...)` |
+| Proven semantic noncompletion | `NoSuccessor(outcome=NoSuccessorOutcome.DIVERGENT, ...)` with the required certificate |
 | Invalid or unsupported Rule boundary | `RuleRejected(fault)` with no authoritative denotation |
 | Invalid or unsupported application boundary | `ApplicationRejected(fault)` with no authoritative successors |
 
@@ -327,7 +343,7 @@ run it once per cell, collect proposals, or resolve a collision afterward.
 A function evaluation can use input and output slots in one configuration:
 
 ```text
-Input(3) -> Output(9), Advanced + Stop(Completed)
+Input(3) -> Output(9), Progress.ADVANCED + Stop(completed, certificate)
 ```
 
 It is complete after one `ca.apply`; it does not need a fake second step to
@@ -393,7 +409,9 @@ requested.
 
 `steps` bounds application depth. It is not necessarily physical time, and
 reaching it produces a typed truncated run with continuing leaves rather than
-a false terminal outcome.
+a false terminal outcome. A zero-step request therefore returns
+`DEPTH_BOUND`, even when the retained initial support is intensional; no
+enumeration or application was requested.
 
 Rollout realizes or binds the Seed with root replay evidence, expands every
 continuing configuration/lineage derivation fiber, retains raw applications
@@ -401,9 +419,9 @@ and witnesses, propagates exact measures or replay subkeys, and stops a branch
 only on its own `Stop` or typed no-successor atom.
 
 A probability law is descriptor data; a draw is an external realization.
-The replay key, sampler/profile version, selected witness, and derived subkey
-are evidence in the realized trace. No ambient RNG state contributes
-semantics.
+The replay-key identity, sampler and numeric profiles, selected-witness
+identity, and derived-subkey identity are evidence in the realized trace. No
+ambient RNG state contributes semantics.
 
 Exhaustive rollout of a branching or intensional relation is itself branching
 or intensional. A query may sample, bound, or project it, but that request does
@@ -444,7 +462,9 @@ rejections, not partially restored values or implicit defaults.
 The canonical program payload always contains the validated, expanded
 `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule` fields.
 
-A versioned outer envelope may carry payload provenance and a derived digest.
+A canonical byte encoding has exactly the four outer fields `tag`, `version`,
+`payload`, and `digest`. The digest is mandatory, derived from the other three
+fields, and carries no independent semantics.
 Canonical codecs neither preserve nor recover the catalog spelling and
 arguments used to construct a program. Applications that need invocation
 history keep a separate user manifest; an alias-only recipe is never accepted

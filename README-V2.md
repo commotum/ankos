@@ -241,6 +241,7 @@ Advanced callers may provide explicit lineage:
 ```python
 application_input = ca.program.ApplicationInput(
     configuration=configuration,
+    trace_lineage=ca.program.TraceLineage("caller-root"),
 )
 result = ca.apply(program, application_input)
 ```
@@ -262,7 +263,8 @@ With no `initial`, rollout starts from the Seed denotation. A replay key
 authorizes reproducible realization when a Seed or Rule law requires a draw.
 Without a key, finite or intensional laws remain complete laws rather than
 being sampled implicitly. A depth bound is application depth, not necessarily
-physical time.
+physical time. A zero-step request reports the depth bound even when its
+retained initial support is intensional.
 
 One-shot functions, constraint completions, representation transforms, and
 many continuous relations are normally consumed with `ca.apply`; they do not

@@ -373,7 +373,7 @@ def test_partial_seed_obligations_never_become_executable_complete_roots() -> No
     )
 
     assert isinstance(result, program.RolloutTruncated)
-    assert result.cause is program.TruncationCause.INTENSIONAL_SUPPORT
+    assert result.cause is program.TruncationCause.DEPTH_BOUND
     assert (
         result.raw_trace.roots.support.presentation
         is rules.SupportPresentation.INTENSIONAL

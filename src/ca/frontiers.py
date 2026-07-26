@@ -509,10 +509,6 @@ class WritableRegion(Generic[C, W]):
             )
 
     @property
-    def required_effect_profile(self) -> EffectProfile:
-        return self.effect_profile
-
-    @property
     def fresh_namespaces(self) -> tuple[FreshNamespace, ...]:
         """All declared namespaces, including heterogeneous compositions."""
 
