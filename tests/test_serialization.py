@@ -122,7 +122,7 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
     assert len(schemas) == 178
     assert sum(
         len(row.enum_values) if row.enum_values else 1 for row in schemas
-    ) == 387
+    ) == 408
     assert len({row.tag for row in schemas}) == 178
     assert len({row.value_type for row in schemas}) == 178
 
@@ -229,6 +229,69 @@ assert serialization.loads(encoded) == serialization.Decoded(value)
         text=True,
     )
     assert completed.returncode == 0, completed.stderr
+
+
+def _new_rule_expression_samples() -> tuple[rules.RuleExpr, ...]:
+    """Return one structurally valid expression for each reopened G7-02 node."""
+
+    source = rules.literal_expr("source")
+    index = rules.literal_expr(0)
+    default = rules.literal_expr("default")
+    value = rules.literal_expr("value")
+    table = rules.literal_expr("table")
+    return (
+        rules.record_field(source, "field"),
+        rules.record_update(source, "field", value),
+        rules.length(source),
+        rules.item_at(source, index, default),
+        rules.slice_items(source, index, rules.literal_expr(1)),
+        rules.concatenate(source, value),
+        rules.reverse(source),
+        rules.replace_at(source, index, value),
+        rules.map_lookup(source, index, default),
+        rules.map_update(source, index, value),
+        rules.index_of(source, value, rules.literal_expr(-1)),
+        rules.index_of_tag(source, "head", rules.literal_expr(-1)),
+        rules.floor_divide(rules.literal_expr(7), rules.literal_expr(3)),
+        rules.absolute(rules.literal_expr(-7)),
+        rules.fractional_part(rules.literal_expr(Fraction(7, 3))),
+        rules.integer_digits(rules.literal_expr(7), 2, width=3),
+        rules.from_digits(source, 2),
+        rules.maximal_runs(source),
+        rules.product_value("product", value),
+        rules.word_value("word", value),
+        rules.flat_map_lookup(source, table),
+    )
+
+
+def test_new_rule_expression_primitives_round_trip_in_exact_enum_order() -> None:
+    """Every reopened mechanics node uses the existing closed RuleExpr codec."""
+
+    samples = _new_rule_expression_samples()
+    new_primitives = tuple(rules.ExpressionPrimitive)[20:]
+
+    assert len(samples) == 21
+    assert tuple(expression.primitive for expression in samples) == new_primitives
+    for expression in samples:
+        encoded = serialization.dumps(expression)
+        assert serialization.loads(encoded) == serialization.Decoded(expression)
+        assert serialization.dumps(expression) == encoded
+
+
+@pytest.mark.parametrize("expression", _new_rule_expression_samples())
+def test_new_rule_expression_primitives_reject_malformed_wire_shape(
+    expression: rules.RuleExpr,
+) -> None:
+    """A valid digest cannot bypass each new primitive's shape validation."""
+
+    envelope = json.loads(serialization.dumps(expression))
+    arguments = envelope["payload"]["arguments"]
+    assert arguments["tag"] == "ca.tuple"
+    arguments["payload"]["items"] = []
+
+    result = serialization.loads(_redigest(envelope))
+    assert isinstance(result, serialization.DecodeRejected)
+    assert result.fault.reason == "invalid-descriptor"
 
 
 def test_mutated_enum_singleton_cannot_encode_as_another_member() -> None:

@@ -230,6 +230,16 @@ _SCHEMAS = (
         "expression.count", "expression.gate", "expression.lookup",
         "expression.equal", "expression.less", "expression.less-equal",
         "expression.conditional", "expression.all", "expression.any",
+        "expression.record-field", "expression.record-update",
+        "expression.length", "expression.item-at", "expression.slice",
+        "expression.concatenate", "expression.reverse",
+        "expression.replace-at", "expression.map-lookup",
+        "expression.map-update", "expression.index-of",
+        "expression.index-of-tag", "expression.floor-divide",
+        "expression.absolute", "expression.fractional-part",
+        "expression.integer-digits", "expression.from-digits",
+        "expression.maximal-runs", "expression.product-value",
+        "expression.word-value", "expression.flat-map-lookup",
     )),
     _enum(rules.GateKind, "ca.rules.gate-kind", (
         "any", "all", "majority", "at-least", "at-most", "exactly",
@@ -1059,8 +1069,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 387:
-        raise RuntimeError("canonical schema registry must contain 387 variants")
+    if variant_count != 408:
+        raise RuntimeError("canonical schema registry must contain 408 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:
