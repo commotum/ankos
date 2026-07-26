@@ -1350,11 +1350,6 @@ def elementary_cellular_automaton(
 
     return eca(rule=rule, width=width)
 
-
-# ---------------------------------------------------------------------------
-# Phase 4. Compatibility adapters
-# ---------------------------------------------------------------------------
-
 __all__ = (
     "alternating_partition_local_evolution",
     "asynchronous_local_state_automaton",

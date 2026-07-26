@@ -1,7 +1,7 @@
 """Export explicit downstream dataset views to viewer bundle version 1.
 
-The Goal 7 target layer in this module accepts only ``DatasetEpisode`` and
-``DatasetBatch`` tensor projections prepared by ``datasets.py``. It preserves
+This layer accepts only ``DatasetEpisode`` and ``DatasetBatch`` tensor
+projections prepared by ``datasets.py``. It preserves
 the existing ``ankos.viz.bundle`` wire contract and presentation metadata. It
 does not infer a tensor layout from arbitrary semantic results, define the
 canonical program codec, or participate in application.

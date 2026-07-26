@@ -487,7 +487,7 @@ class WritableRegion(Generic[C, W]):
             expected_namespace = namespaces[0] if len(namespaces) == 1 else None
             if self.fresh_namespace != expected_namespace:
                 raise WritableResolutionError(
-                    "writable composition legacy namespace does not match its "
+                    "writable composition singular namespace does not match its "
                     "part namespaces"
                 )
         has_fresh_effect = bool(self.effect_profile.fresh)

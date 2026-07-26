@@ -4,7 +4,7 @@ This module owns immutable records for canonical family identity, close roles,
 legacy migration, and public-name relations.  It does not own constructors,
 component values, program values, registries, lookup dispatch, or execution.
 The six category modules build programs without importing this module;
-``ca.catalog`` is the sole eventual join between metadata and callables.
+``ca.catalog`` is the sole join between metadata and callables.
 
 The family and close-role values below are the literal, callable-free
 catalog projection of ``goal-6/catalog-migration.md``.  ``closed_parameters``

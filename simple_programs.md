@@ -16,8 +16,9 @@ The five fields describe where configurations come from, what values they may
 contain, what may be changed, what may be observed, and which complete
 replacement relation connects one configuration to its possible results.
 
-This is the conceptual model. `api.md` gives the public library spelling;
-`goal-6/architecture.md` gives the full internal contracts and application algebra.
+This is the conceptual model. [`api.md`](api.md) gives the public library
+spelling; [`goal-6/architecture.md`](goal-6/architecture.md) gives the full
+internal contracts and application algebra.
 
 ## The program boundary
 
@@ -386,10 +387,12 @@ application law without inventing a trajectory step.
 
 ## Stable boundaries
 
-Serialization is cross-cutting infrastructure. Canonical program encoding
-contains exactly the expanded five fields and preserves exact values, closed
-descriptor versions, structural identities, result witnesses, probability
-laws, and replay evidence without dispatching on an alias.
+Serialization is cross-cutting infrastructure. A canonical program payload
+uses the `ca.simple-program` tag at schema version `1` and contains exactly the
+expanded five fields. The same closed codec separately serializes supported
+components, Rule/application/rollout results, structural identities,
+witnesses, probability laws, traces, and replay evidence without dispatching
+on an alias.
 
 Run horizon, realization profile, solver strategy, replay key, resource
 limits, tracing, observation, rendering, export, datasets, and batching remain

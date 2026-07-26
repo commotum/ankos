@@ -3,8 +3,8 @@
 This module owns audited catalog spellings whose dominant mechanic matches,
 replaces, grows, deletes, or branches structure.  It does not own structural
 identity primitives, component mechanics, metadata, application, conflict
-repair, or execution dispatch.  Goal 7 implementations will compose the five
-component algebras into ordinary ``SimpleProgram`` values.
+repair, or execution dispatch. The implementations compose the five component
+algebras into ordinary ``SimpleProgram`` values.
 
 Each canonical family is an explicitly typed, transparent five-component
 constructor.  Bounded presets below compile their semantic parameters into
@@ -1807,12 +1807,6 @@ def network_rewrite(
         neighborhood=neighborhood,
         rule=rule,
     )
-
-
-# ---------------------------------------------------------------------------
-# Phase 4. Compatibility adapters
-# ---------------------------------------------------------------------------
-
 
 __all__ = (
     "append_only_sequence_generation",

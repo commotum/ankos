@@ -36,6 +36,26 @@ Status: **IN PROGRESS**
 - `GOALS.md` must remain unchanged until every other G7-06 completion gate
   passes.
 
+## Contract Clarification
+
+The hostile release audit found one implemented refinement that was not named
+in Goal 6's four-item truncation-cause sketch:
+`TruncationCause.INTENSIONAL_SUPPORT`.
+
+It is retained because rollout can faithfully carry a complete intensional
+Seed or successor space but cannot enumerate and repeatedly apply its members
+without an external query/realization operation. Reporting
+`INTENSIONAL_SUPPORT` is a request-bound truncation: it preserves the
+intensional continuing support and makes no terminal, divergence,
+cardinality, or resource-exhaustion claim. Mapping this case to
+`RESOURCE_EXHAUSTED` would falsely attribute a resource failure; mapping it to
+completion or rejection would erase a valid denotation.
+
+This is a typed clarification of the already-frozen finite/intensional rollout
+boundary, not a new program field, semantic family, executor, solver, or
+realization path. It is already canonical-codec covered and directly exercised
+by unit and conformance tests. Goal 6 remains frozen.
+
 ## Big Picture Objective
 
 Reconcile source, documentation, packaging, and installed behavior into one

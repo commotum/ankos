@@ -1,7 +1,7 @@
 """Deterministic downstream RNG helpers for dataset planning.
 
-The Goal 7 target responsibility of this auxiliary module is deliberately
-narrow: dataset code may derive stable planning seeds and construct NumPy
+The responsibility of this auxiliary module is deliberately narrow: dataset
+code may derive stable planning seeds and construct NumPy
 generators after the semantic program has already been chosen. This module
 does not own Seed laws, Rule laws, canonical replay coordinates, application
 evidence, or any transition behavior; those remain closed semantic data and

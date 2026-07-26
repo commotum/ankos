@@ -40,22 +40,22 @@ Construct and traverse elementary cellular automaton rule 30:
 ```python
 import ca
 
-program = ca.catalog.eca(rule=30, width=79)
+program = ca.catalog.eca(rule=30, width=9)
 episode = ca.rollout(
     program,
-    steps=100,
+    steps=4,
     replay_key="readme-rule-30",
 )
 
 print(type(episode).__name__)
 print(len(episode.raw_trace.applications.atoms))
 # RolloutTruncated
-# 100
+# 4
 ```
 
 The catalog constructor supplies a Bernoulli Seed. The replay key authorizes
 one deterministic, reproducible realization of that law; it is execution
-evidence, not a sixth program field. Reaching `steps=100` is a depth bound, so
+evidence, not a sixth program field. Reaching `steps=4` is a depth bound, so
 the continuing run is correctly reported as `RolloutTruncated`, not as
 terminal.
 
