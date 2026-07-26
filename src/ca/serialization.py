@@ -1248,6 +1248,50 @@ def _node(tag: str, payload: dict[str, object]) -> dict[str, object]:
     return {"tag": tag, "version": 1, "payload": payload}
 
 
+def _exact_structure_equal(
+    left: object,
+    right: object,
+    active: set[tuple[int, int]] | None = None,
+) -> bool:
+    """Compare closed values without Python's bool/int equality collapse."""
+
+    if type(left) is not type(right):
+        return False
+    if left is None or type(left) in (bool, int, str, Fraction):
+        return left == right
+    if isinstance(left, Enum):
+        return left is right
+    if active is None:
+        active = set()
+    pair = (id(left), id(right))
+    if pair in active:
+        return False
+    active.add(pair)
+    try:
+        if type(left) is tuple:
+            return len(left) == len(right) and all(
+                _exact_structure_equal(
+                    left_item,
+                    right_item,
+                    active,
+                )
+                for left_item, right_item in zip(left, right, strict=True)
+            )
+        schema = _SCHEMA_BY_TYPE.get(type(left))
+        if schema is None or schema.enum_values:
+            return False
+        return all(
+            _exact_structure_equal(
+                getattr(left, field_name),
+                getattr(right, field_name),
+                active,
+            )
+            for field_name in schema.fields
+        )
+    finally:
+        active.remove(pair)
+
+
 def _encode_node(value: object) -> dict[str, object]:
     value_type = type(value)
     if value is None:
@@ -1294,7 +1338,14 @@ def _encode_node(value: object) -> dict[str, object]:
             getattr(reconstructed, field_name)
             for field_name in schema.fields
         )
-        if reconstructed_values != field_values:
+        if any(
+            not _exact_structure_equal(original, canonical)
+            for original, canonical in zip(
+                field_values,
+                reconstructed_values,
+                strict=True,
+            )
+        ):
             raise ValueError("constructor normalization changed forged fields")
     except Exception as error:
         raise TypeError(

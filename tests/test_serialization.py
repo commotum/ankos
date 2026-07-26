@@ -315,6 +315,11 @@ def test_catalog_invocation_legacy_dynamics_and_observers_are_not_canonical() ->
     with pytest.raises(TypeError):
         serialization.dumps(source)
 
+    forged_descriptor = alphabets.enum((0, False)).descriptor
+    object.__setattr__(forged_descriptor, "values", (0, False))
+    with pytest.raises(TypeError):
+        serialization.dumps(forged_descriptor)
+
     completed = subprocess.run(
         [
             sys.executable,

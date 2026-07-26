@@ -585,6 +585,9 @@ def test_lossy_approximate_or_out_of_image_translation_remains_explicit() -> Non
     assert lossy.forward(0) == lossy.forward(1) == 0
     assert approximate.qualification == (("error-bound", Fraction(1, 2)),)
     for relation in (lossy, approximate):
+        blob = serialization.dumps(relation)
+        assert serialization.loads(blob) == serialization.Decoded(relation)
+        assert serialization.dumps(serialization.loads(blob).value) == blob
         with pytest.raises(ValueError, match="only exact"):
             relation.inverse(0)
         with pytest.raises(ValueError, match="outside"):

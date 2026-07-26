@@ -248,6 +248,18 @@ def test_round_trip_preserves_every_exact_semantic_distinction() -> None:
             alphabets.RepresentedNumberProfile.FIXED_POINT,
             Fraction(1, 2),
         ),
+        alphabets.RepresentedNumber(
+            alphabets.RepresentedNumberProfile.IEEE754_BINARY32,
+            0x3F000000,
+        ),
+        alphabets.RepresentedNumber(
+            alphabets.RepresentedNumberProfile.IEEE754_BINARY64,
+            0x3FE0000000000000,
+        ),
+        alphabets.RepresentedNumber(
+            alphabets.RepresentedNumberProfile.INTERVAL,
+            (Fraction(1, 3), Fraction(2, 3)),
+        ),
         alphabets.StructuralReference(loci.named("same-spelling")),
         alphabets.StructuralReference(
             loci.fresh_reference("same-spelling", "same-spelling")
