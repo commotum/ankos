@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import fields, is_dataclass
+from dataclasses import fields, is_dataclass, replace
 from enum import Enum
 from fractions import Fraction
 
@@ -507,6 +507,22 @@ def _clause_disposition_identity_expression(
     return disposition
 
 
+def _is_derived_clause_kernel_witness(witness: rules.Witness) -> bool:
+    """Recognize witness IDs derived canonically by the clause evaluator."""
+
+    descriptor = witness.descriptor
+    return (
+        descriptor.primitive is rules.ExpressionPrimitive.TUPLE
+        and len(descriptor.arguments) in (6, 7)
+        and type(descriptor.arguments[0]) is rules.RuleExpr
+        and descriptor.arguments[0].primitive
+        is rules.ExpressionPrimitive.LITERAL
+        and descriptor.arguments[0].arguments
+        == ("clause-kernel-witness-v1",)
+        and witness.identity == loci.canonical_identity(descriptor)
+    )
+
+
 def _representation_stable_key(
     value: object,
     *,
@@ -562,7 +578,11 @@ def _representation_stable_key(
 
     normalized_fields: list[tuple[str, tuple[object, ...]]] = []
     for field in fields(value):
-        if type(value) is rules.Witness and field.name == "identity":
+        if (
+            type(value) is rules.Witness
+            and field.name == "identity"
+            and _is_derived_clause_kernel_witness(value)
+        ):
             field_key = ("derived-witness-identity",)
         elif (
             type(value) is rules.RuleExpr
@@ -705,7 +725,10 @@ def _normalize_complete_result(
 ) -> tuple[object, ...]:
     """Normalize every stored field, changing only declared values and IDs."""
 
-    aliases = _identity_aliases(result)
+    aliases = _identity_aliases(
+        result,
+        decode_relation=decode_relation,
+    )
     identity_expression_ids: set[int] = set()
     for atom in result.source_outcomes.support.atoms:
         identity_expression_ids.update(
@@ -953,6 +976,88 @@ def test_witness_descriptor_semantics_matching_derived_ids_are_preserved() -> No
         item.startswith("@disposition:")
         for item in strings(normalized)
     )
+
+
+def test_commutation_does_not_merge_distinct_shared_provenance_atoms() -> None:
+    """Atom matching includes structure, not merely type and provenance."""
+
+    def result(
+        probability: tuple[Fraction, Fraction],
+    ) -> program.ApplicationComplete:
+        def atoms(targets: tuple[loci.Locus, ...]):
+            atom_a = replace(
+                derivation(
+                    "atom-a",
+                    existing=(rules.replace(targets[0], False),),
+                ),
+                provenance=("same-provenance",),
+            )
+            atom_b = replace(
+                derivation(
+                    "atom-b",
+                    existing=(rules.replace(targets[0], True),),
+                ),
+                provenance=("same-provenance",),
+            )
+            return atom_a, atom_b
+
+        simple_program, source = finite_record_program(
+            (("value", False),),
+            atoms,
+            alphabet=alphabets.boolean(),
+            effects=(frontiers.Effect.REPLACE,),
+            probability=probability,
+        )
+        application = ca.apply(simple_program, source)
+        assert isinstance(application, program.ApplicationComplete)
+        return application
+
+    left = result((Fraction(1, 4), Fraction(3, 4)))
+    right = result((Fraction(3, 4), Fraction(1, 4)))
+
+    assert left != right
+    assert _normalize_complete_result(left) != _normalize_complete_result(right)
+
+
+def test_commutation_preserves_user_witness_identity_in_atom_matching() -> None:
+    """A finite-rule witness ID may be the sole distinction between atoms."""
+
+    def result(
+        probability: tuple[Fraction, Fraction],
+    ) -> program.ApplicationComplete:
+        def atoms(targets: tuple[loci.Locus, ...]):
+            base = derivation(
+                "shared-atom",
+                existing=(rules.replace(targets[0], True),),
+            )
+            descriptor = rules.literal_expr("shared-witness-descriptor")
+            return (
+                replace(
+                    base,
+                    witness=rules.Witness("witness-a", descriptor),
+                ),
+                replace(
+                    base,
+                    witness=rules.Witness("witness-b", descriptor),
+                ),
+            )
+
+        simple_program, source = finite_record_program(
+            (("value", False),),
+            atoms,
+            alphabet=alphabets.boolean(),
+            effects=(frontiers.Effect.REPLACE,),
+            probability=probability,
+        )
+        application = ca.apply(simple_program, source)
+        assert isinstance(application, program.ApplicationComplete)
+        return application
+
+    left = result((Fraction(1, 4), Fraction(3, 4)))
+    right = result((Fraction(3, 4), Fraction(1, 4)))
+
+    assert left != right
+    assert _normalize_complete_result(left) != _normalize_complete_result(right)
 
 
 def _terminal_px10_result(
