@@ -1,6 +1,6 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — CATALOG COMPLETE; CONFORMANCE NEXT**
+Status: **IN PROGRESS — CONFORMANCE COMPLETE; HANDOFF NEXT**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -1437,8 +1437,10 @@ Every rejected/incomplete application names the first failing generic phase:
 Application stops after the first failing phase; later semantic phases do not
 execute. In particular, resolution failure prevents Rule denotation, and any
 result/fresh/commit/successor fault yields no authoritative successor space.
-This phase ordering is testable with instrumented closed structural
-descriptors and does not depend on a family or traversal order.
+This phase ordering is testable with private harness instrumentation around
+ordinary closed structural descriptors and does not depend on a family or
+traversal order. The instrumentation is neither serialized semantic data nor
+a callback/log field or public observer hook.
 
 Application may dispatch on the sealed generic sum variants above and invoke
 recognized structural descriptor operations. It may not inspect catalog
@@ -2415,5 +2417,7 @@ above.
   six-module homes, legacy migration, named-source evidence, callable kinds,
   exports, roles, and metadata boundaries are verified in
   `catalog-migration.md`.
-- Stage 6 is next: pressure fixtures and conformance;
-- Stage 7 — implementation handoff and final reconciliation.
+- Stage 6 is complete: twelve pressure fixtures, one exact 60-family audit
+  join, fourteen reusable conformance suites, and the final hostile review are
+  verified in `conformance.md`.
+- Stage 7 is next: implementation handoff and final reconciliation.

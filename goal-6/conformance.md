@@ -667,8 +667,9 @@ family-name lookup.
 
 ### CT03 — Validation phases and no-commit failure
 
-Use instrumented closed test descriptors, not a public observer argument, to
-prove the phase order:
+Use private phase-handler spies or sentinel failures around ordinary closed
+test descriptors, not stateful/logging descriptors or a public observer
+argument, to prove the phase order:
 
 ```text
 Program → Input → Frontier → Neighborhood → Join → Rule denotation
@@ -888,11 +889,19 @@ retain independent fixtures for cellular/mobile/Turing automata,
 substitutions, multiway systems, constraints, variable support, stochastic
 laws, and differential/intensional representations.
 
+Differential and intensional oracle cases are deliberately tiny closed
+fixtures whose expected relation has a canonical structural AST or exact
+finite characterization. They do not require a general solver, extensional
+equality for arbitrary intensional relations, or a new equivalence-proving
+framework; unsupported/undetermined equivalence remains explicit.
+
 ### CT13 — Import ownership and no dispatch
 
 Static dependency tests assert:
 
-- component modules do not import `rules`, `program`, or `catalog`;
+- `loci`, `alphabets`, `seeds`, `frontiers`, and `neighborhoods` do not import
+  `rules`, `program`, or `catalog`;
+- `rules.py` does not import `program` or `catalog`;
 - semantic owner modules do not import `serialization`; codecs depend on
   owners, never the reverse;
 - `program.py` and `serialization.py` do not import `catalog`;

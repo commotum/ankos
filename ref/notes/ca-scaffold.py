@@ -489,9 +489,9 @@ APPLICATION_PHASES = (
 )
 def apply(
     program: SimpleProgram[C, V, W, R],
-    application_input: C | ApplicationInput[C],
+    input: C | ApplicationInput[C],
 ) -> ApplicationResult[C, W]:
-    normalized_input = normalize_application_input(application_input)
+    normalized_input = normalize_application_input(input)
     # The closed helper executes APPLICATION_PHASES in order.  Any phase fault
     # becomes ApplicationRejected and prevents every later phase.  After Rule
     # denotation its five passes are: validate the complete space, bind fresh
