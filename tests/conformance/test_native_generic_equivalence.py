@@ -2367,9 +2367,10 @@ def _assert_complete_non_native_result(
     )
 
 
-def _assert_non_native_case(case_id: str) -> None:
-    oracle = _ORACLES_BY_ID[case_id]
-    execution = runtime_ct12_fixture(case_id)
+def _normalize_non_native_case(
+    oracle_case: test_oracles.OracleCase,
+) -> test_oracles.OracleExpected:
+    execution = runtime_ct12_fixture(oracle_case.case_id)
     actual = execution.result
 
     assert isinstance(actual, program.ApplicationComplete)
@@ -2378,8 +2379,17 @@ def _assert_non_native_case(case_id: str) -> None:
     assert actual.evidence.phases == tuple(program.ApplicationPhase)
     assert actual.evidence.program_identity == execution.simple_program.canonical_identity
     assert actual.evidence.input_configuration_identity == execution.source.identity
+    return _assert_complete_non_native_result(
+        oracle_case,
+        execution,
+        actual,
+    )
+
+
+def _assert_non_native_case(case_id: str) -> None:
+    oracle = _ORACLES_BY_ID[case_id]
     assert_full_application_equal(
-        _assert_complete_non_native_result(oracle, execution, actual),
+        _normalize_non_native_case(oracle),
         oracle.expected,
     )
 
@@ -2404,3 +2414,69 @@ def test_differential_and_intensional_fixtures_use_exact_tiny_oracles(
     oracle_case: test_oracles.OracleCase,
 ) -> None:
     _assert_non_native_case(oracle_case.case_id)
+
+
+def test_fresh_binding_normalization_resists_mutated_frozen_evidence() -> None:
+    oracle = _ORACLES_BY_ID["px02.parallel-substitution"]
+    applied = oracle.expected.applied_atoms[0]
+    binding = applied.fresh_bindings[0]
+    mutated_binding = replace(
+        binding,
+        evidence=_term("mutated-fresh-recipe"),
+    )
+    mutated_applied = replace(
+        applied,
+        fresh_bindings=(
+            mutated_binding,
+            *applied.fresh_bindings[1:],
+        ),
+    )
+    mutated_expected = replace(
+        oracle.expected,
+        applied_atoms=(
+            mutated_applied,
+            *oracle.expected.applied_atoms[1:],
+        ),
+    )
+    mutated_case = replace(oracle, expected=mutated_expected)
+
+    normalized = _normalize_non_native_case(mutated_case)
+
+    assert normalized == oracle.expected
+    assert normalized != mutated_expected
+
+
+def test_intensional_normalization_resists_mutated_frozen_relations() -> None:
+    oracle = _ORACLES_BY_ID["px05.constant-field-intensional"]
+    mutated_expected = replace(
+        oracle.expected,
+        applied_intensional_relation=_term("mutated-applied-relation"),
+        successor_intensional_relation=_term("mutated-successor-relation"),
+    )
+    mutated_case = replace(oracle, expected=mutated_expected)
+
+    normalized = _normalize_non_native_case(mutated_case)
+
+    assert normalized == oracle.expected
+    assert normalized != mutated_expected
+
+
+def test_measure_normalization_resists_mutated_frozen_evidence() -> None:
+    oracle = _ORACLES_BY_ID["px06.stochastic-search-law"]
+    applied_measure = replace(
+        oracle.expected.measures.applied_atoms,
+        evidence=_term("mutated-law-evidence"),
+    )
+    mutated_expected = replace(
+        oracle.expected,
+        measures=replace(
+            oracle.expected.measures,
+            applied_atoms=applied_measure,
+        ),
+    )
+    mutated_case = replace(oracle, expected=mutated_expected)
+
+    normalized = _normalize_non_native_case(mutated_case)
+
+    assert normalized == oracle.expected
+    assert normalized != mutated_expected
