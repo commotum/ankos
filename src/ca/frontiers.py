@@ -47,6 +47,10 @@ class EffectProfile:
     fresh: tuple[Effect, ...] = ()
 
     def __post_init__(self) -> None:
+        if type(self.existing) is not tuple or type(self.fresh) is not tuple:
+            raise TypeError("effect profiles must use immutable tuples")
+        if any(not isinstance(effect, Effect) for effect in (*self.existing, *self.fresh)):
+            raise TypeError("effect profile contains an unknown effect")
         if len(set(self.existing)) != len(self.existing):
             raise WritableResolutionError("existing effects must be unique")
         if len(set(self.fresh)) != len(self.fresh):
@@ -66,10 +70,16 @@ class TargetContract:
     frame: WriteFrame = WriteFrame.SUCCESSOR
 
     def __post_init__(self) -> None:
+        if self.locus_kind is not None and not isinstance(
+            self.locus_kind, loci.LocusKind
+        ):
+            raise TypeError("target locus kind is not recognized")
         if self.value_profile is not None and not isinstance(
             self.value_profile, alphabets.ValueProfile
         ):
             raise TypeError("value_profile must be alphabets.ValueProfile")
+        if not isinstance(self.frame, WriteFrame):
+            raise TypeError("target write frame is not recognized")
 
 
 @dataclass(frozen=True)
@@ -80,8 +90,10 @@ class FreshNamespace:
     parent: loci.Locus | None = None
 
     def __post_init__(self) -> None:
-        if not self.namespace:
+        if not isinstance(self.namespace, str) or not self.namespace:
             raise WritableResolutionError("fresh namespace cannot be empty")
+        if self.parent is not None and type(self.parent) is not loci.Locus:
+            raise TypeError("fresh namespace parent must be a Locus")
 
 
 @dataclass(frozen=True)
@@ -90,6 +102,12 @@ class ReconstructionLens:
 
     target: loci.Locus | loci.FreshReference
     frame: WriteFrame
+
+    def __post_init__(self) -> None:
+        if type(self.target) not in (loci.Locus, loci.FreshReference):
+            raise TypeError("reconstruction target is not recognized")
+        if not isinstance(self.frame, WriteFrame):
+            raise TypeError("reconstruction frame is not recognized")
 
 
 @dataclass(frozen=True)
@@ -102,6 +120,14 @@ class ReconstructionEvidence:
     complete: bool = True
 
     def __post_init__(self) -> None:
+        if not isinstance(self.snapshot_identity, str) or not self.snapshot_identity:
+            raise WritableResolutionError(
+                "reconstruction needs a snapshot identity"
+            )
+        if type(self.lenses) is not tuple or any(
+            type(item) is not ReconstructionLens for item in self.lenses
+        ):
+            raise TypeError("reconstruction lenses are not recognized")
         if not self.preserves_outside or not self.complete:
             raise WritableResolutionError(
                 "writable reconstruction must be complete and preserve outside"
@@ -117,8 +143,14 @@ class ExistingCapability:
     effects: tuple[Effect, ...]
 
     def __post_init__(self) -> None:
-        if self.target.kind is loci.LocusKind.FRESH:
-            raise WritableResolutionError("existing capability cannot target FRESH")
+        if type(self.target) is not loci.Locus:
+            raise TypeError("existing capability target must be a bound Locus")
+        if type(self.contract) is not TargetContract:
+            raise TypeError("existing capability contract is not recognized")
+        if type(self.effects) is not tuple or any(
+            not isinstance(effect, Effect) for effect in self.effects
+        ):
+            raise TypeError("existing capability effects are not recognized")
         if not self.effects:
             raise WritableResolutionError("existing capability needs an effect")
         if any(effect is Effect.CREATE for effect in self.effects):
@@ -138,6 +170,10 @@ class FreshCapability:
             raise WritableResolutionError(
                 "fresh capability target must be a FreshReference"
             )
+        if type(self.contract) is not TargetContract:
+            raise TypeError("fresh capability contract is not recognized")
+        if type(self.namespace) is not FreshNamespace:
+            raise TypeError("fresh capability namespace is not recognized")
 
 
 @dataclass(frozen=True)
@@ -150,6 +186,18 @@ class WritableCapabilities:
     reconstruction: ReconstructionEvidence
 
     def __post_init__(self) -> None:
+        if not isinstance(self.snapshot_identity, str) or not self.snapshot_identity:
+            raise WritableResolutionError(
+                "writable capabilities need a snapshot identity"
+            )
+        if type(self.existing) is not tuple or type(self.fresh) is not tuple:
+            raise TypeError("writable capabilities must use immutable tuples")
+        if any(type(item) is not ExistingCapability for item in self.existing):
+            raise TypeError("existing writable capability is not recognized")
+        if any(type(item) is not FreshCapability for item in self.fresh):
+            raise TypeError("fresh writable capability is not recognized")
+        if type(self.reconstruction) is not ReconstructionEvidence:
+            raise TypeError("writable reconstruction evidence is not recognized")
         targets = tuple(
             capability.target for capability in (*self.existing, *self.fresh)
         )
@@ -185,6 +233,22 @@ class WritableRegion(Generic[C, W]):
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
 
     def __post_init__(self) -> None:
+        if type(self.descriptor) is not loci.Region:
+            raise TypeError("writable descriptor is not recognized")
+        if self.configuration_contract is not None and type(
+            self.configuration_contract
+        ) is not loci.CarrierContract:
+            raise TypeError("writable configuration contract is not recognized")
+        if type(self.effect_profile) is not EffectProfile:
+            raise TypeError("writable effect profile is not recognized")
+        if type(self.target_contract) is not TargetContract:
+            raise TypeError("writable target contract is not recognized")
+        if self.fresh_namespace is not None and type(
+            self.fresh_namespace
+        ) is not FreshNamespace:
+            raise TypeError("writable fresh namespace is not recognized")
+        if not isinstance(self.exactness_profile, ExactnessProfile):
+            raise TypeError("writable exactness profile is not recognized")
         if self.value_profile != self.target_contract.value_profile:
             raise WritableResolutionError(
                 "region and target-contract value profiles disagree"
@@ -491,4 +555,15 @@ def product(
     keys = tuple(key for key, _ in fields)
     if any(not key for key in keys) or len(set(keys)) != len(keys):
         raise WritableResolutionError("product field keys must be nonempty and unique")
-    return union(tuple(region for _, region in fields))
+    combined = union(tuple(region for _, region in fields))
+    return WritableRegion(
+        loci.region_product(
+            tuple((key, region.descriptor) for key, region in fields)
+        ),
+        combined.configuration_contract,
+        combined.value_profile,
+        combined.effect_profile,
+        combined.target_contract,
+        combined.fresh_namespace,
+        combined.exactness_profile,
+    )

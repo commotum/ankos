@@ -46,7 +46,7 @@ class LocusKind(Enum):
     FRESH = "fresh"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class Locus:
     """One semantic identity; it carries no access capability."""
 
@@ -62,11 +62,21 @@ class Locus:
             raise TypeError("locus kind is not recognized")
         if not isinstance(self.scope, str) or not self.scope:
             raise ValueError("locus scope cannot be empty")
+        if type(self.path) is not tuple:
+            raise TypeError("locus path must be an immutable tuple")
         if any(not isinstance(part, (bool, int, Fraction, str)) for part in self.path):
             raise TypeError("locus path contains an unclosed value")
 
+    def __eq__(self, other: object) -> bool:
+        return type(other) is Locus and canonical_identity(self) == canonical_identity(
+            other
+        )
 
-@dataclass(frozen=True)
+    def __hash__(self) -> int:
+        return hash((Locus, canonical_identity(self)))
+
+
+@dataclass(frozen=True, eq=False)
 class FreshReference:
     """A Rule-local fresh key, not yet a globally bound identity."""
 
@@ -85,8 +95,18 @@ class FreshReference:
             raise TypeError("fresh-reference local key is not closed")
         if self.parent is not None and not isinstance(self.parent, Locus):
             raise TypeError("fresh-reference parent must be a Locus")
-        if any(not isinstance(item, Locus) for item in self.interface):
+        if type(self.interface) is not tuple or any(
+            not isinstance(item, Locus) for item in self.interface
+        ):
             raise TypeError("fresh-reference interface must contain Loci")
+
+    def __eq__(self, other: object) -> bool:
+        return type(
+            other
+        ) is FreshReference and canonical_identity(self) == canonical_identity(other)
+
+    def __hash__(self) -> int:
+        return hash((FreshReference, canonical_identity(self)))
 
 
 def _locus_token(value: Locus | FreshReference) -> str:
@@ -184,6 +204,10 @@ def field_point(
 
 
 def continuous_region(name: str, bounds: tuple[Fraction, ...]) -> Locus:
+    if type(bounds) is not tuple or any(
+        not isinstance(bound, Fraction) for bound in bounds
+    ):
+        raise TypeError("continuous bounds must be exact Fractions")
     return Locus(
         LocusKind.CONTINUOUS,
         "continuous",
@@ -242,6 +266,8 @@ class SelectorExpr:
             raise ValueError(f"unsupported selector version {self.version}")
         if not isinstance(self.primitive, SelectorPrimitive):
             raise TypeError("selector primitive is not recognized")
+        if type(self.arguments) is not tuple or type(self.children) is not tuple:
+            raise TypeError("selector arguments/children must be immutable tuples")
         if any(
             not isinstance(
                 argument,
@@ -294,6 +320,16 @@ class Region:
             raise ValueError(f"unsupported region version {self.version}")
         if not isinstance(self.kind, RegionKind):
             raise TypeError("region kind is not recognized")
+        if any(
+            type(value) is not tuple
+            for value in (
+                self.loci,
+                self.fresh,
+                self.parts,
+                self.offsets,
+            )
+        ):
+            raise TypeError("region collections must be immutable tuples")
         if self.name is not None and not isinstance(self.name, str):
             raise TypeError("region name must be a string or None")
         if any(not isinstance(item, Locus) for item in self.loci):
@@ -314,6 +350,70 @@ class Region:
             raise ValueError(f"{self.kind.value} region requires parts")
         if self.kind is RegionKind.INTENSIONAL and self.relation is None:
             raise ValueError("intensional region requires a relation")
+        if self.kind is RegionKind.UNION:
+            ordered = tuple(sorted(self.parts, key=canonical_identity))
+            if len({canonical_identity(part) for part in ordered}) != len(ordered):
+                raise ValueError("union region contains duplicate parts")
+            if ordered != self.parts:
+                object.__setattr__(self, "parts", ordered)
+        _validate_region_shape(self)
+
+
+def _validate_region_shape(region: Region) -> None:
+    kind = region.kind
+    if kind is RegionKind.LITERAL:
+        if region.parts or region.offsets or region.relation is not None:
+            raise ValueError("literal region carries irrelevant fields")
+        return
+    if kind in (RegionKind.ALL_SUPPORT, RegionKind.CURRENT_SUPPORT):
+        if (
+            region.loci
+            or region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is not None
+        ):
+            raise ValueError(f"{kind.value} region carries irrelevant fields")
+        return
+    if kind is RegionKind.RELATIVE:
+        if (
+            region.loci
+            or region.fresh
+            or len(region.parts) != 1
+            or not region.offsets
+            or region.relation is not None
+        ):
+            raise ValueError("relative region descriptor shape is invalid")
+        return
+    if kind in (RegionKind.UNION, RegionKind.PRODUCT):
+        if (
+            region.loci
+            or region.fresh
+            or region.offsets
+            or region.relation is not None
+        ):
+            raise ValueError(f"{kind.value} region carries irrelevant fields")
+        return
+    if kind in (RegionKind.FRESH_CHILDREN, RegionKind.FRESH_EDGES):
+        if (
+            region.loci
+            or not region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is not None
+        ):
+            raise ValueError(f"{kind.value} region descriptor shape is invalid")
+        return
+    if kind is RegionKind.INTENSIONAL:
+        if (
+            not region.name
+            or region.loci
+            or region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is None
+        ):
+            raise ValueError("intensional region descriptor shape is invalid")
 
 
 def literal(
@@ -406,6 +506,10 @@ class CarrierContract:
             raise ValueError(f"unsupported carrier-contract version {self.version}")
         if not isinstance(self.kind, CarrierKind):
             raise TypeError("carrier kind is not recognized")
+        if self.shape is not None and type(self.shape) is not tuple:
+            raise TypeError("carrier shape must be an immutable tuple")
+        if type(self.axes) is not tuple:
+            raise TypeError("carrier axes must be an immutable tuple")
         if self.rank is not None and (
             isinstance(self.rank, bool)
             or not isinstance(self.rank, int)
@@ -471,6 +575,8 @@ class Carrier(Generic[V]):
             raise TypeError("carrier contract is not recognized")
         if not isinstance(self.boundary, Boundary):
             raise TypeError("carrier boundary is not recognized")
+        if type(self.attributes) is not tuple:
+            raise TypeError("carrier attributes must be an immutable tuple")
         if any(
             not isinstance(name, str)
             or not isinstance(value, (bool, int, Fraction, str))
@@ -495,6 +601,8 @@ class StructuralRelation:
             raise ValueError(f"unsupported structural relation version {self.version}")
         if not isinstance(self.tag, str) or not self.tag:
             raise ValueError("structural relation tag cannot be empty")
+        if type(self.arguments) is not tuple:
+            raise TypeError("structural relation arguments must be an immutable tuple")
         if any(
             not isinstance(argument, (bool, int, Fraction, str, Locus))
             for argument in self.arguments
@@ -516,6 +624,8 @@ class FiniteConfiguration(Generic[V]):
             raise ValueError(f"unsupported configuration version {self.version}")
         if not isinstance(self.carrier, Carrier):
             raise TypeError("configuration carrier is not recognized")
+        if type(self.entries) is not tuple or type(self.structure) is not tuple:
+            raise TypeError("configuration data must use immutable tuples")
         if any(
             not isinstance(target, Locus)
             for target, _ in self.entries
@@ -526,6 +636,14 @@ class FiniteConfiguration(Generic[V]):
         targets = tuple(target for target, _ in self.entries)
         if len(targets) != len(set(targets)):
             raise ValueError("configuration entries must have unique loci")
+        if any(
+            isinstance(argument, Locus) and argument not in targets
+            for relation in self.structure
+            for argument in relation.arguments
+        ):
+            raise ValueError(
+                "configuration structural relations reference absent loci"
+            )
         contract = self.carrier.contract
         if contract.kind is CarrierKind.HISTORY and contract.shape is not None:
             expected = tuple(
@@ -596,6 +714,12 @@ class IntensionalConfiguration:
             raise ValueError(f"unsupported configuration version {self.version}")
         if not self.identity_evidence:
             raise ValueError("intensional configuration needs identity evidence")
+        if type(self.contract) is not CarrierContract:
+            raise TypeError("intensional configuration contract is not recognized")
+        if type(self.relation) is not SelectorExpr:
+            raise TypeError("intensional configuration relation is not recognized")
+        if not isinstance(self.identity_evidence, str):
+            raise TypeError("intensional identity evidence must be a string")
 
     @property
     def identity(self) -> str:

@@ -617,10 +617,19 @@ def _validate_rule_space(
     result: rules.RuleComplete[C, alphabets.SemanticValue],
     writable: frontiers.WritableCapabilities,
     alphabet: alphabets.Alphabet[V],
+    contract: rules.RuleContract,
 ) -> rules.OutcomeSpace[
     rules.Derivation[alphabets.SemanticValue] | rules.NoSuccessor
 ]:
     outcome_space = result.outcome_space
+    has_law = outcome_space.probability_law is not None
+    declares_law = (
+        contract.entropy_interface is seeds.EntropyInterface.REPLAY_KEY
+    )
+    if has_law != declares_law:
+        raise ValueError(
+            "Rule probability law disagrees with its entropy interface"
+        )
     support = outcome_space.support
     if support.presentation is rules.SupportPresentation.INTENSIONAL:
         if support.relation is None:
@@ -628,6 +637,11 @@ def _validate_rule_space(
         return outcome_space
     if not support.atoms:
         raise ValueError("bare empty finite Rule result is invalid")
+    if any(
+        type(atom) not in (rules.Derivation, rules.NoSuccessor)
+        for atom in support.atoms
+    ):
+        raise TypeError("Rule support contains an unknown atom variant")
     atom_ids = tuple(atom.canonical_identity for atom in support.atoms)
     if len(atom_ids) != len(set(atom_ids)):
         raise ValueError("Rule result repeats a witness identity")
@@ -649,12 +663,20 @@ def _validate_rule_space(
         ):
             if (
                 disposition.action is rules.DispositionAction.REPLACE
-                and frontiers.Effect.REPLACE not in capability.effects
+                and (
+                    frontiers.Effect.REPLACE not in capability.effects
+                    or frontiers.Effect.REPLACE
+                    not in contract.required_effect_profile.existing
+                )
             ):
                 raise ValueError("replacement is not authorized")
             if (
                 disposition.action is rules.DispositionAction.DELETE
-                and frontiers.Effect.DELETE not in capability.effects
+                and (
+                    frontiers.Effect.DELETE not in capability.effects
+                    or frontiers.Effect.DELETE
+                    not in contract.required_effect_profile.existing
+                )
             ):
                 raise ValueError("deletion is not authorized")
             if isinstance(disposition.payload, rules.ValuePayload):
@@ -668,6 +690,12 @@ def _validate_rule_space(
                 rules.DispositionAction.CREATE,
             ):
                 raise ValueError("fresh disposition uses an unauthorized action")
+            if (
+                disposition.action is rules.DispositionAction.CREATE
+                and frontiers.Effect.CREATE
+                not in contract.required_effect_profile.fresh
+            ):
+                raise ValueError("creation is not declared by the Rule")
             if isinstance(disposition.payload, rules.ValuePayload):
                 alphabet.require(disposition.payload.value)
     return outcome_space
@@ -684,8 +712,6 @@ def _bind_fresh_for_atom(
     bindings: list[FreshBinding] = []
     for capability in writable.fresh:
         reference = capability.target
-        if reference.parent is not None and reference.parent.kind is loci.LocusKind.FRESH:
-            raise ValueError("fresh parent must belong to the old snapshot")
         identity = loci.bind_fresh(
             reference,
             input_configuration_identity=input_identity,
@@ -731,6 +757,7 @@ def _commit(
     binding_by_reference = {
         binding.reference: binding.identity for binding in bindings
     }
+    structure = list(configuration.structure)
     for disposition in atom.replacement.fresh:
         if disposition.action is rules.DispositionAction.ABSENT:
             continue
@@ -741,8 +768,26 @@ def _commit(
             raise ValueError("fresh creation has no deterministic binding")
         payload = cast(rules.ValuePayload[alphabets.SemanticValue], disposition.payload)
         entries.append((bound, payload.value))
+        reference = cast(loci.FreshReference, disposition.target)
+        if reference.parent is not None:
+            structure.append(
+                loci.StructuralRelation(
+                    "fresh-parent",
+                    (bound, reference.parent),
+                )
+            )
+        structure.extend(
+            loci.StructuralRelation(
+                "fresh-interface",
+                (bound, interface),
+            )
+            for interface in reference.interface
+        )
 
-    successor = configuration.with_entries(tuple(entries))
+    successor = configuration.with_entries(
+        tuple(entries),
+        structure=tuple(structure),
+    )
     return cast(C, successor)
 
 
@@ -1028,6 +1073,7 @@ def apply(
             rule_result,
             writable,
             program.alphabet,
+            program.rule.contract,
         )
     except (TypeError, ValueError) as error:
         return _rejection(

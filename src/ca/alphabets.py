@@ -61,6 +61,14 @@ class ValueNode:
             ordered = tuple(sorted(self.fields, key=lambda item: item[0]))
             if ordered != self.fields:
                 object.__setattr__(self, "fields", ordered)
+        if self.kind is ValueKind.TAG and (
+            len(self.items) != 1 or self.fields
+        ):
+            raise ValueError("tag values need exactly one payload item")
+        if self.kind in (ValueKind.PRODUCT, ValueKind.WORD) and self.fields:
+            raise ValueError(f"{self.kind.value} values cannot carry named fields")
+        if self.kind in (ValueKind.RECORD, ValueKind.MAP) and self.items:
+            raise ValueError(f"{self.kind.value} values cannot carry positional items")
 
 
 class RepresentedNumberProfile(Enum):
@@ -179,18 +187,31 @@ class AlphabetDescriptor:
             raise ValueError("alphabet scalar parameters must have unique names")
         if len(field_names) != len(set(field_names)):
             raise ValueError("alphabet fields must have unique names")
+        if self.fields:
+            ordered_fields = tuple(sorted(self.fields, key=lambda item: item[0]))
+            if ordered_fields != self.fields:
+                object.__setattr__(self, "fields", ordered_fields)
         if self.kind in (AlphabetKind.ENUM, AlphabetKind.ORDERED, AlphabetKind.SYMBOLIC):
             if not self.values:
                 raise ValueError(f"{self.kind.value} alphabet cannot be empty")
             keys = tuple(_value_key(value) for value in self.values)
             if len(keys) != len(set(keys)):
                 raise ValueError("alphabet values must be semantically unique")
+        if self.kind is AlphabetKind.ENUM:
+            ordered_values = tuple(sorted(self.values, key=_value_key))
+            if ordered_values != self.values:
+                object.__setattr__(self, "values", ordered_values)
+        if self.kind in (AlphabetKind.UNION,):
+            ordered_children = tuple(sorted(self.children, key=_descriptor_key))
+            if ordered_children != self.children:
+                object.__setattr__(self, "children", ordered_children)
         if self.kind is AlphabetKind.MODULAR:
             modulus = _scalar_parameter(self, "modulus")
             if isinstance(modulus, bool) or not isinstance(modulus, int) or modulus <= 0:
                 raise ValueError("modular alphabet needs a positive integer modulus")
         if self.kind is AlphabetKind.REPRESENTED_NUMBER and self.represented_profile is None:
             raise ValueError("represented-number alphabet needs an explicit profile")
+        _validate_descriptor_shape(self)
 
 
 @dataclass(frozen=True)
@@ -198,6 +219,10 @@ class Alphabet(Generic[V]):
     """One closed schema for semantic values."""
 
     descriptor: AlphabetDescriptor
+
+    def __post_init__(self) -> None:
+        if type(self.descriptor) is not AlphabetDescriptor:
+            raise TypeError("Alphabet descriptor is not recognized")
 
     @property
     def value_profile(self) -> ValueProfile:
@@ -245,6 +270,14 @@ def integers(
     minimum: int | None = None,
     maximum: int | None = None,
 ) -> Alphabet[int]:
+    if minimum is not None and (
+        isinstance(minimum, bool) or not isinstance(minimum, int)
+    ):
+        raise TypeError("minimum must be an integer or None")
+    if maximum is not None and (
+        isinstance(maximum, bool) or not isinstance(maximum, int)
+    ):
+        raise TypeError("maximum must be an integer or None")
     scalars: list[tuple[str, ExactScalar]] = []
     if minimum is not None:
         scalars.append(("minimum", int(minimum)))
@@ -262,6 +295,8 @@ def rationals() -> Alphabet[Fraction]:
 
 
 def modular(modulus: int) -> Alphabet[int]:
+    if isinstance(modulus, bool) or not isinstance(modulus, int):
+        raise TypeError("modulus must be an integer")
     return Alphabet(
         AlphabetDescriptor(
             AlphabetKind.MODULAR,
@@ -505,7 +540,16 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
             and all(_contains(descriptor.children[0], item) for item in value.items)
         )
     if kind is AlphabetKind.MAP:
-        return isinstance(value, ValueNode) and value.kind is ValueKind.MAP
+        return (
+            isinstance(value, ValueNode)
+            and value.kind is ValueKind.MAP
+            and not value.items
+            and all(
+                _contains(descriptor.children[0], name)
+                and _contains(descriptor.children[1], item)
+                for name, item in value.fields
+            )
+        )
     structural_kinds = {
         AlphabetKind.GRAPH: ValueKind.GRAPH,
         AlphabetKind.FIELD: ValueKind.FIELD,
@@ -517,6 +561,121 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
     if kind in structural_kinds:
         return isinstance(value, ValueNode) and value.kind is structural_kinds[kind]
     return False
+
+
+def _descriptor_key(descriptor: AlphabetDescriptor) -> tuple[object, ...]:
+    return (
+        descriptor.kind.value,
+        tuple(_value_key(value) for value in descriptor.values),
+        descriptor.scalars,
+        tuple(_descriptor_key(child) for child in descriptor.children),
+        tuple(
+            (name, _descriptor_key(child))
+            for name, child in descriptor.fields
+        ),
+        (
+            None
+            if descriptor.represented_profile is None
+            else descriptor.represented_profile.value
+        ),
+        descriptor.version,
+    )
+
+
+def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
+    kind = descriptor.kind
+    values = bool(descriptor.values)
+    scalars = bool(descriptor.scalars)
+    children = bool(descriptor.children)
+    fields = bool(descriptor.fields)
+    profile = descriptor.represented_profile is not None
+
+    if kind in (AlphabetKind.ENUM, AlphabetKind.ORDERED, AlphabetKind.SYMBOLIC):
+        if scalars or children or fields or profile:
+            raise ValueError(f"{kind.value} alphabet carries irrelevant fields")
+        return
+    if kind in (AlphabetKind.NATURALS, AlphabetKind.RATIONALS):
+        if values or scalars or children or fields or profile:
+            raise ValueError(f"{kind.value} alphabet carries irrelevant fields")
+        return
+    if kind is AlphabetKind.INTEGERS:
+        if values or children or fields or profile:
+            raise ValueError("integer alphabet carries irrelevant fields")
+        if any(name not in ("minimum", "maximum") for name, _ in descriptor.scalars):
+            raise ValueError("integer alphabet has an unknown bound")
+        return
+    if kind is AlphabetKind.MODULAR:
+        if (
+            values
+            or children
+            or fields
+            or profile
+            or tuple(name for name, _ in descriptor.scalars) != ("modulus",)
+        ):
+            raise ValueError("modular alphabet has an invalid descriptor shape")
+        return
+    if kind is AlphabetKind.REPRESENTED_NUMBER:
+        if values or scalars or children or fields or not profile:
+            raise ValueError("represented-number descriptor shape is invalid")
+        return
+    if kind is AlphabetKind.TAG:
+        if (
+            values
+            or fields
+            or profile
+            or len(descriptor.children) != 1
+            or tuple(name for name, _ in descriptor.scalars) != ("name",)
+        ):
+            raise ValueError("tag alphabet descriptor shape is invalid")
+        return
+    if kind in (AlphabetKind.UNION, AlphabetKind.PRODUCT):
+        if values or scalars or fields or profile or not children:
+            raise ValueError(f"{kind.value} alphabet descriptor shape is invalid")
+        return
+    if kind is AlphabetKind.RECORD:
+        if values or scalars or children or profile or not fields:
+            raise ValueError("record alphabet descriptor shape is invalid")
+        return
+    if kind is AlphabetKind.WORD:
+        if (
+            values
+            or scalars
+            or fields
+            or profile
+            or len(descriptor.children) != 1
+        ):
+            raise ValueError("word alphabet descriptor shape is invalid")
+        return
+    if kind is AlphabetKind.MAP:
+        if (
+            values
+            or scalars
+            or fields
+            or profile
+            or len(descriptor.children) != 2
+        ):
+            raise ValueError("map alphabet descriptor shape is invalid")
+        return
+    if kind in (
+        AlphabetKind.GRAPH,
+        AlphabetKind.FIELD,
+        AlphabetKind.INSTRUCTION,
+        AlphabetKind.PATTERN,
+        AlphabetKind.EQUATION,
+        AlphabetKind.DISTRIBUTION,
+    ):
+        if values or scalars or children or fields or profile:
+            raise ValueError(f"{kind.value} alphabet carries irrelevant fields")
+        return
+    if kind is AlphabetKind.REFINEMENT:
+        if (
+            values
+            or fields
+            or profile
+            or len(descriptor.children) != 1
+            or not scalars
+        ):
+            raise ValueError("refinement alphabet descriptor shape is invalid")
 
 
 def _value_key(value: SemanticValue) -> tuple[str, ...]:
