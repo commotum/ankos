@@ -144,10 +144,10 @@ new runtimes may coexist only inside this unfinished transaction.
 | Program, apply, Seed binding, rollout | Complete | Exact five-field value, one family-blind `apply`, replayable Seed realization, and apply-owned rollout |
 | Native preset migration | Complete | Six Rule and six Neighborhood presets agree with independent complete-result fixtures |
 | Root, datasets, RNG, visualization | Complete | Narrow lazy root; explicit downstream recipes, projections, RNG helpers, and viewer records |
-| Active unit/conformance migration | Complete | `224 passed`; no G7-01-owned skip |
+| Active unit/conformance migration | Complete | `225 passed`; no G7-01-owned skip |
 | Old-executor physical deletion | Complete | `specs.py`, `rollout.py`, and `test_specs.py` absent; module specs absent |
 | Packaging/version cutover | Complete | Source/lock metadata at `0.2.0`; NumPy runtime and pytest development dependency |
-| Final hostile review | Complete | Two independent static/dynamic reviews and five adversarial edge regressions found no remaining G7-01 blocker |
+| Final hostile review | Complete | Two independent static/dynamic reviews and adversarial edge regressions found no remaining G7-01 blocker |
 
 ## Completion Gates
 
@@ -222,7 +222,7 @@ The completed tree passed:
 
 ```text
 UV_CACHE_DIR=/tmp/ankos-uv-cache uv run --no-sync pytest -q tests -rs
-→ 224 passed, 36 skipped
+→ 225 passed, 36 skipped
 
 UV_CACHE_DIR=/tmp/ankos-uv-cache uv lock --check
 → Resolved 12 packages
@@ -234,7 +234,7 @@ python -m compileall -q src/ca tests
 → pass
 ```
 
-Focused public/import/descriptor and repaired edge suites passed 23 tests.
+Focused public/import/descriptor and repaired edge suites passed 24 tests.
 The final independent audits additionally established:
 
 - zero G7-01-owned skips;

@@ -326,6 +326,33 @@ def test_accepted_constructive_and_uniform_tuple_seeds_survive_zero_steps() -> N
         )
 
 
+def test_constructive_grid_boundary_must_conform_before_execution() -> None:
+    grid_contract = loci.CarrierContract(
+        loci.CarrierKind.GRID,
+        rank=1,
+        shape=(2,),
+        axes=("x",),
+    )
+    invalid_boundary_seed = seeds.constructive(
+        seeds.Construction(
+            seeds.ConstructionOp.GRID,
+            (
+                (2,),
+                (False, True),
+                (("policy", "fixed"), ("exterior", 7)),
+            ),
+        ),
+        configuration_contract=grid_contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+
+    with pytest.raises(
+        program.ProgramCompatibilityError,
+        match="does not conform to Alphabet",
+    ):
+        _relation_program(invalid_boundary_seed, alphabets.boolean())
+
+
 def test_partial_seed_obligations_never_become_executable_complete_roots() -> None:
     configuration = loci.history_configuration((False, True))
     unresolved = (configuration.entries[0][0],)

@@ -94,7 +94,7 @@ conflict, and reconcile the plan before changing runtime behavior.
   consumers of ordinary programs and explicit rollout views.
 - Source and lock metadata are at `0.2.0`, NumPy is a runtime dependency, and
   pytest is development-only. This is an internal checkpoint, not a release.
-- The active suite reports `224 passed, 36 skipped`. Every remaining skip has
+- The active suite reports `225 passed, 36 skipped`. Every remaining skip has
   an explicit G7-02–G7-05 owner; G7-01 owns none.
 - Serialization and catalog files remain inert, unexposed shells. G7-02 has
   not started and `3-MECHANICS.md` does not yet exist.

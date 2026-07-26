@@ -292,6 +292,20 @@ def _require_seed_values_conform(
             values = tuple(value for _, value in fields_value)
         elif construction.operation is seeds.ConstructionOp.GRID and len(arguments) >= 2:
             values = cast(tuple[alphabets.SemanticValue, ...], arguments[1])
+            boundary_fields = dict(
+                cast(
+                    tuple[tuple[str, alphabets.SemanticValue], ...],
+                    arguments[2],
+                )
+            )
+            if "exterior" in boundary_fields:
+                values = (
+                    *values,
+                    cast(
+                        alphabets.SemanticValue,
+                        boundary_fields["exterior"],
+                    ),
+                )
         for value in values:
             try:
                 program.alphabet.require(value)
