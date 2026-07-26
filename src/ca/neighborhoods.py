@@ -822,6 +822,139 @@ class ReadableRegion(Generic[C, R]):
         return view
 
 
+def _value_relative_offset_rank(region: loci.Region) -> int:
+    """Validate the strict relative-offset descriptor used by value anchors."""
+
+    if (
+        region.kind is not loci.RegionKind.RELATIVE
+        or len(region.parts) != 1
+        or region.parts[0].kind is not loci.RegionKind.ALL_SUPPORT
+        or not region.offsets
+    ):
+        raise ReadableResolutionError(
+            "value-anchored readable regions need one all-support relative "
+            "descriptor"
+        )
+    offsets: list[tuple[int, ...]] = []
+    for offset in region.offsets:
+        if (
+            type(offset) is not loci.Locus
+            or offset.kind is not loci.LocusKind.COORDINATE
+            or offset.scope != "relative"
+            or not offset.path
+            or any(type(coordinate) is not int for coordinate in offset.path)
+        ):
+            raise ReadableResolutionError(
+                "value-relative offsets must be nonempty integer coordinate tuples"
+            )
+        offsets.append(tuple(offset.path))  # type: ignore[arg-type]
+    rank = len(offsets[0])
+    if any(len(offset) != rank for offset in offsets):
+        raise ReadableResolutionError(
+            "value-relative offsets must have one common rank"
+        )
+    if len(set(offsets)) != len(offsets):
+        raise ReadableResolutionError("value-relative offsets must be unique")
+    return rank
+
+
+def _validate_value_relative_contract(
+    contract: loci.CarrierContract | None,
+) -> None:
+    if contract is None:
+        return
+    if contract.kind not in (loci.CarrierKind.GRID, loci.CarrierKind.HISTORY):
+        raise ReadableResolutionError(
+            "value-relative reads support only grid or history carriers"
+        )
+    if contract.kind is loci.CarrierKind.HISTORY and contract.rank not in (
+        None,
+        1,
+    ):
+        raise ReadableResolutionError("history-relative reads require rank one")
+
+
+def _grid_alias_target(
+    configuration: loci.FiniteConfiguration[object],
+    target: loci.Locus,
+) -> loci.Locus:
+    """Return the actual periodic/reflective grid identity for one raw target."""
+
+    if configuration.contains(target):
+        return target
+    boundary = configuration.carrier.boundary
+    if boundary.policy not in (
+        loci.BoundaryPolicy.PERIODIC,
+        loci.BoundaryPolicy.REFLECTIVE,
+    ):
+        return target
+    contract = configuration.contract
+    if (
+        contract.kind is not loci.CarrierKind.GRID
+        or contract.shape is None
+        or not contract.axes
+    ):
+        raise ReadableResolutionError(
+            "aliased grid boundaries require a closed shape and axes"
+        )
+    coordinates = loci.grid_coordinates(target)
+    adjusted: list[int] = []
+    for coordinate, size in zip(coordinates, contract.shape):
+        axis_values = loci.centered_axis_values(size)
+        if boundary.policy is loci.BoundaryPolicy.PERIODIC:
+            adjusted.append(
+                axis_values[
+                    (coordinate - axis_values[0]) % len(axis_values)
+                ]
+            )
+            continue
+        if len(axis_values) == 1:
+            adjusted.append(axis_values[0])
+            continue
+        period = 2 * (len(axis_values) - 1)
+        offset = (coordinate - axis_values[0]) % period
+        if offset >= len(axis_values):
+            offset = period - offset
+        adjusted.append(axis_values[offset])
+    aliased = loci.cell(tuple(adjusted), axes=contract.axes)
+    if not configuration.contains(aliased):
+        raise ReadableResolutionError(
+            "grid boundary alias does not name an existing target"
+        )
+    return aliased
+
+
+def _resolve_value_relative_targets(
+    region: loci.Region,
+    anchor: alphabets.ValueAnchor,
+    configuration: loci.FiniteConfiguration[object],
+) -> tuple[tuple[loci.Locus, ...], tuple[loci.Locus, ...]]:
+    """Resolve one ordered offset group for every value-selected source."""
+
+    rank = _value_relative_offset_rank(region)
+    contract = configuration.contract
+    if contract.kind not in (loci.CarrierKind.GRID, loci.CarrierKind.HISTORY):
+        raise ReadableResolutionError(
+            "value-relative reads support only grid or history carriers"
+        )
+    if contract.rank != rank:
+        raise ReadableResolutionError(
+            "value-relative offset rank disagrees with the carrier"
+        )
+    anchors = alphabets.select_value_anchors(
+        anchor,
+        configuration,  # type: ignore[arg-type]
+    )
+    targets: list[loci.Locus] = []
+    for source in anchors:
+        relative = loci.relative(loci.literal((source,)), region.offsets)
+        for target in loci.resolve_region(relative, configuration):
+            if contract.kind is loci.CarrierKind.GRID:
+                target = _grid_alias_target(configuration, target)
+            targets.append(target)
+    return anchors, tuple(targets)
+
+
 def _selector_requires_intensional_resolution(
     selector: loci.SelectorExpr,
 ) -> bool:
@@ -1244,6 +1377,71 @@ def grid_relative(
     )
 
 
+def value_relative(
+    anchor: alphabets.ValueAnchor,
+    offsets: tuple[tuple[int, ...], ...],
+    *,
+    configuration_contract: loci.CarrierContract | None = None,
+    value_profile: alphabets.ValueProfile | None = None,
+    key: str = "value-relative",
+    exactness_profile: ExactnessProfile = ExactnessProfile.EXACT,
+) -> ReadableRegion[C, ReadableView[V]]:
+    """Read one ordered relative-offset group per value-selected source."""
+
+    if type(anchor) is not alphabets.ValueAnchor:
+        raise TypeError("value-relative neighborhood needs a ValueAnchor")
+    if type(offsets) is not tuple or any(
+        type(offset) is not tuple
+        or not offset
+        or any(type(coordinate) is not int for coordinate in offset)
+        for offset in offsets
+    ):
+        raise TypeError(
+            "value-relative offsets must be nonempty immutable integer tuples"
+        )
+    if not offsets:
+        raise ReadableResolutionError("value-relative offsets cannot be empty")
+    rank = len(offsets[0])
+    if any(len(offset) != rank for offset in offsets):
+        raise ReadableResolutionError(
+            "value-relative offsets must have one common rank"
+        )
+    if len(set(offsets)) != len(offsets):
+        raise ReadableResolutionError("value-relative offsets must be unique")
+    _validate_value_relative_contract(configuration_contract)
+    if (
+        configuration_contract is not None
+        and configuration_contract.rank is not None
+        and configuration_contract.rank != rank
+    ):
+        raise ReadableResolutionError(
+            "value-relative offsets disagree with the declared carrier rank"
+        )
+    offset_loci = tuple(
+        loci.Locus(loci.LocusKind.COORDINATE, "relative", offset)
+        for offset in offsets
+    )
+    return ReadableRegion(
+        descriptor=loci.relative(loci.all_support(), offset_loci),
+        configuration_contract=configuration_contract,
+        value_profile=value_profile,
+        result_shape=ResultShape(
+            (ReadField(key, ReadArity.FIXED, len(offsets)),)
+        ),
+        join_shape=JoinShape(
+            JoinMode.ANCHOR_IDENTITY,
+            ("target", "channel"),
+        ),
+        grouping=GroupingPlan(
+            GroupingKind.FIXED_CHUNKS,
+            key,
+            len(offsets),
+        ),
+        exactness_profile=exactness_profile,
+        value_anchor=anchor,
+    )
+
+
 def intensional(
     binder: str,
     relation: loci.SelectorExpr,
@@ -1364,6 +1562,7 @@ def _with_compatibility_shape(
         region.parts,
         region.exactness_profile,
         region.selector,
+        region.value_anchor,
     )
 
 

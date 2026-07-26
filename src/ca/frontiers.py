@@ -827,6 +827,56 @@ def _validate_value_relative_contract(
         raise WritableResolutionError("history-relative writes require rank one")
 
 
+def _grid_alias_target(
+    configuration: loci.FiniteConfiguration[object],
+    target: loci.Locus,
+) -> loci.Locus:
+    """Return the actual periodic/reflective grid identity for one raw target."""
+
+    if configuration.contains(target):
+        return target
+    boundary = configuration.carrier.boundary
+    if boundary.policy not in (
+        loci.BoundaryPolicy.PERIODIC,
+        loci.BoundaryPolicy.REFLECTIVE,
+    ):
+        return target
+    contract = configuration.contract
+    if (
+        contract.kind is not loci.CarrierKind.GRID
+        or contract.shape is None
+        or not contract.axes
+    ):
+        raise WritableResolutionError(
+            "aliased grid boundaries require a closed shape and axes"
+        )
+    coordinates = loci.grid_coordinates(target)
+    adjusted: list[int] = []
+    for coordinate, size in zip(coordinates, contract.shape):
+        axis_values = loci.centered_axis_values(size)
+        if boundary.policy is loci.BoundaryPolicy.PERIODIC:
+            adjusted.append(
+                axis_values[
+                    (coordinate - axis_values[0]) % len(axis_values)
+                ]
+            )
+            continue
+        if len(axis_values) == 1:
+            adjusted.append(axis_values[0])
+            continue
+        period = 2 * (len(axis_values) - 1)
+        offset = (coordinate - axis_values[0]) % period
+        if offset >= len(axis_values):
+            offset = period - offset
+        adjusted.append(axis_values[offset])
+    aliased = loci.cell(tuple(adjusted), axes=contract.axes)
+    if not configuration.contains(aliased):
+        raise WritableResolutionError(
+            "grid boundary alias does not name an existing target"
+        )
+    return aliased
+
+
 def _resolve_value_relative_targets(
     region: loci.Region,
     anchor: alphabets.ValueAnchor,
@@ -853,6 +903,8 @@ def _resolve_value_relative_targets(
     for source in anchors:
         relative = loci.relative(loci.literal((source,)), region.offsets)
         for target in loci.resolve_region(relative, configuration):
+            if contract.kind is loci.CarrierKind.GRID:
+                target = _grid_alias_target(configuration, target)
             if not configuration.contains(target):
                 raise WritableResolutionError(
                     "value-relative write crosses the existing carrier boundary"
