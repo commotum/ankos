@@ -936,6 +936,129 @@ def field_value(
     )
 
 
+_GRID_FIELD_AXES_TAG = "grid-axes"
+_GRID_FIELD_SHAPE_TAG = "grid-shape"
+_GRID_FIELD_CELLS_TAG = "grid-cells"
+_GRID_FIELD_NAMES = ("axes", "cells", "shape")
+
+
+def _validate_grid_field_parts(
+    axes: tuple[str, ...],
+    shape: tuple[int, ...],
+    cells: tuple[SemanticValue, ...],
+) -> None:
+    if type(axes) is not tuple:
+        raise TypeError("grid field axes must be an immutable tuple")
+    if not axes:
+        raise ValueError("grid field rank must be positive")
+    if any(type(axis) is not str or not axis for axis in axes):
+        raise TypeError("grid field axes must be nonempty strings")
+    if len(set(axes)) != len(axes):
+        raise ValueError("grid field axes must be unique")
+    if type(shape) is not tuple:
+        raise TypeError("grid field shape must be an immutable tuple")
+    if len(shape) != len(axes):
+        raise ValueError("grid field axes and shape must have equal rank")
+    if any(type(extent) is not int for extent in shape):
+        raise TypeError("grid field shape extents must be integers")
+    if any(extent <= 0 for extent in shape):
+        raise ValueError("grid field shape extents must be positive")
+    if type(cells) is not tuple:
+        raise TypeError("grid field cells must be an immutable tuple")
+    if any(not _is_semantic_value(cell) for cell in cells):
+        raise TypeError("grid field cells contain an opaque value")
+    expected_cells = 1
+    for extent in shape:
+        expected_cells *= extent
+    if len(cells) != expected_cells:
+        raise ValueError(
+            f"grid field needs {expected_cells} cells for shape {shape}, "
+            f"got {len(cells)}"
+        )
+
+
+def grid_field_value(
+    axes: tuple[str, ...],
+    shape: tuple[int, ...],
+    cells: tuple[SemanticValue, ...],
+    *,
+    tag: str = "grid",
+) -> ValueNode:
+    """Construct one strict dense rank-N field in last-axis-fastest order."""
+
+    _validate_grid_field_parts(axes, shape, cells)
+    return field_value(
+        tag,
+        fields=(
+            (
+                "axes",
+                word_value(axes, tag=_GRID_FIELD_AXES_TAG),
+            ),
+            (
+                "cells",
+                word_value(cells, tag=_GRID_FIELD_CELLS_TAG),
+            ),
+            (
+                "shape",
+                word_value(shape, tag=_GRID_FIELD_SHAPE_TAG),
+            ),
+        ),
+    )
+
+
+def grid_field_parts(
+    value: SemanticValue,
+) -> tuple[
+    tuple[str, ...],
+    tuple[int, ...],
+    tuple[SemanticValue, ...],
+]:
+    """Parse only the canonical dense-grid FIELD convention.
+
+    The returned cell tuple uses row-major order with the last axis varying
+    fastest.  Arbitrary FIELD values remain valid structural values but are
+    intentionally rejected by this stricter parser.
+    """
+
+    node = _require_node_kind(value, ValueKind.FIELD)
+    if node.items:
+        raise ValueError("grid fields cannot carry positional items")
+    if tuple(name for name, _ in node.fields) != _GRID_FIELD_NAMES:
+        raise ValueError(
+            "grid fields need exactly axes, cells, and shape fields"
+        )
+    fields_by_name = dict(node.fields)
+    axes_node = _require_node_kind(
+        fields_by_name["axes"],
+        ValueKind.WORD,
+    )
+    cells_node = _require_node_kind(
+        fields_by_name["cells"],
+        ValueKind.WORD,
+    )
+    shape_node = _require_node_kind(
+        fields_by_name["shape"],
+        ValueKind.WORD,
+    )
+    if axes_node.tag != _GRID_FIELD_AXES_TAG:
+        raise ValueError("grid field axes word has the wrong tag")
+    if cells_node.tag != _GRID_FIELD_CELLS_TAG:
+        raise ValueError("grid field cells word has the wrong tag")
+    if shape_node.tag != _GRID_FIELD_SHAPE_TAG:
+        raise ValueError("grid field shape word has the wrong tag")
+    if any(type(axis) is not str for axis in axes_node.items):
+        raise TypeError("grid field axes must be strings")
+    if any(type(extent) is not int for extent in shape_node.items):
+        raise TypeError("grid field shape extents must be integers")
+    axes = tuple(axis for axis in axes_node.items if type(axis) is str)
+    shape = tuple(
+        extent for extent in shape_node.items if type(extent) is int
+    )
+    cells = cells_node.items
+    _validate_grid_field_parts(axes, shape, cells)
+    return axes, shape, cells
+
+
 StructuralBinding: TypeAlias = tuple[loci.FreshReference, loci.Locus]
 
 
@@ -1017,6 +1140,7 @@ class AlphabetKind(Enum):
     EQUATION = "equation"
     DISTRIBUTION = "distribution"
     SYMBOLIC = "symbolic"
+    SYMBOLIC_EXPRESSION = "symbolic-expression"
     STRUCTURAL_REFERENCE = "structural-reference"
     REFINEMENT = "refinement"
 
@@ -1619,6 +1743,12 @@ def distribution() -> Alphabet[ValueNode]:
     return _structural_schema(AlphabetKind.DISTRIBUTION)
 
 
+def symbolic_expression() -> Alphabet[ValueNode]:
+    """Construct the open structural schema for symbolic expression nodes."""
+
+    return _structural_schema(AlphabetKind.SYMBOLIC_EXPRESSION)
+
+
 def symbolic(values: tuple[int | str, ...]) -> Alphabet[int | str]:
     return Alphabet(
         AlphabetDescriptor(AlphabetKind.SYMBOLIC, values=tuple(values))
@@ -1703,6 +1833,7 @@ def _profile(descriptor: AlphabetDescriptor) -> ValueProfile:
         AlphabetKind.PATTERN,
         AlphabetKind.EQUATION,
         AlphabetKind.DISTRIBUTION,
+        AlphabetKind.SYMBOLIC_EXPRESSION,
         AlphabetKind.STRUCTURAL_REFERENCE,
     ):
         return ValueProfile.STRUCTURAL
@@ -1828,6 +1959,7 @@ def _contains(descriptor: AlphabetDescriptor, value: SemanticValue) -> bool:
         AlphabetKind.PATTERN: ValueKind.PATTERN,
         AlphabetKind.EQUATION: ValueKind.EQUATION,
         AlphabetKind.DISTRIBUTION: ValueKind.DISTRIBUTION,
+        AlphabetKind.SYMBOLIC_EXPRESSION: ValueKind.SYMBOLIC,
     }
     if kind in structural_kinds:
         return isinstance(value, ValueNode) and value.kind is structural_kinds[kind]
@@ -1985,6 +2117,7 @@ def _validate_descriptor_shape(descriptor: AlphabetDescriptor) -> None:
         AlphabetKind.PATTERN,
         AlphabetKind.EQUATION,
         AlphabetKind.DISTRIBUTION,
+        AlphabetKind.SYMBOLIC_EXPRESSION,
     ):
         if values or scalars or children or fields or profile:
             raise ValueError(f"{kind.value} alphabet carries irrelevant fields")
@@ -2098,6 +2231,8 @@ __all__ = [
     "field",
     "field_value",
     "graph",
+    "grid_field_parts",
+    "grid_field_value",
     "instruction",
     "int_range_alphabet",
     "integers",
@@ -2129,6 +2264,7 @@ __all__ = [
     "select_value_anchors",
     "semantic_equal",
     "symbolic",
+    "symbolic_expression",
     "symbolic_value",
     "structural_references",
     "tag",
