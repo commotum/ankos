@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **READY — G7-03 CODECS (NOT STARTED)**
+Status: **IN PROGRESS — G7-03 CODECS**
 
 ## Big-Picture Objective
 
@@ -103,8 +103,8 @@ conflict, and reconcile the plan before changing runtime behavior.
 - The executable codec inventory contains 387 G7-01/G7-02 sealed
   semantic-variant rows. It is the exhaustive starting worklist for G7-03.
 - Serialization and catalog files remain inert, unexposed shells. G7-03 has
-  not started; G7-02's durable plan, hostile-review repairs, and evidence are
-  recorded in [`3-MECHANICS.md`](3-MECHANICS.md).
+  started from clean commit `d71626f`; its live plan and evidence record is
+  [`4-CODECS.md`](4-CODECS.md).
 - The 26 retained skips are owned exactly by later stages: 13 by G7-03
   serialization/representation and 13 by G7-04 catalog/metadata.
 - Goal 5 established exactly 60 executable families, two close non-family
@@ -258,7 +258,7 @@ stage file and may evolve with the implementation.
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows supported by reusable mechanics |
-| `4-CODECS` | G7-03 | Pending | Canonical serialization and representation proofs |
+| `4-CODECS` | G7-03 | In Progress | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
