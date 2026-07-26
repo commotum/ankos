@@ -119,12 +119,12 @@ def test_every_registered_shape_and_exact_scalar_round_trips_canonically() -> No
     """The closed registry and exact scalar algebra share one codec boundary."""
 
     schemas = serialization._schema_rows()
-    assert len(schemas) == 178
+    assert len(schemas) == 179
     assert sum(
         len(row.enum_values) if row.enum_values else 1 for row in schemas
-    ) == 409
-    assert len({row.tag for row in schemas}) == 178
-    assert len({row.value_type for row in schemas}) == 178
+    ) == 418
+    assert len({row.tag for row in schemas}) == 179
+    assert len({row.value_type for row in schemas}) == 179
 
     samples: list[object] = [
         None,
@@ -268,7 +268,29 @@ def test_new_rule_expression_primitives_round_trip_in_exact_enum_order() -> None
     """Every reopened mechanics node uses the existing closed RuleExpr codec."""
 
     samples = _new_rule_expression_samples()
-    new_primitives = tuple(rules.ExpressionPrimitive)[20:]
+    new_primitives = (
+        rules.ExpressionPrimitive.RECORD_FIELD,
+        rules.ExpressionPrimitive.RECORD_UPDATE,
+        rules.ExpressionPrimitive.LENGTH,
+        rules.ExpressionPrimitive.ITEM_AT,
+        rules.ExpressionPrimitive.SLICE,
+        rules.ExpressionPrimitive.CONCATENATE,
+        rules.ExpressionPrimitive.REVERSE,
+        rules.ExpressionPrimitive.REPLACE_AT,
+        rules.ExpressionPrimitive.MAP_LOOKUP,
+        rules.ExpressionPrimitive.MAP_UPDATE,
+        rules.ExpressionPrimitive.INDEX_OF,
+        rules.ExpressionPrimitive.INDEX_OF_TAG,
+        rules.ExpressionPrimitive.FLOOR_DIVIDE,
+        rules.ExpressionPrimitive.ABSOLUTE,
+        rules.ExpressionPrimitive.FRACTIONAL_PART,
+        rules.ExpressionPrimitive.INTEGER_DIGITS,
+        rules.ExpressionPrimitive.FROM_DIGITS,
+        rules.ExpressionPrimitive.MAXIMAL_RUNS,
+        rules.ExpressionPrimitive.PRODUCT_VALUE,
+        rules.ExpressionPrimitive.WORD_VALUE,
+        rules.ExpressionPrimitive.FLAT_MAP_LOOKUP,
+    )
 
     assert len(samples) == 21
     assert tuple(expression.primitive for expression in samples) == new_primitives

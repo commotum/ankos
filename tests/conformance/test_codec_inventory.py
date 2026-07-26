@@ -219,7 +219,7 @@ def test_inventory_joins_the_closed_production_schema_exactly() -> None:
     assert len(schema_rows) == len(
         {(row["owner"], row["type"]) for row in inventory}
     )
-    assert len(schema_rows) == 178
+    assert len(schema_rows) == 179
     by_owner_type = {
         (row.owner, row.type_name): row for row in schema_rows
     }

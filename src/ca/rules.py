@@ -3409,6 +3409,7 @@ def _evaluate_proven(
         readable,
         anchor=anchor,
         target=anchor if target is None else target,
+        bindings=(),
         steps=steps,
     )
     return result, EvaluationProof(tuple(steps))
@@ -3420,6 +3421,7 @@ def _evaluate_value(
     *,
     anchor: loci.Locus | None,
     target: loci.Locus | loci.FreshReference | None,
+    bindings: _BindingContext,
     steps: list[EvaluationStep],
 ) -> RuleRuntimeValue:
     def evaluate(child: RuleExpr) -> RuleRuntimeValue:
@@ -3428,6 +3430,21 @@ def _evaluate_value(
             readable,
             anchor=anchor,
             target=target,
+            bindings=bindings,
+            steps=steps,
+        )
+
+    def evaluate_bound(
+        child: RuleExpr,
+        value: RuleRuntimeValue,
+        index: int,
+    ) -> RuleRuntimeValue:
+        return _evaluate_value(
+            child,
+            readable,
+            anchor=anchor,
+            target=target,
+            bindings=((value, index), *bindings),
             steps=steps,
         )
 
@@ -3474,6 +3491,27 @@ def _evaluate_value(
                 "target-reference expression requires a writable-target context"
             )
         return finish(alphabets.StructuralReference(target))
+    if primitive in (
+        ExpressionPrimitive.BOUND_VALUE,
+        ExpressionPrimitive.BOUND_INDEX,
+    ):
+        depth = _literal_int(arguments, 0)
+        if depth >= len(bindings):
+            raise IndexError(
+                f"lexical binding depth {depth} is outside the active context"
+            )
+        value, index = bindings[depth]
+        evidence = _binding_read_evidence(
+            primitive,
+            depth,
+            bindings,
+        )
+        return finish(
+            value
+            if primitive is ExpressionPrimitive.BOUND_VALUE
+            else index,
+            evidence,
+        )
     if primitive is ExpressionPrimitive.PROJECT:
         source = evaluate(_child(arguments, 0))
         if not isinstance(source, tuple):
@@ -3688,6 +3726,113 @@ def _evaluate_value(
                 items=tuple(output),
             )
         )
+    if primitive is ExpressionPrimitive.MAP_ITEMS:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        body = _child(arguments, 1)
+        output_tag = _literal_str(arguments, 2)
+        output = tuple(
+            _require_semantic_value(
+                evaluate_bound(body, item, index)
+            )
+            for index, item in enumerate(items)
+        )
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                output_tag,
+                items=output,
+            )
+        )
+    if primitive is ExpressionPrimitive.FILTER_ITEMS:
+        items, tag = _sequence_items(evaluate(_child(arguments, 0)))
+        predicate = _child(arguments, 1)
+        retained: list[RuleRuntimeValue] = []
+        for index, item in enumerate(items):
+            if _require_bit(evaluate_bound(predicate, item, index)):
+                retained.append(item)
+        return finish(_word_from_items(tuple(retained), tag=tag))
+    if primitive is ExpressionPrimitive.FLAT_MAP_ITEMS:
+        items, _ = _sequence_items(evaluate(_child(arguments, 0)))
+        body = _child(arguments, 1)
+        output_tag = _literal_str(arguments, 2)
+        output: list[alphabets.SemanticValue] = []
+        for index, item in enumerate(items):
+            mapped = _require_value_node(
+                evaluate_bound(body, item, index),
+                alphabets.ValueKind.WORD,
+                owner="flat-map-items body",
+            )
+            if mapped.tag != output_tag:
+                raise ValueError(
+                    "flat-map-items body word tag disagrees with output tag"
+                )
+            output.extend(mapped.items)
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                output_tag,
+                items=tuple(output),
+            )
+        )
+    if primitive is ExpressionPrimitive.SLIDING_WINDOWS:
+        items, tag = _sequence_items(evaluate(_child(arguments, 0)))
+        semantic_items = tuple(
+            _require_semantic_value(item) for item in items
+        )
+        before = _literal_int(arguments, 1)
+        after = _literal_int(arguments, 2)
+        boundary = SequenceBoundary(_literal_str(arguments, 3))
+        output_tag = "word" if tag is None else tag
+        if not semantic_items:
+            return finish(
+                alphabets.ValueNode(
+                    alphabets.ValueKind.WORD,
+                    output_tag,
+                )
+            )
+        exterior: alphabets.SemanticValue | None = None
+        if (
+            boundary is SequenceBoundary.FIXED
+            and (before or after)
+        ):
+            exterior = _require_semantic_value(
+                evaluate(_child(arguments, 4))
+            )
+        windows: list[alphabets.ValueNode] = []
+        size = len(semantic_items)
+        for anchor_index in range(size):
+            window: list[alphabets.SemanticValue] = []
+            for raw_index in range(
+                anchor_index - before,
+                anchor_index + after + 1,
+            ):
+                if 0 <= raw_index < size:
+                    window.append(semantic_items[raw_index])
+                elif boundary is SequenceBoundary.FIXED:
+                    assert exterior is not None
+                    window.append(exterior)
+                elif boundary is SequenceBoundary.PERIODIC:
+                    window.append(semantic_items[raw_index % size])
+                else:
+                    window.append(
+                        semantic_items[
+                            _reflect_sequence_index(raw_index, size)
+                        ]
+                    )
+            windows.append(
+                alphabets.ValueNode(
+                    alphabets.ValueKind.WORD,
+                    output_tag,
+                    items=tuple(window),
+                )
+            )
+        return finish(
+            alphabets.ValueNode(
+                alphabets.ValueKind.WORD,
+                output_tag,
+                items=tuple(windows),
+            )
+        )
     if primitive in (ExpressionPrimitive.ADD, ExpressionPrimitive.MULTIPLY):
         values = tuple(
             _require_exact_number(evaluate(_as_expression(argument)))
@@ -3873,6 +4018,25 @@ def _observation_evidence(
             loci.canonical_identity((item.target, state_identity))
         )
     return tuple(evidence)
+
+
+def _binding_read_evidence(
+    primitive: ExpressionPrimitive,
+    depth: int,
+    bindings: _BindingContext,
+) -> tuple[str, ...]:
+    """Identify one exact lexical frame read without adding a proof-node type."""
+
+    return (
+        loci.canonical_identity(
+            (
+                "rule-expression-binding",
+                primitive.value,
+                depth,
+                bindings,
+            )
+        ),
+    )
 
 
 def _runtime_as_expr(value: RuleRuntimeValue) -> RuleExpr:
@@ -4079,6 +4243,18 @@ def _word_from_items(
         "word" if tag is None else tag,
         items=semantic_items,
     )
+
+
+def _reflect_sequence_index(index: int, size: int) -> int:
+    """Reflect an integer index without repeating either finite endpoint."""
+
+    if type(index) is not int or type(size) is not int or size <= 0:
+        raise ValueError("reflected sequence indices require one positive size")
+    if size == 1:
+        return 0
+    period = 2 * (size - 1)
+    offset = index % period
+    return period - offset if offset >= size else offset
 
 
 def _association_entries(
@@ -4877,6 +5053,7 @@ __all__ = [
     "RulePrimitive",
     "RuleRejected",
     "RuleResult",
+    "SequenceBoundary",
     "Stop",
     "SupportPresentation",
     "SupportSpace",
@@ -4888,6 +5065,8 @@ __all__ = [
     "absolute",
     "add",
     "ar2_modular_0d",
+    "bound_index",
+    "bound_value",
     "capability_index",
     "capability_target",
     "cardinality_size",
@@ -4912,6 +5091,8 @@ __all__ = [
     "finite_probability_law",
     "finite_rule",
     "finite_support",
+    "filter_items",
+    "flat_map_items",
     "flat_map_lookup",
     "floor_divide",
     "fractional_part",
@@ -4932,6 +5113,7 @@ __all__ = [
     "lookup",
     "map_lookup",
     "map_update",
+    "map_items",
     "maximal_runs",
     "modulo",
     "multiply",
@@ -4947,6 +5129,7 @@ __all__ = [
     "replace_at",
     "reverse",
     "slice_items",
+    "sliding_windows",
     "subtract",
     "target_reference",
     "word_value",

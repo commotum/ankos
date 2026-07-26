@@ -224,7 +224,8 @@ _SCHEMAS = (
     )),
     _enum(rules.ExpressionPrimitive, "ca.rules.expression-primitive", (
         "expression.literal", "expression.observation", "expression.group",
-        "expression.target-reference", "expression.project",
+        "expression.target-reference", "expression.bound-value",
+        "expression.bound-index", "expression.project",
         "expression.tuple", "expression.add", "expression.subtract",
         "expression.multiply", "expression.divide", "expression.modulo",
         "expression.count", "expression.gate", "expression.lookup",
@@ -240,9 +241,14 @@ _SCHEMAS = (
         "expression.integer-digits", "expression.from-digits",
         "expression.maximal-runs", "expression.product-value",
         "expression.word-value", "expression.flat-map-lookup",
+        "expression.map-items", "expression.filter-items",
+        "expression.flat-map-items", "expression.sliding-windows",
     )),
     _enum(rules.GateKind, "ca.rules.gate-kind", (
         "any", "all", "majority", "at-least", "at-most", "exactly",
+    )),
+    _enum(rules.SequenceBoundary, "ca.rules.sequence-boundary", (
+        "fixed", "periodic", "reflective",
     )),
     _enum(rules.CertificateKind, "ca.rules.certificate-kind", (
         "soundness", "completeness", "cardinality", "totality",
@@ -1060,8 +1066,8 @@ def _validate_registry() -> None:
         program,
     )
     owners = {owner.__name__ for owner in owner_modules}
-    if len(_SCHEMAS) != 178:
-        raise RuntimeError("canonical schema registry must contain 178 owner types")
+    if len(_SCHEMAS) != 179:
+        raise RuntimeError("canonical schema registry must contain 179 owner types")
     if len({row.value_type for row in _SCHEMAS}) != len(_SCHEMAS):
         raise RuntimeError("canonical schema registry contains a duplicate type")
     if len({row.tag for row in _SCHEMAS}) != len(_SCHEMAS):
@@ -1069,8 +1075,8 @@ def _validate_registry() -> None:
     variant_count = sum(
         len(row.enum_values) if row.enum_values else 1 for row in _SCHEMAS
     )
-    if variant_count != 409:
-        raise RuntimeError("canonical schema registry must contain 409 variants")
+    if variant_count != 418:
+        raise RuntimeError("canonical schema registry must contain 418 variants")
 
     public_sealed_types: set[type[object]] = set()
     for owner in owner_modules:
