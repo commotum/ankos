@@ -1,6 +1,7 @@
 # 7-HANDOFF
 
-Status: **IN PROGRESS — implementation handoff and final reconciliation**
+Status: **COMPLETE — implementation handoff and final reconciliation
+verified**
 
 ## Current Facts
 
@@ -86,20 +87,75 @@ Files expected to change:
 
 ## Completion Requirements
 
-- [ ] The handoff contains an exact dependency DAG, file-level edit map,
+- [x] The handoff contains an exact dependency DAG, file-level edit map,
       implementation stages, tests, and exit criteria.
-- [ ] Every Goal 2 preserve item and Goal 5 pressure category has a named
+- [x] Every Goal 2 preserve item and Goal 5 pressure category has a named
       destination.
-- [ ] All 60 SPF rows and CT01–CT14 obligations are assigned exactly.
-- [ ] Compatibility, deprecation, serialization versioning, root exports,
+- [x] All 60 SPF rows and CT01–CT14 obligations are assigned exactly.
+- [x] Compatibility, deprecation, serialization versioning, root exports,
       catalog aliases, downstream adapters, and retirement steps are decided.
-- [ ] No unresolved core, catalog, migration, ownership, or execution-path
+- [x] No unresolved core, catalog, migration, ownership, or execution-path
       question remains.
-- [ ] One hostile review and direct count, link, terminology, scaffold,
+- [x] One hostile review and direct count, link, terminology, scaffold,
       whitespace, scoped-diff, and frozen-tree checks pass.
-- [ ] `0-plan.md`, `architecture.md`, and `GOALS.md` record Goal 6 complete and
+- [x] `0-plan.md`, `architecture.md`, and `GOALS.md` record Goal 6 complete and
       Goal 7 next but unauthorized; Goal 7 itself remains uncreated.
 
 ## Stage Results
 
-Pending.
+- [`goal-7-handoff.md`](goal-7-handoff.md) now provides one exact seven-stage
+  implementation DAG: freeze independent oracles; perform the non-splittable
+  five-field core/test/downstream cutover; close reusable mechanics; implement
+  codecs; assemble the catalog; join full conformance; and reconcile
+  documentation, lockfile, package, and release.
+- The hostile staging review exposed a real defect in the first draft:
+  replacing component contracts before removing the old executor would have
+  left broken checkpoints or required a forbidden parallel architecture.
+  G7-01 now treats the structural kernel, components, Rule algebra,
+  `SimpleProgram`/`apply`/`rollout`, native presets, root/downstream migration,
+  active tests, and physical old-executor deletion as one atomic stage. No
+  completed checkpoint may be red and no G7-00–G7-05 state may ship.
+- The 60 families are assigned once to three primary mechanics owners with one
+  aggregate barrier: `15 M-A / 30 M-B / 15 M-C`. The assignment has no hole or
+  duplicate, matches every canonical SPF/F pair, and distinguishes direct
+  family-fixture ownership from cross-family PX-suite ownership.
+- PX01–PX12, all eight named secondary joins, CT01–CT14, the exact T01–T45
+  manifest, all fifteen preserved Goal 2 strengths, and the two close-role
+  boundaries have named implementation/test stages. Catalog work may compose
+  only mechanics already closed and codec-inventoried earlier.
+- File dispositions are exact for all 20 current tracked `src/ca` files and
+  the target additions: evolve the plural components/loci in place, add
+  `program.py` and `serialization.py`, add the eight catalog files, physically
+  delete `specs.py` and `rollout.py`, retain `py.typed`, and keep
+  datasets/RNG/visualization downstream. The resulting tracked source count is
+  28.
+- Compatibility is closed as a hard pre-1.0 cutover: package `0.2.0`,
+  canonical `ca.simple-program` schema v1, no `Dynamics` façade, no
+  old-manifest decoder/fallback, no temporary component aliases, no broad root
+  compatibility exports, and T10 as the sole category-qualified `K`.
+  Program-owned replay, direct-only dataset recipes, explicit dataset tensor
+  views, and unchanged viewer bundle v1 have precise owners.
+- The final independent reviews report no remaining API, family mapping,
+  staging, import-DAG, numerical/solver, serialization, compatibility,
+  downstream, release, or completion-contract defect.
+- Direct checks report 60 unique family rows, homes
+  `11/15/8/14/9/3`, `19 covered + 41 additions`, 45 unique T rows with
+  dispositions `15/21/2/3/2/1/1`, twelve PX sections, fourteen CT suites, and
+  exact 60-row conformance and mechanics joins. All 27 actual local file links
+  resolve across the 19 checked canonical/stage Markdown files, all checked
+  code-fence counts are even, the reference scaffold parses, compiles, runs,
+  and has exact five-field/`apply`/`rollout` signatures, and
+  `git diff --check` passes.
+- Frozen trees remain
+  `src/ca=6e6b34769d60508c03d0a69fad1ede4fef75e217`,
+  `tests=02ad081e039a46efbf61855fdeae60abb7bb70ad`,
+  `goal-2=48b6309655ec7c1d3aaa1a0ec5dfb700385e16d1`, and
+  `goal-5=ba62f20b8c620094a0ad683906a803c5404be5f2`. Goal 2 handoff and README
+  SHA-256 values remain
+  `5792ac1810dafdd0be6343e1d03c4b1ab20c48551efd73400fea5a1812a9f192`
+  and
+  `e063609c7a52d32bd0a4d3bb384cd5da233c34f57a169e2db6cce197c76e0c4d`.
+  Stage 7 did not rerun the 102 tests because both behavioral trees are
+  identical to their tested baseline.
+- Goal 6 is complete. No `goal-7/` folder, scaffold, runtime change, or
+  implementation work was created.

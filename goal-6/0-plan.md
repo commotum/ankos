@@ -2,6 +2,8 @@
 
 Shorthand: **Architecture Remaster**
 
+Status: **COMPLETE — SEVEN STAGES VERIFIED; GOAL 7 HANDOFF FROZEN**
+
 ## Big-Picture Objective
 
 Remaster the frozen Goal 2 architecture and implementation plan around:
@@ -207,9 +209,9 @@ streams, RNG helpers, or visualization.
   executor, and `ref/notes/ca-scaffold.py` walks the same architecture from
   closed loci through components, catalog construction, application, rollout,
   and serialization.
-- `GOALS.md` now records Goal 5 as complete, Goal 6 as the active remaster, and
-  Goal 7 as future implementation. Goal 4 is explicitly superseded and Goal 2
-  remains frozen evidence.
+- `GOALS.md` now records Goals 1–6 as completed/preserved and Goal 7 as the
+  next separately authorized implementation. Goal 4 is explicitly superseded
+  and Goal 2 remains frozen evidence.
 - Stage 1 is complete. `goal-6/architecture.md` records the source hierarchy,
   document roles, an exhaustive Goal 2 preserve/replace/defer ledger, and the
   clean runtime/test/frozen-plan baseline at commit
@@ -302,8 +304,30 @@ streams, RNG helpers, or visualization.
   `rollout.py`; add `program.py`, `serialization.py`, and `catalog/`; then
   adapt `datasets.py`, `rng.py`, and `viz/` without allowing them into the
   semantic core.
-- Stage 7 (`7-HANDOFF`) is in progress. Its only new durable design output is
-  `goal-6/goal-7-handoff.md`; it does not create or begin Goal 7.
+- Stage 7 (`7-HANDOFF`) is complete. Its durable design output,
+  `goal-6/goal-7-handoff.md`, fixes an atomic G7-01 core cutover, one
+  aggregate G7-02 mechanics barrier across all 60 families, codecs before
+  catalog construction, exact T01–T45 migration, complete conformance, and
+  final documentation/release gates.
+- The final mechanics assignment is exactly `15 M-A / 30 M-B / 15 M-C`.
+  SPF001–SPF060 appear exactly once and agree with the canonical SPF/F join;
+  PX01–PX12, all eight secondary joins, and CT01–CT14 have explicit owners.
+- The hard cutover is closed: package `0.2.0`, canonical
+  `ca.simple-program` schema v1, no `Dynamics` façade or old-manifest decoder,
+  physical `specs.py`/`rollout.py` deletion, direct-only current dataset
+  recipes, and no temporary root/component compatibility aliases.
+- Final direct checks report 60 catalog rows, home counts
+  `11/15/8/14/9/3`, `19 covered + 41 additions`, 45 exact legacy rows with
+  disposition counts `15/21/2/3/2/1/1`, twelve PX sections, fourteen CT
+  suites, valid local links, even code fences, and a compiling/executing
+  reference scaffold with exact public signatures.
+- Three independent final reviews found no remaining architecture, API,
+  family-assignment, staging, compatibility, solver, downstream-ownership, or
+  completion-contract defect after the recorded narrow corrections.
+- `git diff --check`, scoped-diff, frozen-tree, Goal 2 checksum, and Goal 7
+  absence checks pass. Runtime tests were not rerun during Stage 7 because
+  `src/ca` and `tests` remain byte-identical to the 102-test baseline.
+- Goal 6 is complete. Goal 7 has not been scaffolded or started.
 
 ## Assumptions To Challenge
 
@@ -654,6 +678,9 @@ then freeze a compact conformance contract for Goal 7.
 - No behavioral `src/ca` change has occurred relative to the Stage 1 baseline.
 
 ### 7-HANDOFF
+
+Status: **COMPLETE — exact mechanics-first Goal 7 handoff and final
+reconciliation verified**
 
 #### Big Picture Objective
 

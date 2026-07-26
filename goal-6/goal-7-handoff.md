@@ -126,7 +126,8 @@ G7-04 only composes already-tested mechanics.
 
 G7-00 through G7-05 are internal implementation checkpoints, not release
 candidates. Although G7-01 sets the source version for the breaking cutover,
-only the fully reconciled G7-06 state may be packaged or shipped as `0.2.0`.
+only the fully reconciled G7-06 state may be published, distributed, or
+shipped as `0.2.0`. G7-05's wheel is an ephemeral validation artifact.
 
 ## File-Level Migration
 
@@ -173,7 +174,7 @@ count moves from 20 to 28.
 | `tests/test_seeds.py` | Retain and replace ambient RNG/render assumptions with closed Seed-law and explicit realization tests |
 | `tests/test_specs.py` | Delete after its useful manifest cases become negative cutover tests in serialization/public-surface suites |
 | `tests/test_rollout.py` | Rewrite around `SimpleProgram`, `apply`, and apply-owned rollout; move only independently derived expected steps into CT12 oracles |
-| `tests/test_datasets.py` | Retain and adapt at G7-01 to direct program recipes plus downstream materialization; after G7-04, add catalog-delegate/equality cases without moving mechanics into the catalog |
+| `tests/test_datasets.py` | Retain and adapt at G7-01 to direct program recipes, direct expanded-program equality, and downstream materialization; the four current recipe builders never acquire catalog delegates |
 | `tests/test_rng.py` | Retain for external deterministic helpers; assert the semantic core does not import it |
 | `tests/test_viz_export.py` | Retain and adapt to explicit downstream view records |
 
@@ -256,11 +257,13 @@ Files:
   `neighborhoods.py`, `rules.py`, `__init__.py`, `datasets.py`, `rng.py`,
   `viz/__init__.py`, and `viz/export.py`;
 - add `program.py`, `tests/test_alphabets.py`, `tests/test_frontiers.py`,
-  `tests/test_program.py`, and the initial CT01–CT08/CT12/CT13 tests;
+  `tests/test_program.py`, `tests/test_public_api.py`, and the initial
+  CT01–CT08/CT12/CT13 tests;
 - delete `specs.py`, `rollout.py`, and `tests/test_specs.py`;
-- rewrite the obsolete portions of `tests/test_seeds.py`,
+- rewrite the obsolete portions of `tests/test_loci.py`,
+  `tests/test_neighborhoods.py`, `tests/test_seeds.py`,
   `tests/test_rules.py`, `tests/test_rollout.py`, `tests/test_datasets.py`,
-  and `tests/test_viz_export.py`; and
+  `tests/test_rng.py`, and `tests/test_viz_export.py`; and
 - update `pyproject.toml` and `uv.lock` together.
 
 Implement the structural kernel:
@@ -325,6 +328,11 @@ application. None becomes a root export or an unaudited catalog entry.
 dataset IDs; recipe selection chooses constructors, never an executor. Every
 builder returns an ordinary validated program before rollout.
 
+Remove `rules.formulaic`, `rules.instantiate`, `rules.rule_count`, and
+`rules.valid_rule_ids` from the semantic and root APIs. The four dataset
+recipes own explicit closed finite rule domains and pass concrete `rule=`
+construction data; no unresolved family-recipe query survives.
+
 Fix downstream ownership in the same transaction:
 
 - remove public `seeds.render`, `seeds.dedupe`, and bulk `seeds.structured`;
@@ -356,8 +364,9 @@ Perform the cutover:
 - set package version `0.2.0`, update the general description, and move
   `pytest>=9.0.3` from runtime dependencies to
   `[dependency-groups].dev`; and
-- replace every obsolete active test in this same stage. No knowingly red test
-  interval or preserved compatibility structure is allowed.
+- replace every obsolete active test in this same stage. No completed stage or
+  checkpoint may leave knowingly red tests or a preserved compatibility
+  structure.
 
 Exit:
 
@@ -719,13 +728,17 @@ At every stage:
   import `serialization`; `program` and `serialization` never import catalog;
   internals never import root `ca`; and core never imports datasets, RNG, or
   visualization;
-- core never imports catalog, datasets, RNG helpers, or visualization;
+- auxiliary consumption is one-way: core results feed dataset views,
+  `datasets` may use `rng` only for downstream planning, and explicit dataset
+  views feed `viz/export`; no reverse import exists and root eagerly imports
+  none of those auxiliary modules;
 - serialization never imports catalog or reconstructs a constructor call;
 - category modules never import `catalog.entries`; `catalog.__init__` is the
   sole join;
 - catalog metadata contains no callable or semantic object;
-- no callback, hidden solver, ambient draw, silent float, partial branch
-  commit, inferred structural repair, or result-policy keyword appears;
+- no opaque callback in a semantic descriptor or semantic extension point,
+  hidden solver, ambient draw, silent float, partial branch commit, inferred
+  structural repair, or result-policy keyword appears;
 - F045 evaluator code is closed Rule data with visible work state and never
   recursively calls `apply`; and
 - the test oracle never calls the implementation it judges;

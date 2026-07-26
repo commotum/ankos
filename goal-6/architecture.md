@@ -1,6 +1,7 @@
 # Goal 6 Architecture
 
-Status: **IN PROGRESS — CONFORMANCE COMPLETE; HANDOFF NEXT**
+Status: **COMPLETE — ARCHITECTURE, CATALOG, CONFORMANCE, AND GOAL 7 HANDOFF
+VERIFIED**
 
 This is the evolving canonical architecture specification for Goal 6. It
 records settled decisions and points to later-stage artifacts rather than
@@ -153,9 +154,9 @@ obsolete stage machinery.
 | Stable catalog IDs, canonical constructor names, and six-module placement | Resolved in Canonical Catalog Identity and Migration below |
 | Legacy source/capability boundaries for adaptive subdivision, sequential network schedules, weak PDEs, and exact transcendental execution | Stages 5–6 |
 | Pressure fixtures, codec/replay/commutation tests, and hostile review | Stage 6 |
-| Compatibility, the optional `Dynamics` façade, deprecation, serialization cutover, and exact file migration | Stage 7 |
-| Generation, datasets, streams, RNG-helper placement, visualization, and export internals | Goal 7 or later, except for stable public boundaries |
-| Numerical/solver backend selection and performance strategy | Goal 7 implementation; exactness and evidence contracts are already fixed |
+| Compatibility, `Dynamics`, deprecation, serialization cutover, and exact file migration | Resolved by the Stage 7 handoff: hard `0.2.0` cutover, no façade or fallback decoder, canonical codec v1, and physical `specs.py`/`rollout.py` deletion |
+| Generation, datasets, streams, RNG-helper placement, visualization, and export internals | Stage 7 fixes the minimum current-module cutover; broader auxiliary organization remains later work |
+| Numerical/solver backend selection and performance strategy | No solver/integrator belongs to core or generic application; external finite realizations are separately versioned and evidence-bearing, and may be selected only by later tooling |
 
 ### Old Module-Area Coverage
 
@@ -176,7 +177,7 @@ This table proves that no Goal 2 subsystem is silently unreviewed.
 | `serialization.py` | Preserved as a root cross-cutting codec boundary |
 | `specs.py` | Replaced by `program.py` and `SimpleProgram` |
 | `rollout.py` | Generic traversal moves under the `program.py` public boundary; the conflicting public submodule is retired during Goal 7 |
-| `datasets.py`, `rng.py`, `viz/` | Downstream behavior preserved until Goal 7; internal reorganization deferred |
+| `datasets.py`, `rng.py`, `viz/` | Stage 7 fixes their one-way downstream cutover; broader internal reorganization remains deferred |
 | `tests/conformance/` | One-obligation rigor preserved, expanded and reorganized around reusable mechanics and 60-family coverage |
 
 Goal 2's original deferred list is also resolved: stochastic and native
@@ -1555,11 +1556,10 @@ The locked tree deliberately has no public `rollout.py`: a package cannot
 reliably promise both callable `ca.rollout(...)` and a `ca.rollout` submodule
 without attribute shadowing. The target rollout callable, public result
 records, and traversal contract therefore belong to `program.py`. Goal 7
-folds or privatizes the current tensor-oriented `rollout.py`; no public
-replacement module is added. Privatizing means physically renaming the module
-to a nonconflicting private path; merely omitting `rollout.py` from
-`__all__` is insufficient because `import ca.rollout` can still shadow the
-callable.
+transplants only the generic traversal responsibility and physically deletes
+the current tensor/family executor; no public or private replacement module is
+added. Merely omitting `rollout.py` from `__all__` is insufficient because
+`import ca.rollout` can still shadow the callable.
 
 ### Cohesive file responsibilities
 
@@ -1582,8 +1582,8 @@ callable.
 `WritableRegion` and `ReadableRegion` are the canonical component type names.
 The field names remain `frontier` and `neighborhood`, and the plural modules
 remain `frontiers` and `neighborhoods`. The current `Frontier` and
-`Neighborhood` names may be temporary Goal 7 compatibility aliases, but they
-do not define competing contracts.
+`Neighborhood` names are retired at the `0.2.0` cutover; no temporary type
+aliases ship.
 
 The Rule/application split is intentional: `rules.py` owns everything before
 commit; `program.py` owns validation and the applied result after mapping the
@@ -1817,18 +1817,20 @@ The current runtime is migration evidence, not target authority:
 
 | Current area | Goal 7 target disposition fixed here |
 |---|---|
-| `specs.py` and `Dynamics` | Replace with `program.py` and five-field `SimpleProgram`; any temporary compatibility façade must immediately expand and cannot preserve a second executor |
-| Family decoding in `specs.py` | Move construction to closed component/catalog constructors or canonical codecs; remove executor registry behavior |
-| Tensor/family branches and `apply_rule` in `rollout.py` | Move the generic traversal contract, records, and root callable to `program.py`; delete the file after folding it or physically rename any remaining helper to a private nonconflicting path |
-| `RawEpisode` and `RawBatch` | Not canonical core records; Stage 7 may adapt them temporarily at the rollout/dataset boundary while downstream consumers migrate |
-| Broad root constructor exports | Narrow to the façade above; any compatibility exports are explicit, deprecated, and unable to shadow canonical spellings |
-| Current loci/Alphabet/Seed/Frontier/Neighborhood/Rule classes | Evolve in place into the closed generalized contracts; do not create a parallel package |
-| Dataset family switches | Replace downstream with catalog/direct program construction and generic rollout after the core cutover |
-| `rng.py` | Retain only as external realization/dataset support; no semantic authority over Seed or Rule laws |
-| `viz/` | Consume structural rollout/application results through view adapters; never define result identity |
+| `specs.py` and `Dynamics` | Add `program.py` and five-field `SimpleProgram`, then physically delete both old module responsibility and façade during the atomic G7-01 cutover; no compatibility façade ships |
+| Family decoding in `specs.py` | Remove executor-registry behavior. Catalog constructors and explicit component composition create programs; canonical codecs decode expanded values only |
+| Tensor/family branches and `apply_rule` in `rollout.py` | Move the generic traversal contract, records, and root callable to `program.py`, then physically delete `rollout.py`; no private copy or second executor survives |
+| `RawEpisode` and `RawBatch` | Remove from core and root. Downstream `DatasetEpisode`/`DatasetBatch` views carry tensors; the old labels remain only viewer-bundle-v1 presentation metadata |
+| Broad root constructor exports | Remove during G7-01. Component constructors stay module-qualified and whole-program names stay under `ca.catalog`; no temporary root aliases ship |
+| Current loci/Alphabet/Seed/Frontier/Neighborhood/Rule classes | Evolve their owner modules in place into the closed generalized contracts; retire the two old type names and do not create a parallel package |
+| Dataset family switches | Replace with four direct, explicit program recipe builders over the retained module-qualified native presets; dataset IDs select construction only, never mechanics or catalog rows |
+| `rng.py` | Retain for downstream dataset planning only; program-owned replay derivation never imports it |
+| `viz/` | Preserve viewer bundle v1 and accept explicit downstream dataset tensor views only; never infer or define semantic result identity |
 
-Goal 7 decides the exact deprecation window and file-by-file edit order. It may
-not reverse these ownership decisions.
+The exact dependency order, compatibility decisions, native-preset
+dispositions, test migrations, and release gates are closed in
+[`goal-7-handoff.md`](goal-7-handoff.md). Goal 7 implements that handoff under
+separate authorization; it does not reopen these decisions.
 
 ### Documentation and deferred tooling boundary
 
@@ -1845,7 +1847,8 @@ imported. `README-V2.md` continues to document the actually shipped 0.1
 runtime until Goal 7 performs the runtime and documentation cutover; its
 current API examples do not override this target contract.
 
-Generation, dataset planning, streams, batching, RNG convenience, rendering,
+Beyond the minimum current-module cutover fixed by the handoff, generation,
+dataset planning, streams, batching, RNG convenience, rendering,
 visualization, and export organization remain deferred. Whatever later layout
 is chosen must accept ordinary `SimpleProgram` values and/or
 application/rollout results, call only the generic public boundary, preserve
@@ -2420,4 +2423,10 @@ above.
 - Stage 6 is complete: twelve pressure fixtures, one exact 60-family audit
   join, fourteen reusable conformance suites, and the final hostile review are
   verified in `conformance.md`.
-- Stage 7 is next: implementation handoff and final reconciliation.
+- Stage 7 is complete: `goal-7-handoff.md` fixes the atomic core cutover,
+  three-workstream/one-barrier mechanics closure, codec-before-catalog order,
+  exact 60-family and T migration, downstream adapters, hard `0.2.0`
+  compatibility decisions, conformance join, packaging, and final release
+  gates.
+- Goal 6 is complete. Goal 7 remains uncreated and may begin only under a
+  separate user instruction and completion scaffold.
