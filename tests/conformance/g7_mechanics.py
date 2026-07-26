@@ -2191,6 +2191,11 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
     """Run either declared pair through one of eight distinct workspaces."""
 
     unset = _codec_record("unset", status="unset")
+    fresh_parent: loci.Locus | None = None
+    fresh_namespace = ""
+    fresh_keys: tuple[loci.ClosedScalar, ...] = ()
+    fresh_values: tuple[alphabets.SemanticValue, ...] = ()
+    additional_future_values: tuple[alphabets.SemanticValue, ...] = ()
     if row.spf == "SPF012":
         native = _codec_word("source-word", "A", "A", "A", "B", "B")
         encoded = _codec_record("run-records", run0="A:3", run1="B:2")
@@ -2226,22 +2231,24 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
         )
         block = loci.path("root", "block", scope="prefix-tree")
         codebook = loci.path("root", "codebook", scope="prefix-tree")
-        output = loci.path("root", "output", scope="prefix-tree")
         cursor = loci.path("root", "cursor", scope="prefix-tree")
         source = _structural_configuration(
             loci.CarrierKind.TREE,
             (
                 (block, selected_native),
                 (codebook, _codec_record("prefix-tree", A="0", B="10", C="11")),
-                (output, unset),
                 (cursor, "block-0"),
             ),
         )
         read_targets = (block, codebook, cursor)
         writes = (
-            (output, rules.literal_expr(selected_encoded)),
             (cursor, rules.literal_expr("done")),
         )
+        assert type(selected_encoded) is alphabets.ValueNode
+        fresh_parent = block
+        fresh_namespace = "g7-prefix-output"
+        fresh_keys = tuple(range(len(selected_encoded.items)))
+        fresh_values = selected_encoded.items
     elif row.spf == "SPF055":
         native = _codec_word("message", "A", "B")
         encoded = _codec_record(
@@ -2270,7 +2277,6 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
         message = loci.field_point("codec", (0,), component="message")
         low = loci.field_point("codec", (0,), component="low")
         high = loci.field_point("codec", (0,), component="high")
-        output = loci.field_point("codec", (0,), component="interval")
         cursor = loci.field_point("codec", (0,), component="cursor")
         source = _structural_configuration(
             loci.CarrierKind.FIELD,
@@ -2278,18 +2284,16 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
                 (message, selected_native),
                 (low, Fraction(0)),
                 (high, Fraction(1)),
-                (output, unset),
-                (cursor, "symbol-0"),
+                (cursor, 0),
             ),
             rank=1,
             axes=("x",),
         )
         read_targets = (message, low, high, cursor)
         writes = (
-            (low, rules.literal_expr(selected_low)),
-            (high, rules.literal_expr(selected_high)),
-            (output, rules.literal_expr(selected_encoded)),
-            (cursor, rules.literal_expr("done")),
+            (low, rules.literal_expr(Fraction(0))),
+            (high, rules.literal_expr(Fraction(1, 2))),
+            (cursor, rules.literal_expr(1)),
         )
     elif row.spf == "SPF056":
         native = _codec_word("history-input", "A", "B", "A", "B")
@@ -2375,10 +2379,25 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             axes=("x", "y"),
         )
         read_targets = cells
-        writes = (
-            (result_target, rules.literal_expr(selected_encoded)),
-            (cursor, rules.literal_expr("done")),
-        )
+        if case_index == 0:
+            writes = (
+                (result_target, rules.literal_expr(selected_encoded)),
+                (cursor, rules.literal_expr("done")),
+            )
+        else:
+            writes = ((cursor, rules.literal_expr("done")),)
+            fresh_parent = result_target
+            fresh_namespace = "g7-region-children"
+            fresh_keys = ("north-west", "north-east", "south-west", "south-east")
+            fresh_values = tuple(
+                _codec_record(
+                    "region-leaf",
+                    bounds=key,
+                    value=value,
+                )
+                for key, value in zip(fresh_keys, cell_values, strict=True)
+            )
+            additional_future_values = fresh_values
     elif row.spf == "SPF058":
         native = _codec_word("vector", 1, 1)
         encoded = _codec_word("walsh-coefficients", 1, 0)
@@ -2564,41 +2583,107 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
         -1,
         0,
         1,
+        *additional_future_values,
     )
     alphabet = _closed_enum(
         tuple(value for _, value in source.entries) + future_values
     )
     write_targets = tuple(target for target, _ in writes)
-    writable, readable = _literal_regions(
+    existing_writable, readable = _literal_regions(
         source,
         alphabet,
         write_targets=write_targets,
         read_targets=read_targets,
     )
+    fresh_plans: tuple[rules.FreshDispositionPlan, ...] = ()
+    if fresh_parent is None:
+        writable = existing_writable
+    else:
+        fresh_writable, fresh_references = _fresh_children_writable(
+            source,
+            alphabet,
+            parent=fresh_parent,
+            namespace=fresh_namespace,
+            keys=fresh_keys,
+        )
+        writable = frontiers.union((existing_writable, fresh_writable))
+        fresh_plans = tuple(
+            _fresh_target_plan(
+                reference,
+                rules.DispositionAction.CREATE,
+                rules.literal_expr(value),
+            )
+            for reference, value in zip(
+                fresh_references,
+                fresh_values,
+                strict=True,
+            )
+        )
+
+    existing_plans = tuple(
+        _existing_target_plan(
+            target,
+            rules.DispositionAction.REPLACE,
+            value,
+        )
+        for target, value in writes
+    )
+    if row.spf == "SPF055":
+        low, high, cursor = write_targets
+        clauses = (
+            _clause(
+                rules.equal(rules.observation(3), rules.literal_expr(0)),
+                _derivation_result(
+                    f"{row.fixture}:first-symbol",
+                    existing=existing_plans,
+                ),
+            ),
+            _clause(
+                rules.equal(rules.observation(3), rules.literal_expr(1)),
+                _derivation_result(
+                    f"{row.fixture}:second-symbol",
+                    existing=(
+                        _existing_target_plan(
+                            low,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(selected_low),
+                        ),
+                        _existing_target_plan(
+                            high,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(selected_high),
+                        ),
+                        _existing_target_plan(
+                            cursor,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr("done"),
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+        )
+    else:
+        clauses = (
+            _clause(
+                rules.literal_expr(1),
+                _derivation_result(
+                    row.fixture,
+                    existing=existing_plans,
+                    fresh=fresh_plans,
+                    stop=True,
+                ),
+            ),
+        )
+
     rule = _kernel(
         source,
         alphabet,
         writable,
         readable,
-        (
-            _clause(
-                rules.literal_expr(1),
-                _derivation_result(
-                    row.fixture,
-                    existing=tuple(
-                        _existing_target_plan(
-                            target,
-                            rules.DispositionAction.REPLACE,
-                            value,
-                        )
-                        for target, value in writes
-                    ),
-                    stop=True,
-                ),
-            ),
-        ),
+        clauses,
     )
-    return _assemble(
+    execution = _assemble(
         row,
         source,
         alphabet,
@@ -2609,6 +2694,34 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
         representation_source=selected_native,
         representation_target=selected_encoded,
         representation_case_index=case_index,
+    )
+    if row.spf != "SPF055":
+        return execution
+
+    assert isinstance(execution.result, program.ApplicationComplete)
+    first_successors = _finite_successors(execution.result)
+    assert len(first_successors) == 1
+    second_source = first_successors[0]
+    second_result = ca.apply(execution.simple_program, second_source)
+    if not isinstance(second_result, program.ApplicationComplete):
+        fault = second_result.fault
+        raise AssertionError(
+            f"{row.spf}/{row.fixture}/case-{case_index}/second-step rejected: "
+            f"{fault.reason}; {fault.evidence!r}"
+        )
+    return MechanicsRun(
+        row=execution.row,
+        simple_program=execution.simple_program,
+        source=execution.source,
+        result=execution.result,
+        representation=execution.representation,
+        representation_source=execution.representation_source,
+        representation_target=execution.representation_target,
+        representation_case_index=execution.representation_case_index,
+        trajectory=(
+            (execution.source, execution.result),
+            (second_source, second_result),
+        ),
     )
 
 
@@ -3063,13 +3176,69 @@ def _finite_successors(
 
 def _materialized_px10_target(
     execution: MechanicsRun,
+    result: program.ApplicationComplete,
     successor: loci.FiniteConfiguration,
 ) -> alphabets.SemanticValue:
     """Extract the represented value produced by the family workspace."""
 
-    target = execution.representation_target
-    assert target is not None
-    if execution.row.spf == "SPF060":
+    spf = execution.row.spf
+    if spf == "SPF012":
+        return successor.value_at(loci.named("records", scope="record"))
+    if spf == "SPF054":
+        derivations = tuple(
+            atom
+            for atom in result.applied_atoms.atoms
+            if isinstance(atom, program.AppliedDerivation)
+        )
+        assert len(derivations) == 1
+        bindings = {
+            binding.reference.local_key: binding.identity
+            for binding in derivations[0].fresh_bindings
+            if binding.reference.namespace == "g7-prefix-output"
+        }
+        bits = tuple(
+            successor.value_at(bindings[index])
+            for index in range(len(bindings))
+        )
+        return _codec_word("prefix-bits", *bits)
+    if spf == "SPF055":
+        low = successor.value_at(
+            loci.field_point("codec", (0,), component="low")
+        )
+        high = successor.value_at(
+            loci.field_point("codec", (0,), component="high")
+        )
+        return _codec_record("nested-interval", low=low, high=high)
+    if spf == "SPF056":
+        output_index = len(_materialized_read_targets(execution))
+        return successor.value_at(loci.occurrence("history", output_index))
+    if spf == "SPF057":
+        if execution.representation_case_index == 0:
+            return successor.value_at(
+                loci.named("region-tree", scope="grid-workspace")
+            )
+        derivations = tuple(
+            atom
+            for atom in result.applied_atoms.atoms
+            if isinstance(atom, program.AppliedDerivation)
+        )
+        assert len(derivations) == 1
+        child_bindings = tuple(
+            binding
+            for binding in derivations[0].fresh_bindings
+            if binding.reference.namespace == "g7-region-children"
+        )
+        return _codec_record(
+            "region-branch",
+            children=len(child_bindings),
+            bounds="2x2",
+        )
+    if spf == "SPF058":
+        base = loci.named("basis-workspace", scope="product")
+        return successor.value_at(loci.product_locus("result", (base,)))
+    if spf == "SPF059":
+        return successor.value_at(loci.occurrence("history", 6))
+    if spf == "SPF060":
         bits = tuple(
             successor.value_at(loci.occurrence("word", index))
             for index in range(6, 9)
@@ -3080,13 +3249,36 @@ def _materialized_px10_target(
             items=bits,
         )
 
-    matches = tuple(
-        value
-        for _, value in successor.entries
-        if alphabets.semantic_equal(value, target)
-    )
-    assert len(matches) == 1
-    return matches[0]
+    raise AssertionError(f"missing PX10 output extractor for {spf}")
+
+
+def _materialized_px10_source(
+    execution: MechanicsRun,
+) -> alphabets.SemanticValue:
+    """Reconstruct the native relation value from the workspace's real reads."""
+
+    resolved = execution.simple_program.neighborhood.resolve(execution.source)
+    assert type(resolved) is neighborhoods.ReadableView
+    values = tuple(observation.value for observation in resolved.observations)
+    spf = execution.row.spf
+    if spf in ("SPF012", "SPF054", "SPF055"):
+        return values[0]
+    if spf == "SPF056":
+        return _codec_word("history-input", *values)
+    if spf == "SPF057":
+        tag = "uniform-grid" if len(set(values)) == 1 else "nonuniform-grid"
+        return _codec_product(tag, *values)
+    if spf == "SPF058":
+        return _codec_word("vector", *values)
+    if spf == "SPF059":
+        return _codec_word("samples", *values)
+    if spf == "SPF060":
+        return _codec_product(
+            "xor-operands",
+            _codec_word("data", *values[:3]),
+            _codec_word("generator", *values[3:]),
+        )
+    raise AssertionError(f"missing PX10 input extractor for {spf}")
 
 
 def _materialized_read_targets(execution: MechanicsRun) -> tuple[loci.Locus, ...]:

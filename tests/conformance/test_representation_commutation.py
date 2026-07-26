@@ -22,6 +22,7 @@ from g7_mechanics import (
     MECHANICS_ROWS,
     assert_mechanics_run,
     run_mechanics_fixture,
+    run_px10_representation_case,
 )
 
 
@@ -522,16 +523,29 @@ def test_exact_representation_is_inverse_on_its_declared_image() -> None:
             )
 
 
+@pytest.mark.parametrize("case_index", (0, 1), ids=("primary", "alternate"))
 @pytest.mark.parametrize("row", PX10_ROWS, ids=lambda row: row.spf)
-def test_represented_and_native_one_step_results_commute_completely(row) -> None:
-    """Each real transducer establishes a relation whose conjugate step commutes."""
+def test_represented_and_native_one_step_results_commute_completely(
+    row,
+    case_index: int,
+) -> None:
+    """Both real domain points agree with an independently conjugate step."""
 
-    execution = run_mechanics_fixture(row)
+    execution = run_px10_representation_case(row, case_index)
     assert_mechanics_run(execution)
     relation = execution.representation
     assert relation is not None
     assert execution.representation_source is not None
     assert execution.representation_target is not None
+    oracle_source, oracle_target = PX10_ORACLE_PAIRS[row.spf][case_index]
+    assert alphabets.semantic_equal(
+        execution.representation_source,
+        oracle_source,
+    )
+    assert alphabets.semantic_equal(
+        execution.representation_target,
+        oracle_target,
+    )
     assert relation.forward(execution.representation_source) == (
         execution.representation_target
     )
