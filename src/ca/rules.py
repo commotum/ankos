@@ -571,6 +571,12 @@ class NoPayload:
 class ValuePayload(Generic[V]):
     value: V
 
+    def __post_init__(self) -> None:
+        if not alphabets._is_semantic_value(self.value):
+            raise TypeError(
+                "disposition value payload needs a semantic alphabet value"
+            )
+
 
 DispositionPayload: TypeAlias = NoPayload | ValuePayload[V]
 

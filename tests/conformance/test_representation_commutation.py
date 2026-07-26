@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import fields, is_dataclass
 from enum import Enum
 from fractions import Fraction
-import re
 
 import pytest
 
@@ -21,9 +20,6 @@ from g7_mechanics import (
 
 
 PX10_ROWS = tuple(row for row in MECHANICS_ROWS if row.primary == "PX10")
-_HASH = re.compile(r"[0-9a-f]{64}")
-
-
 def _exact_relation(row) -> alphabets.RepresentationRelation:
     execution = run_mechanics_fixture(row)
     assert_mechanics_run(execution)
@@ -196,7 +192,6 @@ def _normalize_complete_result(
     """Normalize every stored field, changing only declared values and IDs."""
 
     aliases = _identity_aliases(result)
-    fallback_hashes: dict[str, str] = {}
 
     def normalize(value: object) -> object:
         if (
@@ -213,11 +208,6 @@ def _normalize_complete_result(
         if type(value) is str:
             if value in aliases:
                 return aliases[value]
-            if _HASH.fullmatch(value):
-                return fallback_hashes.setdefault(
-                    value,
-                    f"@derived:{len(fallback_hashes)}",
-                )
             return value
         if isinstance(value, Enum):
             return (
@@ -314,6 +304,37 @@ def test_commutation_compares_all_outcomes_evidence_measures_and_fibers() -> Non
         blob = serialization.dumps(result)
         assert serialization.loads(blob) == serialization.Decoded(result)
         assert serialization.dumps(serialization.loads(blob).value) == blob
+
+
+def test_commutation_never_erases_hex_shaped_semantic_strings() -> None:
+    """Only explicitly identified derived IDs may be normalized."""
+
+    def result(
+        initial: str,
+        following: str,
+    ) -> program.ApplicationComplete:
+        def atoms(targets: tuple[loci.Locus, ...]):
+            return (
+                derivation(
+                    "hex-shaped-semantic-value",
+                    existing=(rules.replace(targets[0], following),),
+                ),
+            )
+
+        simple_program, source = finite_record_program(
+            (("value", initial),),
+            atoms,
+            alphabet=alphabets.enum((initial, following)),
+            effects=(ca.frontiers.Effect.REPLACE,),
+        )
+        application = ca.apply(simple_program, source)
+        assert isinstance(application, program.ApplicationComplete)
+        return application
+
+    left = result("a" * 64, "b" * 64)
+    right = result("c" * 64, "d" * 64)
+
+    assert _normalize_complete_result(left) != _normalize_complete_result(right)
 
 
 def test_lossy_approximate_or_out_of_image_translation_remains_explicit() -> None:

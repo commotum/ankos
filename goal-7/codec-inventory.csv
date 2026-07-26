@@ -270,7 +270,7 @@ ca.rules,DispositionAction,enum-member,DELETE,ca.rules.disposition-action,1,valu
 ca.rules,DispositionAction,enum-member,ABSENT,ca.rules.disposition-action,1,value,absent,Enum.__call__,enum-member
 ca.rules,DispositionAction,enum-member,CREATE,ca.rules.disposition-action,1,value,create,Enum.__call__,enum-member
 ca.rules,NoPayload,frozen-dataclass,record,ca.rules.no-payload,1,,,Disposition.__post_init__,structural-fields
-ca.rules,ValuePayload,frozen-dataclass,record,ca.rules.value-payload,1,value,,Disposition.__post_init__,structural-fields
+ca.rules,ValuePayload,frozen-dataclass,record,ca.rules.value-payload,1,value,,ValuePayload.__post_init__,structural-fields
 ca.rules,Disposition,frozen-dataclass,record,ca.rules.disposition,1,target|action|payload|evidence|version,,Disposition.__post_init__,structural-fields
 ca.rules,TotalDisposition,frozen-dataclass,record,ca.rules.total-disposition,1,existing|fresh|totality_evidence|version,,TotalDisposition.__post_init__,structural-fields
 ca.rules,Progress,enum-member,ADVANCED,ca.rules.progress,1,value,advanced,Enum.__call__,enum-member
@@ -340,7 +340,7 @@ ca.rules,RuleComplete,frozen-dataclass,record,ca.rules.rule-complete,1,outcome_s
 ca.rules,Rule,frozen-dataclass,record,ca.rules.rule,1,descriptor|contract,,Rule.__post_init__,structural-fields
 ca.rules,EvaluationStep,frozen-dataclass,record,ca.rules.evaluation-step,1,expression|anchor|result|read_evidence|version,,EvaluationStep.__post_init__,structural-fields
 ca.rules,EvaluationProof,frozen-dataclass,record,ca.rules.evaluation-proof,1,steps|version,,EvaluationProof.__post_init__,structural-fields
-ca.program,CompatibilityEvidence,frozen-dataclass,record,ca.program.compatibility-evidence,1,configuration_contract|value_profile|clauses,,_require_compatible_five_fields,structural-fields
+ca.program,CompatibilityEvidence,frozen-dataclass,record,ca.program.compatibility-evidence,1,configuration_contract|value_profile|clauses,,CompatibilityEvidence.__post_init__,structural-fields
 ca.program,SimpleProgram,frozen-dataclass,record,ca.simple-program,1,seed|alphabet|frontier|neighborhood|rule,,SimpleProgram.__post_init__,structural-fields
 ca.program,ApplicationPhase,enum-member,PROGRAM,ca.program.application-phase,1,value,program,Enum.__call__,enum-member
 ca.program,ApplicationPhase,enum-member,INPUT,ca.program.application-phase,1,value,input,Enum.__call__,enum-member

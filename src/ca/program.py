@@ -29,6 +29,18 @@ class ProgramCompatibilityError(ValueError):
     """The five independently built components cannot form one program."""
 
 
+_COMPATIBILITY_CLAUSES = (
+    "seed-output-unifies",
+    "seed-values-conform",
+    "frontier-accepts-carrier",
+    "neighborhood-accepts-carrier",
+    "read-shape-matches",
+    "join-shape-matches",
+    "effects-fit-frontier",
+    "exactness-and-entropy-explicit",
+)
+
+
 @dataclass(frozen=True)
 class CompatibilityEvidence:
     """Ephemeral proof summary; it is never stored on ``SimpleProgram``."""
@@ -36,6 +48,20 @@ class CompatibilityEvidence:
     configuration_contract: loci.CarrierContract
     value_profile: alphabets.ValueProfile
     clauses: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.configuration_contract) is not loci.CarrierContract:
+            raise TypeError(
+                "compatibility evidence needs a CarrierContract"
+            )
+        if type(self.value_profile) is not alphabets.ValueProfile:
+            raise TypeError(
+                "compatibility evidence needs a ValueProfile"
+            )
+        if self.clauses != _COMPATIBILITY_CLAUSES:
+            raise ValueError(
+                "compatibility evidence clauses are not the canonical proof"
+            )
 
 
 @dataclass(frozen=True)
@@ -146,16 +172,7 @@ def _require_compatible_five_fields(
     return CompatibilityEvidence(
         carrier,
         value_profile,
-        (
-            "seed-output-unifies",
-            "seed-values-conform",
-            "frontier-accepts-carrier",
-            "neighborhood-accepts-carrier",
-            "read-shape-matches",
-            "join-shape-matches",
-            "effects-fit-frontier",
-            "exactness-and-entropy-explicit",
-        ),
+        _COMPATIBILITY_CLAUSES,
     )
 
 

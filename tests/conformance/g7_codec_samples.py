@@ -427,11 +427,7 @@ def _program_samples() -> tuple[object, ...]:
         ("codec-evidence",),
         (program.ApplicationPhase.PROGRAM, program.ApplicationPhase.INPUT),
     )
-    compatibility = program.CompatibilityEvidence(
-        simple_program.seed.configuration_contract,
-        simple_program.alphabet.value_profile,
-        ("codec-components-unify",),
-    )
+    compatibility = program._require_compatible_five_fields(simple_program)
     draw = program.DrawEvidence(
         "law",
         "application",

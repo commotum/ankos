@@ -42,11 +42,6 @@ INVENTORY_COLUMNS = (
 
 _CONTEXT_VALIDATORS = {
     ("rules", "NoPayload"): "Disposition.__post_init__",
-    ("rules", "ValuePayload"): "Disposition.__post_init__",
-    (
-        "program",
-        "CompatibilityEvidence",
-    ): "_require_compatible_five_fields",
     ("program", "MeasureAbsent"): "fieldless-sum-variant",
 }
 _CANONICAL_IDENTITY_TYPES = {
