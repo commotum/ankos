@@ -103,10 +103,103 @@ def test_frontier_may_grant_a_strict_superset_of_rule_effects() -> None:
     )
 
 
-def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
+def test_rule_carrier_must_accept_seed_output() -> None:
     program, _, _ = native_program("dyadlags")
+    wrong_carrier = loci.CarrierContract(
+        loci.CarrierKind.RECORD,
+        rank=0,
+        shape=(),
+    )
+    wrong_rule = replace(
+        program.rule,
+        contract=replace(
+            program.rule.contract,
+            configuration_contract=wrong_carrier,
+        ),
+    )
 
-    wrong_profile_frontier = replace(
+    with pytest.raises(
+        ca.program.ProgramCompatibilityError,
+        match="Rule configuration contract",
+    ):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            program.neighborhood,
+            wrong_rule,
+        )
+
+
+def test_frontier_carrier_must_accept_seed_output() -> None:
+    program, _, _ = native_program("dyadlags")
+    wrong_frontier = replace(
+        program.frontier,
+        configuration_contract=loci.CarrierContract(
+            loci.CarrierKind.RECORD,
+            rank=0,
+            shape=(),
+        ),
+    )
+
+    with pytest.raises(
+        ca.program.ProgramCompatibilityError,
+        match="WritableRegion configuration contract",
+    ):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            wrong_frontier,
+            program.neighborhood,
+            program.rule,
+        )
+
+
+def test_neighborhood_carrier_must_accept_seed_output() -> None:
+    program, _, _ = native_program("dyadlags")
+    wrong_neighborhood = replace(
+        program.neighborhood,
+        configuration_contract=loci.CarrierContract(
+            loci.CarrierKind.RECORD,
+            rank=0,
+            shape=(),
+        ),
+    )
+
+    with pytest.raises(
+        ca.program.ProgramCompatibilityError,
+        match="ReadableRegion configuration contract",
+    ):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            wrong_neighborhood,
+            program.rule,
+        )
+
+
+def test_seed_values_must_conform_to_same_profile_alphabet() -> None:
+    program, _, _ = native_program("ar2")
+    excluding_alphabet = alphabets.modular(2)
+
+    assert excluding_alphabet.value_profile is program.alphabet.value_profile
+    with pytest.raises(
+        ca.program.ProgramCompatibilityError,
+        match="Seed value does not conform to Alphabet",
+    ):
+        ca.SimpleProgram(
+            program.seed,
+            excluding_alphabet,
+            program.frontier,
+            program.neighborhood,
+            program.rule,
+        )
+
+
+def test_component_value_profiles_must_agree() -> None:
+    program, _, _ = native_program("dyadlags")
+    wrong_frontier = replace(
         program.frontier,
         value_profile=alphabets.ValueProfile.INTEGER,
         target_contract=replace(
@@ -114,33 +207,20 @@ def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
             value_profile=alphabets.ValueProfile.INTEGER,
         ),
     )
+
     with pytest.raises(ca.program.ProgramCompatibilityError, match="profiles"):
         ca.SimpleProgram(
             program.seed,
             program.alphabet,
-            wrong_profile_frontier,
+            wrong_frontier,
             program.neighborhood,
             program.rule,
         )
 
-    wrong_carrier = replace(
-        program.neighborhood,
-        configuration_contract=loci.CarrierContract(
-            loci.CarrierKind.GRID,
-            rank=1,
-            axes=("x",),
-        ),
-    )
-    with pytest.raises(ca.program.ProgramCompatibilityError, match="ReadableRegion"):
-        ca.SimpleProgram(
-            program.seed,
-            program.alphabet,
-            program.frontier,
-            wrong_carrier,
-            program.rule,
-        )
 
-    wrong_shape = replace(
+def test_rule_read_shape_must_match_neighborhood() -> None:
+    program, _, _ = native_program("dyadlags")
+    wrong_neighborhood = replace(
         program.neighborhood,
         result_shape=neighborhoods.ResultShape(
             (
@@ -149,29 +229,47 @@ def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
                     neighborhoods.ReadArity.ONE,
                     1,
                 ),
-                neighborhoods.ReadField(
-                    "previous",
-                    neighborhoods.ReadArity.ONE,
-                    1,
-                ),
-                neighborhoods.ReadField(
-                    "current",
-                    neighborhoods.ReadArity.ONE,
-                    1,
-                ),
+                *program.neighborhood.result_shape.fields[1:],
             )
         ),
     )
+
     with pytest.raises(ca.program.ProgramCompatibilityError, match="read shape"):
         ca.SimpleProgram(
             program.seed,
             program.alphabet,
             program.frontier,
-            wrong_shape,
+            wrong_neighborhood,
             program.rule,
         )
 
-    wrong_effect = replace(
+
+def test_rule_join_shape_must_match_neighborhood() -> None:
+    program, _, _ = native_program("dyadlags")
+    wrong_rule = replace(
+        program.rule,
+        contract=replace(
+            program.rule.contract,
+            required_join_shape=neighborhoods.JoinShape(
+                neighborhoods.JoinMode.GLOBAL,
+                ("wrong",),
+            ),
+        ),
+    )
+
+    with pytest.raises(ca.program.ProgramCompatibilityError, match="join shape"):
+        ca.SimpleProgram(
+            program.seed,
+            program.alphabet,
+            program.frontier,
+            program.neighborhood,
+            wrong_rule,
+        )
+
+
+def test_rule_effects_must_fit_frontier_capabilities() -> None:
+    program, _, _ = native_program("dyadlags")
+    wrong_rule = replace(
         program.rule,
         contract=replace(
             program.rule.contract,
@@ -186,10 +284,13 @@ def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
             program.alphabet,
             program.frontier,
             program.neighborhood,
-            wrong_effect,
+            wrong_rule,
         )
 
-    wrong_exactness = replace(
+
+def test_component_exactness_and_representation_profiles_must_agree() -> None:
+    program, _, _ = native_program("dyadlags")
+    represented_rule = replace(
         program.rule,
         contract=replace(
             program.rule.contract,
@@ -202,7 +303,7 @@ def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
             program.alphabet,
             program.frontier,
             program.neighborhood,
-            wrong_exactness,
+            represented_rule,
         )
 
 

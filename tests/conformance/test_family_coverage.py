@@ -23,6 +23,7 @@ from g7_mechanics import (
     run_mechanics_fixture,
     run_secondary_fixture,
 )
+from helpers import assert_closed_descriptor
 
 
 
@@ -60,6 +61,7 @@ def test_every_family_constructor_returns_a_closed_compatible_simple_program() -
 
         assert type(actual) is type(execution.simple_program)
         assert actual == execution.simple_program
+        assert_closed_descriptor(actual)
         assert getattr(catalog, entry.constructor_name) is constructor
 
 

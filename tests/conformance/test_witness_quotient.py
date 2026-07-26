@@ -2,6 +2,8 @@
 
 from fractions import Fraction
 
+import pytest
+
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
@@ -51,17 +53,17 @@ def test_rule_enumeration_permutation_preserves_quotient_and_fibers() -> None:
 
     assert isinstance(left, program.ApplicationComplete)
     assert isinstance(right, program.ApplicationComplete)
-    left_fiber = left.successor_quotient_with_derivation_fibers.atoms[0]
-    right_fiber = right.successor_quotient_with_derivation_fibers.atoms[0]
-    assert loci.semantic_equal(left_fiber.successor, right_fiber.successor)
-    assert {
-        item.source.witness.identity for item in left_fiber.derivations
-    } == {
-        item.source.witness.identity for item in right_fiber.derivations
-    }
+    assert left == right
+    assert (
+        left.successor_quotient_with_derivation_fibers
+        == right.successor_quotient_with_derivation_fibers
+    )
+    assert left.applied_atoms == right.applied_atoms
 
 
-def test_semantic_equality_is_not_hash_storage_rendering_or_catalog_name() -> None:
+def test_semantic_equality_is_not_hash_storage_rendering_or_catalog_name(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     carrier = loci.Carrier(
         loci.CarrierContract(loci.CarrierKind.RECORD, rank=0, shape=()),
         loci.Boundary(loci.BoundaryPolicy.NONE),
@@ -85,6 +87,24 @@ def test_semantic_equality_is_not_hash_storage_rendering_or_catalog_name() -> No
     assert left.identity == differently_ordered.identity
     assert not loci.semantic_equal(left, different_boundary)
     assert not hasattr(left, "catalog_name")
+
+    monkeypatch.setattr(loci.Locus, "__hash__", lambda _self: 1)
+    false_value = loci.FiniteConfiguration(
+        carrier,
+        ((a, False), (b, False)),
+    )
+    assert hash(a) == hash(b)
+    assert not loci.semantic_equal(left, false_value)
+
+    exact_fraction = loci.record_configuration(
+        (("value", Fraction(1, 10)),)
+    )
+    nearby_fraction = loci.record_configuration(
+        (("value", Fraction(10000000000000001, 100000000000000000)),)
+    )
+    rendered_fraction = loci.record_configuration((("value", "1/10"),))
+    assert not loci.semantic_equal(exact_fraction, nearby_fraction)
+    assert not loci.semantic_equal(exact_fraction, rendered_fraction)
 
 
 def test_equal_successor_mass_aggregates_without_erasing_source_atoms() -> None:

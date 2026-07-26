@@ -23,6 +23,39 @@ from g7_fixtures import (
 )
 
 
+def _assert_finite_application_shape(
+    result: program.ApplicationComplete,
+    *,
+    outcomes: int,
+    derivations: int,
+    successors: int,
+    no_successors: int,
+) -> None:
+    """Assert all three cardinalities and both semantic partitions."""
+
+    assert rules.cardinality_size(result.outcome_atom_cardinality) == outcomes
+    assert rules.cardinality_size(result.derivation_cardinality) == derivations
+    assert rules.cardinality_size(result.successor_cardinality) == successors
+    assert rules.cardinality_size(result.applied_atoms.cardinality) == outcomes
+    assert (
+        rules.cardinality_size(result.no_successor_partition.cardinality)
+        == no_successors
+    )
+    assert (
+        rules.cardinality_size(
+            result.successor_quotient_with_derivation_fibers.cardinality
+        )
+        == successors
+    )
+    assert len(result.applied_atoms.atoms) == outcomes
+    assert len(result.no_successor_partition.atoms) == no_successors
+    assert (
+        len(result.successor_quotient_with_derivation_fibers.atoms)
+        == successors
+    )
+    assert derivations + no_successors == outcomes
+
+
 def test_all_progress_continuation_and_no_successor_outcomes_remain_distinct() -> None:
     assert rules.Progress.ADVANCED is not rules.Progress.QUIESCENT
     assert isinstance(rules.Continue(), rules.Continue)
@@ -39,6 +72,120 @@ def test_all_progress_continuation_and_no_successor_outcomes_remain_distinct() -
     )
     assert {atom.outcome for atom in atoms} == set(rules.NoSuccessorOutcome)
     assert len({atom.canonical_identity for atom in atoms}) == 4
+
+
+def test_eventful_identity_is_one_applied_derivation_and_one_successor() -> None:
+    def eventful_identity(targets):
+        return (
+            derivation(
+                "eventful-identity",
+                existing=tuple(rules.preserve(target) for target in targets),
+                progress=rules.Progress.ADVANCED,
+                continuation=rules.Continue(),
+            ),
+        )
+
+    simple_program, source = finite_record_program(
+        (("cell", False),),
+        eventful_identity,
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    _assert_finite_application_shape(
+        result,
+        outcomes=1,
+        derivations=1,
+        successors=1,
+        no_successors=0,
+    )
+    source_atom = result.source_outcomes.support.atoms[0]
+    applied_atom = result.applied_atoms.atoms[0]
+    assert isinstance(source_atom, rules.Derivation)
+    assert source_atom.progress is rules.Progress.ADVANCED
+    assert isinstance(source_atom.continuation, rules.Continue)
+    assert isinstance(applied_atom, program.AppliedDerivation)
+    assert applied_atom.source == source_atom
+    assert loci.configuration_equal(applied_atom.successor, source)
+
+
+def test_empty_output_value_is_one_successor_not_an_empty_relation() -> None:
+    nonempty = alphabets.word_value(("A",), tag="symbols")
+    empty = alphabets.word_value((), tag="symbols")
+    word_alphabet = alphabets.word(alphabets.enum(("A", "B")))
+
+    def emit_empty(targets):
+        return (
+            derivation(
+                "emit-epsilon-word",
+                existing=tuple(
+                    rules.replace(target, empty) for target in targets
+                ),
+            ),
+        )
+
+    simple_program, source = finite_record_program(
+        (("word", nonempty),),
+        emit_empty,
+        alphabet=word_alphabet,
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    _assert_finite_application_shape(
+        result,
+        outcomes=1,
+        derivations=1,
+        successors=1,
+        no_successors=0,
+    )
+    group = result.successor_quotient_with_derivation_fibers.atoms[0]
+    assert isinstance(group.successor, loci.FiniteConfiguration)
+    assert tuple(value for _, value in group.successor.entries) == (empty,)
+    assert empty.items == ()
+
+
+@pytest.mark.parametrize(
+    "outcome",
+    tuple(rules.NoSuccessorOutcome),
+    ids=lambda outcome: outcome.value,
+)
+def test_each_no_successor_outcome_is_applied_with_zero_successors(
+    outcome: rules.NoSuccessorOutcome,
+) -> None:
+    def terminal_atom(_targets):
+        return (no_successor(f"applied-{outcome.value}", outcome),)
+
+    simple_program, source = finite_record_program(
+        (("cell", False),),
+        terminal_atom,
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    _assert_finite_application_shape(
+        result,
+        outcomes=1,
+        derivations=0,
+        successors=0,
+        no_successors=1,
+    )
+    source_atom = result.source_outcomes.support.atoms[0]
+    applied_atom = result.applied_atoms.atoms[0]
+    partition_atom = result.no_successor_partition.atoms[0]
+    assert isinstance(source_atom, rules.NoSuccessor)
+    assert isinstance(applied_atom, program.AppliedNoSuccessor)
+    assert partition_atom == applied_atom
+    assert applied_atom.source == source_atom
+    assert source_atom.outcome is outcome
+    assert source_atom.certificate.kind is (
+        rules.CertificateKind.DIVERGENCE
+        if outcome is rules.NoSuccessorOutcome.DIVERGENT
+        else rules.CertificateKind.TERMINALITY
+    )
 
 
 def test_outcome_derivation_and_successor_cardinalities_are_independent() -> None:

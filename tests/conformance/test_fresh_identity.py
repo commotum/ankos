@@ -1,5 +1,7 @@
 """CT07: deterministic fresh structural identities."""
 
+from concurrent.futures import ThreadPoolExecutor
+
 import pytest
 
 import ca
@@ -73,35 +75,141 @@ def test_distinct_authorized_local_keys_bind_distinct_identities() -> None:
 
 
 def test_binding_is_independent_of_traversal_workers_and_unrelated_allocations() -> None:
-    reference = loci.fresh_reference("children", 7)
-    expected = _binding(reference)
+    references = tuple(
+        loci.fresh_reference("children", index)
+        for index in range(12)
+    )
+    expected = tuple(_binding(reference) for reference in references)
 
     unrelated = tuple(
         _binding(loci.fresh_reference("other", index))
         for index in range(50)
     )
+    reverse = tuple(
+        reversed(
+            tuple(_binding(reference) for reference in reversed(references))
+        )
+    )
+    lazy = tuple(map(_binding, references))
+    with ThreadPoolExecutor(max_workers=1) as one_worker:
+        serial_worker = tuple(one_worker.map(_binding, references))
+    with ThreadPoolExecutor(max_workers=4) as four_workers:
+        parallel_worker = tuple(four_workers.map(_binding, references))
 
     assert len(set(unrelated)) == 50
-    assert _binding(reference) == expected
+    assert reverse == expected
+    assert lazy == expected
+    assert serial_worker == expected
+    assert parallel_worker == expected
 
 
-def test_unauthorized_namespace_parent_or_collision_rejects_without_commit() -> None:
-    source = loci.record_configuration((("parent", False),))
-    absent_parent = loci.named("absent", scope="record")
-    reference = loci.fresh_reference(
+def test_every_fresh_scope_input_contributes_to_the_bound_identity() -> None:
+    parent_a = loci.named("a", scope="record")
+    parent_b = loci.named("b", scope="record")
+    base = loci.fresh_reference(
         "children",
-        "child",
-        parent=absent_parent,
+        "local",
+        parent=parent_a,
+        interface_loci=(parent_a,),
     )
+
+    def bind(
+        reference: loci.FreshReference = base,
+        *,
+        input_identity: str = "configuration",
+        rule_identity: str = "rule",
+        witness_identity: str = "witness",
+    ) -> loci.Locus:
+        return loci.bind_fresh(
+            reference,
+            input_configuration_identity=input_identity,
+            canonical_rule_identity=rule_identity,
+            witness_identity=witness_identity,
+        )
+
+    variants = (
+        bind(),
+        bind(input_identity="other-configuration"),
+        bind(rule_identity="other-rule"),
+        bind(witness_identity="other-witness"),
+        bind(loci.fresh_reference("other-namespace", "local", parent=parent_a, interface_loci=(parent_a,))),
+        bind(loci.fresh_reference("children", "other-local", parent=parent_a, interface_loci=(parent_a,))),
+        bind(loci.fresh_reference("children", "local", parent=parent_b, interface_loci=(parent_a,))),
+        bind(loci.fresh_reference("children", "local", parent=parent_a, interface_loci=(parent_b,))),
+    )
+
+    assert len(set(variants)) == len(variants)
+
+
+@pytest.mark.parametrize(
+    ("reference", "namespace", "reason"),
+    (
+        (
+            loci.fresh_reference("wrong", "child"),
+            frontiers.FreshNamespace("children"),
+            "namespace",
+        ),
+        (
+            loci.fresh_reference(
+                "children",
+                "child",
+                parent=loci.named("absent", scope="record"),
+            ),
+            frontiers.FreshNamespace("children"),
+            "parent",
+        ),
+    ),
+)
+def test_unauthorized_namespace_or_parent_rejects_application_without_commit(
+    reference: loci.FreshReference,
+    namespace: frontiers.FreshNamespace,
+    reason: str,
+) -> None:
+    source = loci.record_configuration((("parent", False),))
     writable = frontiers.fresh(
         loci.literal(fresh=(reference,)),
-        namespace=frontiers.FreshNamespace("children"),
+        namespace=namespace,
         configuration_contract=source.contract,
         value_profile=alphabets.ValueProfile.BOOLEAN,
     )
-    with pytest.raises(frontiers.WritableResolutionError, match="parent"):
-        writable.resolve(source)
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    )
+    alphabet = alphabets.boolean()
+    atom = derivation(
+        f"invalid-{reason}",
+        existing=(),
+        fresh=(rules.create(reference, True),),
+    )
+    simple_program = ca.SimpleProgram(
+        seeds.exact(source),
+        alphabet,
+        writable,
+        readable,
+        rules.finite_rule(
+            (atom,),
+            contract=rule_contract(
+                source,
+                alphabet,
+                writable,
+                readable,
+            ),
+        ),
+    )
+    before = source.identity
 
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.FRONTIER
+    assert reason in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
+
+
+def test_duplicate_reference_is_rejected_before_application() -> None:
+    source = loci.record_configuration((("parent", False),))
     duplicate = loci.fresh_reference(
         "children",
         "same",
@@ -110,6 +218,23 @@ def test_unauthorized_namespace_parent_or_collision_rejects_without_commit() -> 
     with pytest.raises(ValueError, match="duplicate fresh"):
         loci.literal(fresh=(duplicate, duplicate))
     assert len(source.entries) == 1
+
+
+def test_fresh_collision_rejects_application_without_commit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    simple_program, source, _ = _fresh_program()
+    collided = loci.Locus(loci.LocusKind.FRESH, "collision", ("same",))
+    before = source.identity
+    monkeypatch.setattr(loci, "bind_fresh", lambda *args, **kwargs: collided)
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationRejected)
+    assert result.fault.phase is program.ApplicationPhase.FRESH_BINDING
+    assert "fresh bindings collide" in result.fault.reason
+    assert source.identity == before
+    assert not hasattr(result, "applied_atoms")
 
 
 def test_raw_bindings_remain_available_before_alpha_equivalence() -> None:

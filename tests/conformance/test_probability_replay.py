@@ -1,13 +1,22 @@
 """CT06: laws, exact submeasures, Seed realization, and replay."""
 
+from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
+import random
 
 import pytest
 
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
-from g7_fixtures import certificate, diamond_program, rule_contract
+from g7_fixtures import (
+    certificate,
+    derivation,
+    diamond_program,
+    finite_record_program,
+    no_successor,
+    rule_contract,
+)
 
 
 def test_rule_law_contains_no_draw_and_applied_mass_is_preserved() -> None:
@@ -30,6 +39,53 @@ def test_rule_law_contains_no_draw_and_applied_mass_is_preserved() -> None:
     assert isinstance(result.no_successor_submeasure, program.MeasureAvailable)
     assert result.no_successor_submeasure.measure.total_mass == 0
     assert not hasattr(law, "draw")
+
+
+def test_terminal_measurement_keeps_successor_and_no_successor_submeasures() -> None:
+    """PX09 measurement is a law over a stopped result and typed terminal."""
+
+    def measured_gate(targets):
+        return (
+            derivation(
+                "gate-open",
+                existing=tuple(rules.replace(target, True) for target in targets),
+                continuation=rules.Stop(
+                    rules.literal_expr("measurement-complete"),
+                    certificate(
+                        rules.CertificateKind.TERMINALITY,
+                        "measurement-complete",
+                    ),
+                ),
+            ),
+            no_successor(
+                "gate-closed",
+                rules.NoSuccessorOutcome.TERMINAL,
+            ),
+        )
+
+    simple_program, source = finite_record_program(
+        (("measured-gate", False),),
+        measured_gate,
+        probability=(Fraction(1, 4), Fraction(3, 4)),
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    assert rules.cardinality_size(result.outcome_atom_cardinality) == 2
+    assert rules.cardinality_size(result.derivation_cardinality) == 1
+    assert rules.cardinality_size(result.successor_cardinality) == 1
+    assert isinstance(result.applied_atom_measure, program.MeasureAvailable)
+    assert result.applied_atom_measure.measure.total_mass == 1
+    assert isinstance(result.successor_submeasure, program.MeasureAvailable)
+    assert result.successor_submeasure.measure.total_mass == Fraction(1, 4)
+    assert isinstance(result.no_successor_submeasure, program.MeasureAvailable)
+    assert result.no_successor_submeasure.measure.total_mass == Fraction(3, 4)
+    assert len(result.no_successor_partition.atoms) == 1
+    assert (
+        result.no_successor_partition.atoms[0].source.outcome
+        is rules.NoSuccessorOutcome.TERMINAL
+    )
 
 
 def test_replay_is_deterministic_and_lineage_bound() -> None:
@@ -61,6 +117,73 @@ def test_replay_is_deterministic_and_lineage_bound() -> None:
     assert draw.law_identity
     assert draw.subkey_identity
     assert draw.selected_witness_identity
+
+
+def test_replay_ignores_ambient_rng_unrelated_draws_and_worker_presentation() -> None:
+    simple_program, source = diamond_program()
+
+    expected = ca.rollout(
+        simple_program,
+        steps=1,
+        initial=source,
+        replay_key="stable-coordinate",
+    )
+    random.seed(918273)
+    _ = tuple(random.random() for _ in range(200))
+    for unrelated_key in ("other-a", "other-b", "other-c"):
+        ca.rollout(
+            simple_program,
+            steps=1,
+            initial=source,
+            replay_key=unrelated_key,
+        )
+    eager = [
+        ca.rollout(
+            simple_program,
+            steps=1,
+            initial=source,
+            replay_key="stable-coordinate",
+        )
+        for _ in range(3)
+    ]
+    lazy = tuple(
+        ca.rollout(
+            simple_program,
+            steps=1,
+            initial=source,
+            replay_key="stable-coordinate",
+        )
+        for _ in range(3)
+    )
+    with ThreadPoolExecutor(max_workers=1) as one_worker:
+        serial_worker = tuple(
+            one_worker.map(
+                lambda _: ca.rollout(
+                    simple_program,
+                    steps=1,
+                    initial=source,
+                    replay_key="stable-coordinate",
+                ),
+                range(3),
+            )
+        )
+    with ThreadPoolExecutor(max_workers=3) as three_workers:
+        parallel_workers = tuple(
+            three_workers.map(
+                lambda _: ca.rollout(
+                    simple_program,
+                    steps=1,
+                    initial=source,
+                    replay_key="stable-coordinate",
+                ),
+                reversed(range(3)),
+            )
+        )
+
+    assert all(item == expected for item in eager)
+    assert all(item == expected for item in lazy)
+    assert all(item == expected for item in serial_worker)
+    assert all(item == expected for item in parallel_workers)
 
 
 def test_seed_law_handles_no_key_keyed_realization_and_explicit_initial() -> None:
@@ -109,6 +232,47 @@ def test_seed_law_handles_no_key_keyed_realization_and_explicit_initial() -> Non
     assert isinstance(explicit, program.RolloutTruncated)
     assert explicit.raw_trace.roots.support.atoms == (initial,)
     assert explicit.raw_trace.seed_evidence.source_identity == "explicit-initial"
+
+
+def test_seed_law_is_immutable_across_keys_and_invalid_keys_fail_closed() -> None:
+    contract = loci.CarrierContract(
+        loci.CarrierKind.HISTORY,
+        rank=1,
+        shape=(3,),
+        axes=("history",),
+    )
+    seed = seeds.uniform_bits(length=3, configuration_contract=contract)
+    alphabet = alphabets.boolean()
+    writable = frontiers.everywhere(
+        configuration_contract=contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.dyadlags_0d(configuration_contract=contract)
+    simple_program = ca.SimpleProgram(
+        seed,
+        alphabet,
+        writable,
+        readable,
+        rules.dyadlags_0d(rule=6),
+    )
+    seed_identity = loci.canonical_identity(seed)
+
+    left = ca.rollout(simple_program, steps=0, replay_key="left-key")
+    right = ca.rollout(simple_program, steps=0, replay_key="right-key")
+    invalid = ca.rollout(
+        simple_program,
+        steps=0,
+        replay_key=object(),  # type: ignore[arg-type]
+    )
+
+    assert isinstance(left, program.RolloutTruncated)
+    assert isinstance(right, program.RolloutTruncated)
+    assert left.raw_trace.roots == right.raw_trace.roots
+    assert left.raw_trace.seed_evidence.denotation == right.raw_trace.seed_evidence.denotation
+    assert loci.canonical_identity(simple_program.seed) == seed_identity
+    assert isinstance(invalid, program.RolloutRejected)
+    assert invalid.fault.evidence == ("TypeError",)
+    assert not hasattr(invalid, "raw_trace")
 
 
 def test_unavailable_is_narrowly_limited_to_successor_quotient_measure() -> None:
