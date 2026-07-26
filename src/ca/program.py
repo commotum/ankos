@@ -1978,7 +1978,15 @@ def apply(
         )
 
     attempted.append(ApplicationPhase.RULE_DENOTATION)
-    rule_result = program.rule.denote(readable, cast(W, writable))
+    try:
+        rule_result = program.rule.denote(readable, cast(W, writable))
+    except (TypeError, ValueError) as error:
+        return _rejection(
+            ApplicationPhase.RULE_DENOTATION,
+            str(error),
+            attempted,
+            type(error).__name__,
+        )
     if isinstance(rule_result, rules.RuleRejected):
         fault_phase = (
             ApplicationPhase.RESULT_VALIDATION
