@@ -253,8 +253,12 @@ PRE_CUTOVER = PreCutoverSnapshot(
         "fe4f136f50cf1471268278b5f62a33492bad090808605a9a3f7c048aed81a4f2"
     ),
     public_manifest_algorithm=(
-        "ca.__all__ order; rows={name,module,kind,signature}; "
-        "inspect.signature; json(sort_keys=True,separators=(',',':')); utf-8"
+        "iterate ordered ca.__all__; obj=getattr(ca,name); "
+        "module=getattr(obj,'__module__',None); kind=type(obj).__name__; "
+        "signature=str(inspect.signature(obj)) with TypeError/ValueError -> None; "
+        "rows contain exactly name,module,kind,signature; "
+        "json.dumps(rows,sort_keys=True,separators=(',',':')).encode('utf-8'); "
+        "sha256 bytes with no trailing newline"
     ),
     root_exports=(
         "Alphabet",
@@ -1106,8 +1110,10 @@ MOBILE_CASE = OracleCase(
 # PX02 parallel substitution: A -> AB and B -> epsilon in one old-snapshot pass.
 SUB_OLD_A = _term("occurrence", "old", 0)
 SUB_OLD_B = _term("occurrence", "old", 1)
-SUB_NEW_A = _term("fresh-child", "old:0", 0)
-SUB_NEW_B = _term("fresh-child", "old:0", 1)
+SUB_NEW_A_SLOT = _term("fresh-slot", "offspring", SUB_OLD_A, 0)
+SUB_NEW_B_SLOT = _term("fresh-slot", "offspring", SUB_OLD_A, 1)
+SUB_NEW_A = _term("fresh-id", "px02.parallel-substitution", "old:0", 0)
+SUB_NEW_B = _term("fresh-id", "px02.parallel-substitution", "old:0", 1)
 SUB_SOURCE = _term(
     "word",
     _term("symbol", SUB_OLD_A, "A"),
@@ -1128,15 +1134,19 @@ SUB_ATOM = OracleSourceAtom(
     dispositions=(
         _disposition(SUB_OLD_A, "delete"),
         _disposition(SUB_OLD_B, "delete"),
-        _disposition(SUB_NEW_A, "create", _term("symbol-value", "A")),
-        _disposition(SUB_NEW_B, "create", _term("symbol-value", "B")),
+        _disposition(SUB_NEW_A_SLOT, "create", _term("symbol-value", "A")),
+        _disposition(SUB_NEW_B_SLOT, "create", _term("symbol-value", "B")),
     ),
     reason=None,
-    certificate=_term("ordered-offspring-certificate", SUB_NEW_A, SUB_NEW_B),
+    certificate=_term(
+        "ordered-offspring-certificate",
+        SUB_NEW_A_SLOT,
+        SUB_NEW_B_SLOT,
+    ),
 )
 SUB_FRESH_BINDINGS = (
     OracleFreshBinding(
-        local_key=_term("offspring-key", SUB_OLD_A, 0),
+        local_key=SUB_NEW_A_SLOT,
         identity=SUB_NEW_A,
         evidence=_term(
             "fresh-recipe",
@@ -1148,7 +1158,7 @@ SUB_FRESH_BINDINGS = (
         ),
     ),
     OracleFreshBinding(
-        local_key=_term("offspring-key", SUB_OLD_A, 1),
+        local_key=SUB_NEW_B_SLOT,
         identity=SUB_NEW_B,
         evidence=_term(
             "fresh-recipe",
@@ -1166,7 +1176,7 @@ SUBSTITUTION_CASE = OracleCase(
     conformance_refs=("PX02:F038", "CT12"),
     current_native=False,
     source=SUB_SOURCE,
-    writable=(SUB_OLD_A, SUB_OLD_B, SUB_NEW_A, SUB_NEW_B),
+    writable=(SUB_OLD_A, SUB_OLD_B, SUB_NEW_A_SLOT, SUB_NEW_B_SLOT),
     readable=_term("old-generation-items", SUB_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
@@ -1470,29 +1480,48 @@ GRAPH_ATOM = OracleSourceAtom(
         _disposition(GRAPH_B, "delete"),
         _disposition(GRAPH_AB, "delete"),
         _disposition(GRAPH_BC, "delete"),
-        _disposition(GRAPH_X_SLOT, "create", GRAPH_X),
-        _disposition(GRAPH_Y_SLOT, "create", GRAPH_Y),
+        _disposition(GRAPH_X_SLOT, "create", _term("node-value", "x")),
+        _disposition(GRAPH_Y_SLOT, "create", _term("node-value", "y")),
         _disposition(
             GRAPH_AX_SLOT,
             "create",
-            _term("edge-record", GRAPH_AX, "a", GRAPH_X),
+            _term(
+                "edge-value",
+                _term("existing-ref", "a"),
+                _term("fresh-ref", GRAPH_X_SLOT),
+            ),
         ),
         _disposition(
             GRAPH_XY_SLOT,
             "create",
-            _term("edge-record", GRAPH_XY, GRAPH_X, GRAPH_Y),
+            _term(
+                "edge-value",
+                _term("fresh-ref", GRAPH_X_SLOT),
+                _term("fresh-ref", GRAPH_Y_SLOT),
+            ),
         ),
         _disposition(
             GRAPH_YC_SLOT,
             "create",
-            _term("edge-record", GRAPH_YC, GRAPH_Y, "c"),
+            _term(
+                "edge-value",
+                _term("fresh-ref", GRAPH_Y_SLOT),
+                _term("existing-ref", "c"),
+            ),
         ),
     ),
     reason=None,
     certificate=_term(
         "interface-certificate",
         _term("external", "a", "c"),
-        _term("fresh", GRAPH_X, GRAPH_Y, GRAPH_AX, GRAPH_XY, GRAPH_YC),
+        _term(
+            "authorized-fresh-slots",
+            GRAPH_X_SLOT,
+            GRAPH_Y_SLOT,
+            GRAPH_AX_SLOT,
+            GRAPH_XY_SLOT,
+            GRAPH_YC_SLOT,
+        ),
     ),
 )
 GRAPH_FRESH_BINDINGS = (
@@ -1842,15 +1871,56 @@ FLOW_CASE = OracleCase(
 
 # PX04/PX05 intensional differential relation: every exact constant field.
 FIELD_U = _term("field-capability", "u")
-DIFFERENTIAL_RELATION = _term(
-    "intensional-relation",
+DIFFERENTIAL_SOURCE_RELATION = _term(
+    "intensional-source-outcome-relation",
     _term("binder", "c"),
     _term("domain", "exact-real"),
     _term(
-        "derivation-template",
-        _term("replace", FIELD_U, _term("constant-field", "c")),
+        "source-derivation-template",
+        _term("atom-id", _term("parameterized", "constant-field", "c")),
+        _term(
+            "total-disposition",
+            _term("replace", FIELD_U, _term("constant-field", "c")),
+        ),
         _term("witness", _term("derivative", "u", "x"), 0),
         _term("stop", "completed"),
+    ),
+)
+DIFFERENTIAL_APPLIED_RELATION = _term(
+    "intensional-applied-atom-relation",
+    _term("binder", "c"),
+    _term("domain", "exact-real"),
+    _term(
+        "applied-derivation-template",
+        _term("source-atom-id", _term("parameterized", "constant-field", "c")),
+        _term(
+            "successor",
+            _term(
+                "field-state",
+                _term("domain", _term("closed-interval", 0, 1)),
+                _term("field", "u", _term("constant-field", "c")),
+            ),
+        ),
+        _term("fresh-bindings", "empty"),
+        _term("output-lineage", "px05.constant-field-intensional", "c"),
+        _term("application-evidence", "exact-differential-proof", "c"),
+    ),
+)
+DIFFERENTIAL_SUCCESSOR_RELATION = _term(
+    "intensional-successor-quotient-relation",
+    _term("binder", "c"),
+    _term("domain", "exact-real"),
+    _term(
+        "successor-group-template",
+        _term(
+            "field-state",
+            _term("domain", _term("closed-interval", 0, 1)),
+            _term("field", "u", _term("constant-field", "c")),
+        ),
+        _term(
+            "derivation-fiber",
+            _term("applied-atom-id", _term("parameterized", "constant-field", "c")),
+        ),
     ),
 )
 DIFFERENTIAL_CASE = OracleCase(
@@ -1872,17 +1942,17 @@ DIFFERENTIAL_CASE = OracleCase(
     ),
     expected=OracleExpected(
         support_kind="intensional",
-        atoms=(),
-        source_outcome_atom_ids=(),
-        applied_atom_ids=(),
-        no_successor_atom_ids=(),
+        source_outcomes=(),
+        applied_atoms=(),
+        no_successor_partition=(),
         outcome_cardinality=UNCOUNTABLE,
         derivation_cardinality=UNCOUNTABLE,
         successor_cardinality=UNCOUNTABLE,
         successor_fibers=(),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=DIFFERENTIAL_RELATION,
+        source_intensional_relation=DIFFERENTIAL_SOURCE_RELATION,
+        applied_intensional_relation=DIFFERENTIAL_APPLIED_RELATION,
+        successor_intensional_relation=DIFFERENTIAL_SUCCESSOR_RELATION,
         evidence=_term(
             "application-evidence",
             "px05.constant-field-intensional",
@@ -1956,6 +2026,14 @@ def _assert_term_is_closed(term: OracleTerm) -> None:
         else:
             assert isinstance(argument, (bool, int, Fraction, str)) or argument is None
             assert not isinstance(argument, float)
+
+
+def _term_contains_tag(term: OracleTerm, tag: str) -> bool:
+    return term.tag == tag or any(
+        _term_contains_tag(argument, tag)
+        for argument in term.arguments
+        if isinstance(argument, OracleTerm)
+    )
 
 
 def test_pre_cutover_snapshot_is_exact_and_complete() -> None:
@@ -2117,28 +2195,56 @@ def test_finite_oracles_have_total_dispositions_cardinalities_and_fibers() -> No
         if expected.support_kind != "finite":
             continue
 
-        assert expected.intensional_relation is None
+        assert expected.source_intensional_relation is None
+        assert expected.applied_intensional_relation is None
+        assert expected.successor_intensional_relation is None
         assert expected.outcome_cardinality == OracleCardinality(
             "exact",
-            len(expected.atoms),
+            len(expected.source_outcomes),
         )
 
-        atom_ids = [atom.atom_id for atom in expected.atoms]
-        assert len(atom_ids) == len(set(atom_ids))
-        assert expected.source_outcome_atom_ids == tuple(atom_ids)
-        assert expected.applied_atom_ids == tuple(atom_ids)
-        derivations = [atom for atom in expected.atoms if atom.kind == "derivation"]
-        no_successors = [
-            atom for atom in expected.atoms if atom.kind == "no-successor"
-        ]
-        assert expected.no_successor_atom_ids == tuple(
-            atom.atom_id for atom in no_successors
+        source_by_id = {
+            atom.atom_id: atom for atom in expected.source_outcomes
+        }
+        assert len(source_by_id) == len(expected.source_outcomes)
+        applied_by_id = {
+            atom.atom_id: atom for atom in expected.applied_atoms
+        }
+        assert len(applied_by_id) == len(expected.applied_atoms)
+        assert set(applied_by_id) == set(source_by_id)
+        assert all(
+            atom.source_atom_id in source_by_id
+            for atom in expected.applied_atoms
         )
-        successors = {atom.successor for atom in derivations}
+
+        source_derivations = [
+            atom
+            for atom in expected.source_outcomes
+            if atom.kind == "derivation"
+        ]
+        source_no_successors = [
+            atom
+            for atom in expected.source_outcomes
+            if atom.kind == "no-successor"
+        ]
+        applied_derivations = [
+            atom
+            for atom in expected.applied_atoms
+            if source_by_id[atom.source_atom_id].kind == "derivation"
+        ]
+        applied_no_successors = [
+            atom
+            for atom in expected.applied_atoms
+            if source_by_id[atom.source_atom_id].kind == "no-successor"
+        ]
+        assert expected.no_successor_partition == tuple(
+            applied_no_successors
+        )
+        successors = {atom.successor for atom in applied_derivations}
         assert None not in successors
         assert expected.derivation_cardinality == OracleCardinality(
             "exact",
-            len(derivations),
+            len(applied_derivations),
         )
         assert expected.successor_cardinality == OracleCardinality(
             "exact",
@@ -2149,12 +2255,13 @@ def test_finite_oracles_have_total_dispositions_cardinalities_and_fibers() -> No
         for fiber in expected.successor_fibers:
             assert fiber.successor in successors
             fiber_atom_ids.extend(fiber.atom_ids)
-        assert sorted(fiber_atom_ids) == sorted(atom.atom_id for atom in derivations)
+        assert sorted(fiber_atom_ids) == sorted(
+            atom.atom_id for atom in applied_derivations
+        )
 
-        for atom in derivations:
+        for atom in source_derivations:
             assert atom.progress is not None
             assert atom.continuation is not None
-            assert atom.successor is not None
             assert atom.reason is None
             assert set(disposition.target for disposition in atom.dispositions) == set(
                 case.writable
@@ -2169,28 +2276,54 @@ def test_finite_oracles_have_total_dispositions_cardinalities_and_fibers() -> No
                 else:
                     assert item.value is None
 
-        for atom in no_successors:
+        for atom in source_no_successors:
             assert atom.progress is None
             assert atom.continuation is None
             assert atom.dispositions == ()
-            assert atom.successor is None
             assert atom.reason is not None
 
-        for atom in expected.atoms:
+        for atom in expected.source_outcomes:
             assert atom.provenance
-            assert atom.lineage.tag == "lineage"
             _assert_term_is_closed(atom.witness)
-            _assert_term_is_closed(atom.lineage)
             _assert_term_is_closed(atom.certificate)
+            assert not _term_contains_tag(atom.certificate, "fresh-id")
+            for disposition in atom.dispositions:
+                if isinstance(disposition.value, OracleTerm):
+                    assert not _term_contains_tag(disposition.value, "fresh-id")
 
-        fresh_local_keys = [binding.local_key for binding in expected.fresh_bindings]
-        fresh_identities = [binding.identity for binding in expected.fresh_bindings]
-        assert len(fresh_local_keys) == len(set(fresh_local_keys))
-        assert len(fresh_identities) == len(set(fresh_identities))
-        for binding in expected.fresh_bindings:
-            _assert_term_is_closed(binding.local_key)
-            _assert_term_is_closed(binding.identity)
-            _assert_term_is_closed(binding.evidence)
+        all_fresh_identities: list[OracleTerm] = []
+        for atom in expected.applied_atoms:
+            source_atom = source_by_id[atom.source_atom_id]
+            assert atom.atom_id == atom.source_atom_id
+            assert atom.output_trace_lineage.tag == "lineage"
+            _assert_term_is_closed(atom.output_trace_lineage)
+            _assert_term_is_closed(atom.evidence)
+            if source_atom.kind == "derivation":
+                assert atom.successor is not None
+            else:
+                assert atom.successor is None
+                assert atom.fresh_bindings == ()
+
+            fresh_local_keys = [
+                binding.local_key for binding in atom.fresh_bindings
+            ]
+            fresh_identities = [
+                binding.identity for binding in atom.fresh_bindings
+            ]
+            assert len(fresh_local_keys) == len(set(fresh_local_keys))
+            assert len(fresh_identities) == len(set(fresh_identities))
+            assert set(fresh_local_keys) == {
+                disposition.target
+                for disposition in source_atom.dispositions
+                if disposition.action == "create"
+            }
+            all_fresh_identities.extend(fresh_identities)
+            for binding in atom.fresh_bindings:
+                assert binding.local_key in case.writable
+                _assert_term_is_closed(binding.local_key)
+                _assert_term_is_closed(binding.identity)
+                _assert_term_is_closed(binding.evidence)
+        assert len(all_fresh_identities) == len(set(all_fresh_identities))
 
         for measure in (
             expected.measures.applied_atoms,
@@ -2251,7 +2384,7 @@ def test_constraint_oracles_distinguish_zero_one_and_many() -> None:
 
 def test_stochastic_oracle_uses_exact_unrenormalized_submeasures() -> None:
     expected = STOCHASTIC_CASE.expected
-    masses = tuple(atom.mass for atom in expected.atoms)
+    masses = tuple(atom.mass for atom in expected.source_outcomes)
     assert masses == (Fraction(1, 2), Fraction(1, 4), Fraction(1, 4))
     assert sum(mass for mass in masses if mass is not None) == Fraction(1, 1)
     assert expected.measures.applied_atoms.total_mass == Fraction(1, 1)
@@ -2269,7 +2402,7 @@ def test_exact_differential_oracle_stops_with_the_maximal_solution_ast() -> None
     assert expected.support_kind == "finite"
     assert expected.outcome_cardinality == EXACT_ONE
     assert FLOW_ATOM.continuation == _term("stop", "completed")
-    assert FLOW_ATOM.successor == FLOW_SUCCESSOR
+    assert expected.applied_atoms[0].successor == FLOW_SUCCESSOR
     assert FLOW_CASE.readable.arguments[-1] == _term(
         "duration-or-event-selector",
         "none",
@@ -2279,14 +2412,23 @@ def test_exact_differential_oracle_stops_with_the_maximal_solution_ast() -> None
 def test_intensional_oracle_is_closed_relation_data_without_a_solver() -> None:
     expected = DIFFERENTIAL_CASE.expected
     assert expected.support_kind == "intensional"
-    assert expected.atoms == ()
+    assert expected.source_outcomes == ()
+    assert expected.applied_atoms == ()
+    assert expected.no_successor_partition == ()
     assert expected.outcome_cardinality == UNCOUNTABLE
     assert expected.derivation_cardinality == UNCOUNTABLE
     assert expected.successor_cardinality == UNCOUNTABLE
-    assert expected.source_outcome_atom_ids == ()
-    assert expected.applied_atom_ids == ()
-    assert expected.no_successor_atom_ids == ()
     assert expected.measures == ABSENT_MEASURES
-    assert expected.intensional_relation == DIFFERENTIAL_RELATION
-    assert expected.intensional_relation.tag == "intensional-relation"
-    _assert_term_is_closed(expected.intensional_relation)
+    assert expected.source_intensional_relation == DIFFERENTIAL_SOURCE_RELATION
+    assert expected.applied_intensional_relation == DIFFERENTIAL_APPLIED_RELATION
+    assert (
+        expected.successor_intensional_relation
+        == DIFFERENTIAL_SUCCESSOR_RELATION
+    )
+    for relation in (
+        expected.source_intensional_relation,
+        expected.applied_intensional_relation,
+        expected.successor_intensional_relation,
+    ):
+        assert relation is not None
+        _assert_term_is_closed(relation)
