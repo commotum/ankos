@@ -2284,7 +2284,10 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             targets[f"symbol{index}"]
             for index in range(len(symbols))
         )
-        read_targets = (*symbol_targets, targets["cursor"])
+        read_targets = (
+            *symbol_targets,
+            targets["cursor"],
+        )
         writes = (
             *tuple(
                 (
@@ -2313,13 +2316,79 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             for index in range(len(symbols) - 1)
         )
         rule_condition = _all_conditions(
+            *(
+                rules.equal(
+                    rules.observation(index),
+                    rules.literal_expr(symbol),
+                )
+                for index, symbol in enumerate(symbols)
+            ),
             *boundary_conditions,
             rules.equal(
                 rules.observation(len(symbols)),
                 rules.literal_expr(0),
             ),
         )
-        additional_future_values = run_values
+        if case_index == 0:
+            writable_targets = tuple(target for target, _ in writes)
+            aaa_record = _run_record("A", 3)
+            custom_clauses = (
+                _clause(
+                    rule_condition,
+                    _derivation_result(
+                        row.fixture,
+                        existing=_total_existing_plans(
+                            writable_targets,
+                            tuple(writes),
+                        ),
+                        stop=True,
+                    ),
+                ),
+                _clause(
+                    _all_conditions(
+                        rules.equal(
+                            rules.observation(0),
+                            rules.observation(1),
+                        ),
+                        rules.equal(
+                            rules.observation(1),
+                            rules.observation(2),
+                        ),
+                        rules.equal(
+                            rules.observation(3),
+                            rules.literal_expr("<end>"),
+                        ),
+                        rules.equal(
+                            rules.observation(4),
+                            rules.literal_expr("<end>"),
+                        ),
+                        rules.equal(
+                            rules.observation(5),
+                            rules.literal_expr(0),
+                        ),
+                    ),
+                    _derivation_result(
+                        f"{row.fixture}:AAA",
+                        existing=_total_existing_plans(
+                            writable_targets,
+                            (
+                                (
+                                    targets["run0"],
+                                    rules.literal_expr(aaa_record),
+                                ),
+                                (
+                                    targets["cursor"],
+                                    rules.literal_expr("done"),
+                                ),
+                            ),
+                        ),
+                        stop=True,
+                    ),
+                ),
+            )
+            additional_future_values = (*run_values, aaa_record, "<end>")
+        else:
+            additional_future_values = run_values
     elif row.spf == "SPF054":
         native = _codec_word("prefix-block", "A")
         encoded = _codec_word("prefix-bits", 0)
@@ -2392,13 +2461,8 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             alternate_encoded,
             case_index,
         )
-        selected_low, selected_high = (
-            (Fraction(1, 4), Fraction(1, 2))
-            if case_index == 0
-            else (Fraction(0), Fraction(1, 4))
-        )
-        message = loci.field_point("codec", (0,), component="message")
-        current_symbol = loci.field_point("codec", (0,), component="symbol")
+        symbol0 = loci.field_point("codec", (0,), component="symbol-0")
+        symbol1 = loci.field_point("codec", (0,), component="symbol-1")
         partition = loci.field_point("codec", (0,), component="partition")
         low = loci.field_point("codec", (0,), component="low")
         high = loci.field_point("codec", (0,), component="high")
@@ -2420,8 +2484,8 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
         source = _structural_configuration(
             loci.CarrierKind.FIELD,
             (
-                (message, selected_native),
-                (current_symbol, "A"),
+                (symbol0, "A"),
+                (symbol1, second_symbol),
                 (partition, partition_value),
                 (low, Fraction(0)),
                 (high, Fraction(1)),
@@ -2430,9 +2494,8 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             rank=1,
             axes=("x",),
         )
-        read_targets = (current_symbol, partition, low, high, cursor)
+        read_targets = (symbol0, symbol1, partition, low, high, cursor)
         writes = (
-            (current_symbol, rules.literal_expr(second_symbol)),
             (low, rules.literal_expr(Fraction(0))),
             (high, rules.literal_expr(Fraction(1, 2))),
             (cursor, rules.literal_expr(1)),
@@ -3096,7 +3159,7 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
     if custom_clauses is not None:
         clauses = custom_clauses
     elif row.spf == "SPF055":
-        current_symbol, low, high, cursor = write_targets
+        low, high, cursor = write_targets
         clauses = (
             _clause(
                 _all_conditions(
@@ -3105,19 +3168,19 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
                         rules.literal_expr("A"),
                     ),
                     rules.equal(
-                        rules.observation(1),
+                        rules.observation(2),
                         rules.literal_expr(partition_value),
                     ),
                     rules.equal(
-                        rules.observation(2),
+                        rules.observation(3),
                         rules.literal_expr(Fraction(0)),
                     ),
                     rules.equal(
-                        rules.observation(3),
+                        rules.observation(4),
                         rules.literal_expr(Fraction(1)),
                     ),
                     rules.equal(
-                        rules.observation(4),
+                        rules.observation(5),
                         rules.literal_expr(0),
                     ),
                 ),
@@ -3129,23 +3192,23 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
             _clause(
                 _all_conditions(
                     rules.equal(
-                        rules.observation(0),
+                        rules.observation(1),
                         rules.literal_expr(second_symbol),
                     ),
                     rules.equal(
-                        rules.observation(1),
+                        rules.observation(2),
                         rules.literal_expr(partition_value),
                     ),
                     rules.equal(
-                        rules.observation(2),
+                        rules.observation(3),
                         rules.literal_expr(Fraction(0)),
                     ),
                     rules.equal(
-                        rules.observation(3),
+                        rules.observation(4),
                         rules.literal_expr(Fraction(1, 2)),
                     ),
                     rules.equal(
-                        rules.observation(4),
+                        rules.observation(5),
                         rules.literal_expr(1),
                     ),
                 ),
@@ -3153,15 +3216,11 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
                     f"{row.fixture}:second-symbol",
                     existing=(
                         _existing_target_plan(
-                            current_symbol,
-                            rules.DispositionAction.PRESERVE,
-                        ),
-                        _existing_target_plan(
                             low,
                             rules.DispositionAction.REPLACE,
                             rules.conditional(
                                 rules.equal(
-                                    rules.observation(0),
+                                    rules.observation(1),
                                     rules.literal_expr("B"),
                                 ),
                                 rules.literal_expr(Fraction(1, 4)),
@@ -3173,7 +3232,7 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
                             rules.DispositionAction.REPLACE,
                             rules.conditional(
                                 rules.equal(
-                                    rules.observation(0),
+                                    rules.observation(1),
                                     rules.literal_expr("B"),
                                 ),
                                 rules.literal_expr(Fraction(1, 2)),
@@ -3266,68 +3325,27 @@ def _px10(row: MechanicsRow, *, case_index: int = 0) -> MechanicsRun:
 def _spf012_maximal_run_secondary(row: MechanicsRow) -> MechanicsRun:
     """Execute the audited AAA -> self-delimiting (A, 3) stopped case."""
 
+    primary = _px10(row, case_index=0)
     unset = _codec_record("unset", status="unset")
-    record = _run_record("A", 3)
     source = _record_configuration(
         (
             ("symbol0", "A"),
             ("symbol1", "A"),
             ("symbol2", "A"),
+            ("symbol3", "<end>"),
+            ("symbol4", "<end>"),
             ("run0", unset),
+            ("run1", unset),
             ("cursor", 0),
         )
     )
-    targets = _record_targets(source)
-    read_targets = (
-        targets["symbol0"],
-        targets["symbol1"],
-        targets["symbol2"],
-        targets["cursor"],
+    result = ca.apply(primary.simple_program, source)
+    return MechanicsRun(
+        row=row,
+        simple_program=primary.simple_program,
+        source=source,
+        result=result,
     )
-    writes = (
-        (targets["run0"], rules.literal_expr(record)),
-        (targets["cursor"], rules.literal_expr("done")),
-    )
-    alphabet = _closed_enum(
-        tuple(value for _, value in source.entries) + (record, "done")
-    )
-    writable, readable = _literal_regions(
-        source,
-        alphabet,
-        write_targets=tuple(target for target, _ in writes),
-        read_targets=read_targets,
-    )
-    rule = _kernel(
-        source,
-        alphabet,
-        writable,
-        readable,
-        (
-            _clause(
-                _all_conditions(
-                    rules.equal(rules.observation(0), rules.observation(1)),
-                    rules.equal(rules.observation(1), rules.observation(2)),
-                    rules.equal(
-                        rules.observation(3),
-                        rules.literal_expr(0),
-                    ),
-                ),
-                _derivation_result(
-                    f"{row.fixture}:AAA",
-                    existing=tuple(
-                        _existing_target_plan(
-                            target,
-                            rules.DispositionAction.REPLACE,
-                            value,
-                        )
-                        for target, value in writes
-                    ),
-                    stop=True,
-                ),
-            ),
-        ),
-    )
-    return _assemble(row, source, alphabet, writable, readable, rule)
 
 
 def _px11(row: MechanicsRow) -> MechanicsRun:
@@ -3955,8 +3973,14 @@ def _materialized_px10_source(
     if spf == "SPF054":
         return values[0]
     if spf == "SPF055":
-        return execution.source.value_at(
-            loci.field_point("codec", (0,), component="message")
+        return _codec_word(
+            "message",
+            execution.source.value_at(
+                loci.field_point("codec", (0,), component="symbol-0")
+            ),
+            execution.source.value_at(
+                loci.field_point("codec", (0,), component="symbol-1")
+            ),
         )
     if spf == "SPF056":
         count = 4 if execution.representation_case_index == 0 else 3
@@ -5084,12 +5108,20 @@ def assert_mechanics_run(
                 source_values[f"symbol{index}"]
                 for index in range(3)
             ) == ("A", "A", "A")
+            assert (source_values["symbol3"], source_values["symbol4"]) == (
+                "<end>",
+                "<end>",
+            )
             output_values = _record_values(successors[0])
             record = output_values["run0"]
             assert type(record) is alphabets.ValueNode
             assert record.kind is alphabets.ValueKind.RECORD
             assert record.tag == "run-record"
             assert dict(record.fields) == {"symbol": "A", "length": 3}
+            assert output_values["run1"] == _codec_record(
+                "unset",
+                status="unset",
+            )
             assert output_values["cursor"] == "done"
         return
 
@@ -5125,7 +5157,7 @@ def assert_mechanics_run(
         expected_shapes = {
             "SPF012": (loci.CarrierKind.RECORD, 6, 3),
             "SPF054": (loci.CarrierKind.TREE, 3, 2),
-            "SPF055": (loci.CarrierKind.FIELD, 5, 4),
+            "SPF055": (loci.CarrierKind.FIELD, 6, 3),
             "SPF056": (loci.CarrierKind.HISTORY, 9, 14),
             "SPF057": (loci.CarrierKind.GRID, 4, 2),
             "SPF058": (loci.CarrierKind.PRODUCT, 9, 3),
@@ -5299,7 +5331,7 @@ def assert_mechanics_run(
             )
             assert (
                 execution.trajectory[1][0].value_at(
-                    loci.field_point("codec", (0,), component="symbol")
+                    loci.field_point("codec", (0,), component="symbol-1")
                 )
                 == ("B" if execution.representation_case_index == 0 else "A")
             )
@@ -5373,6 +5405,22 @@ def assert_mechanics_run(
                 is alphabets.ValueNode
                 for binding in derivation.fresh_bindings
             )
+        if row.spf == "SPF057" and execution.representation_case_index == 0:
+            assert type(materialized_target) is alphabets.ValueNode
+            assert materialized_target.tag == "region-leaf"
+            assert dict(materialized_target.fields) == {
+                "bounds": "2x2",
+                "value": 1,
+            }
+            assert tuple(
+                execution.source.value_at(target)
+                for target in (
+                    loci.cell((-1, -1), axes=("x", "y")),
+                    loci.cell((-1, 0), axes=("x", "y")),
+                    loci.cell((0, -1), axes=("x", "y")),
+                    loci.cell((0, 0), axes=("x", "y")),
+                )
+            ) == (1, 1, 1, 1)
         if row.spf == "SPF058":
             base = loci.named("basis-workspace", scope="product")
             assert tuple(
@@ -5477,6 +5525,13 @@ def assert_mechanics_run(
                 )
                 == 3
             )
+        denotation = execution.simple_program.rule.descriptor.denotation
+        assert type(denotation) is rules.ClauseKernelDenotation
+        assert denotation.clauses
+        assert all(
+            clause.condition.primitive is rules.ExpressionPrimitive.GATE
+            for clause in denotation.clauses
+        )
         return
 
     if pressure == "PX09":
