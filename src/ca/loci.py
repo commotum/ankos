@@ -1439,7 +1439,10 @@ class FiniteConfiguration(Generic[V]):
         ):
             _validate_bound_fresh_identity_targets(targets)
         ordered = tuple(
-            sorted(self.entries, key=lambda item: canonical_order_key(item[0]))
+            sorted(
+                self.entries,
+                key=lambda item: configuration_order_key(self, item[0]),
+            )
         )
         if ordered != self.entries:
             object.__setattr__(self, "entries", ordered)
@@ -1611,7 +1614,15 @@ def resolve_region(
                 if target not in seen:
                     seen.add(target)
                     out.append(target)
-        return tuple(sorted(out, key=canonical_order_key))
+        return tuple(
+            sorted(
+                out,
+                key=lambda target: configuration_order_key(
+                    configuration,
+                    target,
+                ),
+            )
+        )
     if region.kind is RegionKind.INTERSECTION:
         resolved_parts = tuple(
             resolve_region(part, configuration) for part in region.parts
@@ -1619,7 +1630,15 @@ def resolve_region(
         common = set(resolved_parts[0])
         for resolved in resolved_parts[1:]:
             common.intersection_update(resolved)
-        return tuple(sorted(common, key=canonical_order_key))
+        return tuple(
+            sorted(
+                common,
+                key=lambda target: configuration_order_key(
+                    configuration,
+                    target,
+                ),
+            )
+        )
     if region.kind is RegionKind.DIFFERENCE:
         base = resolve_region(region.parts[0], configuration)
         excluded = set(resolve_region(region.parts[1], configuration))
@@ -1734,7 +1753,15 @@ def resolve_fresh_references(
             raise LociResolutionError(
                 "dynamic fresh templates resolve duplicate references"
             )
-        return tuple(sorted(out, key=canonical_order_key))
+        return tuple(
+            sorted(
+                out,
+                key=lambda reference: configuration_order_key(
+                    configuration,
+                    reference,
+                ),
+            )
+        )
     if region.kind in (RegionKind.UNION, RegionKind.PRODUCT):
         out: list[FreshReference] = []
         for part in region.parts:
@@ -1750,7 +1777,17 @@ def resolve_fresh_references(
         common = set(resolved_parts[0])
         for resolved in resolved_parts[1:]:
             common.intersection_update(resolved)
-        return tuple(sorted(common, key=canonical_order_key))
+        if configuration is None:
+            return tuple(sorted(common, key=canonical_order_key))
+        return tuple(
+            sorted(
+                common,
+                key=lambda reference: configuration_order_key(
+                    configuration,
+                    reference,
+                ),
+            )
+        )
     if region.kind is RegionKind.DIFFERENCE:
         base = resolve_fresh_references(region.parts[0], configuration)
         excluded = set(
@@ -1996,7 +2033,15 @@ def _resolve_matched_interface(
             )
             if expected in interface_candidates:
                 selected.add(expected)
-    return tuple(sorted(selected, key=canonical_order_key))
+    return tuple(
+        sorted(
+            selected,
+            key=lambda target: configuration_order_key(
+                configuration,
+                target,
+            ),
+        )
+    )
 
 
 def _resolve_dynamic_address(
@@ -2021,7 +2066,15 @@ def _resolve_dynamic_address(
         value = configuration.value_at(source)
         if type(value) is Locus and configuration.contains(value):
             selected.add(value)
-    return tuple(sorted(selected, key=canonical_order_key))
+    return tuple(
+        sorted(
+            selected,
+            key=lambda target: configuration_order_key(
+                configuration,
+                target,
+            ),
+        )
+    )
 
 
 def _reachable_loci(
@@ -2307,6 +2360,20 @@ def canonical_order_key(
         (0, value.scope),
         *(_scalar_order_part(part) for part in value.path),
     )
+
+
+def configuration_order_key(
+    configuration: FiniteConfiguration[object] | IntensionalConfiguration,
+    value: Locus | FreshReference,
+) -> tuple[OrderPart, ...]:
+    """Order identities according to the configuration's declared law."""
+
+    if (
+        configuration.contract.identity_law
+        is ConfigurationIdentityLaw.BOUND_FRESH_ALPHA
+    ):
+        return ((0, _alpha_term(value)),)
+    return canonical_order_key(value)
 
 
 def _scalar_order_part(value: ClosedScalar) -> OrderPart:
