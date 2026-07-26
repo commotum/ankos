@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-00 COMPLETE**
+Status: **IN PROGRESS — G7-01 COMPLETE**
 
 ## Big-Picture Objective
 
@@ -70,24 +70,34 @@ conflict, and reconcile the plan before changing runtime behavior.
   `1562041e4dab0a6d9e51d730222de0a4f1b52038`.
 - The clean Goal 7 scaffold and actual execution-start commit is
   `95ba134ee8f9671181c237cd2975004f3442efbe`.
-- At that baseline, `uv run pytest -q tests` reports
-  `102 passed, 96 skipped`.
-- The 96 skipped tests are Goal 7 obligation shells. A skip is not evidence
-  that any corresponding contract works.
-- `src/ca` currently has 30 tracked paths. The final handoff target has 28:
-  the ten target semantic/catalog paths are already present as shells, while
-  obsolete `specs.py` and `rollout.py` still remain and must be deleted during
-  the atomic cutover.
-- `program.py`, `serialization.py`, the eight `catalog/` files, additive
-  owner-module declarations, and 22 future test paths already exist.
-- New operations uniformly raise `NotImplementedError`; catalog constructors
-  do not yet construct programs; future tests call `_pending()` if unskipped.
-- The live root façade, `Dynamics`, tensor/family executor, datasets, and
-  visualization path still implement version `0.1.0`.
-- The current root import deliberately does not expose the target
-  `program`, `serialization`, or `catalog` surfaces.
-- `pyproject.toml` still describes the cellular-automata-only `0.1.0` package
-  and includes pytest as a runtime dependency.
+- G7-00 froze 16 independent oracle cases and closed with
+  `114 passed, 96 skipped`.
+- G7-01 is complete. Its durable transaction record and exact evidence are in
+  [`2-CUTOVER.md`](2-CUTOVER.md).
+- The live package is now the five-field runtime: `SimpleProgram` stores
+  exactly `seed`, `alphabet`, `frontier`, `neighborhood`, and `rule`;
+  `program.apply` is the sole family-blind step law; and callable root
+  `rollout` traverses only through it.
+- The root exposes exactly ten names: the three operations/value names and
+  seven core namespaces. It does not eagerly import datasets, RNG,
+  visualization, serialization, or catalog.
+- `src/ca` has 28 tracked paths. `specs.py` and public `rollout.py` are
+  physically absent, as is `tests/test_specs.py`; `ca.rollout` and `ca.specs`
+  have no importable submodule spec.
+- Exact/constructive/partial/law/intensional Seeds, reusable writable/readable
+  contracts, finite/intensional Rule results, atomic reconstruction,
+  cardinalities, measures, deterministic fresh identity, lineage, and replay
+  evidence are authoritative for the G7-01 kernel.
+- All six retained Rule presets and six Neighborhood presets execute through
+  generic application and agree with independent complete-result fixtures.
+- Datasets, RNG helpers, tensor projections, and visualization are downstream
+  consumers of ordinary programs and explicit rollout views.
+- Source and lock metadata are at `0.2.0`, NumPy is a runtime dependency, and
+  pytest is development-only. This is an internal checkpoint, not a release.
+- The active suite reports `224 passed, 36 skipped`. Every remaining skip has
+  an explicit G7-02–G7-05 owner; G7-01 owns none.
+- Serialization and catalog files remain inert, unexposed shells. G7-02 has
+  not started and `3-MECHANICS.md` does not yet exist.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -96,15 +106,6 @@ conflict, and reconcile the plan before changing runtime behavior.
 - General numerical solvers and integrators are not core runtime services.
   Exact or intensional denotations are core; optional realization tooling is
   external and evidence-producing.
-- G7-00 is complete. It froze the exact pre-cutover surface and 16 independent
-  complete-result fixtures covering all six retained native presets plus
-  mobile/Turing, substitution, multiway, constraint zero/one/many, variable
-  support, stochastic laws, exact differential completion, and an intensional
-  differential relation.
-- Stage 1 added 12 active oracle consistency and bidirectional independence
-  checks without changing `src/ca`, packaging, or frozen Goal 2/5/6 content.
-  The original suite remains `102 passed, 96 skipped`; the reconciled full
-  suite is `114 passed, 96 skipped`.
 
 ## Working Assumptions
 
@@ -246,7 +247,7 @@ stage file and may evolve with the implementation.
 | Stage | Handoff stage | Status | Completion boundary |
 |---|---|---|---|
 | `1-ORACLES` | G7-00 | Complete | Frozen behavior and independent expected results |
-| `2-CUTOVER` | G7-01 | In Progress | Atomic five-field runtime replacement |
+| `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Pending | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Pending | Canonical serialization and representation proofs |
 | `5-CATALOG` | G7-04 | Pending | Exact constructors, metadata, exports, and migration |
@@ -297,7 +298,8 @@ preserving its architecture, so the cutover can be judged independently.
 
 Handoff stage: **G7-01 — Atomic five-field core cutover**
 
-Stage status: **In Progress.** The live transaction record is
+Stage status: **Complete.** The implementation, migration, hostile review,
+and exact verification evidence are recorded in
 [`2-CUTOVER.md`](2-CUTOVER.md).
 
 #### Big Picture Objective

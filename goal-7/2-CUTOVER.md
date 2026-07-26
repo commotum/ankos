@@ -1,6 +1,6 @@
 # Goal 7 Stage 2 — Atomic Five-Field Core Cutover
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 Handoff stage: **G7-01**
 
@@ -137,17 +137,17 @@ new runtimes may coexist only inside this unfinished transaction.
 
 | Workstream | State | Evidence |
 |---|---|---|
-| Authority and live dependency audit | In progress | This record and source audit |
-| Loci and Alphabet kernel | Pending | |
-| Seed, WritableRegion, ReadableRegion | Pending | |
-| Rule denotation/result algebra | Pending | |
-| Program, apply, Seed binding, rollout | Pending | |
-| Native preset migration | Pending | |
-| Root, datasets, RNG, visualization | Pending | |
-| Active unit/conformance migration | Pending | |
-| Old-executor physical deletion | Pending | |
-| Packaging/version cutover | Pending | |
-| Final hostile review | Pending | |
+| Authority and live dependency audit | Complete | Starting tree `7226c49`; Goal 2/5/6 remained frozen |
+| Loci and Alphabet kernel | Complete | Closed structural identities, carriers, exact schemas, and focused unit coverage |
+| Seed, WritableRegion, ReadableRegion | Complete | Exact/constructive/partial/law/intensional sources and identity-preserving capability/view contracts |
+| Rule denotation/result algebra | Complete | Closed ASTs, finite/intensional support, dispositions, laws, witnesses, faults, and native presets |
+| Program, apply, Seed binding, rollout | Complete | Exact five-field value, one family-blind `apply`, replayable Seed realization, and apply-owned rollout |
+| Native preset migration | Complete | Six Rule and six Neighborhood presets agree with independent complete-result fixtures |
+| Root, datasets, RNG, visualization | Complete | Narrow lazy root; explicit downstream recipes, projections, RNG helpers, and viewer records |
+| Active unit/conformance migration | Complete | `224 passed`; no G7-01-owned skip |
+| Old-executor physical deletion | Complete | `specs.py`, `rollout.py`, and `test_specs.py` absent; module specs absent |
+| Packaging/version cutover | Complete | Source/lock metadata at `0.2.0`; NumPy runtime and pytest development dependency |
+| Final hostile review | Complete | Two independent static/dynamic reviews and five adversarial edge regressions found no remaining G7-01 blocker |
 
 ## Completion Gates
 
@@ -172,3 +172,97 @@ The closeout must additionally prove:
 
 Only after every gate passes may this file, the stage index, and the top-level
 Goal 7 status record G7-01 as complete.
+
+## Stage Results
+
+### Authoritative behavior
+
+- `SimpleProgram` is a frozen value with exactly `seed`, `alphabet`,
+  `frontier`, `neighborhood`, and `rule`.
+- `program.apply` is the sole executable one-step law. It validates one old
+  snapshot, resolves writable and readable bindings, validates complete Rule
+  results, binds fresh identities, commits atomically, validates successors,
+  preserves derivation fibers, and projects exact measures without family
+  dispatch.
+- `program.rollout` is the only rollout operation and calls the owned `apply`.
+  Seed denotation, keyed realization, draw evidence, replay coordinates, and
+  trace lineage remain in `program.py`; core does not import downstream RNG.
+- Exact, constructive, partial, finite-law, and intensional Seed forms now
+  retain their actual semantics. Partial sources remain non-enumerated until
+  their unresolved roles and obligations are discharged. Large uniform laws
+  use bounded direct rejection sampling rather than materializing their value
+  domain.
+- Finite application records reject contradictory source/applied mappings,
+  partitions, cardinalities, fibers, identities, lineages, bindings, and
+  measures. Intensional applied, no-successor, successor, and measure
+  relations are separately filtered and bound to the application context.
+- The six retained native Rule presets and six corresponding Neighborhood
+  presets execute through that same generic law. Lag-count bands are exposed
+  chronologically, with the Rule selecting history positions explicitly.
+- Dataset construction, deterministic planning helpers, tensor projections,
+  and visualization remain explicit downstream consumers. None is eagerly
+  imported by `ca`.
+
+### Files and migration
+
+- Replaced the provisional kernels in `loci.py`, `alphabets.py`, `seeds.py`,
+  `frontiers.py`, `neighborhoods.py`, `rules.py`, and `program.py`.
+- Narrowed `ca.__all__` to `SimpleProgram`, `apply`, callable `rollout`, and
+  the seven core namespaces.
+- Migrated `datasets.py`, `rng.py`, and `viz/` to the new downstream boundary.
+- Deleted `src/ca/specs.py`, `src/ca/rollout.py`, and `tests/test_specs.py`.
+- Left serialization and catalog declarations inert and unexposed for their
+  owning later stages.
+- Updated package metadata and the lockfile to source version `0.2.0`. This
+  internal checkpoint is not a release or publication.
+
+### Verification
+
+The completed tree passed:
+
+```text
+UV_CACHE_DIR=/tmp/ankos-uv-cache uv run --no-sync pytest -q tests -rs
+→ 224 passed, 36 skipped
+
+UV_CACHE_DIR=/tmp/ankos-uv-cache uv lock --check
+→ Resolved 12 packages
+
+git diff --check
+→ pass
+
+python -m compileall -q src/ca tests
+→ pass
+```
+
+Focused public/import/descriptor and repaired edge suites passed 23 tests.
+The final independent audits additionally established:
+
+- zero G7-01-owned skips;
+- exactly one `apply` definition and exactly one rollout call to it;
+- no alternate step executor, old module, callback/`Any` core descriptor,
+  mutable semantic field, or family/catalog/carrier/locus dispatch in
+  `apply`;
+- the seven-owner import DAG, narrow ten-name root, and lazy auxiliary
+  boundary;
+- callable `ca.rollout` with no `ca.rollout` or `ca.specs` module spec;
+- exactly 28 tracked `src/ca` paths and physical absence of the retired
+  executor files; and
+- no changes under Goal 2, Goal 5, Goal 6, `api.md`,
+  `simple_programs.md`, or the reference scaffold.
+
+The 36 retained skips are explicitly later-stage work: serialization and
+representation in G7-03; catalog assembly in G7-04; observer/family joins
+across G7-02/G7-04/G7-05; and two named CT12 mechanics/catalog cases in
+G7-02/G7-04.
+
+### Changed assumptions and next action
+
+The five-field architecture did not require revision. Hostile review did
+invalidate several implementation assumptions: descriptor acceptance must
+imply a valid Seed execution path; partial configuration metadata cannot be
+dropped into a complete leaf; intensional projections must carry the complete
+application context; and complete-result records need cross-space validation.
+Those defects are now regression-tested.
+
+G7-01 is closed. The first next action is to refresh current facts and create
+`3-MECHANICS.md` for G7-02; no G7-02 implementation began in this stage.
