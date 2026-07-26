@@ -1,0 +1,167 @@
+"""Navigation and explicit export join for whole-program constructors.
+
+The six owner modules classify audited constructions by dominant mechanic;
+``entries`` owns callable-free provenance shells.  This package initializer is
+the sole join between those namespaces.  It does not synthesize functions,
+dispatch by family or ID, construct programs, or attach catalog identity to a
+program.
+
+This skeleton flat-exports all 60 canonical signatures and only the three true
+aliases whose signatures are already fixed by canonical delegates.  Presets,
+the remaining alias, and the compatibility adapter stay visibly pending in
+their owner modules until Goal 7 settles their explicit parameter surfaces.
+Nothing here is re-exported from root ``ca`` by this scaffold.
+"""
+
+from __future__ import annotations
+
+from . import automata, criteria, dynamica, entries, machina, media, substitua
+from .automata import (
+    alternating_partition_local_evolution,
+    asynchronous_local_state_automaton,
+    coupled_field_mobile_locus_evolution,
+    driven_relaxation,
+    history_dependent_agent_game,
+    iterated_map,
+    multi_active_local_rewrite,
+    mutable_rule_local_automaton,
+    population_evolutionary_search,
+    synchronous_local_state_transform,
+    weighted_network_state_update,
+)
+from .criteria import (
+    finite_model_satisfaction,
+    geometric_embedding_relation,
+    global_equation_relation,
+    inverse_local_system_reconstruction,
+    local_factor_weighted_relation,
+    local_satisfaction_relation,
+    program_randomization_test,
+    stochastic_local_search,
+    weighted_history_sum_relation,
+)
+from .dynamica import (
+    continuous_event_dynamics,
+    ordinary_differential_flow,
+    partial_differential_relation,
+    pde,
+)
+from .machina import (
+    enumerative_semidecision,
+    finite_gate_circuit,
+    mobile_head_grid_rewrite,
+    nearest_neighbor_retrieval,
+    priority_dovetailed_oracle_construction,
+    recursive_function_evaluator,
+    register_machine,
+    stored_program_random_access_machine,
+)
+from .media import (
+    aligned_xor_stream_transduction,
+    digit_emitting_register_transduction,
+    error_diffusion_transform,
+    event_provenance_causal_network,
+    hash_index_transform,
+    history_reference_record_transduction,
+    maximal_run_record_transduction,
+    nested_interval_symbol_transduction,
+    orthogonal_basis_coefficient_transform,
+    predictive_residual_transduction,
+    probabilistic_transition_model_fitting,
+    recursive_uniform_region_decomposition,
+    sampled_causal_order_network,
+    weighted_prefix_block_transduction,
+)
+from .substitua import (
+    append_only_sequence_generation,
+    context_dependent_substitution,
+    first_passage_aggregation,
+    front_delete_rear_append_system,
+    global_score_sequential_placement,
+    history_dependent_growth_rewrite,
+    indexed_history_recurrence,
+    iterated_erasure_process,
+    local_graph_rewrite,
+    moving_frontier_shell_accretion,
+    multiway_rewrite,
+    multiway_system,
+    network_rewrite,
+    parallel_independent_substitution,
+    parallel_network_rewrite,
+    random_functional_graph_construction,
+    structural_pattern_rewrite,
+)
+
+
+__all__ = (
+    "entries",
+    "automata",
+    "substitua",
+    "machina",
+    "media",
+    "criteria",
+    "dynamica",
+    "alternating_partition_local_evolution",
+    "asynchronous_local_state_automaton",
+    "coupled_field_mobile_locus_evolution",
+    "driven_relaxation",
+    "history_dependent_agent_game",
+    "iterated_map",
+    "multi_active_local_rewrite",
+    "mutable_rule_local_automaton",
+    "population_evolutionary_search",
+    "synchronous_local_state_transform",
+    "weighted_network_state_update",
+    "append_only_sequence_generation",
+    "context_dependent_substitution",
+    "first_passage_aggregation",
+    "front_delete_rear_append_system",
+    "global_score_sequential_placement",
+    "history_dependent_growth_rewrite",
+    "indexed_history_recurrence",
+    "iterated_erasure_process",
+    "local_graph_rewrite",
+    "moving_frontier_shell_accretion",
+    "multiway_rewrite",
+    "parallel_independent_substitution",
+    "parallel_network_rewrite",
+    "random_functional_graph_construction",
+    "structural_pattern_rewrite",
+    "enumerative_semidecision",
+    "finite_gate_circuit",
+    "mobile_head_grid_rewrite",
+    "nearest_neighbor_retrieval",
+    "recursive_function_evaluator",
+    "register_machine",
+    "stored_program_random_access_machine",
+    "priority_dovetailed_oracle_construction",
+    "event_provenance_causal_network",
+    "digit_emitting_register_transduction",
+    "error_diffusion_transform",
+    "maximal_run_record_transduction",
+    "hash_index_transform",
+    "probabilistic_transition_model_fitting",
+    "sampled_causal_order_network",
+    "weighted_prefix_block_transduction",
+    "nested_interval_symbol_transduction",
+    "history_reference_record_transduction",
+    "recursive_uniform_region_decomposition",
+    "orthogonal_basis_coefficient_transform",
+    "predictive_residual_transduction",
+    "aligned_xor_stream_transduction",
+    "finite_model_satisfaction",
+    "geometric_embedding_relation",
+    "global_equation_relation",
+    "inverse_local_system_reconstruction",
+    "local_factor_weighted_relation",
+    "local_satisfaction_relation",
+    "program_randomization_test",
+    "stochastic_local_search",
+    "weighted_history_sum_relation",
+    "continuous_event_dynamics",
+    "ordinary_differential_flow",
+    "partial_differential_relation",
+    "multiway_system",
+    "network_rewrite",
+    "pde",
+)

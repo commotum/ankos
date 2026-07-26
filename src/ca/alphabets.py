@@ -1,32 +1,14 @@
-"""Alphabet and value-space catalog factories.
+"""Closed semantic value schemas and their composition.
 
-This module defines raw value spaces used by generated trajectories. An
-alphabet is not a vocabulary and does not assign token ids. It only defines the
-values a trajectory cell, symbol, register, or field may contain before
-downstream representation or numerical handling.
+The Goal 7 target layer in this module owns exact value validity, semantic
+equality, represented-number profiles, and scalar or structural schema
+composition. It does not own carrier support, topology, scheduling, program
+families, or transition behavior. Seeds and Rules declare values against these
+schemas; ``program.py`` performs cross-field and successor validation.
 
-Any representation ids are assigned later by downstream code. This keeps
-alphabet definitions reusable and prevents fixed global vocabulary
-constants from creeping into the CA layer.
-
-Prefer parameterized alphabet families over named constants. Scalar numerical
-values use range alphabets, while binary cellular automata use the boolean
-alphabet:
-
-```text
-int_range_alphabet(size=97)
-float_range_alphabet(size=5, start=0.0, step=0.25)
-boolean()
-```
-
-If a rule needs modular arithmetic, that modular behavior belongs in the rule
-specification. The alphabet only needs to say which values are legal.
-
-Likewise, totalistic behavior, ordered-neighborhood behavior, blank/quiescent
-backgrounds, digit-base interpretation, tape-symbol roles, and head-state roles
-belong to rules, engines, encodings, or system metadata. They should not become
-new primitive alphabet families unless they change the underlying value-space
-semantics.
+The target ``Alphabet(descriptor=...)`` contract replaces the current finite
+recipe record only during the atomic G7-01 cutover. Until then, non-colliding
+target declarations remain inert above the complete 0.1 catalog.
 """
 
 from __future__ import annotations
@@ -34,7 +16,63 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
+from enum import Enum
+from typing import Any, NoReturn
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Singular Value-Schema Primitives
+# ---------------------------------------------------------------------------
+
+
+class AlphabetPrimitive(Enum):
+    """Closed schema primitives fixed by the Goal 7 reference scaffold."""
+
+    ENUM = "alphabet.enum"
+    PRODUCT = "alphabet.product"
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 alphabet factory."""
+
+    raise NotImplementedError("Goal 7 alphabet scaffold is not implemented")
+
+
+# The target frozen ``Alphabet`` stores one closed descriptor. Its live class
+# declaration cannot coexist truthfully with the incompatible 0.1 class below.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Compound Value Schemas
+# ---------------------------------------------------------------------------
+
+
+def product(parts: tuple["Alphabet", ...]) -> "Alphabet":
+    """Compose named schema parts without flattening semantic distinctions."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: General Exact and Structural Families
+# ---------------------------------------------------------------------------
+
+# Exact numeric, tag, union, record, word, map, graph, field, instruction,
+# pattern, equation, distribution, and represented-number schemas enter here
+# after their closed descriptors and equality laws are fixed.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Presets and Aliases
+# ---------------------------------------------------------------------------
+
+# Presets delegate to singular or compound schemas and introduce no new value
+# semantics.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 Value = int | float | str

@@ -1,34 +1,94 @@
-"""Frontier catalog factories built from loci.
+"""Closed writable capability envelopes built from raw regions.
 
-This module defines named frontier families for cellular-automata style
-next-state generation. A frontier is an update-site interface: it selects which
-absolute coordinates in the current state slice are allowed to update. The
-generator derives the corresponding next-state write coordinates.
+The Goal 7 target layer in this module owns ``WritableRegion`` descriptors,
+existing and fresh capability schemas, target contracts, namespaces, and
+composition. A Frontier is the complete possible-write envelope for one
+application. It does not select firing sites, expose readable values, resolve
+collisions, or prescribe commit policy; those choices belong to Rule data and
+the one generic application law.
 
-The construction hierarchy mirrors `neighborhoods.py`:
-
-- `loci.py` owns the minimal tensor selector machinery: absolute coordinate
-  universes, predicates, mask algebra, ordering, and coordinate/index
-  conversion.
-- Frontiers are built directly from `loci.py` primitives. The supported
-  executable frontier is the full current slice.
-
-This keeps low-level selector logic centralized in `loci.py`, keeps simple
-frontiers reusable, and prevents composite schedules from duplicating primitive
-coordinate/predicate construction.
-
-The default convention follows Wolfram-style next-state updates: frontiers
-select current-state update sites at time `t`; neighborhoods read around those
-sites; rules write the corresponding next-state values at time `t+1`.
+The target shell builds only from ``loci.py`` and is inert. The incompatible
+0.1 ``Frontier``/``time_slice`` contract remains complete below the explicit
+legacy divider until the atomic G7-01 cutover.
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Literal
+from enum import Enum
+from typing import Any, Generic, Literal, NoReturn, TypeVar
 
 from . import loci
+
+
+C = TypeVar("C")
+W = TypeVar("W")
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Singular Writable Capabilities
+# ---------------------------------------------------------------------------
+
+
+class FrontierPrimitive(Enum):
+    """Closed writable-envelope primitives."""
+
+    CAPABILITY_SPACE = "frontier.capability-space"
+    TARGET_CONTRACT = "frontier.target-contract"
+    FRESH_NAMESPACE = "frontier.fresh-namespace"
+
+
+@dataclass(frozen=True)
+class WritableRegion(Generic[C, W]):
+    """Closed resolver descriptor for one complete writable envelope."""
+
+    descriptor: loci.Region
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 Frontier factory."""
+
+    raise NotImplementedError("Goal 7 Frontier scaffold is not implemented")
+
+
+def everywhere() -> WritableRegion[C, W]:
+    """Authorize the complete support described by the configuration contract."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Writable-Envelope Composition
+# ---------------------------------------------------------------------------
+
+
+def union(parts: tuple[WritableRegion[C, W], ...]) -> WritableRegion[C, W]:
+    """Compose complete writable envelopes by explicit union."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: Structural Writable Families
+# ---------------------------------------------------------------------------
+
+# Product, relative/dilated, matched-interface, dynamic-address, fresh-child,
+# whole-region, and intensional envelopes enter here after their closed
+# capability and reconstruction contracts are fixed.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Presets and Aliases
+# ---------------------------------------------------------------------------
+
+# Presets delegate to the capability primitives and cannot add scheduling or
+# collision behavior.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 CombineMode = Literal["or", "and", "xor"]

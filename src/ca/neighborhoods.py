@@ -1,41 +1,93 @@
-"""Neighborhood catalog factories built from loci.
+"""Closed identity-preserving readable views built from raw regions.
 
-This module defines named neighborhood families for cellular-automata style
-next-state generation. A neighborhood is a read interface: it defines the
-source-relative offsets read around each current update site before the rule
-writes the corresponding next-state value.
+The Goal 7 target layer in this module owns ``ReadableRegion`` descriptors and
+their local, global, historical, structural, metric, differential, and
+intensional composition. A Neighborhood resolves one immutable snapshot while
+retaining every identity, order, grouping, absence, boundary, and provenance
+distinction a Rule declares. It does not authorize writes, choose update
+policy, or expose unrestricted configuration access.
 
-The construction hierarchy is intentional:
-
-- `loci.py` owns the minimal tensor selector machinery: offset universes,
-  predicates, mask algebra, ordering, and coordinate/index conversion.
-- Singular neighborhoods are built directly from `loci.py` primitives. Each
-  singular neighborhood should describe one coherent read locus, such as the
-  current cell, a shell along one axis, or an L1 shell across several axes.
-- Compound or multi-component neighborhoods are built by composing singular
-  neighborhoods. They should preserve component boundaries when the rule needs
-  to treat groups differently.
-
-This keeps low-level selector logic centralized in `loci.py`, keeps simple
-neighborhoods reusable, and prevents composite families from duplicating
-primitive coordinate/predicate construction.
-
-The default convention follows Wolfram-style next-state updates: ordinary
-spatial neighborhoods read the current source state with `time_offset=0`, and
-the generator writes the computed value to time `t+1`. Negative `time_offset`
-values are reserved for explicit temporal-memory neighborhoods such as scalar
-recurrences.
+The target shell builds only from ``loci.py`` and remains inert. The complete
+0.1 ``Neighborhood`` selector catalog stays below the explicit legacy divider
+until the atomic G7-01 cutover.
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Literal
+from enum import Enum
+from typing import Any, Generic, Literal, NoReturn, TypeVar
 
 import numpy as np
 
 from . import loci
+
+
+C = TypeVar("C")
+R = TypeVar("R")
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Singular Readable Views
+# ---------------------------------------------------------------------------
+
+
+class NeighborhoodPrimitive(Enum):
+    """Closed readable-view primitives."""
+
+    OBSERVATION_SPACE = "neighborhood.observation-space"
+    JOIN_SHAPE = "neighborhood.join-shape"
+
+
+@dataclass(frozen=True)
+class ReadableRegion(Generic[C, R]):
+    """Closed resolver descriptor for one identity-preserving read view."""
+
+    descriptor: loci.Region
+    result_shape: tuple[str, ...]
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 Neighborhood factory."""
+
+    raise NotImplementedError("Goal 7 Neighborhood scaffold is not implemented")
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Readable-View Composition
+# ---------------------------------------------------------------------------
+
+
+def product(
+    fields: tuple[tuple[str, ReadableRegion[C, R]], ...],
+) -> ReadableRegion[C, tuple[R, ...]]:
+    """Compose named read fields while preserving their boundaries."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: General Readable Families
+# ---------------------------------------------------------------------------
+
+# Keyed, relative, path, span, match-context, global, historical, metric,
+# differential, and intensional views enter here after their closed result and
+# join shapes are fixed.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Presets and Aliases
+# ---------------------------------------------------------------------------
+
+# The target ``eca`` and six retained native presets eventually delegate to
+# the readable primitives. Their currently implemented names remain legacy
+# until the atomic contract replacement.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 CombineMode = Literal["tuple"]

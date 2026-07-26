@@ -1,18 +1,161 @@
-"""Composable selectors over canonical spacetime coordinates.
+"""Closed structural identities and raw region algebra.
 
-This module is the shared NumPy foundation for constructing finite coordinate
-sets and support masks. All coordinates use canonical four-coordinate form
-`[t, x, y, z]`; inactive spatial axes are fixed to zero, and active spatial
-axes are centered by default.
+The Goal 7 target layer in this module owns identities, selector expressions,
+and regions without granting either read or write authority. Component modules
+build Seed sources, writable envelopes, and readable views from these values;
+``program.py`` later resolves and applies those component contracts. This
+module does not own configuration policy, family behavior, or execution.
+
+The target declarations are intentionally phase-ordered and inert. The finite
+NumPy selector implementation required by the 0.1 runtime remains intact below
+the explicit legacy divider until the atomic G7-01 cutover.
 """
 
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from enum import Enum
+from fractions import Fraction
+from typing import Any, Literal, NoReturn, TypeAlias
 
 import numpy as np
+
+
+ExactLocusPart: TypeAlias = bool | int | Fraction | str
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Singular Structural Identities
+# ---------------------------------------------------------------------------
+
+
+class LocusKind(Enum):
+    """Closed identity variants fixed by the Goal 7 reference scaffold."""
+
+    COORDINATE = "coordinate"
+    NAMED = "named"
+    OCCURRENCE = "occurrence"
+    GRAPH_ELEMENT = "graph-element"
+    FIELD_POINT = "field-point"
+    FRESH = "fresh"
+
+
+@dataclass(frozen=True)
+class Locus:
+    """One closed structural identity; it grants no access authority."""
+
+    kind: LocusKind
+    scope: str
+    path: tuple[ExactLocusPart, ...]
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 loci factory."""
+
+    raise NotImplementedError("Goal 7 loci scaffold is not implemented")
+
+
+def named(name: str) -> Locus:
+    """Build a named identity within the configuration identity scope."""
+
+    _not_implemented()
+
+
+def coordinate(axis: str, value: int) -> Locus:
+    """Build one exact coordinate identity."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Selector Expressions and Region Compounds
+# ---------------------------------------------------------------------------
+
+
+class SelectorPrimitive(Enum):
+    """Closed selector-expression primitives."""
+
+    PREDICATE = "selector.predicate"
+    TRANSFORM = "selector.transform"
+    MEMBERSHIP = "selector.membership"
+
+
+@dataclass(frozen=True)
+class SelectorExpr:
+    """Closed selector expression, never a host-language callback."""
+
+    primitive: SelectorPrimitive
+    arguments: tuple[ExactLocusPart | Locus | "SelectorExpr", ...]
+
+
+class RegionKind(Enum):
+    """Closed raw-region forms shared by component modules."""
+
+    LITERAL = "literal"
+    ALL_SUPPORT = "all-support"
+    RELATIVE = "relative"
+    PRODUCT = "product"
+    UNION = "union"
+    FRESH_CHILDREN = "fresh-children"
+    INTENSIONAL = "intensional"
+
+
+@dataclass(frozen=True)
+class Region:
+    """Raw structural region with no implicit readable or writable meaning."""
+
+    kind: RegionKind
+    name: str | None = None
+    loci: tuple[Locus, ...] = ()
+    parts: tuple["Region", ...] = ()
+    offsets: tuple[Locus, ...] = ()
+    relation: SelectorExpr | None = None
+
+
+def all_support(carrier: str) -> Region:
+    """Describe the complete support of one named carrier."""
+
+    _not_implemented()
+
+
+def relative(anchors: Region, offsets: tuple[Locus, ...]) -> Region:
+    """Describe identities relative to a closed anchor region."""
+
+    _not_implemented()
+
+
+def union(parts: tuple[Region, ...]) -> Region:
+    """Compose raw regions by explicit union."""
+
+    _not_implemented()
+
+
+def intensional(binder: str, relation: SelectorExpr) -> Region:
+    """Describe a closed intensional region without enumerating it."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: Structural Families
+# ---------------------------------------------------------------------------
+
+# Occurrences, paths, spans, ports, interfaces, products, continuous regions,
+# fresh references, and lenses enter here once their closed signatures land.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Private Finite Representations
+# ---------------------------------------------------------------------------
+
+# Finite selector materialization and canonical tensor-coordinate projection
+# remain private representations; they never become the semantic ontology.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 Tensor = np.ndarray

@@ -1,21 +1,15 @@
-"""Seed catalog factories built from loci.
+"""Closed sources of initial configurations.
 
-This module defines seed families for next-state generation. A seed is the
-initial assignment interface: it describes which current or history coordinates
-are initialized, what value selected coordinates receive, and what background
-value fills the rest.
+The Goal 7 target layer in this module owns exact, constructive, partial,
+probability-law, and intensional Seed descriptors plus explicit source
+composition. It builds from closed loci and configuration data. It does not
+draw from ambient entropy, select rollout horizons, plan datasets, render
+tensors, or define transition behavior; realization evidence belongs to
+``program.py``.
 
-The construction hierarchy mirrors `neighborhoods.py` and `frontiers.py`:
-
-- `loci.py` owns selector machinery over canonical `[t, x, y, z]` coordinates.
-- Core seed families package common initial assignments such as constants,
-  scalar history pairs, random initial slices, and selector-backed supports.
-- Structured seed families build meaningful geometric supports from loci
-  predicates rather than duplicating selector logic.
-
-This keeps seed support construction separate from alphabets, rules, rollout,
-representation, and source assembly. Callers choose which seed family is paired
-with each source.
+The target ``Seed(source=...)`` contract replaces the current selector/recipe
+record only during the atomic G7-01 cutover. Non-colliding factories below are
+therefore inert scaffolds, followed by the complete live 0.1 implementation.
 """
 
 from __future__ import annotations
@@ -24,11 +18,101 @@ import itertools
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Literal
+from enum import Enum
+from fractions import Fraction
+from typing import Any, Literal, NoReturn, TypeVar
 
 import numpy as np
 
 from . import loci
+
+
+C = TypeVar("C")
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.1: Singular Configuration Sources
+# ---------------------------------------------------------------------------
+
+
+class SeedPrimitive(Enum):
+    """Closed source primitives fixed by the Goal 7 reference scaffold."""
+
+    BERNOULLI = "seed.bernoulli"
+
+
+def _not_implemented() -> NoReturn:
+    """Raise the standard error for an unfinished Goal 7 Seed factory."""
+
+    raise NotImplementedError("Goal 7 Seed scaffold is not implemented")
+
+
+def exact(configuration: C) -> "Seed":
+    """Describe one fully specified initial configuration."""
+
+    _not_implemented()
+
+
+# The target frozen ``Seed`` stores one exact, constructive, partial, law, or
+# intensional source. Its class name remains owned by the incompatible 0.1
+# record until the atomic replacement.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 1.2: Source Composition
+# ---------------------------------------------------------------------------
+
+
+def product(parts: tuple[tuple[str, "Seed"], ...]) -> "Seed":
+    """Compose named structural source parts."""
+
+    _not_implemented()
+
+
+def overlay(parts: tuple["Seed", ...]) -> "Seed":
+    """Overlay disjoint or explicitly resolved source assignments."""
+
+    _not_implemented()
+
+
+def mixture(parts: tuple[tuple[Fraction, "Seed"], ...]) -> "Seed":
+    """Form an explicit probability-law mixture of sources."""
+
+    _not_implemented()
+
+
+def product_law(parts: tuple[tuple[str, "Seed"], ...]) -> "Seed":
+    """Compose source laws while explicitly declaring independence."""
+
+    _not_implemented()
+
+
+def refine(source: "Seed", constraint: loci.SelectorExpr) -> "Seed":
+    """Add one closed source invariant or refinement relation."""
+
+    _not_implemented()
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 2: General Source Families
+# ---------------------------------------------------------------------------
+
+# Constructive, partial, law-valued, and intensional source families enter
+# here after their output contracts and replay evidence schemas are fixed.
+
+
+# ---------------------------------------------------------------------------
+# Goal 7 Phase 3: Presets and Aliases
+# ---------------------------------------------------------------------------
+
+# Named presets delegate to the closed source primitives above. The current
+# ``bernoulli`` spelling remains legacy until its exact-law signature replaces
+# the float-and-rendering contract atomically.
+
+
+# ===========================================================================
+# Legacy 0.1 implementation retained until atomic G7-01 cutover
+# ===========================================================================
 
 
 Metric = Literal["l1", "l2", "linf"]
