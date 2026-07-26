@@ -564,7 +564,7 @@ def item_at(
     index: RuleExpr,
     default: RuleExpr,
 ) -> RuleExpr:
-    """Read a dynamic nonnegative index, returning an explicit default."""
+    """Read an integer index, defaulting outside ``[0, length)`` without wrap."""
 
     return RuleExpr(ExpressionPrimitive.ITEM_AT, (source, index, default))
 
@@ -3407,7 +3407,12 @@ def _evaluate_value(
             _require_semantic_value(evaluate(_child(arguments, 2)))
         )
     if primitive is ExpressionPrimitive.MAP_UPDATE:
-        entries = _association_entries(evaluate(_child(arguments, 0)))
+        source = _require_value_node(
+            evaluate(_child(arguments, 0)),
+            alphabets.ValueKind.MAP,
+            owner="map-update",
+        )
+        entries = alphabets.map_entries(source)
         key = _require_semantic_value(evaluate(_child(arguments, 1)))
         value = _require_semantic_value(evaluate(_child(arguments, 2)))
         updated: list[
@@ -3415,7 +3420,7 @@ def _evaluate_value(
         ] = []
         replaced = False
         for old_key, old_value in entries:
-            if loci.semantic_equal(old_key, key):
+            if alphabets.semantic_equal(old_key, key):
                 updated.append((key, value))
                 replaced = True
             else:
@@ -3430,7 +3435,8 @@ def _evaluate_value(
                         entry_value,
                     )
                     for entry_key, entry_value in updated
-                )
+                ),
+                tag=source.tag,
             )
         )
     if primitive is ExpressionPrimitive.INDEX_OF:
@@ -3438,7 +3444,7 @@ def _evaluate_value(
         needle = _require_semantic_value(evaluate(_child(arguments, 1)))
         for index, item in enumerate(items):
             semantic_item = _require_semantic_value(item)
-            if loci.semantic_equal(semantic_item, needle):
+            if alphabets.semantic_equal(semantic_item, needle):
                 return finish(index)
         return finish(
             _require_strict_int(evaluate(_child(arguments, 2)))
@@ -3600,7 +3606,7 @@ def _evaluate_value(
             stop = start + 1
             while (
                 stop < len(semantic_items)
-                and loci.semantic_equal(
+                and alphabets.semantic_equal(
                     semantic_items[start],
                     semantic_items[stop],
                 )
@@ -3653,7 +3659,7 @@ def _evaluate_value(
     if primitive is ExpressionPrimitive.EQUAL:
         left = evaluate(_child(arguments, 0))
         right = evaluate(_child(arguments, 1))
-        return finish(loci.semantic_equal(left, right))
+        return finish(_runtime_equal(left, right))
     if primitive in (ExpressionPrimitive.LESS, ExpressionPrimitive.LESS_EQUAL):
         left = _require_exact_number(evaluate(_child(arguments, 0)))
         right = _require_exact_number(evaluate(_child(arguments, 1)))
@@ -3913,9 +3919,28 @@ def _association_lookup(
     key: alphabets.SemanticValue,
 ) -> alphabets.SemanticValue | None:
     for candidate, value in entries:
-        if loci.semantic_equal(candidate, key):
+        if alphabets.semantic_equal(candidate, key):
             return value
     return None
+
+
+def _runtime_equal(
+    left: RuleRuntimeValue,
+    right: RuleRuntimeValue,
+) -> bool:
+    """Compare runtime tuples recursively and semantic leaves by alphabet law."""
+
+    if type(left) is tuple or type(right) is tuple:
+        if type(left) is not tuple or type(right) is not tuple:
+            return False
+        return len(left) == len(right) and all(
+            _runtime_equal(left_item, right_item)
+            for left_item, right_item in zip(left, right, strict=True)
+        )
+    return alphabets.semantic_equal(
+        _require_semantic_value(left),
+        _require_semantic_value(right),
+    )
 
 
 def _integer_digit_values(value: int, base: int) -> tuple[int, ...]:

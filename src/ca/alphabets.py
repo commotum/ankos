@@ -291,7 +291,7 @@ class ValueNode:
         names = tuple(name for name, _ in self.fields)
         if len(names) != len(set(names)):
             raise ValueError("value-node fields must have unique names")
-        if self.kind is ValueKind.RECORD:
+        if self.fields:
             ordered = tuple(sorted(self.fields, key=lambda item: item[0]))
             if ordered != self.fields:
                 object.__setattr__(self, "fields", ordered)

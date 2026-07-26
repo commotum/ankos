@@ -8,7 +8,7 @@ is immutable and versioned; selectors are data, never Python callbacks.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass, replace
 from enum import Enum
 from fractions import Fraction
 from itertools import product as cartesian_product
@@ -1409,6 +1409,22 @@ class FiniteConfiguration(Generic[V]):
         _require_version_one(self.version, "configuration")
         if not isinstance(self.carrier, Carrier):
             raise TypeError("configuration carrier is not recognized")
+        contract = self.carrier.contract
+        if (
+            contract.kind is CarrierKind.GRID
+            and contract.shape is not None
+            and not contract.axes
+        ):
+            concrete_contract = replace(
+                contract,
+                axes=default_grid_axes(len(contract.shape)),
+            )
+            object.__setattr__(
+                self,
+                "carrier",
+                replace(self.carrier, contract=concrete_contract),
+            )
+            contract = concrete_contract
         if type(self.entries) is not tuple or type(self.structure) is not tuple:
             raise TypeError("configuration data must use immutable tuples")
         if any(
@@ -1429,7 +1445,6 @@ class FiniteConfiguration(Generic[V]):
             raise ValueError(
                 "configuration structural relations reference absent loci"
             )
-        contract = self.carrier.contract
         if contract.kind is CarrierKind.HISTORY and contract.shape is not None:
             expected = tuple(
                 occurrence("history", index)
@@ -2289,9 +2304,19 @@ def grid_coordinates(target: Locus) -> tuple[int, ...]:
     if target.kind is not LocusKind.COORDINATE or not target.scope.startswith("grid:"):
         raise ValueError("target is not a grid-cell locus")
     values = target.path
-    if len(values) % 2:
+    if not values or len(values) % 2:
         raise ValueError("malformed grid-cell locus")
-    return tuple(int(values[index]) for index in range(1, len(values), 2))
+    axes = values[::2]
+    if any(type(axis) is not str or not axis for axis in axes):
+        raise ValueError("grid-cell locus has malformed axes")
+    if len(set(axes)) != len(axes):
+        raise ValueError("grid-cell locus axes must be unique")
+    if target.scope != "grid:" + ",".join(axes):
+        raise ValueError("grid-cell locus axes disagree with its scope")
+    coordinates = values[1::2]
+    if any(type(value) is not int for value in coordinates):
+        raise TypeError("grid-cell locus coordinates must be integers")
+    return coordinates
 
 
 def read_grid_value(
