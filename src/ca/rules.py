@@ -2881,6 +2881,39 @@ class Rule(Generic[R, W, C]):
             raise TypeError("Rule descriptor is not recognized")
         if type(self.contract) is not RuleContract:
             raise TypeError("Rule contract is not recognized")
+        denotation = self.descriptor.denotation
+        if type(denotation) is AnchoredClauseKernelDenotation:
+            required_existing = {
+                frontiers.Effect.REPLACE
+                if plan.action is DispositionAction.REPLACE
+                else frontiers.Effect.DELETE
+                for clause in denotation.clauses
+                for plan in clause.result.existing_plans
+                if plan.action in (
+                    DispositionAction.REPLACE,
+                    DispositionAction.DELETE,
+                )
+            }
+            if not required_existing.issubset(
+                self.contract.required_effect_profile.existing
+            ):
+                missing = required_existing.difference(
+                    self.contract.required_effect_profile.existing
+                )
+                raise ValueError(
+                    "anchored Rule contract omits required existing effects: "
+                    + ", ".join(
+                        sorted(effect.value for effect in missing)
+                    )
+                )
+            if (
+                any(clause.mass is not None for clause in denotation.clauses)
+                and self.contract.entropy_interface
+                is not seeds.EntropyInterface.REPLAY_KEY
+            ):
+                raise ValueError(
+                    "probabilistic anchored Rule requires replay-key entropy"
+                )
 
     @property
     def canonical_identity(self) -> str:

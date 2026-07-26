@@ -384,6 +384,25 @@ class ReadableView(Generic[V]):
                     raise ReadableResolutionError(
                         "group and observation anchors disagree"
                     )
+        if anchored_dependencies:
+            source_anchor_count = len(
+                {group.anchor for group in self.groups}
+            )
+            cardinality = anchored_dependencies[0].value_anchor.cardinality
+            if (
+                cardinality is alphabets.AnchorCardinality.EXACTLY_ONE
+                and source_anchor_count != 1
+            ):
+                raise ReadableResolutionError(
+                    "EXACTLY_ONE readable anchor must realize one source"
+                )
+            if (
+                cardinality is alphabets.AnchorCardinality.ONE_OR_MORE
+                and source_anchor_count < 1
+            ):
+                raise ReadableResolutionError(
+                    "ONE_OR_MORE readable anchor must realize a source"
+                )
 
 
 @dataclass(frozen=True)
@@ -427,6 +446,13 @@ class IntensionalReadableView:
         if len(set(keys)) != len(keys):
             raise ReadableResolutionError(
                 "intensional dependency keys must be unique"
+            )
+        if any(
+            dependency.value_anchor is not None
+            for dependency in self.dependencies
+        ):
+            raise ReadableResolutionError(
+                "intensional views cannot carry finite value anchors"
             )
         if type(self.join_shape) is not JoinShape:
             raise TypeError("intensional join shape is not recognized")

@@ -46,6 +46,125 @@ def _program() -> tuple[ca.SimpleProgram, loci.FiniteConfiguration]:
     )
 
 
+def _certificate(
+    kind: rules.CertificateKind,
+    label: str,
+) -> rules.Certificate:
+    return rules.Certificate(kind, rules.literal_expr(label))
+
+
+def _anchored_fixture(
+    *,
+    mass: Fraction | None = None,
+    conflict_policy: rules.ProposalConflictPolicy = (
+        rules.ProposalConflictPolicy.REQUIRE_EQUAL
+    ),
+) -> tuple[
+    ca.SimpleProgram,
+    loci.FiniteConfiguration,
+    neighborhoods.ReadableView,
+]:
+    """Build one complete value-anchored five-field codec fixture."""
+
+    source = loci.grid_configuration(
+        (3,),
+        (False, True, False),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+        axes=("x",),
+    )
+    alphabet = alphabets.boolean()
+    anchor = alphabets.ValueAnchor(
+        alphabets.value_equals(True),
+        alphabets.AnchorCardinality.EXACTLY_ONE,
+    )
+    writable = frontiers.value_relative(
+        anchor,
+        ((0,),),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.value_relative(
+        anchor,
+        ((0,),),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    replacement = rules.DerivationClauseResult(
+        (
+            rules.ExistingDispositionPlan(
+                rules.capability_group_item(0, 0),
+                rules.DispositionAction.REPLACE,
+                rules.literal_expr(False),
+            ),
+        ),
+        (),
+        rules.Progress.ADVANCED,
+        rules.Continue(),
+        rules.literal_expr("anchored-codec-derivation"),
+        ("codec:anchored",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "anchored-codec-derivation",
+        ),
+    )
+    zero_result = rules.DerivationClauseResult(
+        (),
+        (),
+        rules.Progress.QUIESCENT,
+        rules.Continue(),
+        rules.literal_expr("anchored-codec-zero"),
+        ("codec:anchored-zero",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "anchored-codec-zero",
+        ),
+    )
+    contract = rules.RuleContract(
+        source.contract,
+        alphabet.value_profile,
+        readable.result_shape,
+        readable.join_shape,
+        writable.effect_profile,
+        entropy_interface=(
+            seeds.EntropyInterface.REPLAY_KEY
+            if mass is not None
+            else seeds.EntropyInterface.NONE
+        ),
+    )
+    rule = rules.anchored_clause_kernel(
+        (
+            rules.RuleClause(
+                rules.literal_expr(True),
+                replacement,
+                mass,
+            ),
+        ),
+        group_channel=0,
+        zero_result=zero_result,
+        contract=contract,
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "anchored-codec-complete",
+        ),
+        conflict_policy=conflict_policy,
+        selection=(
+            rules.ClauseSelection.ALL
+            if mass is not None
+            else rules.ClauseSelection.FIRST
+        ),
+    )
+    simple_program = ca.SimpleProgram(
+        seed=seeds.exact(source),
+        alphabet=alphabet,
+        frontier=writable,
+        neighborhood=readable,
+        rule=rule,
+    )
+    resolved = readable.resolve(source)
+    assert type(resolved) is neighborhoods.ReadableView
+    return simple_program, source, resolved
+
+
 def _canonical_json(value: object) -> bytes:
     return json.dumps(
         value,
@@ -244,11 +363,41 @@ def _new_rule_expression_samples() -> tuple[rules.RuleExpr, ...]:
     """Return one structurally valid expression for each reopened G7-02 node."""
 
     source = rules.literal_expr("source")
+    sequence = rules.literal_expr(
+        alphabets.word_value(("a", "b"), tag="symbols")
+    )
     index = rules.literal_expr(0)
     default = rules.literal_expr("default")
     value = rules.literal_expr("value")
     table = rules.literal_expr("table")
+    rewrite_rule = alphabets.rewrite_rule_value(
+        alphabets.pattern_sequence((alphabets.pattern_bind("item"),)),
+        alphabets.template_sequence(
+            (alphabets.template_binding("item"),)
+        ),
+    )
+    rewrite_rules = rules.literal_expr(
+        alphabets.rewrite_rules_value((rewrite_rule,))
+    )
+    source_field = alphabets.grid_field_value(
+        ("x",),
+        (1,),
+        ("A",),
+        tag="codec-source",
+    )
+    tile = alphabets.grid_field_value(
+        ("x",),
+        (1,),
+        ("a",),
+        tag="codec-tile",
+    )
+    productions = alphabets.map_value(
+        (alphabets.map_entry_value("A", tile),),
+        tag="mosaic-productions",
+    )
     return (
+        rules.bound_value(1),
+        rules.bound_index(1),
         rules.record_field(source, "field"),
         rules.record_update(source, "field", value),
         rules.length(source),
@@ -270,6 +419,168 @@ def _new_rule_expression_samples() -> tuple[rules.RuleExpr, ...]:
         rules.product_value("product", value),
         rules.word_value("word", value),
         rules.flat_map_lookup(source, table),
+        rules.map_items(sequence, rules.bound_value(), "mapped"),
+        rules.filter_items(
+            sequence,
+            rules.equal(rules.bound_index(), rules.literal_expr(0)),
+        ),
+        rules.flat_map_items(
+            sequence,
+            rules.word_value("symbols", rules.bound_value()),
+            "symbols",
+        ),
+        rules.sliding_windows(
+            sequence,
+            1,
+            1,
+            rules.SequenceBoundary.FIXED,
+            exterior=rules.literal_expr("outside"),
+        ),
+        rules.pattern_rewrite(
+            sequence,
+            rewrite_rules,
+            scan=rules.RewriteScan.LOCATION_PRIORITY_NONOVERLAPPING,
+        ),
+        rules.mosaic_substitute(
+            rules.literal_expr(source_field),
+            rules.literal_expr(productions),
+        ),
+    )
+
+
+def _reopened_mode_expression_samples() -> tuple[rules.RuleExpr, ...]:
+    """Exercise every new boundary/scan mode in an inhabitable AST."""
+
+    sequence = rules.literal_expr(
+        alphabets.word_value(("a", "b"), tag="symbols")
+    )
+    rewrite_rule = alphabets.rewrite_rule_value(
+        alphabets.pattern_sequence((alphabets.pattern_bind("item"),)),
+        alphabets.template_sequence(
+            (alphabets.template_binding("item"),)
+        ),
+    )
+    rewrite_rules = rules.literal_expr(
+        alphabets.rewrite_rules_value((rewrite_rule,))
+    )
+    source_field = alphabets.grid_field_value(
+        ("x",),
+        (1,),
+        ("A",),
+        tag="codec-source",
+    )
+    tile = alphabets.grid_field_value(
+        ("x",),
+        (1,),
+        ("a",),
+        tag="codec-tile",
+    )
+    independent_productions = alphabets.map_value(
+        (alphabets.map_entry_value("A", tile),),
+        tag="mosaic-productions",
+    )
+    context = alphabets.word_value(("A",), tag="mosaic-context")
+    contextual_productions = alphabets.map_value(
+        (alphabets.map_entry_value(context, tile),),
+        tag="mosaic-productions",
+    )
+    source_expression = rules.literal_expr(source_field)
+    contextual_expression = rules.literal_expr(contextual_productions)
+
+    return (
+        rules.sliding_windows(
+            sequence,
+            1,
+            1,
+            rules.SequenceBoundary.FIXED,
+            exterior=rules.literal_expr("outside"),
+        ),
+        rules.sliding_windows(
+            sequence,
+            1,
+            1,
+            rules.SequenceBoundary.PERIODIC,
+        ),
+        rules.sliding_windows(
+            sequence,
+            1,
+            1,
+            rules.SequenceBoundary.REFLECTIVE,
+        ),
+        *(
+            rules.pattern_rewrite(
+                sequence,
+                rewrite_rules,
+                scan=scan,
+            )
+            for scan in rules.RewriteScan
+        ),
+        rules.mosaic_substitute(
+            source_expression,
+            rules.literal_expr(independent_productions),
+        ),
+        rules.mosaic_substitute(
+            source_expression,
+            contextual_expression,
+            offsets=((0,),),
+            boundary=rules.SequenceBoundary.FIXED,
+            exterior=rules.literal_expr("outside"),
+        ),
+        rules.mosaic_substitute(
+            source_expression,
+            contextual_expression,
+            offsets=((0,),),
+            boundary=rules.SequenceBoundary.PERIODIC,
+        ),
+        rules.mosaic_substitute(
+            source_expression,
+            contextual_expression,
+            offsets=((0,),),
+            boundary=rules.SequenceBoundary.REFLECTIVE,
+        ),
+    )
+
+
+def _rank_four_program() -> tuple[
+    ca.SimpleProgram,
+    loci.FiniteConfiguration,
+]:
+    source = loci.grid_configuration(
+        (1, 1, 1, 2),
+        (False, True),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+        axes=("batch", "time", "row", "column"),
+    )
+    alphabet = alphabets.boolean()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule = rules.expression(
+        rules.ExistingPlan(rules.ExistingPlanKind.PRESERVE, ()),
+        contract=rules.RuleContract(
+            source.contract,
+            alphabet.value_profile,
+            readable.result_shape,
+            readable.join_shape,
+            writable.effect_profile,
+        ),
+        witness=rules.literal_expr("rank-four-codec"),
+        provenance=("codec:rank-four",),
+    )
+    return (
+        ca.SimpleProgram(
+            seeds.exact(source),
+            alphabet,
+            writable,
+            readable,
+            rule,
+        ),
+        source,
     )
 
 
@@ -278,6 +589,8 @@ def test_new_rule_expression_primitives_round_trip_in_exact_enum_order() -> None
 
     samples = _new_rule_expression_samples()
     new_primitives = (
+        rules.ExpressionPrimitive.BOUND_VALUE,
+        rules.ExpressionPrimitive.BOUND_INDEX,
         rules.ExpressionPrimitive.RECORD_FIELD,
         rules.ExpressionPrimitive.RECORD_UPDATE,
         rules.ExpressionPrimitive.LENGTH,
@@ -299,9 +612,15 @@ def test_new_rule_expression_primitives_round_trip_in_exact_enum_order() -> None
         rules.ExpressionPrimitive.PRODUCT_VALUE,
         rules.ExpressionPrimitive.WORD_VALUE,
         rules.ExpressionPrimitive.FLAT_MAP_LOOKUP,
+        rules.ExpressionPrimitive.MAP_ITEMS,
+        rules.ExpressionPrimitive.FILTER_ITEMS,
+        rules.ExpressionPrimitive.FLAT_MAP_ITEMS,
+        rules.ExpressionPrimitive.SLIDING_WINDOWS,
+        rules.ExpressionPrimitive.PATTERN_REWRITE,
+        rules.ExpressionPrimitive.MOSAIC_SUBSTITUTE,
     )
 
-    assert len(samples) == 21
+    assert len(samples) == 29
     assert tuple(expression.primitive for expression in samples) == new_primitives
     for expression in samples:
         encoded = serialization.dumps(expression)
@@ -323,6 +642,125 @@ def test_new_rule_expression_primitives_reject_malformed_wire_shape(
     result = serialization.loads(_redigest(envelope))
     assert isinstance(result, serialization.DecodeRejected)
     assert result.fault.reason == "invalid-descriptor"
+
+
+def test_reopened_expression_modes_round_trip_without_collapsing() -> None:
+    """Boundary, scan, and contextual forms retain their exact operands."""
+
+    expressions = _reopened_mode_expression_samples()
+
+    assert len(expressions) == 10
+    encoded = tuple(serialization.dumps(expression) for expression in expressions)
+    assert len(set(encoded)) == len(encoded)
+    for expression, blob in zip(expressions, encoded, strict=True):
+        assert serialization.loads(blob) == serialization.Decoded(expression)
+        assert serialization.dumps(expression) == blob
+
+
+def test_reopened_structural_components_and_results_round_trip() -> None:
+    """The reopened schema is exercised by real non-default inhabitants."""
+
+    equal = alphabets.value_equals(
+        True,
+        path=alphabets.ValuePath(("state", "armed")),
+    )
+    tagged = alphabets.value_tagged(
+        "head",
+        path=alphabets.ValuePath(("state", "role", 0)),
+    )
+    conjunction = alphabets.value_and((equal, tagged))
+    negation = alphabets.value_not(equal)
+    disjunction = alphabets.value_or((conjunction, negation))
+    anchors = tuple(
+        alphabets.ValueAnchor(disjunction, cardinality)
+        for cardinality in alphabets.AnchorCardinality
+    )
+    semantic_map = alphabets.map_value(
+        (
+            alphabets.map_entry_value(False, "boolean"),
+            alphabets.map_entry_value(0, "integer"),
+        ),
+        tag="semantic-keys",
+    )
+    rewrite_rule = alphabets.rewrite_rule_value(
+        alphabets.pattern_node(
+            "pair",
+            (
+                alphabets.pattern_bind("left"),
+                alphabets.pattern_bind("right"),
+            ),
+        ),
+        alphabets.template_node(
+            "swapped",
+            (
+                alphabets.template_binding("right"),
+                alphabets.template_binding("left"),
+            ),
+        ),
+    )
+    rewrite_bundle = alphabets.rewrite_rules_value((rewrite_rule,))
+    grid_field = alphabets.grid_field_value(
+        ("batch", "time", "row", "column"),
+        (1, 1, 2, 2),
+        (0, 1, 2, 3),
+        tag="rank-four-field",
+    )
+    anchored_programs = tuple(
+        _anchored_fixture(conflict_policy=policy)
+        for policy in rules.ProposalConflictPolicy
+    )
+    simple_program, source, resolved = anchored_programs[0]
+    application = ca.apply(simple_program, source)
+    assert type(application) is program.ApplicationComplete
+    dependency = resolved.dependencies[0]
+    selector = rules.capability_group_item(0, 0)
+    denotation = simple_program.rule.descriptor.denotation
+    assert type(denotation) is rules.AnchoredClauseKernelDenotation
+    rank_four_program, rank_four_source = _rank_four_program()
+
+    values: tuple[object, ...] = (
+        equal.path,
+        equal,
+        tagged,
+        conjunction,
+        negation,
+        disjunction,
+        *anchors,
+        alphabets.rational_interval(
+            Fraction(-2, 3),
+            Fraction(5, 7),
+            lower_closed=False,
+        ),
+        alphabets.symbolic_expression(),
+        alphabets.symbolic_value(
+            "plus",
+            items=(1, alphabets.symbolic_value("x")),
+        ),
+        semantic_map,
+        rewrite_bundle,
+        grid_field,
+        simple_program.frontier,
+        simple_program.neighborhood,
+        dependency,
+        resolved,
+        selector,
+        denotation,
+        simple_program.rule.descriptor,
+        simple_program.rule,
+        simple_program,
+        application,
+        rank_four_source,
+        rank_four_program,
+        *(
+            fixture[0].rule.descriptor.denotation
+            for fixture in anchored_programs
+        ),
+    )
+    for value in values:
+        blob = serialization.dumps(value)
+        decoded = serialization.loads(blob)
+        assert decoded == serialization.Decoded(value)
+        assert serialization.dumps(decoded.value) == blob
 
 
 def test_mutated_enum_singleton_cannot_encode_as_another_member() -> None:
