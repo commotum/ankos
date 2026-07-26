@@ -16,6 +16,7 @@ from hashlib import sha256
 import hmac
 import json
 import re
+from types import MappingProxyType
 from typing import Generic, TypeAlias, TypeVar
 
 from . import (
@@ -1063,6 +1064,19 @@ def _validate_registry() -> None:
             raise RuntimeError(f"invalid canonical schema owner for {row.tag}")
         if value_type.__name__ != row.type_name or row.version != 1:
             raise RuntimeError(f"invalid canonical schema identity for {row.tag}")
+        owner_name = row.owner.removeprefix("ca.")
+        kebab_type = re.sub(
+            r"([a-z0-9])([A-Z])",
+            r"\1-\2",
+            row.type_name,
+        ).lower()
+        expected_tag = (
+            _PROGRAM_SCHEMA_TAG
+            if value_type is program.SimpleProgram
+            else f"ca.{owner_name}.{kebab_type}"
+        )
+        if row.tag != expected_tag:
+            raise RuntimeError(f"canonical schema tag drift for {row.tag}")
         if row.enum_values:
             if not issubclass(value_type, Enum):
                 raise RuntimeError(f"{row.tag} is declared as a non-enum")
@@ -1099,8 +1113,10 @@ def _validate_registry() -> None:
 
 _validate_registry()
 
-_SCHEMA_BY_TYPE = {row.value_type: row for row in _SCHEMAS}
-_SCHEMA_BY_TAG = {row.tag: row for row in _SCHEMAS}
+_SCHEMA_BY_TYPE = MappingProxyType(
+    {row.value_type: row for row in _SCHEMAS}
+)
+_SCHEMA_BY_TAG = MappingProxyType({row.tag: row for row in _SCHEMAS})
 
 
 def _schema_rows() -> tuple[_SchemaRow, ...]:
@@ -1231,9 +1247,30 @@ def _encode_node(value: object) -> dict[str, object]:
         if type(member_value) is not str or member_value not in schema.enum_values:
             raise TypeError(f"{schema.tag} has an undeclared enum value")
         return _node(schema.tag, {"value": member_value})
+    try:
+        field_values = tuple(
+            getattr(value, field_name) for field_name in schema.fields
+        )
+        reconstructed = schema.value_type(
+            **dict(zip(schema.fields, field_values, strict=True))
+        )
+        reconstructed_values = tuple(
+            getattr(reconstructed, field_name)
+            for field_name in schema.fields
+        )
+        if reconstructed_values != field_values:
+            raise ValueError("constructor normalization changed forged fields")
+    except Exception as error:
+        raise TypeError(
+            f"{schema.tag} is not a validated canonical instance"
+        ) from error
     payload = {
-        field_name: _encode_node(getattr(value, field_name))
-        for field_name in schema.fields
+        field_name: _encode_node(field_value)
+        for field_name, field_value in zip(
+            schema.fields,
+            field_values,
+            strict=True,
+        )
     }
     return _node(schema.tag, payload)
 

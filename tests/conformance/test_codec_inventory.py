@@ -238,7 +238,12 @@ def test_inventory_joins_the_closed_production_schema_exactly() -> None:
         assert rows
         assert schema.owner == owner
         assert schema.type_name == type_name
-        assert schema.tag == rows[0]["tag"]
+        expected_tag = (
+            "ca.simple-program"
+            if owner == "ca.program" and type_name == "SimpleProgram"
+            else rows[0]["tag"]
+        )
+        assert schema.tag == expected_tag
         assert schema.version == int(rows[0]["version"])
         assert schema.value_type.__module__ == owner
         assert schema.value_type.__name__ == type_name

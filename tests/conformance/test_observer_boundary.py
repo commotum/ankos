@@ -6,11 +6,12 @@ the corresponding serialization exclusion.
 """
 
 from dataclasses import dataclass, fields
+import json
 
 import pytest
 
 import ca
-from ca import program
+from ca import program, serialization
 
 from g7_mechanics import (
     MECHANICS_ROWS,
@@ -69,11 +70,38 @@ def test_observers_cannot_change_identity_or_application() -> None:
     assert ca.apply(execution.simple_program, execution.source) == before_result
 
 
-@pytest.mark.skip(reason="G7-03 owns canonical serialization exclusion checks")
 def test_observers_cannot_change_serialization() -> None:
     """No pure observer is admitted into a canonical five-field payload."""
 
-    raise AssertionError("G7-03 serialization boundary is not active")
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF004")
+    execution = run_mechanics_fixture(row)
+    before = serialization.dumps(execution.simple_program)
+    observation = RenderedObservation(
+        "causal-network-view",
+        execution.source.identity,
+    )
+    after = serialization.dumps(execution.simple_program)
+
+    assert after == before
+    assert serialization.loads(before) == serialization.Decoded(
+        execution.simple_program
+    )
+    with pytest.raises(TypeError, match="closed canonical schema registry"):
+        serialization.dumps(observation)
+
+    envelope = json.loads(before)
+    assert envelope["tag"] == "ca.simple-program"
+    assert envelope["version"] == 1
+    assert set(envelope["payload"]) == {
+        "seed",
+        "alphabet",
+        "frontier",
+        "neighborhood",
+        "rule",
+    }
+    rendered_payload = json.dumps(envelope["payload"], sort_keys=True)
+    assert observation.label not in rendered_payload
+    assert observation.source_identity not in rendered_payload
 
 
 def test_stateful_transform_with_its_own_commit_remains_an_ordinary_program() -> None:

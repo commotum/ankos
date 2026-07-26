@@ -125,6 +125,7 @@ def test_public_surface_submodules_and_signatures_are_exact() -> None:
         "frontiers",
         "neighborhoods",
         "rules",
+        "serialization",
     ]
     assert str(inspect.signature(ca.apply)) == (
         "(program: 'SimpleProgram[C, V, W, R]', "
