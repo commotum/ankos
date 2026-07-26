@@ -2,7 +2,7 @@
 
 Shorthand: **Runtime Cutover**
 
-Status: **IN PROGRESS — G7-04 CATALOG**
+Status: **PAUSED — G7-04 PRESET CONTRACT**
 
 ## Big-Picture Objective
 
@@ -118,9 +118,9 @@ conflict, and reconcile the plan before changing runtime behavior.
   through one fixed native/represented conjugate pair shared across that
   relation's two points. Lossy, approximate, and out-of-image cases remain
   explicitly qualified.
-- The active suite reports `413 passed, 13 skipped`. Every retained skip is
-  owned by G7-04 catalog construction or callable-free metadata; no G7-03
-  skip remains.
+- The G7-04 entry baseline reported `413 passed, 13 skipped`. Every retained
+  skip was owned by G7-04 catalog construction or callable-free metadata; no
+  G7-03 skip remained.
 - G7-04 started from clean commit `cf88affc29e225f64aaeca200c6f6548ecc42512`.
   Its live implementation and evidence record is
   [`5-CATALOG.md`](5-CATALOG.md).
@@ -147,6 +147,23 @@ conflict, and reconcile the plan before changing runtime behavior.
   lists remain callable-free descriptive metadata. Presets still require real
   closed bindings and may not ignore arguments or return hardcoded witnesses.
   The full decision and audit evidence are in [`5-CATALOG.md`](5-CATALOG.md).
+- All sixty canonical five-component constructors and all four true aliases
+  are now explicit ordinary functions. The constructor half of the family
+  coverage join passes for every SPF001–SPF060 representative.
+- Callable-free metadata is populated for exactly 60 families, 2 roles,
+  45 legacy entries, and 105 public-name relations with the frozen
+  `60 C / 40 P / 4 A / 1 K` census and exact home/disposition/target counts.
+- The active suite reports `522 passed, 11 skipped`; the eleven skips are the
+  five CT11 expansion tests, five catalog callable/export tests, and the
+  F010/F042 role-boundary test. The worktree is clean at `db48ebd`.
+- The remaining preset audit exposed a choice not frozen by Goal 6. A
+  source-facing interpretation of the 39 legacy presets requires general
+  tagged-head, structural-matching, variable-support, lattice-incidence,
+  recurrence, positional-number, and property-evidence mechanics absent from
+  G7-02 and therefore reopens G7-02/G7-03. A lean validated-refinement
+  interpretation can stay over existing five-field programs, but must be
+  explicitly accepted as the public preset contract rather than smuggled in
+  as zero-delta aliases.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.
@@ -299,7 +316,7 @@ stage file and may evolve with the implementation.
 | `2-CUTOVER` | G7-01 | Complete | Atomic five-field runtime replacement |
 | `3-MECHANICS` | G7-02 | Complete | All 60 rows supported by reusable mechanics |
 | `4-CODECS` | G7-03 | Complete | Canonical serialization and representation proofs |
-| `5-CATALOG` | G7-04 | In Progress | Exact constructors, metadata, exports, and migration |
+| `5-CATALOG` | G7-04 | Paused | Exact constructors, metadata, exports, and migration |
 | `6-CONFORMANCE` | G7-05 | Pending | All normative suites and joins pass together |
 | `7-RELEASE` | G7-06 | Pending | Docs, packaging, cleanup, and hostile final gate |
 
@@ -508,7 +525,7 @@ application results.
 
 Handoff stage: **G7-04 — Catalog assembly and exact legacy migration**
 
-Stage status: **Paused at a contract-reconciliation gate.** The live evidence,
+Stage status: **Paused at the preset-contract gate.** The live evidence,
 two coherent API choices, and resumable next action are in
 [`5-CATALOG.md`](5-CATALOG.md).
 

@@ -4,24 +4,27 @@
 
 - G7-04 starts from clean commit
   `cf88affc29e225f64aaeca200c6f6548ecc42512`.
-- The complete active baseline reports `413 passed, 13 skipped`. The focused
-  catalog/coverage/role baseline reports `71 passed, 13 skipped`.
-- All thirteen skips are owned by this stage: five CT11 tests, five catalog
-  unit tests, two constructor/metadata family joins, and one F010/F042 role
-  test.
+- The complete stage-entry baseline reported `413 passed, 13 skipped`. The
+  focused catalog/coverage/role baseline reported `71 passed, 13 skipped`.
+- At entry, all thirteen skips were owned by this stage: five CT11 tests, five
+  catalog unit tests, two constructor/metadata family joins, and one
+  F010/F042 role test.
 - G7-00 through G7-03 are complete. Exactly five stored program fields, one
   family-blind `apply`, reusable mechanics for all sixty audited families,
   and the closed catalog-free codec are authoritative prerequisites.
-- The eight catalog files physically exist as inert shells. Sixty canonical
-  exact-slug signatures raise `NotImplementedError`; presets and the sole
-  compatibility adapter remain private pending-name inventories; three true
-  alias signatures are also inert.
-- `catalog.entries` defines frozen callable-free record shapes but no SPF,
-  role, legacy, target, or name values.
+- All sixty canonical exact-slug constructors are now explicit typed
+  five-component assembly functions, all four true aliases delegate exactly,
+  and `eca` is a concrete closed preset. The remaining 39 presets and sole
+  compatibility adapter remain private pending-name inventories.
+- `catalog.entries` now contains the exact immutable callable-free family,
+  role, legacy, target, and name ledgers.
 - Root `ca` exposes eleven names and does not yet expose `catalog`.
 - `goal-6/catalog-migration.md` freezes exactly 60 families, 2 close roles,
   45 legacy rows, 49 callable legacy relations, six homes, every canonical
   signature, every public spelling, and every migration disposition.
+- Both family constructor/metadata joins are active. The current focused
+  catalog/public/family slice reports `181 passed`; the complete active suite
+  reports `522 passed, 11 skipped`.
 
 ## Updated Assumptions
 
@@ -151,6 +154,39 @@ Presets, aliases, and the compatibility adapter remain stricter:
   domain and translate it losslessly; and
 - an underspecified preset remains private rather than becoming an ignored-
   argument wrapper, opaque recipe, or hardcoded family witness.
+
+## Preset Contract Decision Required
+
+The detailed named-construction audit now makes the remaining choice concrete.
+It does not challenge the five stored fields or generic application law.
+
+Under a **source-facing compiler** interpretation, familiar names such as
+`mobile_automaton`, `tag_system`, `symbolic_system`,
+`lattice_cellular_automaton`, `recursive_sequence`, and
+`digit_reversal_map` accept their historical tables, patterns, topology, or
+numeric parameters and compile those into the five fields. That interpretation
+requires new reusable closed mechanics for tagged control, computed
+destinations, ordered variable-support reconstruction, structural patterns,
+general incidence, computed history addressing, positional digits, and
+property evidence. Per the frozen handoff, G7-02 and G7-03 must reopen before
+catalog work can resume.
+
+Under a **validated refinement** interpretation, an underspecified `P`
+callable accepts an already-expanded `SimpleProgram` or explicit five
+components, verifies the named closed structural profile, and returns the
+equal canonical expansion. This keeps the catalog as navigation/refinement
+over the minimal API and avoids a second compiler language. It is honest only
+if each `P` performs a real, documented restriction; a wrapper that merely
+round-trips arbitrary components would be an `A`, not a `P`. Small,
+fully-frozen conveniences such as `eca` may still compile their compact native
+parameters.
+
+Goal 6 fixes the names, kinds, target families, and binding summaries, but it
+does not choose between these two Python domains. Choosing the first expands
+the core and codec substantially. Choosing the second fixes a lean public
+contract that matches the catalog-as-alias intent but is less convenient than
+the historical source-facing constructors. No remaining preset or compatibility
+callable will be exposed until this choice is explicit.
 
 ## Big Picture Objective
 
@@ -290,3 +326,17 @@ manifest/helper when that keeps the expected ledger independent.
   callable-free family/role metadata. Preset and compatibility callables are
   exposed only after their exact closed binding domains are independently
   frozen.
+- Sixty canonical wrappers, four true aliases, concrete `eca`, and all four
+  callable-free ledgers are implemented and focused-tested. The two
+  family-constructor/metadata skips were removed.
+- Exact ledger checks now prove `60 / 2 / 45 / 105` entries, home counts
+  `11 / 15 / 8 / 14 / 9 / 3`, coverage `19 / 41`, callable kinds
+  `60 C / 40 P / 4 A / 1 K`, and the exact T01–T45 target/disposition census.
+- Verification after those changes reports `181 passed` for the focused
+  catalog/public/family slice and `522 passed, 11 skipped` for the complete
+  active suite. `git diff --check` is clean and the worktree is clean at
+  `db48ebd`.
+- The detailed preset audit establishes the source-facing-compiler versus
+  validated-refinement decision above. Stage completion is paused at that
+  public-contract boundary; no fake preset, guessed adapter, or new mechanics
+  has been introduced.
