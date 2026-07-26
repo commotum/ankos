@@ -3006,6 +3006,13 @@ def assert_mechanics_run(
             assert edges["y-c"]["right"] == alphabets.StructuralReference(node_c)
         elif row.spf == "SPF038":
             assert execution.source.structure == successor.structure == ()
+            for target, value in execution.source.entries:
+                assert isinstance(value, alphabets.ValueNode)
+                expected_tag = (
+                    "node" if target.path[0] == "node" else "edge"
+                )
+                assert value.kind is alphabets.ValueKind.GRAPH
+                assert value.tag == expected_tag
             bindings = {
                 binding.reference: binding.identity
                 for binding in derivation.fresh_bindings
@@ -3023,11 +3030,18 @@ def assert_mechanics_run(
                     loci.graph_element("node", "d"),
                 ),
             }
+            created_values = tuple(
+                successor.value_at(identity) for identity in bindings.values()
+            )
+            assert all(
+                isinstance(value, alphabets.ValueNode)
+                and value.kind is alphabets.ValueKind.GRAPH
+                and value.tag == "edge"
+                for value in created_values
+            )
             created_edges = {
-                dict(successor.value_at(identity).fields)["name"]: dict(
-                    successor.value_at(identity).fields
-                )
-                for identity in bindings.values()
+                dict(value.fields)["name"]: dict(value.fields)
+                for value in created_values
             }
             node_a = loci.graph_element("node", "a")
             node_b = loci.graph_element("node", "b")
