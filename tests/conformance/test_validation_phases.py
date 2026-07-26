@@ -74,4 +74,4 @@ def test_rejection_preserves_input_and_publishes_no_authoritative_result() -> No
     assert source.identity == before
     assert not hasattr(result, "applied_atoms")
     assert not hasattr(result, "successor_quotient_with_derivation_fibers")
-    assert_no_authoritative_commit(result, source)
+    assert_no_authoritative_commit(result, source, before)

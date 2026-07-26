@@ -5,7 +5,7 @@ Status: **IN PROGRESS — REQUIREMENT AUDIT**
 ## Current Facts
 
 - G7-05 began from clean commit
-  `0be468cbb27718ee5aad5c0f4cda1c3ee63a452d`.
+  `0be468ccfd3d46bb537d1bb90b185a7d509b29c3`.
 - G7-00 through G7-04 are complete. Their durable evidence is recorded in
   `1-ORACLES.md` through `5-CATALOG.md`; no earlier stage is presumed correct
   merely because its focused tests are green.

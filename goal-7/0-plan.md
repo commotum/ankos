@@ -161,7 +161,7 @@ conflict, and reconcile the plan before changing runtime behavior.
   reports `356 passed`; the complete active suite reports `993 passed` with no
   skips.
 - G7-04 is complete. G7-05 began from clean commit
-  `0be468cbb27718ee5aad5c0f4cda1c3ee63a452d`; its live record is
+  `0be468ccfd3d46bb537d1bb90b185a7d509b29c3`; its live record is
   [`6-CONFORMANCE.md`](6-CONFORMANCE.md).
 - The G7-05 stage-entry conformance directory reports `221 passed`, and the
   complete active suite reports `993 passed` with no skips. The initial static
