@@ -29,6 +29,9 @@ RuleScalar: TypeAlias = (
     | int
     | Fraction
     | str
+    | alphabets.AlgebraicNumber
+    | alphabets.ExactComplex
+    | alphabets.StructuralReference
     | alphabets.RepresentedNumber
     | alphabets.ValueNode
 )
@@ -50,6 +53,9 @@ def _is_rule_scalar(value: object) -> bool:
         int,
         Fraction,
         str,
+        alphabets.AlgebraicNumber,
+        alphabets.ExactComplex,
+        alphabets.StructuralReference,
         alphabets.RepresentedNumber,
         alphabets.ValueNode,
     )
@@ -78,6 +84,7 @@ class ExpressionPrimitive(Enum):
     LITERAL = "expression.literal"
     OBSERVATION = "expression.observation"
     GROUP = "expression.group"
+    TARGET_REFERENCE = "expression.target-reference"
     PROJECT = "expression.project"
     TUPLE = "expression.tuple"
     ADD = "expression.add"
@@ -165,6 +172,9 @@ def _validate_rule_expr_shape(expression: RuleExpr) -> None:
     if primitive in (ExpressionPrimitive.OBSERVATION, ExpressionPrimitive.GROUP):
         require_arity(1)
         require_index(0)
+        return
+    if primitive is ExpressionPrimitive.TARGET_REFERENCE:
+        require_arity(0)
         return
     if primitive is ExpressionPrimitive.PROJECT:
         require_arity(2)
@@ -287,6 +297,12 @@ def group(index: int) -> RuleExpr:
     if isinstance(index, bool) or index < 0:
         raise ValueError("group index must be a non-negative integer")
     return RuleExpr(ExpressionPrimitive.GROUP, (index,))
+
+
+def target_reference() -> RuleExpr:
+    """Reference the existing writable target currently evaluating a plan."""
+
+    return RuleExpr(ExpressionPrimitive.TARGET_REFERENCE)
 
 
 def project(source: RuleExpr, index: int) -> RuleExpr:
@@ -2680,6 +2696,12 @@ def _evaluate_value(
             tuple(item.value for item in items),
             _observation_evidence(items),
         )
+    if primitive is ExpressionPrimitive.TARGET_REFERENCE:
+        if anchor is None:
+            raise ValueError(
+                "target-reference expression requires an existing-target context"
+            )
+        return finish(alphabets.StructuralReference(anchor))
     if primitive is ExpressionPrimitive.PROJECT:
         source = evaluate(_child(arguments, 0))
         if not isinstance(source, tuple):
@@ -2911,7 +2933,17 @@ def _require_semantic_value(
 ) -> alphabets.SemanticValue:
     if isinstance(
         value,
-        (bool, int, Fraction, str, alphabets.RepresentedNumber, alphabets.ValueNode),
+        (
+            bool,
+            int,
+            Fraction,
+            str,
+            alphabets.AlgebraicNumber,
+            alphabets.ExactComplex,
+            alphabets.StructuralReference,
+            alphabets.RepresentedNumber,
+            alphabets.ValueNode,
+        ),
     ):
         return value
     raise TypeError("Rule expression did not produce one semantic value")
@@ -2972,6 +3004,69 @@ def expression(
             certificate_template,
             provenance_templates,
         ),
+    )
+    return Rule(descriptor, contract)
+
+
+def clause_kernel(
+    clauses: tuple[RuleClause, ...],
+    *,
+    contract: RuleContract,
+    completeness_evidence: Certificate,
+    selection: ClauseSelection = ClauseSelection.ALL,
+) -> Rule[R, W, C]:
+    """Build an ordered, closed, input-dependent finite Rule relation.
+
+    Every matched clause denotes one typed outcome. ``ALL`` retains every
+    match; ``FIRST`` retains only the first. A semantic fallback is therefore
+    an explicit final always-true clause, not interpreter policy.
+    """
+
+    denotation = ClauseKernelDenotation(
+        clauses,
+        selection,
+        completeness_evidence,
+    )
+    required_existing: set[frontiers.Effect] = set()
+    required_fresh: set[frontiers.Effect] = set()
+    for clause in clauses:
+        result = clause.result
+        if not isinstance(result, DerivationClauseResult):
+            continue
+        for plan in result.existing_plans:
+            if plan.action is DispositionAction.REPLACE:
+                required_existing.add(frontiers.Effect.REPLACE)
+            elif plan.action is DispositionAction.DELETE:
+                required_existing.add(frontiers.Effect.DELETE)
+        if any(
+            plan.action is DispositionAction.CREATE
+            for plan in result.fresh_plans
+        ):
+            required_fresh.add(frontiers.Effect.CREATE)
+    declared = contract.required_effect_profile
+    if not required_existing.issubset(declared.existing):
+        missing = required_existing.difference(declared.existing)
+        raise ValueError(
+            "clause kernel contract omits required existing effects: "
+            + ", ".join(sorted(effect.value for effect in missing))
+        )
+    if not required_fresh.issubset(declared.fresh):
+        missing = required_fresh.difference(declared.fresh)
+        raise ValueError(
+            "clause kernel contract omits required fresh effects: "
+            + ", ".join(sorted(effect.value for effect in missing))
+        )
+    if (
+        any(clause.mass is not None for clause in clauses)
+        and contract.entropy_interface
+        is not seeds.EntropyInterface.REPLAY_KEY
+    ):
+        raise ValueError(
+            "probabilistic clause kernel requires a replay-key entropy interface"
+        )
+    descriptor: RuleDescriptor[R, W, C] = RuleDescriptor(
+        RulePrimitive.CLAUSE_KERNEL,
+        denotation,
     )
     return Rule(descriptor, contract)
 
@@ -3530,12 +3625,18 @@ def elementary(number: int) -> Rule[R, W, C]:
 
 __all__ = [
     "AtomMass",
+    "CapabilitySelector",
+    "CapabilitySelectorKind",
     "Cardinality",
     "CardinalityClaim",
     "Certificate",
     "CertificateKind",
+    "ClauseKernelDenotation",
+    "ClauseResult",
+    "ClauseSelection",
     "Continue",
     "Derivation",
+    "DerivationClauseResult",
     "Disposition",
     "DispositionAction",
     "EvaluationProof",
@@ -3545,15 +3646,18 @@ __all__ = [
     "EvidenceTerm",
     "ExactlyOne",
     "ExactlyZero",
+    "ExistingDispositionPlan",
     "ExistingPlan",
     "ExistingPlanKind",
     "ExpressionPrimitive",
     "FormattedEvidence",
+    "FreshDispositionPlan",
     "GateKind",
     "InfiniteCardinality",
     "Many",
     "NoPayload",
     "NoSuccessor",
+    "NoSuccessorClauseResult",
     "NoSuccessorOutcome",
     "OutcomeSpace",
     "ProbabilityLaw",
@@ -3563,6 +3667,7 @@ __all__ = [
     "ProvenanceTemplate",
     "Rule",
     "RuleAtom",
+    "RuleClause",
     "RuleComplete",
     "RuleContract",
     "RuleDescriptor",
@@ -3583,17 +3688,24 @@ __all__ = [
     "absent",
     "add",
     "ar2_modular_0d",
+    "capability_index",
+    "capability_target",
     "cardinality_size",
+    "clause_kernel",
+    "conditional",
     "count",
     "create",
     "delete",
     "differential",
+    "divide",
     "distribution",
     "dyadlags_0d",
     "dyadrads_1d",
     "dyadaxes_2d",
     "dyadaxes_3d",
     "elementary",
+    "equal",
+    "every_capability",
     "expression",
     "finite_cardinality",
     "finite_probability_law",
@@ -3603,6 +3715,8 @@ __all__ = [
     "group",
     "intensional_support",
     "lagcounts_0d",
+    "less_equal",
+    "less_than",
     "literal",
     "literal_expr",
     "lookup",
@@ -3614,4 +3728,6 @@ __all__ = [
     "project",
     "relation",
     "replace",
+    "subtract",
+    "target_reference",
 ]

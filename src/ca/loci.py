@@ -365,15 +365,37 @@ def _validate_selector_shape(expression: SelectorExpr) -> None:
     arguments = expression.arguments
     children = expression.children
     if primitive is SelectorPrimitive.LITERAL:
-        if not arguments or children:
-            raise ValueError(
-                "literal selector needs arguments and cannot carry children"
+        if (
+            not arguments
+            or children
+            or any(
+                type(argument) not in (Locus, FreshReference)
+                for argument in arguments
             )
+        ):
+            raise ValueError(
+                "literal selector needs only structural identity arguments"
+            )
+        return
+    if primitive is SelectorPrimitive.EQUAL:
+        if len(arguments) != 2 or children:
+            raise ValueError(
+                "selector.equal needs exactly two closed arguments"
+            )
+        return
+    if primitive is SelectorPrimitive.TAGGED:
+        if (
+            len(arguments) != 1
+            or type(arguments[0]) is not str
+            or not arguments[0]
+            or children
+        ):
+            raise ValueError("selector.tagged needs one nonempty tag")
         return
     if primitive is SelectorPrimitive.MEMBERSHIP:
         if arguments or children:
             raise ValueError(
-                "G7-01 membership selector is an obligation marker with no payload"
+                "membership selector is an obligation marker with no payload"
             )
         return
     if primitive is SelectorPrimitive.RELATIVE:
@@ -383,7 +405,109 @@ def _validate_selector_shape(expression: SelectorExpr) -> None:
             or children
         ):
             raise ValueError(
-                "G7-01 relative selector needs exactly one Locus argument"
+                "relative selector needs exactly one Locus argument"
+            )
+        return
+    if primitive is SelectorPrimitive.METRIC:
+        if (
+            len(arguments) != 2
+            or type(arguments[0]) is not Locus
+            or type(arguments[1]) not in (int, Fraction)
+            or arguments[1] < 0
+            or children
+        ):
+            raise ValueError(
+                "selector.metric needs a Locus and a nonnegative exact radius"
+            )
+        return
+    if primitive is SelectorPrimitive.PATH:
+        if (
+            len(arguments) != 1
+            or type(arguments[0]) is not Locus
+            or arguments[0].kind is not LocusKind.PATH
+            or children
+        ):
+            raise ValueError("selector.path needs one path-prefix Locus")
+        return
+    if primitive is SelectorPrimitive.INCIDENCE:
+        if (
+            len(arguments) != 2
+            or type(arguments[0]) is not Locus
+            or type(arguments[1]) is not str
+            or not arguments[1]
+            or children
+        ):
+            raise ValueError(
+                "selector.incidence needs an anchor Locus and relation tag"
+            )
+        return
+    if primitive is SelectorPrimitive.REACHABLE:
+        if (
+            len(arguments) != 3
+            or type(arguments[0]) is not Locus
+            or type(arguments[1]) is not int
+            or arguments[1] < 0
+            or type(arguments[2]) is not str
+            or not arguments[2]
+            or children
+        ):
+            raise ValueError(
+                "selector.reachable needs an anchor, nonnegative depth, and "
+                "relation tag"
+            )
+        return
+    if primitive is SelectorPrimitive.FIELD_RESTRICTION:
+        bounds = arguments[1:]
+        if (
+            len(arguments) < 3
+            or len(bounds) % 2
+            or type(arguments[0]) is not str
+            or not arguments[0]
+            or any(type(bound) not in (int, Fraction) for bound in bounds)
+            or any(
+                bounds[index] > bounds[index + 1]
+                for index in range(0, len(bounds), 2)
+            )
+            or children
+        ):
+            raise ValueError(
+                "selector.field-restriction needs a field and exact "
+                "lower/upper bound pairs"
+            )
+        return
+    if primitive is SelectorPrimitive.DIFFERENTIAL_GERM:
+        if (
+            len(arguments) not in (2, 3)
+            or type(arguments[0]) is not str
+            or not arguments[0]
+            or type(arguments[1]) is not int
+            or arguments[1] < 0
+            or (
+                len(arguments) == 3
+                and (
+                    type(arguments[2]) is not str
+                    or not arguments[2]
+                )
+            )
+            or children
+        ):
+            raise ValueError(
+                "selector.differential-germ needs a field, nonnegative "
+                "derivative order, and optional component"
+            )
+        return
+    if primitive is SelectorPrimitive.HISTORY:
+        if (
+            len(arguments) not in (0, 2)
+            or any(type(argument) is not int for argument in arguments)
+            or (
+                len(arguments) == 2
+                and arguments[1] < arguments[0]
+            )
+            or children
+        ):
+            raise ValueError(
+                "selector.history needs no bounds or one ordered integer range"
             )
         return
     if primitive in (SelectorPrimitive.AND, SelectorPrimitive.OR):
@@ -396,9 +520,127 @@ def _validate_selector_shape(expression: SelectorExpr) -> None:
         if arguments or len(children) != 1:
             raise ValueError("selector.not needs exactly one child selector")
         return
-    raise ValueError(
-        f"{primitive.value} selector is reserved for G7-02 mechanics"
+    raise AssertionError(f"unhandled selector primitive {primitive.value}")
+
+
+def selector_literal(
+    *targets: Locus | FreshReference,
+) -> SelectorExpr:
+    """Select an explicit nonempty tuple of structural identities."""
+
+    return SelectorExpr(SelectorPrimitive.LITERAL, arguments=targets)
+
+
+def selector_equal(
+    left: SelectorArgument,
+    right: SelectorArgument,
+) -> SelectorExpr:
+    """State exact equality between two closed selector terms."""
+
+    return SelectorExpr(SelectorPrimitive.EQUAL, arguments=(left, right))
+
+
+def selector_tagged(tag: str) -> SelectorExpr:
+    """Select structure carrying one exact tag."""
+
+    return SelectorExpr(SelectorPrimitive.TAGGED, arguments=(tag,))
+
+
+def selector_path(
+    *segments: ClosedScalar | Locus,
+    scope: str = "path",
+) -> SelectorExpr:
+    """Select paths having one closed prefix."""
+
+    if len(segments) == 1 and type(segments[0]) is Locus:
+        prefix = segments[0]
+    else:
+        if any(type(segment) is Locus for segment in segments):
+            raise TypeError("path selector cannot mix a Locus with path segments")
+        prefix = path(*segments, scope=scope)  # type: ignore[arg-type]
+    return SelectorExpr(SelectorPrimitive.PATH, arguments=(prefix,))
+
+
+def selector_incidence(
+    anchor: Locus,
+    relation_tag: str = "incidence",
+) -> SelectorExpr:
+    """Select finite structure incident to ``anchor``."""
+
+    return SelectorExpr(
+        SelectorPrimitive.INCIDENCE,
+        arguments=(anchor, relation_tag),
     )
+
+
+def selector_reachable(
+    anchor: Locus,
+    max_depth: int,
+    relation_tag: str = "incidence",
+) -> SelectorExpr:
+    """Select finite structure reachable within ``max_depth`` relations."""
+
+    return SelectorExpr(
+        SelectorPrimitive.REACHABLE,
+        arguments=(anchor, max_depth, relation_tag),
+    )
+
+
+def selector_metric(
+    anchor: Locus,
+    radius: int | Fraction,
+) -> SelectorExpr:
+    """Select exact coordinate/field points within an L1 radius."""
+
+    return SelectorExpr(
+        SelectorPrimitive.METRIC,
+        arguments=(anchor, radius),
+    )
+
+
+def selector_field_restriction(
+    field: str,
+    bounds: tuple[int | Fraction, ...],
+) -> SelectorExpr:
+    """Select one field over exact lower/upper bound pairs."""
+
+    if type(bounds) is not tuple:
+        raise TypeError("field restriction bounds must be an immutable tuple")
+    return SelectorExpr(
+        SelectorPrimitive.FIELD_RESTRICTION,
+        arguments=(field, *bounds),
+    )
+
+
+def selector_differential_germ(
+    field: str,
+    order: int,
+    *,
+    component: str | None = None,
+) -> SelectorExpr:
+    """Describe an exact differential germ without choosing a stencil."""
+
+    arguments: tuple[SelectorArgument, ...] = (field, order)
+    if component is not None:
+        arguments = (*arguments, component)
+    return SelectorExpr(
+        SelectorPrimitive.DIFFERENTIAL_GERM,
+        arguments=arguments,
+    )
+
+
+def selector_history(
+    start: int | None = None,
+    stop: int | None = None,
+) -> SelectorExpr:
+    """Select all history occurrences or one exact half-open range."""
+
+    if (start is None) != (stop is None):
+        raise ValueError("history selector bounds must be supplied together")
+    arguments: tuple[SelectorArgument, ...] = ()
+    if start is not None and stop is not None:
+        arguments = (start, stop)
+    return SelectorExpr(SelectorPrimitive.HISTORY, arguments=arguments)
 
 
 class RegionKind(Enum):
@@ -423,6 +665,63 @@ class RegionKind(Enum):
     INTENSIONAL = "intensional"
 
 
+class FreshTemplateKind(Enum):
+    """Closed ways to derive fresh references from current structure."""
+
+    CHILDREN = "children"
+    EDGES = "edges"
+
+
+@dataclass(frozen=True)
+class FreshTemplate:
+    """A per-configuration fresh-reference template.
+
+    A child template pairs every resolved parent with every local key.  An
+    edge template takes the Cartesian product of its endpoint regions and
+    pairs every resulting interface with every local key.
+    """
+
+    kind: FreshTemplateKind
+    namespace: str
+    local_keys: tuple[ClosedScalar, ...]
+    parent_region: "Region | None" = None
+    interface_regions: tuple["Region", ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        _require_version_one(self.version, "fresh-template")
+        if type(self.kind) is not FreshTemplateKind:
+            raise TypeError("fresh-template kind is not recognized")
+        if type(self.namespace) is not str or not self.namespace:
+            raise ValueError("fresh-template namespace cannot be empty")
+        if type(self.local_keys) is not tuple or not self.local_keys:
+            raise ValueError("fresh-template local keys must be a nonempty tuple")
+        if any(
+            type(local_key) not in (bool, int, Fraction, str)
+            for local_key in self.local_keys
+        ):
+            raise TypeError("fresh-template local key is not closed")
+        if len(set(self.local_keys)) != len(self.local_keys):
+            raise ValueError("fresh-template local keys must be unique")
+        if self.parent_region is not None and type(self.parent_region) is not Region:
+            raise TypeError("fresh-template parent region is not recognized")
+        if type(self.interface_regions) is not tuple or any(
+            type(region) is not Region for region in self.interface_regions
+        ):
+            raise TypeError(
+                "fresh-template interface regions must contain Region values"
+            )
+        if self.kind is FreshTemplateKind.CHILDREN:
+            if self.parent_region is None or self.interface_regions:
+                raise ValueError(
+                    "child fresh-template needs one parent region only"
+                )
+        elif self.parent_region is not None or len(self.interface_regions) < 2:
+            raise ValueError(
+                "edge fresh-template needs at least two interface regions only"
+            )
+
+
 @dataclass(frozen=True)
 class Region:
     """A closed raw region.  It grants neither read nor write authority."""
@@ -434,6 +733,7 @@ class Region:
     parts: tuple["Region", ...] = ()
     offsets: tuple[Locus, ...] = ()
     relation: SelectorExpr | None = None
+    templates: tuple[FreshTemplate, ...] = ()
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -447,6 +747,7 @@ class Region:
                 self.fresh,
                 self.parts,
                 self.offsets,
+                self.templates,
             )
         ):
             raise TypeError("region collections must be immutable tuples")
@@ -462,18 +763,26 @@ class Region:
             raise TypeError("region offsets must contain Locus values")
         if self.relation is not None and type(self.relation) is not SelectorExpr:
             raise TypeError("region relation must be a SelectorExpr")
+        if any(type(item) is not FreshTemplate for item in self.templates):
+            raise TypeError("region templates must contain FreshTemplate values")
         if self.kind is RegionKind.LITERAL and not (self.loci or self.fresh):
             raise ValueError("literal region cannot be empty")
-        if self.kind in (RegionKind.UNION, RegionKind.PRODUCT) and not self.parts:
+        if self.kind in (
+            RegionKind.UNION,
+            RegionKind.INTERSECTION,
+            RegionKind.PRODUCT,
+        ) and not self.parts:
             raise ValueError(f"{self.kind.value} region requires parts")
         if self.kind is RegionKind.INTENSIONAL and self.relation is None:
             raise ValueError("intensional region requires a relation")
-        if self.kind is RegionKind.UNION:
+        if self.kind in (RegionKind.UNION, RegionKind.INTERSECTION):
             ordered = tuple(sorted(self.parts, key=canonical_identity))
             identities = tuple(canonical_identity(part) for part in self.parts)
             ordered_identities = tuple(canonical_identity(part) for part in ordered)
             if len(set(ordered_identities)) != len(ordered):
-                raise ValueError("union region contains duplicate parts")
+                raise ValueError(
+                    f"{self.kind.value} region contains duplicate parts"
+                )
             if ordered_identities != identities:
                 object.__setattr__(self, "parts", ordered)
         _validate_region_shape(self)
@@ -487,6 +796,7 @@ def _validate_region_shape(region: Region) -> None:
             or region.parts
             or region.offsets
             or region.relation is not None
+            or region.templates
         ):
             raise ValueError("literal region carries irrelevant fields")
         if len(set(region.loci)) != len(region.loci):
@@ -502,6 +812,7 @@ def _validate_region_shape(region: Region) -> None:
             or region.parts
             or region.offsets
             or region.relation is not None
+            or region.templates
         ):
             raise ValueError(f"{kind.value} region carries irrelevant fields")
         return
@@ -513,6 +824,7 @@ def _validate_region_shape(region: Region) -> None:
             or len(region.parts) != 1
             or not region.offsets
             or region.relation is not None
+            or region.templates
         ):
             raise ValueError("relative region descriptor shape is invalid")
         return
@@ -524,8 +836,87 @@ def _validate_region_shape(region: Region) -> None:
             or not region.parts
             or region.offsets
             or region.relation is not None
+            or region.templates
         ):
             raise ValueError("union region carries irrelevant fields")
+        return
+    if kind is RegionKind.INTERSECTION:
+        if (
+            region.name is not None
+            or region.loci
+            or region.fresh
+            or len(region.parts) < 2
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError("intersection region carries irrelevant fields")
+        return
+    if kind is RegionKind.DIFFERENCE:
+        if (
+            region.name is not None
+            or region.loci
+            or region.fresh
+            or len(region.parts) != 2
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError("difference region descriptor shape is invalid")
+        return
+    if kind is RegionKind.SPAN:
+        if (
+            region.name is not None
+            or len(region.loci) != 1
+            or region.loci[0].kind is not LocusKind.SPAN
+            or region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError("span region descriptor shape is invalid")
+        return
+    if kind is RegionKind.PATH:
+        if (
+            region.name is not None
+            or len(region.loci) != 1
+            or region.loci[0].kind is not LocusKind.PATH
+            or region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError("path region descriptor shape is invalid")
+        return
+    if kind is RegionKind.MATCHED_INTERFACE:
+        if (
+            not region.name
+            or region.loci
+            or region.fresh
+            or len(region.parts) != 2
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError(
+                "matched-interface region descriptor shape is invalid"
+            )
+        return
+    if kind is RegionKind.DYNAMIC_ADDRESS:
+        if (
+            not region.name
+            or region.loci
+            or region.fresh
+            or len(region.parts) != 1
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError(
+                "dynamic-address region descriptor shape is invalid"
+            )
         return
     if kind is RegionKind.PRODUCT:
         if (
@@ -534,6 +925,7 @@ def _validate_region_shape(region: Region) -> None:
             or not region.parts
             or region.offsets
             or region.relation is not None
+            or region.templates
             or (region.name is not None and len(region.parts) != 1)
         ):
             raise ValueError("product region descriptor shape is invalid")
@@ -542,15 +934,57 @@ def _validate_region_shape(region: Region) -> None:
         if (
             not region.name
             or region.loci
-            or not region.fresh
             or region.parts
             or region.offsets
             or region.relation is not None
+            or bool(region.fresh) == bool(region.templates)
         ):
             raise ValueError(f"{kind.value} region descriptor shape is invalid")
         if any(reference.namespace != region.name for reference in region.fresh):
             raise ValueError(
                 f"{kind.value} references must use the region namespace"
+            )
+        expected_template_kind = (
+            FreshTemplateKind.CHILDREN
+            if kind is RegionKind.FRESH_CHILDREN
+            else FreshTemplateKind.EDGES
+        )
+        if any(
+            template.namespace != region.name
+            or template.kind is not expected_template_kind
+            for template in region.templates
+        ):
+            raise ValueError(
+                f"{kind.value} templates must use the region namespace and kind"
+            )
+        return
+    if kind is RegionKind.CONTINUOUS:
+        if (
+            not region.name
+            or len(region.loci) != 1
+            or region.loci[0].kind is not LocusKind.CONTINUOUS
+            or region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is not None
+            or region.templates
+        ):
+            raise ValueError("continuous region descriptor shape is invalid")
+        return
+    if kind is RegionKind.DIFFERENTIAL:
+        if (
+            not region.name
+            or region.loci
+            or region.fresh
+            or region.parts
+            or region.offsets
+            or region.relation is None
+            or region.templates
+        ):
+            raise ValueError("differential region descriptor shape is invalid")
+        if region.relation.primitive is not SelectorPrimitive.DIFFERENTIAL_GERM:
+            raise ValueError(
+                "differential region requires a differential-germ selector"
             )
         return
     if kind is RegionKind.INTENSIONAL:
@@ -561,10 +995,11 @@ def _validate_region_shape(region: Region) -> None:
             or region.parts
             or region.offsets
             or region.relation is None
+            or region.templates
         ):
             raise ValueError("intensional region descriptor shape is invalid")
         return
-    raise ValueError(f"{kind.value} region is reserved for G7-02 mechanics")
+    raise AssertionError(f"unhandled region kind {kind.value}")
 
 
 def literal(
@@ -594,6 +1029,62 @@ def union(parts: tuple[Region, ...]) -> Region:
     return Region(RegionKind.UNION, parts=parts)
 
 
+def intersection(parts: tuple[Region, ...]) -> Region:
+    """Return the canonical finite intersection of at least two regions."""
+
+    return Region(RegionKind.INTERSECTION, parts=parts)
+
+
+def difference(base: Region, excluded: Region) -> Region:
+    """Return loci in ``base`` that are not in ``excluded``."""
+
+    return Region(RegionKind.DIFFERENCE, parts=(base, excluded))
+
+
+def span_region(container: Locus | str, start: int, stop: int) -> Region:
+    """Select existing ordered occurrences in one half-open span."""
+
+    return Region(
+        RegionKind.SPAN,
+        loci=(span(container, start, stop),),
+    )
+
+
+def path_region(prefix: Locus) -> Region:
+    """Select existing path loci whose paths begin with ``prefix``."""
+
+    if type(prefix) is not Locus:
+        raise TypeError("path-region prefix must be a Locus")
+    return Region(RegionKind.PATH, loci=(prefix,))
+
+
+def matched_interface(
+    left: Region,
+    right: Region,
+    relation_tag: str = "interface",
+) -> Region:
+    """Select existing interface/edge loci joining two finite regions."""
+
+    return Region(
+        RegionKind.MATCHED_INTERFACE,
+        name=relation_tag,
+        parts=(left, right),
+    )
+
+
+def dynamic_address(
+    sources: Region,
+    relation_tag: str = "address",
+) -> Region:
+    """Resolve targets addressed by current structural state."""
+
+    return Region(
+        RegionKind.DYNAMIC_ADDRESS,
+        name=relation_tag,
+        parts=(sources,),
+    )
+
+
 def region_product(parts: tuple[tuple[str, Region], ...]) -> Region:
     if not parts:
         raise ValueError("region product requires named parts")
@@ -616,6 +1107,99 @@ def fresh_children(
             FreshReference(namespace, local_key, parent)
             for local_key in local_keys
         ),
+    )
+
+
+def fresh_edges(
+    interface_loci: tuple[Locus, ...],
+    namespace: str,
+    local_keys: tuple[ClosedScalar, ...],
+) -> Region:
+    """Declare static fresh edges over one explicit interface."""
+
+    if type(interface_loci) is not tuple or len(interface_loci) < 2:
+        raise ValueError("fresh edges require at least two interface Loci")
+    if any(type(target) is not Locus for target in interface_loci):
+        raise TypeError("fresh-edge interface must contain Loci")
+    return Region(
+        RegionKind.FRESH_EDGES,
+        name=namespace,
+        fresh=tuple(
+            FreshReference(
+                namespace,
+                local_key,
+                interface=interface_loci,
+            )
+            for local_key in local_keys
+        ),
+    )
+
+
+def fresh_children_dynamic(
+    parents: Region,
+    namespace: str,
+    local_keys: tuple[ClosedScalar, ...],
+) -> Region:
+    """Derive child capabilities afresh from every current parent."""
+
+    return Region(
+        RegionKind.FRESH_CHILDREN,
+        name=namespace,
+        templates=(
+            FreshTemplate(
+                FreshTemplateKind.CHILDREN,
+                namespace,
+                local_keys,
+                parent_region=parents,
+            ),
+        ),
+    )
+
+
+def fresh_edges_dynamic(
+    interface_regions: tuple[Region, ...],
+    namespace: str,
+    local_keys: tuple[ClosedScalar, ...],
+) -> Region:
+    """Derive edge capabilities from current endpoint combinations."""
+
+    return Region(
+        RegionKind.FRESH_EDGES,
+        name=namespace,
+        templates=(
+            FreshTemplate(
+                FreshTemplateKind.EDGES,
+                namespace,
+                local_keys,
+                interface_regions=interface_regions,
+            ),
+        ),
+    )
+
+
+def continuous(
+    name: str,
+    bounds: tuple[Fraction, ...],
+) -> Region:
+    """Describe a closed continuous region without finite enumeration."""
+
+    return Region(
+        RegionKind.CONTINUOUS,
+        name=name,
+        loci=(continuous_region(name, bounds),),
+    )
+
+
+def differential(
+    name: str,
+    relation: SelectorExpr,
+) -> Region:
+    """Describe a closed differential region without choosing a stencil."""
+
+    return Region(
+        RegionKind.DIFFERENTIAL,
+        name=name,
+        relation=relation,
     )
 
 
@@ -642,6 +1226,13 @@ class CarrierKind(Enum):
     INTENSIONAL = "intensional"
 
 
+class ConfigurationIdentityLaw(Enum):
+    """Semantic equality law declared by a configuration carrier."""
+
+    EXACT = "exact"
+    BOUND_FRESH_ALPHA = "bound-fresh-alpha"
+
+
 @dataclass(frozen=True)
 class CarrierContract:
     """Closed structural contract shared independently by program components."""
@@ -651,12 +1242,14 @@ class CarrierContract:
     shape: tuple[int, ...] | None = None
     axes: tuple[str, ...] = ()
     version: int = 1
+    identity_law: ConfigurationIdentityLaw = ConfigurationIdentityLaw.EXACT
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported carrier-contract version {self.version}")
-        if not isinstance(self.kind, CarrierKind):
+        _require_version_one(self.version, "carrier-contract")
+        if type(self.kind) is not CarrierKind:
             raise TypeError("carrier kind is not recognized")
+        if type(self.identity_law) is not ConfigurationIdentityLaw:
+            raise TypeError("configuration identity law is not recognized")
         if self.shape is not None and type(self.shape) is not tuple:
             raise TypeError("carrier shape must be an immutable tuple")
         if type(self.axes) is not tuple:
@@ -690,6 +1283,7 @@ class CarrierContract:
             and (self.rank is None or self.rank == other.rank)
             and (self.shape is None or self.shape == other.shape)
             and (not self.axes or self.axes == other.axes)
+            and self.identity_law is other.identity_law
         )
 
 
@@ -816,6 +1410,11 @@ class FiniteConfiguration(Generic[V]):
                 raise ValueError(
                     "finite grid entries do not equal the declared carrier"
                 )
+        if (
+            contract.identity_law
+            is ConfigurationIdentityLaw.BOUND_FRESH_ALPHA
+        ):
+            _validate_bound_fresh_identity_targets(targets)
         ordered = tuple(
             sorted(self.entries, key=lambda item: canonical_order_key(item[0]))
         )
@@ -828,7 +1427,7 @@ class FiniteConfiguration(Generic[V]):
 
     @property
     def identity(self) -> str:
-        return canonical_identity(self)
+        return configuration_identity(self)
 
     @property
     def canonical_identity(self) -> str:
@@ -879,7 +1478,7 @@ class IntensionalConfiguration:
 
     @property
     def identity(self) -> str:
-        return canonical_identity(self)
+        return configuration_identity(self)
 
     @property
     def canonical_identity(self) -> str:
@@ -990,6 +1589,18 @@ def resolve_region(
                     seen.add(target)
                     out.append(target)
         return tuple(sorted(out, key=canonical_order_key))
+    if region.kind is RegionKind.INTERSECTION:
+        resolved_parts = tuple(
+            resolve_region(part, configuration) for part in region.parts
+        )
+        common = set(resolved_parts[0])
+        for resolved in resolved_parts[1:]:
+            common.intersection_update(resolved)
+        return tuple(sorted(common, key=canonical_order_key))
+    if region.kind is RegionKind.DIFFERENCE:
+        base = resolve_region(region.parts[0], configuration)
+        excluded = set(resolve_region(region.parts[1], configuration))
+        return tuple(target for target in base if target not in excluded)
     if region.kind is RegionKind.PRODUCT:
         out: list[Locus] = []
         for part in region.parts:
@@ -1002,28 +1613,479 @@ def resolve_region(
             for offset in region.offsets:
                 resolved.append(_relative_target(configuration, anchor, offset))
         return tuple(resolved)
+    if region.kind is RegionKind.SPAN:
+        descriptor = region.loci[0]
+        container, start, stop = descriptor.path
+        return tuple(
+            target
+            for target, _ in configuration.entries
+            if target.kind is LocusKind.OCCURRENCE
+            and len(target.path) >= 2
+            and target.path[0] == container
+            and type(target.path[-1]) is int
+            and start <= target.path[-1] < stop
+        )
+    if region.kind is RegionKind.PATH:
+        prefix = region.loci[0]
+        return tuple(
+            target
+            for target, _ in configuration.entries
+            if _has_path_prefix(target, prefix)
+        )
+    if region.kind is RegionKind.MATCHED_INTERFACE:
+        return _resolve_matched_interface(region, configuration)
+    if region.kind is RegionKind.DYNAMIC_ADDRESS:
+        return _resolve_dynamic_address(region, configuration)
+    if region.kind in (
+        RegionKind.CONTINUOUS,
+        RegionKind.DIFFERENTIAL,
+        RegionKind.INTENSIONAL,
+    ):
+        raise LociResolutionError(
+            f"{region.kind.value} region is closed but non-enumerated"
+        )
+    if region.kind in (
+        RegionKind.FRESH_CHILDREN,
+        RegionKind.FRESH_EDGES,
+    ):
+        return ()
     raise LociResolutionError(
         f"region {region.kind.value} is not finitely resolvable"
     )
 
 
-def resolve_fresh_references(region: Region) -> tuple[FreshReference, ...]:
+def resolve_fresh_references(
+    region: Region,
+    configuration: FiniteConfiguration[object] | None = None,
+) -> tuple[FreshReference, ...]:
     """Resolve the structurally declared fresh portion without binding it."""
 
-    if region.kind in (
-        RegionKind.LITERAL,
-        RegionKind.FRESH_CHILDREN,
-        RegionKind.FRESH_EDGES,
-    ):
+    if region.kind is RegionKind.LITERAL:
         return region.fresh
+    if region.kind in (RegionKind.FRESH_CHILDREN, RegionKind.FRESH_EDGES):
+        if region.fresh:
+            return region.fresh
+        if configuration is None:
+            raise LociResolutionError(
+                "dynamic fresh-template resolution needs a configuration"
+            )
+        out: list[FreshReference] = []
+        for template in region.templates:
+            if template.kind is FreshTemplateKind.CHILDREN:
+                assert template.parent_region is not None
+                parents = resolve_region(template.parent_region, configuration)
+                out.extend(
+                    FreshReference(template.namespace, local_key, parent)
+                    for parent in parents
+                    for local_key in template.local_keys
+                )
+            else:
+                interfaces = tuple(
+                    resolve_region(interface_region, configuration)
+                    for interface_region in template.interface_regions
+                )
+                out.extend(
+                    FreshReference(
+                        template.namespace,
+                        local_key,
+                        interface=tuple(interface_loci),
+                    )
+                    for interface_loci in cartesian_product(*interfaces)
+                    for local_key in template.local_keys
+                )
+        if len(out) != len(set(out)):
+            raise LociResolutionError(
+                "dynamic fresh templates resolve duplicate references"
+            )
+        return tuple(sorted(out, key=canonical_order_key))
     if region.kind in (RegionKind.UNION, RegionKind.PRODUCT):
         out: list[FreshReference] = []
         for part in region.parts:
-            out.extend(resolve_fresh_references(part))
+            out.extend(resolve_fresh_references(part, configuration))
         if len(out) != len(set(out)):
             raise LociResolutionError("fresh region contains duplicate local keys")
         return tuple(out)
+    if region.kind is RegionKind.INTERSECTION:
+        resolved_parts = tuple(
+            resolve_fresh_references(part, configuration)
+            for part in region.parts
+        )
+        common = set(resolved_parts[0])
+        for resolved in resolved_parts[1:]:
+            common.intersection_update(resolved)
+        return tuple(sorted(common, key=canonical_order_key))
+    if region.kind is RegionKind.DIFFERENCE:
+        base = resolve_fresh_references(region.parts[0], configuration)
+        excluded = set(
+            resolve_fresh_references(region.parts[1], configuration)
+        )
+        return tuple(target for target in base if target not in excluded)
     return ()
+
+
+def resolve_selector(
+    expression: SelectorExpr,
+    configuration: FiniteConfiguration[V],
+    *,
+    candidates: tuple[Locus, ...] | None = None,
+) -> tuple[Locus, ...]:
+    """Resolve one finitely decidable selector over a finite configuration.
+
+    Membership and differential-germ expressions deliberately remain closed
+    non-enumerated contracts and therefore fail rather than approximate.
+    """
+
+    if type(expression) is not SelectorExpr:
+        raise TypeError("selector expression is not recognized")
+    if type(configuration) is not FiniteConfiguration:
+        raise TypeError("selector resolution needs a FiniteConfiguration")
+    if candidates is None:
+        candidates = tuple(target for target, _ in configuration.entries)
+    elif type(candidates) is not tuple or any(
+        type(target) is not Locus for target in candidates
+    ):
+        raise TypeError("selector candidates must be an immutable tuple of Loci")
+
+    primitive = expression.primitive
+    arguments = expression.arguments
+    if primitive is SelectorPrimitive.LITERAL:
+        return tuple(
+            target
+            for target in arguments
+            if type(target) is Locus and target in candidates
+        )
+    if primitive is SelectorPrimitive.EQUAL:
+        left, right = arguments
+        selected: list[Locus] = []
+        if type(left) is Locus and type(right) is Locus:
+            if (
+                configuration.contains(left)
+                and configuration.contains(right)
+                and _canonical_term(configuration.value_at(left))
+                == _canonical_term(configuration.value_at(right))
+            ):
+                selected.extend(
+                    target
+                    for target in (left, right)
+                    if target in candidates and target not in selected
+                )
+        elif type(left) is Locus and configuration.contains(left):
+            if _canonical_term(configuration.value_at(left)) == _canonical_term(
+                right
+            ):
+                selected.append(left)
+        elif type(right) is Locus and configuration.contains(right):
+            if _canonical_term(configuration.value_at(right)) == _canonical_term(
+                left
+            ):
+                selected.append(right)
+        return tuple(selected)
+    if primitive is SelectorPrimitive.TAGGED:
+        tag = arguments[0]
+        assert type(tag) is str
+        structurally_tagged = {
+            argument
+            for relation in configuration.structure
+            if relation.tag == tag
+            for argument in relation.arguments
+            if type(argument) is Locus
+        }
+        return tuple(
+            target
+            for target in candidates
+            if target.kind.value == tag
+            or target.scope == tag
+            or target in structurally_tagged
+        )
+    if primitive is SelectorPrimitive.RELATIVE:
+        target = arguments[0]
+        assert type(target) is Locus
+        return (target,) if target in candidates else ()
+    if primitive is SelectorPrimitive.METRIC:
+        anchor, radius = arguments
+        assert type(anchor) is Locus
+        assert type(radius) in (int, Fraction)
+        return tuple(
+            target
+            for target in candidates
+            if _l1_distance(anchor, target) <= radius
+        )
+    if primitive is SelectorPrimitive.PATH:
+        prefix = arguments[0]
+        assert type(prefix) is Locus
+        return tuple(
+            target
+            for target in candidates
+            if _has_path_prefix(target, prefix)
+        )
+    if primitive in (
+        SelectorPrimitive.INCIDENCE,
+        SelectorPrimitive.REACHABLE,
+    ):
+        anchor = arguments[0]
+        assert type(anchor) is Locus
+        depth = 1
+        relation_tag = arguments[1]
+        if primitive is SelectorPrimitive.REACHABLE:
+            depth = arguments[1]
+            relation_tag = arguments[2]
+        assert type(depth) is int and type(relation_tag) is str
+        reachable = _reachable_loci(
+            configuration,
+            anchor,
+            depth,
+            relation_tag,
+        )
+        if primitive is SelectorPrimitive.INCIDENCE:
+            reachable.discard(anchor)
+        return tuple(target for target in candidates if target in reachable)
+    if primitive is SelectorPrimitive.FIELD_RESTRICTION:
+        field = arguments[0]
+        bounds = arguments[1:]
+        assert type(field) is str
+        return tuple(
+            target
+            for target in candidates
+            if _field_point_within(target, field, bounds)
+        )
+    if primitive is SelectorPrimitive.HISTORY:
+        if arguments:
+            start, stop = arguments
+            assert type(start) is int and type(stop) is int
+        else:
+            start = None
+            stop = None
+        return tuple(
+            target
+            for target in candidates
+            if target.kind is LocusKind.OCCURRENCE
+            and len(target.path) >= 2
+            and type(target.path[-1]) is int
+            and (
+                start is None
+                or start <= target.path[-1] < stop  # type: ignore[operator]
+            )
+        )
+    if primitive in (SelectorPrimitive.AND, SelectorPrimitive.OR):
+        resolved_children = tuple(
+            resolve_selector(child, configuration, candidates=candidates)
+            for child in expression.children
+        )
+        if primitive is SelectorPrimitive.AND:
+            selected = set(resolved_children[0])
+            for child_targets in resolved_children[1:]:
+                selected.intersection_update(child_targets)
+        else:
+            selected = {
+                target
+                for child_targets in resolved_children
+                for target in child_targets
+            }
+        return tuple(target for target in candidates if target in selected)
+    if primitive is SelectorPrimitive.NOT:
+        excluded = set(
+            resolve_selector(
+                expression.children[0],
+                configuration,
+                candidates=candidates,
+            )
+        )
+        return tuple(target for target in candidates if target not in excluded)
+    if primitive in (
+        SelectorPrimitive.MEMBERSHIP,
+        SelectorPrimitive.DIFFERENTIAL_GERM,
+    ):
+        raise LociResolutionError(
+            f"{primitive.value} selector is closed but non-enumerated"
+        )
+    raise AssertionError(f"unhandled selector primitive {primitive.value}")
+
+
+def _has_path_prefix(target: Locus, prefix: Locus) -> bool:
+    return (
+        target.kind is LocusKind.PATH
+        and prefix.kind is LocusKind.PATH
+        and target.scope == prefix.scope
+        and target.path[: len(prefix.path)] == prefix.path
+    )
+
+
+def _relation_loci(relation: StructuralRelation) -> tuple[Locus, ...]:
+    return tuple(
+        argument
+        for argument in relation.arguments
+        if type(argument) is Locus
+    )
+
+
+def _resolve_matched_interface(
+    region: Region,
+    configuration: FiniteConfiguration[V],
+) -> tuple[Locus, ...]:
+    left = set(resolve_region(region.parts[0], configuration))
+    right = set(resolve_region(region.parts[1], configuration))
+    selected: set[Locus] = set()
+    for relation in configuration.structure:
+        if relation.tag != region.name:
+            continue
+        relation_loci = _relation_loci(relation)
+        if not any(target in left for target in relation_loci) or not any(
+            target in right for target in relation_loci
+        ):
+            continue
+        selected.update(
+            target
+            for target in relation_loci
+            if target.kind is LocusKind.INTERFACE
+            or (
+                target.kind is LocusKind.GRAPH_ELEMENT
+                and target.path
+                and target.path[0] in ("edge", "port")
+            )
+        )
+    interface_candidates = tuple(
+        target
+        for target, _ in configuration.entries
+        if target.kind is LocusKind.INTERFACE
+    )
+    for left_target in left:
+        for right_target in right:
+            expected = interface(
+                left_target,
+                right_target,
+                name=region.name or "interface",
+            )
+            if expected in interface_candidates:
+                selected.add(expected)
+    return tuple(sorted(selected, key=canonical_order_key))
+
+
+def _resolve_dynamic_address(
+    region: Region,
+    configuration: FiniteConfiguration[V],
+) -> tuple[Locus, ...]:
+    sources = set(resolve_region(region.parts[0], configuration))
+    selected: set[Locus] = set()
+    for relation in configuration.structure:
+        if relation.tag != region.name:
+            continue
+        relation_loci = _relation_loci(relation)
+        if relation_loci and relation_loci[0] in sources:
+            selected.update(
+                target
+                for target in relation_loci[1:]
+                if configuration.contains(target)
+            )
+    for source in sources:
+        if not configuration.contains(source):
+            continue
+        value = configuration.value_at(source)
+        if type(value) is Locus and configuration.contains(value):
+            selected.add(value)
+    return tuple(sorted(selected, key=canonical_order_key))
+
+
+def _reachable_loci(
+    configuration: FiniteConfiguration[V],
+    anchor: Locus,
+    max_depth: int,
+    relation_tag: str,
+) -> set[Locus]:
+    adjacency: dict[Locus, set[Locus]] = {}
+    for relation in configuration.structure:
+        if relation.tag != relation_tag:
+            continue
+        relation_loci = _relation_loci(relation)
+        for source in relation_loci:
+            adjacency.setdefault(source, set()).update(
+                target for target in relation_loci if target != source
+            )
+    reached = {anchor}
+    frontier = {anchor}
+    for _ in range(max_depth):
+        frontier = {
+            target
+            for source in frontier
+            for target in adjacency.get(source, ())
+            if target not in reached
+        }
+        reached.update(frontier)
+        if not frontier:
+            break
+    return reached
+
+
+def _l1_distance(left: Locus, right: Locus) -> int | Fraction:
+    if (
+        left.kind is LocusKind.COORDINATE
+        and right.kind is LocusKind.COORDINATE
+        and left.scope == right.scope
+    ):
+        left_values = (
+            grid_coordinates(left)
+            if left.scope.startswith("grid:")
+            else tuple(
+                value for value in left.path if type(value) is int
+            )
+        )
+        right_values = (
+            grid_coordinates(right)
+            if right.scope.startswith("grid:")
+            else tuple(
+                value for value in right.path if type(value) is int
+            )
+        )
+    elif (
+        left.kind is LocusKind.FIELD_POINT
+        and right.kind is LocusKind.FIELD_POINT
+        and left.path
+        and right.path
+        and left.path[0] == right.path[0]
+    ):
+        left_values = tuple(
+            value
+            for value in left.path[1:]
+            if type(value) in (int, Fraction)
+        )
+        right_values = tuple(
+            value
+            for value in right.path[1:]
+            if type(value) in (int, Fraction)
+        )
+    else:
+        return Fraction(10**18)
+    if len(left_values) != len(right_values):
+        return Fraction(10**18)
+    return sum(
+        (abs(left_value - right_value) for left_value, right_value in zip(
+            left_values, right_values
+        )),
+        Fraction(0),
+    )
+
+
+def _field_point_within(
+    target: Locus,
+    field: str,
+    bounds: tuple[SelectorArgument, ...],
+) -> bool:
+    if (
+        target.kind is not LocusKind.FIELD_POINT
+        or not target.path
+        or target.path[0] != field
+    ):
+        return False
+    coordinates = tuple(
+        value
+        for value in target.path[1:]
+        if type(value) in (int, Fraction)
+    )
+    if len(coordinates) * 2 != len(bounds):
+        return False
+    return all(
+        bounds[2 * index] <= coordinate <= bounds[2 * index + 1]  # type: ignore[operator]
+        for index, coordinate in enumerate(coordinates)
+    )
 
 
 def resolve_relative_anchors(

@@ -5,11 +5,239 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
+from math import gcd
 from typing import Generic, TypeAlias, TypeVar
+
+from . import loci
 
 
 V = TypeVar("V")
 ExactScalar: TypeAlias = bool | int | Fraction | str
+
+
+@dataclass(frozen=True)
+class AlgebraicNumber:
+    """One exact real root of a normalized integer polynomial.
+
+    ``polynomial`` is written in descending degree order.  The rational
+    interval must isolate exactly one real root.  ``root_index`` is the
+    zero-based position of that root among all distinct real roots and is
+    derived when omitted.
+    """
+
+    polynomial: tuple[int, ...]
+    isolating_interval: tuple[Fraction, Fraction]
+    root_index: int | None = None
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueError(
+                f"unsupported algebraic-number version {self.version!r}"
+            )
+        if type(self.polynomial) is not tuple or any(
+            type(coefficient) is not int for coefficient in self.polynomial
+        ):
+            raise TypeError(
+                "algebraic polynomial must be an immutable tuple of integers"
+            )
+        normalized = _normalize_integer_polynomial(self.polynomial)
+        if normalized != self.polynomial:
+            object.__setattr__(self, "polynomial", normalized)
+        interval = self.isolating_interval
+        if (
+            type(interval) is not tuple
+            or len(interval) != 2
+            or any(type(endpoint) is not Fraction for endpoint in interval)
+        ):
+            raise TypeError(
+                "algebraic isolating interval needs two exact Fractions"
+            )
+        lower, upper = interval
+        if lower >= upper:
+            raise ValueError(
+                "algebraic isolating interval endpoints must be increasing"
+            )
+        sequence = _sturm_sequence(normalized)
+        if _polynomial_at(normalized, lower) == 0:
+            raise ValueError("algebraic lower endpoint cannot be a root")
+        if _polynomial_at(normalized, upper) == 0:
+            raise ValueError("algebraic upper endpoint cannot be a root")
+        root_count = _sturm_variations_at(sequence, lower) - (
+            _sturm_variations_at(sequence, upper)
+        )
+        if root_count != 1:
+            raise ValueError(
+                "algebraic interval must isolate exactly one distinct real root"
+            )
+        derived_index = _sturm_variations_at_infinity(
+            sequence, negative=True
+        ) - _sturm_variations_at(sequence, lower)
+        if self.root_index is None:
+            object.__setattr__(self, "root_index", derived_index)
+        elif type(self.root_index) is not int or self.root_index < 0:
+            raise ValueError("algebraic root_index must be a nonnegative integer")
+        elif self.root_index != derived_index:
+            raise ValueError(
+                "algebraic root_index disagrees with the isolating interval"
+            )
+
+
+ExactReal: TypeAlias = int | Fraction | AlgebraicNumber
+
+
+@dataclass(frozen=True)
+class ExactComplex:
+    """An exact complex value with rational or algebraic components."""
+
+    real: ExactReal
+    imaginary: ExactReal
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueError(
+                f"unsupported exact-complex version {self.version!r}"
+            )
+        if type(self.real) not in (int, Fraction, AlgebraicNumber) or type(
+            self.imaginary
+        ) not in (int, Fraction, AlgebraicNumber):
+            raise TypeError(
+                "exact-complex components must be integers, Fractions, "
+                "or AlgebraicNumbers"
+            )
+
+
+@dataclass(frozen=True)
+class StructuralReference:
+    """A semantic value that names an existing or Rule-local fresh locus."""
+
+    reference: loci.Locus | loci.FreshReference
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueError(
+                f"unsupported structural-reference version {self.version!r}"
+            )
+        if type(self.reference) not in (loci.Locus, loci.FreshReference):
+            raise TypeError(
+                "structural reference must contain a Locus or FreshReference"
+            )
+
+    @property
+    def is_bound(self) -> bool:
+        return type(self.reference) is loci.Locus
+
+
+Polynomial: TypeAlias = tuple[Fraction, ...]
+
+
+def _trim_polynomial(polynomial: Polynomial) -> Polynomial:
+    index = 0
+    while index < len(polynomial) - 1 and polynomial[index] == 0:
+        index += 1
+    return polynomial[index:]
+
+
+def _normalize_integer_polynomial(
+    polynomial: tuple[int, ...],
+) -> tuple[int, ...]:
+    if len(polynomial) < 2:
+        raise ValueError("algebraic polynomial must have positive degree")
+    index = 0
+    while index < len(polynomial) and polynomial[index] == 0:
+        index += 1
+    if index == len(polynomial) or len(polynomial) - index < 2:
+        raise ValueError("algebraic polynomial must have positive degree")
+    coefficients = polynomial[index:]
+    content = 0
+    for coefficient in coefficients:
+        content = gcd(content, abs(coefficient))
+    assert content > 0
+    coefficients = tuple(coefficient // content for coefficient in coefficients)
+    if coefficients[0] < 0:
+        coefficients = tuple(-coefficient for coefficient in coefficients)
+    return coefficients
+
+
+def _polynomial_at(
+    polynomial: tuple[int, ...] | Polynomial,
+    point: Fraction,
+) -> Fraction:
+    value = Fraction(0)
+    for coefficient in polynomial:
+        value = value * point + coefficient
+    return value
+
+
+def _polynomial_derivative(polynomial: Polynomial) -> Polynomial:
+    degree = len(polynomial) - 1
+    return tuple(
+        coefficient * (degree - index)
+        for index, coefficient in enumerate(polynomial[:-1])
+    )
+
+
+def _polynomial_remainder(dividend: Polynomial, divisor: Polynomial) -> Polynomial:
+    dividend = _trim_polynomial(dividend)
+    divisor = _trim_polynomial(divisor)
+    if len(divisor) == 1 and divisor[0] == 0:
+        raise ZeroDivisionError("polynomial division by zero")
+    remainder = list(dividend)
+    while len(remainder) >= len(divisor) and any(remainder):
+        factor = remainder[0] / divisor[0]
+        for index, coefficient in enumerate(divisor):
+            remainder[index] -= factor * coefficient
+        remainder = list(_trim_polynomial(tuple(remainder)))
+        if len(remainder) == 1 and remainder[0] == 0:
+            break
+    return _trim_polynomial(tuple(remainder))
+
+
+def _sturm_sequence(polynomial: tuple[int, ...]) -> tuple[Polynomial, ...]:
+    first = tuple(Fraction(coefficient) for coefficient in polynomial)
+    second = _trim_polynomial(_polynomial_derivative(first))
+    sequence = [first, second]
+    while not (len(sequence[-1]) == 1 and sequence[-1][0] == 0):
+        remainder = _polynomial_remainder(sequence[-2], sequence[-1])
+        if len(remainder) == 1 and remainder[0] == 0:
+            break
+        sequence.append(tuple(-coefficient for coefficient in remainder))
+    return tuple(sequence)
+
+
+def _sign(value: Fraction) -> int:
+    return (value > 0) - (value < 0)
+
+
+def _sign_variations(signs: tuple[int, ...]) -> int:
+    nonzero = tuple(sign for sign in signs if sign)
+    return sum(left != right for left, right in zip(nonzero, nonzero[1:]))
+
+
+def _sturm_variations_at(
+    sequence: tuple[Polynomial, ...],
+    point: Fraction,
+) -> int:
+    return _sign_variations(
+        tuple(_sign(_polynomial_at(polynomial, point)) for polynomial in sequence)
+    )
+
+
+def _sturm_variations_at_infinity(
+    sequence: tuple[Polynomial, ...],
+    *,
+    negative: bool,
+) -> int:
+    signs = []
+    for polynomial in sequence:
+        sign = _sign(polynomial[0])
+        degree = len(polynomial) - 1
+        if negative and degree % 2:
+            sign = -sign
+        signs.append(sign)
+    return _sign_variations(tuple(signs))
 
 
 class ValueKind(Enum):
@@ -33,11 +261,8 @@ class ValueNode:
 
     kind: ValueKind
     tag: str
-    items: tuple[ExactScalar | "ValueNode" | "RepresentedNumber", ...] = ()
-    fields: tuple[
-        tuple[str, ExactScalar | "ValueNode" | "RepresentedNumber"],
-        ...,
-    ] = ()
+    items: tuple["SemanticValue", ...] = ()
+    fields: tuple[tuple[str, "SemanticValue"], ...] = ()
     version: int = 1
 
     def __post_init__(self) -> None:
@@ -139,7 +364,14 @@ class RepresentedNumber:
                 raise ValueError("represented interval endpoints are reversed")
 
 
-SemanticValue: TypeAlias = ExactScalar | RepresentedNumber | ValueNode
+SemanticValue: TypeAlias = (
+    ExactScalar
+    | AlgebraicNumber
+    | ExactComplex
+    | StructuralReference
+    | RepresentedNumber
+    | ValueNode
+)
 
 
 def _is_semantic_value(value: object) -> bool:
@@ -148,9 +380,69 @@ def _is_semantic_value(value: object) -> bool:
         int,
         Fraction,
         str,
+        AlgebraicNumber,
+        ExactComplex,
+        StructuralReference,
         RepresentedNumber,
         ValueNode,
     )
+
+
+StructuralBinding: TypeAlias = tuple[loci.FreshReference, loci.Locus]
+
+
+def bind_structural_references(
+    value: SemanticValue,
+    bindings: tuple[StructuralBinding, ...],
+) -> SemanticValue:
+    """Recursively replace every fresh value reference with its bound locus.
+
+    Bindings are immutable semantic pairs.  Missing references, duplicate
+    local references, and target collisions fail closed.
+    """
+
+    if not _is_semantic_value(value):
+        raise TypeError("structural-reference binding needs a semantic value")
+    if type(bindings) is not tuple or any(
+        type(binding) is not tuple
+        or len(binding) != 2
+        or type(binding[0]) is not loci.FreshReference
+        or type(binding[1]) is not loci.Locus
+        for binding in bindings
+    ):
+        raise TypeError(
+            "bindings must be immutable (FreshReference, Locus) pairs"
+        )
+    fresh = tuple(reference for reference, _ in bindings)
+    targets = tuple(target for _, target in bindings)
+    if len(set(fresh)) != len(fresh):
+        raise ValueError("structural bindings contain duplicate fresh references")
+    if len(set(targets)) != len(targets):
+        raise ValueError("structural bindings contain colliding bound loci")
+
+    if type(value) is StructuralReference:
+        reference = value.reference
+        if type(reference) is loci.Locus:
+            return value
+        for fresh_reference, target in bindings:
+            if reference == fresh_reference:
+                return StructuralReference(target)
+        raise ValueError("structural value contains an unbound fresh reference")
+    if type(value) is ValueNode:
+        return ValueNode(
+            value.kind,
+            value.tag,
+            items=tuple(
+                bind_structural_references(item, bindings)
+                for item in value.items
+            ),
+            fields=tuple(
+                (name, bind_structural_references(item, bindings))
+                for name, item in value.fields
+            ),
+            version=value.version,
+        )
+    return value
 
 
 class AlphabetKind(Enum):
@@ -160,6 +452,8 @@ class AlphabetKind(Enum):
     INTEGERS = "integers"
     RATIONALS = "rationals"
     MODULAR = "modular"
+    ALGEBRAIC = "algebraic"
+    EXACT_COMPLEX = "exact-complex"
     REPRESENTED_NUMBER = "represented-number"
     TAG = "tag"
     UNION = "union"
@@ -174,6 +468,7 @@ class AlphabetKind(Enum):
     EQUATION = "equation"
     DISTRIBUTION = "distribution"
     SYMBOLIC = "symbolic"
+    STRUCTURAL_REFERENCE = "structural-reference"
     REFINEMENT = "refinement"
 
 
@@ -181,6 +476,8 @@ class ValueProfile(Enum):
     BOOLEAN = "boolean"
     INTEGER = "integer"
     RATIONAL = "rational"
+    ALGEBRAIC = "algebraic"
+    COMPLEX = "complex"
     REPRESENTED = "represented"
     SYMBOLIC = "symbolic"
     STRUCTURAL = "structural"
@@ -298,6 +595,240 @@ class Alphabet(Generic[V]):
         self.require(left)
         self.require(right)
         return semantic_equal(left, right)
+
+
+class RepresentationProfile(Enum):
+    """The semantic strength claimed by a finite representation map."""
+
+    EXACT = "exact"
+    LOSSY = "lossy"
+    APPROXIMATE = "approximate"
+
+
+@dataclass(frozen=True)
+class RepresentationPair:
+    """One source-to-target atom in a closed finite representation map."""
+
+    source: SemanticValue
+    target: SemanticValue
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueError(
+                f"unsupported representation-pair version {self.version!r}"
+            )
+        if not _is_semantic_value(self.source) or not _is_semantic_value(
+            self.target
+        ):
+            raise TypeError("representation pairs require closed semantic values")
+
+
+@dataclass(frozen=True)
+class RepresentationRelation:
+    """A validated finite map with explicit image and inverse evidence.
+
+    The source schema must enumerate its complete finite domain.  Exact maps
+    are injective and carry their complete inverse-on-image graph.  Lossy and
+    approximate maps cannot expose that exact inverse and instead require
+    explicit qualification data.
+    """
+
+    source_schema: AlphabetDescriptor
+    target_schema: AlphabetDescriptor
+    profile: RepresentationProfile
+    relation: tuple[RepresentationPair, ...]
+    image_evidence: tuple[SemanticValue, ...]
+    inverse_evidence: tuple[RepresentationPair, ...] = ()
+    qualification: tuple[tuple[str, ExactScalar], ...] = ()
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueError(
+                f"unsupported representation-relation version {self.version!r}"
+            )
+        if type(self.source_schema) is not AlphabetDescriptor or type(
+            self.target_schema
+        ) is not AlphabetDescriptor:
+            raise TypeError("representation schemas must be AlphabetDescriptors")
+        if type(self.profile) is not RepresentationProfile:
+            raise TypeError("representation profile is not recognized")
+        if type(self.relation) is not tuple or any(
+            type(pair) is not RepresentationPair for pair in self.relation
+        ):
+            raise TypeError(
+                "representation relation must be an immutable tuple of pairs"
+            )
+        if not self.relation:
+            raise ValueError("representation relation cannot be empty")
+        if type(self.image_evidence) is not tuple or any(
+            not _is_semantic_value(value) for value in self.image_evidence
+        ):
+            raise TypeError(
+                "representation image evidence must contain semantic values"
+            )
+        if type(self.inverse_evidence) is not tuple or any(
+            type(pair) is not RepresentationPair
+            for pair in self.inverse_evidence
+        ):
+            raise TypeError(
+                "representation inverse evidence must be an immutable pair tuple"
+            )
+        if type(self.qualification) is not tuple or any(
+            type(item) is not tuple
+            or len(item) != 2
+            or type(item[0]) is not str
+            or not item[0]
+            or type(item[1]) not in (bool, int, Fraction, str)
+            for item in self.qualification
+        ):
+            raise TypeError(
+                "representation qualification must contain closed named scalars"
+            )
+        qualification_names = tuple(name for name, _ in self.qualification)
+        if len(set(qualification_names)) != len(qualification_names):
+            raise ValueError("representation qualification names must be unique")
+        object.__setattr__(
+            self,
+            "qualification",
+            tuple(sorted(self.qualification, key=lambda item: item[0])),
+        )
+
+        finite_kinds = (
+            AlphabetKind.ENUM,
+            AlphabetKind.ORDERED,
+            AlphabetKind.SYMBOLIC,
+        )
+        if self.source_schema.kind not in finite_kinds:
+            raise ValueError(
+                "finite representation relation needs an enumerable source schema"
+            )
+        for pair in self.relation:
+            if not _contains(self.source_schema, pair.source):
+                raise ValueError(
+                    "representation relation contains a value outside its "
+                    "source schema"
+                )
+            if not _contains(self.target_schema, pair.target):
+                raise ValueError(
+                    "representation relation contains a value outside its "
+                    "target schema"
+                )
+
+        source_keys = tuple(_value_key(pair.source) for pair in self.relation)
+        if len(source_keys) != len(set(source_keys)):
+            raise ValueError(
+                "representation relation must map each source exactly once"
+            )
+        expected_sources = {
+            _value_key(value) for value in self.source_schema.values
+        }
+        if set(source_keys) != expected_sources:
+            raise ValueError(
+                "representation relation does not cover its finite source schema"
+            )
+        ordered_relation = tuple(
+            sorted(self.relation, key=lambda pair: _value_key(pair.source))
+        )
+        object.__setattr__(self, "relation", ordered_relation)
+
+        image_keys = tuple(_value_key(value) for value in self.image_evidence)
+        if len(image_keys) != len(set(image_keys)):
+            raise ValueError("representation image evidence contains duplicates")
+        expected_image_by_key = {
+            _value_key(pair.target): pair.target for pair in ordered_relation
+        }
+        if set(image_keys) != set(expected_image_by_key):
+            raise ValueError(
+                "representation image evidence disagrees with the relation"
+            )
+        object.__setattr__(
+            self,
+            "image_evidence",
+            tuple(
+                expected_image_by_key[key]
+                for key in sorted(expected_image_by_key)
+            ),
+        )
+
+        if self.profile is RepresentationProfile.EXACT:
+            target_keys = tuple(
+                _value_key(pair.target) for pair in ordered_relation
+            )
+            if len(target_keys) != len(set(target_keys)):
+                raise ValueError("exact representation relation must be injective")
+            expected_inverse = {
+                (_value_key(pair.target), _value_key(pair.source))
+                for pair in ordered_relation
+            }
+            actual_inverse = {
+                (_value_key(pair.source), _value_key(pair.target))
+                for pair in self.inverse_evidence
+            }
+            if not self.inverse_evidence or actual_inverse != expected_inverse:
+                raise ValueError(
+                    "exact representation needs complete inverse-on-image evidence"
+                )
+            if self.qualification:
+                raise ValueError(
+                    "exact representation cannot carry lossy/approximate "
+                    "qualification"
+                )
+            object.__setattr__(
+                self,
+                "inverse_evidence",
+                tuple(
+                    sorted(
+                        self.inverse_evidence,
+                        key=lambda pair: _value_key(pair.source),
+                    )
+                ),
+            )
+        else:
+            if self.inverse_evidence:
+                raise ValueError(
+                    "lossy/approximate representation cannot claim an exact "
+                    "inverse"
+                )
+            if not self.qualification:
+                raise ValueError(
+                    "lossy/approximate representation needs explicit "
+                    "qualification"
+                )
+            if (
+                self.profile is RepresentationProfile.APPROXIMATE
+                and not {
+                    "error-bound",
+                    "error-model",
+                }.intersection(qualification_names)
+            ):
+                raise ValueError(
+                    "approximate representation needs error-bound or "
+                    "error-model evidence"
+                )
+
+    @property
+    def mapping(self) -> tuple[RepresentationPair, ...]:
+        return self.relation
+
+    def forward(self, value: SemanticValue) -> SemanticValue:
+        if not _contains(self.source_schema, value):
+            raise ValueError("value is outside the representation source schema")
+        for pair in self.relation:
+            if semantic_equal(pair.source, value):
+                return pair.target
+        raise ValueError("value is outside the declared finite relation")
+
+    def inverse(self, value: SemanticValue) -> SemanticValue:
+        if self.profile is not RepresentationProfile.EXACT:
+            raise ValueError(
+                "only exact representations have an inverse-on-image"
+            )
+        for pair in self.inverse_evidence:
+            if semantic_equal(pair.source, value):
+                return pair.target
+        raise ValueError("value is outside the declared representation image")
 
 
 def _scalar_parameter(

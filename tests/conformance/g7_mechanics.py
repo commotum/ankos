@@ -8,6 +8,10 @@ covered; no production descriptor or application branch may inspect them.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from fractions import Fraction
+
+import ca
+from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
 
 @dataclass(frozen=True)
@@ -112,3 +116,728 @@ SECONDARY_JOINS = (
     ("SPF042", "PX08"),
 )
 
+
+Semantic = alphabets.SemanticValue
+Configuration = loci.FiniteConfiguration[Semantic] | loci.IntensionalConfiguration
+
+
+@dataclass(frozen=True)
+class MechanicsRun:
+    """One test-owned expanded program, its source, and its complete result."""
+
+    row: MechanicsRow
+    simple_program: ca.SimpleProgram
+    source: Configuration
+    result: program.ApplicationResult
+
+
+def _certificate(kind: rules.CertificateKind, label: str) -> rules.Certificate:
+    return rules.Certificate(kind, rules.literal_expr(label))
+
+
+def _stop(label: str) -> rules.Stop:
+    return rules.Stop(
+        rules.literal_expr(label),
+        _certificate(rules.CertificateKind.TERMINALITY, f"{label}:terminal"),
+    )
+
+
+def _contract(
+    source: Configuration,
+    alphabet: alphabets.Alphabet,
+    writable: frontiers.WritableRegion,
+    readable: neighborhoods.ReadableRegion,
+    *,
+    stochastic: bool = False,
+    exactness: seeds.ExactnessProfile = seeds.ExactnessProfile.EXACT,
+) -> rules.RuleContract:
+    return rules.RuleContract(
+        source.contract,
+        alphabet.value_profile,
+        readable.result_shape,
+        readable.join_shape,
+        writable.effect_profile,
+        exactness_profile=exactness,
+        entropy_interface=(
+            seeds.EntropyInterface.REPLAY_KEY
+            if stochastic
+            else seeds.EntropyInterface.NONE
+        ),
+    )
+
+
+def _existing_plan(
+    index: int,
+    action: rules.DispositionAction,
+    value: rules.RuleExpr | None = None,
+) -> rules.ExistingDispositionPlan:
+    return rules.ExistingDispositionPlan(
+        rules.capability_index(index),
+        action,
+        value,
+    )
+
+
+def _fresh_plan(
+    index: int,
+    action: rules.DispositionAction,
+    value: rules.RuleExpr | None = None,
+) -> rules.FreshDispositionPlan:
+    return rules.FreshDispositionPlan(
+        rules.capability_index(index),
+        action,
+        value,
+    )
+
+
+def _derivation_result(
+    label: str,
+    *,
+    existing: tuple[rules.ExistingDispositionPlan, ...] = (),
+    fresh: tuple[rules.FreshDispositionPlan, ...] = (),
+    stop: bool = False,
+) -> rules.DerivationClauseResult:
+    return rules.DerivationClauseResult(
+        existing,
+        fresh,
+        rules.Progress.ADVANCED,
+        _stop(f"{label}:completed") if stop else rules.Continue(),
+        rules.literal_expr(label),
+        (f"mechanics:{label}",),
+        _certificate(rules.CertificateKind.DERIVATION, f"{label}:derived"),
+    )
+
+
+def _no_successor_result(
+    label: str,
+    outcome: rules.NoSuccessorOutcome = rules.NoSuccessorOutcome.TERMINAL,
+) -> rules.NoSuccessorClauseResult:
+    kind = (
+        rules.CertificateKind.DIVERGENCE
+        if outcome is rules.NoSuccessorOutcome.DIVERGENT
+        else rules.CertificateKind.TERMINALITY
+    )
+    return rules.NoSuccessorClauseResult(
+        outcome,
+        rules.literal_expr(f"{label}:reason"),
+        rules.literal_expr(label),
+        (f"mechanics:{label}",),
+        _certificate(kind, f"{label}:no-successor"),
+    )
+
+
+def _clause(
+    condition: rules.RuleExpr,
+    result: rules.ClauseResult,
+    *,
+    mass: Fraction | None = None,
+) -> rules.RuleClause:
+    return rules.RuleClause(condition, result, mass)
+
+
+def _kernel(
+    source: Configuration,
+    alphabet: alphabets.Alphabet,
+    writable: frontiers.WritableRegion,
+    readable: neighborhoods.ReadableRegion,
+    clauses: tuple[rules.RuleClause, ...],
+    *,
+    stochastic: bool = False,
+    selection: rules.ClauseSelection = rules.ClauseSelection.ALL,
+) -> rules.Rule:
+    return rules.clause_kernel(
+        clauses,
+        contract=_contract(
+            source,
+            alphabet,
+            writable,
+            readable,
+            stochastic=stochastic,
+        ),
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "g7-mechanics:closed-clause-space",
+        ),
+        selection=selection,
+    )
+
+
+def _assemble(
+    row: MechanicsRow,
+    source: Configuration,
+    alphabet: alphabets.Alphabet,
+    writable: frontiers.WritableRegion,
+    readable: neighborhoods.ReadableRegion,
+    rule: rules.Rule,
+    *,
+    exactness: seeds.ExactnessProfile = seeds.ExactnessProfile.EXACT,
+) -> MechanicsRun:
+    simple_program = ca.SimpleProgram(
+        seeds.exact(
+            source,
+            value_profile=alphabet.value_profile,
+            exactness_profile=exactness,
+        ),
+        alphabet,
+        writable,
+        readable,
+        rule,
+    )
+    return MechanicsRun(row, simple_program, source, ca.apply(simple_program, source))
+
+
+def _finite_history_components(
+    values: tuple[int | Fraction, ...],
+    *,
+    alphabet: alphabets.Alphabet | None = None,
+    effects: tuple[frontiers.Effect, ...] = (frontiers.Effect.REPLACE,),
+) -> tuple[
+    loci.FiniteConfiguration,
+    alphabets.Alphabet,
+    frontiers.WritableRegion,
+    neighborhoods.ReadableRegion,
+]:
+    source = loci.history_configuration(values)
+    if alphabet is None:
+        alphabet = (
+            alphabets.rationals()
+            if any(type(value) is Fraction for value in values)
+            else alphabets.integers()
+        )
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=effects,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    return source, alphabet, writable, readable
+
+
+def _px01(row: MechanicsRow) -> MechanicsRun:
+    """Couple source, control, and every possible destination atomically."""
+
+    source, alphabet, writable, readable = _finite_history_components((0, 1, 0))
+    base = (
+        _existing_plan(0, rules.DispositionAction.REPLACE, rules.observation(1)),
+        _existing_plan(1, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+        _existing_plan(2, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+    )
+    clauses = [_clause(rules.literal_expr(1), _derivation_result(row.fixture, existing=base))]
+    if row.spf == "SPF030":
+        other = (
+            _existing_plan(0, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+            _existing_plan(1, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+            _existing_plan(2, rules.DispositionAction.REPLACE, rules.observation(1)),
+        )
+        clauses.append(
+            _clause(
+                rules.equal(rules.observation(1), rules.literal_expr(1)),
+                _derivation_result(f"{row.fixture}:alternate", existing=other),
+            )
+        )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        tuple(clauses),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+_PX02_SHAPES = {
+    "SPF002": (0, 1),
+    "SPF005": (2, 2),
+    "SPF016": (2, 1),
+    "SPF022": (0, 1),
+    "SPF023": (0, 1),
+    "SPF025": (1, 0),
+    "SPF028": (2, 3),
+    "SPF031": (1, 2),
+    "SPF037": (2, 2),
+    "SPF038": (1, 2),
+    "SPF049": (1, 1),
+}
+
+
+def _word_configuration(values: tuple[int, ...]) -> loci.FiniteConfiguration[int]:
+    contract = loci.CarrierContract(loci.CarrierKind.WORD, rank=1, axes=("word",))
+    entries = tuple(
+        (loci.occurrence("word", index), value)
+        for index, value in enumerate(values)
+    )
+    return loci.FiniteConfiguration(
+        loci.Carrier(contract, loci.Boundary(loci.BoundaryPolicy.NONE)),
+        entries,
+    )
+
+
+def _px02(row: MechanicsRow) -> MechanicsRun:
+    """Apply one input-derived total delete/create structural patch."""
+
+    delete_count, create_count = _PX02_SHAPES[row.spf]
+    source = _word_configuration((1, 2))
+    alphabet = alphabets.integers()
+    existing = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
+    )
+    parent = source.entries[0][0]
+    references = tuple(
+        loci.FreshReference(
+            f"g7-{row.spf.lower()}",
+            index,
+            parent=parent,
+            interface=(parent,),
+        )
+        for index in range(create_count)
+    )
+    if references:
+        fresh_region = frontiers.fresh(
+            loci.fresh_children(references),
+            namespace=frontiers.FreshNamespace(
+                f"g7-{row.spf.lower()}",
+                parent=parent,
+            ),
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        writable = frontiers.union((existing, fresh_region))
+    else:
+        writable = existing
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    existing_plans = tuple(
+        _existing_plan(index, rules.DispositionAction.DELETE)
+        for index in range(delete_count)
+    )
+    fresh_plans = tuple(
+        _fresh_plan(
+            index,
+            rules.DispositionAction.CREATE,
+            rules.add(rules.observation(0), rules.literal_expr(index + 10)),
+        )
+        for index in range(create_count)
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.less_equal(rules.literal_expr(0), rules.observation(0)),
+                _derivation_result(
+                    row.fixture,
+                    existing=existing_plans,
+                    fresh=fresh_plans,
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px03(row: MechanicsRow) -> MechanicsRun:
+    """Use the complete immutable snapshot in one coupled global decision."""
+
+    marker = int(row.spf[-3:])
+    source, alphabet, writable, readable = _finite_history_components(
+        (marker, 2, 3, 0)
+    )
+    aggregate = rules.add(
+        rules.observation(0),
+        rules.observation(1),
+        rules.observation(2),
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.less_than(rules.observation(3), aggregate),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(
+                            3,
+                            rules.DispositionAction.REPLACE,
+                            aggregate,
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px04(row: MechanicsRow) -> MechanicsRun:
+    """Denote typed zero, witnessed one, or witnessed many alternatives."""
+
+    desired = {
+        "SPF014": 1,
+        "SPF018": 2,
+        "SPF024": 1,
+        "SPF026": 0,
+        "SPF029": 2,
+        "SPF033": 2,
+    }[row.spf]
+    source, alphabet, writable, readable = _finite_history_components((desired,))
+    solution_clauses = tuple(
+        _clause(
+            rules.less_than(rules.literal_expr(solution), rules.observation(0)),
+            _derivation_result(
+                f"{row.fixture}:solution-{solution}",
+                existing=(
+                    _existing_plan(
+                        0,
+                        rules.DispositionAction.REPLACE,
+                        # SPF033 deliberately demonstrates two witnesses that
+                        # quotient to one successor.
+                        rules.literal_expr(
+                            1 if row.spf == "SPF033" else solution + 1
+                        ),
+                    ),
+                ),
+                stop=row.spf in {"SPF014", "SPF024", "SPF026", "SPF029"},
+            ),
+        )
+        for solution in range(2)
+    )
+    fallback = _clause(
+        rules.equal(rules.observation(0), rules.literal_expr(0)),
+        _no_successor_result(f"{row.fixture}:zero"),
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (*solution_clauses, fallback),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px05_finite(row: MechanicsRow) -> MechanicsRun:
+    """Commit an exact Fraction-valued flow/event segment and stop."""
+
+    source, alphabet, writable, readable = _finite_history_components(
+        (Fraction(1, 4), Fraction(-1), Fraction(0), Fraction(0)),
+        alphabet=alphabets.rationals(),
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.less_equal(rules.literal_expr(0), rules.observation(0)),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(
+                            0,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(Fraction(0)),
+                        ),
+                        _existing_plan(
+                            1,
+                            rules.DispositionAction.REPLACE,
+                            rules.subtract(
+                                rules.literal_expr(0),
+                                rules.observation(1),
+                            ),
+                        ),
+                        _existing_plan(
+                            2,
+                            rules.DispositionAction.REPLACE,
+                            rules.add(rules.observation(2), rules.observation(0)),
+                        ),
+                        _existing_plan(
+                            3,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(1),
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px06(row: MechanicsRow) -> MechanicsRun:
+    """Return an exact law without drawing, then expose both submeasures."""
+
+    source, alphabet, writable, readable = _finite_history_components((1, 0))
+    accepted = _derivation_result(
+        f"{row.fixture}:accepted",
+        existing=(
+            _existing_plan(
+                1,
+                rules.DispositionAction.REPLACE,
+                rules.add(rules.observation(0), rules.literal_expr(1)),
+            ),
+        ),
+    )
+    continued = _derivation_result(f"{row.fixture}:rejected-continue")
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(rules.literal_expr(1), accepted, mass=Fraction(1, 2)),
+            _clause(rules.literal_expr(1), continued, mass=Fraction(1, 2)),
+        ),
+        stochastic=True,
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px07(row: MechanicsRow) -> MechanicsRun:
+    """Mutate carrier data and visible program/instruction state together."""
+
+    source, alphabet, writable, readable = _finite_history_components((1, 30, 0))
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.equal(rules.observation(0), rules.literal_expr(1)),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(
+                            0,
+                            rules.DispositionAction.REPLACE,
+                            rules.literal_expr(0),
+                        ),
+                        _existing_plan(
+                            1,
+                            rules.DispositionAction.REPLACE,
+                            rules.add(rules.observation(1), rules.literal_expr(1)),
+                        ),
+                        _existing_plan(
+                            2,
+                            rules.DispositionAction.REPLACE,
+                            rules.add(rules.observation(2), rules.literal_expr(1)),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px08(row: MechanicsRow) -> MechanicsRun:
+    """Produce a typed one-shot successor whose continuation is stopped."""
+
+    source, alphabet, writable, readable = _finite_history_components((1, 0))
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.equal(rules.observation(0), rules.literal_expr(1)),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(
+                            1,
+                            rules.DispositionAction.REPLACE,
+                            rules.add(rules.observation(0), rules.literal_expr(6)),
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+            _clause(
+                rules.equal(rules.observation(0), rules.literal_expr(0)),
+                _no_successor_result(
+                    f"{row.fixture}:divergent",
+                    rules.NoSuccessorOutcome.DIVERGENT,
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px09(row: MechanicsRow) -> MechanicsRun:
+    """Evaluate a closed fixed wiring/gate expression and stop."""
+
+    source = loci.history_configuration((True, True, False))
+    alphabet = alphabets.boolean()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    gate_value = rules.gate(
+        rules.RuleExpr(
+            rules.ExpressionPrimitive.TUPLE,
+            (rules.observation(0), rules.observation(1)),
+        ),
+        rules.GateKind.ALL,
+    )
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.literal_expr(1),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(
+                            2,
+                            rules.DispositionAction.REPLACE,
+                            gate_value,
+                        ),
+                    ),
+                    stop=True,
+                ),
+            ),
+        ),
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px11(row: MechanicsRow) -> MechanicsRun:
+    """Advance one priority requirement and atomically injure the lower one."""
+
+    source, alphabet, writable, readable = _finite_history_components((0, 1, 1, 0))
+    rule = _kernel(
+        source,
+        alphabet,
+        writable,
+        readable,
+        (
+            _clause(
+                rules.equal(rules.observation(0), rules.literal_expr(0)),
+                _derivation_result(
+                    row.fixture,
+                    existing=(
+                        _existing_plan(0, rules.DispositionAction.REPLACE, rules.literal_expr(1)),
+                        _existing_plan(1, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+                        _existing_plan(2, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+                        _existing_plan(3, rules.DispositionAction.REPLACE, rules.literal_expr(1)),
+                    ),
+                ),
+            ),
+        ),
+        selection=rules.ClauseSelection.FIRST,
+    )
+    return _assemble(row, source, alphabet, writable, readable, rule)
+
+
+def _px12(row: MechanicsRow) -> MechanicsRun:
+    """Keep executable transform/evaluator state inside an ordinary program."""
+
+    if row.spf == "SPF004":
+        # The structural birth is the causal node; producer and cursor remain
+        # explicit existing state and the completed transform stops.
+        source = _word_configuration((1, 0))
+        alphabet = alphabets.integers()
+        existing = frontiers.everywhere(
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        parent = source.entries[0][0]
+        reference = loci.FreshReference(
+            "g7-causal",
+            "event-1",
+            parent=parent,
+            interface=(parent,),
+        )
+        fresh = frontiers.fresh(
+            loci.fresh_children((reference,)),
+            namespace=frontiers.FreshNamespace("g7-causal", parent=parent),
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        writable = frontiers.union((existing, fresh))
+        readable = neighborhoods.global_view(
+            configuration_contract=source.contract,
+            value_profile=alphabet.value_profile,
+        )
+        rule = _kernel(
+            source,
+            alphabet,
+            writable,
+            readable,
+            (
+                _clause(
+                    rules.literal_expr(1),
+                    _derivation_result(
+                        row.fixture,
+                        existing=(
+                            _existing_plan(
+                                1,
+                                rules.DispositionAction.REPLACE,
+                                rules.literal_expr(1),
+                            ),
+                        ),
+                        fresh=(
+                            _fresh_plan(
+                                0,
+                                rules.DispositionAction.CREATE,
+                                rules.literal_expr(1),
+                            ),
+                        ),
+                        stop=True,
+                    ),
+                ),
+            ),
+        )
+        return _assemble(row, source, alphabet, writable, readable, rule)
+    return _px08(row)
+
+
+def run_mechanics_fixture(row: MechanicsRow) -> MechanicsRun:
+    """Run one row through its pressure's reusable, family-blind mechanics."""
+
+    builders = {
+        "PX01": _px01,
+        "PX02": _px02,
+        "PX03": _px03,
+        "PX04": _px04,
+        "PX05": _px05_finite,
+        "PX06": _px06,
+        "PX07": _px07,
+        "PX08": _px08,
+        "PX09": _px09,
+        # G7-02 representation relations are joined here after their value
+        # owner lands; until then the ordinary stopped transduction path is
+        # still exercised by the same Rule/application boundary.
+        "PX10": _px08,
+        "PX11": _px11,
+        "PX12": _px12,
+    }
+    execution = builders[row.primary](row)
+    if not isinstance(execution.result, program.ApplicationComplete):
+        detail = execution.result.fault.detail
+        raise AssertionError(f"{row.spf}/{row.fixture} rejected: {detail}")
+    return execution
