@@ -26,14 +26,15 @@
    runtime behavior. Its exact mechanics-first implementation contract is
    [goal-7-handoff.md](goal-6/goal-7-handoff.md).
 
-## Next Goal — Not Started
+## Next Goal — Scaffolded, Not Started
 
-7. **Goal 7 — implementation.** Next, but its execution goal is not scaffolded
-   or authorized. Inert source declarations and explicitly skipped test
-   obligations now make the Goal 6 target shape concrete; they do not implement
-   behavior or provide conformance evidence. Implement the completed Goal 6
-   handoff only after a separate user instruction establishes Goal 7's own
-   scaffold and completion contract.
+7. [Goal 7](goal-7/0-plan.md) — five-field runtime implementation. Its
+   operating scaffold and completion contract are ready, but no implementation
+   stage has started. Inert source declarations and explicitly skipped test
+   obligations make the target shape concrete; they do not implement behavior
+   or provide conformance evidence. Begin with
+   [`1-ORACLES`](goal-7/0-plan.md#1-oracles) only after an explicit start
+   instruction.
 
 The current order is Goal 5 (completed semantic authority) → Goal 6 (completed
 architecture and handoff) → Goal 7 (future implementation). Goal 2 remains
