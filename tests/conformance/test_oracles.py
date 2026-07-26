@@ -9,10 +9,10 @@ closed test-only terms; the runtime must never import this module.
 from __future__ import annotations
 
 import ast
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from fractions import Fraction
 from pathlib import Path
-from typing import Literal, TypeAlias
+from typing import Any, Literal, TypeAlias
 
 
 OracleScalar: TypeAlias = bool | int | Fraction | str | None
@@ -21,6 +21,7 @@ AtomKind: TypeAlias = Literal["derivation", "no-successor"]
 Progress: TypeAlias = Literal["advanced", "quiescent"]
 SupportKind: TypeAlias = Literal["finite", "intensional"]
 CardinalityKind: TypeAlias = Literal["exact", "uncountable"]
+MeasureKind: TypeAlias = Literal["absent", "available", "unavailable"]
 
 
 @dataclass(frozen=True)
@@ -78,18 +79,48 @@ class OracleFiber:
 
 
 @dataclass(frozen=True)
+class OracleFreshBinding:
+    """One structural fresh-identity recipe and its exact bound identity."""
+
+    local_key: OracleTerm
+    identity: OracleTerm
+    evidence: OracleTerm
+
+
+@dataclass(frozen=True)
+class OracleMeasureView:
+    """One explicitly absent, available, or unavailable measure view."""
+
+    kind: MeasureKind
+    masses: tuple[tuple[OracleValue, Fraction], ...]
+    total_mass: Fraction | None
+    evidence: OracleTerm | None
+
+
+@dataclass(frozen=True)
+class OracleMeasures:
+    """The three non-renormalized measure views owned by application."""
+
+    applied_atoms: OracleMeasureView
+    successors: OracleMeasureView
+    no_successors: OracleMeasureView
+
+
+@dataclass(frozen=True)
 class OracleExpected:
     """Complete normalized expectation for one generic application."""
 
     support_kind: SupportKind
     atoms: tuple[OracleAtom, ...]
+    source_outcome_atom_ids: tuple[str, ...]
+    applied_atom_ids: tuple[str, ...]
+    no_successor_atom_ids: tuple[str, ...]
     outcome_cardinality: OracleCardinality
     derivation_cardinality: OracleCardinality
     successor_cardinality: OracleCardinality
     successor_fibers: tuple[OracleFiber, ...]
-    applied_atom_mass: Fraction | None
-    successor_mass: Fraction | None
-    no_successor_mass: Fraction | None
+    fresh_bindings: tuple[OracleFreshBinding, ...]
+    measures: OracleMeasures
     intensional_relation: OracleTerm | None
     evidence: OracleTerm
 
@@ -113,6 +144,7 @@ class PreCutoverSnapshot:
     """Exact historical facts needed by later cutover-negative tests."""
 
     goal6_close_commit: str
+    preimplementation_shell_commit: str
     execution_start_commit: str
     goal6_runtime_src_tree: str
     goal6_runtime_tests_tree: str
@@ -126,9 +158,15 @@ class PreCutoverSnapshot:
     package_description: str
     runtime_dependencies: tuple[str, ...]
     active_test_baseline: str
+    public_manifest_sha256: str
+    public_manifest_algorithm: str
     root_exports: tuple[str, ...]
     target_root_exports: tuple[str, ...]
+    eager_imports: tuple[str, ...]
     physical_modules_to_remove: tuple[str, ...]
+    obsolete_execution_sites: tuple[str, ...]
+    frozen_git_blobs: tuple[tuple[str, str], ...]
+    frozen_sha256: tuple[tuple[str, str], ...]
 
 
 def _term(tag: str, *arguments: OracleValue) -> OracleTerm:
@@ -152,10 +190,22 @@ EXACT_ONE = OracleCardinality("exact", 1)
 EXACT_TWO = OracleCardinality("exact", 2)
 EXACT_THREE = OracleCardinality("exact", 3)
 UNCOUNTABLE = OracleCardinality("uncountable", None)
+ABSENT_MEASURE = OracleMeasureView(
+    kind="absent",
+    masses=(),
+    total_mass=None,
+    evidence=None,
+)
+ABSENT_MEASURES = OracleMeasures(
+    applied_atoms=ABSENT_MEASURE,
+    successors=ABSENT_MEASURE,
+    no_successors=ABSENT_MEASURE,
+)
 
 
 PRE_CUTOVER = PreCutoverSnapshot(
     goal6_close_commit="60bde6da318f415e43e14fc98b5faa28f14cd945",
+    preimplementation_shell_commit="1562041e4dab0a6d9e51d730222de0a4f1b52038",
     execution_start_commit="95ba134ee8f9671181c237cd2975004f3442efbe",
     goal6_runtime_src_tree="6e6b34769d60508c03d0a69fad1ede4fef75e217",
     goal6_runtime_tests_tree="02ad081e039a46efbf61855fdeae60abb7bb70ad",
@@ -169,6 +219,13 @@ PRE_CUTOVER = PreCutoverSnapshot(
     package_description="A New Kind of Science cellular automata library",
     runtime_dependencies=("numpy>=2.2", "pytest>=9.0.3"),
     active_test_baseline="102 passed, 96 skipped",
+    public_manifest_sha256=(
+        "fe4f136f50cf1471268278b5f62a33492bad090808605a9a3f7c048aed81a4f2"
+    ),
+    public_manifest_algorithm=(
+        "ca.__all__ order; rows={name,module,kind,signature}; "
+        "inspect.signature; json(sort_keys=True,separators=(',',':')); utf-8"
+    ),
     root_exports=(
         "Alphabet",
         "Dynamics",
@@ -252,7 +309,58 @@ PRE_CUTOVER = PreCutoverSnapshot(
         "serialization",
         "catalog",
     ),
+    eager_imports=(
+        "ca.specs",
+        "ca.rollout",
+        "ca.datasets",
+        "ca.rng",
+        "ca.viz",
+    ),
     physical_modules_to_remove=("ca.rollout", "ca.specs"),
+    obsolete_execution_sites=(
+        "src/ca/__init__.py imports ca.specs and ca.rollout",
+        "src/ca/datasets.py imports ca.specs and ca.rollout",
+        "src/ca/datasets.py branches on _rule and _neighborhood",
+        "src/ca/viz/export.py imports ca.specs",
+        "src/ca/rules.py instantiate branches on rule.family",
+    ),
+    frozen_git_blobs=(
+        ("src/ca/__init__.py", "1f4868f38ba209b862bd2a0855bcd638f40497e1"),
+        ("src/ca/specs.py", "a6f92d421b5af773a68301ae7c7b542a915c2416"),
+        ("src/ca/rollout.py", "1191137be02192a86c775da3a91b3dbe2eabc33d"),
+        (
+            "tests/test_specs.py",
+            "88eceb78a7b33168ea97e7e5885419dc415f021f",
+        ),
+        (
+            "tests/test_rollout.py",
+            "2f34d1a78dd599e381ed31a5e3d4adbf2123d320",
+        ),
+        ("pyproject.toml", "16b8eecc60521130e742fb6c3eb64e02b41c3861"),
+        ("uv.lock", "5eacafdd1c819f6c50080268156b58e8a10fdf25"),
+    ),
+    frozen_sha256=(
+        (
+            "src/ca/__init__.py",
+            "34729bcbde8109ea46e52fc1912f06c50e58737d5d936ea7958d2369e433401d",
+        ),
+        (
+            "src/ca/specs.py",
+            "8593ca05fb6be723513802a5019428d84c7bf36d9a8e2a7122afbb076ed523a4",
+        ),
+        (
+            "src/ca/rollout.py",
+            "ba14aa66c6494cd35f3601f0fed25d0d590e64aede014314ac72d3177018f44b",
+        ),
+        (
+            "pyproject.toml",
+            "3f278bba4c64719fe76546e3470a0954bb506c25daa3a9d4b79a9e02f7cb2345",
+        ),
+        (
+            "uv.lock",
+            "7ec09380d160d9f1299793091c0ed02579aa1db7cb6e83f5df41093bc00b7600",
+        ),
+    ),
 )
 
 
