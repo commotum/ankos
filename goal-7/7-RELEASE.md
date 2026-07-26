@@ -45,7 +45,7 @@ Status: **IN PROGRESS**
 - `GOALS.md` must remain unchanged until every other G7-06 completion gate
   passes.
 
-## Open Contract Decision
+## Authorized Contract Resolution
 
 The hostile release audit found one implemented Goal 7 addition that conflicts
 with Goal 6's exhaustive four-item truncation-cause sum at
@@ -63,17 +63,19 @@ was reached; and `CANCELLED` or `PRUNED` would invent caller actions.
 The fifth cause is therefore the most faithful representation, and it does not
 add a program field, semantic family, executor, solver, or realization path.
 It is nevertheless a public sum variant, not merely a wording clarification.
-Goal 6 remains byte-for-byte frozen, so closing Goal 7 with this variant
-requires explicit authority to let Goal 7 supersede only Goal 6's four-cause
-enumeration.
+On 2026-07-26 the user explicitly authorized retaining
+`INTENSIONAL_SUPPORT`. Goal 7 therefore supersedes only the exhaustive
+four-cause enumeration at `goal-6/architecture.md:1724`; every other Goal 6
+contract remains authoritative and the Goal 6 tree remains byte-for-byte
+frozen.
 
 The related zero-step precedence defect found by the same audit is repaired:
 `steps=0` now returns `DEPTH_BOUND` even for an intensional initial support,
 because no enumeration or application was requested. Focused unit and
 conformance tests cover both the zero-step and positive-depth cases.
 
-Until the contract decision is authorized, G7-06 remains in progress and no
-release-candidate or Goal 7 completion claim is permitted.
+The authorization resolves the hostile review's only contract blocker without
+weakening the five-field architecture or adding an execution path.
 
 ## Big Picture Objective
 
@@ -147,7 +149,7 @@ must remain untouched.
 - [x] One final hostile review finds no sixth field, second executor, family
       dispatch, lossy migration, observer/tooling leak, missing audited
       family, or competing API story.
-- [ ] Explicit authority resolves the fifth truncation-cause conflict without
+- [x] Explicit authority resolves the fifth truncation-cause conflict without
       editing the frozen Goal 6 tree.
 - [ ] `GOALS.md` is updated only after every other requirement passes.
 
@@ -215,13 +217,12 @@ runtime cleanup, and the complete release contract:
 - no competing API story, covert sixth field, second executor, family
   dispatch, observer leak, missing family, or installed-package drift remains;
   and
-- the only remaining blocker is the explicit fifth-cause authority decision
-  recorded above.
+- the fifth-cause authority conflict is resolved by the narrow user-authorized
+  Goal 7 supersession recorded above.
 
 ## Stage Results
 
-All decision-independent G7-06 work is complete and verified. `GOALS.md`
-remains intentionally unchanged. After explicit authority is received, the
-only remaining actions are to record the narrow Goal 7 contract supersession,
-rerun the final stage-range checks, update `GOALS.md` last, and close G7-06 and
-Goal 7. No release has been published.
+The release implementation and decision-independent evidence are complete,
+and the narrow contract supersession is authorized. `GOALS.md` remains
+intentionally unchanged until the closing verification rerun passes. No
+release has been published.

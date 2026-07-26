@@ -63,6 +63,13 @@ by Goal 6. Goal 4 and Book rediscovery are outside this goal. If this execution
 plan appears to contradict a higher-authority source, stop, record the exact
 conflict, and reconcile the plan before changing runtime behavior.
 
+The G7-06 hostile review followed that rule for one narrow conflict: Goal 6
+listed four rollout truncation causes, while complete intensional support
+requires a fifth truthful traversal cause. On 2026-07-26 the user explicitly
+authorized Goal 7 to retain `TruncationCause.INTENSIONAL_SUPPORT`, superseding
+only that four-cause enumeration. Goal 6 remains byte-for-byte frozen and all
+other Goal 6 contracts remain authoritative.
+
 ## Current Facts
 
 - Goal 6 is complete and its Goal 7 handoff is frozen.
@@ -178,6 +185,10 @@ conflict, and reconcile the plan before changing runtime behavior.
 - G7-06 is the first incomplete stage and has begun from clean commit
   `1c92123cf3c04a421759f5acd84141a6074a6fbe`. Its live transaction record is
   [`7-RELEASE.md`](7-RELEASE.md). No release-readiness claim has been made.
+- G7-06's only hostile-review contract conflict is resolved by explicit user
+  authorization: `INTENSIONAL_SUPPORT` remains a fifth rollout truncation
+  cause for positive-depth traversal blocked by valid unenumerated support.
+  Zero-step rollout reports `DEPTH_BOUND`.
 - Goal 5 established exactly 60 executable families, two close non-family
   roles, 19 covered families, and 41 additions. No family requires a sixth
   program field.

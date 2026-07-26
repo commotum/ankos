@@ -600,7 +600,11 @@ must preserve the same downstream boundary.
 
 `api.md` is the implemented public contract;
 [`goal-6/architecture.md`](goal-6/architecture.md) is the frozen internal
-specification; [`simple_programs.md`](simple_programs.md) supplies
-non-competing conceptual rationale; and
+design baseline. Goal 7's authorized addition of
+`TruncationCause.INTENSIONAL_SUPPORT` supersedes only its four-cause rollout
+enumeration and is recorded in
+[`goal-7/7-RELEASE.md`](goal-7/7-RELEASE.md).
+[`simple_programs.md`](simple_programs.md) supplies non-competing conceptual
+rationale; and
 [`ref/notes/ca-scaffold.py`](ref/notes/ca-scaffold.py) is the compact
 code-shaped walkthrough.
