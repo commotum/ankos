@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from ca import loci
+from ca import alphabets, loci
 
 
 def test_locus_constructors_cover_closed_structural_identity_forms() -> None:
@@ -133,3 +133,62 @@ def test_closed_nodes_reject_opaque_or_malformed_payloads() -> None:
         )
     with pytest.raises(ValueError):
         loci.CarrierContract(loci.CarrierKind.GRID, rank=2, shape=(3,))
+
+
+@pytest.mark.parametrize("coordinate", (0.5, True, "1/2"))
+def test_field_points_reject_implicit_exactification(coordinate: object) -> None:
+    with pytest.raises(TypeError, match="exact integers or Fractions"):
+        loci.field_point(
+            "u",
+            (coordinate,),  # type: ignore[arg-type]
+        )
+
+
+def test_field_points_require_closed_names_and_immutable_coordinates() -> None:
+    assert loci.field_point("u", (1, Fraction(1, 2))).path == (
+        "u",
+        Fraction(1),
+        Fraction(1, 2),
+    )
+    with pytest.raises(TypeError, match="immutable tuple"):
+        loci.field_point("u", [Fraction(0)])  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="field name"):
+        loci.field_point("", (Fraction(0),))
+    with pytest.raises(ValueError, match="component"):
+        loci.field_point("u", (Fraction(0),), component="")
+
+
+@pytest.mark.parametrize(
+    "exterior",
+    (
+        object(),
+        lambda: None,
+        0.5,
+        [1],
+        {"value": 1},
+    ),
+)
+def test_fixed_boundaries_reject_opaque_mutable_or_inexact_data(
+    exterior: object,
+) -> None:
+    with pytest.raises(TypeError, match="closed immutable semantic data"):
+        loci.Boundary(loci.BoundaryPolicy.FIXED, exterior)
+
+
+def test_fixed_boundaries_accept_closed_structural_semantic_data() -> None:
+    structural = alphabets.ValueNode(
+        alphabets.ValueKind.WORD,
+        "binary-word",
+        items=(False, True),
+    )
+
+    boundary = loci.Boundary(loci.BoundaryPolicy.FIXED, structural)
+
+    assert boundary.exterior == structural
+
+
+def test_exact_structural_records_reject_boolean_versions_and_subclass_scalars() -> None:
+    with pytest.raises(TypeError, match="version"):
+        loci.Locus(loci.LocusKind.NAMED, "scope", ("name",), True)
+    with pytest.raises(TypeError, match="version"):
+        loci.Boundary(loci.BoundaryPolicy.NONE, version=True)

@@ -1020,7 +1020,7 @@ def _intensional_application(
         _mapped_intensional_support(
             phase="validated-application",
             relation=relation,
-            cardinality=unknown,
+            cardinality=support.cardinality,
         ),
     )
     no_successor = cast(
@@ -2551,6 +2551,7 @@ __all__ = [
     "ClosedLeaf",
     "CompatibilityEvidence",
     "ContinuingLeaf",
+    "DrawEvidence",
     "FreshBinding",
     "MeasureAbsent",
     "MeasureAvailable",
@@ -2567,6 +2568,8 @@ __all__ = [
     "RolloutResult",
     "RolloutTruncated",
     "SeedRealizationEvidence",
+    "SamplerProfile",
+    "NumericProfile",
     "SimpleProgram",
     "SuccessorGroup",
     "TraceEdge",

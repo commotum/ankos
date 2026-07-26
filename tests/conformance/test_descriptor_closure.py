@@ -50,10 +50,41 @@ def test_program_construction_proves_all_cross_field_compatibility_clauses() -> 
 
     assert program.seed.configuration_contract == program.rule.contract.configuration_contract
     assert program.alphabet.value_profile is program.seed.value_profile
-    assert program.frontier.effect_profile == program.rule.contract.required_effect_profile
+    assert set(program.rule.contract.required_effect_profile.existing).issubset(
+        program.frontier.effect_profile.existing
+    )
+    assert set(program.rule.contract.required_effect_profile.fresh).issubset(
+        program.frontier.effect_profile.fresh
+    )
     assert program.neighborhood.result_shape == program.rule.contract.required_read_shape
     assert program.neighborhood.join_shape == program.rule.contract.required_join_shape
     assert program.seed.exactness_profile is program.rule.contract.exactness_profile
+
+
+def test_frontier_may_grant_a_strict_superset_of_rule_effects() -> None:
+    program, _, _ = native_program("dyadlags")
+    broader_frontier = replace(
+        program.frontier,
+        effect_profile=frontiers.EffectProfile(
+            existing=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
+        ),
+    )
+
+    broader = ca.SimpleProgram(
+        program.seed,
+        program.alphabet,
+        broader_frontier,
+        program.neighborhood,
+        program.rule,
+    )
+
+    assert broader.rule.contract.required_effect_profile.existing == (
+        frontiers.Effect.REPLACE,
+    )
+    assert broader.frontier.effect_profile.existing == (
+        frontiers.Effect.REPLACE,
+        frontiers.Effect.DELETE,
+    )
 
 
 def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
@@ -168,4 +199,35 @@ def test_descriptors_reject_callbacks_opaque_escape_and_ambient_entropy() -> Non
                 rank=0,
                 shape=(),
             ),
+        )
+    with pytest.raises(TypeError):
+        frontiers.EffectProfile(
+            existing=("opaque",),  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        frontiers.TargetContract(
+            "opaque",  # type: ignore[arg-type]
+            alphabets.ValueProfile.BOOLEAN,
+        )
+    with pytest.raises(TypeError):
+        neighborhoods.JoinShape(
+            "opaque",  # type: ignore[arg-type]
+            (),
+        )
+    with pytest.raises(TypeError):
+        neighborhoods.ResultShape(
+            ("opaque",),  # type: ignore[arg-type]
+        )
+
+    program, _, _ = native_program("dyadlags")
+    with pytest.raises(TypeError):
+        seeds.OverlaySource(
+            (program.seed,),
+            "opaque",  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        seeds.SeedOutputContract(
+            program.seed.configuration_contract,
+            program.seed.value_profile,
+            "opaque",  # type: ignore[arg-type]
         )

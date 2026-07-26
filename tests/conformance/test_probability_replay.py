@@ -53,6 +53,14 @@ def test_replay_is_deterministic_and_lineage_bound() -> None:
     assert left.raw_trace.derivation_edges.atoms == right.raw_trace.derivation_edges.atoms
     assert left.raw_trace.lineage_graph == right.raw_trace.lineage_graph
     assert len(left.raw_trace.derivation_edges.atoms) == 1
+    assert len(left.raw_trace.draw_evidence) == 1
+    draw = left.raw_trace.draw_evidence[0]
+    assert draw.sampler_profile is program.SamplerProfile.SHA256_REJECTION_V1
+    assert draw.numeric_profile is program.NumericProfile.FRACTION_TICKETS_V1
+    assert draw.application_identity
+    assert draw.law_identity
+    assert draw.subkey_identity
+    assert draw.selected_witness_identity
 
 
 def test_seed_law_handles_no_key_keyed_realization_and_explicit_initial() -> None:
@@ -160,6 +168,13 @@ def test_unavailable_is_narrowly_limited_to_successor_quotient_measure() -> None
     assert isinstance(result.applied_atom_measure, program.MeasureAvailable)
     assert isinstance(result.no_successor_submeasure, program.MeasureAvailable)
     assert isinstance(result.successor_submeasure, program.MeasureUnavailable)
+    assert result.applied_atom_measure.measure.total_mass is None
+    assert result.no_successor_submeasure.measure.total_mass is None
+
+    rolled = ca.rollout(simple_program, steps=1, initial=source)
+    assert isinstance(rolled, program.RolloutTruncated)
+    assert rolled.cause is program.TruncationCause.INTENSIONAL_SUPPORT
+    assert len(rolled.raw_trace.applications.atoms) == 1
 
     with pytest.raises(ValueError, match="normalize"):
         rules.ProbabilityLaw(
@@ -172,3 +187,69 @@ def test_unavailable_is_narrowly_limited_to_successor_quotient_measure() -> None
             certificate(rules.CertificateKind.NORMALIZATION, "bad"),
             certificate(rules.CertificateKind.MEASURABILITY, "space"),
         )
+
+
+def test_large_seed_law_is_retained_without_eager_enumeration_and_draws_directly() -> None:
+    length = 20
+    contract = loci.CarrierContract(
+        loci.CarrierKind.HISTORY,
+        rank=1,
+        shape=(length,),
+        axes=("history",),
+    )
+    seed = seeds.uniform_bits(
+        length=length,
+        configuration_contract=contract,
+    )
+    template = loci.history_configuration((False,) * length)
+    alphabet = alphabets.boolean()
+    writable = frontiers.everywhere(
+        configuration_contract=contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=contract,
+        value_profile=alphabet.value_profile,
+    )
+    atom = rules.Derivation(
+        rules.TotalDisposition(
+            tuple(rules.preserve(target) for target, _ in template.entries),
+            (),
+            certificate(rules.CertificateKind.TOTALITY, "large-seed:total"),
+        ),
+        rules.Progress.QUIESCENT,
+        rules.Continue(),
+        rules.Witness("large-seed", rules.literal_expr("large-seed")),
+        ("test:large-seed",),
+        certificate(rules.CertificateKind.DERIVATION, "large-seed:derived"),
+    )
+    rule = rules.finite_rule(
+        (atom,),
+        contract=rule_contract(template, alphabet, writable, readable),
+    )
+    simple_program = ca.SimpleProgram(
+        seed,
+        alphabet,
+        writable,
+        readable,
+        rule,
+    )
+
+    unkeyed = ca.rollout(simple_program, steps=0)
+    keyed = ca.rollout(simple_program, steps=0, replay_key="large-seed-key")
+
+    assert isinstance(unkeyed, program.RolloutTruncated)
+    assert (
+        unkeyed.raw_trace.roots.support.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
+    assert unkeyed.cause is program.TruncationCause.INTENSIONAL_SUPPORT
+    assert isinstance(keyed, program.RolloutTruncated)
+    assert (
+        keyed.raw_trace.roots.support.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
+    assert keyed.cause is program.TruncationCause.DEPTH_BOUND
+    assert len(keyed.continuing_leaves.atoms) == 1
+    assert len(keyed.raw_trace.seed_evidence.draws) == length
+    assert keyed.raw_trace.seed_evidence.denotation is not None

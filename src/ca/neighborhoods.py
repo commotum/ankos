@@ -372,6 +372,51 @@ class ReadableRegion(Generic[C, R]):
             raise ReadableResolutionError(
                 "product grouping and readable parts must appear together"
             )
+        if is_product != (self.join_shape.mode is JoinMode.PRODUCT):
+            raise ReadableResolutionError(
+                "product grouping and product join mode must agree"
+            )
+        if is_product:
+            if self.descriptor.kind is not loci.RegionKind.PRODUCT:
+                raise ReadableResolutionError(
+                    "product grouping requires a product region descriptor"
+                )
+            part_keys = tuple(part.key for part in self.parts)
+            if len(set(part_keys)) != len(part_keys):
+                raise ReadableResolutionError(
+                    "readable product part keys must be unique"
+                )
+            expected_extents = tuple(
+                _field_extent(field)
+                for part in self.parts
+                for field in part.region.result_shape.fields
+            )
+            actual_extents = tuple(
+                _field_extent(field) for field in self.result_shape.fields
+            )
+            if actual_extents != expected_extents:
+                raise ReadableResolutionError(
+                    "product result fields disagree with their readable parts"
+                )
+        elif self.grouping.kind is GroupingKind.SINGLE:
+            if len(self.result_shape.fields) != 1:
+                raise ReadableResolutionError(
+                    "single grouping requires exactly one result field"
+                )
+        elif self.grouping.kind is GroupingKind.FIXED_CHUNKS:
+            if (
+                self.descriptor.kind is not loci.RegionKind.RELATIVE
+                or self.grouping.chunk_size is None
+                or len(self.descriptor.offsets) % self.grouping.chunk_size
+            ):
+                raise ReadableResolutionError(
+                    "fixed grouping must divide a relative descriptor exactly"
+                )
+            field_count = len(self.descriptor.offsets) // self.grouping.chunk_size
+            if len(self.result_shape.fields) != field_count:
+                raise ReadableResolutionError(
+                    "fixed grouping and result-field counts disagree"
+                )
 
     @property
     def required_read_shape(self) -> ResultShape:

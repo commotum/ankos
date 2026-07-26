@@ -8,7 +8,7 @@ is immutable and versioned; selectors are data, never Python callbacks.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from enum import Enum
 from fractions import Fraction
 from itertools import product as cartesian_product
@@ -18,6 +18,45 @@ from typing import Generic, TypeAlias, TypeVar
 V = TypeVar("V")
 ClosedScalar: TypeAlias = bool | int | Fraction | str
 ConfigurationIdentity: TypeAlias = str
+
+
+def _require_version_one(version: object, owner: str) -> None:
+    if type(version) is not int:
+        raise TypeError(f"{owner} version must be an integer")
+    if version != 1:
+        raise ValueError(f"unsupported {owner} version {version}")
+
+
+def _is_closed_semantic_data(
+    value: object,
+    active: set[int] | None = None,
+) -> bool:
+    """Recognize immutable recursive data without importing downstream schemas."""
+
+    if value is None or type(value) in (bool, int, Fraction, str):
+        return True
+    if isinstance(value, Enum):
+        return _is_closed_semantic_data(value.value, active)
+    if type(value) is tuple:
+        return all(_is_closed_semantic_data(item, active) for item in value)
+    if isinstance(value, type) or not is_dataclass(value):
+        return False
+    parameters = getattr(type(value), "__dataclass_params__", None)
+    if parameters is None or not parameters.frozen:
+        return False
+    if active is None:
+        active = set()
+    marker = id(value)
+    if marker in active:
+        return False
+    active.add(marker)
+    try:
+        return all(
+            _is_closed_semantic_data(getattr(value, field.name), active)
+            for field in fields(value)
+        )
+    finally:
+        active.remove(marker)
 
 
 class LociResolutionError(ValueError):
@@ -56,15 +95,14 @@ class Locus:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported locus version {self.version}")
-        if not isinstance(self.kind, LocusKind):
+        _require_version_one(self.version, "locus")
+        if type(self.kind) is not LocusKind:
             raise TypeError("locus kind is not recognized")
-        if not isinstance(self.scope, str) or not self.scope:
+        if type(self.scope) is not str or not self.scope:
             raise ValueError("locus scope cannot be empty")
         if type(self.path) is not tuple:
             raise TypeError("locus path must be an immutable tuple")
-        if any(not isinstance(part, (bool, int, Fraction, str)) for part in self.path):
+        if any(type(part) not in (bool, int, Fraction, str) for part in self.path):
             raise TypeError("locus path contains an unclosed value")
 
     def __eq__(self, other: object) -> bool:
@@ -87,16 +125,15 @@ class FreshReference:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported fresh-reference version {self.version}")
-        if not isinstance(self.namespace, str) or not self.namespace:
+        _require_version_one(self.version, "fresh-reference")
+        if type(self.namespace) is not str or not self.namespace:
             raise ValueError("fresh namespace cannot be empty")
-        if not isinstance(self.local_key, (bool, int, Fraction, str)):
+        if type(self.local_key) not in (bool, int, Fraction, str):
             raise TypeError("fresh-reference local key is not closed")
-        if self.parent is not None and not isinstance(self.parent, Locus):
+        if self.parent is not None and type(self.parent) is not Locus:
             raise TypeError("fresh-reference parent must be a Locus")
         if type(self.interface) is not tuple or any(
-            not isinstance(item, Locus) for item in self.interface
+            type(item) is not Locus for item in self.interface
         ):
             raise TypeError("fresh-reference interface must contain Loci")
 
@@ -194,6 +231,17 @@ def field_point(
     *,
     component: str | None = None,
 ) -> Locus:
+    if type(field) is not str or not field:
+        raise ValueError("field name must be a nonempty string")
+    if type(coordinates) is not tuple:
+        raise TypeError("field coordinates must be an immutable tuple")
+    if any(
+        type(value) not in (int, Fraction)
+        for value in coordinates
+    ):
+        raise TypeError("field coordinates must be exact integers or Fractions")
+    if component is not None and (type(component) is not str or not component):
+        raise ValueError("field component must be a nonempty string or None")
     path_parts: tuple[ClosedScalar, ...] = (
         field,
         *(Fraction(value) for value in coordinates),
@@ -204,8 +252,10 @@ def field_point(
 
 
 def continuous_region(name: str, bounds: tuple[Fraction, ...]) -> Locus:
+    if type(name) is not str or not name:
+        raise ValueError("continuous-region name must be a nonempty string")
     if type(bounds) is not tuple or any(
-        not isinstance(bound, Fraction) for bound in bounds
+        type(bound) is not Fraction for bound in bounds
     ):
         raise TypeError("continuous bounds must be exact Fractions")
     return Locus(
@@ -549,14 +599,20 @@ class Boundary(Generic[V]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported boundary version {self.version}")
-        if not isinstance(self.policy, BoundaryPolicy):
+        _require_version_one(self.version, "boundary")
+        if type(self.policy) is not BoundaryPolicy:
             raise TypeError("boundary policy is not recognized")
         if self.policy is BoundaryPolicy.FIXED and self.exterior is None:
             raise ValueError("fixed boundary requires an exterior value")
         if self.policy is not BoundaryPolicy.FIXED and self.exterior is not None:
             raise ValueError("only fixed boundary carries an exterior value")
+        if (
+            self.policy is BoundaryPolicy.FIXED
+            and not _is_closed_semantic_data(self.exterior)
+        ):
+            raise TypeError(
+                "fixed boundary exterior must be closed immutable semantic data"
+            )
 
 
 @dataclass(frozen=True)
@@ -597,14 +653,13 @@ class StructuralRelation:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported structural relation version {self.version}")
-        if not isinstance(self.tag, str) or not self.tag:
+        _require_version_one(self.version, "structural relation")
+        if type(self.tag) is not str or not self.tag:
             raise ValueError("structural relation tag cannot be empty")
         if type(self.arguments) is not tuple:
             raise TypeError("structural relation arguments must be an immutable tuple")
         if any(
-            not isinstance(argument, (bool, int, Fraction, str, Locus))
+            type(argument) not in (bool, int, Fraction, str, Locus)
             for argument in self.arguments
         ):
             raise TypeError("structural relation contains an opaque argument")

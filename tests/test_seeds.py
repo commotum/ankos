@@ -138,3 +138,24 @@ def test_seed_descriptors_reject_callbacks_and_malformed_composition() -> None:
                 axes=("history",),
             ),
         )
+    with pytest.raises(TypeError):
+        seeds.Construction(
+            seeds.ConstructionOp.SEQUENCE,
+            [(True, False)],  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        seeds.OverlaySource(
+            (seeds.sequence((True, False)),),
+            "opaque",  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        seeds.UniformTupleLaw(
+            2,
+            2,
+            [[0, 0]],  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError):
+        seeds.RefinedSource(
+            seeds.sequence((True, False)),
+            "opaque",  # type: ignore[arg-type]
+        )

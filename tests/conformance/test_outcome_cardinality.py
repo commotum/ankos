@@ -94,6 +94,35 @@ def test_exact_zero_requires_typed_atom_and_coverage_evidence() -> None:
     )
     assert rules.cardinality_size(unknown) is None
 
+    simple_program, source, _ = native_program("dyadlags")
+    exact_zero = rules.ExactlyZero(
+        certificate(rules.CertificateKind.CARDINALITY, "exactly-zero")
+    )
+    zero_relation = rules.relation(
+        rules.literal_expr("empty-relation"),
+        exact_zero,
+        contract=simple_program.rule.contract,
+        completeness_evidence=certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "empty-complete",
+        ),
+        soundness_evidence=certificate(
+            rules.CertificateKind.SOUNDNESS,
+            "empty-sound",
+        ),
+    )
+    zero_program = ca.SimpleProgram(
+        simple_program.seed,
+        simple_program.alphabet,
+        simple_program.frontier,
+        simple_program.neighborhood,
+        zero_relation,
+    )
+    rejected = ca.apply(zero_program, source)
+    assert isinstance(rejected, program.ApplicationRejected)
+    assert rejected.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
+    assert "typed NoSuccessor" in rejected.fault.reason
+
 
 def test_resource_exhaustion_exists_only_in_bounded_external_results() -> None:
     simple_program, source, _ = native_program("dyadlags")

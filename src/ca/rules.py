@@ -221,8 +221,7 @@ class RuleContract:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported Rule contract version {self.version}")
+        _require_version_one(self.version, "Rule contract")
         if type(self.configuration_contract) is not loci.CarrierContract:
             raise TypeError("Rule configuration contract is not recognized")
         if not isinstance(self.value_profile, alphabets.ValueProfile):
@@ -347,9 +346,8 @@ class Certificate:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported certificate version {self.version}")
-        if not isinstance(self.kind, CertificateKind):
+        _require_version_one(self.version, "certificate")
+        if type(self.kind) is not CertificateKind:
             raise TypeError("certificate kind is not recognized")
         if type(self.statement) is not RuleExpr:
             raise TypeError("certificate statement must be a closed RuleExpr")
@@ -492,9 +490,8 @@ class Disposition(Generic[W, V]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported disposition version {self.version}")
-        if not isinstance(self.action, DispositionAction):
+        _require_version_one(self.version, "disposition")
+        if type(self.action) is not DispositionAction:
             raise TypeError("disposition action is not recognized")
         if self.action in (
             DispositionAction.PRESERVE,
@@ -537,10 +534,9 @@ class TotalDisposition(Generic[V]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(
-                f"unsupported total-disposition version {self.version}"
-            )
+        _require_version_one(self.version, "total-disposition")
+        if type(self.existing) is not tuple or type(self.fresh) is not tuple:
+            raise TypeError("total disposition entries must be immutable tuples")
         if any(type(item) is not Disposition for item in self.entries):
             raise TypeError("total disposition contains an unknown entry variant")
         if (
@@ -714,19 +710,20 @@ class Derivation(Generic[V]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported derivation version {self.version}")
+        _require_version_one(self.version, "derivation")
         if type(self.replacement) is not TotalDisposition:
             raise TypeError("derivation replacement is not recognized")
-        if not isinstance(self.progress, Progress):
+        if type(self.progress) is not Progress:
             raise TypeError("derivation progress is not recognized")
         if type(self.continuation) not in (Continue, Stop):
             raise TypeError("derivation continuation is not recognized")
         if type(self.witness) is not Witness:
             raise TypeError("derivation witness is not recognized")
+        if type(self.provenance) is not tuple:
+            raise TypeError("derivation provenance must be an immutable tuple")
         if (
             not self.provenance
-            or any(not isinstance(item, str) or not item for item in self.provenance)
+            or any(type(item) is not str or not item for item in self.provenance)
         ):
             raise ValueError("derivation provenance cannot be empty")
         if (
@@ -750,19 +747,22 @@ class NoSuccessor:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported no-successor version {self.version}")
-        if not isinstance(self.outcome, NoSuccessorOutcome):
+        _require_version_one(self.version, "no-successor")
+        if type(self.outcome) is not NoSuccessorOutcome:
             raise TypeError("no-successor outcome is not recognized")
         if type(self.reason) is not RuleExpr:
             raise TypeError("no-successor reason must be a RuleExpr")
         if type(self.witness) is not Witness:
             raise TypeError("no-successor witness is not recognized")
+        if type(self.provenance) is not tuple:
+            raise TypeError("no-successor provenance must be an immutable tuple")
         if (
             not self.provenance
-            or any(not isinstance(item, str) or not item for item in self.provenance)
+            or any(type(item) is not str or not item for item in self.provenance)
         ):
             raise ValueError("no-successor provenance cannot be empty")
+        if type(self.certificate) is not Certificate:
+            raise TypeError("no-successor certificate is not recognized")
         if (
             self.outcome is NoSuccessorOutcome.DIVERGENT
             and self.certificate.kind is not CertificateKind.DIVERGENCE
@@ -805,10 +805,20 @@ class SupportSpace(Generic[A]):
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported support version {self.version}")
-        if not isinstance(self.presentation, SupportPresentation):
+        _require_version_one(self.version, "support")
+        if type(self.presentation) is not SupportPresentation:
             raise TypeError("support presentation is not recognized")
+        if type(self.atoms) is not tuple:
+            raise TypeError("support atoms must be an immutable tuple")
+        if self.relation is not None and type(self.relation) is not RuleExpr:
+            raise TypeError("support relation must be a RuleExpr or None")
+        if type(self.cardinality) not in (
+            ExactlyZero,
+            ExactlyOne,
+            Many,
+            Undetermined,
+        ):
+            raise TypeError("support cardinality variant is not recognized")
         if (
             type(self.completeness_evidence) is not Certificate
             or self.completeness_evidence.kind is not CertificateKind.COMPLETENESS
@@ -828,15 +838,19 @@ class SupportSpace(Generic[A]):
             identities = tuple(_atom_identity(atom) for atom in self.atoms)
             if len(identities) != len(set(identities)):
                 raise ValueError("finite support repeats a canonical atom identity")
-            ordered = tuple(
-                atom
-                for _, atom in sorted(
+            ordered_pairs = tuple(
+                sorted(
                     zip(identities, self.atoms, strict=True),
                     key=lambda item: item[0],
                 )
             )
-            if ordered != self.atoms:
-                object.__setattr__(self, "atoms", ordered)
+            ordered_identities = tuple(identity for identity, _ in ordered_pairs)
+            if ordered_identities != identities:
+                object.__setattr__(
+                    self,
+                    "atoms",
+                    tuple(atom for _, atom in ordered_pairs),
+                )
         else:
             if self.atoms:
                 raise ValueError("intensional support cannot carry enumerated atoms")
@@ -887,9 +901,9 @@ class AtomMass:
     mass: Fraction
 
     def __post_init__(self) -> None:
-        if not self.atom_identity:
+        if type(self.atom_identity) is not str or not self.atom_identity:
             raise ValueError("probability mass needs an atom identity")
-        if isinstance(self.mass, bool) or not isinstance(self.mass, Fraction):
+        if type(self.mass) is not Fraction:
             raise TypeError("probability mass must be an exact Fraction")
         if self.mass <= 0:
             raise ValueError("probability masses must be strictly positive")
@@ -907,10 +921,15 @@ class ProbabilityLaw:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported probability-law version {self.version}")
-        if not isinstance(self.presentation, ProbabilityPresentation):
+        _require_version_one(self.version, "probability-law")
+        if type(self.presentation) is not ProbabilityPresentation:
             raise TypeError("probability presentation is not recognized")
+        if type(self.masses) is not tuple or any(
+            type(item) is not AtomMass for item in self.masses
+        ):
+            raise TypeError("probability masses must be an immutable AtomMass tuple")
+        if self.measure is not None and type(self.measure) is not RuleExpr:
+            raise TypeError("probability measure must be a RuleExpr or None")
         if (
             type(self.normalization_evidence) is not Certificate
             or self.normalization_evidence.kind is not CertificateKind.NORMALIZATION
@@ -932,10 +951,9 @@ class ProbabilityLaw:
                 raise ValueError("finite probability law repeats an atom identity")
             if sum((item.mass for item in self.masses), Fraction(0)) != Fraction(1):
                 raise ValueError("finite probability law must normalize exactly to one")
-            ordered = tuple(
-                sorted(self.masses, key=lambda item: item.atom_identity)
-            )
-            if ordered != self.masses:
+            ordered = tuple(sorted(self.masses, key=lambda item: item.atom_identity))
+            ordered_identities = tuple(item.atom_identity for item in ordered)
+            if ordered_identities != identities:
                 object.__setattr__(self, "masses", ordered)
         else:
             if self.masses:
@@ -1020,13 +1038,14 @@ class ExistingPlan:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported existing-plan version {self.version}")
-        if not isinstance(self.kind, ExistingPlanKind):
+        _require_version_one(self.version, "existing-plan")
+        if type(self.kind) is not ExistingPlanKind:
             raise TypeError("existing-plan kind is not recognized")
-        if any(not isinstance(item, RuleExpr) for item in self.expressions):
+        if type(self.expressions) is not tuple or type(self.targets) is not tuple:
+            raise TypeError("existing-plan collections must be immutable tuples")
+        if any(type(item) is not RuleExpr for item in self.expressions):
             raise TypeError("existing-plan expressions must be RuleExpr values")
-        if any(not isinstance(item, loci.Locus) for item in self.targets):
+        if any(type(item) is not loci.Locus for item in self.targets):
             raise TypeError("existing-plan targets must be Locus values")
         if self.kind is ExistingPlanKind.BY_TARGET and len(self.expressions) != 1:
             raise ValueError("by-target plan needs exactly one expression")
@@ -1061,13 +1080,10 @@ class EvidenceExpression:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(
-                f"unsupported evidence-expression version {self.version}"
-            )
+        _require_version_one(self.version, "evidence-expression")
         if type(self.expression) is not RuleExpr:
             raise TypeError("evidence expression must contain a RuleExpr")
-        if not isinstance(self.scope, EvaluationScope):
+        if type(self.scope) is not EvaluationScope:
             raise TypeError("evidence-expression scope is not recognized")
 
 
@@ -1080,10 +1096,7 @@ class FormattedEvidence:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(
-                f"unsupported formatted-evidence version {self.version}"
-            )
+        _require_version_one(self.version, "formatted-evidence")
         if self.template not in ("{}", "0x{:016x}"):
             raise ValueError("formatted evidence uses an unsupported template")
         if type(self.expression) is not RuleExpr:
@@ -1102,24 +1115,16 @@ class EvidenceTerm:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported evidence-term version {self.version}")
-        if not isinstance(self.tag, str) or not self.tag:
+        _require_version_one(self.version, "evidence-term")
+        if type(self.tag) is not str or not self.tag:
             raise ValueError("evidence-term tag must be a nonempty string")
+        if type(self.arguments) is not tuple:
+            raise TypeError("evidence-term arguments must be an immutable tuple")
         if any(
-            not isinstance(
-                argument,
-                (
-                    bool,
-                    int,
-                    Fraction,
-                    str,
-                    alphabets.RepresentedNumber,
-                    alphabets.ValueNode,
-                    EvidenceExpression,
-                    FormattedEvidence,
-                    EvidenceTerm,
-                ),
+            not (
+                _is_rule_scalar(argument)
+                or type(argument)
+                in (EvidenceExpression, FormattedEvidence, EvidenceTerm)
             )
             for argument in self.arguments
         ):
@@ -1135,12 +1140,13 @@ class ProvenanceTemplate:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(
-                f"unsupported provenance-template version {self.version}"
-            )
-        if not isinstance(self.template, str) or not self.template:
+        _require_version_one(self.version, "provenance-template")
+        if type(self.template) is not str or not self.template:
             raise ValueError("provenance template cannot be empty")
+        if type(self.expressions) is not tuple:
+            raise TypeError(
+                "provenance-template expressions must be an immutable tuple"
+            )
         if any(type(item) is not RuleExpr for item in self.expressions):
             raise TypeError("provenance templates require RuleExpr values")
         fields = []
@@ -1189,9 +1195,11 @@ class ExpressionDenotation:
             raise TypeError("expression continuation is not recognized")
         if type(self.witness) is not RuleExpr:
             raise TypeError("expression witness is not recognized")
+        if type(self.provenance) is not tuple:
+            raise TypeError("expression provenance must be an immutable tuple")
         if (
             not self.provenance
-            or any(not isinstance(item, str) or not item for item in self.provenance)
+            or any(type(item) is not str or not item for item in self.provenance)
         ):
             raise ValueError("expression provenance must be closed and nonempty")
         if type(self.certificate) is not Certificate:
@@ -1200,7 +1208,7 @@ class ExpressionDenotation:
             self.certificate_template
         ) is not EvidenceTerm:
             raise TypeError("expression certificate template is not recognized")
-        if any(
+        if type(self.provenance_templates) is not tuple or any(
             type(item) is not ProvenanceTemplate
             for item in self.provenance_templates
         ):
@@ -1247,8 +1255,12 @@ class ParallelDenotation(Generic[R, W, C]):
     parts: tuple["Rule[R, W, C]", ...]
 
     def __post_init__(self) -> None:
+        if type(self.parts) is not tuple:
+            raise TypeError("parallel Rule parts must be an immutable tuple")
         if not self.parts:
             raise ValueError("parallel Rule needs at least one part")
+        if any(type(part) is not Rule for part in self.parts):
+            raise TypeError("parallel Rule parts must be recognized Rules")
 
 
 RuleDenotation: TypeAlias = (
@@ -1313,11 +1325,18 @@ class RuleFault:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported Rule fault version {self.version}")
+        _require_version_one(self.version, "Rule fault")
+        if type(self.phase) is not RuleFaultPhase:
+            raise TypeError("Rule fault phase is not recognized")
+        if type(self.reason) is not RuleFaultReason:
+            raise TypeError("Rule fault reason is not recognized")
+        if type(self.evidence) is not tuple or any(
+            type(item) is not Certificate for item in self.evidence
+        ):
+            raise TypeError("Rule fault evidence must be a Certificate tuple")
         if not self.evidence:
             raise ValueError("Rule fault needs closed evidence")
-        if not self.detail:
+        if type(self.detail) is not str or not self.detail:
             raise ValueError("Rule fault detail cannot be empty")
 
 
@@ -1325,10 +1344,24 @@ class RuleFault:
 class RuleRejected:
     fault: RuleFault
 
+    def __post_init__(self) -> None:
+        if type(self.fault) is not RuleFault:
+            raise TypeError("RuleRejected fault variant is not recognized")
+
 
 @dataclass(frozen=True)
 class RuleComplete(Generic[C, V]):
     outcome_space: OutcomeSpace[RuleAtom[V]]
+
+    def __post_init__(self) -> None:
+        if type(self.outcome_space) is not OutcomeSpace:
+            raise TypeError("RuleComplete outcome space is not recognized")
+        support = self.outcome_space.support
+        if (
+            support.presentation is SupportPresentation.FINITE
+            and any(type(atom) not in (Derivation, NoSuccessor) for atom in support.atoms)
+        ):
+            raise TypeError("RuleComplete support contains an unknown atom variant")
 
 
 RuleResult: TypeAlias = RuleComplete[C, V] | RuleRejected
@@ -1820,8 +1853,19 @@ class EvaluationStep:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported evaluation-step version {self.version}")
+        _require_version_one(self.version, "evaluation-step")
+        if type(self.expression) is not RuleExpr:
+            raise TypeError("evaluation step expression is not recognized")
+        if self.anchor is not None and type(self.anchor) is not loci.Locus:
+            raise TypeError("evaluation step anchor must be a Locus or None")
+        if not _is_rule_runtime_value(self.result):
+            raise TypeError("evaluation step result is not a closed runtime value")
+        if type(self.read_evidence) is not tuple or any(
+            type(item) is not str or not item for item in self.read_evidence
+        ):
+            raise TypeError(
+                "evaluation step read evidence must be a nonempty-string tuple"
+            )
 
 
 @dataclass(frozen=True)
@@ -1832,10 +1876,21 @@ class EvaluationProof:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported evaluation-proof version {self.version}")
+        _require_version_one(self.version, "evaluation-proof")
+        if type(self.steps) is not tuple or any(
+            type(step) is not EvaluationStep for step in self.steps
+        ):
+            raise TypeError("evaluation proof steps must be an EvaluationStep tuple")
         if not self.steps:
             raise ValueError("evaluation proof cannot be empty")
+
+
+def _is_rule_runtime_value(value: object) -> bool:
+    if _is_rule_scalar(value):
+        return True
+    return type(value) is tuple and all(
+        _is_rule_runtime_value(item) for item in value
+    )
 
 
 def _evaluate(
@@ -2742,10 +2797,17 @@ __all__ = [
     "Derivation",
     "Disposition",
     "DispositionAction",
+    "EvaluationProof",
+    "EvaluationScope",
+    "EvaluationStep",
+    "EvidenceExpression",
+    "EvidenceTerm",
     "ExactlyOne",
     "ExactlyZero",
     "ExistingPlan",
     "ExistingPlanKind",
+    "ExpressionPrimitive",
+    "FormattedEvidence",
     "GateKind",
     "InfiniteCardinality",
     "Many",
@@ -2757,6 +2819,7 @@ __all__ = [
     "ProbabilityPresentation",
     "Progress",
     "Provenance",
+    "ProvenanceTemplate",
     "Rule",
     "RuleAtom",
     "RuleComplete",

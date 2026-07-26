@@ -1,10 +1,27 @@
 """Unit tests for closed Rule denotations and results."""
 
+from dataclasses import dataclass
 from fractions import Fraction
 
 import pytest
 
 from ca import alphabets, frontiers, loci, neighborhoods, rules
+
+
+def _certificate(kind: rules.CertificateKind) -> rules.Certificate:
+    return rules.Certificate(kind, rules.literal_expr(kind.value))
+
+
+@dataclass(frozen=True, eq=False)
+class _EqualityMaskingAtom:
+    identity: str
+
+    @property
+    def canonical_identity(self) -> str:
+        return self.identity
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, _EqualityMaskingAtom)
 
 
 def _bindings():
@@ -39,6 +56,162 @@ def test_rule_expression_ast_is_closed_versioned_and_exact() -> None:
         rules.RuleExpr(
             rules.ExpressionPrimitive.LITERAL,
             (lambda: None,),  # type: ignore[arg-type]
+        )
+
+
+@pytest.mark.parametrize(
+    ("primitive", "arguments"),
+    (
+        (rules.ExpressionPrimitive.LITERAL, ()),
+        (
+            rules.ExpressionPrimitive.LITERAL,
+            (rules.literal_expr(1),),
+        ),
+        (rules.ExpressionPrimitive.OBSERVATION, (True,)),
+        (rules.ExpressionPrimitive.GROUP, (-1,)),
+        (rules.ExpressionPrimitive.PROJECT, (rules.literal_expr(1),)),
+        (
+            rules.ExpressionPrimitive.PROJECT,
+            (1, 0),
+        ),
+        (rules.ExpressionPrimitive.ADD, ()),
+        (rules.ExpressionPrimitive.MULTIPLY, ()),
+        (
+            rules.ExpressionPrimitive.MODULO,
+            (rules.literal_expr(1), 0),
+        ),
+        (
+            rules.ExpressionPrimitive.COUNT,
+            (rules.literal_expr(1), rules.literal_expr(2)),
+        ),
+        (
+            rules.ExpressionPrimitive.GATE,
+            (rules.literal_expr(1), "unknown", 0),
+        ),
+        (
+            rules.ExpressionPrimitive.GATE,
+            (rules.literal_expr(1), rules.GateKind.ANY.value, True),
+        ),
+        (
+            rules.ExpressionPrimitive.LOOKUP,
+            (rules.literal_expr(1),),
+        ),
+        (
+            rules.ExpressionPrimitive.EQUAL,
+            (rules.literal_expr(1), 1),
+        ),
+        (rules.ExpressionPrimitive.ALL, (1,)),
+        (rules.ExpressionPrimitive.ANY, ()),
+    ),
+)
+def test_rule_expression_primitives_reject_wrong_arity_or_types(
+    primitive: rules.ExpressionPrimitive,
+    arguments: tuple[object, ...],
+) -> None:
+    with pytest.raises((TypeError, ValueError)):
+        rules.RuleExpr(primitive, arguments)  # type: ignore[arg-type]
+
+
+def test_rule_expression_and_evidence_collections_require_exact_tuples() -> None:
+    with pytest.raises(TypeError, match="immutable tuple"):
+        rules.RuleExpr(
+            rules.ExpressionPrimitive.LITERAL,
+            [1],  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError, match="immutable tuple"):
+        rules.EvidenceTerm("proof", [1])  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="immutable tuple"):
+        rules.ProvenanceTemplate("{}", [rules.literal_expr(1)])  # type: ignore[arg-type]
+
+
+def test_cardinality_variants_require_exact_cardinality_certificates() -> None:
+    wrong = _certificate(rules.CertificateKind.SOUNDNESS)
+
+    for constructor in (
+        lambda: rules.ExactlyZero(wrong),
+        lambda: rules.ExactlyOne(wrong),
+        lambda: rules.Many(2, None, wrong),
+        lambda: rules.Undetermined(rules.literal_expr("unknown"), wrong),
+    ):
+        with pytest.raises(ValueError, match="cardinality evidence"):
+            constructor()
+
+    with pytest.raises(TypeError, match="infinite cardinality"):
+        rules.Many(
+            None,
+            "uncountable",  # type: ignore[arg-type]
+            _certificate(rules.CertificateKind.CARDINALITY),
+        )
+
+
+def test_support_and_probability_canonicalize_by_identity_sequence() -> None:
+    support = rules.finite_support(
+        (_EqualityMaskingAtom("z"), _EqualityMaskingAtom("a"))
+    )
+
+    assert tuple(atom.canonical_identity for atom in support.atoms) == ("a", "z")
+
+    law = rules.ProbabilityLaw(
+        rules.ProbabilityPresentation.FINITE,
+        (
+            rules.AtomMass("z", Fraction(1, 2)),
+            rules.AtomMass("a", Fraction(1, 2)),
+        ),
+        None,
+        _certificate(rules.CertificateKind.NORMALIZATION),
+        _certificate(rules.CertificateKind.MEASURABILITY),
+    )
+    assert tuple(item.atom_identity for item in law.masses) == ("a", "z")
+
+
+def test_rule_fault_and_result_wrappers_are_closed_exact_variants() -> None:
+    conformance = _certificate(rules.CertificateKind.CONFORMANCE)
+    with pytest.raises(TypeError, match="Certificate tuple"):
+        rules.RuleFault(
+            rules.RuleFaultPhase.DENOTATION,
+            rules.RuleFaultReason.INVALID_DESCRIPTOR,
+            [conformance],  # type: ignore[arg-type]
+            "invalid",
+        )
+    with pytest.raises(TypeError, match="fault variant"):
+        rules.RuleRejected(object())  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="outcome space"):
+        rules.RuleComplete(object())  # type: ignore[arg-type]
+
+    unknown_support = rules.finite_support((_EqualityMaskingAtom("unknown"),))
+    with pytest.raises(TypeError, match="unknown atom variant"):
+        rules.RuleComplete(rules.OutcomeSpace(unknown_support))  # type: ignore[arg-type]
+
+
+def test_public_evidence_and_evaluation_ast_types_are_exported_and_closed() -> None:
+    expected = {
+        "EvaluationProof",
+        "EvaluationScope",
+        "EvaluationStep",
+        "EvidenceExpression",
+        "EvidenceTerm",
+        "FormattedEvidence",
+        "ProvenanceTemplate",
+    }
+    assert expected.issubset(set(rules.__all__))
+
+    step = rules.EvaluationStep(
+        rules.literal_expr(1),
+        None,
+        1,
+        ("read",),
+    )
+    proof = rules.EvaluationProof((step,))
+    assert proof.steps == (step,)
+
+    with pytest.raises(TypeError, match="EvaluationStep tuple"):
+        rules.EvaluationProof([step])  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="read evidence"):
+        rules.EvaluationStep(
+            rules.literal_expr(1),
+            None,
+            1,
+            ["read"],  # type: ignore[arg-type]
         )
 
 

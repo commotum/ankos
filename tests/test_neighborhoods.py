@@ -119,37 +119,127 @@ def test_product_preserves_field_group_boundaries_and_channels() -> None:
 @pytest.mark.parametrize(
     ("factory", "fields"),
     (
-        (neighborhoods.ar2_0d, ("ar2",)),
+        (neighborhoods.ar2_0d, (("ar2", 2),)),
         (
             neighborhoods.dyadlags_0d,
-            ("older", "previous", "current"),
+            (("older", 1), ("previous", 1), ("current", 1)),
         ),
         (
             neighborhoods.lagcounts_0d,
-            ("history", "recent", "middle", "oldest"),
+            (("history", 1), ("recent", 3), ("middle", 3), ("oldest", 3)),
         ),
         (
             neighborhoods.dyadrads_1d,
-            ("self", "primary", "secondary"),
+            (("self", 1), ("primary", 2), ("secondary", 2)),
         ),
         (
             neighborhoods.dyadaxes_2d,
-            ("self", "primary", "secondary"),
+            (("self", 1), ("primary", 4), ("secondary", 4)),
         ),
         (
             neighborhoods.dyadaxes_3d,
-            ("self", "primary", "secondary"),
+            (("self", 1), ("primary", 6), ("secondary", 20)),
         ),
     ),
 )
 def test_retained_native_presets_publish_exact_rule_facing_shapes(
     factory,
-    fields: tuple[str, ...],
+    fields: tuple[tuple[str, int], ...],
 ) -> None:
     region = factory()
 
-    assert tuple(field.key for field in region.result_shape.fields) == fields
+    assert tuple(
+        (
+            field.key,
+            1 if field.arity is neighborhoods.ReadArity.ONE else field.size,
+        )
+        for field in region.result_shape.fields
+    ) == fields
+    assert all(
+        field.arity is not neighborhoods.ReadArity.VARIABLE
+        for field in region.result_shape.fields
+    )
     assert isinstance(region, neighborhoods.ReadableRegion)
+
+
+@pytest.mark.parametrize(
+    ("region", "source", "sizes"),
+    (
+        (
+            neighborhoods.dyadlags_0d(),
+            loci.history_configuration((True, False, True)),
+            (1, 1, 1),
+        ),
+        (
+            neighborhoods.lagcounts_0d(),
+            loci.history_configuration(
+                (True, False, True, False, True, False, True, False, True, False)
+            ),
+            (1, 3, 3, 3),
+        ),
+        (
+            neighborhoods.dyadrads_1d(),
+            loci.grid_configuration(
+                (5,),
+                (False,) * 5,
+                boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+            ),
+            (1, 2, 2),
+        ),
+        (
+            neighborhoods.dyadaxes_2d(),
+            loci.grid_configuration(
+                (3, 3),
+                (False,) * 9,
+                boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+            ),
+            (1, 4, 4),
+        ),
+        (
+            neighborhoods.dyadaxes_3d(),
+            loci.grid_configuration(
+                (3, 3, 3),
+                (False,) * 27,
+                boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+            ),
+            (1, 6, 20),
+        ),
+    ),
+)
+def test_native_resolved_groups_match_declared_field_arities(
+    region,
+    source,
+    sizes: tuple[int, ...],
+) -> None:
+    view = region.resolve(source)
+    groups_by_anchor = {}
+    for group in view.groups:
+        groups_by_anchor.setdefault(group.anchor, []).append(group)
+
+    assert all(
+        tuple(len(group.indices) for group in groups) == sizes
+        for groups in groups_by_anchor.values()
+    )
+
+
+def test_lagcount_shape_tracks_the_requested_band_size() -> None:
+    region = neighborhoods.lagcounts_0d(band_size=2)
+    source = loci.history_configuration(
+        (True, False, True, False, True, False, True)
+    )
+
+    assert tuple(
+        1 if field.arity is neighborhoods.ReadArity.ONE else field.size
+        for field in region.result_shape.fields
+    ) == (1, 2, 2, 2)
+    assert tuple(len(group.indices) for group in region.resolve(source).groups) == (
+        1,
+        2,
+        2,
+        2,
+    )
+    with pytest.raises(neighborhoods.ReadableResolutionError):
+        neighborhoods.lagcounts_0d(band_count=2)
 
 
 def test_neighborhood_grants_no_write_authority() -> None:

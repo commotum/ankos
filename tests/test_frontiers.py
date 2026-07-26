@@ -72,9 +72,43 @@ def test_writable_region_composition_returns_one_component() -> None:
     product = frontiers.product(parts)
 
     assert isinstance(product, frontiers.WritableRegion)
+    assert product.descriptor.kind is loci.RegionKind.PRODUCT
+    assert tuple(part.name for part in product.descriptor.parts) == ("a", "b")
     assert product.resolve(source).targets == tuple(
         target for target, _ in source.entries
     )
+
+
+def test_target_kind_and_fresh_namespace_are_checked_without_barring_bound_births() -> None:
+    bound_birth = loci.Locus(loci.LocusKind.FRESH, "children", ("child",))
+    capability = frontiers.ExistingCapability(
+        bound_birth,
+        frontiers.TargetContract(
+            loci.LocusKind.FRESH,
+            alphabets.ValueProfile.BOOLEAN,
+        ),
+        (frontiers.Effect.REPLACE,),
+    )
+
+    assert capability.target is bound_birth
+    with pytest.raises(frontiers.WritableResolutionError, match="target kind"):
+        frontiers.ExistingCapability(
+            loci.named("cell"),
+            frontiers.TargetContract(
+                loci.LocusKind.COORDINATE,
+                alphabets.ValueProfile.BOOLEAN,
+            ),
+            (frontiers.Effect.REPLACE,),
+        )
+    with pytest.raises(frontiers.WritableResolutionError, match="namespace"):
+        frontiers.FreshCapability(
+            loci.fresh_reference("other", "child"),
+            frontiers.TargetContract(
+                loci.LocusKind.FRESH,
+                alphabets.ValueProfile.BOOLEAN,
+            ),
+            frontiers.FreshNamespace("children"),
+        )
 
 
 def test_frontier_grants_no_implicit_read_authority() -> None:

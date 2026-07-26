@@ -237,6 +237,15 @@ class WritableCapabilities:
             raise WritableResolutionError(
                 "reconstruction lenses must cover capabilities in order"
             )
+        capability_frames = tuple(
+            capability.contract.frame
+            for capability in (*self.existing, *self.fresh)
+        )
+        lens_frames = tuple(lens.frame for lens in self.reconstruction.lenses)
+        if lens_frames != capability_frames:
+            raise WritableResolutionError(
+                "reconstruction lens frames must match target contracts"
+            )
 
     @property
     def targets(self) -> tuple[loci.Locus | loci.FreshReference, ...]:
@@ -286,6 +295,13 @@ class WritableRegion(Generic[C, W]):
         if has_fresh_effect != (self.fresh_namespace is not None):
             raise WritableResolutionError(
                 "fresh effects and a fresh namespace must be declared together"
+            )
+        if has_fresh_effect and self.target_contract.locus_kind not in (
+            None,
+            loci.LocusKind.FRESH,
+        ):
+            raise WritableResolutionError(
+                "fresh effects cannot declare a non-fresh target kind"
             )
 
     @property

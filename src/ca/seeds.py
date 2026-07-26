@@ -24,6 +24,15 @@ class SeedValidationError(ValueError):
     """A Seed descriptor is malformed or contains an unknown node."""
 
 
+def _is_exact_seed_value(value: object) -> bool:
+    """Recognize only sealed semantic-value variants."""
+
+    return type(value) in (bool, int, Fraction, str) or type(value) in (
+        alphabets.RepresentedNumber,
+        alphabets.ValueNode,
+    )
+
+
 class ExactnessProfile(Enum):
     """Exactness promised by a source descriptor."""
 
@@ -49,8 +58,14 @@ class SeedOutputContract:
     entropy_interface: EntropyInterface = EntropyInterface.NONE
 
     def __post_init__(self) -> None:
-        if not isinstance(self.value_profile, alphabets.ValueProfile):
+        if type(self.configuration_contract) is not loci.CarrierContract:
+            raise TypeError("configuration_contract must be loci.CarrierContract")
+        if type(self.value_profile) is not alphabets.ValueProfile:
             raise TypeError("value_profile must be alphabets.ValueProfile")
+        if type(self.exactness_profile) is not ExactnessProfile:
+            raise TypeError("exactness_profile is not recognized")
+        if type(self.entropy_interface) is not EntropyInterface:
+            raise TypeError("entropy_interface is not recognized")
 
 
 class ConstructionOp(Enum):
@@ -81,24 +96,96 @@ class Construction:
     arguments: tuple[ConstructionArgument, ...] = ()
 
     def __post_init__(self) -> None:
-        if not isinstance(self.operation, ConstructionOp):
+        if type(self.operation) is not ConstructionOp:
             raise TypeError("construction operation is not recognized")
+        if type(self.arguments) is not tuple:
+            raise TypeError("construction arguments must be an immutable tuple")
         if any(not _closed_construction_argument(item) for item in self.arguments):
             raise SeedValidationError(
                 "construction contains an unclosed argument"
             )
         if self.operation is ConstructionOp.EMPTY and self.arguments:
             raise SeedValidationError("EMPTY construction takes no arguments")
+        if self.operation is ConstructionOp.FILL:
+            if len(self.arguments) != 1 or not _is_exact_seed_value(
+                self.arguments[0]
+            ):
+                raise SeedValidationError(
+                    "FILL construction takes one closed semantic value"
+                )
+        if self.operation is ConstructionOp.POINT:
+            if (
+                len(self.arguments) != 2
+                or type(self.arguments[0]) is not loci.Locus
+                or not _is_exact_seed_value(self.arguments[1])
+            ):
+                raise SeedValidationError(
+                    "POINT construction takes one Locus and one semantic value"
+                )
         if self.operation is ConstructionOp.SEQUENCE:
             if len(self.arguments) not in (0, 1):
                 raise SeedValidationError(
                     "SEQUENCE construction takes one tuple or a law-supplied tuple"
                 )
             if self.arguments and (
-                not isinstance(self.arguments[0], tuple)
+                type(self.arguments[0]) is not tuple
                 or not self.arguments[0]
             ):
                 raise SeedValidationError("SEQUENCE values cannot be empty")
+            if self.arguments and any(
+                not _is_exact_seed_value(value) for value in self.arguments[0]
+            ):
+                raise SeedValidationError(
+                    "SEQUENCE construction contains a non-semantic value"
+                )
+        if self.operation is ConstructionOp.RECORD:
+            if len(self.arguments) not in (0, 1):
+                raise SeedValidationError(
+                    "RECORD construction takes one field tuple or law values"
+                )
+            if self.arguments:
+                fields = self.arguments[0]
+                if (
+                    type(fields) is not tuple
+                    or not fields
+                    or any(
+                        type(field) is not tuple
+                        or len(field) != 2
+                        or type(field[0]) is not str
+                        or not field[0]
+                        or not _is_exact_seed_value(field[1])
+                        for field in fields
+                    )
+                ):
+                    raise SeedValidationError(
+                        "RECORD construction needs closed named fields"
+                    )
+        if self.operation is ConstructionOp.GRID:
+            if len(self.arguments) not in (0, 3):
+                raise SeedValidationError(
+                    "GRID construction takes shape, values, and boundary fields"
+                )
+            if self.arguments:
+                shape, values, boundary_fields = self.arguments
+                if (
+                    type(shape) is not tuple
+                    or not shape
+                    or any(type(size) is not int or size <= 0 for size in shape)
+                    or type(values) is not tuple
+                    or any(not _is_exact_seed_value(value) for value in values)
+                    or type(boundary_fields) is not tuple
+                    or any(
+                        type(field) is not tuple
+                        or len(field) != 2
+                        or type(field[0]) is not str
+                        or not field[0]
+                        or not _is_exact_seed_value(field[1])
+                        for field in boundary_fields
+                    )
+                ):
+                    raise SeedValidationError(
+                        "GRID construction contains malformed closed fields"
+                    )
 
 
 @dataclass(frozen=True)
@@ -107,12 +194,23 @@ class ExactSource(Generic[C]):
 
     configuration: C
 
+    def __post_init__(self) -> None:
+        if type(self.configuration) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("exact source configuration is not recognized")
+
 
 @dataclass(frozen=True)
 class ConstructiveSource:
     """A closed constructor, never a host-language callable."""
 
     construction: Construction
+
+    def __post_init__(self) -> None:
+        if type(self.construction) is not Construction:
+            raise TypeError("constructive source construction is not recognized")
 
 
 @dataclass(frozen=True)
@@ -124,6 +222,21 @@ class PartialSource(Generic[C]):
     obligations: tuple[loci.SelectorExpr, ...]
 
     def __post_init__(self) -> None:
+        if type(self.configuration) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("partial source configuration is not recognized")
+        if type(self.unresolved) is not tuple or any(
+            type(item) is not loci.Locus for item in self.unresolved
+        ):
+            raise TypeError("partial unresolved roles must be an immutable Locus tuple")
+        if type(self.obligations) is not tuple or any(
+            type(item) is not loci.SelectorExpr for item in self.obligations
+        ):
+            raise TypeError(
+                "partial obligations must be an immutable SelectorExpr tuple"
+            )
         if not self.unresolved:
             raise SeedValidationError("a partial source needs an unresolved role")
         if len(set(self.unresolved)) != len(self.unresolved):
@@ -143,12 +256,20 @@ class BernoulliLaw:
     )
 
     def __post_init__(self) -> None:
+        if type(self.support) is not loci.Region:
+            raise TypeError("Bernoulli support is not recognized")
         probability = self.probability_true
-        if isinstance(probability, bool) or not isinstance(probability, Fraction):
+        if type(probability) is not Fraction:
             raise TypeError("probability_true must be fractions.Fraction")
         if probability < 0 or probability > 1:
             raise SeedValidationError("probability_true must lie in [0, 1]")
-        if self.false_value == self.true_value:
+        if not _is_exact_seed_value(self.false_value) or not _is_exact_seed_value(
+            self.true_value
+        ):
+            raise TypeError("Bernoulli outcomes must be closed semantic values")
+        if type(self.boundary) is not loci.Boundary:
+            raise TypeError("Bernoulli boundary is not recognized")
+        if alphabets.semantic_equal(self.false_value, self.true_value):
             raise SeedValidationError("Bernoulli outcomes must be distinct")
 
 
@@ -161,10 +282,16 @@ class UniformTupleLaw:
     excluded: tuple[tuple[int, ...], ...] = ()
 
     def __post_init__(self) -> None:
-        if isinstance(self.length, bool) or self.length <= 0:
+        if type(self.length) is not int or self.length <= 0:
             raise SeedValidationError("uniform tuple length must be positive")
-        if isinstance(self.value_count, bool) or self.value_count <= 0:
+        if type(self.value_count) is not int or self.value_count <= 0:
             raise SeedValidationError("uniform tuple value_count must be positive")
+        if type(self.excluded) is not tuple or any(
+            type(item) is not tuple
+            or any(type(value) is not int for value in item)
+            for item in self.excluded
+        ):
+            raise TypeError("excluded values must be immutable integer tuples")
         for item in self.excluded:
             if len(item) != self.length:
                 raise SeedValidationError("excluded tuple has the wrong length")
@@ -172,8 +299,11 @@ class UniformTupleLaw:
                 raise SeedValidationError("excluded tuple value is outside the law")
         if len(set(self.excluded)) != len(self.excluded):
             raise SeedValidationError("excluded tuples must be unique")
-        if len(self.excluded) >= self.value_count**self.length:
+        if self.value_count == 1 and self.excluded:
             raise SeedValidationError("uniform tuple law has empty support")
+        ordered = tuple(sorted(self.excluded))
+        if ordered != self.excluded:
+            object.__setattr__(self, "excluded", ordered)
 
 
 @dataclass(frozen=True)
@@ -184,8 +314,10 @@ class IntensionalProbabilityLaw:
     relation: loci.SelectorExpr
 
     def __post_init__(self) -> None:
-        if not self.binder:
+        if type(self.binder) is not str or not self.binder:
             raise SeedValidationError("an intensional law binder cannot be empty")
+        if type(self.relation) is not loci.SelectorExpr:
+            raise TypeError("intensional law relation is not recognized")
 
 
 ProbabilityLaw = BernoulliLaw | UniformTupleLaw | IntensionalProbabilityLaw
@@ -198,6 +330,18 @@ class LawSource:
     law: ProbabilityLaw
     construction: Construction | None = None
 
+    def __post_init__(self) -> None:
+        if type(self.law) not in (
+            BernoulliLaw,
+            UniformTupleLaw,
+            IntensionalProbabilityLaw,
+        ):
+            raise TypeError("probability-law variant is not recognized")
+        if self.construction is not None and type(
+            self.construction
+        ) is not Construction:
+            raise TypeError("law construction is not recognized")
+
 
 @dataclass(frozen=True)
 class IntensionalSource:
@@ -207,8 +351,10 @@ class IntensionalSource:
     relation: loci.SelectorExpr
 
     def __post_init__(self) -> None:
-        if not self.binder:
+        if type(self.binder) is not str or not self.binder:
             raise SeedValidationError("an intensional source binder cannot be empty")
+        if type(self.relation) is not loci.SelectorExpr:
+            raise TypeError("intensional source relation is not recognized")
 
 
 @dataclass(frozen=True)
@@ -217,8 +363,10 @@ class ProductPart(Generic[C]):
     seed: "Seed[C]"
 
     def __post_init__(self) -> None:
-        if not self.key:
+        if type(self.key) is not str or not self.key:
             raise SeedValidationError("product part keys cannot be empty")
+        if type(self.seed) is not Seed:
+            raise TypeError("product part seed is not recognized")
 
 
 @dataclass(frozen=True)
@@ -226,6 +374,10 @@ class ProductSource(Generic[C]):
     parts: tuple[ProductPart[C], ...]
 
     def __post_init__(self) -> None:
+        if type(self.parts) is not tuple or any(
+            type(part) is not ProductPart for part in self.parts
+        ):
+            raise TypeError("product parts must be an immutable ProductPart tuple")
         _validate_keys(self.parts)
 
 
@@ -244,6 +396,12 @@ class OverlaySource(Generic[C]):
     conflict: OverlayConflict
 
     def __post_init__(self) -> None:
+        if type(self.parts) is not tuple or any(
+            type(part) is not Seed for part in self.parts
+        ):
+            raise TypeError("overlay parts must be an immutable Seed tuple")
+        if type(self.conflict) is not OverlayConflict:
+            raise TypeError("overlay conflict mode is not recognized")
         if not self.parts:
             raise SeedValidationError("an overlay needs at least one part")
 
@@ -254,10 +412,12 @@ class MixturePart(Generic[C]):
     seed: "Seed[C]"
 
     def __post_init__(self) -> None:
-        if isinstance(self.weight, bool) or not isinstance(self.weight, Fraction):
+        if type(self.weight) is not Fraction:
             raise TypeError("mixture weights must be fractions.Fraction")
         if self.weight <= 0:
             raise SeedValidationError("mixture weights must be positive")
+        if type(self.seed) is not Seed:
+            raise TypeError("mixture part seed is not recognized")
 
 
 @dataclass(frozen=True)
@@ -265,6 +425,10 @@ class MixtureSource(Generic[C]):
     parts: tuple[MixturePart[C], ...]
 
     def __post_init__(self) -> None:
+        if type(self.parts) is not tuple or any(
+            type(part) is not MixturePart for part in self.parts
+        ):
+            raise TypeError("mixture parts must be an immutable MixturePart tuple")
         if not self.parts:
             raise SeedValidationError("a mixture needs at least one part")
         if sum((part.weight for part in self.parts), Fraction(0)) != 1:
@@ -278,6 +442,12 @@ class ProductLawSource(Generic[C]):
     parts: tuple[ProductPart[C], ...]
 
     def __post_init__(self) -> None:
+        if type(self.parts) is not tuple or any(
+            type(part) is not ProductPart for part in self.parts
+        ):
+            raise TypeError(
+                "product-law parts must be an immutable ProductPart tuple"
+            )
         _validate_keys(self.parts)
         if any(not _has_probability_law(part.seed.source) for part in self.parts):
             raise SeedValidationError("every product-law part must contain a law")
@@ -287,6 +457,12 @@ class ProductLawSource(Generic[C]):
 class RefinedSource(Generic[C]):
     source: "Seed[C]"
     constraint: loci.SelectorExpr
+
+    def __post_init__(self) -> None:
+        if type(self.source) is not Seed:
+            raise TypeError("refined source seed is not recognized")
+        if type(self.constraint) is not loci.SelectorExpr:
+            raise TypeError("refined source constraint is not recognized")
 
 
 SeedSource = (
@@ -310,6 +486,11 @@ class SeedDenotation(Generic[C]):
     source: SeedSource[C]
     output_contract: SeedOutputContract
 
+    def __post_init__(self) -> None:
+        _validate_source(self.source)
+        if type(self.output_contract) is not SeedOutputContract:
+            raise TypeError("seed denotation output contract is not recognized")
+
     @property
     def exact_configuration(self) -> C:
         if not isinstance(self.source, ExactSource):
@@ -326,11 +507,13 @@ class Seed(Generic[C]):
 
     def __post_init__(self) -> None:
         _validate_source(self.source)
+        if type(self.output_contract) is not SeedOutputContract:
+            raise TypeError("Seed output contract is not recognized")
         if isinstance(self.source, (ExactSource, PartialSource)):
             configuration = self.source.configuration
-            if not isinstance(
-                configuration,
-                (loci.FiniteConfiguration, loci.IntensionalConfiguration),
+            if type(configuration) not in (
+                loci.FiniteConfiguration,
+                loci.IntensionalConfiguration,
             ):
                 raise SeedValidationError(
                     "exact/partial sources require a recognized configuration"
@@ -389,21 +572,9 @@ _LAW_TYPES = (BernoulliLaw, UniformTupleLaw, IntensionalProbabilityLaw)
 
 
 def _closed_construction_argument(value: object) -> bool:
-    if isinstance(
-        value,
-        (
-            bool,
-            int,
-            Fraction,
-            str,
-            alphabets.RepresentedNumber,
-            alphabets.ValueNode,
-            loci.Locus,
-            loci.Region,
-        ),
-    ):
+    if _is_exact_seed_value(value) or type(value) in (loci.Locus, loci.Region):
         return True
-    if isinstance(value, tuple):
+    if type(value) is tuple:
         return all(_closed_construction_argument(item) for item in value)
     return False
 
