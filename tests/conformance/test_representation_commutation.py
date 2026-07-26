@@ -9,7 +9,7 @@ from fractions import Fraction
 import pytest
 
 import ca
-from ca import alphabets, loci, program, rules, serialization
+from ca import alphabets, frontiers, loci, program, rules, serialization
 
 from g7_fixtures import (
     certificate,
@@ -21,6 +21,7 @@ from g7_fixtures import (
 from g7_mechanics import (
     MECHANICS_ROWS,
     assert_mechanics_run,
+    materialized_px10_source,
     materialized_px10_target,
     run_mechanics_fixture,
     run_px10_representation_case,
@@ -589,24 +590,183 @@ def test_spf060_oracle_rejects_payload_only_relation_mutations(
         _assert_exact_relation_matches_oracle(corrupted, oracle_pairs)
 
 
-def _terminal_application(
+def _assert_px10_step_algebra(
     execution,
-) -> tuple[
-    loci.FiniteConfiguration | loci.IntensionalConfiguration,
-    program.ApplicationComplete,
-]:
-    """Select the final trajectory step, or the sole application if uniterated."""
+    source: loci.FiniteConfiguration,
+    result: program.ApplicationComplete,
+    *,
+    terminal: bool,
+) -> program.AppliedDerivation:
+    """Assert the exact deterministic complete-result algebra for one step."""
+
+    simple_program = execution.simple_program
+    writable = simple_program.frontier.resolve(source)
+    readable = simple_program.neighborhood.resolve(source)
+    assert type(writable) is frontiers.WritableCapabilities
+
+    source_outcomes = result.source_outcomes
+    source_support = source_outcomes.support
+    assert source_outcomes.probability_law is None
+    assert source_support.presentation is rules.SupportPresentation.FINITE
+    assert source_support.relation is None
+    assert len(source_support.atoms) == 1
+    source_atom = source_support.atoms[0]
+    assert type(source_atom) is rules.Derivation
+    assert type(source_support.cardinality) is rules.ExactlyOne
+    assert type(result.outcome_atom_cardinality) is rules.ExactlyOne
+    assert type(result.derivation_cardinality) is rules.ExactlyOne
+    assert type(result.successor_cardinality) is rules.ExactlyOne
+
+    assert len(result.applied_atoms.atoms) == 1
+    applied = result.applied_atoms.atoms[0]
+    assert type(applied) is program.AppliedDerivation
+    assert applied.source == source_atom
+    assert type(result.applied_atoms.cardinality) is rules.ExactlyOne
+
+    assert result.no_successor_partition.atoms == ()
+    assert type(
+        result.no_successor_partition.cardinality
+    ) is rules.ExactlyZero
+    assert len(
+        result.successor_quotient_with_derivation_fibers.atoms
+    ) == 1
+    fiber = result.successor_quotient_with_derivation_fibers.atoms[0]
+    assert fiber.derivations == (applied,)
+    assert loci.configuration_equal(fiber.successor, applied.successor)
+    assert type(
+        result.successor_quotient_with_derivation_fibers.cardinality
+    ) is rules.ExactlyOne
+
+    for measure in (
+        result.applied_atom_measure,
+        result.successor_submeasure,
+        result.no_successor_submeasure,
+    ):
+        assert type(measure) is program.MeasureAbsent
+
+    disposition = source_atom.replacement
+    assert (
+        disposition.totality_evidence.kind
+        is rules.CertificateKind.TOTALITY
+    )
+    assert tuple(item.target for item in disposition.existing) == tuple(
+        capability.target for capability in writable.existing
+    )
+    assert tuple(item.target for item in disposition.fresh) == tuple(
+        capability.target for capability in writable.fresh
+    )
+    assert all(
+        item.evidence.kind is rules.CertificateKind.TOTALITY
+        for item in disposition.entries
+    )
+
+    expected_continuation = rules.Stop if terminal else rules.Continue
+    assert type(source_atom.continuation) is expected_continuation
+
+    evidence = result.evidence
+    assert evidence.phases == tuple(program.ApplicationPhase)
+    assert evidence.program_identity == simple_program.canonical_identity
+    assert evidence.input_configuration_identity == source.identity
+    assert evidence.readable_binding_identity == loci.canonical_identity(
+        readable
+    )
+    assert evidence.writable_binding_identity == loci.canonical_identity(
+        writable
+    )
+    assert evidence.application_identity == loci.canonical_identity(
+        (
+            evidence.program_identity,
+            evidence.input_configuration_identity,
+            evidence.readable_binding_identity,
+            evidence.writable_binding_identity,
+        )
+    )
+    assert (
+        evidence.canonical_rule_identity
+        == simple_program.rule.canonical_identity
+    )
+
+    expected_input_lineage = program.TraceLineage(
+        loci.canonical_identity(("direct-application-root", source.identity))
+    )
+    assert (
+        evidence.input_trace_lineage_identity
+        == expected_input_lineage.canonical_identity
+    )
+    assert applied.input_trace_lineage == expected_input_lineage
+    expected_edge = loci.canonical_identity(
+        (
+            expected_input_lineage.canonical_identity,
+            evidence.application_identity,
+            source_atom.canonical_identity,
+            source_atom.progress.value,
+        )
+    )
+    assert applied.output_trace_lineage == program.TraceLineage(
+        expected_input_lineage.root_identity,
+        (*expected_input_lineage.path, expected_edge),
+    )
+    assert applied.evidence.application_identity == evidence.application_identity
+    assert (
+        applied.evidence.disposition_identity
+        == disposition.canonical_identity
+    )
+
+    assert tuple(
+        binding.reference for binding in applied.fresh_bindings
+    ) == tuple(item.target for item in disposition.fresh)
+    assert tuple(
+        binding.identity for binding in applied.fresh_bindings
+    ) == tuple(
+        loci.bind_fresh(
+            item.target,
+            input_configuration_identity=source.identity,
+            canonical_rule_identity=evidence.canonical_rule_identity,
+            witness_identity=source_atom.witness.canonical_identity,
+        )
+        for item in disposition.fresh
+    )
+    for item, binding in zip(
+        disposition.fresh,
+        applied.fresh_bindings,
+        strict=True,
+    ):
+        assert applied.successor.contains(binding.identity) == (
+            item.action is rules.DispositionAction.CREATE
+        )
+    return applied
+
+
+def _assert_px10_trajectory_algebra(
+    execution,
+) -> program.ApplicationComplete:
+    """Assert every actual step and link each successor to the next source."""
 
     if execution.trajectory:
-        terminal_source, terminal_result = execution.trajectory[-1]
+        steps = execution.trajectory
     else:
-        terminal_source, terminal_result = execution.source, execution.result
+        steps = ((execution.source, execution.result),)
+    assert loci.configuration_equal(steps[0][0], execution.source)
+    assert steps[0][1] == execution.result
+
+    prior_applied: program.AppliedDerivation | None = None
+    for index, (step_source, step_result) in enumerate(steps):
+        assert type(step_source) is loci.FiniteConfiguration
+        assert isinstance(step_result, program.ApplicationComplete)
+        if prior_applied is not None:
+            assert loci.configuration_equal(
+                step_source,
+                prior_applied.successor,
+            )
+        prior_applied = _assert_px10_step_algebra(
+            execution,
+            step_source,
+            step_result,
+            terminal=index == len(steps) - 1,
+        )
+    terminal_result = steps[-1][1]
     assert isinstance(terminal_result, program.ApplicationComplete)
-    assert (
-        terminal_result.evidence.input_configuration_identity
-        == terminal_source.identity
-    )
-    return terminal_source, terminal_result
+    return terminal_result
 
 
 @pytest.mark.parametrize("case_index", (0, 1), ids=("primary", "alternate"))
@@ -634,6 +794,8 @@ def test_represented_and_native_one_step_results_commute_completely(
         execution.representation_target,
         oracle_target,
     )
+    actual_source = materialized_px10_source(execution)
+    assert alphabets.semantic_equal(actual_source, oracle_source)
     assert alphabets.semantic_equal(
         relation.forward(oracle_source),
         oracle_target,
@@ -641,7 +803,7 @@ def test_represented_and_native_one_step_results_commute_completely(
     actual_target = materialized_px10_target(execution)
     assert alphabets.semantic_equal(actual_target, oracle_target)
 
-    _, terminal_result = _terminal_application(execution)
+    terminal_result = _assert_px10_trajectory_algebra(execution)
     terminal_derivations = tuple(
         atom
         for atom in terminal_result.applied_atoms.atoms
