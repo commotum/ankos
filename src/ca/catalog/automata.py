@@ -388,8 +388,6 @@ def _grid_expression_program(
     expression: rules.RuleExpr,
     boundary: loci.Boundary,
     axes: tuple[str, ...] | None,
-    label: str,
-    provenance: tuple[str, ...] = (),
 ) -> SimpleProgram:
     source = loci.grid_configuration(
         shape,
@@ -418,8 +416,8 @@ def _grid_expression_program(
             readable.join_shape,
             writable.effect_profile,
         ),
-        witness=rules.literal_expr(label),
-        provenance=(f"catalog:{label}", *provenance),
+        witness=rules.literal_expr("expression-replacement"),
+        provenance=("mechanics:expression-replacement",),
     )
     return synchronous_local_state_transform(
         seed=seeds.exact(source, value_profile=alphabet.value_profile),
@@ -439,9 +437,7 @@ def _finite_table_program(
     table: tuple[int, ...],
     boundary: loci.Boundary[int],
     axes: tuple[str, ...] | None,
-    label: str,
     totalistic: bool = False,
-    provenance: tuple[str, ...] = (),
 ) -> SimpleProgram:
     alphabet = alphabets.int_range_alphabet(colors)
     index = (
@@ -459,8 +455,6 @@ def _finite_table_program(
         expression=rules.lookup(table, index),
         boundary=boundary,
         axes=axes,
-        label=label,
-        provenance=provenance,
     )
 
 
@@ -526,7 +520,6 @@ def multicolor_cellular_automaton(
         table=table,
         boundary=resolved_boundary,
         axes=("x",),
-        label="multicolor-cellular-automaton",
     )
 
 
@@ -571,7 +564,6 @@ def totalistic_cellular_automaton(
             label="totalistic cellular automaton",
         ),
         axes=("x",),
-        label="totalistic-cellular-automaton",
         totalistic=True,
     )
 
@@ -649,8 +641,6 @@ def quiescent_cellular_automaton(
         table=table,
         boundary=resolved_boundary,
         axes=("x",),
-        label="quiescent-cellular-automaton",
-        provenance=(f"background:{background}",),
     )
 
 
@@ -683,7 +673,6 @@ def symmetric_cellular_automaton(
         table=table,
         boundary=resolved_boundary,
         axes=("x",),
-        label="symmetric-cellular-automaton",
     )
 
 
@@ -713,7 +702,6 @@ def _all_equal(
 def _anchored_result(
     replacements: tuple[tuple[int, alphabets.SemanticValue], ...],
     *,
-    label: str,
     continuation: rules.Continuation = rules.Continue(),
 ) -> rules.DerivationClauseResult:
     return rules.DerivationClauseResult(
@@ -732,9 +720,12 @@ def _anchored_result(
             else rules.Progress.QUIESCENT
         ),
         continuation,
-        rules.literal_expr(label),
-        (f"catalog:{label}",),
-        _certificate(rules.CertificateKind.DERIVATION, f"{label}:derived"),
+        rules.literal_expr("anchored-replacement"),
+        ("mechanics:anchored-replacement",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "anchored-replacement:derived",
+        ),
     )
 
 
@@ -907,20 +898,16 @@ def generalized_mobile_automaton(
             clauses.append(
                 rules.RuleClause(
                     _all_equal(expected),
-                    _anchored_result(
-                        replacements,
-                        label="generalized-mobile-transition",
-                    ),
+                    _anchored_result(replacements),
                 )
             )
     zero_result = _anchored_result(
         (),
-        label="generalized-mobile-no-active-loci",
         continuation=rules.Stop(
             rules.literal_expr("no-active-loci"),
             _certificate(
                 rules.CertificateKind.TERMINALITY,
-                "generalized-mobile:no-active-loci",
+                "terminal:no-active-loci",
             ),
         ),
     )
@@ -937,7 +924,7 @@ def generalized_mobile_automaton(
         ),
         completeness_evidence=_certificate(
             rules.CertificateKind.COMPLETENESS,
-            "generalized-mobile:complete",
+            "anchored-clause-kernel:complete",
         ),
         conflict_policy=conflict_policy,
         selection=rules.ClauseSelection.FIRST,
@@ -987,7 +974,6 @@ def _finite_grid_table_preset(
         table=table,
         boundary=_integer_boundary(boundary, colors=size, label=label),
         axes=axes,
-        label=label,
     )
 
 
@@ -1110,12 +1096,11 @@ def _single_state_program(
     initial: alphabets.SemanticValue,
     alphabet: alphabets.Alphabet,
     expression: rules.RuleExpr,
-    label: str,
 ) -> SimpleProgram:
     if type(alphabet) is not alphabets.Alphabet:
-        raise TypeError(f"{label} alphabet must be an Alphabet")
+        raise TypeError("single-state alphabet must be an Alphabet")
     if type(expression) is not rules.RuleExpr:
-        raise TypeError(f"{label} expression must be a RuleExpr")
+        raise TypeError("single-state expression must be a RuleExpr")
     alphabet.require(initial)
     source = loci.record_configuration((("state", initial),))
     writable = frontiers.everywhere(
@@ -1138,8 +1123,8 @@ def _single_state_program(
             readable.join_shape,
             writable.effect_profile,
         ),
-        witness=rules.literal_expr(label),
-        provenance=(f"catalog:{label}",),
+        witness=rules.literal_expr("expression-replacement"),
+        provenance=("mechanics:expression-replacement",),
     )
     return iterated_map(
         seed=seeds.exact(source, value_profile=alphabet.value_profile),
@@ -1162,7 +1147,6 @@ def arithmetic_iteration(
         initial=initial,
         alphabet=alphabet,
         expression=map_expression,
-        label="arithmetic-iteration",
     )
 
 
@@ -1209,7 +1193,6 @@ def piecewise_integer_map(
         initial=initial,
         alphabet=alphabets.integers(),
         expression=expression,
-        label="piecewise-integer-map",
     )
 
 
@@ -1236,7 +1219,6 @@ def digit_reversal_map(
         initial=initial,
         alphabet=alphabets.naturals(),
         expression=rules.add(source, reversed_value),
-        label="digit-reversal-map",
     )
 
 
@@ -1279,7 +1261,6 @@ def continuous_cellular_automaton(
         expression=local_rule,
         boundary=boundary,
         axes=("x",),
-        label="continuous-cellular-automaton",
     )
 
 

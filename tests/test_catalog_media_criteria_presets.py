@@ -274,14 +274,14 @@ def test_constraint_presets_retain_three_distinct_source_presentations() -> None
     template_state = states["template"]
     seeded_state = states["seeded-template"]
 
-    assert local_state.tag == "local-constraint-system"
+    assert local_state.tag == "predicate-constraint-state"
     assert alphabets.record_get(
         local_state,
         "partial_assignment",
     ) == partial_assignment
     assert alphabets.record_get(local_state, "predicates") == predicates
 
-    assert template_state.tag == "template-constraint-system"
+    assert template_state.tag == "template-constraint-state"
     assert alphabets.record_get(
         template_state,
         "partial_assignment",
@@ -291,7 +291,7 @@ def test_constraint_presets_retain_three_distinct_source_presentations() -> None
         "allowed_templates",
     ) == allowed_templates
 
-    assert seeded_state.tag == "seeded-template-constraint-system"
+    assert seeded_state.tag == "seeded-template-constraint-state"
     assert alphabets.record_get(
         seeded_state,
         "partial_assignment",
@@ -376,6 +376,7 @@ def test_preset_programs_round_trip_and_reencode_canonically(
     assert type(decoded.value) is ca.SimpleProgram
     assert decoded.value == simple_program
     assert serialization.dumps(decoded.value) == encoded
+    assert b"catalog:" not in encoded
 
 
 def test_media_presets_reject_hostile_inputs() -> None:

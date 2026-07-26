@@ -306,7 +306,6 @@ def _all_equal(
 def _derivation_result(
     replacements: tuple[tuple[int, alphabets.SemanticValue], ...],
     *,
-    label: str,
     continuation: rules.Continuation = rules.Continue(),
 ) -> rules.DerivationClauseResult:
     return rules.DerivationClauseResult(
@@ -325,32 +324,39 @@ def _derivation_result(
             else rules.Progress.QUIESCENT
         ),
         continuation,
-        rules.literal_expr(label),
-        (f"catalog:{label}",),
-        _certificate(rules.CertificateKind.DERIVATION, f"{label}:derived"),
-    )
-
-
-def _zero_anchor_result(*, label: str) -> rules.DerivationClauseResult:
-    return _derivation_result(
-        (),
-        label=label,
-        continuation=rules.Stop(
-            rules.literal_expr("no-head"),
-            _certificate(rules.CertificateKind.TERMINALITY, f"{label}:terminal"),
+        rules.literal_expr("anchored-replacement"),
+        ("mechanics:anchored-replacement",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "anchored-replacement:derived",
         ),
     )
 
 
-def _terminal_transition_result(*, label: str) -> rules.DerivationClauseResult:
-    """Return an explicit typed terminal continuation without hidden fallback."""
-
+def _zero_anchor_result() -> rules.DerivationClauseResult:
     return _derivation_result(
         (),
-        label=label,
         continuation=rules.Stop(
-            rules.literal_expr("missing-transition"),
-            _certificate(rules.CertificateKind.TERMINALITY, f"{label}:terminal"),
+            rules.literal_expr("no-selected-anchor"),
+            _certificate(
+                rules.CertificateKind.TERMINALITY,
+                "terminal:no-selected-anchor",
+            ),
+        ),
+    )
+
+
+def _terminal_transition_result() -> rules.NoSuccessorClauseResult:
+    """Return an explicit typed terminal continuation without hidden fallback."""
+
+    return rules.NoSuccessorClauseResult(
+        rules.NoSuccessorOutcome.TERMINAL,
+        rules.literal_expr("missing-transition"),
+        rules.literal_expr("missing-transition"),
+        ("mechanics:missing-transition",),
+        _certificate(
+            rules.CertificateKind.TERMINALITY,
+            "terminal:missing-transition",
         ),
     )
 
@@ -376,7 +382,6 @@ def _machine_program(
     offsets: tuple[tuple[int, ...], ...],
     anchor: alphabets.ValueAnchor,
     clauses: tuple[rules.RuleClause, ...],
-    label: str,
 ) -> SimpleProgram:
     writable = frontiers.value_relative(
         anchor,
@@ -393,7 +398,7 @@ def _machine_program(
     rule = rules.anchored_clause_kernel(
         clauses,
         group_channel=0,
-        zero_result=_zero_anchor_result(label=f"{label}-no-head"),
+        zero_result=_zero_anchor_result(),
         contract=rules.RuleContract(
             source.contract,
             alphabet.value_profile,
@@ -403,9 +408,144 @@ def _machine_program(
         ),
         completeness_evidence=_certificate(
             rules.CertificateKind.COMPLETENESS,
-            f"{label}:complete",
+            "anchored-clause-kernel:complete",
         ),
         conflict_policy=rules.ProposalConflictPolicy.REQUIRE_EQUAL,
+        selection=rules.ClauseSelection.FIRST,
+    )
+    return mobile_head_grid_rewrite(
+        seed=seeds.exact(source, value_profile=alphabet.value_profile),
+        alphabet=alphabet,
+        frontier=writable,
+        neighborhood=readable,
+        rule=rule,
+    )
+
+
+def _indexed_derivation_result(
+    replacements: tuple[tuple[int, alphabets.SemanticValue], ...],
+) -> rules.DerivationClauseResult:
+    return rules.DerivationClauseResult(
+        tuple(
+            rules.ExistingDispositionPlan(
+                rules.capability_index(index),
+                rules.DispositionAction.REPLACE,
+                rules.literal_expr(value),
+            )
+            for index, value in replacements
+        ),
+        (),
+        rules.Progress.ADVANCED,
+        rules.Continue(),
+        rules.literal_expr("indexed-replacement"),
+        ("mechanics:indexed-replacement",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "indexed-replacement:derived",
+        ),
+    )
+
+
+def _value_has_tag(expression: rules.RuleExpr, tag: str) -> rules.RuleExpr:
+    singleton = rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (expression,),
+    )
+    return rules.equal(
+        rules.index_of_tag(
+            singleton,
+            tag,
+            rules.literal_expr(-1),
+        ),
+        rules.literal_expr(0),
+    )
+
+
+def _global_turing_condition(
+    *,
+    cell_count: int,
+    head_index: int,
+    head_value: alphabets.ValueNode,
+    destination_index: int,
+    destination_value: alphabets.ValueNode | None,
+) -> rules.RuleExpr:
+    conditions: list[rules.RuleExpr] = []
+    for index in range(cell_count):
+        observation = rules.observation(index)
+        if index == head_index:
+            conditions.append(
+                rules.equal(
+                    observation,
+                    rules.literal_expr(head_value),
+                )
+            )
+        elif index == destination_index and destination_value is not None:
+            conditions.append(
+                rules.equal(
+                    observation,
+                    rules.literal_expr(destination_value),
+                )
+            )
+        else:
+            conditions.append(_value_has_tag(observation, "cell"))
+    return rules.RuleExpr(
+        rules.ExpressionPrimitive.ALL,
+        (
+            rules.RuleExpr(
+                rules.ExpressionPrimitive.TUPLE,
+                tuple(conditions),
+            ),
+        ),
+    )
+
+
+def _bounded_axis_destination(
+    index: int,
+    extent: int,
+    movement: int,
+    policy: loci.BoundaryPolicy,
+) -> int | None:
+    candidate = index + movement
+    if 0 <= candidate < extent:
+        return candidate
+    if policy is loci.BoundaryPolicy.PERIODIC:
+        return candidate % extent
+    if policy is loci.BoundaryPolicy.REFLECTIVE:
+        if extent == 1:
+            return 0
+        period = 2 * (extent - 1)
+        reflected = candidate % period
+        return period - reflected if reflected >= extent else reflected
+    return None
+
+
+def _global_turing_program(
+    *,
+    source: loci.FiniteConfiguration,
+    alphabet: alphabets.Alphabet,
+    clauses: tuple[rules.RuleClause, ...],
+) -> SimpleProgram:
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule = rules.clause_kernel(
+        clauses,
+        contract=rules.RuleContract(
+            source.contract,
+            alphabet.value_profile,
+            readable.result_shape,
+            readable.join_shape,
+            writable.effect_profile,
+        ),
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "clause-kernel:complete",
+        ),
         selection=rules.ClauseSelection.FIRST,
     )
     return mobile_head_grid_rewrite(
@@ -550,7 +690,6 @@ def mobile_automaton(
                         _mobile_head(key[output[1] + 1]),
                     ),
                 ),
-                label="mobile-transition",
             ),
         )
         for key, output in parsed
@@ -564,7 +703,6 @@ def mobile_automaton(
             alphabets.AnchorCardinality.EXACTLY_ONE,
         ),
         clauses=clauses,
-        label="mobile-automaton",
     )
 
 
@@ -626,7 +764,6 @@ def neighbor_updating_mobile_automaton(
                     )
                     for index in range(3)
                 ),
-                label="neighbor-updating-mobile-transition",
             ),
         )
         for key, output in parsed
@@ -640,7 +777,6 @@ def neighbor_updating_mobile_automaton(
             alphabets.AnchorCardinality.EXACTLY_ONE,
         ),
         clauses=clauses,
-        label="neighbor-updating-mobile-automaton",
     )
 
 
@@ -765,44 +901,70 @@ def turing_machine(
     )
     clauses: list[rules.RuleClause] = []
     for (state, scanned), (next_state, write_symbol, movement) in parsed:
-        for left, right in cartesian_product(range(size), repeat=2):
-            clauses.append(
-                rules.RuleClause(
-                    _all_equal(
-                        (
-                            _cell(left),
-                            _turing_head(state, scanned),
-                            _cell(right),
-                        )
-                    ),
-                    _derivation_result(
-                        (
-                            (1, _cell(write_symbol)),
-                            (
-                                movement + 1,
-                                _turing_head(
-                                    next_state,
-                                    left if movement == -1 else right,
-                                ),
-                            ),
-                        ),
-                        label="turing-transition",
-                    ),
-                )
+        for source_index in range(len(values)):
+            destination_index = _bounded_axis_destination(
+                source_index,
+                len(values),
+                movement,
+                source.carrier.boundary.policy,
             )
+            if destination_index is None:
+                continue
+            if destination_index == source_index:
+                clauses.append(
+                    rules.RuleClause(
+                        _global_turing_condition(
+                            cell_count=len(values),
+                            head_index=source_index,
+                            head_value=_turing_head(state, scanned),
+                            destination_index=destination_index,
+                            destination_value=None,
+                        ),
+                        _indexed_derivation_result(
+                            (
+                                (
+                                    source_index,
+                                    _turing_head(next_state, write_symbol),
+                                ),
+                            )
+                        ),
+                    )
+                )
+                continue
+            for destination_symbol in range(size):
+                clauses.append(
+                    rules.RuleClause(
+                        _global_turing_condition(
+                            cell_count=len(values),
+                            head_index=source_index,
+                            head_value=_turing_head(state, scanned),
+                            destination_index=destination_index,
+                            destination_value=_cell(destination_symbol),
+                        ),
+                        _indexed_derivation_result(
+                            (
+                                (source_index, _cell(write_symbol)),
+                                (
+                                    destination_index,
+                                    _turing_head(
+                                        next_state,
+                                        destination_symbol,
+                                    ),
+                                ),
+                            )
+                        ),
+                    )
+                )
     clauses.append(
         rules.RuleClause(
             rules.literal_expr(True),
-            _terminal_transition_result(label="turing-missing-transition"),
+            _terminal_transition_result(),
         )
     )
-    return _machine_program(
+    return _global_turing_program(
         source=source,
         alphabet=alphabet,
-        offsets=_LINE_OFFSETS,
-        anchor=_turing_anchor(resolved_states),
         clauses=tuple(clauses),
-        label="turing-machine",
     )
 
 
@@ -951,49 +1113,85 @@ def turing_machine_2d(
         ),
         axes=("x", "y"),
     )
-    center_index = _CARDINAL_2D.index((0, 0))
     clauses: list[rules.RuleClause] = []
     for (state, scanned), (next_state, write_symbol, movement) in parsed:
-        for neighbors in cartesian_product(range(size), repeat=4):
-            expected_symbols = iter(neighbors)
-            expected = tuple(
-                (
-                    _turing_head(state, scanned)
-                    if offset == (0, 0)
-                    else _cell(next(expected_symbols))
-                )
-                for offset in _CARDINAL_2D
+        for row, column in cartesian_product(
+            range(resolved_shape[0]),
+            range(resolved_shape[1]),
+        ):
+            destination_row = _bounded_axis_destination(
+                row,
+                resolved_shape[0],
+                movement[0],
+                source.carrier.boundary.policy,
             )
-            destination_index = _CARDINAL_2D.index(movement)
-            destination_symbol = alphabets.tag_payload(expected[destination_index])
-            clauses.append(
-                rules.RuleClause(
-                    _all_equal(expected),
-                    _derivation_result(
-                        (
-                            (center_index, _cell(write_symbol)),
-                            (
-                                destination_index,
-                                _turing_head(next_state, destination_symbol),
-                            ),
+            destination_column = _bounded_axis_destination(
+                column,
+                resolved_shape[1],
+                movement[1],
+                source.carrier.boundary.policy,
+            )
+            if destination_row is None or destination_column is None:
+                continue
+            source_index = row * resolved_shape[1] + column
+            destination_index = (
+                destination_row * resolved_shape[1] + destination_column
+            )
+            if destination_index == source_index:
+                clauses.append(
+                    rules.RuleClause(
+                        _global_turing_condition(
+                            cell_count=len(values),
+                            head_index=source_index,
+                            head_value=_turing_head(state, scanned),
+                            destination_index=destination_index,
+                            destination_value=None,
                         ),
-                        label="turing-2d-transition",
-                    ),
+                        _indexed_derivation_result(
+                            (
+                                (
+                                    source_index,
+                                    _turing_head(next_state, write_symbol),
+                                ),
+                            )
+                        ),
+                    )
                 )
-            )
+                continue
+            for destination_symbol in range(size):
+                clauses.append(
+                    rules.RuleClause(
+                        _global_turing_condition(
+                            cell_count=len(values),
+                            head_index=source_index,
+                            head_value=_turing_head(state, scanned),
+                            destination_index=destination_index,
+                            destination_value=_cell(destination_symbol),
+                        ),
+                        _indexed_derivation_result(
+                            (
+                                (source_index, _cell(write_symbol)),
+                                (
+                                    destination_index,
+                                    _turing_head(
+                                        next_state,
+                                        destination_symbol,
+                                    ),
+                                ),
+                            )
+                        ),
+                    )
+                )
     clauses.append(
         rules.RuleClause(
             rules.literal_expr(True),
-            _terminal_transition_result(label="turing-2d-missing-transition"),
+            _terminal_transition_result(),
         )
     )
-    return _machine_program(
+    return _global_turing_program(
         source=source,
         alphabet=alphabet,
-        offsets=_CARDINAL_2D,
-        anchor=_turing_anchor(resolved_states),
         clauses=tuple(clauses),
-        label="turing-machine-2d",
     )
 
 

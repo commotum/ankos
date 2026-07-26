@@ -345,8 +345,8 @@ def _single_value_components(
             readable.join_shape,
             writable.effect_profile,
         ),
-        witness=rules.literal_expr(label),
-        provenance=(f"catalog:{label}",),
+        witness=rules.literal_expr("single-value-transduction"),
+        provenance=("single-value-transduction",),
     )
     return (
         seeds.exact(source, value_profile=alphabet.value_profile),
@@ -384,7 +384,7 @@ def constant_digit_register(
             ("register", register),
             ("digit", register % base),
         ),
-        tag="constant-digit-register",
+        tag="digit-register-state",
     )
     alphabet = alphabets.record(
         (

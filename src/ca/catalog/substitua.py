@@ -340,7 +340,6 @@ def _certificate(
 
 
 def _evidence_template(
-    label: str,
     source_evidence: rules.EvidenceTerm | None,
 ) -> rules.EvidenceTerm | None:
     if source_evidence is None:
@@ -348,8 +347,8 @@ def _evidence_template(
     if type(source_evidence) is not rules.EvidenceTerm:
         raise TypeError("source_evidence must be an EvidenceTerm")
     return rules.EvidenceTerm(
-        "catalog-source-evidence",
-        (label, source_evidence),
+        "source-evidence",
+        (source_evidence,),
     )
 
 
@@ -420,9 +419,9 @@ def _expression_components(
             (expression,),
         ),
         contract=contract,
-        witness=rules.literal_expr(label),
-        provenance=(f"catalog:{label}",),
-        certificate_template=_evidence_template(label, source_evidence),
+        witness=rules.literal_expr("closed-expression"),
+        provenance=("closed-expression",),
+        certificate_template=_evidence_template(source_evidence),
     )
     return seed, alphabet, frontier, neighborhood, rule
 
@@ -465,17 +464,23 @@ def _conditional_components(
         (),
         rules.Progress.ADVANCED,
         rules.Continue(),
-        rules.literal_expr(f"{label}:advance"),
-        (f"catalog:{label}",),
-        _certificate(rules.CertificateKind.DERIVATION, f"{label}:derived"),
-        certificate_template=_evidence_template(label, source_evidence),
+        rules.literal_expr("conditional-replacement"),
+        ("conditional-replacement",),
+        _certificate(
+            rules.CertificateKind.DERIVATION,
+            "conditional-replacement:derived",
+        ),
+        certificate_template=_evidence_template(source_evidence),
     )
     terminal = rules.NoSuccessorClauseResult(
         rules.NoSuccessorOutcome.TERMINAL,
-        rules.literal_expr(f"{label}:terminal"),
-        rules.literal_expr(f"{label}:terminal-witness"),
-        (f"catalog:{label}:terminal",),
-        _certificate(rules.CertificateKind.TERMINALITY, f"{label}:terminal"),
+        rules.literal_expr("condition-false"),
+        rules.literal_expr("condition-false"),
+        ("conditional-replacement:terminal",),
+        _certificate(
+            rules.CertificateKind.TERMINALITY,
+            "conditional-replacement:terminal",
+        ),
     )
     rule = rules.clause_kernel(
         (
@@ -485,7 +490,7 @@ def _conditional_components(
         contract=contract,
         completeness_evidence=_certificate(
             rules.CertificateKind.COMPLETENESS,
-            f"{label}:complete",
+            "conditional-replacement:complete",
         ),
         selection=rules.ClauseSelection.FIRST,
     )
@@ -578,7 +583,7 @@ def _word_production_map(
         )
     if not _same_semantic_members(tuple(keys), symbols):
         raise ValueError(f"{label} productions must be total on symbols")
-    return alphabets.map_value(tuple(entries), tag=f"{label}-productions")
+    return alphabets.map_value(tuple(entries), tag="word-productions")
 
 
 def _context_production_map(
@@ -630,7 +635,7 @@ def _context_production_map(
         raise ValueError(
             f"{label} productions must cover every width-{width} context"
         )
-    return alphabets.map_value(tuple(entries), tag=f"{label}-productions")
+    return alphabets.map_value(tuple(entries), tag="context-productions")
 
 
 def _require_rank_two_field(
@@ -799,7 +804,7 @@ def constant_digit_sequence(
         )
     if type(next_digit) is not rules.RuleExpr:
         raise TypeError("next_digit must be a RuleExpr")
-    _evidence_template("constant-digit-sequence", source_evidence)
+    _evidence_template(source_evidence)
     state = alphabets.word_value(prefix, tag="digits")
     output = rules.concatenate(
         rules.observation(0),
@@ -1027,7 +1032,7 @@ def cyclic_tag_system(
             ("phase", initial_phase),
             ("word", alphabets.word_value(initial, tag="bits")),
         ),
-        tag="cyclic-tag-system",
+        tag="front-delete-rear-append-state",
     )
     state_expr = rules.observation(0)
     word = rules.record_field(state_expr, "word")
@@ -1196,7 +1201,7 @@ def variable_index_recursive_sequence(
             ("next_index", len(prefix) + 1),
             ("prefix", alphabets.word_value(prefix, tag="history")),
         ),
-        tag="variable-index-recursive-sequence",
+        tag="indexed-history-state",
     )
     state_expr = rules.observation(0)
     prefix_expr = rules.record_field(state_expr, "prefix")
@@ -1267,7 +1272,7 @@ def number_theoretic_filtering(
             ),
             ("divisor", first_divisor),
         ),
-        tag="number-theoretic-filtering",
+        tag="erasure-state",
     )
     state_expr = rules.observation(0)
     candidates = rules.record_field(state_expr, "candidates")
@@ -1533,7 +1538,7 @@ def continued_fraction_substitution(
             "continued_fraction needs one signed integer followed by "
             "positive integers"
         )
-    _evidence_template("continued-fraction-substitution", source_evidence)
+    _evidence_template(source_evidence)
     schedule_values = tuple(reversed(continued_fraction[1:]))
     state = alphabets.record_value(
         (
@@ -1551,7 +1556,7 @@ def continued_fraction_substitution(
             ),
             ("word", alphabets.word_value((0,), tag="cf-word")),
         ),
-        tag="continued-fraction-substitution",
+        tag="scheduled-substitution-state",
     )
     state_expr = rules.observation(0)
     cursor = rules.record_field(state_expr, "cursor")

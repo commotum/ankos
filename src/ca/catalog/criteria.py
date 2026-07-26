@@ -267,11 +267,11 @@ def _constraint_components(
         ),
         completeness_evidence=_certificate(
             rules.CertificateKind.COMPLETENESS,
-            f"{label}:complete",
+            "constraint-relation:complete",
         ),
         soundness_evidence=_certificate(
             rules.CertificateKind.SOUNDNESS,
-            f"{label}:sound",
+            "constraint-relation:sound",
         ),
     )
     return (
@@ -301,7 +301,7 @@ def local_constraint_system(
             ("partial_assignment", partial_assignment),
             ("predicates", predicates),
         ),
-        tag="local-constraint-system",
+        tag="predicate-constraint-state",
     )
     seed, alphabet, frontier, neighborhood, rule = _constraint_components(
         state,
@@ -336,7 +336,7 @@ def template_constraint_system(
             ("partial_assignment", partial_assignment),
             ("allowed_templates", allowed_templates),
         ),
-        tag="template-constraint-system",
+        tag="template-constraint-state",
     )
     seed, alphabet, frontier, neighborhood, rule = _constraint_components(
         state,
@@ -388,7 +388,7 @@ def seeded_template_constraint_system(
             ("allowed_templates", allowed_templates),
             ("required_occurrences", occurrences),
         ),
-        tag="seeded-template-constraint-system",
+        tag="seeded-template-constraint-state",
     )
     seed, alphabet, frontier, neighborhood, rule = _constraint_components(
         state,

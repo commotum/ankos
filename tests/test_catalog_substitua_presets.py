@@ -58,6 +58,7 @@ def _roundtrip(value):
     encoded = serialization.dumps(value)
     assert serialization.loads(encoded) == serialization.Decoded(value)
     assert serialization.dumps(value) == encoded
+    assert b"catalog:" not in encoded
 
 
 def _apply_value(
@@ -501,6 +502,10 @@ def test_rank_two_independent_contextual_and_geometric_mosaics_apply() -> None:
         ("row", "column"),
         (1, 4),
         ("A", "B", "B", "A"),
+    )
+    assert geometric == substitution
+    assert serialization.dumps(geometric) == serialization.dumps(
+        substitution
     )
 
     contextual = substitua.context_dependent_substitution_2d(
