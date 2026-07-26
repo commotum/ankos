@@ -53,18 +53,16 @@ class OracleDisposition:
 
 
 @dataclass(frozen=True)
-class OracleAtom:
-    """One complete expected Rule/application atom."""
+class OracleSourceAtom:
+    """One complete expected Rule atom before reconstruction and commit."""
 
     atom_id: str
     kind: AtomKind
     witness: OracleTerm
     provenance: tuple[str, ...]
-    lineage: OracleTerm
     progress: Progress | None
     continuation: OracleTerm | None
     dispositions: tuple[OracleDisposition, ...]
-    successor: OracleTerm | None
     reason: OracleTerm | None
     certificate: OracleTerm
     mass: Fraction | None = None
@@ -84,6 +82,18 @@ class OracleFreshBinding:
 
     local_key: OracleTerm
     identity: OracleTerm
+    evidence: OracleTerm
+
+
+@dataclass(frozen=True)
+class OracleAppliedAtom:
+    """One source atom after generic binding, reconstruction, and validation."""
+
+    atom_id: str
+    source_atom_id: str
+    successor: OracleTerm | None
+    fresh_bindings: tuple[OracleFreshBinding, ...]
+    output_trace_lineage: OracleTerm
     evidence: OracleTerm
 
 
@@ -111,17 +121,17 @@ class OracleExpected:
     """Complete normalized expectation for one generic application."""
 
     support_kind: SupportKind
-    atoms: tuple[OracleAtom, ...]
-    source_outcome_atom_ids: tuple[str, ...]
-    applied_atom_ids: tuple[str, ...]
-    no_successor_atom_ids: tuple[str, ...]
+    source_outcomes: tuple[OracleSourceAtom, ...]
+    applied_atoms: tuple[OracleAppliedAtom, ...]
+    no_successor_partition: tuple[OracleAppliedAtom, ...]
     outcome_cardinality: OracleCardinality
     derivation_cardinality: OracleCardinality
     successor_cardinality: OracleCardinality
     successor_fibers: tuple[OracleFiber, ...]
-    fresh_bindings: tuple[OracleFreshBinding, ...]
     measures: OracleMeasures
-    intensional_relation: OracleTerm | None
+    source_intensional_relation: OracleTerm | None
+    applied_intensional_relation: OracleTerm | None
+    successor_intensional_relation: OracleTerm | None
     evidence: OracleTerm
 
 
@@ -184,6 +194,24 @@ def _disposition(
     """Construct one inert expected disposition."""
 
     return OracleDisposition(target=target, action=action, value=value)
+
+
+def _applied(
+    source: OracleSourceAtom,
+    successor: OracleTerm | None,
+    case_id: str,
+    fresh_bindings: tuple[OracleFreshBinding, ...] = (),
+) -> OracleAppliedAtom:
+    """Construct inert applied-atom data without reconstructing a successor."""
+
+    return OracleAppliedAtom(
+        atom_id=source.atom_id,
+        source_atom_id=source.atom_id,
+        successor=successor,
+        fresh_bindings=fresh_bindings,
+        output_trace_lineage=_term("lineage", case_id, source.atom_id),
+        evidence=_term("applied-atom-evidence", case_id, source.atom_id),
+    )
 
 
 EXACT_ZERO = OracleCardinality("exact", 0)
@@ -379,19 +407,17 @@ AR2_SUCCESSOR = _term(
     _term("field-value", "previous", 5),
     _term("field-value", "current", 14),
 )
-AR2_ATOM = OracleAtom(
+AR2_ATOM = OracleSourceAtom(
     atom_id="ar2-step",
     kind="derivation",
     witness=_term("witness.rule", "ar2-modular", "rule-id", 17),
     provenance=("native:ar2_modular_0d", "rule-17:a=2,b=1,c=1,mod=97"),
-    lineage=_term("lineage", "native.scalar.ar2-modular", "ar2-step"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
         _disposition(AR2_PREVIOUS, "replace", 5),
         _disposition(AR2_CURRENT, "replace", 14),
     ),
-    successor=AR2_SUCCESSOR,
     reason=None,
     certificate=_term(
         "arithmetic-certificate",
@@ -412,17 +438,23 @@ AR2_CASE = OracleCase(
     ),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(AR2_ATOM,),
-        source_outcome_atom_ids=("ar2-step",),
-        applied_atom_ids=("ar2-step",),
-        no_successor_atom_ids=(),
+        source_outcomes=(AR2_ATOM,),
+        applied_atoms=(
+            _applied(
+                AR2_ATOM,
+                AR2_SUCCESSOR,
+                "native.scalar.ar2-modular",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(OracleFiber(AR2_SUCCESSOR, ("ar2-step",)),),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "native.scalar.ar2-modular"),
     ),
 )
@@ -434,7 +466,7 @@ DYAD_PREVIOUS = _term("history-slot", "previous")
 DYAD_CURRENT = _term("history-slot", "current")
 DYADLAGS_SOURCE = _term("history", _term("values", 1, 0, 0))
 DYADLAGS_SUCCESSOR = _term("history", _term("values", 0, 0, 1))
-DYADLAGS_ATOM = OracleAtom(
+DYADLAGS_ATOM = OracleSourceAtom(
     atom_id="dyadlags-rule-150",
     kind="derivation",
     witness=_term(
@@ -445,11 +477,6 @@ DYADLAGS_ATOM = OracleAtom(
         _term("rule-id", 150),
     ),
     provenance=("native:dyadlags_0d", "rule-150:bit-4=1"),
-    lineage=_term(
-        "lineage",
-        "native.temporal.dyadlags-rule-150",
-        "dyadlags-rule-150",
-    ),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -457,7 +484,6 @@ DYADLAGS_ATOM = OracleAtom(
         _disposition(DYAD_PREVIOUS, "replace", 0),
         _disposition(DYAD_CURRENT, "replace", 1),
     ),
-    successor=DYADLAGS_SUCCESSOR,
     reason=None,
     certificate=_term("lookup-certificate", 150, 4, 1),
 )
@@ -471,19 +497,25 @@ DYADLAGS_CASE = OracleCase(
     readable=_term("temporal-lag-view", _term("values", 1, 0, 0)),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(DYADLAGS_ATOM,),
-        source_outcome_atom_ids=("dyadlags-rule-150",),
-        applied_atom_ids=("dyadlags-rule-150",),
-        no_successor_atom_ids=(),
+        source_outcomes=(DYADLAGS_ATOM,),
+        applied_atoms=(
+            _applied(
+                DYADLAGS_ATOM,
+                DYADLAGS_SUCCESSOR,
+                "native.temporal.dyadlags-rule-150",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(
             OracleFiber(DYADLAGS_SUCCESSOR, ("dyadlags-rule-150",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term(
             "application-evidence",
             "native.temporal.dyadlags-rule-150",
@@ -511,7 +543,7 @@ LAGCOUNTS_SUCCESSOR = _term(
     "history",
     _term("values", 0, 1, 1, 0, 0, 1, 0, 1, 1, 1),
 )
-LAGCOUNTS_ATOM = OracleAtom(
+LAGCOUNTS_ATOM = OracleSourceAtom(
     atom_id="lagcounts-rule-91",
     kind="derivation",
     witness=_term(
@@ -525,11 +557,6 @@ LAGCOUNTS_ATOM = OracleAtom(
         "native:lagcounts_0d",
         "hash-word:0x3238ad129bb6db1d",
         "output-bit:1",
-    ),
-    lineage=_term(
-        "lineage",
-        "native.temporal.lagcounts-rule-91",
-        "lagcounts-rule-91",
     ),
     progress="advanced",
     continuation=_term("continue"),
@@ -545,7 +572,6 @@ LAGCOUNTS_ATOM = OracleAtom(
         _disposition(LAG_8, "replace", 1),
         _disposition(LAG_9, "replace", 1),
     ),
-    successor=LAGCOUNTS_SUCCESSOR,
     reason=None,
     certificate=_term(
         "deterministic-table-certificate",
@@ -583,19 +609,25 @@ LAGCOUNTS_CASE = OracleCase(
     ),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(LAGCOUNTS_ATOM,),
-        source_outcome_atom_ids=("lagcounts-rule-91",),
-        applied_atom_ids=("lagcounts-rule-91",),
-        no_successor_atom_ids=(),
+        source_outcomes=(LAGCOUNTS_ATOM,),
+        applied_atoms=(
+            _applied(
+                LAGCOUNTS_ATOM,
+                LAGCOUNTS_SUCCESSOR,
+                "native.temporal.lagcounts-rule-91",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(
             OracleFiber(LAGCOUNTS_SUCCESSOR, ("lagcounts-rule-91",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term(
             "application-evidence",
             "native.temporal.lagcounts-rule-91",
@@ -622,7 +654,7 @@ LINE_SUCCESSOR = _term(
     _term("default", 0),
     _term("values", 0, 1, 0, 1, 1),
 )
-LINE_ATOM = OracleAtom(
+LINE_ATOM = OracleSourceAtom(
     atom_id="dyadrads-rule-30",
     kind="derivation",
     witness=_term(
@@ -632,11 +664,6 @@ LINE_ATOM = OracleAtom(
         _term("rule-id", 30),
     ),
     provenance=("native:dyadrads_1d", "configuration-topology:fixed-zero", "rule-30"),
-    lineage=_term(
-        "lineage",
-        "native.cellular.dyadrads-rule-30",
-        "dyadrads-rule-30",
-    ),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -646,7 +673,6 @@ LINE_ATOM = OracleAtom(
         _disposition(LINE_3, "replace", 1),
         _disposition(LINE_4, "replace", 1),
     ),
-    successor=LINE_SUCCESSOR,
     reason=None,
     certificate=_term("lookup-certificate", 30, _term("indices", 5, 2, 5, 2, 4)),
 )
@@ -660,17 +686,23 @@ LINE_CASE = OracleCase(
     readable=_term("old-snapshot-stencils", LINE_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(LINE_ATOM,),
-        source_outcome_atom_ids=("dyadrads-rule-30",),
-        applied_atom_ids=("dyadrads-rule-30",),
-        no_successor_atom_ids=(),
+        source_outcomes=(LINE_ATOM,),
+        applied_atoms=(
+            _applied(
+                LINE_ATOM,
+                LINE_SUCCESSOR,
+                "native.cellular.dyadrads-rule-30",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(OracleFiber(LINE_SUCCESSOR, ("dyadrads-rule-30",)),),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "native.cellular.dyadrads-rule-30"),
     ),
 )
@@ -713,7 +745,7 @@ GRID_WRITABLE = (
     GRID_S,
     GRID_SE,
 )
-GRID_ATOM = OracleAtom(
+GRID_ATOM = OracleSourceAtom(
     atom_id="dyadaxes-2d-rule-128",
     kind="derivation",
     witness=_term(
@@ -732,11 +764,6 @@ GRID_ATOM = OracleAtom(
         "configuration-topology:fixed-zero",
         "rule-128",
     ),
-    lineage=_term(
-        "lineage",
-        "native.multidimensional.dyadaxes-2d-rule-128",
-        "dyadaxes-2d-rule-128",
-    ),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -750,7 +777,6 @@ GRID_ATOM = OracleAtom(
         _disposition(GRID_S, "replace", 0),
         _disposition(GRID_SE, "replace", 0),
     ),
-    successor=GRID_SUCCESSOR,
     reason=None,
     certificate=_term("lookup-certificate", 128, "bit-7-only"),
 )
@@ -764,19 +790,25 @@ GRID_CASE = OracleCase(
     readable=_term("old-snapshot-2d-stencils", GRID_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(GRID_ATOM,),
-        source_outcome_atom_ids=("dyadaxes-2d-rule-128",),
-        applied_atom_ids=("dyadaxes-2d-rule-128",),
-        no_successor_atom_ids=(),
+        source_outcomes=(GRID_ATOM,),
+        applied_atoms=(
+            _applied(
+                GRID_ATOM,
+                GRID_SUCCESSOR,
+                "native.multidimensional.dyadaxes-2d-rule-128",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(
             OracleFiber(GRID_SUCCESSOR, ("dyadaxes-2d-rule-128",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term(
             "application-evidence",
             "native.multidimensional.dyadaxes-2d-rule-128",
@@ -888,7 +920,7 @@ CUBE_SUCCESSOR = _term(
         _term("row", 0, 0, 0),
     ),
 )
-CUBE_ATOM = OracleAtom(
+CUBE_ATOM = OracleSourceAtom(
     atom_id="dyadaxes-3d-rule-128",
     kind="derivation",
     witness=_term(
@@ -901,11 +933,6 @@ CUBE_ATOM = OracleAtom(
         "native:dyadaxes_3d",
         "configuration-topology:fixed-zero",
         "rule-128",
-    ),
-    lineage=_term(
-        "lineage",
-        "native.multidimensional.dyadaxes-3d-rule-128",
-        "dyadaxes-3d-rule-128",
     ),
     progress="advanced",
     continuation=_term("continue"),
@@ -938,7 +965,6 @@ CUBE_ATOM = OracleAtom(
         _disposition(C_PPZ, "replace", 0),
         _disposition(C_PPP, "replace", 0),
     ),
-    successor=CUBE_SUCCESSOR,
     reason=None,
     certificate=_term(
         "lookup-certificate",
@@ -956,19 +982,25 @@ CUBE_CASE = OracleCase(
     readable=_term("old-snapshot-3d-stencils", CUBE_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(CUBE_ATOM,),
-        source_outcome_atom_ids=("dyadaxes-3d-rule-128",),
-        applied_atom_ids=("dyadaxes-3d-rule-128",),
-        no_successor_atom_ids=(),
+        source_outcomes=(CUBE_ATOM,),
+        applied_atoms=(
+            _applied(
+                CUBE_ATOM,
+                CUBE_SUCCESSOR,
+                "native.multidimensional.dyadaxes-3d-rule-128",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(
             OracleFiber(CUBE_SUCCESSOR, ("dyadaxes-3d-rule-128",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term(
             "application-evidence",
             "native.multidimensional.dyadaxes-3d-rule-128",
@@ -1001,12 +1033,11 @@ MOBILE_RIGHT_SUCCESSOR = _term(
     _term("at", 0, 0),
     _term("at", 1, HEAD_P0),
 )
-MOBILE_LEFT_ATOM = OracleAtom(
+MOBILE_LEFT_ATOM = OracleSourceAtom(
     atom_id="mobile-left",
     kind="derivation",
     witness=_term("transition-witness", "q", 1, "p", 0, "left"),
     provenance=("PX01:F031", "transition:left"),
-    lineage=_term("lineage", "px01.mobile-head-branching", "mobile-left"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -1014,16 +1045,14 @@ MOBILE_LEFT_ATOM = OracleAtom(
         _disposition(TAPE_SOURCE, "replace", 0),
         _disposition(TAPE_RIGHT, "preserve"),
     ),
-    successor=MOBILE_LEFT_SUCCESSOR,
     reason=None,
     certificate=_term("single-head-certificate", -1),
 )
-MOBILE_RIGHT_ATOM = OracleAtom(
+MOBILE_RIGHT_ATOM = OracleSourceAtom(
     atom_id="mobile-right",
     kind="derivation",
     witness=_term("transition-witness", "q", 1, "p", 0, "right"),
     provenance=("PX01:F031", "transition:right"),
-    lineage=_term("lineage", "px01.mobile-head-branching", "mobile-right"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -1031,7 +1060,6 @@ MOBILE_RIGHT_ATOM = OracleAtom(
         _disposition(TAPE_SOURCE, "replace", 0),
         _disposition(TAPE_RIGHT, "replace", HEAD_P0),
     ),
-    successor=MOBILE_RIGHT_SUCCESSOR,
     reason=None,
     certificate=_term("single-head-certificate", 1),
 )
@@ -1045,10 +1073,20 @@ MOBILE_CASE = OracleCase(
     readable=_term("keyed-old-tape", MOBILE_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(MOBILE_LEFT_ATOM, MOBILE_RIGHT_ATOM),
-        source_outcome_atom_ids=("mobile-left", "mobile-right"),
-        applied_atom_ids=("mobile-left", "mobile-right"),
-        no_successor_atom_ids=(),
+        source_outcomes=(MOBILE_LEFT_ATOM, MOBILE_RIGHT_ATOM),
+        applied_atoms=(
+            _applied(
+                MOBILE_LEFT_ATOM,
+                MOBILE_LEFT_SUCCESSOR,
+                "px01.mobile-head-branching",
+            ),
+            _applied(
+                MOBILE_RIGHT_ATOM,
+                MOBILE_RIGHT_SUCCESSOR,
+                "px01.mobile-head-branching",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_TWO,
         derivation_cardinality=EXACT_TWO,
         successor_cardinality=EXACT_TWO,
@@ -1056,9 +1094,10 @@ MOBILE_CASE = OracleCase(
             OracleFiber(MOBILE_LEFT_SUCCESSOR, ("mobile-left",)),
             OracleFiber(MOBILE_RIGHT_SUCCESSOR, ("mobile-right",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px01.mobile-head-branching"),
     ),
 )
@@ -1079,12 +1118,11 @@ SUB_SUCCESSOR = _term(
     _term("symbol", SUB_NEW_A, "A"),
     _term("symbol", SUB_NEW_B, "B"),
 )
-SUB_ATOM = OracleAtom(
+SUB_ATOM = OracleSourceAtom(
     atom_id="parallel-substitution",
     kind="derivation",
     witness=_term("generation-witness", "A->AB", "B->epsilon"),
     provenance=("PX02:F038",),
-    lineage=_term("lineage", "px02.parallel-substitution", "parallel-substitution"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -1093,9 +1131,34 @@ SUB_ATOM = OracleAtom(
         _disposition(SUB_NEW_A, "create", _term("symbol-value", "A")),
         _disposition(SUB_NEW_B, "create", _term("symbol-value", "B")),
     ),
-    successor=SUB_SUCCESSOR,
     reason=None,
     certificate=_term("ordered-offspring-certificate", SUB_NEW_A, SUB_NEW_B),
+)
+SUB_FRESH_BINDINGS = (
+    OracleFreshBinding(
+        local_key=_term("offspring-key", SUB_OLD_A, 0),
+        identity=SUB_NEW_A,
+        evidence=_term(
+            "fresh-recipe",
+            _term("input-identity", "word:old-generation"),
+            _term("rule-identity", "A->AB"),
+            _term("witness", "generation-witness"),
+            _term("namespace", "px02.parallel-substitution"),
+            _term("parent-and-ordinal", SUB_OLD_A, 0),
+        ),
+    ),
+    OracleFreshBinding(
+        local_key=_term("offspring-key", SUB_OLD_A, 1),
+        identity=SUB_NEW_B,
+        evidence=_term(
+            "fresh-recipe",
+            _term("input-identity", "word:old-generation"),
+            _term("rule-identity", "A->AB"),
+            _term("witness", "generation-witness"),
+            _term("namespace", "px02.parallel-substitution"),
+            _term("parent-and-ordinal", SUB_OLD_A, 1),
+        ),
+    ),
 )
 SUBSTITUTION_CASE = OracleCase(
     case_id="px02.parallel-substitution",
@@ -1107,42 +1170,24 @@ SUBSTITUTION_CASE = OracleCase(
     readable=_term("old-generation-items", SUB_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(SUB_ATOM,),
-        source_outcome_atom_ids=("parallel-substitution",),
-        applied_atom_ids=("parallel-substitution",),
-        no_successor_atom_ids=(),
+        source_outcomes=(SUB_ATOM,),
+        applied_atoms=(
+            _applied(
+                SUB_ATOM,
+                SUB_SUCCESSOR,
+                "px02.parallel-substitution",
+                fresh_bindings=SUB_FRESH_BINDINGS,
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(OracleFiber(SUB_SUCCESSOR, ("parallel-substitution",)),),
-        fresh_bindings=(
-            OracleFreshBinding(
-                local_key=_term("offspring-key", SUB_OLD_A, 0),
-                identity=SUB_NEW_A,
-                evidence=_term(
-                    "fresh-recipe",
-                    _term("input-identity", "word:old-generation"),
-                    _term("rule-identity", "A->AB"),
-                    _term("witness", "generation-witness"),
-                    _term("namespace", "px02.parallel-substitution"),
-                    _term("parent-and-ordinal", SUB_OLD_A, 0),
-                ),
-            ),
-            OracleFreshBinding(
-                local_key=_term("offspring-key", SUB_OLD_A, 1),
-                identity=SUB_NEW_B,
-                evidence=_term(
-                    "fresh-recipe",
-                    _term("input-identity", "word:old-generation"),
-                    _term("rule-identity", "A->AB"),
-                    _term("witness", "generation-witness"),
-                    _term("namespace", "px02.parallel-substitution"),
-                    _term("parent-and-ordinal", SUB_OLD_A, 1),
-                ),
-            ),
-        ),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px02.parallel-substitution"),
     ),
 )
@@ -1152,29 +1197,25 @@ SUBSTITUTION_CASE = OracleCase(
 MW_TARGET = _term("word-occurrence", 0)
 MW_SOURCE = _term("word", _term("symbol", MW_TARGET, "a"))
 MW_SUCCESSOR = _term("word", _term("symbol", MW_TARGET, "b"))
-MW_ATOM_LEFT = OracleAtom(
+MW_ATOM_LEFT = OracleSourceAtom(
     atom_id="diamond-rule-left",
     kind="derivation",
     witness=_term("rewrite-witness", "rule-left", "match:0", "parent:a"),
     provenance=("PX04:F034", "rule:left"),
-    lineage=_term("lineage", "px04.multiway-diamond", "diamond-rule-left"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(_disposition(MW_TARGET, "replace", _term("symbol-value", "b")),),
-    successor=MW_SUCCESSOR,
     reason=None,
     certificate=_term("rewrite-certificate", "a->b", "left"),
 )
-MW_ATOM_RIGHT = OracleAtom(
+MW_ATOM_RIGHT = OracleSourceAtom(
     atom_id="diamond-rule-right",
     kind="derivation",
     witness=_term("rewrite-witness", "rule-right", "match:0", "parent:a"),
     provenance=("PX04:F034", "rule:right"),
-    lineage=_term("lineage", "px04.multiway-diamond", "diamond-rule-right"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(_disposition(MW_TARGET, "replace", _term("symbol-value", "b")),),
-    successor=MW_SUCCESSOR,
     reason=None,
     certificate=_term("rewrite-certificate", "a->b", "right"),
 )
@@ -1188,10 +1229,20 @@ MULTIWAY_CASE = OracleCase(
     readable=_term("all-matches", MW_SOURCE),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(MW_ATOM_LEFT, MW_ATOM_RIGHT),
-        source_outcome_atom_ids=("diamond-rule-left", "diamond-rule-right"),
-        applied_atom_ids=("diamond-rule-left", "diamond-rule-right"),
-        no_successor_atom_ids=(),
+        source_outcomes=(MW_ATOM_LEFT, MW_ATOM_RIGHT),
+        applied_atoms=(
+            _applied(
+                MW_ATOM_LEFT,
+                MW_SUCCESSOR,
+                "px04.multiway-diamond",
+            ),
+            _applied(
+                MW_ATOM_RIGHT,
+                MW_SUCCESSOR,
+                "px04.multiway-diamond",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_TWO,
         derivation_cardinality=EXACT_TWO,
         successor_cardinality=EXACT_ONE,
@@ -1201,9 +1252,10 @@ MULTIWAY_CASE = OracleCase(
                 ("diamond-rule-left", "diamond-rule-right"),
             ),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px04.multiway-diamond"),
     ),
 )
@@ -1223,16 +1275,14 @@ def _constraint_source(rhs: int) -> OracleTerm:
     )
 
 
-CONSTRAINT_ZERO_ATOM = OracleAtom(
+CONSTRAINT_ZERO_ATOM = OracleSourceAtom(
     atom_id="constraint-no-solution",
     kind="no-successor",
     witness=_term("relation-witness", "x^2=2", "Z/3Z"),
     provenance=("PX04:F019", "rhs=2"),
-    lineage=_term("lineage", "px04.constraint-mod3-zero", "constraint-no-solution"),
     progress=None,
     continuation=None,
     dispositions=(),
-    successor=None,
     reason=_term("terminal", "no-solution"),
     certificate=_term(
         "truth-table",
@@ -1240,6 +1290,11 @@ CONSTRAINT_ZERO_ATOM = OracleAtom(
         _term("row", 1, _term("square-residue", 1), False),
         _term("row", 2, _term("square-residue", 1), False),
     ),
+)
+CONSTRAINT_ZERO_APPLIED = _applied(
+    CONSTRAINT_ZERO_ATOM,
+    None,
+    "px04.constraint-mod3-zero",
 )
 CONSTRAINT_ZERO_CASE = OracleCase(
     case_id="px04.constraint-mod3-zero",
@@ -1251,32 +1306,30 @@ CONSTRAINT_ZERO_CASE = OracleCase(
     readable=_term("constraint-view", "x^2=2", "Z/3Z"),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(CONSTRAINT_ZERO_ATOM,),
-        source_outcome_atom_ids=("constraint-no-solution",),
-        applied_atom_ids=("constraint-no-solution",),
-        no_successor_atom_ids=("constraint-no-solution",),
+        source_outcomes=(CONSTRAINT_ZERO_ATOM,),
+        applied_atoms=(CONSTRAINT_ZERO_APPLIED,),
+        no_successor_partition=(CONSTRAINT_ZERO_APPLIED,),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ZERO,
         successor_cardinality=EXACT_ZERO,
         successor_fibers=(),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px04.constraint-mod3-zero"),
     ),
 )
 
 CONSTRAINT_ONE_SUCCESSOR = _term("assignment", _term("value", "x", 0))
-CONSTRAINT_ONE_ATOM = OracleAtom(
+CONSTRAINT_ONE_ATOM = OracleSourceAtom(
     atom_id="constraint-x-0",
     kind="derivation",
     witness=_term("solution-witness", "x", 0),
     provenance=("PX04:F019", "rhs=0"),
-    lineage=_term("lineage", "px04.constraint-mod3-one", "constraint-x-0"),
     progress="advanced",
     continuation=_term("stop", "completed"),
     dispositions=(_disposition(CONSTRAINT_X, "replace", 0),),
-    successor=CONSTRAINT_ONE_SUCCESSOR,
     reason=None,
     certificate=_term("equation-certificate", "0^2=0 mod 3"),
 )
@@ -1290,48 +1343,50 @@ CONSTRAINT_ONE_CASE = OracleCase(
     readable=_term("constraint-view", "x^2=0", "Z/3Z"),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(CONSTRAINT_ONE_ATOM,),
-        source_outcome_atom_ids=("constraint-x-0",),
-        applied_atom_ids=("constraint-x-0",),
-        no_successor_atom_ids=(),
+        source_outcomes=(CONSTRAINT_ONE_ATOM,),
+        applied_atoms=(
+            _applied(
+                CONSTRAINT_ONE_ATOM,
+                CONSTRAINT_ONE_SUCCESSOR,
+                "px04.constraint-mod3-one",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(
             OracleFiber(CONSTRAINT_ONE_SUCCESSOR, ("constraint-x-0",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px04.constraint-mod3-one"),
     ),
 )
 
 CONSTRAINT_X1_SUCCESSOR = _term("assignment", _term("value", "x", 1))
 CONSTRAINT_X2_SUCCESSOR = _term("assignment", _term("value", "x", 2))
-CONSTRAINT_X1_ATOM = OracleAtom(
+CONSTRAINT_X1_ATOM = OracleSourceAtom(
     atom_id="constraint-x-1",
     kind="derivation",
     witness=_term("solution-witness", "x", 1),
     provenance=("PX04:F019", "rhs=1"),
-    lineage=_term("lineage", "px04.constraint-mod3-many", "constraint-x-1"),
     progress="advanced",
     continuation=_term("stop", "completed"),
     dispositions=(_disposition(CONSTRAINT_X, "replace", 1),),
-    successor=CONSTRAINT_X1_SUCCESSOR,
     reason=None,
     certificate=_term("equation-certificate", "1^2=1 mod 3"),
 )
-CONSTRAINT_X2_ATOM = OracleAtom(
+CONSTRAINT_X2_ATOM = OracleSourceAtom(
     atom_id="constraint-x-2",
     kind="derivation",
     witness=_term("solution-witness", "x", 2),
     provenance=("PX04:F019", "rhs=1"),
-    lineage=_term("lineage", "px04.constraint-mod3-many", "constraint-x-2"),
     progress="advanced",
     continuation=_term("stop", "completed"),
     dispositions=(_disposition(CONSTRAINT_X, "replace", 2),),
-    successor=CONSTRAINT_X2_SUCCESSOR,
     reason=None,
     certificate=_term("equation-certificate", "2^2=1 mod 3"),
 )
@@ -1345,10 +1400,20 @@ CONSTRAINT_MANY_CASE = OracleCase(
     readable=_term("constraint-view", "x^2=1", "Z/3Z"),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(CONSTRAINT_X1_ATOM, CONSTRAINT_X2_ATOM),
-        source_outcome_atom_ids=("constraint-x-1", "constraint-x-2"),
-        applied_atom_ids=("constraint-x-1", "constraint-x-2"),
-        no_successor_atom_ids=(),
+        source_outcomes=(CONSTRAINT_X1_ATOM, CONSTRAINT_X2_ATOM),
+        applied_atoms=(
+            _applied(
+                CONSTRAINT_X1_ATOM,
+                CONSTRAINT_X1_SUCCESSOR,
+                "px04.constraint-mod3-many",
+            ),
+            _applied(
+                CONSTRAINT_X2_ATOM,
+                CONSTRAINT_X2_SUCCESSOR,
+                "px04.constraint-mod3-many",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_TWO,
         derivation_cardinality=EXACT_TWO,
         successor_cardinality=EXACT_TWO,
@@ -1356,9 +1421,10 @@ CONSTRAINT_MANY_CASE = OracleCase(
             OracleFiber(CONSTRAINT_X1_SUCCESSOR, ("constraint-x-1",)),
             OracleFiber(CONSTRAINT_X2_SUCCESSOR, ("constraint-x-2",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px04.constraint-mod3-many"),
     ),
 )
@@ -1393,16 +1459,11 @@ GRAPH_SUCCESSOR = _term(
         _term("edge-record", GRAPH_YC, GRAPH_Y, "c"),
     ),
 )
-GRAPH_ATOM = OracleAtom(
+GRAPH_ATOM = OracleSourceAtom(
     atom_id="graph-replacement",
     kind="derivation",
     witness=_term("match", _term("node", "b"), _term("ports", "a", "c")),
     provenance=("PX02:F029",),
-    lineage=_term(
-        "lineage",
-        "px02.graph-interface-replacement",
-        "graph-replacement",
-    ),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
@@ -1427,12 +1488,78 @@ GRAPH_ATOM = OracleAtom(
             _term("edge-record", GRAPH_YC, GRAPH_Y, "c"),
         ),
     ),
-    successor=GRAPH_SUCCESSOR,
     reason=None,
     certificate=_term(
         "interface-certificate",
         _term("external", "a", "c"),
         _term("fresh", GRAPH_X, GRAPH_Y, GRAPH_AX, GRAPH_XY, GRAPH_YC),
+    ),
+)
+GRAPH_FRESH_BINDINGS = (
+    OracleFreshBinding(
+        GRAPH_X_SLOT,
+        GRAPH_X,
+        _term(
+            "fresh-recipe",
+            _term("input-identity", "graph:a-b-c"),
+            _term("rule-identity", "F029"),
+            _term("match-witness", "node:b"),
+            _term("interface", "a", "c"),
+            _term("namespace", "px02.graph-interface-replacement"),
+            _term("local-key", "x"),
+        ),
+    ),
+    OracleFreshBinding(
+        GRAPH_Y_SLOT,
+        GRAPH_Y,
+        _term(
+            "fresh-recipe",
+            _term("input-identity", "graph:a-b-c"),
+            _term("rule-identity", "F029"),
+            _term("match-witness", "node:b"),
+            _term("interface", "a", "c"),
+            _term("namespace", "px02.graph-interface-replacement"),
+            _term("local-key", "y"),
+        ),
+    ),
+    OracleFreshBinding(
+        GRAPH_AX_SLOT,
+        GRAPH_AX,
+        _term(
+            "fresh-recipe",
+            _term("input-identity", "graph:a-b-c"),
+            _term("rule-identity", "F029"),
+            _term("match-witness", "node:b"),
+            _term("interface", "a", "c"),
+            _term("namespace", "px02.graph-interface-replacement"),
+            _term("local-key", "a-x"),
+        ),
+    ),
+    OracleFreshBinding(
+        GRAPH_XY_SLOT,
+        GRAPH_XY,
+        _term(
+            "fresh-recipe",
+            _term("input-identity", "graph:a-b-c"),
+            _term("rule-identity", "F029"),
+            _term("match-witness", "node:b"),
+            _term("interface", "a", "c"),
+            _term("namespace", "px02.graph-interface-replacement"),
+            _term("local-key", "x-y"),
+        ),
+    ),
+    OracleFreshBinding(
+        GRAPH_YC_SLOT,
+        GRAPH_YC,
+        _term(
+            "fresh-recipe",
+            _term("input-identity", "graph:a-b-c"),
+            _term("rule-identity", "F029"),
+            _term("match-witness", "node:b"),
+            _term("interface", "a", "c"),
+            _term("namespace", "px02.graph-interface-replacement"),
+            _term("local-key", "y-c"),
+        ),
     ),
 )
 GRAPH_CASE = OracleCase(
@@ -1458,83 +1585,24 @@ GRAPH_CASE = OracleCase(
     ),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(GRAPH_ATOM,),
-        source_outcome_atom_ids=("graph-replacement",),
-        applied_atom_ids=("graph-replacement",),
-        no_successor_atom_ids=(),
+        source_outcomes=(GRAPH_ATOM,),
+        applied_atoms=(
+            _applied(
+                GRAPH_ATOM,
+                GRAPH_SUCCESSOR,
+                "px02.graph-interface-replacement",
+                fresh_bindings=GRAPH_FRESH_BINDINGS,
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(OracleFiber(GRAPH_SUCCESSOR, ("graph-replacement",)),),
-        fresh_bindings=(
-            OracleFreshBinding(
-                GRAPH_X_SLOT,
-                GRAPH_X,
-                _term(
-                    "fresh-recipe",
-                    _term("input-identity", "graph:a-b-c"),
-                    _term("rule-identity", "F029"),
-                    _term("match-witness", "node:b"),
-                    _term("interface", "a", "c"),
-                    _term("namespace", "px02.graph-interface-replacement"),
-                    _term("local-key", "x"),
-                ),
-            ),
-            OracleFreshBinding(
-                GRAPH_Y_SLOT,
-                GRAPH_Y,
-                _term(
-                    "fresh-recipe",
-                    _term("input-identity", "graph:a-b-c"),
-                    _term("rule-identity", "F029"),
-                    _term("match-witness", "node:b"),
-                    _term("interface", "a", "c"),
-                    _term("namespace", "px02.graph-interface-replacement"),
-                    _term("local-key", "y"),
-                ),
-            ),
-            OracleFreshBinding(
-                GRAPH_AX_SLOT,
-                GRAPH_AX,
-                _term(
-                    "fresh-recipe",
-                    _term("input-identity", "graph:a-b-c"),
-                    _term("rule-identity", "F029"),
-                    _term("match-witness", "node:b"),
-                    _term("interface", "a", "c"),
-                    _term("namespace", "px02.graph-interface-replacement"),
-                    _term("local-key", "a-x"),
-                ),
-            ),
-            OracleFreshBinding(
-                GRAPH_XY_SLOT,
-                GRAPH_XY,
-                _term(
-                    "fresh-recipe",
-                    _term("input-identity", "graph:a-b-c"),
-                    _term("rule-identity", "F029"),
-                    _term("match-witness", "node:b"),
-                    _term("interface", "a", "c"),
-                    _term("namespace", "px02.graph-interface-replacement"),
-                    _term("local-key", "x-y"),
-                ),
-            ),
-            OracleFreshBinding(
-                GRAPH_YC_SLOT,
-                GRAPH_YC,
-                _term(
-                    "fresh-recipe",
-                    _term("input-identity", "graph:a-b-c"),
-                    _term("rule-identity", "F029"),
-                    _term("match-witness", "node:b"),
-                    _term("interface", "a", "c"),
-                    _term("namespace", "px02.graph-interface-replacement"),
-                    _term("local-key", "y-c"),
-                ),
-            ),
-        ),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term(
             "application-evidence",
             "px02.graph-interface-replacement",
@@ -1561,53 +1629,62 @@ SEARCH_REJECT_SUCCESSOR = _term(
     _term("field-value", "x", 0),
     _term("field-value", "k", 1),
 )
-SEARCH_ACCEPT_ATOM = OracleAtom(
+SEARCH_ACCEPT_ATOM = OracleSourceAtom(
     atom_id="search-accept",
     kind="derivation",
     witness=_term("proposal-witness", 1, "accepted"),
     provenance=("PX06:F050",),
-    lineage=_term("lineage", "px06.stochastic-search-law", "search-accept"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
         _disposition(SEARCH_X, "replace", 1),
         _disposition(SEARCH_K, "replace", 1),
     ),
-    successor=SEARCH_ACCEPT_SUCCESSOR,
     reason=None,
     certificate=_term("law-atom-certificate", "accept", Fraction(1, 2)),
     mass=Fraction(1, 2),
 )
-SEARCH_REJECT_ATOM = OracleAtom(
+SEARCH_REJECT_ATOM = OracleSourceAtom(
     atom_id="search-reject",
     kind="derivation",
     witness=_term("proposal-witness", 0, "rejected"),
     provenance=("PX06:F050",),
-    lineage=_term("lineage", "px06.stochastic-search-law", "search-reject"),
     progress="advanced",
     continuation=_term("continue"),
     dispositions=(
         _disposition(SEARCH_X, "preserve"),
         _disposition(SEARCH_K, "replace", 1),
     ),
-    successor=SEARCH_REJECT_SUCCESSOR,
     reason=None,
     certificate=_term("law-atom-certificate", "reject", Fraction(1, 4)),
     mass=Fraction(1, 4),
 )
-SEARCH_NONE_ATOM = OracleAtom(
+SEARCH_NONE_ATOM = OracleSourceAtom(
     atom_id="search-no-proposal",
     kind="no-successor",
     witness=_term("proposal-witness", "none"),
     provenance=("PX06:F050",),
-    lineage=_term("lineage", "px06.stochastic-search-law", "search-no-proposal"),
     progress=None,
     continuation=None,
     dispositions=(),
-    successor=None,
     reason=_term("terminal", "no-proposal"),
     certificate=_term("law-atom-certificate", "no-proposal", Fraction(1, 4)),
     mass=Fraction(1, 4),
+)
+SEARCH_ACCEPT_APPLIED = _applied(
+    SEARCH_ACCEPT_ATOM,
+    SEARCH_ACCEPT_SUCCESSOR,
+    "px06.stochastic-search-law",
+)
+SEARCH_REJECT_APPLIED = _applied(
+    SEARCH_REJECT_ATOM,
+    SEARCH_REJECT_SUCCESSOR,
+    "px06.stochastic-search-law",
+)
+SEARCH_NONE_APPLIED = _applied(
+    SEARCH_NONE_ATOM,
+    None,
+    "px06.stochastic-search-law",
 )
 STOCHASTIC_CASE = OracleCase(
     case_id="px06.stochastic-search-law",
@@ -1624,18 +1701,17 @@ STOCHASTIC_CASE = OracleCase(
     ),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(SEARCH_ACCEPT_ATOM, SEARCH_REJECT_ATOM, SEARCH_NONE_ATOM),
-        source_outcome_atom_ids=(
-            "search-accept",
-            "search-reject",
-            "search-no-proposal",
+        source_outcomes=(
+            SEARCH_ACCEPT_ATOM,
+            SEARCH_REJECT_ATOM,
+            SEARCH_NONE_ATOM,
         ),
-        applied_atom_ids=(
-            "search-accept",
-            "search-reject",
-            "search-no-proposal",
+        applied_atoms=(
+            SEARCH_ACCEPT_APPLIED,
+            SEARCH_REJECT_APPLIED,
+            SEARCH_NONE_APPLIED,
         ),
-        no_successor_atom_ids=("search-no-proposal",),
+        no_successor_partition=(SEARCH_NONE_APPLIED,),
         outcome_cardinality=EXACT_THREE,
         derivation_cardinality=EXACT_TWO,
         successor_cardinality=EXACT_TWO,
@@ -1643,7 +1719,6 @@ STOCHASTIC_CASE = OracleCase(
             OracleFiber(SEARCH_ACCEPT_SUCCESSOR, ("search-accept",)),
             OracleFiber(SEARCH_REJECT_SUCCESSOR, ("search-reject",)),
         ),
-        fresh_bindings=(),
         measures=OracleMeasures(
             applied_atoms=OracleMeasureView(
                 kind="available",
@@ -1671,7 +1746,9 @@ STOCHASTIC_CASE = OracleCase(
                 evidence=_term("restriction-evidence", "no-successor-atoms-only"),
             ),
         ),
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px06.stochastic-search-law"),
     ),
 )
@@ -1698,7 +1775,7 @@ FLOW_SUCCESSOR = _term(
         ),
     ),
 )
-FLOW_ATOM = OracleAtom(
+FLOW_ATOM = OracleSourceAtom(
     atom_id="exact-flow-x-equals-t",
     kind="derivation",
     witness=_term(
@@ -1708,11 +1785,6 @@ FLOW_ATOM = OracleAtom(
         _term("coverage", "maximal-exact-real-solution"),
     ),
     provenance=("PX05:F037",),
-    lineage=_term(
-        "lineage",
-        "px05.exact-differential-flow",
-        "exact-flow-x-equals-t",
-    ),
     progress="advanced",
     continuation=_term("stop", "completed"),
     dispositions=(
@@ -1726,7 +1798,6 @@ FLOW_ATOM = OracleAtom(
             ),
         ),
     ),
-    successor=FLOW_SUCCESSOR,
     reason=None,
     certificate=_term("equation-and-initial-condition-certificate", "exact"),
 )
@@ -1745,19 +1816,25 @@ FLOW_CASE = OracleCase(
     ),
     expected=OracleExpected(
         support_kind="finite",
-        atoms=(FLOW_ATOM,),
-        source_outcome_atom_ids=("exact-flow-x-equals-t",),
-        applied_atom_ids=("exact-flow-x-equals-t",),
-        no_successor_atom_ids=(),
+        source_outcomes=(FLOW_ATOM,),
+        applied_atoms=(
+            _applied(
+                FLOW_ATOM,
+                FLOW_SUCCESSOR,
+                "px05.exact-differential-flow",
+            ),
+        ),
+        no_successor_partition=(),
         outcome_cardinality=EXACT_ONE,
         derivation_cardinality=EXACT_ONE,
         successor_cardinality=EXACT_ONE,
         successor_fibers=(
             OracleFiber(FLOW_SUCCESSOR, ("exact-flow-x-equals-t",)),
         ),
-        fresh_bindings=(),
         measures=ABSENT_MEASURES,
-        intensional_relation=None,
+        source_intensional_relation=None,
+        applied_intensional_relation=None,
+        successor_intensional_relation=None,
         evidence=_term("application-evidence", "px05.exact-differential-flow"),
     ),
 )
