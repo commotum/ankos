@@ -45,6 +45,22 @@ def test_every_descriptor_is_recursively_closed_versioned_and_exact() -> None:
         assert_closed_descriptor(value)
 
 
+def test_top_level_components_have_one_exact_supported_version() -> None:
+    program, _, _ = native_program("dyadlags")
+
+    assert (
+        program.seed.version,
+        program.frontier.version,
+        program.neighborhood.version,
+    ) == (1, 1, 1)
+    with pytest.raises(seeds.SeedValidationError, match="version"):
+        replace(program.seed, version=2)
+    with pytest.raises(frontiers.WritableResolutionError, match="version"):
+        replace(program.frontier, version=True)
+    with pytest.raises(neighborhoods.ReadableResolutionError, match="version"):
+        replace(program.neighborhood, version="1")  # type: ignore[arg-type]
+
+
 def test_program_construction_proves_all_cross_field_compatibility_clauses() -> None:
     program, _, _ = native_program("dyadlags")
 
@@ -127,7 +143,23 @@ def test_each_cross_field_clause_has_an_independent_negative_case() -> None:
     wrong_shape = replace(
         program.neighborhood,
         result_shape=neighborhoods.ResultShape(
-            (neighborhoods.ReadField("wrong", neighborhoods.ReadArity.ONE),)
+            (
+                neighborhoods.ReadField(
+                    "wrong",
+                    neighborhoods.ReadArity.ONE,
+                    1,
+                ),
+                neighborhoods.ReadField(
+                    "previous",
+                    neighborhoods.ReadArity.ONE,
+                    1,
+                ),
+                neighborhoods.ReadField(
+                    "current",
+                    neighborhoods.ReadArity.ONE,
+                    1,
+                ),
+            )
         ),
     )
     with pytest.raises(ca.program.ProgramCompatibilityError, match="read shape"):

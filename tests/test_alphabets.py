@@ -77,6 +77,15 @@ def test_alphabet_semantic_equality_ignores_mapping_insertion_order() -> None:
     assert schema.equal(left, right)
 
 
+def test_enum_canonicalization_does_not_collapse_python_equal_value_types() -> None:
+    left = alphabets.enum((0, False))
+    right = alphabets.enum((False, 0))
+
+    assert left.descriptor.values == (False, 0)
+    assert tuple(type(item) for item in left.descriptor.values) == (bool, int)
+    assert left.descriptor == right.descriptor
+
+
 def test_alphabet_composition_returns_one_component() -> None:
     composed = alphabets.union(
         (
@@ -104,3 +113,27 @@ def test_represented_numbers_do_not_claim_exact_real_semantics() -> None:
     assert not represented.contains(1)  # type: ignore[arg-type]
     with pytest.raises((TypeError, AttributeError)):
         alphabets.enum((0.5,))  # type: ignore[arg-type]
+
+
+def test_alphabet_values_reject_mutable_and_profile_incompatible_payloads() -> None:
+    with pytest.raises(TypeError, match="immutable"):
+        alphabets.ValueNode(
+            alphabets.ValueKind.PRODUCT,
+            "pair",
+            items=[1],  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError, match="immutable"):
+        alphabets.AlphabetDescriptor(
+            alphabets.AlphabetKind.ORDERED,
+            values=[1, 2],  # type: ignore[arg-type]
+        )
+    with pytest.raises(TypeError, match="IEEE"):
+        alphabets.RepresentedNumber(
+            alphabets.RepresentedNumberProfile.IEEE754_BINARY64,
+            (Fraction(0), Fraction(1)),
+        )
+    with pytest.raises(TypeError, match="interval"):
+        alphabets.RepresentedNumber(
+            alphabets.RepresentedNumberProfile.INTERVAL,
+            1,
+        )

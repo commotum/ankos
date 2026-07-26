@@ -59,6 +59,14 @@ class EffectProfile:
             raise WritableResolutionError("CREATE cannot target existing structure")
         if any(effect is not Effect.CREATE for effect in self.fresh):
             raise WritableResolutionError("fresh capabilities authorize only CREATE")
+        existing = tuple(
+            effect for effect in Effect if effect in self.existing
+        )
+        fresh = tuple(effect for effect in Effect if effect in self.fresh)
+        if existing != self.existing:
+            object.__setattr__(self, "existing", existing)
+        if fresh != self.fresh:
+            object.__setattr__(self, "fresh", fresh)
 
 
 @dataclass(frozen=True)
@@ -265,8 +273,13 @@ class WritableRegion(Generic[C, W]):
     )
     fresh_namespace: FreshNamespace | None = None
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
+    version: int = 1
 
     def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise WritableResolutionError(
+                f"unsupported writable-region version {self.version!r}"
+            )
         if type(self.descriptor) is not loci.Region:
             raise TypeError("writable descriptor is not recognized")
         if self.configuration_contract is not None and type(

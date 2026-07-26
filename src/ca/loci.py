@@ -165,12 +165,22 @@ def coordinate(axis: str, value: int, *, scope: str = "offset") -> Locus:
 
 
 def cell(coordinates: tuple[int, ...], *, axes: tuple[str, ...] | None = None) -> Locus:
-    if any(isinstance(value, bool) or not isinstance(value, int) for value in coordinates):
+    if type(coordinates) is not tuple:
+        raise TypeError("cell coordinates must be an immutable tuple")
+    if not coordinates:
+        raise ValueError("cell coordinates cannot be empty")
+    if any(type(value) is not int for value in coordinates):
         raise TypeError("cell coordinates must be integers")
     if axes is None:
         axes = ("x", "y", "z")[: len(coordinates)]
+    elif type(axes) is not tuple:
+        raise TypeError("cell axes must be an immutable tuple")
     if len(axes) != len(coordinates):
         raise ValueError("axes and coordinates must have equal length")
+    if any(type(axis) is not str or not axis for axis in axes):
+        raise TypeError("cell axes must be nonempty strings")
+    if len(set(axes)) != len(axes):
+        raise ValueError("cell axes must be unique")
     return Locus(
         LocusKind.COORDINATE,
         "grid:" + ",".join(axes),
@@ -179,8 +189,17 @@ def cell(coordinates: tuple[int, ...], *, axes: tuple[str, ...] | None = None) -
 
 
 def occurrence(container: Locus | str, index: int) -> Locus:
-    token = container if isinstance(container, str) else _locus_token(container)
-    return Locus(LocusKind.OCCURRENCE, "occurrence", (token, int(index)))
+    if type(container) is str:
+        if not container:
+            raise ValueError("occurrence container cannot be empty")
+        token = container
+    elif type(container) is Locus:
+        token = _locus_token(container)
+    else:
+        raise TypeError("occurrence container must be a Locus or string")
+    if type(index) is not int:
+        raise TypeError("occurrence index must be an integer")
+    return Locus(LocusKind.OCCURRENCE, "occurrence", (token, index))
 
 
 def path(*segments: ClosedScalar, scope: str = "path") -> Locus:
@@ -190,10 +209,19 @@ def path(*segments: ClosedScalar, scope: str = "path") -> Locus:
 
 
 def span(container: Locus | str, start: int, stop: int) -> Locus:
+    if type(start) is not int or type(stop) is not int:
+        raise TypeError("span bounds must be integers")
     if stop < start:
         raise ValueError("span stop must be >= start")
-    token = container if isinstance(container, str) else _locus_token(container)
-    return Locus(LocusKind.SPAN, "span", (token, int(start), int(stop)))
+    if type(container) is str:
+        if not container:
+            raise ValueError("span container cannot be empty")
+        token = container
+    elif type(container) is Locus:
+        token = _locus_token(container)
+    else:
+        raise TypeError("span container must be a Locus or string")
+    return Locus(LocusKind.SPAN, "span", (token, start, stop))
 
 
 def port(owner: Locus | str, name: str) -> Locus:
@@ -266,6 +294,10 @@ def continuous_region(name: str, bounds: tuple[Fraction, ...]) -> Locus:
 
 
 def intensional_reference(binder: str, relation_id: str) -> Locus:
+    if type(binder) is not str or not binder:
+        raise ValueError("intensional binder must be a nonempty string")
+    if type(relation_id) is not str or not relation_id:
+        raise ValueError("intensional relation identity must be a nonempty string")
     return Locus(LocusKind.INTENSIONAL, "intensional", (binder, relation_id))
 
 
@@ -312,22 +344,61 @@ class SelectorExpr:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported selector version {self.version}")
-        if not isinstance(self.primitive, SelectorPrimitive):
+        _require_version_one(self.version, "selector")
+        if type(self.primitive) is not SelectorPrimitive:
             raise TypeError("selector primitive is not recognized")
         if type(self.arguments) is not tuple or type(self.children) is not tuple:
             raise TypeError("selector arguments/children must be immutable tuples")
         if any(
-            not isinstance(
-                argument,
-                (bool, int, Fraction, str, Locus, FreshReference),
-            )
+            type(argument)
+            not in (bool, int, Fraction, str, Locus, FreshReference)
             for argument in self.arguments
         ):
             raise TypeError("selector contains an opaque or executable argument")
-        if any(not isinstance(child, SelectorExpr) for child in self.children):
+        if any(type(child) is not SelectorExpr for child in self.children):
             raise TypeError("selector children must be SelectorExpr values")
+        _validate_selector_shape(self)
+
+
+def _validate_selector_shape(expression: SelectorExpr) -> None:
+    primitive = expression.primitive
+    arguments = expression.arguments
+    children = expression.children
+    if primitive is SelectorPrimitive.LITERAL:
+        if not arguments or children:
+            raise ValueError(
+                "literal selector needs arguments and cannot carry children"
+            )
+        return
+    if primitive is SelectorPrimitive.MEMBERSHIP:
+        if arguments or children:
+            raise ValueError(
+                "G7-01 membership selector is an obligation marker with no payload"
+            )
+        return
+    if primitive is SelectorPrimitive.RELATIVE:
+        if (
+            len(arguments) != 1
+            or type(arguments[0]) is not Locus
+            or children
+        ):
+            raise ValueError(
+                "G7-01 relative selector needs exactly one Locus argument"
+            )
+        return
+    if primitive in (SelectorPrimitive.AND, SelectorPrimitive.OR):
+        if arguments or len(children) < 2:
+            raise ValueError(
+                f"{primitive.value} needs at least two child selectors"
+            )
+        return
+    if primitive is SelectorPrimitive.NOT:
+        if arguments or len(children) != 1:
+            raise ValueError("selector.not needs exactly one child selector")
+        return
+    raise ValueError(
+        f"{primitive.value} selector is reserved for G7-02 mechanics"
+    )
 
 
 class RegionKind(Enum):
@@ -366,9 +437,8 @@ class Region:
     version: int = 1
 
     def __post_init__(self) -> None:
-        if self.version != 1:
-            raise ValueError(f"unsupported region version {self.version}")
-        if not isinstance(self.kind, RegionKind):
+        _require_version_one(self.version, "region")
+        if type(self.kind) is not RegionKind:
             raise TypeError("region kind is not recognized")
         if any(
             type(value) is not tuple
@@ -380,19 +450,17 @@ class Region:
             )
         ):
             raise TypeError("region collections must be immutable tuples")
-        if self.name is not None and not isinstance(self.name, str):
+        if self.name is not None and (type(self.name) is not str or not self.name):
             raise TypeError("region name must be a string or None")
-        if any(not isinstance(item, Locus) for item in self.loci):
+        if any(type(item) is not Locus for item in self.loci):
             raise TypeError("region loci must contain Locus values")
-        if any(not isinstance(item, FreshReference) for item in self.fresh):
+        if any(type(item) is not FreshReference for item in self.fresh):
             raise TypeError("region fresh targets must contain FreshReference values")
-        if any(not isinstance(item, Region) for item in self.parts):
+        if any(type(item) is not Region for item in self.parts):
             raise TypeError("region parts must contain Region values")
-        if any(not isinstance(item, Locus) for item in self.offsets):
+        if any(type(item) is not Locus for item in self.offsets):
             raise TypeError("region offsets must contain Locus values")
-        if self.relation is not None and not isinstance(
-            self.relation, SelectorExpr
-        ):
+        if self.relation is not None and type(self.relation) is not SelectorExpr:
             raise TypeError("region relation must be a SelectorExpr")
         if self.kind is RegionKind.LITERAL and not (self.loci or self.fresh):
             raise ValueError("literal region cannot be empty")
@@ -402,9 +470,11 @@ class Region:
             raise ValueError("intensional region requires a relation")
         if self.kind is RegionKind.UNION:
             ordered = tuple(sorted(self.parts, key=canonical_identity))
-            if len({canonical_identity(part) for part in ordered}) != len(ordered):
+            identities = tuple(canonical_identity(part) for part in self.parts)
+            ordered_identities = tuple(canonical_identity(part) for part in ordered)
+            if len(set(ordered_identities)) != len(ordered):
                 raise ValueError("union region contains duplicate parts")
-            if ordered != self.parts:
+            if ordered_identities != identities:
                 object.__setattr__(self, "parts", ordered)
         _validate_region_shape(self)
 
@@ -412,12 +482,22 @@ class Region:
 def _validate_region_shape(region: Region) -> None:
     kind = region.kind
     if kind is RegionKind.LITERAL:
-        if region.parts or region.offsets or region.relation is not None:
+        if (
+            not (region.loci or region.fresh)
+            or region.parts
+            or region.offsets
+            or region.relation is not None
+        ):
             raise ValueError("literal region carries irrelevant fields")
+        if len(set(region.loci)) != len(region.loci):
+            raise ValueError("literal region contains duplicate loci")
+        if len(set(region.fresh)) != len(region.fresh):
+            raise ValueError("literal region contains duplicate fresh references")
         return
     if kind in (RegionKind.ALL_SUPPORT, RegionKind.CURRENT_SUPPORT):
         if (
-            region.loci
+            not region.name
+            or region.loci
             or region.fresh
             or region.parts
             or region.offsets
@@ -427,7 +507,8 @@ def _validate_region_shape(region: Region) -> None:
         return
     if kind is RegionKind.RELATIVE:
         if (
-            region.loci
+            region.name is not None
+            or region.loci
             or region.fresh
             or len(region.parts) != 1
             or not region.offsets
@@ -435,24 +516,42 @@ def _validate_region_shape(region: Region) -> None:
         ):
             raise ValueError("relative region descriptor shape is invalid")
         return
-    if kind in (RegionKind.UNION, RegionKind.PRODUCT):
+    if kind is RegionKind.UNION:
         if (
-            region.loci
+            region.name is not None
+            or region.loci
             or region.fresh
+            or not region.parts
             or region.offsets
             or region.relation is not None
         ):
-            raise ValueError(f"{kind.value} region carries irrelevant fields")
+            raise ValueError("union region carries irrelevant fields")
+        return
+    if kind is RegionKind.PRODUCT:
+        if (
+            region.loci
+            or region.fresh
+            or not region.parts
+            or region.offsets
+            or region.relation is not None
+            or (region.name is not None and len(region.parts) != 1)
+        ):
+            raise ValueError("product region descriptor shape is invalid")
         return
     if kind in (RegionKind.FRESH_CHILDREN, RegionKind.FRESH_EDGES):
         if (
-            region.loci
+            not region.name
+            or region.loci
             or not region.fresh
             or region.parts
             or region.offsets
             or region.relation is not None
         ):
             raise ValueError(f"{kind.value} region descriptor shape is invalid")
+        if any(reference.namespace != region.name for reference in region.fresh):
+            raise ValueError(
+                f"{kind.value} references must use the region namespace"
+            )
         return
     if kind is RegionKind.INTENSIONAL:
         if (
@@ -464,6 +563,8 @@ def _validate_region_shape(region: Region) -> None:
             or region.relation is None
         ):
             raise ValueError("intensional region descriptor shape is invalid")
+        return
+    raise ValueError(f"{kind.value} region is reserved for G7-02 mechanics")
 
 
 def literal(

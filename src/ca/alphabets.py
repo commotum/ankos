@@ -47,11 +47,17 @@ class ValueNode:
             raise TypeError("value-node kind is not recognized")
         if not isinstance(self.tag, str) or not self.tag:
             raise ValueError("value-node tag cannot be empty")
+        if type(self.items) is not tuple or type(self.fields) is not tuple:
+            raise TypeError("value-node collections must be immutable tuples")
         if any(not _is_semantic_value(item) for item in self.items):
             raise TypeError("value-node items contain an opaque value")
         if any(
-            not isinstance(name, str) or not _is_semantic_value(value)
-            for name, value in self.fields
+            type(field) is not tuple
+            or len(field) != 2
+            or not isinstance(field[0], str)
+            or not field[0]
+            or not _is_semantic_value(field[1])
+            for field in self.fields
         ):
             raise TypeError("value-node fields contain an opaque value")
         names = tuple(name for name, _ in self.fields)
@@ -93,22 +99,58 @@ class RepresentedNumber:
         if not isinstance(self.profile, RepresentedNumberProfile):
             raise TypeError("represented-number profile is not recognized")
         value = self.representation
-        if not isinstance(value, (int, Fraction, str, tuple)) or isinstance(
-            value, bool
+        if self.profile in (
+            RepresentedNumberProfile.IEEE754_BINARY32,
+            RepresentedNumberProfile.IEEE754_BINARY64,
         ):
-            raise TypeError("represented-number payload is not closed")
-        if isinstance(value, tuple) and (
-            len(value) != 2
-            or any(not isinstance(item, Fraction) for item in value)
-        ):
-            raise TypeError("represented interval needs two exact Fractions")
+            if isinstance(value, bool) or not isinstance(value, (int, str)):
+                raise TypeError(
+                    "IEEE represented numbers require raw integer bits or a bit string"
+                )
+            if isinstance(value, int):
+                width = (
+                    32
+                    if self.profile
+                    is RepresentedNumberProfile.IEEE754_BINARY32
+                    else 64
+                )
+                if not 0 <= value < 1 << width:
+                    raise ValueError("IEEE raw bits exceed the declared width")
+            elif not value:
+                raise ValueError("IEEE bit string cannot be empty")
+        elif self.profile is RepresentedNumberProfile.FIXED_POINT:
+            if isinstance(value, bool) or not isinstance(
+                value, (int, Fraction, str)
+            ):
+                raise TypeError(
+                    "fixed-point representation must be integer, Fraction, or text"
+                )
+        elif self.profile is RepresentedNumberProfile.DECIMAL:
+            if not isinstance(value, str) or not value:
+                raise TypeError("decimal representation must be nonempty text")
+        elif self.profile is RepresentedNumberProfile.INTERVAL:
+            if (
+                type(value) is not tuple
+                or len(value) != 2
+                or any(type(item) is not Fraction for item in value)
+            ):
+                raise TypeError("represented interval needs two exact Fractions")
+            if value[0] > value[1]:
+                raise ValueError("represented interval endpoints are reversed")
 
 
 SemanticValue: TypeAlias = ExactScalar | RepresentedNumber | ValueNode
 
 
 def _is_semantic_value(value: object) -> bool:
-    return isinstance(value, (bool, int, Fraction, str, RepresentedNumber, ValueNode))
+    return type(value) in (
+        bool,
+        int,
+        Fraction,
+        str,
+        RepresentedNumber,
+        ValueNode,
+    )
 
 
 class AlphabetKind(Enum):
@@ -162,23 +204,34 @@ class AlphabetDescriptor:
             raise ValueError(f"unsupported alphabet version {self.version}")
         if not isinstance(self.kind, AlphabetKind):
             raise TypeError("alphabet kind is not recognized")
+        if any(
+            type(value) is not tuple
+            for value in (self.values, self.scalars, self.children, self.fields)
+        ):
+            raise TypeError("alphabet collections must be immutable tuples")
         if any(not _is_semantic_value(value) for value in self.values):
             raise TypeError("alphabet contains an opaque semantic value")
         if any(
-            not isinstance(name, str)
-            or not isinstance(value, (bool, int, Fraction, str))
-            for name, value in self.scalars
+            type(item) is not tuple
+            or len(item) != 2
+            or not isinstance(item[0], str)
+            or not item[0]
+            or type(item[1]) not in (bool, int, Fraction, str)
+            for item in self.scalars
         ):
             raise TypeError("alphabet scalar parameters are not closed")
         if any(
-            not isinstance(child, AlphabetDescriptor)
+            type(child) is not AlphabetDescriptor
             for child in self.children
         ):
             raise TypeError("alphabet children must be AlphabetDescriptor values")
         if any(
-            not isinstance(name, str)
-            or not isinstance(child, AlphabetDescriptor)
-            for name, child in self.fields
+            type(item) is not tuple
+            or len(item) != 2
+            or not isinstance(item[0], str)
+            or not item[0]
+            or type(item[1]) is not AlphabetDescriptor
+            for item in self.fields
         ):
             raise TypeError("alphabet fields must contain closed descriptors")
         scalar_names = tuple(name for name, _ in self.scalars)
@@ -199,11 +252,15 @@ class AlphabetDescriptor:
                 raise ValueError("alphabet values must be semantically unique")
         if self.kind is AlphabetKind.ENUM:
             ordered_values = tuple(sorted(self.values, key=_value_key))
-            if ordered_values != self.values:
+            if tuple(_value_key(value) for value in ordered_values) != tuple(
+                _value_key(value) for value in self.values
+            ):
                 object.__setattr__(self, "values", ordered_values)
         if self.kind in (AlphabetKind.UNION,):
             ordered_children = tuple(sorted(self.children, key=_descriptor_key))
-            if ordered_children != self.children:
+            if tuple(_descriptor_key(child) for child in ordered_children) != tuple(
+                _descriptor_key(child) for child in self.children
+            ):
                 object.__setattr__(self, "children", ordered_children)
         if self.kind is AlphabetKind.MODULAR:
             modulus = _scalar_parameter(self, "modulus")

@@ -504,8 +504,13 @@ class Seed(Generic[C]):
 
     source: SeedSource[C]
     output_contract: SeedOutputContract
+    version: int = 1
 
     def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise SeedValidationError(
+                f"unsupported Seed version {self.version!r}"
+            )
         _validate_source(self.source)
         if type(self.output_contract) is not SeedOutputContract:
             raise TypeError("Seed output contract is not recognized")

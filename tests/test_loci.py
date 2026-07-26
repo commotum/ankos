@@ -192,3 +192,151 @@ def test_exact_structural_records_reject_boolean_versions_and_subclass_scalars()
         loci.Locus(loci.LocusKind.NAMED, "scope", ("name",), True)
     with pytest.raises(TypeError, match="version"):
         loci.Boundary(loci.BoundaryPolicy.NONE, version=True)
+
+
+@pytest.mark.parametrize("index", (True, 1.5, "1"))
+def test_occurrences_reject_implicit_integer_coercion(index: object) -> None:
+    with pytest.raises(TypeError, match="index must be an integer"):
+        loci.occurrence("word", index)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("start", "stop"),
+    (
+        (True, 1),
+        (0, False),
+        (0.5, 1),
+        (0, 1.5),
+    ),
+)
+def test_spans_reject_implicit_integer_coercion(
+    start: object,
+    stop: object,
+) -> None:
+    with pytest.raises(TypeError, match="bounds must be integers"):
+        loci.span("word", start, stop)  # type: ignore[arg-type]
+
+
+def test_cells_and_intensional_references_require_nonempty_exact_identity() -> None:
+    with pytest.raises(ValueError, match="cannot be empty"):
+        loci.cell(())
+    with pytest.raises(TypeError, match="coordinates must be integers"):
+        loci.cell((True,))
+    with pytest.raises(ValueError, match="binder"):
+        loci.intensional_reference("", "relation")
+    with pytest.raises(ValueError, match="relation identity"):
+        loci.intensional_reference("x", "")
+
+
+def test_g7_01_selector_shapes_are_closed_and_explicit() -> None:
+    target = loci.named("target")
+    literal = loci.SelectorExpr(
+        loci.SelectorPrimitive.LITERAL,
+        arguments=(target,),
+    )
+    membership = loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP)
+    relative = loci.SelectorExpr(
+        loci.SelectorPrimitive.RELATIVE,
+        arguments=(target,),
+    )
+
+    assert loci.SelectorExpr(
+        loci.SelectorPrimitive.AND,
+        children=(literal, membership),
+    ).children == (literal, membership)
+    assert loci.SelectorExpr(
+        loci.SelectorPrimitive.OR,
+        children=(membership, relative),
+    ).children == (membership, relative)
+    assert loci.SelectorExpr(
+        loci.SelectorPrimitive.NOT,
+        children=(membership,),
+    ).children == (membership,)
+
+    with pytest.raises(ValueError, match="literal selector"):
+        loci.SelectorExpr(loci.SelectorPrimitive.LITERAL)
+    with pytest.raises(ValueError, match="one Locus"):
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.RELATIVE,
+            arguments=("target",),
+        )
+    with pytest.raises(ValueError, match="two child"):
+        loci.SelectorExpr(
+            loci.SelectorPrimitive.AND,
+            children=(membership,),
+        )
+
+
+def test_unimplemented_selector_primitives_reject_until_their_mechanics_exist() -> None:
+    implemented = {
+        loci.SelectorPrimitive.LITERAL,
+        loci.SelectorPrimitive.MEMBERSHIP,
+        loci.SelectorPrimitive.RELATIVE,
+        loci.SelectorPrimitive.AND,
+        loci.SelectorPrimitive.OR,
+        loci.SelectorPrimitive.NOT,
+    }
+
+    for primitive in set(loci.SelectorPrimitive) - implemented:
+        with pytest.raises(ValueError, match="reserved for G7-02"):
+            loci.SelectorExpr(primitive)
+
+
+def test_every_g7_01_region_variant_has_one_validated_shape() -> None:
+    target = loci.named("target")
+    base = loci.literal((target,))
+    membership = loci.SelectorExpr(loci.SelectorPrimitive.MEMBERSHIP)
+    fresh_edge = loci.FreshReference("edges", "edge")
+    regions = (
+        base,
+        loci.all_support(),
+        loci.current_support(),
+        loci.relative(base, (loci.coordinate("x", 1),)),
+        loci.region_product((("left", base),)),
+        loci.union((base, loci.literal((loci.named("other"),)))),
+        loci.fresh_children(target, "children", ("child",)),
+        loci.Region(
+            loci.RegionKind.FRESH_EDGES,
+            name="edges",
+            fresh=(fresh_edge,),
+        ),
+        loci.intensional("x", membership),
+    )
+    implemented = {
+        loci.RegionKind.LITERAL,
+        loci.RegionKind.ALL_SUPPORT,
+        loci.RegionKind.CURRENT_SUPPORT,
+        loci.RegionKind.RELATIVE,
+        loci.RegionKind.PRODUCT,
+        loci.RegionKind.UNION,
+        loci.RegionKind.FRESH_CHILDREN,
+        loci.RegionKind.FRESH_EDGES,
+        loci.RegionKind.INTENSIONAL,
+    }
+
+    assert {region.kind for region in regions} == implemented
+    for kind in set(loci.RegionKind) - implemented:
+        with pytest.raises(ValueError, match="reserved for G7-02"):
+            loci.Region(kind)
+
+
+def test_region_variants_reject_irrelevant_or_ambiguous_fields_locally() -> None:
+    target = loci.named("target")
+    base = loci.literal((target,))
+    with pytest.raises(ValueError, match="all-support"):
+        loci.Region(loci.RegionKind.ALL_SUPPORT)
+    with pytest.raises(ValueError, match="duplicate loci"):
+        loci.literal((target, target))
+    with pytest.raises(ValueError, match="relative"):
+        loci.Region(
+            loci.RegionKind.RELATIVE,
+            name="unexpected",
+            parts=(base,),
+            offsets=(loci.coordinate("x", 1),),
+        )
+    with pytest.raises(ValueError, match="product"):
+        loci.Region(
+            loci.RegionKind.PRODUCT,
+            name="field",
+            parts=(base, base),
+        )

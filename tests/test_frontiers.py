@@ -32,6 +32,20 @@ def test_writable_region_resolves_the_complete_possible_write_envelope() -> None
     assert resolved.reconstruction.complete
 
 
+def test_effect_profile_has_one_canonical_permission_order() -> None:
+    profile = frontiers.EffectProfile(
+        existing=(frontiers.Effect.DELETE, frontiers.Effect.REPLACE),
+    )
+
+    assert profile.existing == (
+        frontiers.Effect.REPLACE,
+        frontiers.Effect.DELETE,
+    )
+    assert profile == frontiers.EffectProfile(
+        existing=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
+    )
+
+
 def test_writable_region_distinguishes_existing_and_fresh_capabilities() -> None:
     source = _source()
     parent = source.entries[0][0]

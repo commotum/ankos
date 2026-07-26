@@ -93,6 +93,14 @@ class ResultShape:
             raise ReadableResolutionError("result-shape keys must be unique")
 
 
+def _field_extent(field: ReadField) -> tuple[str, int | None]:
+    if field.arity is ReadArity.ONE:
+        return ("fixed", 1)
+    if field.arity is ReadArity.FIXED:
+        return ("fixed", field.size)
+    return (field.arity.value, None)
+
+
 class JoinMode(Enum):
     """How resolved read groups align with writable targets."""
 
@@ -263,6 +271,10 @@ class ReadableView(Generic[V]):
             raise TypeError("view groups must be an immutable tuple")
         if type(self.join_shape) is not JoinShape:
             raise TypeError("view join shape is not recognized")
+        if not self.observations or not self.groups:
+            raise ReadableResolutionError(
+                "a materialized readable view cannot be empty"
+            )
         covered: list[int] = []
         for group in self.groups:
             covered.extend(group.indices)
@@ -343,8 +355,13 @@ class ReadableRegion(Generic[C, R]):
     grouping: GroupingPlan
     parts: tuple[ReadableField[C, R], ...] = ()
     exactness_profile: ExactnessProfile = ExactnessProfile.EXACT
+    version: int = 1
 
     def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ReadableResolutionError(
+                f"unsupported readable-region version {self.version!r}"
+            )
         if type(self.descriptor) is not loci.Region:
             raise TypeError("readable descriptor is not recognized")
         if self.configuration_contract is not None and type(

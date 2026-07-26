@@ -107,17 +107,8 @@ def test_unauthorized_namespace_parent_or_collision_rejects_without_commit() -> 
         "same",
         parent=source.entries[0][0],
     )
-    duplicate_region = frontiers.fresh(
-        loci.literal(fresh=(duplicate, duplicate)),
-        namespace=frontiers.FreshNamespace(
-            "children",
-            source.entries[0][0],
-        ),
-        configuration_contract=source.contract,
-        value_profile=alphabets.ValueProfile.BOOLEAN,
-    )
-    with pytest.raises(frontiers.WritableResolutionError, match="duplicate"):
-        duplicate_region.resolve(source)
+    with pytest.raises(ValueError, match="duplicate fresh"):
+        loci.literal(fresh=(duplicate, duplicate))
     assert len(source.entries) == 1
 
 

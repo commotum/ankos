@@ -318,6 +318,8 @@ class TraceLineage:
             raise ValueError(f"unsupported trace-lineage version {self.version}")
         if not isinstance(self.root_identity, str) or not self.root_identity:
             raise ValueError("trace lineage requires a root identity")
+        if type(self.path) is not tuple:
+            raise TypeError("trace lineage path must be an immutable tuple")
         if any(not isinstance(edge, str) or not edge for edge in self.path):
             raise ValueError("trace lineage path must contain nonempty identities")
 
@@ -332,6 +334,11 @@ class ApplicationInput(Generic[C]):
     trace_lineage: TraceLineage | None = None
 
     def __post_init__(self) -> None:
+        if type(self.configuration) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("application input configuration is not recognized")
         if self.trace_lineage is not None and type(self.trace_lineage) is not TraceLineage:
             raise TypeError("trace_lineage must be a recognized TraceLineage")
 
@@ -341,12 +348,32 @@ class FreshBinding:
     reference: loci.FreshReference
     identity: loci.Locus
 
+    def __post_init__(self) -> None:
+        if type(self.reference) is not loci.FreshReference:
+            raise TypeError("fresh binding reference is not recognized")
+        if type(self.identity) is not loci.Locus:
+            raise TypeError("fresh binding identity is not recognized")
+        if self.identity.kind is not loci.LocusKind.FRESH:
+            raise ValueError("fresh binding must bind a fresh Locus identity")
+
 
 @dataclass(frozen=True)
 class AppliedEvidence:
     application_identity: str
     disposition_identity: str
     version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.version) is not int or self.version != 1:
+            raise ValueError(f"unsupported applied-evidence version {self.version}")
+        if any(
+            not isinstance(value, str) or not value
+            for value in (
+                self.application_identity,
+                self.disposition_identity,
+            )
+        ):
+            raise ValueError("applied evidence identities cannot be empty")
 
 
 @dataclass(frozen=True)
@@ -357,6 +384,34 @@ class AppliedDerivation(Generic[C]):
     input_trace_lineage: TraceLineage
     output_trace_lineage: TraceLineage
     evidence: AppliedEvidence
+
+    def __post_init__(self) -> None:
+        if type(self.successor) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("applied successor configuration is not recognized")
+        if type(self.source) is not rules.Derivation:
+            raise TypeError("applied derivation source is not recognized")
+        if type(self.fresh_bindings) is not tuple or any(
+            type(item) is not FreshBinding for item in self.fresh_bindings
+        ):
+            raise TypeError("fresh bindings must be an immutable tuple")
+        if type(self.input_trace_lineage) is not TraceLineage or type(
+            self.output_trace_lineage
+        ) is not TraceLineage:
+            raise TypeError("applied derivation lineage is not recognized")
+        if type(self.evidence) is not AppliedEvidence:
+            raise TypeError("applied derivation evidence is not recognized")
+        if (
+            self.input_trace_lineage.root_identity
+            != self.output_trace_lineage.root_identity
+            or len(self.output_trace_lineage.path)
+            != len(self.input_trace_lineage.path) + 1
+            or self.output_trace_lineage.path[:-1]
+            != self.input_trace_lineage.path
+        ):
+            raise ValueError("output lineage must extend input lineage once")
 
     @property
     def canonical_identity(self) -> str:
@@ -378,6 +433,25 @@ class AppliedNoSuccessor:
     output_trace_lineage: TraceLineage
     evidence: AppliedEvidence
 
+    def __post_init__(self) -> None:
+        if type(self.source) is not rules.NoSuccessor:
+            raise TypeError("applied no-successor source is not recognized")
+        if type(self.input_trace_lineage) is not TraceLineage or type(
+            self.output_trace_lineage
+        ) is not TraceLineage:
+            raise TypeError("applied no-successor lineage is not recognized")
+        if type(self.evidence) is not AppliedEvidence:
+            raise TypeError("applied no-successor evidence is not recognized")
+        if (
+            self.input_trace_lineage.root_identity
+            != self.output_trace_lineage.root_identity
+            or len(self.output_trace_lineage.path)
+            != len(self.input_trace_lineage.path) + 1
+            or self.output_trace_lineage.path[:-1]
+            != self.input_trace_lineage.path
+        ):
+            raise ValueError("output lineage must extend input lineage once")
+
     @property
     def canonical_identity(self) -> str:
         return loci.canonical_identity(
@@ -398,6 +472,15 @@ class SuccessorGroup(Generic[C]):
     derivations: tuple[AppliedDerivation[C], ...]
 
     def __post_init__(self) -> None:
+        if type(self.successor) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("successor-group configuration is not recognized")
+        if type(self.derivations) is not tuple or any(
+            type(item) is not AppliedDerivation for item in self.derivations
+        ):
+            raise TypeError("successor fiber must be an immutable derivation tuple")
         if not self.derivations:
             raise ValueError("successor group needs a derivation fiber")
         if any(
@@ -405,6 +488,20 @@ class SuccessorGroup(Generic[C]):
             for item in self.derivations
         ):
             raise ValueError("successor fiber contains a different successor")
+        identities = tuple(
+            item.canonical_identity for item in self.derivations
+        )
+        if len(identities) != len(set(identities)):
+            raise ValueError("successor fiber repeats a derivation")
+        ordered = tuple(
+            item
+            for _, item in sorted(
+                zip(identities, self.derivations, strict=True),
+                key=lambda pair: pair[0],
+            )
+        )
+        if tuple(item.canonical_identity for item in ordered) != identities:
+            object.__setattr__(self, "derivations", ordered)
 
     @property
     def canonical_identity(self) -> str:
@@ -417,8 +514,10 @@ class MeasureMass:
     mass: Fraction
 
     def __post_init__(self) -> None:
-        if not self.point_identity:
+        if not isinstance(self.point_identity, str) or not self.point_identity:
             raise ValueError("measure point identity cannot be empty")
+        if isinstance(self.mass, bool) or not isinstance(self.mass, Fraction):
+            raise TypeError("measure mass must be an exact Fraction")
         if self.mass <= 0:
             raise ValueError("measure mass must be positive")
 
@@ -434,6 +533,12 @@ class ProgramMeasure:
             type(item) is not MeasureMass for item in self.masses
         ):
             raise TypeError("measure masses must be a tuple of MeasureMass values")
+        point_identities = tuple(item.point_identity for item in self.masses)
+        if len(point_identities) != len(set(point_identities)):
+            raise ValueError("measure repeats a point identity")
+        ordered = tuple(sorted(self.masses, key=lambda item: item.point_identity))
+        if tuple(item.point_identity for item in ordered) != point_identities:
+            object.__setattr__(self, "masses", ordered)
         if self.total_mass is not None and (
             isinstance(self.total_mass, bool)
             or not isinstance(self.total_mass, Fraction)
@@ -470,6 +575,10 @@ class MeasureAbsent:
 class MeasureAvailable:
     measure: ProgramMeasure
 
+    def __post_init__(self) -> None:
+        if type(self.measure) is not ProgramMeasure:
+            raise TypeError("available measure payload is not recognized")
+
 
 @dataclass(frozen=True)
 class MeasureUnavailable:
@@ -477,7 +586,14 @@ class MeasureUnavailable:
     retained_source_law_and_mapping_evidence: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        if not self.reason or not self.retained_source_law_and_mapping_evidence:
+        if not isinstance(self.reason, str) or not self.reason:
+            raise ValueError("unavailable measure needs a reason")
+        if type(self.retained_source_law_and_mapping_evidence) is not tuple or any(
+            not isinstance(item, str) or not item
+            for item in self.retained_source_law_and_mapping_evidence
+        ):
+            raise TypeError("unavailable measure evidence is not recognized")
+        if not self.retained_source_law_and_mapping_evidence:
             raise ValueError("unavailable measure needs reason and retained evidence")
 
 
@@ -494,8 +610,21 @@ class ApplicationEvidence:
     application_identity: str
 
     def __post_init__(self) -> None:
+        if type(self.phases) is not tuple or any(
+            type(phase) is not ApplicationPhase for phase in self.phases
+        ):
+            raise TypeError("application phases are not recognized")
         if self.phases != tuple(ApplicationPhase):
             raise ValueError("complete application evidence needs every phase")
+        identities = (
+            self.program_identity,
+            self.input_configuration_identity,
+            self.readable_binding_identity,
+            self.writable_binding_identity,
+            self.application_identity,
+        )
+        if any(not isinstance(item, str) or not item for item in identities):
+            raise ValueError("application evidence identities cannot be empty")
 
 
 @dataclass(frozen=True)
@@ -516,6 +645,84 @@ class ApplicationComplete(Generic[C]):
     no_successor_submeasure: MeasureView
     evidence: ApplicationEvidence
 
+    def __post_init__(self) -> None:
+        if type(self.source_outcomes) is not rules.OutcomeSpace:
+            raise TypeError("application source outcomes are not recognized")
+        if type(self.applied_atoms) is not rules.SupportSpace:
+            raise TypeError("application applied-atom space is not recognized")
+        if type(self.no_successor_partition) is not rules.SupportSpace:
+            raise TypeError("application no-successor space is not recognized")
+        cardinality_types = (
+            rules.ExactlyZero,
+            rules.ExactlyOne,
+            rules.Many,
+            rules.Undetermined,
+        )
+        if any(
+            type(value) not in cardinality_types
+            for value in (
+                self.outcome_atom_cardinality,
+                self.derivation_cardinality,
+                self.successor_cardinality,
+            )
+        ):
+            raise TypeError("application cardinality variant is not recognized")
+        if (
+            self.outcome_atom_cardinality
+            != self.source_outcomes.support.cardinality
+        ):
+            raise ValueError("outcome cardinality disagrees with source support")
+        if type(
+            self.successor_quotient_with_derivation_fibers
+        ) is not rules.SupportSpace:
+            raise TypeError("successor quotient space is not recognized")
+        if (
+            self.successor_cardinality
+            != self.successor_quotient_with_derivation_fibers.cardinality
+        ):
+            raise ValueError("successor cardinality disagrees with quotient support")
+        measure_types = (MeasureAbsent, MeasureAvailable, MeasureUnavailable)
+        if any(
+            type(value) not in measure_types
+            for value in (
+                self.applied_atom_measure,
+                self.successor_submeasure,
+                self.no_successor_submeasure,
+            )
+        ):
+            raise TypeError("application measure view is not recognized")
+        if type(self.evidence) is not ApplicationEvidence:
+            raise TypeError("application evidence is not recognized")
+        if (
+            self.applied_atoms.presentation
+            is rules.SupportPresentation.FINITE
+        ):
+            derivations = tuple(
+                item
+                for item in self.applied_atoms.atoms
+                if type(item) is AppliedDerivation
+            )
+            no_successors = tuple(
+                item
+                for item in self.applied_atoms.atoms
+                if type(item) is AppliedNoSuccessor
+            )
+            if len(derivations) + len(no_successors) != len(
+                self.applied_atoms.atoms
+            ):
+                raise TypeError("application support contains an unknown atom")
+            if rules.cardinality_size(self.derivation_cardinality) != len(
+                derivations
+            ):
+                raise ValueError("derivation cardinality disagrees with applied atoms")
+            if tuple(
+                item.canonical_identity for item in no_successors
+            ) != tuple(
+                item.canonical_identity
+                for item in self.no_successor_partition.atoms
+            ):
+                raise ValueError("no-successor partition disagrees with applied atoms")
+
 
 @dataclass(frozen=True)
 class ApplicationFault:
@@ -525,7 +732,19 @@ class ApplicationFault:
     attempted_phases: tuple[ApplicationPhase, ...]
 
     def __post_init__(self) -> None:
-        if not self.reason or not self.evidence:
+        if type(self.phase) is not ApplicationPhase:
+            raise TypeError("application fault phase is not recognized")
+        if not isinstance(self.reason, str) or not self.reason:
+            raise ValueError("application fault needs a reason")
+        if type(self.evidence) is not tuple or any(
+            not isinstance(item, str) or not item for item in self.evidence
+        ):
+            raise TypeError("application fault evidence is not recognized")
+        if type(self.attempted_phases) is not tuple or any(
+            type(item) is not ApplicationPhase for item in self.attempted_phases
+        ):
+            raise TypeError("attempted application phases are not recognized")
+        if not self.evidence:
             raise ValueError("application fault needs reason and evidence")
         if not self.attempted_phases or self.attempted_phases[-1] is not self.phase:
             raise ValueError("fault phase must be the final attempted phase")
@@ -534,6 +753,10 @@ class ApplicationFault:
 @dataclass(frozen=True)
 class ApplicationRejected:
     fault: ApplicationFault
+
+    def __post_init__(self) -> None:
+        if type(self.fault) is not ApplicationFault:
+            raise TypeError("application rejection fault is not recognized")
 
 
 ApplicationResult: TypeAlias = ApplicationComplete[C] | ApplicationRejected
@@ -1465,6 +1688,15 @@ class ContinuingLeaf(Generic[C]):
     configuration: C
     trace_lineage: TraceLineage
 
+    def __post_init__(self) -> None:
+        if type(self.configuration) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("continuing-leaf configuration is not recognized")
+        if type(self.trace_lineage) is not TraceLineage:
+            raise TypeError("continuing-leaf lineage is not recognized")
+
     @property
     def canonical_identity(self) -> str:
         return loci.canonical_identity(
@@ -1476,6 +1708,27 @@ class ContinuingLeaf(Generic[C]):
 class ClosedLeaf(Generic[C]):
     final_configuration: C | None
     source: AppliedAtom[C]
+
+    def __post_init__(self) -> None:
+        if self.final_configuration is not None and type(
+            self.final_configuration
+        ) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
+            raise TypeError("closed-leaf configuration is not recognized")
+        if type(self.source) not in (AppliedDerivation, AppliedNoSuccessor):
+            raise TypeError("closed-leaf source atom is not recognized")
+        if (
+            type(self.source) is AppliedDerivation
+            and self.final_configuration is None
+        ):
+            raise ValueError("a stopped derivation retains its final configuration")
+        if (
+            type(self.source) is AppliedNoSuccessor
+            and self.final_configuration is not None
+        ):
+            raise ValueError("a no-successor leaf has no final configuration")
 
     @property
     def canonical_identity(self) -> str:
@@ -1494,6 +1747,25 @@ class TraceEdge:
     parent_lineage: TraceLineage
     child_lineage: TraceLineage
     applied_atom_identity: str
+
+    def __post_init__(self) -> None:
+        if type(self.parent_lineage) is not TraceLineage or type(
+            self.child_lineage
+        ) is not TraceLineage:
+            raise TypeError("trace-edge lineage is not recognized")
+        if (
+            self.parent_lineage.root_identity
+            != self.child_lineage.root_identity
+            or len(self.child_lineage.path)
+            != len(self.parent_lineage.path) + 1
+            or self.child_lineage.path[:-1] != self.parent_lineage.path
+        ):
+            raise ValueError("trace edge child must extend its parent once")
+        if (
+            not isinstance(self.applied_atom_identity, str)
+            or not self.applied_atom_identity
+        ):
+            raise ValueError("trace edge needs an applied-atom identity")
 
 
 @dataclass(frozen=True)
@@ -1529,6 +1801,12 @@ class RolloutComplete(Generic[C]):
     raw_trace: RawTrace[C]
     closed_leaves: rules.SupportSpace[ClosedLeaf[C]]
 
+    def __post_init__(self) -> None:
+        if type(self.raw_trace) is not RawTrace:
+            raise TypeError("complete rollout trace is not recognized")
+        if type(self.closed_leaves) is not rules.SupportSpace:
+            raise TypeError("closed-leaf support is not recognized")
+
 
 class TruncationCause(Enum):
     DEPTH_BOUND = "depth-bound"
@@ -1544,16 +1822,36 @@ class RolloutTruncated(Generic[C]):
     continuing_leaves: rules.SupportSpace[ContinuingLeaf[C]]
     cause: TruncationCause
 
+    def __post_init__(self) -> None:
+        if type(self.raw_trace) is not RawTrace:
+            raise TypeError("truncated rollout trace is not recognized")
+        if type(self.continuing_leaves) is not rules.SupportSpace:
+            raise TypeError("continuing-leaf support is not recognized")
+        if type(self.cause) is not TruncationCause:
+            raise TypeError("truncation cause is not recognized")
+
 
 @dataclass(frozen=True)
 class RolloutFault:
     reason: str
     evidence: tuple[str, ...] = ()
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.reason, str) or not self.reason:
+            raise ValueError("rollout fault needs a reason")
+        if type(self.evidence) is not tuple or any(
+            not isinstance(item, str) or not item for item in self.evidence
+        ):
+            raise TypeError("rollout fault evidence is not recognized")
+
 
 @dataclass(frozen=True)
 class RolloutRejected:
     fault: RolloutFault
+
+    def __post_init__(self) -> None:
+        if type(self.fault) is not RolloutFault:
+            raise TypeError("rollout rejection fault is not recognized")
 
 
 RolloutResult: TypeAlias = (
@@ -1667,6 +1965,17 @@ def _enumerate_bernoulli(
             raise ValueError("Bernoulli support size disagrees with its carrier")
         if set(targets) != set(loci.grid_loci(contract.shape)):
             raise ValueError("Bernoulli support does not equal the grid carrier")
+    if law.probability_true in (Fraction(0), Fraction(1)):
+        selected_value = (
+            law.true_value
+            if law.probability_true == Fraction(1)
+            else law.false_value
+        )
+        configuration = loci.FiniteConfiguration(
+            loci.Carrier(contract, law.boundary),
+            tuple((target, selected_value) for target in targets),
+        )
+        return (configuration,), (Fraction(1),)
     configurations: list[
         loci.FiniteConfiguration[alphabets.SemanticValue]
     ] = []
