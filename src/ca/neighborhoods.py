@@ -126,6 +126,12 @@ class ReadDependency:
             self.value_anchor
         ) is not alphabets.ValueAnchor:
             raise TypeError("read-dependency value anchor is not recognized")
+        if self.value_anchor is not None:
+            if self.selector is not None:
+                raise ReadableResolutionError(
+                    "value-anchored read dependencies cannot add a selector"
+                )
+            _value_relative_offset_rank(self.region)
 
 
 def _field_extent(field: ReadField) -> tuple[str, int | None]:
@@ -325,15 +331,29 @@ class ReadableView(Generic[V]):
             raise ReadableResolutionError(
                 "readable-view dependency keys must be unique"
             )
+        anchored_dependencies = tuple(
+            dependency
+            for dependency in self.dependencies
+            if dependency.value_anchor is not None
+        )
+        if anchored_dependencies:
+            if len(anchored_dependencies) != 1 or len(self.dependencies) != 1:
+                raise ReadableResolutionError(
+                    "value-anchored readable views need exactly one dependency"
+                )
+            if self.join_shape.mode is not JoinMode.ANCHOR_IDENTITY:
+                raise ReadableResolutionError(
+                    "value-anchored readable views need an anchor-identity join"
+                )
         if bool(self.observations) != bool(self.groups):
             raise ReadableResolutionError(
                 "readable observations and groups must be empty together"
             )
         if not self.observations:
             permits_empty = (
-                len(self.dependencies) == 1
-                and self.dependencies[0].value_anchor is not None
-                and self.dependencies[0].value_anchor.cardinality
+                len(anchored_dependencies) == 1
+                and anchored_dependencies[0].value_anchor is not None
+                and anchored_dependencies[0].value_anchor.cardinality
                 is alphabets.AnchorCardinality.ZERO_OR_MORE
             )
             if not permits_empty:
@@ -341,6 +361,11 @@ class ReadableView(Generic[V]):
                     "an empty readable view needs an explicit ZERO_OR_MORE "
                     "value anchor"
                 )
+        group_keys = tuple(group.key for group in self.groups)
+        if len(set(group_keys)) != len(group_keys):
+            raise ReadableResolutionError(
+                "readable-view group keys must be unique"
+            )
         covered: list[int] = []
         for group in self.groups:
             covered.extend(group.indices)
@@ -349,8 +374,10 @@ class ReadableView(Generic[V]):
                 "observation groups must partition observations in order"
             )
         for group in self.groups:
-            if group.anchor is None:
-                continue
+            if anchored_dependencies and group.anchor is None:
+                raise ReadableResolutionError(
+                    "realized value-anchored groups need a source anchor"
+                )
             for index in group.indices:
                 observation_anchor = self.observations[index].anchor
                 if observation_anchor != group.anchor:

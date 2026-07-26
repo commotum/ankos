@@ -5,6 +5,7 @@ from __future__ import annotations
 from fractions import Fraction
 
 import ca
+import pytest
 from ca import (
     alphabets,
     frontiers,
@@ -474,3 +475,52 @@ def test_maximal_runs_and_exact_numeric_transduction_apply_together() -> None:
 
     assert loci.configuration_identity(source) == source_identity
     assert source.entries[0][1] == initial_state
+
+
+@pytest.mark.parametrize(
+    ("expression", "exception_name"),
+    (
+        (
+            rules.divide(
+                rules.literal_expr(1),
+                rules.literal_expr(0),
+            ),
+            "ZeroDivisionError",
+        ),
+        (
+            rules.integer_digits(
+                rules.literal_expr(4),
+                2,
+                width=2,
+            ),
+            "OverflowError",
+        ),
+    ),
+)
+def test_arithmetic_evaluation_faults_reject_at_both_public_boundaries(
+    expression: rules.RuleExpr,
+    exception_name: str,
+) -> None:
+    source = loci.record_configuration((("value", 1),))
+    simple_program = _one_locus_expression_program(
+        source,
+        alphabets.integers(),
+        expression,
+        label="arithmetic-fault",
+    )
+
+    denotation = simple_program.rule.denote(
+        simple_program.neighborhood.resolve(source),
+        simple_program.frontier.resolve(source),
+    )
+
+    assert isinstance(denotation, rules.RuleRejected)
+    assert denotation.fault.phase is rules.RuleFaultPhase.DENOTATION
+    assert denotation.fault.reason is rules.RuleFaultReason.EVALUATION_FAILURE
+    assert exception_name in denotation.fault.detail
+
+    application = ca.apply(simple_program, source)
+
+    assert isinstance(application, program.ApplicationRejected)
+    assert application.fault.phase is program.ApplicationPhase.RULE_DENOTATION
+    assert exception_name in application.fault.reason

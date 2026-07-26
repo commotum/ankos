@@ -353,9 +353,6 @@ ca.rules,ExpressionDenotation,frozen-dataclass,record,ca.rules.expression-denota
 ca.rules,IntensionalDenotation,frozen-dataclass,record,ca.rules.intensional-denotation,1,relation|cardinality|completeness_evidence|soundness_evidence|probability_law|projection_cardinalities,,IntensionalDenotation.__post_init__,structural-fields
 ca.rules,ClauseSelection,enum-member,ALL,ca.rules.clause-selection,1,value,all,Enum.__call__,enum-member
 ca.rules,ClauseSelection,enum-member,FIRST,ca.rules.clause-selection,1,value,first,Enum.__call__,enum-member
-ca.rules,ProposalConflictPolicy,enum-member,REQUIRE_EQUAL,ca.rules.proposal-conflict-policy,1,value,require-equal,Enum.__call__,enum-member
-ca.rules,ProposalConflictPolicy,enum-member,FIRST,ca.rules.proposal-conflict-policy,1,value,first,Enum.__call__,enum-member
-ca.rules,ProposalConflictPolicy,enum-member,LAST,ca.rules.proposal-conflict-policy,1,value,last,Enum.__call__,enum-member
 ca.rules,CapabilitySelectorKind,enum-member,INDEX,ca.rules.capability-selector-kind,1,value,index,Enum.__call__,enum-member
 ca.rules,CapabilitySelectorKind,enum-member,TARGET,ca.rules.capability-selector-kind,1,value,target,Enum.__call__,enum-member
 ca.rules,CapabilitySelectorKind,enum-member,GROUP_ITEM,ca.rules.capability-selector-kind,1,value,group-item,Enum.__call__,enum-member
@@ -367,6 +364,9 @@ ca.rules,DerivationClauseResult,frozen-dataclass,record,ca.rules.derivation-clau
 ca.rules,NoSuccessorClauseResult,frozen-dataclass,record,ca.rules.no-successor-clause-result,1,outcome|reason|witness|provenance|certificate|certificate_template|provenance_templates|version,,NoSuccessorClauseResult.__post_init__,structural-fields
 ca.rules,RuleClause,frozen-dataclass,record,ca.rules.rule-clause,1,condition|result|mass|version,,RuleClause.__post_init__,structural-fields
 ca.rules,ClauseKernelDenotation,frozen-dataclass,record,ca.rules.clause-kernel-denotation,1,clauses|selection|completeness_evidence|version,,ClauseKernelDenotation.__post_init__,structural-fields
+ca.rules,ProposalConflictPolicy,enum-member,REQUIRE_EQUAL,ca.rules.proposal-conflict-policy,1,value,require-equal,Enum.__call__,enum-member
+ca.rules,ProposalConflictPolicy,enum-member,FIRST,ca.rules.proposal-conflict-policy,1,value,first,Enum.__call__,enum-member
+ca.rules,ProposalConflictPolicy,enum-member,LAST,ca.rules.proposal-conflict-policy,1,value,last,Enum.__call__,enum-member
 ca.rules,AnchoredClauseKernelDenotation,frozen-dataclass,record,ca.rules.anchored-clause-kernel-denotation,1,clauses|group_channel|selection|conflict_policy|zero_result|completeness_evidence|version,,AnchoredClauseKernelDenotation.__post_init__,structural-fields
 ca.rules,ParallelDenotation,frozen-dataclass,record,ca.rules.parallel-denotation,1,parts,,ParallelDenotation.__post_init__,structural-fields
 ca.rules,RuleDescriptor,frozen-dataclass,record,ca.rules.rule-descriptor,1,primitive|denotation|version,,RuleDescriptor.__post_init__,structural-fields

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from ca import (
@@ -154,6 +156,96 @@ def test_zero_or_more_anchor_produces_explicit_empty_envelopes() -> None:
     assert readable.groups == ()
     assert readable.dependencies[0].value_anchor == anchor
     assert readable.snapshot_identity == writable.snapshot_identity
+
+
+def test_value_anchored_dependency_requires_strict_relative_shape_and_no_selector() -> None:
+    anchor = _anchor(alphabets.AnchorCardinality.ZERO_OR_MORE)
+    valid = neighborhoods.value_relative(anchor, ((0,),))
+
+    dependency = neighborhoods.ReadDependency(
+        "valid",
+        valid.descriptor,
+        None,
+        seeds.ExactnessProfile.EXACT,
+        anchor,
+    )
+
+    assert dependency.value_anchor == anchor
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="all-support relative descriptor",
+    ):
+        neighborhoods.ReadDependency(
+            "wrong-region",
+            loci.all_support(),
+            None,
+            seeds.ExactnessProfile.EXACT,
+            anchor,
+        )
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="cannot add a selector",
+    ):
+        neighborhoods.ReadDependency(
+            "hidden-selector",
+            valid.descriptor,
+            loci.selector_literal(loci.named("hidden")),
+            seeds.ExactnessProfile.EXACT,
+            anchor,
+        )
+
+
+def test_empty_value_anchored_view_requires_one_anchor_identity_dependency() -> None:
+    source = _grid((_state("cell"), _state("cell"), _state("cell")))
+    anchor = _anchor(alphabets.AnchorCardinality.ZERO_OR_MORE)
+    view = neighborhoods.value_relative(anchor, ((0,),)).resolve(source)
+
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="anchor-identity join",
+    ):
+        replace(
+            view,
+            join_shape=neighborhoods.JoinShape(
+                neighborhoods.JoinMode.GLOBAL,
+                ("value-relative",),
+            ),
+        )
+
+    extra = neighborhoods.ReadDependency(
+        "extra",
+        loci.all_support(),
+        None,
+        seeds.ExactnessProfile.EXACT,
+    )
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="exactly one dependency",
+    ):
+        replace(view, dependencies=(*view.dependencies, extra))
+
+
+def test_realized_value_anchored_groups_require_source_anchor_identity() -> None:
+    source = _grid((_state("cell"), _state("head"), _state("cell")))
+    view = neighborhoods.value_relative(_anchor(), ((0,),)).resolve(source)
+    observations = tuple(
+        replace(observation, anchor=None)
+        for observation in view.observations
+    )
+    groups = tuple(
+        replace(
+            group,
+            key=replace(group.key, anchor=None),
+            anchor=None,
+        )
+        for group in view.groups
+    )
+
+    with pytest.raises(
+        neighborhoods.ReadableResolutionError,
+        match="need a source anchor",
+    ):
+        replace(view, observations=observations, groups=groups)
 
 
 def test_zero_or_more_no_anchor_is_a_valid_quiescent_public_apply() -> None:
