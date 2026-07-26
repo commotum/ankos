@@ -1091,6 +1091,11 @@ class OutcomeSpace(Generic[A]):
             raise ValueError(
                 "finite supports derive projection cardinalities from their atoms"
             )
+        if self.projection_cardinalities is not None:
+            _validate_projection_cardinality_claims(
+                self.support.cardinality,
+                self.projection_cardinalities,
+            )
         law = self.probability_law
         if law is None:
             return
@@ -1137,6 +1142,54 @@ class ProjectionCardinalities:
             raise ValueError(
                 "projection cardinalities need closed composition evidence"
             )
+
+
+def _validate_projection_cardinality_claims(
+    source: Cardinality,
+    claims: ProjectionCardinalities,
+) -> None:
+    """Reject exact projection claims that violate quotient arithmetic."""
+
+    source_size = cardinality_size(source)
+    derivation_size = cardinality_size(claims.derivations)
+    no_successor_size = cardinality_size(claims.no_successors)
+    successor_size = cardinality_size(claims.successors)
+
+    if source_size is not None:
+        if derivation_size is None or no_successor_size is None:
+            raise ValueError(
+                "finite source support needs exact finite derivation and "
+                "no-successor projection claims"
+            )
+        if derivation_size + no_successor_size != source_size:
+            raise ValueError(
+                "derivation and no-successor cardinalities do not partition "
+                "the source support"
+            )
+
+    if derivation_size is not None:
+        if successor_size is None:
+            raise ValueError(
+                "finite derivation support needs an exact finite successor "
+                "quotient claim"
+            )
+        if derivation_size == 0 and successor_size != 0:
+            raise ValueError(
+                "zero derivations require zero distinct successors"
+            )
+        if derivation_size > 0 and not 1 <= successor_size <= derivation_size:
+            raise ValueError(
+                "successor cardinality must lie between one and the finite "
+                "derivation cardinality"
+            )
+    elif (
+        isinstance(claims.derivations, Many)
+        and claims.derivations.infinite is not None
+        and isinstance(claims.successors, ExactlyZero)
+    ):
+        raise ValueError(
+            "infinite derivations cannot have zero successors"
+        )
 
 
 def _atom_identity(atom: object) -> str:

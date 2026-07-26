@@ -1038,6 +1038,61 @@ def test_intensional_projection_cardinalities_are_explicit_and_evidenced() -> No
         )
 
 
+def test_intensional_projection_cardinalities_obey_partition_and_quotient_laws() -> None:
+    source = rules.intensional_support(
+        rules.literal_expr("one-source-atom"),
+        rules.finite_cardinality(1),
+        completeness_evidence=_certificate(rules.CertificateKind.COMPLETENESS),
+        soundness_evidence=_certificate(rules.CertificateKind.SOUNDNESS),
+    )
+    composition = _certificate(rules.CertificateKind.COMPOSITION)
+
+    with pytest.raises(ValueError, match="do not partition"):
+        rules.OutcomeSpace(
+            source,
+            projection_cardinalities=rules.ProjectionCardinalities(
+                rules.finite_cardinality(1),
+                rules.finite_cardinality(1),
+                rules.finite_cardinality(1),
+                composition,
+            ),
+        )
+    with pytest.raises(ValueError, match="successor cardinality"):
+        rules.OutcomeSpace(
+            source,
+            projection_cardinalities=rules.ProjectionCardinalities(
+                rules.finite_cardinality(1),
+                rules.finite_cardinality(0),
+                rules.finite_cardinality(2),
+                composition,
+            ),
+        )
+    with pytest.raises(ValueError, match="zero distinct successors"):
+        rules.OutcomeSpace(
+            source,
+            projection_cardinalities=rules.ProjectionCardinalities(
+                rules.finite_cardinality(0),
+                rules.finite_cardinality(1),
+                rules.finite_cardinality(1),
+                composition,
+            ),
+        )
+    undetermined = rules.Undetermined(
+        rules.literal_expr("unproved"),
+        _certificate(rules.CertificateKind.CARDINALITY),
+    )
+    with pytest.raises(ValueError, match="finite source support"):
+        rules.OutcomeSpace(
+            source,
+            projection_cardinalities=rules.ProjectionCardinalities(
+                undetermined,
+                rules.finite_cardinality(0),
+                undetermined,
+                composition,
+            ),
+        )
+
+
 @pytest.mark.parametrize(
     "factory",
     (

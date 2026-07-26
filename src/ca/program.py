@@ -889,8 +889,8 @@ def _validate_configuration(
 
 
 def _validate_join(
-    readable: neighborhoods.ReadableView[alphabets.SemanticValue],
-    writable: frontiers.WritableCapabilities,
+    readable: neighborhoods.ResolvedReadableView[alphabets.SemanticValue],
+    writable: frontiers.ResolvedWritableCapabilities,
     configuration_identity: str,
     program: SimpleProgram[C, V, W, R],
 ) -> None:
@@ -909,12 +909,20 @@ def _validate_join(
         if group.anchor is not None
     }
     if readable.join_shape.mode is neighborhoods.JoinMode.TARGET_IDENTITY:
+        if type(writable) is frontiers.IntensionalWritableCapabilities:
+            raise ValueError(
+                "target-identity joins require enumerable writable targets"
+            )
         if anchors != set(existing_targets):
             raise ValueError("target-identity join does not cover writable targets")
     elif readable.join_shape.mode in (
         neighborhoods.JoinMode.ANCHOR_IDENTITY,
         neighborhoods.JoinMode.PRODUCT,
     ):
+        if type(writable) is frontiers.IntensionalWritableCapabilities:
+            raise ValueError(
+                "anchor/product joins require enumerable writable targets"
+            )
         # An anchor identifies the read context used by the Rule; it is not
         # necessarily every member of the complete writable envelope.  A
         # temporal macro-rule, for example, reads one current-anchored history
@@ -928,7 +936,7 @@ def _validate_join(
 
 def _validate_rule_space(
     result: rules.RuleComplete[C, alphabets.SemanticValue],
-    writable: frontiers.WritableCapabilities,
+    writable: frontiers.ResolvedWritableCapabilities,
     alphabet: alphabets.Alphabet[V],
     contract: rules.RuleContract,
 ) -> rules.OutcomeSpace[
@@ -952,6 +960,10 @@ def _validate_rule_space(
                 "exact-zero Rule denotation requires a typed NoSuccessor atom"
             )
         return outcome_space
+    if type(writable) is frontiers.IntensionalWritableCapabilities:
+        raise ValueError(
+            "an intensional writable envelope requires an intensional Rule result"
+        )
     if not support.atoms:
         raise ValueError("bare empty finite Rule result is invalid")
     if any(
@@ -1997,6 +2009,13 @@ def apply(
             input_lineage.canonical_identity,
         )
         return _intensional_application(outcome_space, evidence)
+    if type(writable) is not frontiers.WritableCapabilities:
+        return _rejection(
+            ApplicationPhase.RESULT_VALIDATION,
+            "a finite Rule result requires enumerable writable capabilities",
+            attempted,
+            "WritableResolutionError",
+        )
 
     bindings_by_atom: list[
         tuple[

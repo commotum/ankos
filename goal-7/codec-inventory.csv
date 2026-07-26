@@ -181,6 +181,8 @@ ca.frontiers,ReconstructionEvidence,frozen-dataclass,record,ca.frontiers.reconst
 ca.frontiers,ExistingCapability,frozen-dataclass,record,ca.frontiers.existing-capability,1,target|contract|effects,,ExistingCapability.__post_init__,structural-fields
 ca.frontiers,FreshCapability,frozen-dataclass,record,ca.frontiers.fresh-capability,1,target|contract|namespace,,FreshCapability.__post_init__,structural-fields
 ca.frontiers,WritableCapabilities,frozen-dataclass,record,ca.frontiers.writable-capabilities,1,snapshot_identity|existing|fresh|reconstruction,,WritableCapabilities.__post_init__,structural-fields
+ca.frontiers,IntensionalReconstructionEvidence,frozen-dataclass,record,ca.frontiers.intensional-reconstruction-evidence,1,snapshot_identity|region|target_contract|preserves_outside|complete|version,,IntensionalReconstructionEvidence.__post_init__,structural-fields
+ca.frontiers,IntensionalWritableCapabilities,frozen-dataclass,record,ca.frontiers.intensional-writable-capabilities,1,snapshot_identity|region|effect_profile|target_contract|reconstruction|version,,IntensionalWritableCapabilities.__post_init__,structural-fields
 ca.frontiers,WritableRegion,frozen-dataclass,record,ca.frontiers.writable-region,1,descriptor|configuration_contract|value_profile|effect_profile|target_contract|fresh_namespace|exactness_profile|parts|version,,WritableRegion.__post_init__,structural-fields
 ca.neighborhoods,ReadArity,enum-member,ONE,ca.neighborhoods.read-arity,1,value,one,Enum.__call__,enum-member
 ca.neighborhoods,ReadArity,enum-member,FIXED,ca.neighborhoods.read-arity,1,value,fixed,Enum.__call__,enum-member

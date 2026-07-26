@@ -3,7 +3,15 @@
 import pytest
 
 import ca
-from ca import program, rules
+from ca import (
+    alphabets,
+    frontiers,
+    loci,
+    neighborhoods,
+    program,
+    rules,
+    seeds,
+)
 
 from g7_fixtures import (
     certificate,
@@ -122,6 +130,120 @@ def test_exact_zero_requires_typed_atom_and_coverage_evidence() -> None:
     assert isinstance(rejected, program.ApplicationRejected)
     assert rejected.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
     assert "typed NoSuccessor" in rejected.fault.reason
+
+
+def test_intensional_read_write_and_application_remain_one_closed_relation() -> None:
+    contract = loci.CarrierContract(loci.CarrierKind.FIELD)
+    dependency = loci.selector_differential_germ("u", 1)
+    source = loci.IntensionalConfiguration(
+        contract,
+        dependency,
+        "field-u-exact-presentation",
+    )
+    alphabet = alphabets.field()
+    frontier = frontiers.intensional(
+        "u",
+        dependency,
+        configuration_contract=contract,
+        value_profile=alphabet.value_profile,
+    )
+    neighborhood = neighborhoods.differential_germ(
+        "u",
+        1,
+        configuration_contract=contract,
+        value_profile=alphabet.value_profile,
+    )
+    rule_contract = rules.RuleContract(
+        contract,
+        alphabet.value_profile,
+        neighborhood.result_shape,
+        neighborhood.join_shape,
+        frontier.effect_profile,
+    )
+    uncountable = rules.Many(
+        None,
+        rules.InfiniteCardinality.UNCOUNTABLE,
+        certificate(rules.CertificateKind.CARDINALITY, "constant-fields"),
+    )
+    relation = rules.differential(
+        rules.literal_expr("du/dx=0"),
+        uncountable,
+        contract=rule_contract,
+        completeness_evidence=certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "all-constant-fields",
+        ),
+        soundness_evidence=certificate(
+            rules.CertificateKind.SOUNDNESS,
+            "only-constant-fields",
+        ),
+        projection_cardinalities=rules.ProjectionCardinalities(
+            uncountable,
+            rules.finite_cardinality(0),
+            uncountable,
+            certificate(
+                rules.CertificateKind.COMPOSITION,
+                "field-projection-is-total-and-injective",
+            ),
+        ),
+    )
+    simple_program = ca.SimpleProgram(
+        seeds.intensional(
+            "u",
+            dependency,
+            configuration_contract=contract,
+            value_profile=alphabet.value_profile,
+            exactness_profile=seeds.ExactnessProfile.EXACT,
+        ),
+        alphabet,
+        frontier,
+        neighborhood,
+        relation,
+    )
+
+    result = ca.apply(simple_program, source)
+
+    assert isinstance(result, program.ApplicationComplete)
+    assert (
+        result.source_outcomes.support.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
+    assert (
+        result.applied_atoms.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
+    assert (
+        result.successor_quotient_with_derivation_fibers.presentation
+        is rules.SupportPresentation.INTENSIONAL
+    )
+    assert result.evidence.phases == tuple(program.ApplicationPhase)
+
+    finite_rule = rules.literal(
+        rules.OutcomeSpace(
+            rules.finite_support(
+                (
+                    no_successor(
+                        "cannot-enumerate-intensional-writes",
+                        rules.NoSuccessorOutcome.TERMINAL,
+                    ),
+                )
+            )
+        ),
+        contract=rule_contract,
+    )
+    rejected = ca.apply(
+        ca.SimpleProgram(
+            simple_program.seed,
+            alphabet,
+            frontier,
+            neighborhood,
+            finite_rule,
+        ),
+        source,
+    )
+    assert isinstance(rejected, program.ApplicationRejected)
+    assert rejected.fault.phase is program.ApplicationPhase.RESULT_VALIDATION
+    assert "intensional writable envelope" in rejected.fault.reason
 
 
 def test_resource_exhaustion_exists_only_in_bounded_external_results() -> None:

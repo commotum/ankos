@@ -271,3 +271,30 @@ def test_dynamic_fresh_template_may_resolve_no_current_capabilities() -> None:
 
     assert resolved.fresh == ()
     assert resolved.targets == ()
+
+
+def test_intensional_frontier_resolves_without_fabricating_finite_targets() -> None:
+    contract = loci.CarrierContract(loci.CarrierKind.FIELD)
+    source = loci.IntensionalConfiguration(
+        contract,
+        loci.selector_differential_germ("u", 1),
+        "exact-field-presentation",
+    )
+    region = frontiers.intensional(
+        "u",
+        loci.selector_differential_germ("u", 1),
+        configuration_contract=contract,
+        value_profile=alphabets.ValueProfile.STRUCTURAL,
+    )
+
+    resolved = region.resolve(source)
+
+    assert type(resolved) is frontiers.IntensionalWritableCapabilities
+    assert resolved.snapshot_identity == source.identity
+    assert resolved.region == region.descriptor
+    assert resolved.existing == ()
+    assert resolved.fresh == ()
+    assert resolved.targets == ()
+    assert resolved.reconstruction.region == region.descriptor
+    assert resolved.reconstruction.preserves_outside
+    assert resolved.reconstruction.complete

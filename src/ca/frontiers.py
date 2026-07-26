@@ -261,6 +261,113 @@ class WritableCapabilities:
 
 
 @dataclass(frozen=True)
+class IntensionalReconstructionEvidence:
+    """Closed reconstruction law for a non-enumerated writable envelope."""
+
+    snapshot_identity: str
+    region: loci.Region
+    target_contract: TargetContract
+    preserves_outside: bool = True
+    complete: bool = True
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.snapshot_identity) is not str or not self.snapshot_identity:
+            raise WritableResolutionError(
+                "intensional reconstruction needs a snapshot identity"
+            )
+        if type(self.region) is not loci.Region:
+            raise TypeError("intensional reconstruction region is not recognized")
+        if type(self.target_contract) is not TargetContract:
+            raise TypeError(
+                "intensional reconstruction target contract is not recognized"
+            )
+        if type(self.preserves_outside) is not bool or type(self.complete) is not bool:
+            raise TypeError(
+                "intensional reconstruction proof flags must be booleans"
+            )
+        if not self.preserves_outside or not self.complete:
+            raise WritableResolutionError(
+                "intensional reconstruction must be complete and preserve outside"
+            )
+        if type(self.version) is not int or self.version != 1:
+            raise WritableResolutionError(
+                f"unsupported intensional reconstruction version {self.version!r}"
+            )
+
+
+@dataclass(frozen=True)
+class IntensionalWritableCapabilities:
+    """One complete, closed, non-enumerated writable capability relation."""
+
+    snapshot_identity: str
+    region: loci.Region
+    effect_profile: EffectProfile
+    target_contract: TargetContract
+    reconstruction: IntensionalReconstructionEvidence
+    version: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.snapshot_identity) is not str or not self.snapshot_identity:
+            raise WritableResolutionError(
+                "intensional writable capabilities need a snapshot identity"
+            )
+        if type(self.region) is not loci.Region:
+            raise TypeError("intensional writable region is not recognized")
+        if type(self.effect_profile) is not EffectProfile:
+            raise TypeError("intensional writable effects are not recognized")
+        if not self.effect_profile.existing:
+            raise WritableResolutionError(
+                "intensional writable capabilities need an existing-target effect"
+            )
+        if self.effect_profile.fresh:
+            raise WritableResolutionError(
+                "non-enumerated fresh binding is not an implemented capability"
+            )
+        if type(self.target_contract) is not TargetContract:
+            raise TypeError("intensional writable target contract is not recognized")
+        if type(self.reconstruction) is not IntensionalReconstructionEvidence:
+            raise TypeError(
+                "intensional writable reconstruction evidence is not recognized"
+            )
+        if (
+            self.reconstruction.snapshot_identity != self.snapshot_identity
+            or self.reconstruction.region != self.region
+            or self.reconstruction.target_contract != self.target_contract
+        ):
+            raise WritableResolutionError(
+                "intensional writable reconstruction disagrees with its envelope"
+            )
+        if type(self.version) is not int or self.version != 1:
+            raise WritableResolutionError(
+                f"unsupported intensional writable version {self.version!r}"
+            )
+
+    @property
+    def existing(self) -> tuple[ExistingCapability, ...]:
+        """Finite Rule kernels see no fabricated enumerable capabilities."""
+
+        return ()
+
+    @property
+    def fresh(self) -> tuple[FreshCapability, ...]:
+        """Fresh identities cannot be invented from an intensional envelope."""
+
+        return ()
+
+    @property
+    def targets(self) -> tuple[loci.Locus | loci.FreshReference, ...]:
+        """The target set is denoted by ``region`` rather than enumerated."""
+
+        return ()
+
+
+ResolvedWritableCapabilities = (
+    WritableCapabilities | IntensionalWritableCapabilities
+)
+
+
+@dataclass(frozen=True)
 class WritableRegion(Generic[C, W]):
     """Closed resolver for one complete possible-write envelope."""
 
@@ -397,18 +504,21 @@ class WritableRegion(Generic[C, W]):
             return _part_fresh_namespaces(self.parts)
         return () if self.fresh_namespace is None else (self.fresh_namespace,)
 
-    def resolve(self, configuration: C) -> WritableCapabilities:
+    def resolve(self, configuration: C) -> ResolvedWritableCapabilities:
         """Resolve independently against one immutable configuration."""
 
         if self.parts:
             return self._resolve_composition(configuration)
 
         try:
-            if type(configuration) is not loci.FiniteConfiguration:
+            if type(configuration) not in (
+                loci.FiniteConfiguration,
+                loci.IntensionalConfiguration,
+            ):
                 raise WritableResolutionError(
-                    "finite WritableRegion resolution needs FiniteConfiguration"
+                    "WritableRegion resolution needs a recognized configuration"
                 )
-            snapshot_identity = configuration.identity
+            snapshot_identity = loci.configuration_identity(configuration)
             if (
                 self.configuration_contract is not None
                 and not self.configuration_contract.accepts(configuration.contract)
@@ -416,6 +526,27 @@ class WritableRegion(Generic[C, W]):
                 raise WritableResolutionError(
                     "WritableRegion does not accept this carrier contract"
                 )
+            if (
+                type(configuration) is loci.IntensionalConfiguration
+                or _requires_intensional_resolution(self.descriptor)
+            ):
+                if self.fresh_namespaces or self.effect_profile.fresh:
+                    raise WritableResolutionError(
+                        "non-enumerated fresh capabilities are not implemented"
+                    )
+                reconstruction = IntensionalReconstructionEvidence(
+                    snapshot_identity,
+                    self.descriptor,
+                    self.target_contract,
+                )
+                return IntensionalWritableCapabilities(
+                    snapshot_identity,
+                    self.descriptor,
+                    self.effect_profile,
+                    self.target_contract,
+                    reconstruction,
+                )
+            assert type(configuration) is loci.FiniteConfiguration
             targets, fresh_targets = _resolve_targets(
                 self.descriptor, configuration
             )
@@ -497,12 +628,18 @@ class WritableRegion(Generic[C, W]):
             reconstruction,
         )
 
-    def _resolve_composition(self, configuration: C) -> WritableCapabilities:
+    def _resolve_composition(
+        self,
+        configuration: C,
+    ) -> ResolvedWritableCapabilities:
         """Resolve each part under its own declarations, then compose targets."""
 
-        if type(configuration) is not loci.FiniteConfiguration:
+        if type(configuration) not in (
+            loci.FiniteConfiguration,
+            loci.IntensionalConfiguration,
+        ):
             raise WritableResolutionError(
-                "finite WritableRegion resolution needs FiniteConfiguration"
+                "writable composition needs a recognized configuration"
             )
         resolved_parts = tuple(part.resolve(configuration) for part in self.parts)
         snapshot_identity = loci.configuration_identity(configuration)
@@ -513,6 +650,27 @@ class WritableRegion(Generic[C, W]):
             raise WritableResolutionError(
                 "writable parts resolved against different snapshots"
             )
+        if any(
+            type(resolved) is IntensionalWritableCapabilities
+            for resolved in resolved_parts
+        ):
+            if self.fresh_namespaces or self.effect_profile.fresh:
+                raise WritableResolutionError(
+                    "non-enumerated fresh capabilities are not implemented"
+                )
+            reconstruction = IntensionalReconstructionEvidence(
+                snapshot_identity,
+                self.descriptor,
+                self.target_contract,
+            )
+            return IntensionalWritableCapabilities(
+                snapshot_identity,
+                self.descriptor,
+                self.effect_profile,
+                self.target_contract,
+                reconstruction,
+            )
+        assert all(type(resolved) is WritableCapabilities for resolved in resolved_parts)
 
         existing_by_target: dict[loci.Locus, ExistingCapability] = {}
         existing_order: list[loci.Locus] = []
@@ -592,6 +750,17 @@ def _resolve_targets(
 def _contains_fresh_template(region: loci.Region) -> bool:
     return bool(region.templates) or any(
         _contains_fresh_template(part) for part in region.parts
+    )
+
+
+def _requires_intensional_resolution(region: loci.Region) -> bool:
+    return region.kind in (
+        loci.RegionKind.CONTINUOUS,
+        loci.RegionKind.DIFFERENTIAL,
+        loci.RegionKind.INTENSIONAL,
+    ) or any(
+        _requires_intensional_resolution(part)
+        for part in region.parts
     )
 
 

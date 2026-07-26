@@ -130,6 +130,98 @@ class MechanicsRun:
     source: Configuration
     result: program.ApplicationResult
     representation: alphabets.RepresentationRelation | None = None
+    trajectory: tuple[
+        tuple[Configuration, program.ApplicationComplete],
+        ...,
+    ] = ()
+
+
+@dataclass(frozen=True)
+class FiniteRecipe:
+    """Exact test-owned finite mechanics expected from one family fixture."""
+
+    read_targets: tuple[loci.Locus, ...]
+    write_targets: tuple[loci.Locus, ...]
+    successor_entries: tuple[
+        tuple[tuple[loci.Locus, alphabets.SemanticValue], ...],
+        ...,
+    ]
+    stop: tuple[bool, ...]
+
+
+def _record_configuration(
+    fields: tuple[tuple[str, alphabets.SemanticValue], ...],
+) -> loci.FiniteConfiguration:
+    return loci.record_configuration(fields)
+
+
+def _structural_configuration(
+    kind: loci.CarrierKind,
+    entries: tuple[tuple[loci.Locus, alphabets.SemanticValue], ...],
+    *,
+    rank: int | None = None,
+    axes: tuple[str, ...] = (),
+    attributes: tuple[tuple[str, loci.ClosedScalar], ...] = (),
+) -> loci.FiniteConfiguration:
+    """Build a small variable-support carrier without an executor sidecar."""
+
+    return loci.FiniteConfiguration(
+        loci.Carrier(
+            loci.CarrierContract(kind, rank=rank, axes=axes),
+            loci.Boundary(loci.BoundaryPolicy.NONE),
+            attributes,
+        ),
+        entries,
+    )
+
+
+def _literal_regions(
+    source: loci.FiniteConfiguration,
+    alphabet: alphabets.Alphabet,
+    *,
+    write_targets: tuple[loci.Locus, ...],
+    read_targets: tuple[loci.Locus, ...],
+    effects: tuple[frontiers.Effect, ...] = (frontiers.Effect.REPLACE,),
+) -> tuple[frontiers.WritableRegion, neighborhoods.ReadableRegion]:
+    """Resolve the exact W/R named by a closed finite recipe."""
+
+    writable = frontiers.literal(
+        write_targets,
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=effects,
+    )
+    readable = neighborhoods.literal(
+        read_targets,
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        key="family-input",
+    )
+    return writable, readable
+
+
+def _existing_target_plan(
+    target: loci.Locus,
+    action: rules.DispositionAction,
+    value: rules.RuleExpr | None = None,
+) -> rules.ExistingDispositionPlan:
+    return rules.ExistingDispositionPlan(
+        rules.capability_target(target),
+        action,
+        value,
+    )
+
+
+def _fresh_target_plan(
+    target: loci.FreshReference,
+    action: rules.DispositionAction,
+    value: rules.RuleExpr | None = None,
+) -> rules.FreshDispositionPlan:
+    return rules.FreshDispositionPlan(
+        rules.capability_target(target),
+        action,
+        value,
+    )
 
 
 def _certificate(kind: rules.CertificateKind, label: str) -> rules.Certificate:
@@ -324,34 +416,156 @@ def _finite_history_components(
     return source, alphabet, writable, readable
 
 
+_PX01_CASES: dict[
+    str,
+    tuple[
+        tuple[tuple[str, int], ...],
+        tuple[str, ...],
+        tuple[str, ...],
+        tuple[tuple[tuple[str, int], ...], ...],
+        bool,
+    ],
+] = {
+    # fields, R, W, complete alternative write maps, stop
+    "SPF001": (
+        (("phase", 0), ("left", 1), ("right", 0), ("block", 0)),
+        ("phase", "left", "right", "block"),
+        ("phase", "left", "right", "block"),
+        ((("phase", 1), ("left", 0), ("right", 1), ("block", 1)),),
+        False,
+    ),
+    "SPF003": (
+        (("site0", 1), ("site1", 0), ("scheduler", 0)),
+        ("site0", "site1", "scheduler"),
+        ("site0", "scheduler"),
+        ((("site0", 0), ("scheduler", 1)),),
+        False,
+    ),
+    "SPF007": (
+        (("field0", 2), ("field1", 1), ("field2", 0), ("marker", 1), ("phase", 0)),
+        ("field0", "field1", "field2", "marker", "phase"),
+        ("field0", "field1", "field2", "marker", "phase"),
+        (
+            (
+                ("field0", 1),
+                ("field1", 1),
+                ("field2", 0),
+                ("marker", 2),
+                ("phase", 1),
+            ),
+        ),
+        False,
+    ),
+    "SPF008": (
+        (("register", 13), ("radix", 10), ("digit", -1), ("output_end", 0)),
+        ("register", "radix"),
+        ("register", "digit", "output_end"),
+        ((("register", 1), ("digit", 3), ("output_end", 1)),),
+        False,
+    ),
+    "SPF011": (
+        (("pixel", 6), ("threshold", 4), ("error", 0), ("cursor", 0)),
+        ("pixel", "threshold", "error", "cursor"),
+        ("pixel", "error", "cursor"),
+        ((("pixel", 1), ("error", 2), ("cursor", 1)),),
+        False,
+    ),
+    "SPF021": (
+        (("action_a", 1), ("action_b", 0), ("score_a", 0), ("score_b", 0), ("history", 0)),
+        ("action_a", "action_b", "score_a", "score_b", "history"),
+        ("score_a", "score_b", "history"),
+        ((("score_a", 1), ("score_b", -1), ("history", 2)),),
+        False,
+    ),
+    "SPF030": (
+        (("left", 0), ("source", 1), ("right", 0)),
+        ("left", "source", "right"),
+        ("left", "source", "right"),
+        (
+            (("left", 2), ("source", 0), ("right", 0)),
+            (("left", 0), ("source", 0), ("right", 2)),
+        ),
+        False,
+    ),
+    "SPF032": (
+        (("source_a", 1), ("source_b", 1), ("collision", 0), ("phase", 0)),
+        ("source_a", "source_b", "collision", "phase"),
+        ("source_a", "source_b", "collision", "phase"),
+        ((("source_a", 0), ("source_b", 0), ("collision", 2), ("phase", 1)),),
+        False,
+    ),
+    "SPF045": (
+        (("pc", 0), ("counter", 2), ("register", 5)),
+        ("pc", "counter", "register"),
+        ("pc", "counter", "register"),
+        ((("pc", 1), ("counter", 1), ("register", 7)),),
+        False,
+    ),
+    "SPF050": (
+        (("old0", 1), ("old1", 0), ("next0", 0), ("next1", 0), ("cursor", 0)),
+        ("old0", "old1", "cursor"),
+        ("next0", "next1", "cursor"),
+        ((("next0", 0), ("next1", 1), ("cursor", 2)),),
+        True,
+    ),
+    "SPF052": (
+        (("input", 2), ("weight", 3), ("bias", -1), ("activation", 0)),
+        ("input", "weight", "bias"),
+        ("activation",),
+        ((("activation", 5),),),
+        False,
+    ),
+}
+
+
+def _record_targets(
+    source: loci.FiniteConfiguration,
+) -> dict[str, loci.Locus]:
+    return {
+        str(target.path[-1]): target
+        for target, _ in source.entries
+    }
+
+
 def _px01(row: MechanicsRow) -> MechanicsRun:
     """Couple source, control, and every possible destination atomically."""
 
-    source, alphabet, writable, readable = _finite_history_components((0, 1, 0))
-    base = (
-        _existing_plan(0, rules.DispositionAction.REPLACE, rules.observation(1)),
-        _existing_plan(1, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
-        _existing_plan(2, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
+    fields, read_names, write_names, alternatives, stop = _PX01_CASES[row.spf]
+    source = _record_configuration(fields)
+    alphabet = alphabets.integers()
+    targets = _record_targets(source)
+    read_targets = tuple(targets[name] for name in read_names)
+    write_targets = tuple(targets[name] for name in write_names)
+    writable, readable = _literal_regions(
+        source,
+        alphabet,
+        write_targets=write_targets,
+        read_targets=read_targets,
     )
-    clauses = [_clause(rules.literal_expr(1), _derivation_result(row.fixture, existing=base))]
-    if row.spf == "SPF030":
-        other = (
-            _existing_plan(0, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
-            _existing_plan(1, rules.DispositionAction.REPLACE, rules.literal_expr(0)),
-            _existing_plan(2, rules.DispositionAction.REPLACE, rules.observation(1)),
+    clauses = tuple(
+        _clause(
+            rules.literal_expr(1),
+            _derivation_result(
+                f"{row.fixture}:alternative-{index}",
+                existing=tuple(
+                    _existing_target_plan(
+                        targets[name],
+                        rules.DispositionAction.REPLACE,
+                        rules.literal_expr(value),
+                    )
+                    for name, value in replacements
+                ),
+                stop=stop,
+            ),
         )
-        clauses.append(
-            _clause(
-                rules.equal(rules.observation(1), rules.literal_expr(1)),
-                _derivation_result(f"{row.fixture}:alternate", existing=other),
-            )
-        )
+        for index, replacements in enumerate(alternatives)
+    )
     rule = _kernel(
         source,
         alphabet,
         writable,
         readable,
-        tuple(clauses),
+        clauses,
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
 
@@ -1215,57 +1429,199 @@ def assert_mechanics_run(
     raise AssertionError(f"missing pressure assertion for {pressure}")
 
 
-def _ct12_stochastic() -> MechanicsRun:
-    """The frozen stochastic-search case: accept, reject, or no proposal."""
+def _ct12_expr(
+    tag: str,
+    *arguments: rules.RuleScalar | rules.RuleExpr,
+) -> rules.RuleExpr:
+    """Build inert semantic syntax independently of the frozen oracle module."""
 
-    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF047")
-    source, alphabet, writable, readable = _finite_history_components((0, 0))
-    accepted = _derivation_result(
-        "ct12-stochastic:accepted",
-        existing=(
-            _existing_plan(
-                0,
-                rules.DispositionAction.REPLACE,
-                rules.literal_expr(1),
+    return rules.RuleExpr(
+        rules.ExpressionPrimitive.TUPLE,
+        (
+            rules.literal_expr(tag),
+            *(
+                argument
+                if isinstance(argument, rules.RuleExpr)
+                else rules.literal_expr(argument)
+                for argument in arguments
             ),
         ),
     )
-    rejected = _derivation_result("ct12-stochastic:rejected-continue")
-    absent_proposal = _no_successor_result(
-        "ct12-stochastic:no-proposal",
-        rules.NoSuccessorOutcome.DECLARED_FAILURE,
-    )
-    rule = _kernel(
-        source,
-        alphabet,
-        writable,
-        readable,
-        (
-            _clause(rules.literal_expr(1), accepted, mass=Fraction(1, 2)),
-            _clause(rules.literal_expr(1), rejected, mass=Fraction(1, 4)),
-            _clause(rules.literal_expr(1), absent_proposal, mass=Fraction(1, 4)),
+
+
+def _ct12_value(
+    tag: str,
+    *items: alphabets.SemanticValue,
+    kind: alphabets.ValueKind = alphabets.ValueKind.SYMBOLIC,
+) -> alphabets.ValueNode:
+    return alphabets.ValueNode(kind, tag, items=items)
+
+
+def _ct12_certificate(
+    kind: rules.CertificateKind,
+    statement: rules.RuleExpr,
+) -> rules.Certificate:
+    return rules.Certificate(kind, statement)
+
+
+def _ct12_witness(statement: rules.RuleExpr) -> rules.Witness:
+    return rules.Witness(loci.canonical_identity(statement), statement)
+
+
+def _ct12_stop() -> rules.Stop:
+    return rules.Stop(
+        rules.literal_expr("completed"),
+        _ct12_certificate(
+            rules.CertificateKind.TERMINALITY,
+            _ct12_expr("terminal", "completed"),
         ),
-        stochastic=True,
+    )
+
+
+def _ct12_total_disposition(
+    writable: frontiers.WritableCapabilities,
+    *,
+    existing: tuple[
+        tuple[int, rules.DispositionAction, alphabets.SemanticValue | None],
+        ...,
+    ] = (),
+    fresh: tuple[
+        tuple[int, rules.DispositionAction, alphabets.SemanticValue | None],
+        ...,
+    ] = (),
+) -> rules.TotalDisposition:
+    existing_overrides = {index: (action, value) for index, action, value in existing}
+    fresh_overrides = {index: (action, value) for index, action, value in fresh}
+    if len(existing_overrides) != len(existing):
+        raise ValueError("CT12 existing disposition indices repeat")
+    if len(fresh_overrides) != len(fresh):
+        raise ValueError("CT12 fresh disposition indices repeat")
+
+    existing_dispositions = []
+    for index, capability in enumerate(writable.existing):
+        action, value = existing_overrides.get(
+            index,
+            (rules.DispositionAction.PRESERVE, None),
+        )
+        if action is rules.DispositionAction.PRESERVE:
+            existing_dispositions.append(rules.preserve(capability.target))
+        elif action is rules.DispositionAction.REPLACE:
+            assert value is not None
+            existing_dispositions.append(rules.replace(capability.target, value))
+        elif action is rules.DispositionAction.DELETE:
+            assert value is None
+            existing_dispositions.append(rules.delete(capability.target))
+        else:
+            raise ValueError("CT12 existing disposition action is invalid")
+
+    fresh_dispositions = []
+    for index, capability in enumerate(writable.fresh):
+        action, value = fresh_overrides.get(
+            index,
+            (rules.DispositionAction.ABSENT, None),
+        )
+        if action is rules.DispositionAction.ABSENT:
+            fresh_dispositions.append(rules.absent(capability.target))
+        elif action is rules.DispositionAction.CREATE:
+            assert value is not None
+            fresh_dispositions.append(rules.create(capability.target, value))
+        else:
+            raise ValueError("CT12 fresh disposition action is invalid")
+
+    return rules.TotalDisposition(
+        tuple(existing_dispositions),
+        tuple(fresh_dispositions),
+        _ct12_certificate(
+            rules.CertificateKind.TOTALITY,
+            _ct12_expr("totality", "complete-writable-envelope"),
+        ),
+    )
+
+
+def _ct12_derivation(
+    writable: frontiers.WritableCapabilities,
+    *,
+    witness: rules.RuleExpr,
+    provenance: tuple[str, ...],
+    certificate: rules.RuleExpr,
+    existing: tuple[
+        tuple[int, rules.DispositionAction, alphabets.SemanticValue | None],
+        ...,
+    ] = (),
+    fresh: tuple[
+        tuple[int, rules.DispositionAction, alphabets.SemanticValue | None],
+        ...,
+    ] = (),
+    stop: bool = False,
+) -> rules.Derivation:
+    return rules.Derivation(
+        _ct12_total_disposition(
+            writable,
+            existing=existing,
+            fresh=fresh,
+        ),
+        rules.Progress.ADVANCED,
+        _ct12_stop() if stop else rules.Continue(),
+        _ct12_witness(witness),
+        provenance,
+        _ct12_certificate(rules.CertificateKind.DERIVATION, certificate),
+    )
+
+
+def _ct12_no_successor(
+    *,
+    witness: rules.RuleExpr,
+    provenance: tuple[str, ...],
+    reason: rules.RuleExpr,
+    certificate: rules.RuleExpr,
+) -> rules.NoSuccessor:
+    return rules.NoSuccessor(
+        rules.NoSuccessorOutcome.TERMINAL,
+        reason,
+        _ct12_witness(witness),
+        provenance,
+        _ct12_certificate(rules.CertificateKind.TERMINALITY, certificate),
+    )
+
+
+def _ct12_literal_run(
+    row: MechanicsRow,
+    source: loci.FiniteConfiguration,
+    alphabet: alphabets.Alphabet,
+    writable: frontiers.WritableRegion,
+    readable: neighborhoods.ReadableRegion,
+    atoms: tuple[rules.Derivation | rules.NoSuccessor, ...],
+    *,
+    masses: tuple[Fraction, ...] | None = None,
+) -> MechanicsRun:
+    law = (
+        None
+        if masses is None
+        else rules.finite_probability_law(
+            tuple(zip(atoms, masses, strict=True))
+        )
+    )
+    rule = rules.finite_rule(
+        atoms,
+        contract=_contract(
+            source,
+            alphabet,
+            writable,
+            readable,
+            stochastic=masses is not None,
+        ),
+        probability_law=law,
+        label="ct12-independent-literal",
     )
     return _assemble(row, source, alphabet, writable, readable, rule)
 
 
-def _ct12_flow() -> MechanicsRun:
-    """The frozen exact-flow shape: one whole solution object and a stop."""
-
-    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF036")
-    initial = alphabets.ValueNode(
-        alphabets.ValueKind.FIELD,
-        "ode-state",
-        fields=(("equation", "dx/dt=1"), ("initial", 0)),
-    )
-    solution = alphabets.ValueNode(
-        alphabets.ValueKind.FIELD,
-        "ode-solution",
-        fields=(("domain", "[0,1]"), ("expression", "x(t)=t")),
-    )
-    source = loci.history_configuration((initial,))
-    alphabet = alphabets.field()
+def _ct12_mobile() -> MechanicsRun:
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF030")
+    head_q1 = _ct12_value("head", "q", 1)
+    head_p0 = _ct12_value("head", "p", 0)
+    source = loci.history_configuration((0, head_q1, 0))
+    alphabet = alphabets.enum((0, head_q1, head_p0))
     writable = frontiers.everywhere(
         configuration_contract=source.contract,
         value_profile=alphabet.value_profile,
@@ -1274,25 +1630,591 @@ def _ct12_flow() -> MechanicsRun:
         configuration_contract=source.contract,
         value_profile=alphabet.value_profile,
     )
-    rule = _kernel(
+    capabilities = writable.resolve(source)
+    left = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr("transition-witness", "q", 1, "p", 0, "left"),
+        provenance=("PX01:F031", "transition:left"),
+        certificate=_ct12_expr("single-head-certificate", -1),
+        existing=(
+            (0, rules.DispositionAction.REPLACE, head_p0),
+            (1, rules.DispositionAction.REPLACE, 0),
+        ),
+    )
+    right = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr("transition-witness", "q", 1, "p", 0, "right"),
+        provenance=("PX01:F031", "transition:right"),
+        certificate=_ct12_expr("single-head-certificate", 1),
+        existing=(
+            (1, rules.DispositionAction.REPLACE, 0),
+            (2, rules.DispositionAction.REPLACE, head_p0),
+        ),
+    )
+    return _ct12_literal_run(
+        row,
         source,
         alphabet,
         writable,
         readable,
+        (left, right),
+    )
+
+
+def _ct12_substitution() -> MechanicsRun:
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF037")
+    source = _word_configuration(("A", "B"))
+    alphabet = alphabets.enum(("A", "B"))
+    existing = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
+    )
+    parent = source.entries[0][0]
+    namespace = "px02.parallel-substitution"
+    fresh = frontiers.fresh(
+        loci.fresh_children(parent, namespace, ("old:0:0", "old:0:1")),
+        namespace=frontiers.FreshNamespace(namespace, parent=parent),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    writable = frontiers.union((existing, fresh))
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    capabilities = writable.resolve(source)
+    atom = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr(
+            "generation-witness",
+            "A->AB",
+            "B->epsilon",
+        ),
+        provenance=("PX02:F038",),
+        certificate=_ct12_expr(
+            "ordered-offspring-certificate",
+            _ct12_expr(
+                "fresh-slot",
+                "offspring",
+                _ct12_expr("occurrence", "old", 0),
+                0,
+            ),
+            _ct12_expr(
+                "fresh-slot",
+                "offspring",
+                _ct12_expr("occurrence", "old", 0),
+                1,
+            ),
+        ),
+        existing=(
+            (0, rules.DispositionAction.DELETE, None),
+            (1, rules.DispositionAction.DELETE, None),
+        ),
+        fresh=(
+            (0, rules.DispositionAction.CREATE, "A"),
+            (1, rules.DispositionAction.CREATE, "B"),
+        ),
+    )
+    return _ct12_literal_run(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        (atom,),
+    )
+
+
+def _ct12_multiway() -> MechanicsRun:
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF033")
+    source = _word_configuration(("a",))
+    alphabet = alphabets.enum(("a", "b"))
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    capabilities = writable.resolve(source)
+    atoms = tuple(
+        _ct12_derivation(
+            capabilities,
+            witness=_ct12_expr(
+                "rewrite-witness",
+                f"rule-{side}",
+                "match:0",
+                "parent:a",
+            ),
+            provenance=("PX04:F034", f"rule:{side}"),
+            certificate=_ct12_expr(
+                "rewrite-certificate",
+                "a->b",
+                side,
+            ),
+            existing=((0, rules.DispositionAction.REPLACE, "b"),),
+        )
+        for side in ("left", "right")
+    )
+    return _ct12_literal_run(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        atoms,
+    )
+
+
+def _ct12_constraint(rhs: int) -> MechanicsRun:
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF018")
+    source = loci.record_configuration(
         (
-            _clause(
-                rules.literal_expr(1),
-                _derivation_result(
-                    "ct12-exact-flow",
-                    existing=(
-                        _existing_plan(
-                            0,
-                            rules.DispositionAction.REPLACE,
-                            rules.literal_expr(solution),
-                        ),
+            ("domain", "Z/3Z"),
+            ("equation", "x^2=rhs"),
+            ("rhs", rhs),
+            ("x", "unset"),
+        )
+    )
+    alphabet = alphabets.enum(("Z/3Z", "x^2=rhs", "unset", 0, 1, 2))
+    x_target = next(
+        target for target, _ in source.entries if target.path[-1] == "x"
+    )
+    writable = frontiers.literal(
+        (x_target,),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    capabilities = writable.resolve(source)
+    if rhs == 2:
+        atoms: tuple[rules.Derivation | rules.NoSuccessor, ...] = (
+            _ct12_no_successor(
+                witness=_ct12_expr("relation-witness", "x^2=2", "Z/3Z"),
+                provenance=("PX04:F019", "rhs=2"),
+                reason=_ct12_expr("terminal", "no-solution"),
+                certificate=_ct12_expr(
+                    "truth-table",
+                    _ct12_expr(
+                        "row",
+                        0,
+                        _ct12_expr("square-residue", 0),
+                        False,
                     ),
-                    stop=True,
+                    _ct12_expr(
+                        "row",
+                        1,
+                        _ct12_expr("square-residue", 1),
+                        False,
+                    ),
+                    _ct12_expr(
+                        "row",
+                        2,
+                        _ct12_expr("square-residue", 1),
+                        False,
+                    ),
                 ),
+            ),
+        )
+    else:
+        solutions = (0,) if rhs == 0 else (1, 2)
+        atoms = tuple(
+            _ct12_derivation(
+                capabilities,
+                witness=_ct12_expr("solution-witness", "x", solution),
+                provenance=("PX04:F019", f"rhs={rhs}"),
+                certificate=_ct12_expr(
+                    "equation-certificate",
+                    f"{solution}^2={rhs} mod 3",
+                ),
+                existing=(
+                    (0, rules.DispositionAction.REPLACE, solution),
+                ),
+                stop=True,
+            )
+            for solution in solutions
+        )
+    return _ct12_literal_run(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        atoms,
+    )
+
+
+def _ct12_graph() -> MechanicsRun:
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF028")
+    node_a = loci.graph_element("node", "a")
+    node_b = loci.graph_element("node", "b")
+    node_c = loci.graph_element("node", "c")
+    edge_ab = loci.graph_element("edge", "a-b")
+    edge_bc = loci.graph_element("edge", "b-c")
+    node = lambda label: _ct12_value(  # noqa: E731
+        "node-value",
+        label,
+        kind=alphabets.ValueKind.GRAPH,
+    )
+    edge = lambda left, right: _ct12_value(  # noqa: E731
+        "edge-value",
+        left,
+        right,
+        kind=alphabets.ValueKind.GRAPH,
+    )
+    contract = loci.CarrierContract(loci.CarrierKind.GRAPH)
+    source = loci.FiniteConfiguration(
+        loci.Carrier(contract, loci.Boundary(loci.BoundaryPolicy.NONE)),
+        (
+            (node_a, node("a")),
+            (node_b, node("b")),
+            (node_c, node("c")),
+            (
+                edge_ab,
+                edge(
+                    alphabets.StructuralReference(node_a),
+                    alphabets.StructuralReference(node_b),
+                ),
+            ),
+            (
+                edge_bc,
+                edge(
+                    alphabets.StructuralReference(node_b),
+                    alphabets.StructuralReference(node_c),
+                ),
+            ),
+        ),
+    )
+    alphabet = alphabets.graph()
+    existing = frontiers.literal(
+        (node_b, edge_ab, edge_bc),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+        effects=(frontiers.Effect.REPLACE, frontiers.Effect.DELETE),
+    )
+    namespace = "px02.graph-interface-replacement"
+    fresh_nodes = frontiers.fresh(
+        loci.fresh_children(node_b, namespace, ("x", "y")),
+        namespace=frontiers.FreshNamespace(namespace, parent=node_b),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    fresh_edges = frontiers.fresh(
+        loci.fresh_edges(
+            (node_a, node_c),
+            namespace,
+            ("a-x", "x-y", "y-c"),
+        ),
+        namespace=frontiers.FreshNamespace(namespace),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    writable = frontiers.union((existing, fresh_nodes, fresh_edges))
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    capabilities = writable.resolve(source)
+    fresh_by_key = {
+        capability.target.local_key: (index, capability.target)
+        for index, capability in enumerate(capabilities.fresh)
+    }
+    x_index, x_ref = fresh_by_key["x"]
+    y_index, y_ref = fresh_by_key["y"]
+    ax_index, _ = fresh_by_key["a-x"]
+    xy_index, _ = fresh_by_key["x-y"]
+    yc_index, _ = fresh_by_key["y-c"]
+    existing_index = {
+        capability.target: index
+        for index, capability in enumerate(capabilities.existing)
+    }
+    atom = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr(
+            "match",
+            _ct12_expr("node", "b"),
+            _ct12_expr("ports", "a", "c"),
+        ),
+        provenance=("PX02:F029",),
+        certificate=_ct12_expr(
+            "interface-certificate",
+            _ct12_expr("external", "a", "c"),
+            _ct12_expr(
+                "authorized-fresh-slots",
+                *(
+                    _ct12_expr("fresh-slot", kind, key)
+                    for kind, key in (
+                        ("node", "x"),
+                        ("node", "y"),
+                        ("edge", "a-x"),
+                        ("edge", "x-y"),
+                        ("edge", "y-c"),
+                    )
+                ),
+            ),
+        ),
+        existing=tuple(
+            (
+                existing_index[target],
+                rules.DispositionAction.DELETE,
+                None,
+            )
+            for target in (node_b, edge_ab, edge_bc)
+        ),
+        fresh=(
+            (x_index, rules.DispositionAction.CREATE, node("x")),
+            (y_index, rules.DispositionAction.CREATE, node("y")),
+            (
+                ax_index,
+                rules.DispositionAction.CREATE,
+                edge(
+                    alphabets.StructuralReference(node_a),
+                    alphabets.StructuralReference(x_ref),
+                ),
+            ),
+            (
+                xy_index,
+                rules.DispositionAction.CREATE,
+                edge(
+                    alphabets.StructuralReference(x_ref),
+                    alphabets.StructuralReference(y_ref),
+                ),
+            ),
+            (
+                yc_index,
+                rules.DispositionAction.CREATE,
+                edge(
+                    alphabets.StructuralReference(y_ref),
+                    alphabets.StructuralReference(node_c),
+                ),
+            ),
+        ),
+    )
+    return _ct12_literal_run(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        (atom,),
+    )
+
+
+def _ct12_stochastic() -> MechanicsRun:
+    """The exact mixed search law: accept, reject-and-count, or no proposal."""
+
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF047")
+    source = loci.record_configuration((("x", 0), ("k", 0)))
+    alphabet = alphabets.integers()
+    writable = frontiers.everywhere(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    capabilities = writable.resolve(source)
+    by_name = {
+        str(capability.target.path[-1]): index
+        for index, capability in enumerate(capabilities.existing)
+    }
+    accepted = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr("proposal-witness", 1, "accepted"),
+        provenance=("PX06:F050",),
+        certificate=_ct12_expr(
+            "law-atom-certificate",
+            "accept",
+            Fraction(1, 2),
+        ),
+        existing=(
+            (by_name["x"], rules.DispositionAction.REPLACE, 1),
+            (by_name["k"], rules.DispositionAction.REPLACE, 1),
+        ),
+    )
+    rejected = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr("proposal-witness", 0, "rejected"),
+        provenance=("PX06:F050",),
+        certificate=_ct12_expr(
+            "law-atom-certificate",
+            "reject",
+            Fraction(1, 4),
+        ),
+        existing=(
+            (by_name["k"], rules.DispositionAction.REPLACE, 1),
+        ),
+    )
+    absent_proposal = _ct12_no_successor(
+        witness=_ct12_expr("proposal-witness", "none"),
+        provenance=("PX06:F050",),
+        reason=_ct12_expr("terminal", "no-proposal"),
+        certificate=_ct12_expr(
+            "law-atom-certificate",
+            "no-proposal",
+            Fraction(1, 4),
+        ),
+    )
+    return _ct12_literal_run(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        (accepted, rejected, absent_proposal),
+        masses=(Fraction(1, 2), Fraction(1, 4), Fraction(1, 4)),
+    )
+
+
+def _ct12_flow() -> MechanicsRun:
+    """One exact maximal solution object selected by closed differential data."""
+
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF036")
+    equation = _ct12_value("derivative-equals", "x", "t", 1)
+    initial = _ct12_value("initial-condition", "x", 0, 0)
+    solution = _ct12_value(
+        "maximal-solution",
+        _ct12_value("binder", "t", "exact-real"),
+        _ct12_value("equals", _ct12_value("x-of", "t"), "t"),
+        kind=alphabets.ValueKind.FIELD,
+    )
+    source = loci.record_configuration(
+        (
+            ("equation", equation),
+            ("initial", initial),
+            ("solution", "unset"),
+        )
+    )
+    alphabet = alphabets.enum((equation, initial, "unset", solution))
+    solution_target = next(
+        target for target, _ in source.entries if target.path[-1] == "solution"
+    )
+    writable = frontiers.literal(
+        (solution_target,),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    capabilities = writable.resolve(source)
+    atom = _ct12_derivation(
+        capabilities,
+        witness=_ct12_expr(
+            "differential-proof",
+            _ct12_expr("derivative-of", "t", "t", 1),
+            _ct12_expr("initial-value", 0, 0),
+            _ct12_expr("coverage", "maximal-exact-real-solution"),
+        ),
+        provenance=("PX05:F037",),
+        certificate=_ct12_expr(
+            "equation-and-initial-condition-certificate",
+            "exact",
+        ),
+        existing=((0, rules.DispositionAction.REPLACE, solution),),
+        stop=True,
+    )
+    return _ct12_literal_run(
+        row,
+        source,
+        alphabet,
+        writable,
+        readable,
+        (atom,),
+    )
+
+
+def _ct12_intensional() -> MechanicsRun:
+    row = next(row for row in MECHANICS_ROWS if row.spf == "SPF039")
+    domain = _ct12_value(
+        "closed-interval",
+        0,
+        1,
+        kind=alphabets.ValueKind.FIELD,
+    )
+    unknown = _ct12_value(
+        "unknown-field",
+        "u",
+        kind=alphabets.ValueKind.FIELD,
+    )
+    contract = loci.CarrierContract(loci.CarrierKind.FIELD)
+    domain_target = loci.named("domain", scope="field")
+    u_target = loci.named("u", scope="field")
+    source = loci.FiniteConfiguration(
+        loci.Carrier(contract, loci.Boundary(loci.BoundaryPolicy.NONE)),
+        ((domain_target, domain), (u_target, unknown)),
+    )
+    alphabet = alphabets.field()
+    writable = frontiers.literal(
+        (u_target,),
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    readable = neighborhoods.global_view(
+        configuration_contract=source.contract,
+        value_profile=alphabet.value_profile,
+    )
+    field_u = _ct12_expr("field-capability", "u")
+    relation = _ct12_expr(
+        "intensional-source-outcome-relation",
+        _ct12_expr("binder", "c"),
+        _ct12_expr("domain", "exact-real"),
+        _ct12_expr(
+            "source-derivation-template",
+            _ct12_expr(
+                "atom-id",
+                _ct12_expr("parameterized", "constant-field", "c"),
+            ),
+            _ct12_expr(
+                "total-disposition",
+                _ct12_expr(
+                    "replace",
+                    field_u,
+                    _ct12_expr("constant-field", "c"),
+                ),
+            ),
+            _ct12_expr(
+                "witness",
+                _ct12_expr("derivative", "u", "x"),
+                0,
+            ),
+            _ct12_expr("stop", "completed"),
+        ),
+    )
+    uncountable = rules.Many(
+        None,
+        rules.InfiniteCardinality.UNCOUNTABLE,
+        _certificate(
+            rules.CertificateKind.CARDINALITY,
+            "constant-field:uncountable",
+        ),
+    )
+    rule = rules.differential(
+        relation,
+        uncountable,
+        contract=_contract(source, alphabet, writable, readable),
+        completeness_evidence=_certificate(
+            rules.CertificateKind.COMPLETENESS,
+            "constant-field:complete",
+        ),
+        soundness_evidence=_certificate(
+            rules.CertificateKind.SOUNDNESS,
+            "constant-field:sound",
+        ),
+        projection_cardinalities=rules.ProjectionCardinalities(
+            uncountable,
+            rules.finite_cardinality(0),
+            uncountable,
+            _certificate(
+                rules.CertificateKind.COMPOSITION,
+                "constant-field:injective-total-projection",
             ),
         ),
     )
@@ -1304,18 +2226,16 @@ def runtime_ct12_fixture(case_id: str) -> MechanicsRun:
 
     rows = {row.spf: row for row in MECHANICS_ROWS}
     builders = {
-        "px01.mobile-head-branching": lambda: _px01(rows["SPF030"]),
-        "px02.parallel-substitution": lambda: _px02(rows["SPF037"]),
-        "px04.multiway-diamond": lambda: _px04(rows["SPF033"]),
-        "px04.constraint-mod3-zero": lambda: _px04(rows["SPF026"]),
-        "px04.constraint-mod3-one": lambda: _px04(rows["SPF014"]),
-        "px04.constraint-mod3-many": lambda: _px04(rows["SPF018"]),
-        "px02.graph-interface-replacement": lambda: _px02(rows["SPF028"]),
+        "px01.mobile-head-branching": _ct12_mobile,
+        "px02.parallel-substitution": _ct12_substitution,
+        "px04.multiway-diamond": _ct12_multiway,
+        "px04.constraint-mod3-zero": lambda: _ct12_constraint(2),
+        "px04.constraint-mod3-one": lambda: _ct12_constraint(0),
+        "px04.constraint-mod3-many": lambda: _ct12_constraint(1),
+        "px02.graph-interface-replacement": _ct12_graph,
         "px06.stochastic-search-law": _ct12_stochastic,
         "px05.exact-differential-flow": _ct12_flow,
-        "px05.constant-field-intensional": lambda: _px05_intensional(
-            rows["SPF039"]
-        ),
+        "px05.constant-field-intensional": _ct12_intensional,
     }
     try:
         execution = builders[case_id]()
