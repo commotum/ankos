@@ -79,6 +79,9 @@ def _assert_single_deterministic_successor(
     expected: loci.FiniteConfiguration,
 ) -> loci.FiniteConfiguration:
     assert type(result) is program.ApplicationComplete
+    encoded = serialization.dumps(result)
+    assert serialization.loads(encoded) == serialization.Decoded(result)
+    assert serialization.dumps(result) == encoded
     assert (
         result.source_outcomes.support.presentation
         is rules.SupportPresentation.FINITE

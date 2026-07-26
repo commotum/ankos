@@ -790,6 +790,28 @@ else:
     assert completed.returncode == 0, completed.stderr
 
 
+@pytest.mark.parametrize(
+    "member",
+    (
+        alphabets.AlphabetKind.RATIONAL_INTERVAL,
+        alphabets.ValuePredicateKind.EQUAL,
+        alphabets.AnchorCardinality.EXACTLY_ONE,
+        rules.RulePrimitive.ANCHORED_CLAUSE_KERNEL,
+        rules.ExpressionPrimitive.BOUND_VALUE,
+        rules.SequenceBoundary.FIXED,
+        rules.RewriteScan.RULE_PRIORITY_FIRST,
+        rules.CapabilitySelectorKind.GROUP_ITEM,
+        rules.ProposalConflictPolicy.REQUIRE_EQUAL,
+    ),
+)
+def test_each_reopened_enum_schema_rejects_an_unknown_value(
+    member: Enum,
+) -> None:
+    envelope = json.loads(serialization.dumps(member))
+    envelope["payload"]["value"] = "future-reopened-member"
+    _assert_rejected(_redigest(envelope), "unknown-enum-value")
+
+
 def test_unknown_lossy_noncanonical_or_forged_payloads_fail_closed() -> None:
     """Hostile schema and integrity mutations cannot default or migrate."""
 
@@ -870,6 +892,266 @@ def test_unknown_lossy_noncanonical_or_forged_payloads_fail_closed() -> None:
     _assert_rejected(duplicate, "duplicate-field")
 
 
+def test_reopened_expression_nested_wire_mutations_fail_closed() -> None:
+    """Nested scan, boundary, exterior, and offset structure is validated."""
+
+    expressions = _reopened_mode_expression_samples()
+
+    sliding = json.loads(serialization.dumps(expressions[0]))
+    sliding_arguments = sliding["payload"]["arguments"]["payload"]["items"]
+    sliding_arguments[3]["payload"]["value"] = "future-boundary"
+    _assert_rejected(_redigest(sliding), "invalid-descriptor")
+
+    pattern = json.loads(serialization.dumps(expressions[3]))
+    pattern_arguments = pattern["payload"]["arguments"]["payload"]["items"]
+    pattern_arguments[2]["payload"]["value"] = "future-scan"
+    _assert_rejected(_redigest(pattern), "invalid-descriptor")
+
+    mosaic = json.loads(serialization.dumps(expressions[7]))
+    mosaic_arguments = mosaic["payload"]["arguments"]["payload"]["items"]
+    mosaic_arguments[2]["payload"]["tag"]["payload"]["value"] = (
+        "forged-offsets"
+    )
+    _assert_rejected(_redigest(mosaic), "invalid-descriptor")
+
+    missing_exterior = json.loads(serialization.dumps(expressions[7]))
+    missing_arguments = (
+        missing_exterior["payload"]["arguments"]["payload"]["items"]
+    )
+    missing_arguments.pop()
+    _assert_rejected(_redigest(missing_exterior), "invalid-descriptor")
+
+
+def test_expanded_v1_records_reject_pre_delta_missing_fields() -> None:
+    """Reopened v1 shapes cannot silently fill their newly required fields."""
+
+    simple_program, _, resolved = _anchored_fixture()
+    selector = rules.capability_group_item(0, 0)
+    expanded = (
+        (simple_program.frontier, "value_anchor"),
+        (simple_program.neighborhood, "value_anchor"),
+        (resolved.dependencies[0], "value_anchor"),
+        (selector, "channel"),
+        (selector, "item"),
+    )
+
+    for value, field in expanded:
+        envelope = json.loads(serialization.dumps(value))
+        del envelope["payload"][field]
+        _assert_rejected(_redigest(envelope), "missing-field")
+
+
+def test_expanded_record_invariants_reject_hostile_wire_values() -> None:
+    """Non-default anchor/selector fields remain locally fail-closed."""
+
+    simple_program, _, resolved = _anchored_fixture()
+
+    negative_channel = json.loads(
+        serialization.dumps(rules.capability_group_item(0, 0))
+    )
+    negative_channel["payload"]["channel"] = _nested_wire_value(-1)
+    _assert_rejected(_redigest(negative_channel), "invalid-descriptor")
+
+    boolean_item = json.loads(
+        serialization.dumps(rules.capability_group_item(0, 0))
+    )
+    boolean_item["payload"]["item"] = _nested_wire_value(True)
+    _assert_rejected(_redigest(boolean_item), "invalid-descriptor")
+
+    forbidden_index = json.loads(
+        serialization.dumps(rules.capability_group_item(0, 0))
+    )
+    forbidden_index["payload"]["index"] = _nested_wire_value(0)
+    _assert_rejected(_redigest(forbidden_index), "invalid-descriptor")
+
+    hidden_selector = json.loads(
+        serialization.dumps(simple_program.neighborhood)
+    )
+    hidden_selector["payload"]["selector"] = _nested_wire_value(
+        loci.selector_tagged("forbidden")
+    )
+    _assert_rejected(_redigest(hidden_selector), "invalid-descriptor")
+
+    dependency_selector = json.loads(
+        serialization.dumps(resolved.dependencies[0])
+    )
+    dependency_selector["payload"]["selector"] = _nested_wire_value(
+        loci.selector_tagged("forbidden")
+    )
+    _assert_rejected(_redigest(dependency_selector), "invalid-descriptor")
+
+    wrong_writable_descriptor = json.loads(
+        serialization.dumps(simple_program.frontier)
+    )
+    wrong_writable_descriptor["payload"]["descriptor"] = _nested_wire_value(
+        loci.all_support()
+    )
+    _assert_rejected(
+        _redigest(wrong_writable_descriptor),
+        "invalid-descriptor",
+    )
+
+
+def test_reopened_predicate_and_interval_wire_mutations_fail_closed() -> None:
+    """New selector and exact-interval records reject forged inhabitants."""
+
+    path = alphabets.ValuePath(("state", 0))
+    invalid_path = json.loads(serialization.dumps(path))
+    path_items = invalid_path["payload"]["segments"]["payload"]["items"]
+    path_items[1] = _nested_wire_value(True)
+    _assert_rejected(_redigest(invalid_path), "invalid-descriptor")
+
+    equal = alphabets.value_equals(True)
+    conjunction = alphabets.value_and(
+        (equal, alphabets.value_not(equal))
+    )
+    invalid_conjunction = json.loads(serialization.dumps(conjunction))
+    children = invalid_conjunction["payload"]["children"]["payload"]["items"]
+    children.pop()
+    _assert_rejected(_redigest(invalid_conjunction), "invalid-descriptor")
+
+    invalid_equal = json.loads(serialization.dumps(equal))
+    invalid_equal["payload"]["expected"] = _nested_wire_value(None)
+    _assert_rejected(_redigest(invalid_equal), "invalid-descriptor")
+
+    invalid_anchor = json.loads(
+        serialization.dumps(alphabets.ValueAnchor(equal))
+    )
+    invalid_anchor["payload"]["cardinality"]["payload"]["value"] = (
+        "future-cardinality"
+    )
+    _assert_rejected(_redigest(invalid_anchor), "unknown-enum-value")
+
+    interval = alphabets.rational_interval(
+        Fraction(-1, 2),
+        Fraction(3, 2),
+    ).descriptor
+
+    def scalar_items(
+        envelope: dict[str, object],
+    ) -> tuple[list[object], dict[str, list[object]]]:
+        items = envelope["payload"]["scalars"]["payload"]["items"]
+        by_name = {
+            pair["payload"]["items"][0]["payload"]["value"]: (
+                pair["payload"]["items"]
+            )
+            for pair in items
+        }
+        return items, by_name
+
+    reordered = json.loads(serialization.dumps(interval))
+    items, _ = scalar_items(reordered)
+    items.reverse()
+    _assert_rejected(_redigest(reordered), "invalid-descriptor")
+
+    missing = json.loads(serialization.dumps(interval))
+    items, _ = scalar_items(missing)
+    items.pop()
+    _assert_rejected(_redigest(missing), "invalid-descriptor")
+
+    integer_bound = json.loads(serialization.dumps(interval))
+    _, parameters = scalar_items(integer_bound)
+    parameters["lower"][1] = _nested_wire_value(0)
+    _assert_rejected(_redigest(integer_bound), "invalid-descriptor")
+
+    reversed_bounds = json.loads(serialization.dumps(interval))
+    _, parameters = scalar_items(reversed_bounds)
+    parameters["lower"][1] = _nested_wire_value(Fraction(2))
+    parameters["upper"][1] = _nested_wire_value(Fraction(1))
+    _assert_rejected(_redigest(reversed_bounds), "invalid-descriptor")
+
+    empty_interval = json.loads(serialization.dumps(interval))
+    _, parameters = scalar_items(empty_interval)
+    parameters["lower"][1] = _nested_wire_value(Fraction(1))
+    parameters["upper"][1] = _nested_wire_value(Fraction(1))
+    parameters["lower_closed"][1] = _nested_wire_value(False)
+    _assert_rejected(_redigest(empty_interval), "invalid-descriptor")
+
+
+def test_composite_value_wire_order_and_semantic_keys_are_canonical() -> None:
+    """Maps and named structural fields cannot admit a second byte spelling."""
+
+    semantic_map = alphabets.map_value(
+        (
+            alphabets.map_entry_value(False, "boolean"),
+            alphabets.map_entry_value(0, "integer"),
+        ),
+        tag="semantic-keys",
+    )
+    reversed_map = json.loads(serialization.dumps(semantic_map))
+    map_items = reversed_map["payload"]["items"]["payload"]["items"]
+    map_items.reverse()
+    _assert_rejected(_redigest(reversed_map), "noncanonical-encoding")
+
+    duplicate_key = json.loads(serialization.dumps(semantic_map))
+    map_items = duplicate_key["payload"]["items"]["payload"]["items"]
+    first_key = map_items[0]["payload"]["items"]["payload"]["items"][0]
+    second_items = map_items[1]["payload"]["items"]["payload"]["items"]
+    second_items[0] = deepcopy(first_key)
+    _assert_rejected(_redigest(duplicate_key), "invalid-descriptor")
+
+    field = alphabets.grid_field_value(
+        ("x", "y"),
+        (1, 2),
+        (0, 1),
+        tag="canonical-field",
+    )
+    reversed_fields = json.loads(serialization.dumps(field))
+    fields = reversed_fields["payload"]["fields"]["payload"]["items"]
+    fields.reverse()
+    _assert_rejected(
+        _redigest(reversed_fields),
+        "noncanonical-encoding",
+    )
+
+
+def test_hostile_anchored_rule_graphs_fail_closed() -> None:
+    """Decoded anchored Rules must satisfy builder-level graph contracts."""
+
+    weighted_program, _, _ = _anchored_fixture(mass=Fraction(1))
+    anchored_rule = weighted_program.rule
+
+    wrong_entropy = json.loads(serialization.dumps(anchored_rule))
+    contract = wrong_entropy["payload"]["contract"]["payload"]
+    contract["entropy_interface"] = _nested_wire_value(
+        seeds.EntropyInterface.NONE
+    )
+    _assert_rejected(_redigest(wrong_entropy), "invalid-descriptor")
+
+    missing_effect = json.loads(serialization.dumps(anchored_rule))
+    contract = missing_effect["payload"]["contract"]["payload"]
+    effect_profile = contract["required_effect_profile"]["payload"]
+    effect_profile["existing"] = _nested_wire_value(())
+    _assert_rejected(_redigest(missing_effect), "invalid-descriptor")
+
+    def denotation_payload(envelope: dict[str, object]) -> dict[str, object]:
+        return envelope["payload"]["descriptor"]["payload"]["denotation"][
+            "payload"
+        ]
+
+    wrong_channel = json.loads(serialization.dumps(anchored_rule))
+    denotation_payload(wrong_channel)["group_channel"] = _nested_wire_value(
+        True
+    )
+    _assert_rejected(_redigest(wrong_channel), "invalid-descriptor")
+
+    wrong_selector = json.loads(serialization.dumps(anchored_rule))
+    denotation = denotation_payload(wrong_selector)
+    clause = denotation["clauses"]["payload"]["items"][0]["payload"]
+    clause_result = clause["result"]
+    plan = clause_result["payload"]["existing_plans"]["payload"]["items"][0]
+    plan["payload"]["selector"] = _nested_wire_value(
+        rules.capability_index(0)
+    )
+    _assert_rejected(_redigest(wrong_selector), "invalid-descriptor")
+
+    proposed_zero = json.loads(serialization.dumps(anchored_rule))
+    denotation = denotation_payload(proposed_zero)
+    clause = denotation["clauses"]["payload"]["items"][0]["payload"]
+    denotation["zero_result"] = deepcopy(clause["result"])
+    _assert_rejected(_redigest(proposed_zero), "invalid-descriptor")
+
+
 def test_hostile_value_anchored_readable_views_fail_closed() -> None:
     source = loci.grid_configuration(
         (3,),
@@ -927,6 +1209,53 @@ def test_hostile_value_anchored_readable_views_fail_closed() -> None:
         _redigest(missing_source_anchor),
         "invalid-descriptor",
     )
+
+    multiple_source = loci.grid_configuration(
+        (3,),
+        (True, False, True),
+        boundary=loci.Boundary(loci.BoundaryPolicy.PERIODIC),
+        axes=("x",),
+    )
+    multiple = neighborhoods.value_relative(
+        alphabets.ValueAnchor(
+            alphabets.value_equals(True),
+            alphabets.AnchorCardinality.ONE_OR_MORE,
+        ),
+        ((0,),),
+        configuration_contract=multiple_source.contract,
+        value_profile=alphabets.ValueProfile.BOOLEAN,
+    ).resolve(multiple_source)
+    false_singleton = json.loads(serialization.dumps(multiple))
+    dependency = false_singleton["payload"]["dependencies"]["payload"][
+        "items"
+    ][0]
+    dependency["payload"]["value_anchor"]["payload"]["cardinality"] = (
+        _nested_wire_value(alphabets.AnchorCardinality.EXACTLY_ONE)
+    )
+    _assert_rejected(_redigest(false_singleton), "invalid-descriptor")
+
+    relation = loci.selector_tagged("codec-intensional")
+    intensional_contract = loci.CarrierContract(
+        loci.CarrierKind.INTENSIONAL
+    )
+    intensional_source = loci.IntensionalConfiguration(
+        intensional_contract,
+        relation,
+        "codec-intensional-source",
+    )
+    intensional = neighborhoods.intensional(
+        "x",
+        relation,
+        configuration_contract=intensional_contract,
+        value_profile=alphabets.ValueProfile.SYMBOLIC,
+        exactness_profile=seeds.ExactnessProfile.SYMBOLIC,
+    ).resolve(intensional_source)
+    assert type(intensional) is neighborhoods.IntensionalReadableView
+    finite_anchor = json.loads(serialization.dumps(intensional))
+    finite_anchor["payload"]["dependencies"]["payload"]["items"][0] = (
+        _nested_wire_value(multiple.dependencies[0])
+    )
+    _assert_rejected(_redigest(finite_anchor), "invalid-descriptor")
 
 
 def test_hostile_readable_group_identity_mutations_fail_closed() -> None:

@@ -109,6 +109,12 @@ def _public_apply_field(
     applied = ca.apply(simple_program, source)
 
     assert type(applied) is program.ApplicationComplete
+    for semantic_value in (simple_program, applied):
+        encoded = ca.serialization.dumps(semantic_value)
+        assert ca.serialization.loads(encoded) == (
+            ca.serialization.Decoded(semantic_value)
+        )
+        assert ca.serialization.dumps(semantic_value) == encoded
     groups = applied.successor_quotient_with_derivation_fibers.atoms
     assert len(groups) == 1
     assert type(groups[0]) is program.SuccessorGroup
