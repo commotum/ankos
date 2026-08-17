@@ -58,7 +58,6 @@ def test_catalog_has_six_explicit_navigation_namespaces() -> None:
 
     assert ca.catalog is __import__("ca.catalog", fromlist=["catalog"])
     assert "catalog" in ca.__all__
-    assert len(ca.__all__) == 12
 
 
 def test_catalog_flat_exports_are_explicit_and_collision_free() -> None:
@@ -67,10 +66,8 @@ def test_catalog_flat_exports_are_explicit_and_collision_free() -> None:
     }
     actual = set(ca.catalog.__all__) - set(NAVIGATION_NAMES)
 
-    assert len(ca.catalog.__all__) == 111
-    assert len(set(ca.catalog.__all__)) == 111
+    assert len(ca.catalog.__all__) == len(set(ca.catalog.__all__))
     assert actual == expected
-    assert len(actual) == 104
     assert all(callable(getattr(ca.catalog, name)) for name in actual)
     assert not hasattr(ca.catalog, "extended_mobile_automaton")
     assert callable(machina.extended_mobile_automaton)

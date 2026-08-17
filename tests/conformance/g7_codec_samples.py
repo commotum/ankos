@@ -1,9 +1,8 @@
-"""Closed representative values for the exhaustive G7-03 codec contract.
+"""Closed representative values for the exhaustive codec contract.
 
-The mechanics ledger already supplies the richest realistic object graphs in
-the suite.  This module traverses those graphs and a deliberately small set of
-codec-only edge fixtures, then selects one valid instance of every registered
-record type.  Enum coverage is stronger: every member is included.
+This module traverses a deliberately small set of independently constructed
+runtime and codec edge fixtures, then selects one valid instance of every
+registered record type.  Enum coverage is stronger: every member is included.
 
 Nothing here is a production registry or constructor fallback.  The helper is
 test-owned, imports only semantic owners, and fails if a newly sealed type has
@@ -21,7 +20,7 @@ from types import ModuleType
 import ca
 from ca import alphabets, frontiers, loci, neighborhoods, program, rules, seeds
 
-from g7_mechanics import MECHANICS_ROWS, run_mechanics_fixture
+from g7_fixtures import derivation, finite_record_program
 
 
 OWNER_NAMES = (
@@ -436,11 +435,146 @@ def _rule_samples() -> tuple[object, ...]:
     )
 
 
+def _variant_samples() -> tuple[object, ...]:
+    """Supply intentional representatives for closed sum-type variants."""
+
+    encoded = alphabets.ValueNode(
+        alphabets.ValueKind.TAG,
+        "codec-bit",
+        items=(1,),
+    )
+    forward = alphabets.RepresentationPair(True, encoded)
+    inverse = alphabets.RepresentationPair(encoded, True)
+    relation = alphabets.RepresentationRelation(
+        alphabets.enum((True,)).descriptor,
+        alphabets.enum((encoded,)).descriptor,
+        alphabets.RepresentationProfile.EXACT,
+        (forward,),
+        (encoded,),
+        inverse_evidence=(inverse,),
+    )
+
+    cardinality = _certificate(
+        rules.CertificateKind.CARDINALITY,
+        "codec-many",
+    )
+    completeness = _certificate(
+        rules.CertificateKind.COMPLETENESS,
+        "codec-complete",
+    )
+    soundness = _certificate(
+        rules.CertificateKind.SOUNDNESS,
+        "codec-sound",
+    )
+    terminality = _certificate(
+        rules.CertificateKind.TERMINALITY,
+        "codec-terminal",
+    )
+    reason = rules.literal_expr("codec-terminal")
+    witness = rules.Witness("codec-no-successor", reason)
+    no_successor = rules.NoSuccessor(
+        rules.NoSuccessorOutcome.TERMINAL,
+        reason,
+        witness,
+        ("codec:no-successor",),
+        terminality,
+    )
+    no_successor_clause = rules.NoSuccessorClauseResult(
+        rules.NoSuccessorOutcome.TERMINAL,
+        reason,
+        reason,
+        ("codec:no-successor-clause",),
+        terminality,
+    )
+    atom_mass = rules.AtomMass("codec-atom", Fraction(1))
+    probability_law = rules.ProbabilityLaw(
+        rules.ProbabilityPresentation.FINITE,
+        (atom_mass,),
+        None,
+        _certificate(
+            rules.CertificateKind.NORMALIZATION,
+            "codec-normalization",
+        ),
+        _certificate(
+            rules.CertificateKind.MEASURABILITY,
+            "codec-measurability",
+        ),
+    )
+    many = rules.Many(2, None, cardinality)
+    intensional = rules.IntensionalDenotation(
+        rules.literal_expr("codec-intensional-relation"),
+        many,
+        completeness,
+        soundness,
+    )
+    kernel = rules.ClauseKernelDenotation(
+        (rules.RuleClause(rules.literal_expr(True), no_successor_clause),),
+        rules.ClauseSelection.FIRST,
+        completeness,
+    )
+    fresh = loci.fresh_reference("codec-variants", "child")
+    fresh_plan = rules.FreshDispositionPlan(
+        rules.capability_target(fresh),
+        rules.DispositionAction.CREATE,
+        rules.literal_expr(True),
+    )
+    stop = rules.Stop(reason, terminality)
+
+    input_lineage = program.TraceLineage("codec-input")
+    output_lineage = program.TraceLineage(
+        "codec-input",
+        ("codec-output",),
+    )
+    applied_no_successor = program.AppliedNoSuccessor(
+        no_successor,
+        input_lineage,
+        output_lineage,
+        program.AppliedEvidence("codec-application", "codec-disposition"),
+    )
+    fresh_binding = program.FreshBinding(
+        fresh,
+        loci.bind_fresh(
+            fresh,
+            input_configuration_identity="codec-input",
+            canonical_rule_identity="codec-rule",
+            witness_identity="codec-witness",
+        ),
+    )
+    measure_mass = program.MeasureMass("codec-point", Fraction(1))
+    measure = program.ProgramMeasure((measure_mass,), Fraction(1))
+    available = program.MeasureAvailable(measure)
+
+    return (
+        relation,
+        rules.NoPayload(),
+        no_successor,
+        no_successor_clause,
+        probability_law,
+        intensional,
+        kernel,
+        fresh_plan,
+        stop,
+        applied_no_successor,
+        fresh_binding,
+        available,
+    )
+
+
 def _program_samples() -> tuple[object, ...]:
-    execution = run_mechanics_fixture(MECHANICS_ROWS[0])
-    simple_program = execution.simple_program
-    source = execution.source
-    application = execution.result
+    def atoms(targets: tuple[loci.Locus, ...]) -> tuple[rules.Derivation, ...]:
+        return (
+            derivation(
+                "codec-program",
+                existing=(rules.replace(targets[0], True),),
+            ),
+        )
+
+    simple_program, source = finite_record_program(
+        (("value", False),),
+        atoms,
+        effects=(frontiers.Effect.REPLACE,),
+    )
+    application = ca.apply(simple_program, source)
     rollout = ca.rollout(
         simple_program,
         steps=1,
@@ -490,6 +624,9 @@ def _program_samples() -> tuple[object, ...]:
         (draw,),
     )
     return (
+        simple_program,
+        source,
+        application,
         compatibility,
         program.ApplicationInput(
             source,
@@ -548,10 +685,10 @@ def representative_values() -> tuple[object, ...]:
     selected: dict[type[object], object] = {}
     visited: set[int] = set()
     roots = (
-        *(run_mechanics_fixture(row) for row in MECHANICS_ROWS),
         *_resolved_samples(),
         *_exact_value_samples(),
         *_rule_samples(),
+        *_variant_samples(),
         *_program_samples(),
     )
     for root in roots:

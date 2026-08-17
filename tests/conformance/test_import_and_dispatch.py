@@ -17,7 +17,6 @@ import pytest
 import ca
 from ca import program
 
-from g7_catalog_manifest import CANONICAL_ROWS, LEGACY_CALLABLE_ROWS
 from g7_fixtures import diamond_program, native_program
 
 
@@ -509,15 +508,13 @@ def test_public_surface_submodules_and_signatures_are_exact() -> None:
         "-> 'RolloutResult[C]'"
     )
     assert callable(ca.rollout)
-    catalog_constructor_names = {
-        row[2].replace("-", "_")
-        for row in CANONICAL_ROWS
-    } | {
-        row[0]
-        for row in LEGACY_CALLABLE_ROWS
+    catalog_callable_names = {
+        name
+        for name in ca.catalog.__all__
+        if callable(getattr(ca.catalog, name))
     }
     assert not {
-        name for name in catalog_constructor_names if hasattr(ca, name)
+        name for name in catalog_callable_names if hasattr(ca, name)
     }
     for submodule in OBSOLETE_PUBLIC_SUBMODULES:
         qualified = f"ca.{submodule}"
