@@ -1,4 +1,4 @@
-"""Shared live Goal 7 conformance assertions."""
+"""Shared runtime conformance assertions."""
 
 from dataclasses import fields, is_dataclass
 from enum import Enum
@@ -9,8 +9,6 @@ import ca
 
 
 T = TypeVar("T")
-L = TypeVar("L")
-R = TypeVar("R")
 Source = TypeVar("Source")
 
 
@@ -80,12 +78,6 @@ def assert_closed_descriptor(value: T) -> None:
         decoded = ca.serialization.loads(blob)
         assert decoded == ca.serialization.Decoded(value)
         assert ca.serialization.dumps(decoded.value) == blob
-
-
-def assert_full_application_equal(left: L, right: R) -> None:
-    """Compare every source, applied, quotient, measure, and evidence record."""
-
-    assert left == right
 
 
 def assert_no_authoritative_commit(

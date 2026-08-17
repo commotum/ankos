@@ -1,4 +1,4 @@
-"""Navigation and explicit export join for whole-program constructors.
+"""Navigation and explicit export join for whole-program catalog spellings.
 
 The six owner modules classify audited constructions by dominant mechanic;
 ``entries`` owns callable-free provenance shells.  This package initializer is
@@ -6,10 +6,10 @@ the sole join between those namespaces.  It does not synthesize functions,
 dispatch by family or ID, construct programs, or attach catalog identity to a
 program.
 
-This module flat-exports all canonical, preset, and true-alias spellings
-explicitly.  The sole deprecated compatibility spelling remains qualified as
+This module flat-exports all canonical development stubs, implemented presets,
+and true-alias spellings explicitly.  The sole deprecated compatibility spelling remains qualified as
 ``ca.catalog.machina.extended_mobile_automaton``.  Root ``ca`` exposes this
-namespace but does not flatten any catalog constructor.
+namespace but does not flatten any catalog spelling.
 """
 
 from __future__ import annotations

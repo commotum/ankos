@@ -7,16 +7,16 @@
    produced the frozen Goal 2 handoff.
 2. [Goal 2](goal-2/README.md) — the original implementation and conformance
    handoff. Frozen as a comparison baseline; it is evidence for the completed
-   Goal 6 remaster and completed Goal 7 implementation, not the current plan
-   to execute.
+   Goal 6 remaster and the preserved runtime portion of Goal 7, not the current
+   plan to execute.
 3. [Goal 3](goal-3/0-plan.md) — source-verified correction and release of the
    canonical *A New Kind of Science* Markdown corpus. Complete; its compact
    historical plan and release record remain.
 4. [Goal 4](goal-4/README.md) — retired whole-book audit attempt. Its stale
    generated machinery was removed; one archival record remains.
 5. [Goal 5](goal-5/taxonomy-census.md) — completed whole-book construction
-   taxonomy and five-field API audit. Complete: 60 executable semantic
-   families, two close non-family roles, 41 family-level additions, and no
+   taxonomy and five-field API audit. Complete: 60 audited semantic-family
+   obligations, two close non-family roles, 41 family-level additions, and no
    unresolved taxonomy/API questions. Its remaster boundary is
    [integration-handoff.md](goal-5/integration-handoff.md).
 6. [Goal 6](goal-6/0-plan.md) — completed architecture remaster. It rebuilds

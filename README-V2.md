@@ -1,6 +1,6 @@
 # ankos
 
-ankos 0.2.0 is a Python library for constructing and applying closed simple
+ankos is a Python library for constructing and applying closed simple
 programs inspired by *A New Kind of Science*. Cellular automata, substitutions,
 machines, transductions, constraints, and continuous relations share one
 program boundary:
@@ -15,7 +15,7 @@ SimpleProgram(
 )
 ```
 
-Every named construction expands to those five fields. One family-blind
+Every implemented construction expands to those five fields. One family-blind
 operation applies every program, and rollout repeats that same operation:
 
 ```python
@@ -121,8 +121,8 @@ See [`simple_programs.md`](simple_programs.md) for the conceptual model and
 
 ## Explicit five-field construction
 
-Catalog names are ordinary compositions. This complete expansion is exactly
-equal to `ca.catalog.eca(rule=30, width=79)`:
+The implemented `eca` preset is an ordinary composition. This complete
+expansion is exactly equal to `ca.catalog.eca(rule=30, width=79)`:
 
 ```python
 from fractions import Fraction
@@ -185,8 +185,8 @@ presets. Component constructors remain module-qualified, so
 
 ## Catalog
 
-The catalog inventories 60 audited executable semantic families. Their 60
-canonical family spellings are currently **development stubs and progress
+The catalog inventories a taxonomy of 60 audited semantic-family obligations.
+Their 60 canonical family spellings are currently **development stubs and progress
 markers**, not implemented family constructors. The presence of a callable or
 exported canonical name does not mean that it compiles the family's planned
 parameters, validates family membership, or certifies implementation
@@ -315,16 +315,17 @@ semantic format. Migrate source deliberately:
 
 | Removed 0.1 spelling | 0.2.0 replacement |
 |---|---|
-| `ca.Dynamics(...)` plus `rule_id` | A matching `ca.catalog.<constructor>(...)`, or explicit `ca.SimpleProgram(...)` |
+| `ca.Dynamics(...)` plus `rule_id` | An implemented `ca.catalog` preset or builder where available, otherwise explicit `ca.SimpleProgram(...)` |
 | `ca.rollout(dynamics=..., rule_id=..., seed_state=..., steps=...)` | `ca.rollout(program, steps=..., initial=..., replay_key=...)` |
 | `ca.RawEpisode` / `ca.RawBatch` | `ca.program.RolloutComplete`, `RolloutTruncated`, or `RolloutRejected`; downstream dataset views when dense tensors are needed |
 | root component helpers | Their plural owner modules, such as `ca.rules.elementary(...)` |
 | `ca.apply_rule` | `ca.apply` |
 
 Old `Dynamics` manifest dictionaries are not accepted by
-`ca.serialization.loads`. Reconstruct them in source through a catalog
-constructor or explicit five-field composition, then serialize the expanded
-program. ankos intentionally ships no fallback decoder, compatibility
+`ca.serialization.loads`. Reconstruct them in source through an implemented
+catalog preset or builder where available, or use explicit five-field
+composition, then serialize the expanded program. ankos intentionally ships
+no fallback decoder, compatibility
 executor, or silent “try old then new” path.
 
 [`README-V1.md`](README-V1.md) preserves the old source surface only as
@@ -354,7 +355,9 @@ ca.serialization
 There is no public `ca.rollout` submodule: the package attribute has one
 meaning, the callable. Application and rollout records remain under
 `ca.program`; Rule records remain under `ca.rules`; components remain under
-their plural owners; complete programs remain under `ca.catalog`.
+their plural owners; implemented whole-program presets and builders remain
+under `ca.catalog`, while `ca.SimpleProgram(...)` is the general explicit
+construction route.
 
 Auxiliary modules are explicit downstream imports and are not loaded by
 `import ca`:

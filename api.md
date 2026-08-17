@@ -1,9 +1,10 @@
 # `ca` 0.2.0 Public API
 
-Status: **implemented and conformance-tested**
+Status: **runtime implemented and conformance-tested; canonical catalog builders unfinished**
 
-This is the public contract shipped by ankos 0.2.0. The removed 0.1
-`Dynamics` surface is retained only as a historical source snapshot in
+This documents the current 0.2.0-target public contract. It is not a release
+claim. The removed 0.1 `Dynamics` surface is retained only as a historical
+source snapshot in
 [`README-V1.md`](README-V1.md).
 
 The complete validation, reconstruction, measure, and intensional contract is
@@ -164,7 +165,7 @@ root-level `ca.eca`.
 is not an execution registry, and catalog IDs or family names never select an
 application algorithm.
 
-The 60 audited executable semantic families are design and coverage
+The 60 audited semantic-family taxonomy rows are design and implementation
 obligations. Their canonical names are currently stub destinations, not 60
 implemented constructors, subclasses, executor branches, or top-level fields.
 Presets may be implemented independently and must be assessed individually.
@@ -496,15 +497,15 @@ machine floating behavior are never semantic identity.
 ## Migrating Source From 0.1
 
 The 0.1 `Dynamics` dictionaries were construction recipes, not an earlier
-canonical semantic format. Reconstruct each program in source through the
-matching catalog constructor:
+canonical semantic format. Reconstruct each program through an implemented
+catalog preset or builder where one exists, for example:
 
 ```python
 program = ca.catalog.eca(rule=30, width=79)
 ```
 
-or through explicit five-field construction as shown above. Then serialize the
-expanded value with `ca.serialization.dumps`.
+Otherwise use explicit five-field construction as shown above. Then serialize
+the expanded value with `ca.serialization.dumps`.
 
 The old call:
 
@@ -529,7 +530,7 @@ that schema version is independent of the package version `0.2.0`.
 
 ## Package and Import Ownership
 
-The implemented semantic package surface is:
+The package surface is:
 
 ```text
 src/ca/
@@ -566,8 +567,8 @@ src/ca/
 | `rules.py` | Rule descriptors, Rule results/atoms, total dispositions, composition, and presets |
 | `serialization.py` | Versioned canonical codecs, explicit schema registry, and typed decode results |
 | `py.typed` | Static-typing package marker; no runtime behavior |
-| `catalog/entries.py` | Descriptive constructor/alias/provenance metadata |
-| six catalog modules | Canonical whole-program constructor ownership |
+| `catalog/entries.py` | Descriptive family/name/provenance metadata |
+| six catalog modules | Canonical development stubs plus independently implemented whole-program presets and builders |
 
 The root façade re-exports only:
 
@@ -579,7 +580,9 @@ The root façade re-exports only:
 
 Application/rollout records remain under `ca.program`; Rule result records and
 atoms remain under `ca.rules`. Component constructors remain under their
-plural modules, and whole-program constructors remain under `ca.catalog`.
+plural modules. Canonical family stubs and implemented whole-program presets
+or builders remain under `ca.catalog`; explicit construction remains available
+through `ca.SimpleProgram(...)`.
 
 There is no need for public `configuration.py`, `replacement.py`, `results.py`,
 `engine.py`, `rollout.py`, or `run.py`. Their legitimate responsibilities are
@@ -606,7 +609,8 @@ must preserve the same downstream boundary.
 
 ## Documentation Roles
 
-`api.md` is the implemented public contract;
+`api.md` is the implemented runtime contract plus the unfinished catalog
+development surface;
 [`goal-6/architecture.md`](goal-6/architecture.md) is the frozen internal
 design baseline. Goal 7's authorized addition of
 `TruncationCause.INTENSIONAL_SUPPORT` supersedes only its four-cause rollout

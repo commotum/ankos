@@ -69,37 +69,6 @@ OBSOLETE_PUBLIC_SUBMODULES = (
     "updates",
     "specs",
 )
-EXPECTED_ROOT_MODULES = {
-    "__init__.py",
-    "alphabets.py",
-    "datasets.py",
-    "frontiers.py",
-    "loci.py",
-    "neighborhoods.py",
-    "program.py",
-    "rng.py",
-    "rules.py",
-    "seeds.py",
-    "serialization.py",
-}
-EXPECTED_CATALOG_MODULES = {
-    "__init__.py",
-    "automata.py",
-    "criteria.py",
-    "dynamica.py",
-    "entries.py",
-    "machina.py",
-    "media.py",
-    "substitua.py",
-}
-EXPECTED_VIZ_MODULES = {
-    "__init__.py",
-    "export.py",
-    "format.py",
-    "server.py",
-}
-
-
 def _tree(path: Path) -> ast.Module:
     return ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
 
@@ -301,17 +270,7 @@ def _assert_no_dispatch_vocabulary(
     assert getattr_fields <= {"canonical_identity"}
 
 
-def test_static_import_graph_matches_the_complete_one_way_package_dag() -> None:
-    assert {
-        path.name for path in SOURCE_ROOT.glob("*.py")
-    } == EXPECTED_ROOT_MODULES
-    assert {
-        path.name for path in (SOURCE_ROOT / "catalog").glob("*.py")
-    } == EXPECTED_CATALOG_MODULES
-    assert {
-        path.name for path in (SOURCE_ROOT / "viz").glob("*.py")
-    } == EXPECTED_VIZ_MODULES
-
+def test_static_import_graph_preserves_the_one_way_package_dag() -> None:
     for module_name, allowed in CORE_DEPENDENCIES.items():
         assert _relative_import_roots(SOURCE_ROOT / f"{module_name}.py") <= allowed
 

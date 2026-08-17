@@ -1,16 +1,18 @@
 """Callable-free metadata shells for the audited simple-program catalog.
 
 This module owns immutable records for canonical family identity, close roles,
-legacy migration, and public-name relations.  It does not own constructors,
+legacy migration, and public-name relations.  It does not own builders,
 component values, program values, registries, lookup dispatch, or execution.
-The six category modules build programs without importing this module;
-``ca.catalog`` is the sole join between metadata and callables.
+The six category modules host canonical development stubs and independently
+implemented presets without importing this module; ``ca.catalog`` is the sole
+join between metadata and callables.
 
 The family and close-role values below are the literal, callable-free
 catalog projection of ``goal-6/catalog-migration.md``.  ``closed_parameters``
-retains the semantic construction inventory from that authority; it does not
-define the Python signature of the canonical five-component constructors.
-Legacy and public-name relations use the same inert record discipline below.
+retains the semantic construction inventory from that authority and defines
+the keyword-only signature of each canonical development stub.  ``coverage``
+records taxonomy-audit coverage, not implementation status.  Legacy and
+public-name relations use the same inert record discipline below.
 """
 
 from __future__ import annotations
@@ -44,7 +46,7 @@ CallableNameKind: TypeAlias = Literal["C", "P", "A", "K"]
 
 @dataclass(frozen=True)
 class FamilyEntry:
-    """Metadata for exactly one canonical SPF family constructor."""
+    """Metadata for one canonical SPF family and its planned builder stub."""
 
     family_id: str
     audit_family_id: str
@@ -95,7 +97,12 @@ class LegacyTarget:
 
 @dataclass(frozen=True)
 class NameEntry:
-    """Callable-free metadata for one canonical or delegating spelling."""
+    """Callable-free metadata for one catalog spelling.
+
+    For canonical and preset rows, ``delegate_import_name`` records the
+    associated canonical-family path; it does not imply runtime delegation.
+    Alias and compatibility rows use it as their actual delegate path.
+    """
 
     spelling: str
     owner_module: CatalogHome
@@ -460,7 +467,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
             "N08:L84-105,L322-328",
         ),
         "goal-5/api-pressure.md:F041",
-        ("T45 canonical constructor", "pde true alias"),
+        ("T45 canonical development stub", "pde true alias"),
     ),
     FamilyEntry(
         "SPF040", "F043", "population-evolutionary-search", "automata",
@@ -1422,13 +1429,13 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "alternating_partition_local_evolution", "automata", "C", "SPF001",
         "ca.catalog.automata.alternating_partition_local_evolution", True,
-        "Canonical five-component profile for alternating-partition-local-evolution.",
+        "Development stub for the planned alternating-partition-local-evolution builder.",
         (), ("CH08:L155-165", "N08:L107,L124-126", "CH09:L303-321"),
     ),
     NameEntry(
         "append_only_sequence_generation", "substitua", "C", "SPF002",
         "ca.catalog.substitua.append_only_sequence_generation", True,
-        "Canonical five-component profile for append-only-sequence-generation.",
+        "Development stub for the planned append-only-sequence-generation builder.",
         (),
         (
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
@@ -1438,25 +1445,25 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "asynchronous_local_state_automaton", "automata", "C", "SPF003",
         "ca.catalog.automata.asynchronous_local_state_automaton", True,
-        "Canonical five-component profile for asynchronous-local-state-automaton.",
+        "Development stub for the planned asynchronous-local-state-automaton builder.",
         (), ("N09:L407-443",),
     ),
     NameEntry(
         "event_provenance_causal_network", "media", "C", "SPF004",
         "ca.catalog.media.event_provenance_causal_network", True,
-        "Canonical five-component profile for event-provenance-causal-network.",
+        "Development stub for the planned event-provenance-causal-network builder.",
         (), ("CH09:L655-707", "N09:L347-355,L378-384"),
     ),
     NameEntry(
         "context_dependent_substitution", "substitua", "C", "SPF005",
         "ca.catalog.substitua.context_dependent_substitution", True,
-        "Canonical five-component profile for context-dependent-substitution.",
+        "Development stub for the planned context-dependent-substitution builder.",
         (), ("CH03:L333-337",),
     ),
     NameEntry(
         "continuous_event_dynamics", "dynamica", "C", "SPF006",
         "ca.catalog.dynamica.continuous_event_dynamics", True,
-        "Canonical five-component profile for continuous-event-dynamics.",
+        "Development stub for the planned continuous-event-dynamics builder.",
         (),
         (
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
@@ -1466,20 +1473,20 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "coupled_field_mobile_locus_evolution", "automata", "C", "SPF007",
         "ca.catalog.automata.coupled_field_mobile_locus_evolution", True,
-        "Canonical five-component profile for coupled-field-mobile-locus-evolution.",
+        "Development stub for the planned coupled-field-mobile-locus-evolution builder.",
         (), ("CH08:L131-138",),
     ),
     NameEntry(
         "digit_emitting_register_transduction", "media", "C", "SPF008",
         "ca.catalog.media.digit_emitting_register_transduction", True,
-        "Canonical five-component profile for digit-emitting-register-transduction.",
+        "Development stub for the planned digit-emitting-register-transduction builder.",
         (),
         ("CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L303-308,L343-350",),
     ),
     NameEntry(
         "driven_relaxation", "automata", "C", "SPF009",
         "ca.catalog.automata.driven_relaxation", True,
-        "Canonical five-component profile for driven-relaxation.",
+        "Development stub for the planned driven-relaxation builder.",
         (),
         (
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
@@ -1489,37 +1496,37 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "enumerative_semidecision", "machina", "C", "SPF010",
         "ca.catalog.machina.enumerative_semidecision", True,
-        "Canonical five-component profile for enumerative-semidecision.",
+        "Development stub for the planned enumerative-semidecision builder.",
         (), ("CH10:L975-989", "N10:L5-15", "N11:L829-855"),
     ),
     NameEntry(
         "error_diffusion_transform", "media", "C", "SPF011",
         "ca.catalog.media.error_diffusion_transform", True,
-        "Canonical five-component profile for error-diffusion-transform.",
+        "Development stub for the planned error-diffusion-transform builder.",
         (), ("N10:L348-360",),
     ),
     NameEntry(
         "maximal_run_record_transduction", "media", "C", "SPF012",
         "ca.catalog.media.maximal_run_record_transduction", True,
-        "Canonical five-component profile for maximal-run-record-transduction.",
+        "Development stub for the planned maximal-run-record-transduction builder.",
         (), ("CH10:L163-187", "N10:L83-85,L171-175", "N04:L193-202"),
     ),
     NameEntry(
         "finite_gate_circuit", "machina", "C", "SPF013",
         "ca.catalog.machina.finite_gate_circuit", True,
-        "Canonical five-component profile for finite-gate-circuit.",
+        "Development stub for the planned finite-gate-circuit builder.",
         (), ("N10:L904", "N12:L331-347,L560-574"),
     ),
     NameEntry(
         "finite_model_satisfaction", "criteria", "C", "SPF014",
         "ca.catalog.criteria.finite_model_satisfaction", True,
-        "Canonical five-component profile for finite-model-satisfaction.",
+        "Development stub for the planned finite-model-satisfaction builder.",
         (), ("CH12:L1073-1095", "N12:L1189-1203,L1245-1257"),
     ),
     NameEntry(
         "first_passage_aggregation", "substitua", "C", "SPF015",
         "ca.catalog.substitua.first_passage_aggregation", True,
-        "Canonical five-component profile for first-passage-aggregation.",
+        "Development stub for the planned first-passage-aggregation builder.",
         (),
         (
             "N08:L50",
@@ -1530,43 +1537,43 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "front_delete_rear_append_system", "substitua", "C", "SPF016",
         "ca.catalog.substitua.front_delete_rear_append_system", True,
-        "Canonical five-component profile for front-delete-rear-append-system.",
+        "Development stub for the planned front-delete-rear-append-system builder.",
         (), ("CH03:L423-445,L447-471",),
     ),
     NameEntry(
         "geometric_embedding_relation", "criteria", "C", "SPF017",
         "ca.catalog.criteria.geometric_embedding_relation", True,
-        "Canonical five-component profile for geometric-embedding-relation.",
+        "Development stub for the planned geometric-embedding-relation builder.",
         (), ("CH08:L563-569", "N08:L226"),
     ),
     NameEntry(
         "global_equation_relation", "criteria", "C", "SPF018",
         "ca.catalog.criteria.global_equation_relation", True,
-        "Canonical five-component profile for global-equation-relation.",
+        "Development stub for the planned global-equation-relation builder.",
         (), ("CH12:L885-905", "N12:L901-966"),
     ),
     NameEntry(
         "global_score_sequential_placement", "substitua", "C", "SPF019",
         "ca.catalog.substitua.global_score_sequential_placement", True,
-        "Canonical five-component profile for global-score-sequential-placement.",
+        "Development stub for the planned global-score-sequential-placement builder.",
         (), ("CH08:L531-547", "N08:L223-225"),
     ),
     NameEntry(
         "hash_index_transform", "media", "C", "SPF020",
         "ca.catalog.media.hash_index_transform", True,
-        "Canonical five-component profile for hash-index-transform.",
+        "Development stub for the planned hash-index-transform builder.",
         (), ("CH10:L829-839", "N10:L976-980"),
     ),
     NameEntry(
         "history_dependent_agent_game", "automata", "C", "SPF021",
         "ca.catalog.automata.history_dependent_agent_game", True,
-        "Canonical five-component profile for history-dependent-agent-game.",
+        "Development stub for the planned history-dependent-agent-game builder.",
         (), ("N10:L1081-1085",),
     ),
     NameEntry(
         "history_dependent_growth_rewrite", "substitua", "C", "SPF022",
         "ca.catalog.substitua.history_dependent_growth_rewrite", True,
-        "Canonical five-component profile for history-dependent-growth-rewrite.",
+        "Development stub for the planned history-dependent-growth-rewrite builder.",
         (),
         (
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:"
@@ -1576,86 +1583,86 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "indexed_history_recurrence", "substitua", "C", "SPF023",
         "ca.catalog.substitua.indexed_history_recurrence", True,
-        "Canonical five-component profile for indexed-history-recurrence.",
+        "Development stub for the planned indexed-history-recurrence builder.",
         (), ("CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L169-186",),
     ),
     NameEntry(
         "inverse_local_system_reconstruction", "criteria", "C", "SPF024",
         "ca.catalog.criteria.inverse_local_system_reconstruction", True,
-        "Canonical five-component profile for inverse-local-system-reconstruction.",
+        "Development stub for the planned inverse-local-system-reconstruction builder.",
         (), ("CH10:L575-633", "N10:L531-544,L608-624"),
     ),
     NameEntry(
         "iterated_erasure_process", "substitua", "C", "SPF025",
         "ca.catalog.substitua.iterated_erasure_process", True,
-        "Canonical five-component profile for iterated-erasure-process.",
+        "Development stub for the planned iterated-erasure-process builder.",
         (), ("CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L211-214",),
     ),
     NameEntry(
         "iterated_map", "automata", "C", "SPF026",
         "ca.catalog.automata.iterated_map", True,
-        "Canonical five-component profile for iterated-map.",
+        "Development stub for the planned iterated-map builder.",
         ("T43",),
         ("CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L53-54,L111-118,L472-491",),
     ),
     NameEntry(
         "local_factor_weighted_relation", "criteria", "C", "SPF027",
         "ca.catalog.criteria.local_factor_weighted_relation", True,
-        "Canonical five-component profile for local-factor-weighted-relation.",
+        "Development stub for the planned local-factor-weighted-relation builder.",
         (), ("N10:L493-494",),
     ),
     NameEntry(
         "local_graph_rewrite", "substitua", "C", "SPF028",
         "ca.catalog.substitua.local_graph_rewrite", True,
-        "Canonical five-component profile for local-graph-rewrite.",
+        "Development stub for the planned local-graph-rewrite builder.",
         (), ("CH09:L901-965", "N09:L495-528,L552-556,L594-600"),
     ),
     NameEntry(
         "local_satisfaction_relation", "criteria", "C", "SPF029",
         "ca.catalog.criteria.local_satisfaction_relation", True,
-        "Canonical five-component profile for local-satisfaction-relation.",
+        "Development stub for the planned local-satisfaction-relation builder.",
         (), ("CH09:L595-615", "N09:L324-330"),
     ),
     NameEntry(
         "mobile_head_grid_rewrite", "machina", "C", "SPF030",
         "ca.catalog.machina.mobile_head_grid_rewrite", True,
-        "Canonical five-component profile for mobile-head-grid-rewrite.",
+        "Development stub for the planned mobile-head-grid-rewrite builder.",
         (), ("CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L127-131",),
     ),
     NameEntry(
         "moving_frontier_shell_accretion", "substitua", "C", "SPF031",
         "ca.catalog.substitua.moving_frontier_shell_accretion", True,
-        "Canonical five-component profile for moving-frontier-shell-accretion.",
+        "Development stub for the planned moving-frontier-shell-accretion builder.",
         (), ("CH08:L581-591", "N08:L234-246"),
     ),
     NameEntry(
         "multi_active_local_rewrite", "automata", "C", "SPF032",
         "ca.catalog.automata.multi_active_local_rewrite", True,
-        "Canonical five-component profile for multi-active-local-rewrite.",
+        "Development stub for the planned multi-active-local-rewrite builder.",
         (), ("CH03:L231-247",),
     ),
     NameEntry(
         "multiway_rewrite", "substitua", "C", "SPF033",
         "ca.catalog.substitua.multiway_rewrite", True,
-        "Canonical five-component profile for multiway-rewrite.",
+        "Development stub for the planned multiway-rewrite builder.",
         (), ("CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L355-369",),
     ),
     NameEntry(
         "mutable_rule_local_automaton", "automata", "C", "SPF034",
         "ca.catalog.automata.mutable_rule_local_automaton", True,
-        "Canonical five-component profile for mutable-rule-local-automaton.",
+        "Development stub for the planned mutable-rule-local-automaton builder.",
         (), ("CH08:L319-329",),
     ),
     NameEntry(
         "nearest_neighbor_retrieval", "machina", "C", "SPF035",
         "ca.catalog.machina.nearest_neighbor_retrieval", True,
-        "Canonical five-component profile for nearest-neighbor-retrieval.",
+        "Development stub for the planned nearest-neighbor-retrieval builder.",
         (), ("N10:L988-996",),
     ),
     NameEntry(
         "ordinary_differential_flow", "dynamica", "C", "SPF036",
         "ca.catalog.dynamica.ordinary_differential_flow", True,
-        "Canonical five-component profile for ordinary-differential-flow.",
+        "Development stub for the planned ordinary-differential-flow builder.",
         (),
         (
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
@@ -1665,20 +1672,20 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "parallel_independent_substitution", "substitua", "C", "SPF037",
         "ca.catalog.substitua.parallel_independent_substitution", True,
-        "Canonical five-component profile for parallel-independent-substitution.",
+        "Development stub for the planned parallel-independent-substitution builder.",
         (), ("CH03:L299-307,L343-363",),
     ),
     NameEntry(
         "parallel_network_rewrite", "substitua", "C", "SPF038",
         "ca.catalog.substitua.parallel_network_rewrite", True,
-        "Canonical five-component profile for parallel-network-rewrite.",
+        "Development stub for the planned parallel-network-rewrite builder.",
         ("T29",),
         ("CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L241,L287-331",),
     ),
     NameEntry(
         "partial_differential_relation", "dynamica", "C", "SPF039",
         "ca.catalog.dynamica.partial_differential_relation", True,
-        "Canonical five-component profile for partial-differential-relation.",
+        "Development stub for the planned partial-differential-relation builder.",
         ("T45",),
         (
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L625-674",
@@ -1688,7 +1695,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "population_evolutionary_search", "automata", "C", "SPF040",
         "ca.catalog.automata.population_evolutionary_search", True,
-        "Canonical five-component profile for population-evolutionary-search.",
+        "Development stub for the planned population-evolutionary-search builder.",
         (),
         (
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
@@ -1698,19 +1705,19 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "probabilistic_transition_model_fitting", "media", "C", "SPF041",
         "ca.catalog.media.probabilistic_transition_model_fitting", True,
-        "Canonical five-component profile for probabilistic-transition-model-fitting.",
+        "Development stub for the planned probabilistic-transition-model-fitting builder.",
         (), ("CH10:L441-459", "N10:L495-501"),
     ),
     NameEntry(
         "program_randomization_test", "criteria", "C", "SPF042",
         "ca.catalog.criteria.program_randomization_test", True,
-        "Canonical five-component profile for program-randomization-test.",
+        "Development stub for the planned program-randomization-test builder.",
         (), ("CH10:L515-533",),
     ),
     NameEntry(
         "random_functional_graph_construction", "substitua", "C", "SPF043",
         "ca.catalog.substitua.random_functional_graph_construction", True,
-        "Canonical five-component profile for random-functional-graph-construction.",
+        "Development stub for the planned random-functional-graph-construction builder.",
         (),
         (
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md:"
@@ -1720,7 +1727,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "recursive_function_evaluator", "machina", "C", "SPF044",
         "ca.catalog.machina.recursive_function_evaluator", True,
-        "Canonical five-component profile for recursive-function-evaluator.",
+        "Development stub for the planned recursive-function-evaluator builder.",
         ("T41",),
         (
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
@@ -1730,105 +1737,105 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
     NameEntry(
         "register_machine", "machina", "C", "SPF045",
         "ca.catalog.machina.register_machine", True,
-        "Canonical five-component profile for register-machine.",
+        "Development stub for the planned register-machine builder.",
         ("T19",), ("CH03:L473-509,L519-525",),
     ),
     NameEntry(
         "sampled_causal_order_network", "media", "C", "SPF046",
         "ca.catalog.media.sampled_causal_order_network", True,
-        "Canonical five-component profile for sampled-causal-order-network.",
+        "Development stub for the planned sampled-causal-order-network builder.",
         (), ("N09:L816-818",),
     ),
     NameEntry(
         "stochastic_local_search", "criteria", "C", "SPF047",
         "ca.catalog.criteria.stochastic_local_search", True,
-        "Canonical five-component profile for stochastic-local-search.",
+        "Development stub for the planned stochastic-local-search builder.",
         (), ("CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md:L553-596",),
     ),
     NameEntry(
         "stored_program_random_access_machine", "machina", "C", "SPF048",
         "ca.catalog.machina.stored_program_random_access_machine", True,
-        "Canonical five-component profile for stored-program-random-access-machine.",
+        "Development stub for the planned stored-program-random-access-machine builder.",
         (), ("N11:L15-23",),
     ),
     NameEntry(
         "structural_pattern_rewrite", "substitua", "C", "SPF049",
         "ca.catalog.substitua.structural_pattern_rewrite", True,
-        "Canonical five-component profile for structural-pattern-rewrite.",
+        "Development stub for the planned structural-pattern-rewrite builder.",
         (), ("CH03:L531-537", "N03:L823-835", "CH10:L909-915"),
     ),
     NameEntry(
         "synchronous_local_state_transform", "automata", "C", "SPF050",
         "ca.catalog.automata.synchronous_local_state_transform", True,
-        "Canonical five-component profile for synchronous-local-state-transform.",
+        "Development stub for the planned synchronous-local-state-transform builder.",
         (), ("CH10:L323-347", "N10:L328-347", "N03:L135-150,L190,L192-225"),
     ),
     NameEntry(
         "weighted_history_sum_relation", "criteria", "C", "SPF051",
         "ca.catalog.criteria.weighted_history_sum_relation", True,
-        "Canonical five-component profile for weighted-history-sum-relation.",
+        "Development stub for the planned weighted-history-sum-relation builder.",
         (), ("N09:L880,L955-957",),
     ),
     NameEntry(
         "weighted_network_state_update", "automata", "C", "SPF052",
         "ca.catalog.automata.weighted_network_state_update", True,
-        "Canonical five-component profile for weighted-network-state-update.",
+        "Development stub for the planned weighted-network-state-update builder.",
         (), ("N10:L1021-1023",),
     ),
     NameEntry(
         "priority_dovetailed_oracle_construction", "machina", "C", "SPF053",
         "ca.catalog.machina.priority_dovetailed_oracle_construction", True,
-        "Canonical five-component profile for priority-dovetailed-oracle-construction.",
+        "Development stub for the planned priority-dovetailed-oracle-construction builder.",
         (), ("N12:L80-92",),
     ),
     NameEntry(
         "weighted_prefix_block_transduction", "media", "C", "SPF054",
         "ca.catalog.media.weighted_prefix_block_transduction", True,
-        "Canonical five-component profile for weighted-prefix-block-transduction.",
+        "Development stub for the planned weighted-prefix-block-transduction builder.",
         (), ("CH10:L189-205,L235-249", "N10:L87-106"),
     ),
     NameEntry(
         "nested_interval_symbol_transduction", "media", "C", "SPF055",
         "ca.catalog.media.nested_interval_symbol_transduction", True,
-        "Canonical five-component profile for nested-interval-symbol-transduction.",
+        "Development stub for the planned nested-interval-symbol-transduction builder.",
         (), ("N10:L108-121",),
     ),
     NameEntry(
         "history_reference_record_transduction", "media", "C", "SPF056",
         "ca.catalog.media.history_reference_record_transduction", True,
-        "Canonical five-component profile for history-reference-record-transduction.",
+        "Development stub for the planned history-reference-record-transduction builder.",
         (), ("CH10:L209-267", "N10:L123-153"),
     ),
     NameEntry(
         "recursive_uniform_region_decomposition", "media", "C", "SPF057",
         "ca.catalog.media.recursive_uniform_region_decomposition", True,
-        "Canonical five-component profile for recursive-uniform-region-decomposition.",
+        "Development stub for the planned recursive-uniform-region-decomposition builder.",
         (), ("CH10:L233-239,L269-279", "N10:L154-168"),
     ),
     NameEntry(
         "orthogonal_basis_coefficient_transform", "media", "C", "SPF058",
         "ca.catalog.media.orthogonal_basis_coefficient_transform", True,
-        "Canonical five-component profile for orthogonal-basis-coefficient-transform.",
+        "Development stub for the planned orthogonal-basis-coefficient-transform builder.",
         (), ("CH10:L281-305", "N10:L181-288"),
     ),
     NameEntry(
         "predictive_residual_transduction", "media", "C", "SPF059",
         "ca.catalog.media.predictive_residual_transduction", True,
-        "Canonical five-component profile for predictive-residual-transduction.",
+        "Development stub for the planned predictive-residual-transduction builder.",
         (), ("N10:L424",),
     ),
     NameEntry(
         "aligned_xor_stream_transduction", "media", "C", "SPF060",
         "ca.catalog.media.aligned_xor_stream_transduction", True,
-        "Canonical five-component profile for aligned-xor-stream-transduction.",
+        "Development stub for the planned aligned-xor-stream-transduction builder.",
         (), ("CH10:L539-565,L599-605",),
     ),
     NameEntry(
         "eca", "automata", "P", "SPF050",
         "ca.catalog.automata.synchronous_local_state_transform", True,
         (
-            "Bind binary 1-D radius-one synchronous feedback; family constructor "
-            "remains synchronous_local_state_transform."
+            "Bind binary 1-D radius-one synchronous feedback; the canonical "
+            "family stub is synchronous_local_state_transform."
         ),
         ("T01",), ("CH03:L29-56",),
     ),
@@ -1836,8 +1843,8 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "elementary_cellular_automaton", "automata", "A", "SPF050",
         "ca.catalog.automata.eca", True,
         (
-            "Bind binary 1-D radius-one synchronous feedback; family constructor "
-            "remains synchronous_local_state_transform."
+            "Bind binary 1-D radius-one synchronous feedback; the canonical "
+            "family stub is synchronous_local_state_transform."
         ),
         ("T01",), ("CH03:L29-56",),
     ),
