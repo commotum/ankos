@@ -19,7 +19,7 @@ from typing import Any
 WORKER_ID = "ch06-main"
 STAGE = 10
 EPOCH = 2
-SOURCE_PATH = "CHAPTERS/06-Starting-from-Randomness.md"
+SOURCE_PATH = "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md"
 EXPECTED_CANDIDATE_COUNT = 60
 
 FIELDS = [

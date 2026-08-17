@@ -1,4 +1,4 @@
-![](_page_312_Picture_0.jpeg)
+![](images/_page_312_Picture_0.jpeg)
 
 ## Mechanisms in Programs and Nature
 
@@ -36,11 +36,11 @@ And more important, many of the phenomena that I consider—particularly those t
 
 In nature one of the single most common things one sees is apparent randomness. And indeed, there are a great many different kinds of systems that all exhibit randomness. And it could be that in each case the cause of randomness is different. But from my investigations of simple programs I have come to the conclusion that one can in fact identify just three basic mechanisms for randomness, as illustrated in the pictures below.
 
-![](_page_314_Figure_3.jpeg)
+![](images/_page_314_Figure_3.jpeg)
 
-![](_page_314_Figure_4.jpeg)
+![](images/_page_314_Figure_4.jpeg)
 
-![](_page_314_Figure_5.jpeg)
+![](images/_page_314_Figure_5.jpeg)
 
 Three possible mechanisms that can be responsible for randomness. The diagonal arrows represent external input. In the first case, there is random input from the environment at every step. In the second case, there is random input only in the initial conditions. And in the third case, there is effectively no random input at all. Yet despite their different underlying structure, each of these mechanisms leads to randomness in the column shown at the left. The first mechanism corresponds to randomness produced by external noise, as captured in so-called stochastic models. The second mechanism is essentially the one suggested by chaos theory. The third mechanism is new, and is suggested by the results on the behavior of simple programs in this book. I will give evidence that this third mechanism is the most common one in nature.
 
@@ -128,9 +128,9 @@ As a simple example, consider a ball that has one hemisphere white and the other
 
 The answer is that it comes from randomness in the initial speed with which the ball is rolled. The picture below shows the motion of a ball with a sequence of different initial speeds. And what one sees is that it takes only a small change in the initial speed to make the ball come to rest in a completely different orientation.
 
-![](_page_320_Picture_7.jpeg)
+![](images/_page_320_Picture_7.jpeg)
 
-![](_page_320_Picture_8.jpeg)
+![](images/_page_320_Picture_8.jpeg)
 
 A plot of the position of a ball rolled with various initial speeds. Time goes down the page. The ball starts on the left, with an initial speed given by the initial slope of the curve. The ball slows down as a result of friction, and eventually stops. The ball is half white and half black, and the stripes in the picture indicate which color is on top when the ball is at a particular position. The divergence of the curves in the picture indicate the sensitivity of the motion to the exact initial speed of the ball. Small changes in this speed are seen to make the ball stop with a different color on top. It is such sensitivity to randomness in the initial conditions that makes processes such as rolling dice or tossing coins yield seemingly random output.
 
@@ -148,11 +148,11 @@ The result of this is that any change in the initial position of a point will be
 
 But what does this actually mean for the motion of a point in the material? The bottom pictures on the facing page show what happens to two sets of points that start very close together. The most obvious effect is that these points diverge rapidly on successive steps. But after a while, they reach the edge of the material and cannot diverge any further. And then in the first case, the subsequent motion looks quite random. But in the second case it is fairly regular. So why is this?
 
-![](_page_322_Picture_2.jpeg)
+![](images/_page_322_Picture_2.jpeg)
 
 A kneading process similar to ones used to make noodles or taffy, which exhibits very sensitive dependence on initial conditions. In the first part of each step, the material is stretched to twice its original length. Then it is cut in two, and the two halves are stacked on top of each other. The picture demonstrates that dots which are initially close together rapidly separate. (A more realistic kneading process would fold material rather than cutting it, but the same sensitive dependence on initial conditions would occur.)
 
-![](_page_322_Picture_4.jpeg)
+![](images/_page_322_Picture_4.jpeg)
 
 Two examples of what can happen when the kneading process above is applied to nearby collections of points. In both cases the points initially diverge exponentially, as implied by chaos theory. But after a while they reach the edge of the material, and although in the first case they then show quite random behavior, in the second case they instead just show simple repetitive behavior. What differs between the two cases is the detailed digit sequences of the positions of the points: in the first case these digit sequences are quite random, while in the second case they have a simple repetitive form.
 
@@ -162,7 +162,7 @@ But it turns out that this process is exactly the same as the one we discussed o
 
 And what we found there was that it is crucial to think not in terms of the sizes of the numbers $x$, but rather in terms of their digit sequences represented in base 2. And in fact, in terms of such digit sequences, the kneading process consists simply in shifting all digits one place to the left at each step, as shown in the pictures below.
 
-![](_page_323_Figure_4.jpeg)
+![](images/_page_323_Figure_4.jpeg)
 
 The digit sequences of positions of points on successive steps in the two examples of kneading processes at the bottom of the previous page. At each step these digit sequences are shifted one place to the left. So if the initial digit sequence is random, as in the first example, then the subsequent behavior will also be correspondingly random. But if the initial digit sequence is simple, as in the second example, then the behavior will be correspondingly simple. In general, a point at position $x$ on a particular step will move to position $FractionalPart[2 x]$ on the next step.
 
@@ -196,9 +196,9 @@ The picture on the facing page shows a system in which a beam of light repeatedl
 
 But once again, in any practical implementation, the light would go around only a few tens of times before being affected by microscopic perturbations in the mirrors and by other phenomena that are not accounted for in the simple description we have given.
 
-![](_page_326_Picture_2.jpeg)
+![](images/_page_326_Picture_2.jpeg)
 
-![](_page_326_Picture_3.jpeg)
+![](images/_page_326_Picture_3.jpeg)
 
 An arrangement of mirrors set up to exhibit randomness arising from sensitive dependence on initial conditions. The initial condition for the system is specified by the position of the incoming light ray in the gray region at the top of each picture. Whether the light ray goes to the left or to the right at each step is then determined by successive digits in the base 2 representation for the number that gives the initial condition. The heart of the system is the “amplifier” shown on the left which uses a pair of parabolic mirrors to double the displacement of each incoming ray. The initial condition used here is $\pi/4$, which has digit sequence 0.1100100100001111111.
 
@@ -208,7 +208,7 @@ Indeed, the simple pegboard shown below exhibits the same phenomenon, with balls
 
 The details of these trajectories cannot be deduced quite as directly as before from the digit sequences of initial positions, but exactly the same phenomenon of successively sampling less and less significant digits still occurs. And once again, at least for a while, any randomness in the motion of the ball can be attributed to randomness in this initial digit sequence.
 
-![](_page_327_Picture_6.jpeg)
+![](images/_page_327_Picture_6.jpeg)
 
 Paths followed by four idealized balls dropped from initial positions differing by one part in a thousand into an array of identical circular pegs. The balls are taken to fall under gravity, and to bounce elastically whenever they hit a peg. As illustrated in the inset, small differences in direction are amplified—roughly doubling—at each bounce, with the result that after a few bounces the trajectories of the three balls are quite different. In a physical version of the system with balls of the same actual size as on this page perturbations from the environment will inevitably be amplified to have a significant effect on the trajectories after roughly the number of bounces shown. Versions of the system illustrated here—particularly with smaller peg spacings—are sometimes known as Galton or quincunx boards, and have been used since the late 1800s to demonstrate principles of probability theory. If balls are assumed to fall randomly on each side of each peg then with a large number of balls the final positions will approximate a binomial distribution.
 
@@ -224,7 +224,7 @@ The pictures on the next page show a particular case of the three-body problem, 
 
 So what happens in practice with planets and other bodies in our solar system? Observations suggest that at least on human timescales most of their motion is quite regular. And in fact this regularity was in the past taken as one of the key pieces of evidence for the idea that simple laws of nature could exist.
 
-![](_page_329_Figure_1.jpeg)
+![](images/_page_329_Figure_1.jpeg)
 
 An example of the three-body problem, in which an idealized planet moves up and down through the plane of two equal-mass idealized stars in a perfect elliptical orbit. The trajectories obtained with four possible initial positions for the planet—differing by $10^{-8}$—are shown. The pictures are made assuming the system to be in uniform motion from left to right. Successive black dots indicate where the planets are on each revolution of the stars. The main picture shows what happens over the course of 100 revolutions. The planet is assumed to be of negligible mass relative to the stars, and to start with zero vertical velocity at exactly an equal distance between the stars. The divergence of trajectories with slightly different initial vertical positions indicates sensitive dependence on initial conditions.
 
@@ -238,7 +238,7 @@ One of the important results of this book, however, is that there is also a thir
 
 The picture below shows the rule 30 cellular automaton in which I first identified this mechanism for randomness. The basic rule for the system is very simple. And the initial condition is also very simple.
 
-![](_page_330_Picture_5.jpeg)
+![](images/_page_330_Picture_5.jpeg)
 
 The rule 30 cellular automaton from page 27 that was the first example I found of intrinsic randomness generation. There is no random input to this system, yet its behavior seems in many respects random. I suspect that this is how much of the randomness that we see in nature arises.
 
@@ -288,7 +288,7 @@ Keeping only a limited number of digits at each step makes it inevitable that th
 
 It has then often been assumed that having maximal repetition period will somehow imply maximum randomness in all aspects of the sequence one gets. But in practice over the years, one after another linear congruential generator that has been constructed to have maximal repetition period has turned out to exhibit very substantial deviations from perfect randomness.
 
-![](_page_334_Picture_2.jpeg)
+![](images/_page_334_Picture_2.jpeg)
 
 Patterns of digits in base 2 produced by starting with the number 1 and then repeatedly multiplying by various fixed constants. In all cases, the complete pattern has a triangular form, but except in the first case, it is truncated on the left here. The mathematical structure of these systems is nevertheless such that digits further to the left do not affect those shown: at each step the number obtained is effectively reduced modulo $2^n$, where $n$ is the width of the picture.
 
@@ -296,7 +296,7 @@ A typical kind of failure, illustrated in the pictures on the next page, is that
 
 And seeing this one might conclude that it must be essentially impossible to produce good randomness with any kind of system that has reasonably simple rules. But the rule 30 cellular automaton that we discussed above demonstrates that in fact this is absolutely not the case.
 
-![](_page_335_Figure_1.jpeg)
+![](images/_page_335_Figure_1.jpeg)
 
 Examples of three so-called linear congruential random number generators. In each case they start with the number 1, then successively multiply by the specified multiplier, keeping only the rightmost 31 digits in the base 2 representation of the number obtained at each step. A version of the case with multiplier 3 was already shown on page 120. Multiplier 65539 was used as the random number generator on many computer systems, starting with mainframes in the 1960s. The last two pictures in each row above give the distribution of points whose coordinates in two and three dimensions are obtained by taking successive numbers from the linear congruential generator. If the output from the generator was perfectly random, then in each case these points would be uniformly distributed. But as the pictures demonstrate, stripes are visible in either two or three dimensions, or both.
 
@@ -340,7 +340,7 @@ But how easy is it to disturb this sequence? If one makes a fairly drastic pertu
 
 But with less drastic perturbations, the sequence can be quite robust. As an example, one can consider allowing each cell to be not just black or white, but any shade of gray, as in the continuous cellular automata we discussed on page 155. And in such systems, one can investigate what happens if at every step one randomly perturbs the gray level of each cell by a small amount.
 
-![](_page_339_Figure_1.jpeg)
+![](images/_page_339_Figure_1.jpeg)
 
 The effect of changing the number of initial black cells in the rule 30 cellular automaton shown above. With only 2 or 3 black cells, the sequence in the center of the pattern does not change. But as soon as more black cells are added, it does change.
 
@@ -354,9 +354,9 @@ And the reason this is important is that in any real experiment, there are inevi
 
 With more care in setting up the experiment, a higher degree of isolation from the environment can usually be achieved. But it is never possible to eliminate absolutely all interaction with the environment.
 
-![](_page_340_Figure_2.jpeg)
+![](images/_page_340_Figure_2.jpeg)
 
-![](_page_340_Figure_4.jpeg)
+![](images/_page_340_Figure_4.jpeg)
 
 The effects of various levels of external randomness on the behavior of continuous cellular automata with generalizations of rules 90 and 30. The value of each cell can be any gray level between 0 and 1. For the generalization of rule 90, the values of the left and right cells are added together, and the value of the cell on the next step is then found by applying the continuous generalization of the modulo 2 function shown at the right. For the generalization of rule 30, a similar scheme based on an algebraic representation of the rule is used. In both cases, every value at each step is also perturbed by a random amount up to the percentage indicated for each picture.
 
@@ -394,13 +394,13 @@ Each random walk is made by taking a discrete particle, and then at each step ra
 
 The answer, as illustrated on the next page, is that if there are enough particles, then the distribution one sees takes on a smooth and continuous form, and shows no trace of the underlying discreteness of the system; the randomness has in a sense successfully washed out essentially all the microscopic details of the system.
 
-![](_page_343_Figure_2.jpeg)
+![](images/_page_343_Figure_2.jpeg)
 
 The distribution of positions by reached particles that follow random walks. The top left shows three individual examples of random walks, in which each particle randomly moves one position to the left or right. Even though the individual particles are discrete, the pictures show that when a large number of particles are considered, the overall behavior obtained seems smooth and continuous.
 
 The pictures at the top of the facing page show what happens if one uses several different underlying rules for the motion of each particle. And what one sees is that despite differences at a microscopic level, the overall distribution obtained in each case has exactly the same continuous form.
 
-![](_page_344_Figure_2.jpeg)
+![](images/_page_344_Figure_2.jpeg)
 
 A demonstration of the fact that for a wide range of underlying rules for each step in a random walk, the overall distribution obtained always has the same continuous form. In case (a), each particle moves just one position to the left or right at each step. In case (b), it can move between 0, 1 or 2 positions, while in case (c) it can move any distance between 0 and 1 at each step. Finally, in case (d), on alternate steps the particle moves either always to the right or always to the left.
 
@@ -410,13 +410,13 @@ This kind of independence of microscopic details has many important consequences
 
 One might expect that the different underlying forms of these lattices would lead to different shapes in overall distributions. But the remarkable fact illustrated on the next page is that when enough particles are considered, one gets in the end distributions that have a purely circular shape that shows no trace of the different discrete structures of the underlying lattices.
 
-![](_page_345_Figure_2.jpeg)
+![](images/_page_345_Figure_2.jpeg)
 
 Examples of random walks on square and hexagonal lattices. Despite the different underlying lattices the average of sufficiently many particles yields ultimately circular behavior in both cases—as implied by the Central Limit Theorem.
 
 Beyond random walks, there are many other systems based on discrete components in which randomness at a microscopic level also leads to continuous behavior on a large scale. The picture below shows as one example what happens in a simple aggregation model.
 
-![](_page_346_Picture_3.jpeg)
+![](images/_page_346_Picture_3.jpeg)
 
 Behavior of a simple aggregation model, in which a single new black cell is added at each step at a randomly chosen position adjacent to the existing cluster of black cells. The system is a version of the so-called Eden model. The shape obtained is ultimately an almost perfect circle.
 
@@ -426,13 +426,13 @@ At early stages, clusters that are grown in this way look quite irregular. But a
 
 The pictures below, for example, show generalizations of the aggregation model in which new cells are added only at positions that have certain numbers of existing neighbors. And despite such changes in underlying rules, the overall shapes of the clusters produced remain very much the same.
 
-![](_page_347_Picture_5.jpeg)
+![](images/_page_347_Picture_5.jpeg)
 
-![](_page_347_Picture_7.jpeg)
+![](images/_page_347_Picture_7.jpeg)
 
-![](_page_347_Figure_8.jpeg)
+![](images/_page_347_Figure_8.jpeg)
 
-![](_page_347_Figure_9.jpeg)
+![](images/_page_347_Figure_9.jpeg)
 
 Patterns produced by generalized aggregation models in which a new cell is added only if (a) it would have only one immediate neighbor (out of four), or (b) it would have either one or four neighbors. The pictures above show step 30,000, while those on the right show step 200. Despite the difference in underlying rules, the same basic overall shape of pattern is eventually produced.
 
@@ -448,7 +448,7 @@ As a rough guide, it seems that continuous patterns of growth are possible only 
 
 And indeed this same issue also exists for processes other than growth. In general the point is that continuous behavior can arise in systems with discrete components only when there are features that evolve slowly relative to the rate of small-scale random changes.
 
-![](_page_349_Figure_1.jpeg)
+![](images/_page_349_Figure_1.jpeg)
 
 A two-dimensional cellular automaton first shown on page 178 with the rule that if out of the eight neighbors (including diagonals) around a given cell, there are exactly three black cells, then the cell itself becomes black on the next step. If the cell has 1, 2 or 4 black neighbors, then it stays the same color as before, and if it has 5 or more black neighbors, then it becomes white on the next step. (Outer totalistic code 746.) This simple rule produces randomness through the mechanism of intrinsic randomness generation, and this randomness in turn leads to a pattern of growth that takes on an increasingly smooth more-or-less circular form.
 
@@ -456,11 +456,11 @@ The pictures on the next page show an example where this happens. The detailed p
 
 It is still true, however, that at a small scale the boundaries consist of discrete cells. But as the picture below shows, the detailed configuration of these cells changes rapidly in a seemingly random way. And just as in the other systems we have discussed, what then emerges on average from all these small-scale random changes is overall behavior that again seems in many ways smooth and continuous.
 
-![](_page_350_Picture_4.jpeg)
+![](images/_page_350_Picture_4.jpeg)
 
 The behavior of an individual domain of black cells in the cellular automaton shown on the next page. The boundary of the domain exhibits seemingly random fluctuations. But at an overall level, the behavior that is produced seems in many respects quite smooth and continuous. The domain effectively behaves as if it has a surface tension, so that it first evolves to a roughly circular shape, then shrinks eventually to nothing. The main black rectangle is initially $39 \times 29$ cells in size.
 
-![](_page_351_Figure_2.jpeg)
+![](images/_page_351_Figure_2.jpeg)
 
 Behavior of a two-dimensional cellular automaton starting from a random initial condition. At each step, each cell looks at the total number of black cells in the 9-cell neighborhood consisting of the cell itself and the 8 cells adjacent to it (including diagonals). If this total is less than 4, then the cell becomes white on the next step, while if the total is greater than 6, it becomes black. If the total is exactly 5, then the cell becomes white, and if the total is exactly 4, then it becomes black. (The rule has totalistic code 976.) The pictures show that on a large scale, the rule leads to regions of black and white whose boundaries behave in a seemingly smooth and continuous way. Note that each picture is 80 cells across, and is effectively wrapped around so that the left neighbor of the leftmost cell is the rightmost cell, and so on.
 
@@ -482,7 +482,7 @@ The pictures at the top of the next page show a simple example based on a one-di
 
 One might think that if the changes one makes are always continuous, then effects would be correspondingly continuous. But the pictures on the next page demonstrate that this is not so.
 
-![](_page_353_Picture_1.jpeg)
+![](images/_page_353_Picture_1.jpeg)
 
 A one-dimensional cellular automaton that shows a discrete change in behavior when the properties of its initial conditions are continuously changed. If the initial density of black cells is less than 50%, then only white stripes ultimately survive. But as soon as the density increases above 50%, the white stripes disappear, and black stripes dominate. The underlying rule for the cellular automaton shown takes the new color of a cell to be the color of its right neighbor if the cell is black and its left neighbor if the cell is white. (This corresponds to rule 184 in the scheme described on page 53.)
 
@@ -492,13 +492,13 @@ The pictures on the facing page show another example of the same basic phenomeno
 
 It turns out that such discrete transitions are fairly rare among one-dimensional cellular automata, but in two and more dimensions they become increasingly common. The pictures on the next page show two examples—the second corresponding to a rule that we saw in a different context at the end of the previous section.
 
-![](_page_354_Picture_2.jpeg)
+![](images/_page_354_Picture_2.jpeg)
 
 A one-dimensional cellular automaton in which the density of black cells obtained after a large number of steps changes discretely when the initial density of black cells is continuously increased. With an initial density below 50%, regions of black always eventually disappear. But as soon as the density is increased above 50%, regions of black progressively expand, eventually taking over the whole system. The underlying rule allows four possible colors for each cell. The rule is set up so that whenever a region of black occurs to the left of a region of white, an expanding region of gray appears in between. The crucial point is then that if the region of white is narrower than the region of black, then the gray will reach the edge of the white before it reaches the edge of the black. And when this happens, the black expands and the gray gradually tapers away.
 
 In both examples, what essentially happens is that in regions where there is an excess of black over white, an increasingly large fraction of cells become black, while in regions where there is an excess of white over black, the reverse happens. And so long as the boundaries of the regions do not get stuck—as happens in many one-dimensional cellular automata—the result is that whichever color was initially more common eventually takes over the whole system.
 
-![](_page_355_Figure_1.jpeg)
+![](images/_page_355_Figure_1.jpeg)
 
 Two examples of two-dimensional cellular automata that show discrete transitions in behavior when the density of initial black cells is continuously varied. In the top rule, the new color of a particular cell is found simply by looking at that cell and its immediate neighbors above and to the right. If two or more of these three cells are black, then the new color is black; otherwise it is white. The pictures in the middle above show that with this rule blocks of opposite color are progressively destroyed, so that whichever color was initially more common eventually dominates completely. The bottom rule above is exactly the same as was shown on page 336. Whichever color was initially more common again eventually dominates, though with this rule it takes somewhat longer for this to occur.
 
@@ -508,13 +508,13 @@ One might think that the existence of such a discrete transition must somehow be
 
 The pictures below show a standard very simple example of how this can happen. If one starts to the left of the center hump, then the ball will always roll into the left-hand minimum. But if one progressively changes the initial position of the ball, then when one passes the center a discrete transition occurs, and the ball instead rolls into the right-hand minimum.
 
-![](_page_356_Figure_5.jpeg)
+![](images/_page_356_Figure_5.jpeg)
 
-![](_page_356_Figure_6.jpeg)
+![](images/_page_356_Figure_6.jpeg)
 
-![](_page_356_Figure_7.jpeg)
+![](images/_page_356_Figure_7.jpeg)
 
-![](_page_356_Figure_8.jpeg)
+![](images/_page_356_Figure_8.jpeg)
 
 A standard simple example of a continuous system in which there is a discrete change in behavior as a consequence of a continuous change in initial conditions. When the ball starts anywhere to the left of the center line, it rolls into the left-hand minimum. But if instead it starts on the right, then it rolls into the right-hand minimum. There are many systems in nature that follow the same general form of mathematical equations as those that describe the energy and motion of the ball.
 
@@ -540,9 +540,9 @@ In principle one could imagine looking at every possible pattern, and then picki
 
 One might imagine, however, that if such systems were just to try patterns at random, then even though incredibly few of these patterns would satisfy any given constraint exactly, a reasonable number might at least still come close. But typically it turns out that even this is not the case. And as an example, the pictures below show what fraction of patterns chosen at random have a given percentage of squares that violate the constraints described on page 211.
 
-![](_page_358_Figure_4.jpeg)
+![](images/_page_358_Figure_4.jpeg)
 
-![](_page_358_Figure_5.jpeg)
+![](images/_page_358_Figure_5.jpeg)
 
 The fraction of all possible patterns in which a certain percentage of squares violate the constraints discussed on page 211. Only a handful of patterns satisfy the constraints exactly (so that 0% of the squares are wrong). For large arrays, the vast majority of possible patterns have about 70% of the squares wrong.
 
@@ -558,11 +558,11 @@ The picture below shows results obtained with this procedure. For the first few 
 
 In practical situations this kind of approximate result can sometimes be useful, but the pictures at the top of the facing page show that the actual patterns obtained do not look much at all like the exact results that we saw for this system in Chapter 5.
 
-![](_page_359_Figure_5.jpeg)
+![](images/_page_359_Figure_5.jpeg)
 
 The results of a procedure intended to produce patterns that get progressively closer to satisfying the constraints described on page 211. The procedure starts with a randomly chosen pattern, then at each step picks a square in the pattern at random, and reverses the color of this square whenever doing so does not increase the total number of squares in the pattern that violate the constraints. The top picture shows one particular run of this procedure. The second picture shows the average behavior obtained from many runs. And finally, the bottom picture shows how the fraction of patterns with different percentages of squares violating the constraints changes as the procedure progresses. In all cases 10 × 10 patterns are used.
 
-![](_page_360_Figure_2.jpeg)
+![](images/_page_360_Figure_2.jpeg)
 
 Patterns generated by using the same procedure as in the previous picture but with three different sets of constraints. Case (a) uses the same constraints as in the previous picture, (b) requires every black square and every white square to have exactly two adjacent black squares, and (c) requires every black square to have 3 adjacent black squares and 1 white square, and every white square to have 4 adjacent white squares. In cases (a) and (b) it is possible to satisfy the constraints exactly; in case (c) it is not. The pictures show the evolution of a $30 \times 30$ array, which is nearly 10 times the area of the array shown in the previous picture. Although the fraction of squares that violate the constraints is less than 20% after 100,000 steps, the overall patterns still do not look much like the exact results.
 
@@ -570,7 +570,7 @@ So why does the procedure not work better? The problem turns out to be a rather 
 
 As a first example, consider a procedure that at each step picks a square at random, then reverses its color whenever doing so reduces the total number of squares that violate the constraint. The pictures at the top of the next page show what happens in this case. The results are remarkably poor: instead of steadily evolving to all black or all white, the system quickly gets stuck in a state that contains regions of different colors.
 
-![](_page_361_Picture_2.jpeg)
+![](images/_page_361_Picture_2.jpeg)
 
 Results of four tries at applying an iterative procedure to find configurations which satisfy the simple constraint that every square should be the same color as the square to its right. (The squares are assumed to be arranged cyclically, so that the right neighbor of the rightmost square is the leftmost square.) The procedure starts from a random configuration of squares, and then at each step picks a square at random, then reverses the color of this square whenever doing so reduces the total number of squares that violate the constraint. The only configurations that ultimately satisfy the constraints are all white and all black. But the procedure gets stuck long before it reaches these configurations. The problem is that for any block more than one square across changing the color of a square at either end will not reduce the total number of squares that violate the constraint. And as a result, such blocks remain fixed and cannot disappear.
 
@@ -578,11 +578,11 @@ And as it turns out, this kind of behavior is not uncommon among iterative proce
 
 And indeed for the first curve shown below, this procedure works just fine, and quickly leads to the lowest point. But for the second curve, the procedure will already typically not work; it will usually get stuck in one of the local minima and never reach a global minimum.
 
-![](_page_361_Figure_7.jpeg)
+![](images/_page_361_Figure_7.jpeg)
 
-![](_page_361_Figure_8.jpeg)
+![](images/_page_361_Figure_8.jpeg)
 
-![](_page_361_Figure_9.jpeg)
+![](images/_page_361_Figure_9.jpeg)
 
 Three examples of curves. In the first case, the most obvious mechanical or mathematical procedure of continually going downhill will successfully lead one to the lowest point. But in the other two cases, this procedure will usually end up getting stuck at a local minimum. This is the basic phenomenon which makes it difficult to find patterns that satisfy constraints exactly using a procedure that is based on progressive improvement. The third picture above is a representation of the kind of curve that arises in almost all discrete systems based on constraints.
 
@@ -594,7 +594,7 @@ The procedure at the top of the facing page already in a sense involved randomne
 
 Modifying the procedure slightly, however, can avoid this. And as an example the pictures below show what happens if at each step one reverses the color of a random square not only if this will decrease the total number of squares violating the constraints, but also if it leaves this number the same. In this case the system never gets permanently stuck, and instead will always eventually evolve to satisfy the constraints.
 
-![](_page_362_Picture_7.jpeg)
+![](images/_page_362_Picture_7.jpeg)
 
 Results from a slight modification to the procedure used in the picture at the top of the facing page. A random square is again picked at each step. But now the color of that square is reversed not only if doing so actually changes the total number of squares that violate the constraint, but also if it leaves this number the same. With this procedure, evolution from any initial condition can visit every possible configuration, so that the configurations which satisfy the constraints will at least eventually be reached.
 
@@ -610,13 +610,13 @@ The two cellular automata on the left both have all white and all black as invar
 
 The two-dimensional patterns that arise from the constraints at the end of Chapter 5 all turn out to correspond to invariant states of various two-dimensional cellular automata. And so for example the pattern of page 211 is found to be the unique invariant state for 572,522 of the 4,294,967,296 possible five-neighbor cellular automaton rules. But if one starts these rules from random initial conditions, one typically never gets the pattern of page 211. Instead, as the pictures at the top of the facing page show, one sees a variety of patterns that very much more reflect explicit rules of evolution than the constraint associated with the invariant state.
 
-![](_page_363_Picture_7.jpeg)
+![](images/_page_363_Picture_7.jpeg)
 
-![](_page_363_Picture_9.jpeg)
+![](images/_page_363_Picture_9.jpeg)
 
 Two of the 28 elementary cellular automata whose only invariant states are uniform in color. In the first case one of these invariant states is always reached; in the second it is not.
 
-![](_page_364_Figure_2.jpeg)
+![](images/_page_364_Figure_2.jpeg)
 
 Typical behavior of two-dimensional cellular automata that leave only the pattern on the right invariant. The results shown come from 500 steps of evolution starting from random initial conditions. In no case does the global behavior seen come even close to satisfying the simple constraints that determine the invariant state.
 
@@ -626,15 +626,15 @@ But with balls in three dimensions the situation is quite different. In this cas
 
 In two dimensions similar issues arise as soon as one has coins of more than one size. Indeed, even with just two sizes, working out how to satisfy the constraint of densest packing is already so difficult that in most cases it is still not known what configuration does it.
 
-![](_page_364_Picture_9.jpeg)
+![](images/_page_364_Picture_9.jpeg)
 
 The densest packing of identical circles in the plane. Each circle is surrounded by six others.
 
-![](_page_364_Picture_11.jpeg)
+![](images/_page_364_Picture_11.jpeg)
 
 The densest packing of identical spheres in three-dimensional space. Each sphere is surrounded by 12 others.
 
-![](_page_365_Figure_1.jpeg)
+![](images/_page_365_Figure_1.jpeg)
 
 Patterns obtained by successively laying down circles in such a way that the center of each new circle is as close as possible to the center of the first circle. Except in the very first case, the extent to which these represent the densest possible packings is not clear, and indeed it is quite possible that in most such actual packings circles of different sizes are just separated into several uniform regions.
 
@@ -656,7 +656,7 @@ Traditional intuition might have made one assume that there must be a direct cor
 
 For even programs with some of the very simplest possible rules yield highly complex behavior, while programs with fairly complicated rules often yield only rather simple behavior. And indeed, as we have seen many times in this book, and as the pictures below illustrate, even rules that are extremely similar can produce quite different behavior.
 
-![](_page_367_Figure_3.jpeg)
+![](images/_page_367_Figure_3.jpeg)
 
 A sequence of elementary cellular automata whose rules differ from one to the next only at one position (a Gray code sequence). Despite the similarity of their rules, the overall behavior of these cellular automata differs considerably.
 
@@ -668,33 +668,33 @@ But it is still often useful to identify simple mechanisms that can at least ser
 
 In many respects the very simplest possible type of behavior in any system is pure uniformity. And uniformity in time is particularly straightforward, for it corresponds just to no change occurring in the evolution of a system. But uniformity in space is already slightly more complicated, and indeed there are several different mechanisms that can be involved in it. A rather straightforward one, illustrated in the pictures below, is that some process can start at one point in space and then progressively spread, doing the same thing at every point it reaches.
 
-![](_page_368_Picture_3.jpeg)
+![](images/_page_368_Picture_3.jpeg)
 
 Homogenous growth from a single point is one straightforward way that uniformity in space can be produced, here illustrated in a mobile automaton and a cellular automaton.
 
 Another mechanism is that every part of a system can evolve completely independently to the same state, as in the pictures below.
 
-![](_page_368_Picture_6.jpeg)
+![](images/_page_368_Picture_6.jpeg)
 
 Uniformity in space can be achieved almost trivially if each element in a system independently evolves to the same state.
 
 A slightly less straightforward mechanism is illustrated in the pictures below. Here different elements in the system do interact, but the result is still that all of them evolve to the same state.
 
-![](_page_368_Picture_9.jpeg)
+![](images/_page_368_Picture_9.jpeg)
 
-![](_page_368_Picture_10.jpeg)
+![](images/_page_368_Picture_10.jpeg)
 
-![](_page_368_Picture_11.jpeg)
+![](images/_page_368_Picture_11.jpeg)
 
 Class 1 cellular automata that exhibit evolution to a uniform state, as discussed in Chapter 6.
 
 So far all the mechanisms for uniformity I have mentioned involve behavior that is in a sense simple at every level. But in nature uniformity often seems to be associated with quite complex microscopic behavior. Most often what happens is that on a small scale a system exhibits randomness, but on a larger scale this randomness averages out to leave apparent uniformity, as in the pictures below.
 
-![](_page_368_Picture_14.jpeg)
+![](images/_page_368_Picture_14.jpeg)
 
-![](_page_368_Picture_15.jpeg)
+![](images/_page_368_Picture_15.jpeg)
 
-![](_page_368_Picture_16.jpeg)
+![](images/_page_368_Picture_16.jpeg)
 
 Averaging out small-scale randomness yields apparent uniformity, as shown here for a rule 30 pattern.
 
@@ -704,11 +704,11 @@ One way this can happen, illustrated in the pictures below, is for the system to
 
 With each cell at each step having a gray level that is the average of its predecessor and its two neighbors the total amount of black is conserved, but eventually becomes spread uniformly throughout the system.
 
-![](_page_369_Picture_4.jpeg)
+![](images/_page_369_Picture_4.jpeg)
 
 An alternative is that the system may always evolve to certain specific uniform phases, but the choice of which phase may depend on the total value of some quantity, as in the pictures below.
 
-![](_page_369_Picture_6.jpeg)
+![](images/_page_369_Picture_6.jpeg)
 
 With different initial conditions this cellular automaton from page 339 can evolve either to uniform white or uniform black. Such discrete transitions are somewhat less common in one dimension than elsewhere.
 
@@ -718,7 +718,7 @@ Beyond uniformity, repetition can be considered the next-simplest form of behavi
 
 This can happen if, for example, the behavior of a system in effect follows some closed curve such as a circle which always leads back to the same point. And in general, in any system with definite rules that only ever visits a limited number of states, it is inevitable—as discussed on page 255 and illustrated above—that the behavior of the system will eventually repeat.
 
-![](_page_370_Picture_2.jpeg)
+![](images/_page_370_Picture_2.jpeg)
 
 The behavior of a system will be repetitive in time whenever it effectively follows a closed curve—either literally in space, or in terms of states that it visits.
 
@@ -726,25 +726,25 @@ In some cases the basic structure of a system may allow only a limited number of
 
 Often it is very difficult to predict whether this will be so just by looking at the underlying rules. But in a system like a cellular automaton the typical reason for it is just that in the end effects never spread beyond a limited region, as in the examples shown below.
 
-![](_page_370_Figure_7.jpeg)
+![](images/_page_370_Figure_7.jpeg)
 
 Examples of behavior in mobile automata and cellular automata that remains localized to a limited region and thus always eventually repeats.
 
 Given repetition in time, repetition in space will follow whenever elements that repeat systematically move in space. The pictures below show two cases of this, with the second picture illustrating the notion of waves that is common in traditional physics.
 
-![](_page_370_Picture_10.jpeg)
+![](images/_page_370_Picture_10.jpeg)
 
-![](_page_370_Picture_11.jpeg)
+![](images/_page_370_Picture_11.jpeg)
 
 Examples where repetition in time leads directly to repetition in space. The second picture shows standard wave motion.
 
 Growth from a simple seed can also readily lead to repetition in both space and time, as in the pictures below.
 
-![](_page_370_Picture_14.jpeg)
+![](images/_page_370_Picture_14.jpeg)
 
-![](_page_370_Picture_15.jpeg)
+![](images/_page_370_Picture_15.jpeg)
 
-![](_page_370_Picture_16.jpeg)
+![](images/_page_370_Picture_16.jpeg)
 
 Cellular automata in which a repetitive pattern in both space and time is generated by evolution from a simple seed.
 
@@ -752,15 +752,15 @@ But what about random initial conditions? Repetition in time is still easy to ac
 
 And the walls between different domains often end up not being mobile enough to allow this to happen, as in the examples below.
 
-![](_page_371_Picture_3.jpeg)
+![](images/_page_371_Picture_3.jpeg)
 
-![](_page_371_Picture_4.jpeg)
+![](images/_page_371_Picture_4.jpeg)
 
-![](_page_371_Picture_5.jpeg)
+![](images/_page_371_Picture_5.jpeg)
 
 Cellular automata in which domains of repetitive behavior form, but in which walls typically remain forever between these domains.
 
-![](_page_371_Picture_7.jpeg)
+![](images/_page_371_Picture_7.jpeg)
 
 A cellular automaton (rule 184) in which domains quickly combine to make the whole system repetitive in space.
 
@@ -768,11 +768,11 @@ But there are certainly cases—in one dimension and particularly above—where 
 
 But in other cases it happens only rather slowly. An example is rule 110, in which repetitive domains form with period 14 in space and 7 in time, but as the picture below illustrates, the localized structures which separate these domains take a very long time to disappear.
 
-![](_page_371_Picture_11.jpeg)
+![](images/_page_371_Picture_11.jpeg)
 
-![](_page_371_Picture_12.jpeg)
+![](images/_page_371_Picture_12.jpeg)
 
-![](_page_371_Picture_13.jpeg)
+![](images/_page_371_Picture_13.jpeg)
 
 The behavior of rule 110 starting from random initial conditions. Domains of repetitive behavior are formed, which in most cases gradually combine as the localized structures which separate them disappear.
 
@@ -782,13 +782,13 @@ Beyond uniformity and repetition, the one further type of simple behavior that w
 
 Nesting can be defined by thinking in terms of splitting into smaller and smaller elements according to some fixed rule. And as the pictures below illustrate, nested patterns are generated very directly in substitution systems by each element successively splitting explicitly into blocks of smaller and smaller elements.
 
-![](_page_372_Figure_4.jpeg)
+![](images/_page_372_Figure_4.jpeg)
 
 Nesting in one- and two-dimensional neighbor-independent substitution systems in which each element breaks into a block of smaller elements at each step.
 
 An essentially equivalent process involves every element branching into smaller and smaller elements and eventually forming a tree-like structure, as in the pictures below.
 
-![](_page_372_Figure_6.jpeg)
+![](images/_page_372_Figure_6.jpeg)
 
 Nested patterns generated by simple branching processes. (Compare page 406.)
 
@@ -800,21 +800,21 @@ But in general nesting need not just arise from larger elements being broken dow
 
 As an example, the pictures below show how nested patterns with larger and larger features can be built up by starting with a single black cell, and then following simple additive cellular automaton rules.
 
-![](_page_373_Picture_4.jpeg)
+![](images/_page_373_Picture_4.jpeg)
 
-![](_page_373_Picture_5.jpeg)
+![](images/_page_373_Picture_5.jpeg)
 
-![](_page_373_Picture_6.jpeg)
+![](images/_page_373_Picture_6.jpeg)
 
-![](_page_373_Picture_7.jpeg)
+![](images/_page_373_Picture_7.jpeg)
 
 Nested patterns built by the evolution of the rule 90 and rule 150 additive cellular automata starting from a single black cell.
 
 It turns out that the very same patterns can also be produced—as the pictures below illustrate—by processes in which new branches form at regular intervals, and annihilate when any pair of them collide.
 
-![](_page_373_Picture_10.jpeg)
+![](images/_page_373_Picture_10.jpeg)
 
-![](_page_373_Picture_11.jpeg)
+![](images/_page_373_Picture_11.jpeg)
 
 Nested patterns obtained by processes in which either two or three branches are formed at regular intervals, and annihilate when any pair of them collide.
 
@@ -822,11 +822,11 @@ But what about random initial conditions? Can nesting also arise from these? It 
 
 The pictures below show an example, based on the rule 184 cellular automaton. Starting from random initial conditions this rule yields a collection of stripes which annihilate whenever they meet, leading to a sequence of progressively larger nested regions.
 
-![](_page_374_Picture_3.jpeg)
+![](images/_page_374_Picture_3.jpeg)
 
-![](_page_374_Picture_4.jpeg)
+![](images/_page_374_Picture_4.jpeg)
 
-![](_page_374_Picture_5.jpeg)
+![](images/_page_374_Picture_5.jpeg)
 
 The generation of a nested pattern by rule 184 starting from random initial conditions. The pattern consists of a collection of stripes, highlighted in the second picture, which form the tree-like structure shown in the third picture. The initial condition used has exactly equal numbers of black and white cells, causing all the stripes eventually to annihilate.
 
@@ -836,7 +836,7 @@ Nesting in rule 184 is easiest to see when the initial conditions contain exactl
 
 As an example, the picture below shows the rule 110 cellular automaton evolving from random initial conditions. The picture samples just the first cell in every $14 \times 7$ block of cells, making each domain of repetitive behavior stand out as having a uniform color.
 
-![](_page_374_Picture_10.jpeg)
+![](images/_page_374_Picture_10.jpeg)
 
 A highly compressed representation of the evolution of rule 110 from random initial conditions in which only the first cell in every 14 × 7 block is sampled.
 
@@ -844,15 +844,15 @@ In the detailed behavior of the various localized structures that separate these
 
 It turns out that this basic process is not restricted to systems which produce simple uniform or repetitive domains. And the pictures below show for example cases where the behavior inside each domain is quite random.
 
-![](_page_375_Picture_4.jpeg)
+![](images/_page_375_Picture_4.jpeg)
 
 *k=3 totalistic code 1893*
 
 <!-- Editorial source-accounting reference: the legacy asset below rasterizes the author label transcribed as live text above.
-![](_page_375_Picture_5.jpeg)
+![](images/_page_375_Picture_5.jpeg)
 -->
 
-![](_page_375_Picture_6.jpeg)
+![](images/_page_375_Picture_6.jpeg)
 
 *elementary rule 18 (compressed)*
 

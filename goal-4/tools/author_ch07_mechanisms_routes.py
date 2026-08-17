@@ -46,7 +46,7 @@ IDENTITY_FIELDS = (
     "expected_topic",
 )
 STAGE_PATHS = (
-    "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+    "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
     "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md",
 )
 EXPECTED_TERMINAL_REVIEW_ID = "V000031"

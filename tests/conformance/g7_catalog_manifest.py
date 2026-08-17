@@ -29,7 +29,7 @@ SPF004	F004	event-provenance-causal-network	media	addition	event_trace;read_sets
 SPF005	F005	context-dependent-substitution	substitua	covered	seed;productions;context_shape;boundary	CH03:L333-337
 SPF006	F006	continuous-event-dynamics	dynamica	addition	seed;geometry;flow_law;reset_law;terminal_condition	BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L60-61
 SPF007	F007	coupled-field-mobile-locus-evolution	automata	addition	seed;field_law;mobile_law;boundary	CH08:L131-138
-SPF008	F008	digit-emitting-register-transduction	media	covered	seed;register_law;base;digit_projection	CHAPTERS/04-Systems-Based-on-Numbers.md:L303-308,L343-350
+SPF008	F008	digit-emitting-register-transduction	media	covered	seed;register_law;base;digit_projection	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L303-308,L343-350
 SPF009	F009	driven-relaxation	automata	addition	seed;drive_law;toppling_law;boundary;relaxation_form	BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L665-676
 SPF010	F011	enumerative-semidecision	machina	addition	query;enumeration;predicate;start	CH10:L975-989;N10:L5-15;N11:L829-855
 SPF011	F012	error-diffusion-transform	media	addition	input;palette;diffusion_kernel;scan	N10:L348-360
@@ -44,23 +44,23 @@ SPF019	F020	global-score-sequential-placement	substitua	addition	seed;score_expr
 SPF020	F021	hash-index-transform	media	addition	key;table;hash_fold;collision;operation	CH10:L829-839;N10:L976-980
 SPF021	F022	history-dependent-agent-game	automata	addition	agents;histories;payoff;action_schema;round_control	N10:L1081-1085
 SPF022	F023	history-dependent-growth-rewrite	substitua	addition	seed;eligibility;provenance_law;boundary	BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L130-151
-SPF023	F024	indexed-history-recurrence	substitua	covered	prefix;recurrence;index_law;invalidity	CHAPTERS/04-Systems-Based-on-Numbers.md:L169-186
+SPF023	F024	indexed-history-recurrence	substitua	covered	prefix;recurrence;index_law;invalidity	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L169-186
 SPF024	F025	inverse-local-system-reconstruction	criteria	addition	observations;local_law;boundary;unknown_schema;search_order	CH10:L575-633;N10:L531-544,L608-624
-SPF025	F026	iterated-erasure-process	substitua	covered	seed;erasure_predicate;rank_convention	CHAPTERS/04-Systems-Based-on-Numbers.md:L211-214
-SPF026	F027	iterated-map	automata	covered	seed;map_expression;guards;terminal_condition	CHAPTERS/04-Systems-Based-on-Numbers.md:L53-54,L111-118,L472-491
+SPF025	F026	iterated-erasure-process	substitua	covered	seed;erasure_predicate;rank_convention	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L211-214
+SPF026	F027	iterated-map	automata	covered	seed;map_expression;guards;terminal_condition	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L53-54,L111-118,L472-491
 SPF027	F028	local-factor-weighted-relation	criteria	addition	seed;factors;reduction;normalization;objective	N10:L493-494
 SPF028	F029	local-graph-rewrite	substitua	addition	seed;patterns;replacements;match_schedule;interface_schema	CH09:L901-965;N09:L495-528,L552-556,L594-600
 SPF029	F030	local-satisfaction-relation	criteria	covered	partial_assignment;templates;boundary;obligations	CH09:L595-615;N09:L324-330
-SPF030	F031	mobile-head-grid-rewrite	machina	covered	tape;transitions;head;stencil;boundary	CHAPTERS/05-Two-Dimensions-and-Beyond.md:L127-131
+SPF030	F031	mobile-head-grid-rewrite	machina	covered	tape;transitions;head;stencil;boundary	CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L127-131
 SPF031	F032	moving-frontier-shell-accretion	substitua	addition	seed;strip_constructor;rim_law;geometry;terminal_condition	CH08:L581-591;N08:L234-246
 SPF032	F033	multi-active-local-rewrite	automata	covered	seed;local_law;collision_law;schedule	CH03:L231-247
-SPF033	F034	multiway-rewrite	substitua	covered	seed;rewrites;match_semantics;quotient	CHAPTERS/05-Two-Dimensions-and-Beyond.md:L355-369
+SPF033	F034	multiway-rewrite	substitua	covered	seed;rewrites;match_semantics;quotient	CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L355-369
 SPF034	F035	mutable-rule-local-automaton	automata	addition	seed;rule_program;interpreter;mutation_law	CH08:L319-329
 SPF035	F036	nearest-neighbor-retrieval	machina	addition	items;query;metric;index;traversal	N10:L988-996
 SPF036	F037	ordinary-differential-flow	dynamica	addition	seed;rhs;parameters;duration_or_event	BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L901-902,L953-980
 SPF037	F038	parallel-independent-substitution	substitua	covered	seed;productions;schedule;geometry	CH03:L299-307,L343-363
-SPF038	F040	parallel-network-rewrite	substitua	covered	seed;patches;port_schema;overlap_law	CHAPTERS/05-Two-Dimensions-and-Beyond.md:L241,L287-331
-SPF039	F041	partial-differential-relation	dynamica	covered	domain;coefficients;differential_relation;side_data	CHAPTERS/04-Systems-Based-on-Numbers.md:L625-674;N08:L84-105,L322-328
+SPF038	F040	parallel-network-rewrite	substitua	covered	seed;patches;port_schema;overlap_law	CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L241,L287-331
+SPF039	F041	partial-differential-relation	dynamica	covered	domain;coefficients;differential_relation;side_data	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L625-674;N08:L84-105,L322-328
 SPF040	F043	population-evolutionary-search	automata	addition	population;fitness_expression;selection;recombination;mutation;size	BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L556-560
 SPF041	F044	probabilistic-transition-model-fitting	media	addition	observations;topology;estimator;generation_law;generation_request	CH10:L441-459;N10:L495-501
 SPF042	F045	program-randomization-test	criteria	addition	observed;surrogate_law;program;statistic;replicates;calibration	CH10:L515-533
@@ -68,7 +68,7 @@ SPF043	F046	random-functional-graph-construction	substitua	addition	nodes;succes
 SPF044	F047	recursive-function-evaluator	machina	covered	call;definitions;evaluation_order;cache	BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L237-268,L316-364
 SPF045	F048	register-machine	machina	covered	program;registers;entry	CH03:L473-509,L519-525
 SPF046	F049	sampled-causal-order-network	media	addition	region;causal_order;density;event_measure	N09:L816-818
-SPF047	F050	stochastic-local-search	criteria	addition	incumbent;objective;constraints;proposal;acceptance	CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md:L553-596
+SPF047	F050	stochastic-local-search	criteria	addition	incumbent;objective;constraints;proposal;acceptance	CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md:L553-596
 SPF048	F051	stored-program-random-access-machine	machina	addition	memory;entry;instruction_set	N11:L15-23
 SPF049	F052	structural-pattern-rewrite	substitua	covered	expression;patterns;replacements;scan;nonoverlap	CH03:L531-537;N03:L823-835;CH10:L909-915
 SPF050	F053	synchronous-local-state-transform	automata	covered	seed;stencil;local_law;boundary;feedback	CH10:L323-347;N10:L328-347;N03:L135-150,L190,L192-225
@@ -242,9 +242,9 @@ T45	-	SPF039	partial_differential_relation	C	CH04:L625-674;N04:L933-940
 
 LEGACY_CALLABLE_ROWS = _tab_rows(
     """
-iterated_map	automata	C	SPF026	ca.catalog.automata.iterated_map	1	T43	CHAPTERS/04-Systems-Based-on-Numbers.md:L53-54,L111-118,L472-491
-parallel_network_rewrite	substitua	C	SPF038	ca.catalog.substitua.parallel_network_rewrite	1	T29	CHAPTERS/05-Two-Dimensions-and-Beyond.md:L241,L287-331
-partial_differential_relation	dynamica	C	SPF039	ca.catalog.dynamica.partial_differential_relation	1	T45	CHAPTERS/04-Systems-Based-on-Numbers.md:L625-674;N08:L84-105,L322-328
+iterated_map	automata	C	SPF026	ca.catalog.automata.iterated_map	1	T43	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L53-54,L111-118,L472-491
+parallel_network_rewrite	substitua	C	SPF038	ca.catalog.substitua.parallel_network_rewrite	1	T29	CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L241,L287-331
+partial_differential_relation	dynamica	C	SPF039	ca.catalog.dynamica.partial_differential_relation	1	T45	CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L625-674;N08:L84-105,L322-328
 recursive_function_evaluator	machina	C	SPF044	ca.catalog.machina.recursive_function_evaluator	1	T41	BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L237-268,L316-364
 register_machine	machina	C	SPF045	ca.catalog.machina.register_machine	1	T19	CH03:L473-509,L519-525
 eca	automata	P	SPF050	Bind binary 1-D radius-one synchronous feedback; family constructor remains synchronous_local_state_transform.	1	T01	CH03:L29-56

@@ -312,7 +312,7 @@ Stage 11 owns exactly two still-pending canonical assignments:
 
 | Assignment | Source units | Physical images |
 |---|---:|---:|
-| `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` | 435, `U001577..U002011` | 92 referenced: `A001028..A001040`, `A001042..A001056`, `A001058..A001121` |
+| `CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md` | 435, `U001577..U002011` | 92 referenced: `A001028..A001040`, `A001042..A001056`, `A001058..A001121` |
 | `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 278, `U006592..U006869` | 43 referenced + 59 unreferenced: `A000001..A000018`, `A000661..A000744` |
 | **Total** | **713** | **194** |
 

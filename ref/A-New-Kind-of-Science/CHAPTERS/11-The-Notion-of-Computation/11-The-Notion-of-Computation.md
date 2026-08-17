@@ -1,4 +1,4 @@
-![](_page_652_Picture_0.jpeg)
+![](images/_page_652_Picture_0.jpeg)
 
 ## The Notion of Computation
 
@@ -28,9 +28,9 @@ The pictures below show an example of a cellular automaton whose evolution can b
 
 If one starts this cellular automaton with an even number of black cells, then after a few steps of evolution, no black cells are left. But if instead one starts it with an odd number of black cells, then a single black cell survives forever. So in effect this cellular automaton can be viewed as computing whether a given number is even or odd.
 
-![](_page_653_Picture_9.jpeg)
+![](images/_page_653_Picture_9.jpeg)
 
-![](_page_653_Picture_10.jpeg)
+![](images/_page_653_Picture_10.jpeg)
 
 A simple cellular automaton whose evolution effectively computes the remainder after division of a number by 2. Starting from a row of $n$ black cells, 0 black cells survive if $n$ is even, and 1 black cell survives if $n$ is odd. The cellular automaton follows elementary rule 132, as shown on the left.
 
@@ -38,7 +38,7 @@ One specifies the input to the computation by setting up an appropriate number o
 
 Testing whether a number is even or odd is by most measures a rather simple computation. But one can also get cellular automata to do more complicated computations. And as an example the pictures below show a cellular automaton that computes the square of any number. If one starts say with 5 black squares, then after a certain number of steps the cellular automaton will produce a block of exactly $5 \times 5 = 25$ black squares.
 
-![](_page_654_Figure_3.jpeg)
+![](images/_page_654_Figure_3.jpeg)
 
 A cellular automaton that computes the square of any number. The cellular automaton effectively works by adding the original number $n$ together $n$ times. The underlying rule used here involves eight possible colors for each cell.
 
@@ -46,7 +46,7 @@ At first it might seem surprising that a system with the simple underlying struc
 
 The rule for this cellular automaton is somewhat complicated—it involves a total of sixteen colors possible for each cell—but the example demonstrates the point that in principle a cellular automaton can compute the primes.
 
-![](_page_655_Picture_2.jpeg)
+![](images/_page_655_Picture_2.jpeg)
 
 A cellular automaton constructed to compute the prime numbers. The system generates a dark gray stripe on the left at all positions that correspond to any product of numbers other than 1. White gaps then remain at positions that correspond to the prime numbers 2, 3, 5, 7, 11, 13, 17, etc. The cellular automaton effectively does its computation using the standard sieve of Eratosthenes method. The structures on the right bounce backwards and forwards with repetition periods corresponding to successive odd numbers. Once in each period they produce a gray stripe which propagates to the left, so that in the end there is a gray stripe corresponding to every multiple of every number. The rule for the cellular automaton shown here involves 16 possible colors for each cell.
 
@@ -58,13 +58,13 @@ But for the cellular automata that I have discussed in this section, it so happe
 
 And this turns out to be possible for some of the cellular automata that I discussed earlier in this book. Thus, for example, as shown below, rule 94 can effectively be described as enumerating even numbers. Similarly, rule 62 can be thought of as enumerating numbers that are multiples of 3, while rule 190 enumerates numbers that are multiples of 4. And if one looks down the center column of the pattern it produces, rule 129 can be thought of as enumerating numbers that are powers of 2.
 
-![](_page_656_Figure_5.jpeg)
+![](images/_page_656_Figure_5.jpeg)
 
-![](_page_656_Figure_6.jpeg)
+![](images/_page_656_Figure_6.jpeg)
 
-![](_page_656_Figure_7.jpeg)
+![](images/_page_656_Figure_7.jpeg)
 
-![](_page_656_Figure_8.jpeg)
+![](images/_page_656_Figure_8.jpeg)
 
 Examples of simple cellular automata whose evolution corresponds to computations that can easily be described in traditional mathematical terms. In analogy to the previous page, the positions of white cells at the bottom of the rule 94 picture correspond to even numbers, on the left in rule 62 to multiples of 3, in rule 190 to multiples of 4, and in the center column of rule 129 to powers of 2.
 
@@ -74,13 +74,13 @@ So how then can we ever expect to describe these computations? Traditional mathe
 
 Examples of cellular automata that have simple underlying rules but whose overall behavior does not seem to correspond to computations with any kind of simple description in standard mathematical or other terms.
 
-![](_page_656_Picture_13.jpeg)
+![](images/_page_656_Picture_13.jpeg)
 
-![](_page_656_Picture_14.jpeg)
+![](images/_page_656_Picture_14.jpeg)
 
 *rule 45*
 
-![](_page_656_Picture_16.jpeg)
+![](images/_page_656_Picture_16.jpeg)
 
 *rule 73*
 
@@ -132,55 +132,55 @@ The rules for this cellular automaton itself are always the same. But the fact t
 
 The next three pages show three examples of this.
 
-![](_page_660_Picture_1.jpeg)
+![](images/_page_660_Picture_1.jpeg)
 
-![](_page_660_Picture_2.jpeg)
+![](images/_page_660_Picture_2.jpeg)
 
 The universal cellular automaton emulating elementary rule 254. Each cell in rule 254 is represented by a block of 20 cells in the universal cellular automaton. Each of these blocks encodes both the color of the cell it represents, and the rule for updating this color.
 
-![](_page_660_Figure_4.jpeg)
+![](images/_page_660_Figure_4.jpeg)
 
-![](_page_661_Picture_2.jpeg)
+![](images/_page_661_Picture_2.jpeg)
 
 The universal cellular automaton emulating elementary rule 90. The underlying rules for the universal cellular automaton are exactly the same as on the previous page. But each block in the initial conditions now contains a representation of rule 90 rather than rule 254.
 
-![](_page_661_Picture_4.jpeg)
+![](images/_page_661_Picture_4.jpeg)
 
-![](_page_661_Picture_5.jpeg)
+![](images/_page_661_Picture_5.jpeg)
 
-![](_page_662_Picture_1.jpeg)
+![](images/_page_662_Picture_1.jpeg)
 
-![](_page_662_Picture_2.jpeg)
+![](images/_page_662_Picture_2.jpeg)
 
 The universal cellular automaton emulating rule 30. A total of 848 steps in the evolution of the universal cellular automaton are shown, corresponding to 16 steps in the evolution of rule 30.
 
-![](_page_662_Picture_4.jpeg)
+![](images/_page_662_Picture_4.jpeg)
 
 On each page the underlying rules for the universal cellular automaton are exactly the same. But on the first page, the initial conditions are set up so as to make the universal cellular automaton emulate rule 254, while on the second page they are set up to make it emulate rule 90, and on the third page rule 30.
 
 The pages that follow show how this works. The basic idea is that a block of 20 cells in the universal cellular automaton is used to represent each single cell in the cellular automaton that is being emulated. And within this block of 20 cells is encoded both a specification of the current color of the cell that is being represented, as well as the rule by which that color is to be updated.
 
-![](_page_663_Picture_3.jpeg)
+![](images/_page_663_Picture_3.jpeg)
 
 The rules for the universal cellular automaton. There are 19 possible colors for each cell, represented here by 19 different icons. Since the new color of each cell depends on the previous colors of a total of five cells, there are in principle 2,476,099 cases to cover. But by using $\boxminus$ to stand for a cell with any possible color, many cases are combined. Note that the cases shown are in a definite order reading down successive columns, with special cases given before more general ones. With the initial conditions used, there are some combinations of cells that can never occur, and these are not covered in the rules shown.
 
-![](_page_664_Picture_1.jpeg)
+![](images/_page_664_Picture_1.jpeg)
 
 Details of how the universal cellular automaton emulates rule 254. Each of the blocks in the universal cellular automaton represents a single cell in rule 254, and encodes both the current color of the cell and the form of the rule used to update it.
 
-![](_page_664_Picture_3.jpeg)
+![](images/_page_664_Picture_3.jpeg)
 
-![](_page_665_Figure_1.jpeg)
+![](images/_page_665_Figure_1.jpeg)
 
 Details of how the universal cellular automaton emulates rule 90. The only difference in initial conditions from the picture on the previous page is that each block now encodes rule 90 instead of rule 254.
 
-![](_page_665_Figure_3.jpeg)
+![](images/_page_665_Figure_3.jpeg)
 
-![](_page_666_Figure_1.jpeg)
+![](images/_page_666_Figure_1.jpeg)
 
 Details of how the universal cellular automaton emulates rule 30. Once again, the only difference in initial conditions from the facing page is that each block now encodes rule 30 instead of rule 90.
 
-![](_page_666_Figure_3.jpeg)
+![](images/_page_666_Figure_3.jpeg)
 
 In the examples shown, the cellular automata being emulated have 8 cases in their rules, with each case giving the outcome for one of the 8 possible combinations of colors of a cell and its immediate neighbors. In every block of 20 cells in the universal cellular automaton, these rules are encoded in a very straightforward way, by listing in order the outcomes for each of the 8 possible cases.
 
@@ -192,7 +192,7 @@ There are three basic stages, visible in the pictures as three stripes moving to
 
 The pictures on the last few pages have shown how the universal cellular automaton can in effect be programmed to emulate any cellular automaton whose rules involve nearest neighbors and two possible colors for each cell. But the universal cellular automaton is in no way restricted to emulating only rules that involve nearest neighbors. And thus on the facing page, for example, it is shown emulating a rule that involves next-nearest as well as nearest neighbors.
 
-![](_page_668_Figure_2.jpeg)
+![](images/_page_668_Figure_2.jpeg)
 
 The universal cellular automaton emulating one step in the evolution of the rule shown above, which involves next-nearest as well as nearest-neighbor cells. The rule now covers a total of 32 cases, corresponding to the possible arrangements of colors of a cell and its nearest and next-nearest neighbors. The picture shows the evolution of five cells according to the rule shown, with each cell now being represented by a block of 70 cells in the universal cellular automaton.
 
@@ -208,7 +208,7 @@ But from studying the universal cellular automaton in this section, we now know 
 
 In a sense, therefore, what we can now see is that nothing fundamental can ever be gained by using rules that are more complicated than those for the universal cellular automaton. For given the universal cellular automaton, more complicated rules can always be emulated just by setting up appropriate initial conditions.
 
-![](_page_670_Figure_1.jpeg)
+![](images/_page_670_Figure_1.jpeg)
 
 An example of how a cellular automaton with three possible colors and nearest-neighbor rules can be emulated by a cellular automaton with only two possible colors but a larger number of neighbors (in this case five on each side). The basic idea is to represent each cell in the three-color rule by a block of three cells in the two-color rule, according to the correspondence given on the left. The three-color rule illustrated here is totalistic code 1599 from page 70.
 
@@ -224,13 +224,13 @@ With their simple and rather specific underlying structure one might think that 
 
 As a first example of this, the picture on the facing page shows how a cellular automaton can be made to emulate a mobile automaton.
 
-![](_page_672_Picture_1.jpeg)
+![](images/_page_672_Picture_1.jpeg)
 
 An example of a mobile automaton (see page 71) being emulated by a cellular automaton. In the mobile automaton shown on the left each cell has two possible colors. In the cellular automaton shown on the right, the cells have four possible colors, with two darker colors corresponding to the active cell in the mobile automaton. The rules for the mobile automaton and the cellular automaton are shown below. In the rules for the cellular automaton, $\boxminus$ indicates a cell of any color.
 
-![](_page_672_Picture_3.jpeg)
+![](images/_page_672_Picture_3.jpeg)
 
-![](_page_672_Picture_4.jpeg)
+![](images/_page_672_Picture_4.jpeg)
 
 The main difference between a mobile automaton and a cellular automaton is that in a mobile automaton there is a special active cell that moves around from one step to the next, while in a cellular automaton all cells are always effectively treated as being exactly the same. And to emulate a mobile automaton with a cellular automaton it turns out that all one need do is to divide the possible colors of cells in the cellular automaton into two sets: lighter ones that correspond to ordinary cells in the mobile automaton, and darker ones that correspond to active cells. And then by setting up appropriate rules and choosing initial conditions that contain only one darker cell, one can produce in the cellular automaton an exact emulation of every step in the evolution of a mobile automaton—as in the picture above.
 
@@ -238,11 +238,11 @@ The same basic approach can be used to construct a cellular automaton that emula
 
 One might think that the reason that mobile automata and Turing machines can be emulated by cellular automata is that they both consist of fixed arrays of cells, just like cellular automata. So then one may wonder what happens with substitution systems, for example, where there is no fixed array of elements.
 
-![](_page_673_Figure_1.jpeg)
+![](images/_page_673_Figure_1.jpeg)
 
-![](_page_673_Figure_2.jpeg)
+![](images/_page_673_Figure_2.jpeg)
 
-![](_page_673_Figure_3.jpeg)
+![](images/_page_673_Figure_3.jpeg)
 
 The pictures on the facing page demonstrate that in fact these can also be emulated by cellular automata. But while one can emulate each step in the evolution of a mobile automaton or a Turing machine with a single step of cellular automaton evolution, this is no longer in general true for substitution systems.
 
@@ -252,11 +252,11 @@ The same kind of problem occurs in sequential substitution systems—as well as 
 
 But just how broad is the set of systems that cellular automata can ultimately emulate? All the examples of systems that I have shown so far can at some level be thought of as involving sequences of elements that are fairly directly analogous to the cells in a cellular automaton.
 
-![](_page_674_Picture_2.jpeg)
+![](images/_page_674_Picture_2.jpeg)
 
 Examples of cellular automata that emulate substitution systems. The successive steps in the evolution of each substitution system are obtained at the points indicated by arrows. Note that the sequences of elements generated by the cellular automata are aligned at the right, while in the pictures of the substitution systems shown they are aligned at the left. The rules for the three cellular automata involve only nearest neighbors, and allow 12 possible colors for each cell.
 
-![](_page_675_Figure_1.jpeg)
+![](images/_page_675_Figure_1.jpeg)
 
 A cellular automaton set up to emulate a sequential substitution system. The cellular automaton involves 28 colors and nearest-neighbor rules. The strings produced by the sequential substitution system appear on successive diagonal stripes indicated by arrows in the evolution of the cellular automaton on the right.
 
@@ -264,9 +264,9 @@ But one example where there is no such direct analogy is a register machine. And
 
 But in fact it turns out to be fairly straightforward to do so, as illustrated at the top of the facing page. The basic idea is to have the cellular automaton produce a pattern that expands and contracts on each side in a way that corresponds to the incrementing and decrementing of the sizes of numbers in the first and second registers of the register machine. In the center of the cellular automaton is then a cell whose possible colors correspond to possible points in the program for the register machine. And as the cell makes transitions from one color to another, it effectively emits signals that move to the left or right modifying the pattern in the cellular automaton in a way that follows each instruction in the register machine program.
 
-![](_page_676_Picture_1.jpeg)
+![](images/_page_676_Picture_1.jpeg)
 
-![](_page_676_Picture_2.jpeg)
+![](images/_page_676_Picture_2.jpeg)
 
 An example of a register machine being emulated by a cellular automaton. The cellular automaton has 12 possible colors for each cell. Of these, 5 are used by the center cell to represent the point that has been reached in the register machine program. The other 7 are used to implement signals that propagate out to the left and right to do the analog of incrementing and decrementing each register.
 
@@ -274,17 +274,17 @@ So what about systems based on numbers? Can these also be emulated by cellular a
 
 So what about practical computers? Can these also be emulated by cellular automata? From the examples just discussed of register machines and systems based on numbers, we already know that cellular automata can emulate some of the low-level operations typically found in computers. And the pictures on the next two pages show how cellular automata can also be made to emulate two other important aspects of practical computers.
 
-![](_page_676_Figure_7.jpeg)
+![](images/_page_676_Figure_7.jpeg)
 
 Repeated multiplication by 3 in base 2 being performed by a cellular automaton with 11 colors.
 
 The pictures below show how a cellular automaton can evaluate any logic expression that is given in a certain form. And the picture on the facing page then shows how a cellular automaton can retrieve data from a numbered location in what is effectively a random-access memory.
 
-![](_page_677_Figure_2.jpeg)
+![](images/_page_677_Figure_2.jpeg)
 
 A cellular automaton which emulates basic logic circuits. The underlying rules for the cellular automaton are exactly the same in each case, and involve nearest neighbors and five possible colors for each cell. But the initial condition can represent a logic expression that involves any number of variables together with the operations of AND, OR and NOT. In the examples above, two variables, $p$ and $q$, are used, and in each case the behavior obtained with all four possible combinations of values for $p$ and $q$ are shown.
 
-![](_page_678_Figure_1.jpeg)
+![](images/_page_678_Figure_1.jpeg)
 
 A cellular automaton set up to emulate random-access memory in a computer. The memory is on the right, and can be of any size. Instructions come in from the left, with memory locations specified by addresses consisting of binary digits.
 
@@ -302,7 +302,7 @@ In this section we will discover that in fact almost all of the systems that we 
 
 As a first example, the pictures below show how mobile automata can be set up to emulate cellular automata. The basic idea is to have the active cell in the mobile automaton sweep backwards and forwards, updating cells as it goes, in such a way that after each complete sweep it has effectively performed one step of cellular automaton evolution.
 
-![](_page_679_Figure_5.jpeg)
+![](images/_page_679_Figure_5.jpeg)
 
 Examples of mobile automata emulating cellular automata. In case (a) the rules for the mobile automaton are set up to emulate the rule 90 elementary cellular automaton; in case (b) they are set up to emulate rule 30. The pictures on the right are obtained by keeping only the steps indicated by arrows on the left, corresponding to times when the active cell in the mobile automaton is further to the left than it has ever been before. The mobile automata used here involve 7 possible colors for each cell.
 
@@ -314,7 +314,7 @@ A similar scheme to the one for mobile automata can also be used for Turing mach
 
 But as it turns out, a universal Turing machine was already constructed in 1936, using somewhat different methods. And in fact that universal Turing machine provided what was historically the very first clear example of universality seen in any system.
 
-![](_page_680_Figure_5.jpeg)
+![](images/_page_680_Figure_5.jpeg)
 
 Examples of Turing machines that emulate cellular automata with rules 90 and 30. The pictures on the right are obtained by keeping only the steps indicated by arrows on the left. The Turing machines have 6 states and 3 possible colors for each cell.
 
@@ -322,7 +322,7 @@ Continuing with the types of systems from the previous section, we come next to 
 
 But if one generalizes to neighbor-dependent substitution systems then it immediately becomes very straightforward to emulate cellular automata, as in the pictures below.
 
-![](_page_681_Figure_3.jpeg)
+![](images/_page_681_Figure_3.jpeg)
 
 Neighbor-dependent substitution systems that emulate cellular automata with rules 90 and 30. The systems shown are simple examples of neighbor-dependent substitution systems with highly uniform rules always yielding just one cell and corresponding quite directly to cellular automata.
 
@@ -332,19 +332,19 @@ Perhaps more surprisingly, the same is also true for ordinary tag systems. And e
 
 What about symbolic systems? The structure of these systems is certainly vastly different from cellular automata. But once again—as the picture at the top of page 668 shows—it is quite easy to get these systems to emulate cellular automata.
 
-![](_page_682_Figure_2.jpeg)
+![](images/_page_682_Figure_2.jpeg)
 
-![](_page_682_Figure_3.jpeg)
+![](images/_page_682_Figure_3.jpeg)
 
 Sequential substitution systems that emulate cellular automata with rules 90 and 30. The pictures at the top above are obtained by keeping only the steps indicated by arrows on the left. The sequential substitution systems involve elements with 3 possible colors.
 
-![](_page_682_Figure_5.jpeg)
+![](images/_page_682_Figure_5.jpeg)
 
-![](_page_682_Figure_6.jpeg)
+![](images/_page_682_Figure_6.jpeg)
 
 Tag systems that emulate the rule 90 and rule 30 cellular automata. The pictures at the top above are obtained by keeping only the steps indicated by arrows on the left. Both tag systems involve 6 colors.
 
-![](_page_683_Figure_1.jpeg)
+![](images/_page_683_Figure_1.jpeg)
 
 Symbolic systems set up to emulate cellular automata that have rules 90 and 30. Unlike the examples of symbolic systems in Chapter 3, which involve only one symbol, these symbolic systems involve three symbols, $p$, $q$ and $r$.
 
@@ -354,29 +354,29 @@ So what about the other types of systems that we considered in Chapter 3? One th
 
 But to demonstrate that cyclic tag systems can manage to emulate cellular automata is not quite as straightforward as to do this for the various kinds of systems we have discussed so far. And indeed we will end up doing it in several stages. The first stage, illustrated in the picture at the top of the facing page, is to get a cyclic tag system to emulate an ordinary tag system with the property that its rules depend only on the very first element that appears at each step.
 
-![](_page_684_Figure_1.jpeg)
+![](images/_page_684_Figure_1.jpeg)
 
 A cyclic tag system emulating a tag system that depends only on the first element at each step. In the expanded tag system evolution, successive colors of elements are encoded by having a black cell at successive positions inside a fixed block of white cells.
 
 And having done this, the next stage is to get such a tag system to emulate a Turing machine. The pictures on the next page illustrate how this can be done. But at least with the particular construction shown, the resulting Turing machine can only have cells with two possible colors. The pictures below demonstrate, however, that such a Turing machine can readily be made to emulate a Turing machine with any number of colors. And through the construction of page 665 this then finally shows that a cyclic tag system can successfully emulate any cellular automaton—and can thus be universal.
 
-![](_page_684_Figure_4.jpeg)
+![](images/_page_684_Figure_4.jpeg)
 
-![](_page_684_Picture_5.jpeg)
+![](images/_page_684_Picture_5.jpeg)
 
 Turing machines with two colors emulating ones with more colors.
 
-![](_page_685_Figure_2.jpeg)
+![](images/_page_685_Figure_2.jpeg)
 
 Emulating a Turing machine with a tag system that depends only on the first element at each step. The configuration of cells on each side of the head in the Turing machine is treated as a base 2 number. At the steps indicated by arrows the tag system yields sequences of dark cells with lengths that correspond to each of these numbers.
 
 This leaves only one remaining type of system from Chapter 3: register machines. And although it is again slightly complicated, the pictures on the next page—and below—show how even these systems can be made to emulate Turing machines and thus cellular automata.
 
-![](_page_686_Picture_3.jpeg)
+![](images/_page_686_Picture_3.jpeg)
 
 So what about systems based on numbers, like those we discussed in Chapter 4? As an example, one can consider a generalization of the arithmetic systems discussed on page 122—in which one has a whole number $n$, and at each step one finds the remainder after dividing by a constant, and based on the value of this remainder one then applies some specified arithmetic operation to $n$.
 
-![](_page_687_Figure_1.jpeg)
+![](images/_page_687_Figure_1.jpeg)
 
 An example of a register machine set up to emulate a Turing machine. The Turing machine used here has two states for the head; the register machine program has 72 instructions and uses three registers. The register machine compressed evolution keeps only steps corresponding to every other time the third register gets incremented from zero.
 
@@ -386,9 +386,9 @@ And indeed the fact that it is possible to set up a universal system using essen
 
 But from what we have learned in this chapter, it no longer seems surprising that arithmetic should be capable of achieving universality. Indeed, considering all the kinds of systems that we have found can exhibit universality, it would have been quite peculiar if arithmetic had somehow not been able to support it.
 
-![](_page_688_Figure_4.jpeg)
+![](images/_page_688_Figure_4.jpeg)
 
-![](_page_688_Picture_5.jpeg)
+![](images/_page_688_Picture_5.jpeg)
 
 An example of how a simple arithmetic system can emulate a register machine. The arithmetic system takes the value $n$ that it obtains at each step, computes $Mod[n, 30]$, and then depending on the result applies to $n$ one of the arithmetic operations specified by the rule on the left below. The rule is set up so that if the value of $n$ is written in the form $i + 5$, $2^a$, $3^b$ then the values of $i$, $a$ and $b$ on successive steps correspond respectively to the position of the register machine in its program, and to the values of the two registers (2 and 3 appear because they are the first two primes; 5 appears because it is the length of the register machine program). The values of $n$ in the pictures on the left are indicated on a logarithmic scale.
 
@@ -434,13 +434,13 @@ But such rules still involve 343 distinct cases and are by almost any measure ve
 
 The leading candidate was what I called rule 110—a cellular automaton that we have in fact discussed several times before in this book. Like any of the 256 so-called elementary rules, rule 110 can be specified as below by giving the outcome for each of the eight possible combinations of colors of a cell and its nearest neighbors.
 
-![](_page_691_Picture_5.jpeg)
+![](images/_page_691_Picture_5.jpeg)
 
 The underlying rules for the rule 110 cellular automaton discussed in this section. As elsewhere in the book, each of the eight cases shows what the new color of a cell should be based on its own previous color, and on the previous colors of its neighbors. Despite the extreme simplicity of its underlying rules, what this section will demonstrate is that the rule 110 cellular automaton is in fact universal, and is thus in a sense capable of arbitrarily complex behavior. If the values of the cells in each block are labelled $p$, $q$ and $r$, then rule 110 can be written as $Mod[(1 + p) q r + q + r, 2]$ or $\neg (p \land q \land r) \land (q \lor r)$.
 
 Looking just at this very simple specification, however, it seems at first quite absurd to think that rule 110 might be universal. But as soon as one looks at a picture of how rule 110 actually behaves, the idea that it could be universal starts to seem much less absurd. For despite the simplicity of its underlying rules, rule 110 supports a whole variety of localized structures—that move around and interact in many complicated ways. And from pictures like the one on the facing page, it begins to seem not unreasonable that perhaps these localized structures could be arranged so as to perform meaningful computations.
 
-![](_page_692_Picture_1.jpeg)
+![](images/_page_692_Picture_1.jpeg)
 
 A typical example of the behavior of rule 110 with random initial conditions. From looking at pictures like these one can begin to imagine that it could be possible to arrange localized structures in rule 110 so as to be able to perform meaningful computations. Note that page 292 already showed many of the types of localized structures that can occur in rule 110.
 
@@ -464,17 +464,17 @@ So if we can succeed in demonstrating that rule 110 can emulate any cyclic tag s
 
 Picture (a) shows an example of the evolution of a cyclic tag system in the standard representation from pages 95 and 96. Picture (b) then shows another version of this same evolution, but now rearranged so that each element stays in the same position, rather than always shifting to the left at each step.
 
-![](_page_694_Picture_1.jpeg)
+![](images/_page_694_Picture_1.jpeg)
 
-![](_page_694_Picture_2.jpeg)
+![](images/_page_694_Picture_2.jpeg)
 
-![](_page_694_Picture_3.jpeg)
+![](images/_page_694_Picture_3.jpeg)
 
-![](_page_694_Picture_4.jpeg)
+![](images/_page_694_Picture_4.jpeg)
 
 Four views of a cyclic tag system with rules as shown above, drawn so as to be progressively closer to what can be emulated directly in rule 110. Picture (a) shows the cyclic tag system in the same form as on pages 95 and 96. Picture (b) shows the system with sequences on successive steps rearranged so that they do not shift to the left when the first element is removed. Picture (c) is a skewed version of (b) in which the way information is used from the underlying rules at each step is explicitly indicated. Picture (d) shows a more definite mechanism for the evolution of the system in which different lines effectively indicate the motions of different pieces of information.
 
-![](_page_694_Picture_6.jpeg)
+![](images/_page_694_Picture_6.jpeg)
 
 A cyclic tag system in general operates by removing the first element from the sequence that exists at each step, and then adding a new block of elements to the end of the sequence if this element is black. A crucial feature of cyclic tag systems is that the choice of what block of elements can be added does not depend in any way on the form of the sequence. So, for example, on the previous page, there are just two possibilities, and these possibilities alternate on successive steps.
 
@@ -490,7 +490,7 @@ When this line is gray, it then absorbs all other lines coming from the left unt
 
 By looking at picture (d), one can begin to see how it might be possible for a cyclic tag system to be emulated by rule 110: the basic idea is to have each of the various kinds of lines in the picture be emulated by some collection of localized structures in rule 110.
 
-![](_page_696_Picture_2.jpeg)
+![](images/_page_696_Picture_2.jpeg)
 
 Objects constructed from localized structures in rule 110, used for the emulation of cyclic tag systems. Each of the pictures shown is 500 cells wide. The objects in the top two pictures correspond to the thick vertical black and gray lines in picture (d) on page 679. The objects in the next two pictures correspond to the dark and light gray lines that come in from the left in picture (d). (Note that all the structures are left-right reversed in rule 110.) The third pair of pictures correspond to two versions of the dashed lines in picture (d). And the fourth pair of pictures correspond to right-going lines on the right-hand side of picture (d). All the localized structures involved in the pictures above were shown individually on page 292. Note that the spacings between structures are crucial in determining the objects they represent.
 
@@ -510,19 +510,19 @@ The next several pages then give details of what happens in each of the regions 
 
 Region (a) shows a block separator—corresponding to a dashed line in picture (d) on page 679—hitting the single black element in the sequence that exists at the first step. Because the element hit is black, an object must be produced that allows information from the block at this step to pass through. Most of the activity in region (a) is concerned with producing such an object. But it turns out that as a side-effect two additional localized structures are produced that can be seen propagating to the left. These structures could later cause trouble, but looking at region (b) we see that in fact they just pass through other structures that they meet without any adverse effect.
 
-![](_page_698_Picture_1.jpeg)
+![](images/_page_698_Picture_1.jpeg)
 
 A schematic diagram of how rule 110 can be made to emulate a cyclic tag system. Each line in this diagram corresponds to one localized structure in rule 110. Note that the relative slopes of the structures are reproduced faithfully here, but their spacings are not. Note also that lines shown in different colors here often correspond to the same structure in rule 110.
 
-![](_page_699_Picture_1.jpeg)
+![](images/_page_699_Picture_1.jpeg)
 
 Close-ups of circled regions shown schematically on the previous page. Each picture is 320 cells wide and shows 1200 evolution steps.
 
-![](_page_700_Picture_1.jpeg)
+![](images/_page_700_Picture_1.jpeg)
 
 Close-ups (continued).
 
-![](_page_701_Picture_1.jpeg)
+![](images/_page_701_Picture_1.jpeg)
 
 Close-ups (continued).
 
@@ -542,7 +542,7 @@ The way that the lines interact in the interior of each picture is always exactl
 
 In the way that the pictures are drawn below, the blocks that appear in each rule are encoded in the pattern of lines coming in from the left edge of the picture. But if each picture were extended sufficiently far to the left, then all these lines would eventually be seen to start from the top. And what this means is that the arrangement of lines can therefore always be viewed as an initial condition for the system.
 
-![](_page_703_Picture_5.jpeg)
+![](images/_page_703_Picture_5.jpeg)
 
 Schematic diagrams of how cyclic tag systems with four different underlying rules can be emulated. The lines in each diagram correspond essentially to collections of localized structures in rule 110. The processes that occur in the interior of each picture are always the same; the different cyclic tag system rules are implemented by different arrangements of lines entering each picture.
 
@@ -584,7 +584,7 @@ If one looks at the typical behavior of rule 110 with random initial conditions,
 
 The pictures on the next page show a few examples of such class 4 systems. And while the details are different in each case, the general features of the behavior are always rather similar.
 
-![](_page_707_Figure_1.jpeg)
+![](images/_page_707_Figure_1.jpeg)
 
 Examples of cellular automata with class 4 overall behavior, as discussed in Chapter 6. I strongly suspect that all class 4 rules, like rule 110, will turn out to be universal.
 
@@ -614,13 +614,13 @@ By showing that rule 110 is universal, we have established that universality is 
 
 In general, if a system is to be universal, then this means that by setting up an appropriate choice of initial conditions it is possible to get the system to emulate any type of behavior that can occur in any other system. And as a consequence, cellular automata like the ones in the pictures below are definitely not universal, since they always produce just simple uniform or repetitive patterns of behavior, whatever initial conditions one uses.
 
-![](_page_709_Picture_4.jpeg)
+![](images/_page_709_Picture_4.jpeg)
 
-![](_page_709_Picture_5.jpeg)
+![](images/_page_709_Picture_5.jpeg)
 
-![](_page_709_Picture_6.jpeg)
+![](images/_page_709_Picture_6.jpeg)
 
-![](_page_709_Picture_7.jpeg)
+![](images/_page_709_Picture_7.jpeg)
 
 Examples of elementary cellular automata which only ever show purely uniform or purely repetitive behavior, and which therefore definitely cannot be universal. These cellular automata are necessarily all class 1 or class 2 systems.
 
@@ -628,7 +628,7 @@ In a sense the fundamental reason for this—as we discussed on page 252—is th
 
 In cellular automata like the ones at the top of the facing page some information can be transmitted over larger distances. But the way this occurs is highly constrained, and in the end these systems can only produce patterns that are in essence purely nested—so that it is again not possible for universality to be achieved.
 
-![](_page_710_Picture_1.jpeg)
+![](images/_page_710_Picture_1.jpeg)
 
 Examples of cellular automata that do allow information to be transmitted over large distances, but only in very restricted ways. The overall patterns produced by such cellular automata are essentially nested. No cellular automata of this kind can ever be universal.
 
@@ -636,7 +636,7 @@ What about additive rules such as 90 and 150?
 
 With simple initial conditions these rules always yield very regular nested patterns. But with more complicated initial conditions, they produce more complicated patterns of behavior—as the pictures at the bottom of this page illustrate. As we saw on page 264, however, these patterns never in fact really correspond to more than rather simple transformations of the initial conditions. Indeed, even after say 1,048,576 steps—or any number of steps that is a power of two—the array of cells produced always turns out to correspond just to a simple superposition of two or three shifted copies of the initial conditions.
 
-![](_page_710_Picture_4.jpeg)
+![](images/_page_710_Picture_4.jpeg)
 
 Examples of cellular automata with additive rules. The repetitive occurrence of states that correspond to simple transformations of the initial conditions prevent such cellular automata from ever being universal.
 
@@ -644,17 +644,17 @@ And since there are many kinds of behavior that do not return to such predictabl
 
 At the end of the last section I mentioned rule 54 as another elementary cellular automaton besides rule 110 that might be class 4. The pictures below show examples of the typical behavior of rule 54.
 
-![](_page_711_Picture_4.jpeg)
+![](images/_page_711_Picture_4.jpeg)
 
-![](_page_711_Picture_5.jpeg)
+![](images/_page_711_Picture_5.jpeg)
 
-![](_page_711_Picture_6.jpeg)
+![](images/_page_711_Picture_6.jpeg)
 
 Two views of the evolution of rule 54 from typical random initial conditions. The top view shows the color of every cell at every step. The bottom groups together pairs of cells, and shows only every other step. There are various localized structures—and hints of class 4 behavior.
 
 Some localized structures are definitely seen. But are they enough to support class 4 behavior and universality? The pictures below show what happens if one starts looking in turn at each of the possible initial conditions for rule 54. At first one sees only simple repetitive behavior. At initial condition 291 one sees a very simple form of nesting. And as one continues one sees various other repetitive and nested forms. But at least up to the hundred millionth initial condition one sees nothing that is fundamentally any more complicated.
 
-![](_page_712_Picture_2.jpeg)
+![](images/_page_712_Picture_2.jpeg)
 
 Forms of behavior seen in the first 100 million initial conditions for rule 54. With initial condition 291 the $n^{\text{th}}$ new stripe on the right is produced at step $2 n^2 + 8 n - 9$. Even in the last case shown, the arrangement of stripes eventually becomes completely regular, with the $n^{\text{th}}$ new stripe being produced at step $n^2 + 21 n/2 - \{6, 5, -4, 3\}[[Mod[n, 4] + 1]]/2$. Pairs of cells are grouped together in each picture, as at the bottom of the facing page.
 
@@ -676,7 +676,7 @@ So what can be done in such cases? The most obvious possibility is that one migh
 
 The pictures below show the typical behavior of rule 73—first with completely random initial conditions, and then with initial conditions in which no run of an even number of black squares occurs.
 
-![](_page_714_Picture_2.jpeg)
+![](images/_page_714_Picture_2.jpeg)
 
 Two examples of rule 73. The top example uses completely random initial conditions; the bottom example uses initial conditions in which no run of an even number of black squares ever occurs. The bottom example is actually part of the pattern obtained from a single black cell—just to the right of the center column, starting with step 1000.
 
@@ -686,13 +686,13 @@ So can one then achieve something intermediate in rule 73—in which information
 
 The pictures at the top of the next page give some indication of how this might be done. For they show that with an appropriate background rule 73 supports various localized structures, some of which move. And while these structures may at first seem more like those in rule 54 than rule 110, I strongly suspect that the complexity of the typical behavior of rule 73 will be reflected in more sophisticated interactions between the structures—and will eventually provide what is needed to allow universality to be demonstrated in much the same way as in rule 110.
 
-![](_page_715_Figure_1.jpeg)
+![](images/_page_715_Figure_1.jpeg)
 
 Examples of localized structures in rule 73. Note that in the last case shown, the background patterns on either side are mirror images.
 
 So what about a case like rule 30? With strictly repetitive initial conditions—like any cellular automaton—this must yield purely repetitive behavior. But as soon as one perturbs such initial conditions, one normally seems to get only complicated and seemingly random behavior, as in the top row of pictures below.
 
-![](_page_715_Figure_4.jpeg)
+![](images/_page_715_Figure_4.jpeg)
 
 Examples of patterns produced by rule 30 with repetitive backgrounds. The top row shows the effect of inserting a single extra black cell into various backgrounds. The bottom row shows all localized structures involving up to 25 cells supported by rule 30 on repetitive backgrounds with blocks of up to 25 cells. Note that these localized structures always move one cell to the right at each step—making it impossible for them to interact in non-trivial ways.
 
@@ -700,13 +700,13 @@ Yet it turns out still to be possible to get localized structures—as the botto
 
 The picture below shows what happens in rule 45. Many possible perturbations to repetitive initial conditions again yield seemingly random behavior. But in one case a nested pattern is produced. And structures that remain localized are now fairly common—but just as in rule 30 always seem to move at the same speed.
 
-![](_page_716_Figure_3.jpeg)
+![](images/_page_716_Figure_3.jpeg)
 
-![](_page_716_Figure_4.jpeg)
+![](images/_page_716_Figure_4.jpeg)
 
-![](_page_716_Figure_5.jpeg)
+![](images/_page_716_Figure_5.jpeg)
 
-![](_page_716_Figure_6.jpeg)
+![](images/_page_716_Figure_6.jpeg)
 
 Examples of patterns produced by inserting a single extra black cell into repetitive backgrounds for rule 45. Note the appearance of a slanted version of the nested pattern from rule 90. In rule 45, localized structures turn out to be fairly common—but as in rule 30 they always seem to move at the same speed, and so presumably cannot interact to produce any kind of class 4 behavior.
 
@@ -718,7 +718,7 @@ If a system is universal, then this means that with a suitable encoding of initi
 
 In the case of the 19-color universal cellular automaton on page 645 it turns out that encodings in which individual black and white cells are represented by particular 20-cell blocks are sufficient to allow the universal cellular automaton to emulate all 256 possible elementary cellular automata—with one step in the evolution of each of these corresponding to 53 steps in the evolution of the original system.
 
-![](_page_717_Figure_1.jpeg)
+![](images/_page_717_Figure_1.jpeg)
 
 Examples of using various specific elementary cellular automata to emulate other elementary cellular automata. In each case single cells are encoded as blocks of cells, and all distinct such encodings with blocks up to length 20 are shown.
 
@@ -732,9 +732,9 @@ From the proof of universality that we gave it follows that rule 110 must be abl
 
 But although it seems somewhat difficult to emulate the complete evolution of one cellular automaton with another, it turns out to be much easier to emulate fragments of evolution for limited numbers of steps. And as an example the picture below shows how rule 30 can be made to emulate the basic action of one step in rule 90.
 
-![](_page_718_Figure_6.jpeg)
+![](images/_page_718_Figure_6.jpeg)
 
-![](_page_718_Figure_7.jpeg)
+![](images/_page_718_Figure_7.jpeg)
 
 Rule 30 set up to emulate a single XOR operation—as used in a step of rule 90 evolution. The initial conditions for rule 30 are fixed except at the two positions indicated, where input can effectively be given. The picture shows that for each possible combination of inputs, the result from the rule 30 evolution corresponds exactly to the output from the XOR.
 
@@ -742,7 +742,7 @@ The idea is to set up a configuration in rule 30 so that if one inserts input at
 
 But as the picture on the next page indicates, by having appropriate blocks 5 cells wide rule 30 can actually be made to emulate one step in the evolution of every single one of the 256 possible elementary cellular automata.
 
-![](_page_719_Figure_1.jpeg)
+![](images/_page_719_Figure_1.jpeg)
 
 Illustrations of how rule 30 can be set up to emulate a single step in the evolution of all elementary cellular automata.
 
@@ -750,7 +750,7 @@ So what about other underlying rules?
 
 The picture on the facing page shows for several different underlying rules which of the 256 possible elementary rules can successfully be emulated with successively wider blocks. In cases where the underlying rules have only rather simple behavior—as with rules 90 and 184—it turns out that it is never possible to emulate more than a few of the 256 possible elementary rules. But for underlying rules that have more complex behavior—like rules 22, 30, or 110—it turns out that in the end it is always possible to emulate all 256 elementary rules.
 
-![](_page_720_Figure_2.jpeg)
+![](images/_page_720_Figure_2.jpeg)
 
 Summaries of how various underlying cellular automata do in emulating a single step in the evolution of each of the 256 possible elementary cellular automata using the scheme from the facing page with blocks of successively greater widths.
 
@@ -764,11 +764,11 @@ From the results of the previous few sections, we now have some idea where the t
 
 In the 1950s and early 1960s a certain amount of work was done on trying to construct small Turing machines that would be universal. The main achievement of this work was the construction of the universal machine with 7 states and 4 possible colors shown below.
 
-![](_page_721_Picture_4.jpeg)
+![](images/_page_721_Picture_4.jpeg)
 
 The rule for a universal Turing machine with 7 states and 4 colors constructed in 1962. Until now, this was essentially the simplest known universal Turing machine. Note that one element of the rule can be considered as specifying that the Turing machine should “halt” with the head staying in the same location and same state.
 
-![](_page_721_Figure_6.jpeg)
+![](images/_page_721_Figure_6.jpeg)
 
 An example of how the Turing machine above can emulate a tag system. A black element in the tag system is set up to correspond to a block of four cells in the Turing machine, while a white element corresponds to a single cell.
 
@@ -778,13 +778,13 @@ It is already an achievement to find a universal Turing machine as comparatively
 
 But as one might expect from the discoveries in this book, this is far from correct. And in fact, by using the universality of rule 110 it turns out to be possible to come up with the vastly simpler universal Turing machine shown below—with just 2 states and 5 possible colors.
 
-![](_page_722_Turing_Rule.jpeg)
+![](images/_page_722_Turing_Rule.jpeg)
 
 The rule for the simplest Turing machine currently known to be universal, based on discoveries in this book. The machine has 2 states and 5 possible colors.
 
-![](_page_722_Figure_6.jpeg)
+![](images/_page_722_Figure_6.jpeg)
 
-![](_page_722_Figure_7.jpeg)
+![](images/_page_722_Figure_7.jpeg)
 
 An example of how the Turing machine above manages to emulate rule 110. The compressed picture is made by keeping only the steps indicated at which the head is further to the right than ever before. To get the picture shown requires running the Turing machine for a total of 5000 steps.
 
@@ -796,7 +796,7 @@ I am quite certain that it is not. And in fact I expect that there are some sign
 
 If one looks at the 4096 Turing machines with 2 states and 2 colors it is fairly easy to see that their behavior is in all cases too simple to support universality. So between 2 states and 2 colors and 2 states and 5 colors, where does the threshold for universality in Turing machines lie?
 
-![](_page_723_Figure_6.jpeg)
+![](images/_page_723_Figure_6.jpeg)
 
 Examples of Turing machines with 2 states and 4 colors that show complex behavior. The compressed pictures above are based on 50,000 steps of evolution. In all cases, all cells are initially white.
 
@@ -808,11 +808,11 @@ So what about Turing machines with 2 states and 3 colors? There are a total of 2
 
 The picture below shows an example.
 
-![](_page_724_Picture_5.jpeg)
+![](images/_page_724_Picture_5.jpeg)
 
-![](_page_724_Picture_6.jpeg)
+![](images/_page_724_Picture_6.jpeg)
 
-![](_page_724_Picture_7.jpeg)
+![](images/_page_724_Picture_7.jpeg)
 
 One of the 14 essentially equivalent 2-state 3-color Turing machines that yield complicated behavior when started from a blank tape. The compressed picture above is made by taking the first 100,000 steps, and keeping only those at which the head is further to the left than ever before. The interior of the pattern that emerges is like an inverted version of the rule 60 additive cellular automaton; the boundary, however, is more complicated. In the numbering scheme of page 761 this is machine 596,440 out of the total of 2,985,984 with 2 states and 3 colors.
 
@@ -820,7 +820,7 @@ And although it will no doubt be very difficult to prove, it seems likely that t
 
 With 3 states and 2 colors it turns out that with blank initial conditions all of the 2,985,984 possible Turing machines of this type quickly evolve to produce simple repetitive or nested behavior. With more complicated initial conditions the behavior one sees can sometimes be more complicated, at least for a while—as in the pictures below. But in the end it still always seems to resolve into a simple form.
 
-![](_page_725_Figure_2.jpeg)
+![](images/_page_725_Figure_2.jpeg)
 
 Yet despite this, it still seems conceivable that with appropriate initial conditions significantly more complex behavior might occur—and might ultimately allow universality in 3-state 2-color Turing machines.
 
@@ -840,13 +840,13 @@ Combinators are a particular case of the symbolic systems that we discussed on p
 
 The basic rules for combinators are given below.
 
-![](_page_726_Picture_8.jpeg)
+![](images/_page_726_Picture_8.jpeg)
 
 Rules for symbolic systems known as combinators, first introduced in 1920, and proved universal by the mid-1930s.
 
 With short initial conditions, the pictures at the top of the next page demonstrate that combinators tend to evolve quickly to simple fixed points. But with initial condition (e) of length 8 the pictures show that no fixed point is reached, and instead there is exponential growth in total size—with apparently rather random internal behavior.
 
-![](_page_727_Figure_1.jpeg)
+![](images/_page_727_Figure_1.jpeg)
 
 Examples of combinator evolution. The expression in case (e) is the shortest that leads to unlimited growth. The plots at the bottom show the total sizes of expressions reached on successive steps. Note that the detailed pattern of evolution—though not any final fixed point reached—can depend on the fact that the combinator rules are applied at each step in *Mathematica* */.* order.
 
@@ -868,7 +868,7 @@ Yet we saw in Chapter 3 that there are symbolic systems with rules even simpler 
 
 And in fact wherever one looks, the threshold for universality seems to be much lower than one would ever have imagined. And this is one of the important basic observations that led me to formulate the Principle of Computational Equivalence that I discuss in the next chapter.
 
-![](_page_729_Figure_1.jpeg)
+![](images/_page_729_Figure_1.jpeg)
 
 Emulating the rule 110 cellular automaton using combinators. The rule 110 combinator from the previous page is applied once for each step of rule 110 evolution. The initial state is taken to consist of a single black cell.
 

@@ -25,7 +25,7 @@ EXPECTED_CONTENT_SET = (
 )
 EXPECTED_WORKER = "ch01-foundations-reader-e1"
 EXPECTED_PATHS = [
-    "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+    "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
     "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md",
 ]
 CHAPTER_IMAGE = "CHAPTERS/_page_16_Picture_0.jpeg"

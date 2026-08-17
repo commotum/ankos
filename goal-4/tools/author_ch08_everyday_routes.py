@@ -50,7 +50,7 @@ IDENTITY_FIELDS = (
     "expected_topic",
 )
 STAGE_PATHS = (
-    "CHAPTERS/08-Implications-for-Everyday-Systems.md",
+    "CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md",
     "BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md",
 )
 EXPECTED_PREVIOUS_REVIEW_ID = "V000034"

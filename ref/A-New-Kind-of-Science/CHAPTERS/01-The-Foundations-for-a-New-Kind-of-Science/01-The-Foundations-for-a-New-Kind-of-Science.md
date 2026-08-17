@@ -1,4 +1,4 @@
-![](_page_16_Picture_0.jpeg)
+![](images/_page_16_Picture_0.jpeg)
 
 ## The Foundations for a New Kind of Science
 
@@ -132,7 +132,7 @@ My goals in this book are sufficiently broad and fundamental that there have ine
 
 I can trace the beginning of my serious interest in the kinds of scientific issues discussed in this book rather accurately to the summer of 1972, when I was twelve years old. I had bought a copy of the physics textbook on the right, and had become very curious about the process of randomization illustrated on its cover. But being far from convinced by the mathematical explanation given in the book, I decided to try to simulate the process for myself on a computer.
 
-![](_page_32_Picture_8.jpeg)
+![](images/_page_32_Picture_8.jpeg)
 
 The book cover that originally sparked my interest in some of the issues discussed in this book.
 
@@ -160,7 +160,7 @@ But in the summer of 1981 I did what I considered to be a fairly straightforward
 
 The picture on the right shows a reproduction of typical output from my original experiment. The graphics are primitive, but the elaborate patterns they contain were like nothing I had ever seen before. At first I did not believe that they could possibly be correct. But after a while I became convinced that they were—and I realized that I had seen a sign of a quite remarkable and unexpected phenomenon: that even from very simple programs behavior of great complexity could emerge.
 
-![](_page_34_Figure_9.jpeg)
+![](images/_page_34_Figure_9.jpeg)
 
 A reproduction of the computer printout that first gave me a hint of some of the central phenomena in this book.
 

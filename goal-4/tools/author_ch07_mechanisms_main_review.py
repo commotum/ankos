@@ -18,7 +18,7 @@ from typing import Any
 WORKER_ID = "ch07-main"
 STAGE = 11
 EPOCH = 2
-SOURCE_PATH = "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md"
+SOURCE_PATH = "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md"
 EXPECTED_CANDIDATES = 82
 
 FIELDS = [

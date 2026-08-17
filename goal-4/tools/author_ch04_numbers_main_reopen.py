@@ -3,7 +3,7 @@
 
 This helper is deliberately narrower than the original Stage 8 review
 author.  It consumes a sealed reopened bundle for exactly
-``CHAPTERS/04-Systems-Based-on-Numbers.md``, retains every existing global
+``CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md``, retains every existing global
 candidate and route link, emits no new proposals, and changes only the review
 identity plus eleven explicitly enumerated asset classifications.
 
@@ -38,7 +38,7 @@ from audit_contract import (  # noqa: E402
 
 
 EXPECTED_WORKER = "ch04-numbers-reopen-e2"
-EXPECTED_PATHS = ["CHAPTERS/04-Systems-Based-on-Numbers.md"]
+EXPECTED_PATHS = ["CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"]
 EXPECTED_PATH = EXPECTED_PATHS[0]
 STAGE = 8
 EPOCH = 2

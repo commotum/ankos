@@ -32,7 +32,7 @@ EXPECTED_CONTENT_SET = (
     "e554fe52881b9a2dc3ca6062df10b3458f5556035d257a81301e7c3eb48d2aae"
 )
 EXPECTED_WORKER = "ch03-main-reader-e1"
-EXPECTED_PATHS = ["CHAPTERS/03-The-World-of-Simple-Programs.md"]
+EXPECTED_PATHS = ["CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md"]
 STAGE = 7
 
 

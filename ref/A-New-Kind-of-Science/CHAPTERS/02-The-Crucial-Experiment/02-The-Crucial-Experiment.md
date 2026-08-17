@@ -1,4 +1,4 @@
-![](_page_38_Chapter_Opener.jpeg)
+![](images/_page_38_Chapter_Opener.jpeg)
 
 ## The Crucial Experiment
 
@@ -14,17 +14,17 @@ Any program can at some level be thought of as consisting of a set of rules that
 
 An important feature of cellular automata is that their behavior can readily be presented in a visual way. And so the picture below shows what one cellular automaton does over the course of ten steps.
 
-![](_page_39_Figure_2.jpeg)
+![](images/_page_39_Figure_2.jpeg)
 
 A visual representation of the behavior of a cellular automaton, with each row of cells corresponding to one step. At the first step the cell in the center is black and all other cells are white. Then on each successive step, a particular cell is made black whenever it or either of its neighbors were black on the step before. As the picture shows, this leads to a simple expanding pattern uniformly filled with black.
 
-![](_page_39_Figure_4.jpeg)
+![](images/_page_39_Figure_4.jpeg)
 
 The cellular automaton consists of a line of cells, each colored either black or white. At every step there is then a definite rule that determines the color of a given cell from the color of that cell and its immediate left and right neighbors on the step before.
 
 For the particular cellular automaton shown here the rule specifies—as in the picture below—that a cell should be black in all cases where it or either of its neighbors were black on the step before.
 
-![](_page_39_Picture_7.jpeg)
+![](images/_page_39_Picture_7.jpeg)
 
 A representation of the rule for the cellular automaton shown above. The top row in each box gives one of the possible combinations of colors for a cell and its immediate neighbors. The bottom row then specifies what color the center cell should be on the next step in each of these cases. In the numbering scheme described in Chapter 3, this is cellular automaton rule 254.
 
@@ -32,9 +32,9 @@ And the picture at the top of the page shows that starting with a single black c
 
 As a first example, the picture at the top of the facing page shows what happens with a rule that makes a cell white whenever both of its neighbors were white on the step before—even if the cell itself was black before. And rather than producing a pattern that is uniformly filled with black, this rule now instead gives a pattern that repeatedly alternates between black and white like a checkerboard.
 
-![](_page_40_Picture_1.jpeg)
+![](images/_page_40_Picture_1.jpeg)
 
-![](_page_40_Picture_2.jpeg)
+![](images/_page_40_Picture_2.jpeg)
 
 A cellular automaton with a slightly different rule. The rule makes a particular cell black if either of its neighbors was black on the step before, and makes the cell white if both its neighbors were white. Starting from a single black cell, this rule leads to a checkerboard pattern. In the numbering scheme of Chapter 3, this is cellular automaton rule 250.
 
@@ -42,15 +42,15 @@ This pattern is however again fairly simple. And we might assume that at least w
 
 The picture below shows the pattern produced by a cellular automaton of the same type as before, but with a slightly different rule. This time the rule specifies that a cell should be black when either its left neighbor or its right neighbor—but not both—were black on the step before. And again this rule is undeniably quite simple. But now the picture shows that the pattern it produces is not so simple.
 
-![](_page_40_Picture_6.jpeg)
+![](images/_page_40_Picture_6.jpeg)
 
-![](_page_40_Rule_90.jpeg)
+![](images/_page_40_Rule_90.jpeg)
 
 A cellular automaton that produces an intricate nested pattern. The rule in this case is that a cell should be black whenever one or the other, but not both, of its neighbors were black on the step before. Even though the rule is very simple, the picture shows that the overall pattern obtained over the course of 50 steps starting from a single black cell is not so simple. The particular rule used here can be described by the formula $a_i' = Mod[a_{i-1} + a_{i+1}, 2]$. In the numbering scheme of Chapter 3, it is cellular automaton rule 90.
 
 And if one runs the cellular automaton for more steps, as in the picture below, then a rather intricate pattern emerges. But one can now see that this pattern has very definite regularity. For even though it is intricate, one can see that it actually consists of many nested triangular pieces that all have exactly the same form. And as the picture shows, each of these pieces is essentially just a smaller copy of the whole pattern, with still smaller copies nested in a very regular way inside it.
 
-![](_page_41_Picture_4.jpeg)
+![](images/_page_41_Picture_4.jpeg)
 
 A larger version of the pattern from the previous page, now shown without a grid explicitly indicating each cell. The picture shows five hundred steps of cellular automaton evolution. The pattern obtained is intricate, but has a definite nested structure. Indeed, as the picture illustrates, each triangular section is essentially just a smaller copy of the whole pattern, with still smaller copies nested inside it. Patterns with nested structure of this kind are often called “fractal” or “self-similar”.
 
@@ -60,9 +60,9 @@ But the remarkable fact is that this turns out to be wrong.
 
 And the picture below shows an example of this. The rule used—that I call rule 30—is of exactly the same kind as before, and can be described as follows. First, look at each cell and its right-hand neighbor. If both of these were white on the previous step, then take the new color of the cell to be whatever the previous color of its left-hand neighbor was. Otherwise, take the new color to be the opposite of that.
 
-![](_page_42_Figure_4.jpeg)
+![](images/_page_42_Figure_4.jpeg)
 
-![](_page_42_Rule_30.jpeg)
+![](images/_page_42_Rule_30.jpeg)
 
 A cellular automaton with a simple rule that generates a pattern which seems in many respects random. The rule used is of the same type as in the previous examples, and the cellular automaton is again started from a single black cell. But now the pattern that is obtained is highly complex, and shows almost no overall regularity. This picture is our first example of the fundamental phenomenon that even with simple underlying rules and simple initial conditions, it is possible to produce behavior of great complexity. In the numbering scheme of Chapter 3, the cellular automaton shown here is rule 30.
 
@@ -80,11 +80,11 @@ But it turns out that even the most sophisticated mathematical and statistical m
 
 In a sense, however, there is a certain simplicity to such perfect randomness. For even though it may be impossible to predict what color will occur at any specific step, one still knows for example that black and white will on average always occur equally often.
 
-![](_page_44_Picture_1.jpeg)
+![](images/_page_44_Picture_1.jpeg)
 
 Five hundred steps in the evolution of the rule 30 cellular automaton from page 27. The pattern produced continues to expand on both left and right, but only the part that fits across the page is shown here. The asymmetry between the left and right-hand sides is a direct consequence of asymmetry that exists in the particular underlying cellular automaton rule used.
 
-![](_page_45_Picture_2.jpeg)
+![](images/_page_45_Picture_2.jpeg)
 
 Fifteen hundred steps of rule 30 evolution. Some regularities are evident, particularly on the left. But even after all these steps there are no signs of overall regularity—and indeed even continuing for a million steps many aspects of the pattern obtained seem perfectly random according to standard mathematical and statistical tests. The picture here shows a total of just under two million individual cells.
 
@@ -104,25 +104,25 @@ Will all the structures that are produced eventually annihilate each other, leav
 
 The only sure way to answer these questions, it seems, is just to run the cellular automaton for as many steps as are needed, and to watch what happens. And as it turns out, in the particular case shown here, the outcome is finally clear after about 2780 steps: one structure survives, and that structure interacts with the periodic stripes coming from the left to produce behavior that repeats every 240 steps.
 
-![](_page_47_Figure_1.jpeg)
+![](images/_page_47_Figure_1.jpeg)
 
-![](_page_47_Figure_2.jpeg)
+![](images/_page_47_Figure_2.jpeg)
 
 A cellular automaton whose behavior seems neither highly regular nor completely random. The picture is obtained by applying the simple rule shown for a total of 150 steps, starting with a single black cell. Note that the particular rule used here yields a pattern that expands on the left but not on the right. In the scheme defined in Chapter 3, the rule is number 110.
 
 More steps in the pattern shown above. Each successive page shows a total of 700 steps. The pattern continues to expand on the left forever, but only the part that fits across each page is shown. For a long time it is not clear how the right-hand part of the pattern will eventually look. But after 2780 steps, a fairly simple repetitive structure emerges. Note that to generate the pictures that follow requires applying the underlying cellular automaton rule for individual cells a total of about 12 million times. <sup>▶</sup>
 
-![](_page_48_Picture_2.jpeg)
+![](images/_page_48_Picture_2.jpeg)
 
-![](_page_49_Picture_1.jpeg)
+![](images/_page_49_Picture_1.jpeg)
 
-![](_page_50_Picture_1.jpeg)
+![](images/_page_50_Picture_1.jpeg)
 
-![](_page_51_Picture_1.jpeg)
+![](images/_page_51_Picture_1.jpeg)
 
-![](_page_52_Picture_1.jpeg)
+![](images/_page_52_Picture_1.jpeg)
 
-![](_page_53_Picture_2.jpeg)
+![](images/_page_53_Picture_2.jpeg)
 
 <sup>◀</sup> A single picture of the behavior from the previous five pages. A total of 3200 steps are shown. Note that this is more than twice as many as in the picture on page 30.
 
@@ -178,7 +178,7 @@ And indeed, if it had been known that they were worthwhile, many of the experime
 
 And looking at the historical examples of ornamental art on the facing page, there seems little reason to think that the behavior of many cellular automata could not have been worked out many centuries or even millennia ago. And perhaps one day some Babylonian artifact created using the rule 30 cellular automaton from page 27 will be unearthed. But I very much doubt it. For I tend to think that if pictures like the one on page 27 had ever in fact been seen in ancient times then science would have been led down a very different path from the one it actually took.
 
-![](_page_58_Picture_2.jpeg)
+![](images/_page_58_Picture_2.jpeg)
 
 Historical examples of ornamental art. Repetitive patterns are common and some nested patterns are seen, but the more complicated kinds of patterns discussed in this chapter do not ever appear to have been used. Note that the second-to-last picture is not an abstract design, but is instead text written in a highly stylized form of Arabic script.
 

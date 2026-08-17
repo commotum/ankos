@@ -36,7 +36,7 @@ from audit_contract import (  # noqa: E402
 )
 
 
-STAGE_PATH = "CHAPTERS/04-Systems-Based-on-Numbers.md"
+STAGE_PATH = "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
 STAGE_PATHS = [STAGE_PATH]
 STAGE = 8
 EPOCH = 2

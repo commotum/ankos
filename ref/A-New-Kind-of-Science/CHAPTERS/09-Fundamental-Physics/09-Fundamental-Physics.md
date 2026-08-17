@@ -1,4 +1,4 @@
-![](_page_448_Picture_0.jpeg)
+![](images/_page_448_Picture_0.jpeg)
 
 ## Fundamental Physics
 
@@ -36,9 +36,9 @@ All current evidence suggests that the underlying laws of physics have this kind
 
 In the first cellular automaton shown below it is also straightforward to do this. For any cell that has one color at a particular step must always have had the opposite color on the step before.
 
-![](_page_450_Picture_5.jpeg)
+![](images/_page_450_Picture_5.jpeg)
 
-![](_page_450_Picture_6.jpeg)
+![](images/_page_450_Picture_6.jpeg)
 
 Examples of cellular automata that are and are not reversible. Rule 51 is reversible, so that it preserves enough information to allow one to go backwards from any particular step as well as forwards. Rule 254 is not reversible, since it always evolves to uniform black and preserves no information about the arrangement of cells on earlier steps.
 
@@ -48,13 +48,13 @@ There are many examples of systems in nature which seem to organize themselves a
 
 But my purpose here is to explore what kinds of systems can be reversible. And of the 256 elementary cellular automata with two colors and nearest-neighbor rules, only the six shown below turn out to be reversible. And as the pictures demonstrate, all of these exhibit fairly trivial behavior, in which only rather simple transformations are ever made to the initial configuration of cells.
 
-![](_page_451_Picture_3.jpeg)
+![](images/_page_451_Picture_3.jpeg)
 
 Examples of the behavior of the six elementary cellular automata that are reversible. In all cases the transformations made to the initial conditions are simple enough that it is straightforward to go backwards as well as forwards in the evolution.
 
 So is it possible to get more complex behavior while maintaining reversibility? There are a total of 7,625,597,484,987 cellular automata with three colors and nearest-neighbor rules, and searching through these one finds just 1800 that are reversible. Of these 1800, many again exhibit simple behavior, much like the pictures above. But some exhibit more complex behavior, as in the pictures below.
 
-![](_page_451_Picture_6.jpeg)
+![](images/_page_451_Picture_6.jpeg)
 
 Examples of some of the 1800 reversible cellular automata with three colors and nearest-neighbor rules. Even though these systems exhibit complex behavior that scrambles the initial conditions, all of them are still reversible, so that starting from the configuration of cells at the bottom of each picture, it is always possible to deduce the configurations on all previous steps.
 
@@ -62,9 +62,9 @@ How can one now tell that such systems are reversible? It is no longer true that
 
 But in trying to understand the range of behavior that can occur in reversible systems it is often convenient to consider classes of cellular automata with rules that are specifically constructed to be reversible. One such class is illustrated below. The idea is to have rules that explicitly remain the same even if they are turned upside-down, thereby interchanging the roles of past and future.
 
-![](_page_452_Picture_4.jpeg)
+![](images/_page_452_Picture_4.jpeg)
 
-![](_page_452_Picture_5.jpeg)
+![](images/_page_452_Picture_5.jpeg)
 
 An example of a cellular automaton that is explicitly set up to be reversible. The rule for the system remains unchanged if all its elements are turned upside-down—effectively interchanging the roles of past and future. Patterns produced by the rule must exhibit the same time reversal symmetry, as shown on the left. The specific rule used here is based on taking elementary rule 214, then adding the specification that the new color of a cell should be inverted whenever the cell was black two steps back. Note that by allowing a total of four rather than two colors, a version of the rule that depends only on the immediately preceding step can be constructed.
 
@@ -74,23 +74,23 @@ The resulting rules can be run both forwards and backwards. In each case they re
 
 The next two pages show examples of the behavior of such cellular automata with both random and simple initial conditions.
 
-![](_page_453_Figure_2.jpeg)
+![](images/_page_453_Figure_2.jpeg)
 
 Examples of reversible cellular automata starting from random and from simple initial conditions. In the upper block of pictures, every cell is chosen to be black or white with equal probability on the two successive first steps. In the lower block of pictures, only the center cell is taken to be black on these steps.
 
-![](_page_454_Picture_2.jpeg)
+![](images/_page_454_Picture_2.jpeg)
 
-![](_page_454_Picture_4.jpeg)
+![](images/_page_454_Picture_4.jpeg)
 
 rule 154R
 
-![](_page_454_Picture_6.jpeg)
+![](images/_page_454_Picture_6.jpeg)
 
 rule 214R
 
 The evolution of three reversible cellular automata for 300 steps. In the first case, a regular nested pattern is obtained. In the other cases, the patterns show many features of randomness.
 
-![](_page_455_Picture_1.jpeg)
+![](images/_page_455_Picture_1.jpeg)
 
 An example of a reversible cellular automaton whose evolution supports localized structures. Because of the reversibility of the underlying rule, every collision must be able to occur equally well when its initial and final states are interchanged.
 
@@ -112,7 +112,7 @@ The picture at the top of the next page shows an example based on a reversible c
 
 At the beginning the particles are placed in a simple arrangement at the center of the box. But over the course of time the picture shows that the arrangement of particles becomes progressively more random.
 
-![](_page_457_Picture_1.jpeg)
+![](images/_page_457_Picture_1.jpeg)
 
 A reversible cellular automaton that exhibits seemingly irreversible behavior. Starting from an initial condition in which all black cells or particles lie at the center of a box, the distribution becomes progressively more random. Such behavior appears to be the central phenomenon responsible for the Second Law of Thermodynamics. The specific cellular automaton used here is rule 122R. The system is restricted to a region of size 100 cells.
 
@@ -122,7 +122,7 @@ But what about reversibility? The underlying rules for the cellular automaton us
 
 The resolution of this apparent conflict is however fairly straightforward. For as the picture on the facing page demonstrates, if the simple arrangement of particles occurs in the middle of the evolution, then one can readily see that randomness increases in exactly the same way—whether one goes forwards or backwards from that point.
 
-![](_page_458_Picture_1.jpeg)
+![](images/_page_458_Picture_1.jpeg)
 
 An extended version of the picture on the facing page, in which the reversibility of the underlying cellular automaton is more clearly manifest. An initial condition is carefully constructed so that halfway through the evolution shown a simple arrangement of particles will be produced. If one starts with this arrangement, then the randomness of the system will effectively increase whether one goes forwards or backwards in time from that point.
 
@@ -156,7 +156,7 @@ In the first case shown, the particles are taken to bounce around in an empty sq
 
 And in the second case, for example, the presence of a small fixed obstacle leads to rapid randomization in the arrangement of particles—very much like the randomization we saw in the one-dimensional cellular automaton that we discussed earlier in this section.
 
-![](_page_461_Figure_2.jpeg)
+![](images/_page_461_Figure_2.jpeg)
 
 The behavior of a simple two-dimensional cellular automaton that emulates an ideal gas of particles. In the top group of pictures, the particles bounce around in an empty square box. In the bottom group of pictures, the box contains a small fixed obstacle. In the top group of pictures, the arrangement of particles shows simple repetitive behavior. In the bottom group, however, it becomes progressively more random with time. The underlying rules for the cellular automaton used here are reversible, and conserve the total number of particles. The specific rules are based on $2 \times 2$ blocks—a two-dimensional generalization of the block cellular automata to be discussed in the next section. For each $2 \times 2$ block the configuration of particles is taken to remain the same at a particular step unless there are exactly two particles arranged diagonally within the block, in which case the particles move to the opposite diagonal.
 
@@ -164,15 +164,15 @@ So even though the total of the energy of all particles remains the same, the di
 
 An important practical consequence of this is that it becomes increasingly difficult to extract energy from the system in the form of systematic mechanical work. At an idealized level one might imagine trying to do this by inserting into the system some kind of paddle which would experience force as a result of impacts from particles.
 
-![](_page_462_Picture_2.jpeg)
+![](images/_page_462_Picture_2.jpeg)
 
-![](_page_462_Picture_3.jpeg)
+![](images/_page_462_Picture_3.jpeg)
 
 Time histories of the cellular automata from the facing page. In each case a slice is taken through the midline of the box. Black cells that are further from the midline are shown in progressively lighter shades of gray. Case (a) corresponds to an empty square box, and shows simple repetitive behavior. Case (b) corresponds to a box containing a fixed obstacle, and in this case rapid randomization is seen. Each panel corresponds to 100 steps in the evolution of the system; the box is 24 cells across.
 
 The pictures below show how such force might vary with time in cases (a) and (b) above. In case (a), where no randomization occurs, the force can readily be predicted, and it is easy to imagine harnessing it to produce systematic mechanical work. But in case (b), the force quickly randomizes, and there is no obvious way to obtain systematic mechanical work from it.
 
-![](_page_462_Figure_6.jpeg)
+![](images/_page_462_Figure_6.jpeg)
 
 The force on an idealized paddle placed on the midline of the systems shown above. The force reflects an imbalance in the number of particles at each step arriving at the midline from above and below. In case (a) this imbalance is readily predictable. In case (b), however, it rapidly becomes for most practical purposes random. This randomness is essentially what makes it impossible to build a physical perpetual motion machine which continually turns heat into mechanical work.
 
@@ -192,7 +192,7 @@ We will discuss in more detail in Chapter 10 the notion of amount of information
 
 The pictures below show the behavior of the entropy calculated in this way for systems like the one discussed above. And what we see is that the entropy does indeed tend to increase, just as the Second Law implies.
 
-![](_page_464_Figure_3.jpeg)
+![](images/_page_464_Figure_3.jpeg)
 
 The entropy as a function of time for systems of the type shown in case (b) from page 447. The top plot is exactly for case (b); the bottom one is for a system three times larger in size. The entropy is found in each case by working out how many possible configurations of particles are consistent with measurements of the total numbers of particles in a $6 \times 6$ grid of regions within the system. Just as the Second Law of Thermodynamics suggests, the entropy tends to increase with time. Note that the plots above would be exactly symmetrical if they were continued to the left: the entropy would increase in the same way going both forwards and backwards from the simple initial conditions used.
 
@@ -216,7 +216,7 @@ This fact turns out in a sense to be implicit in many everyday applications of p
 
 The existence of a unique equilibrium to which any particular system tends to evolve is also a common statement of the Second Law of Thermodynamics. And once again, therefore, we find that the Second Law is associated with basic phenomena that we already saw early in this book.
 
-![](_page_466_Picture_1.jpeg)
+![](images/_page_466_Picture_1.jpeg)
 
 The approach to equilibrium in a reversible cellular automaton with a variety of different initial conditions. Apart from exceptional cases where no randomization occurs, the behavior obtained with different initial conditions is eventually quite indistinguishable in its overall properties. Because the underlying rule is reversible, however, the details with different initial conditions are always at least slightly different—otherwise it would not be possible to go backwards in a unique way. The rule used here is 122R. Successive pairs of pictures have initial conditions that differ only in the color of a single cell at the center.
 
@@ -226,7 +226,7 @@ Starting nearly a century ago it came to be widely believed that the Second Law 
 
 Indeed, almost all of the detailed applications ever made of the full Second Law have been concerned with just one specific area: the behavior of gases. By now there is therefore good evidence that gases obey the Second Law—just as the idealized model earlier in this section suggests. But what about other kinds of systems?
 
-![](_page_467_Picture_2.jpeg)
+![](images/_page_467_Picture_2.jpeg)
 
 Examples of reversible cellular automata with various rules. Some quickly randomize, as the Second Law of Thermodynamics would suggest. But others do not—and thus in effect do not obey the Second Law of Thermodynamics.
 
@@ -246,7 +246,7 @@ How do such systems work? A common feature appears to be the presence of some ki
 
 The picture on page 456 shows what happens if one starts rule 37R with a single small region of randomness. And for a while what one sees is that the randomness that has been inserted persists. But eventually the system instead seems to organize itself to yield just a small number of simple repetitive structures.
 
-![](_page_469_Figure_2.jpeg)
+![](images/_page_469_Figure_2.jpeg)
 
 More steps in the evolution of the reversible cellular automaton with rule 37R. This system is an example of one that does not in any meaningful way obey the Second Law of Thermodynamics. Instead of exhibiting progressively more random behavior, it appears to fluctuate between quite ordered and quite disordered states.
 
@@ -264,7 +264,7 @@ Allowing information to escape is a rather straightforward way to evade the Seco
 
 What instead happens is that kinds of membranes form between different regions of the system, and within each region orderly behavior can then occur, at least while the membrane survives.
 
-![](_page_471_Picture_2.jpeg)
+![](images/_page_471_Picture_2.jpeg)
 
 An example of evolution according to rule 37R from an initial condition containing a fairly random region. Even though the system is reversible, this region tends to organize itself so as to take on a much simpler form. Information on the initial conditions ends up being carried by localized structures which radiate outwards.
 
@@ -290,19 +290,19 @@ With most rules, systems like cellular automata do not usually exhibit such cons
 
 Among elementary cellular automata with just two colors and nearest-neighbor rules, the only types of examples are the fairly trivial ones shown in the pictures below.
 
-![](_page_473_Picture_5.jpeg)
+![](images/_page_473_Picture_5.jpeg)
 
 Elementary cellular automata whose evolution conserves the total number of black cells. The behavior of the rules shown here is simple enough that in each case it is fairly obvious how the number of black cells manages to stay the same on every step.
 
 But with next-nearest-neighbor rules, more complicated examples become possible, as the pictures below demonstrate.
 
-![](_page_474_Picture_2.jpeg)
+![](images/_page_474_Picture_2.jpeg)
 
 Examples of cellular automata with next-nearest-neighbor rules whose evolution conserves the total number of black cells. Even though it is not immediately obvious by eye, the total number of black cells stays exactly the same on each successive step in each picture. Among the 4,294,967,296 possible next-neighbor rules, only 428 exhibit the kind of conservation property shown here.
 
 One straightforward way to generate collections of systems that will inevitably exhibit conserved quantities is to work not with ordinary cellular automata but instead with block cellular automata. The basic idea of a block cellular automaton is illustrated at the top of the next page. At each step what happens is that blocks of adjacent cells are replaced by other blocks of the same size according to some definite rule. And then on successive steps the alignment of these blocks shifts by one cell.
 
-![](_page_475_Figure_2.jpeg)
+![](images/_page_475_Figure_2.jpeg)
 
 An example of a block cellular automaton. The system works by partitioning the sequence of cells that exists at each step into pairs, then replacing these pairs by other pairs according to the rule shown. The choice of whether to pair a cell with its left or right neighbor alternates on successive steps. Like many block cellular automata, the system shown is reversible, since in the rule each pair has a unique predecessor. It does not, however, conserve the total number of black cells.
 
@@ -310,19 +310,19 @@ And with this setup, if the underlying rules replace each block by one that cont
 
 With two possible colors and blocks of size two the only kinds of block cellular automata that conserve the total number of black cells are the ones shown below—and all of these exhibit rather trivial behavior.
 
-![](_page_475_Picture_6.jpeg)
+![](images/_page_475_Picture_6.jpeg)
 
 Block cellular automata with two possible colors and blocks of size two that conserve the total number of black cells (the last example has this property only on alternate steps). It so happens that all but the second of the rules shown here not only conserve the total number of black cells but also turn out to be reversible.
 
 But if one allows three possible colors, and requires, say, that the total number of black and gray cells together be conserved, then more complicated behavior can occur, as in the pictures below.
 
-![](_page_476_Figure_3.jpeg)
+![](images/_page_476_Figure_3.jpeg)
 
 Block cellular automata with three possible colors which conserve the combined number of black and gray cells. In rule (a), black and gray cells remain in localized regions. In rule (b), they move in fairly simple ways, and in rules (c) and (d), they move in a seemingly somewhat random way. The rules shown here are reversible, although their behavior is similar to that of non-reversible rules, at least after a few steps.
 
 Indeed, as the pictures on the next page demonstrate, such systems can produce considerable randomness even when starting from very simple initial conditions.
 
-![](_page_477_Figure_2.jpeg)
+![](images/_page_477_Figure_2.jpeg)
 
 The behavior of rules (c) and (d) from the previous page, starting with very simple initial conditions. Each panel shows 500 steps of evolution, and rapid randomization is evident. The black and gray cells behave much like physical particles: their total number is conserved, and with the particular rules used here, their interactions are reversible. Note that the presence of boundaries is crucial; for without them there would in a sense be no collisions between particles, and the behavior of both systems would be rather trivial.
 
@@ -332,17 +332,17 @@ The pictures below show what happens with four different rules, starting with hi
 
 As in many kinds of systems, the details of the initial arrangement of cells will normally have an effect on the details of the behavior that occurs. But what the pictures below suggest is that if one looks only at the overall distribution of density, then these details will become largely irrelevant—so that a given initial distribution of density will always tend to evolve in the same overall way, regardless of what particular arrangement of cells happened to make up that distribution.
 
-![](_page_478_Picture_5.jpeg)
+![](images/_page_478_Picture_5.jpeg)
 
-![](_page_478_Picture_6.jpeg)
+![](images/_page_478_Picture_6.jpeg)
 
-![](_page_478_Picture_7.jpeg)
+![](images/_page_478_Picture_7.jpeg)
 
-![](_page_478_Picture_8.jpeg)
+![](images/_page_478_Picture_8.jpeg)
 
 The block cellular automata from previous pages started from initial conditions containing regions of different density. In rules (a) and (b) the regions remain separated forever, but in rules (c) and (d) they gradually diffuse into each other.
 
-![](_page_479_Picture_1.jpeg)
+![](images/_page_479_Picture_1.jpeg)
 
 The evolution of overall density for block cellular automata (c) and (d) from the previous page. Even though at an underlying level these systems consist of discrete cells, their overall behavior seems smooth and continuous. The results shown here are obtained by averaging over progressively larger numbers of runs with initial conditions that differ in detail, but have the same overall density distribution. In the limit of an infinite number of runs (or infinite number of cells), the behavior in the second case approaches the form implied by the continuum diffusion equation. (In the first case correlations in effect last too long to yield exactly such behavior.)
 
@@ -380,7 +380,7 @@ It is already difficult enough to work out from an underlying rule what behavior
 
 So how then could one ever expect to find the underlying rule in such a case? Almost always, it seems that the best strategy is a simple one: to come up with an appropriate general class of rules, and then just to search through these rules, trying each one in turn, and looking to see if it produces the behavior one wants.
 
-![](_page_482_Figure_1.jpeg)
+![](images/_page_482_Figure_1.jpeg)
 
 A typical example of a situation where it would be very difficult to deduce the underlying rule from a description of the overall behavior that it produces. There is in a sense too great a distance between the simple rule shown and the behavior that emerges from it. I suspect that the same will be true of the basic rule for the universe. The particular rule shown here is the elementary cellular automaton with rule number 94, and with initial condition $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\Box\Box\Box\Box\Box\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$.
 
@@ -462,7 +462,7 @@ At first, one might think that this would be completely inconsistent with everyd
 
 The pictures below show three different cellular automata, all set up on the same two-dimensional grid. And to see the effect of the grid, I show what happens when each of these cellular automata is started from blocks of black cells arranged at three different angles.
 
-![](_page_488_Figure_2.jpeg)
+![](images/_page_488_Figure_2.jpeg)
 
 Examples of orientation dependence in the behavior of two-dimensional cellular automata on a fixed grid. Three different initial conditions, consisting of blocks at three different angles, are shown. For rules (a) and (b) the patterns produced always exhibit features that remain aligned with directions in the underlying grid. But with rule (c) essentially the same rounded pattern is obtained regardless of orientation. The rules shown here are outer totalistic: (a) 4-neighbor code 468, (b) 4-neighbor code 686 and (c) 8-neighbor code 746. In cases (a) and (b) 40 steps of evolution are used; in case (c) 100 steps are used.
 
@@ -500,7 +500,7 @@ For one thing, there is no need to distinguish between incoming and outgoing con
 
 With two connections, only very trivial networks can ever be made. But if one uses three connections, a vast range of networks immediately become possible. One might think that one could get a fundamentally larger range if one allowed, say, four or five connections rather than just three. But in fact one cannot, since any node with more than three connections can in effect always be broken into a collection of nodes with exactly three connections, as in the pictures on the left.
 
-![](_page_491_Picture_1.jpeg)
+![](images/_page_491_Picture_1.jpeg)
 
 Examples of how nodes with more than three connections can be decomposed into collections of nodes with exactly three connections.
 
@@ -508,13 +508,13 @@ So what this means is that it is in a sense always sufficient to consider networ
 
 The pictures below show a few small examples of such networks. And already considerable diversity is evident. But none of the networks shown seem to have many properties familiar from ordinary space.
 
-![](_page_491_Picture_6.jpeg)
+![](images/_page_491_Picture_6.jpeg)
 
 Examples of small networks with exactly three connections at each node. The first line shows all possible networks with up to four nodes. In what follows I consider only non-degenerate networks, in which there is at most one connection between any two nodes. Example (i) is the smallest network that cannot be drawn in two dimensions without lines crossing. Examples (k) and (l) are the smallest networks that have no symmetries between different nodes. Example (e) corresponds to the net of a tetrahedron, (j) to the net of a cube, and (m) to the net of a dodecahedron. Examples (o) through (u) show seven ways of drawing the same network, in this case the so-called Petersen network.
 
 So how then can one get networks that correspond to ordinary space? The first step is to consider networks that have much larger numbers of nodes. And as examples of these, the pictures at the top of the facing page show networks that are specifically constructed to correspond to ordinary one-, two- and three-dimensional space.
 
-![](_page_492_Picture_2.jpeg)
+![](images/_page_492_Picture_2.jpeg)
 
 Examples of networks with three connections at each node that are effectively one, two and three-dimensional. These networks can be continued forever, and all have the property of being homogeneous, in the sense that every node has an environment identical to every other node.
 
@@ -524,17 +524,17 @@ The pictures above are drawn so as to make this correspondence obvious. But what
 
 The pictures below illustrate the main difficulty: given only its pattern of connections, a particular network can be laid out in many completely different ways, most of which tell one very little about its potential correspondence with ordinary space.
 
-![](_page_492_Picture_7.jpeg)
+![](images/_page_492_Picture_7.jpeg)
 
-![](_page_492_Picture_8.jpeg)
+![](images/_page_492_Picture_8.jpeg)
 
-![](_page_492_Picture_9.jpeg)
+![](images/_page_492_Picture_9.jpeg)
 
-![](_page_492_Picture_10.jpeg)
+![](images/_page_492_Picture_10.jpeg)
 
-![](_page_492_Picture_11.jpeg)
+![](images/_page_492_Picture_11.jpeg)
 
-![](_page_492_Picture_12.jpeg)
+![](images/_page_492_Picture_12.jpeg)
 
 Six different ways of laying out the same network. (a) nodes arranged around a circle; (b) nodes arranged along a line; (c) nodes arranged across the page according to distance from a particular node; (d) 2D layout with network and spatial distances as close as possible; (e) planar layout; (f) 3D layout.
 
@@ -554,7 +554,7 @@ For the other two networks at the top of the previous page similar arguments can
 
 Below I show pictures of various networks. In each case the first picture is drawn to emphasize obvious regularities in the network. But the second picture is drawn in a more systematic way—by picking a specific starting node, and then laying out other nodes so that those at successively greater network distances appear in successive columns across the page. And this setup has the feature that the height of column $r$ gives the number of nodes that are at network distance $r$.
 
-![](_page_494_Picture_4.jpeg)
+![](images/_page_494_Picture_4.jpeg)
 
 Examples of various networks, shown first to emphasize their regularities, and second to illustrate the number of nodes reached by going successively more steps from a given node. For networks that in a limiting sense correspond to ordinary $d$-dimensional space, this number grows like $r^{d-1}$. All the larger networks shown are approximately uniform, in the sense that similar results are obtained starting from any node. Network (e) effectively has limiting dimension $Log[2, 3] \simeq 1.58$.
 
@@ -606,7 +606,7 @@ With templates that involve nodes out to distance one there are a total of 11 di
 
 In order to have a meaningful model for the universe, however, what must presumably happen is that essentially just one network can satisfy whatever constraints there are, and this one network must then represent all of the complex spacetime history of our universe.
 
-![](_page_498_Picture_1.jpeg)
+![](images/_page_498_Picture_1.jpeg)
 
 Examples of networks determined by constraints. In each case the networks shown are required to satisfy the constraint that around every node their form must correspond to the template shown, in such a way that no dangling connections in the template are joined to each other. The pictures include all 14 templates that involve nodes out to distance at most two for which complete networks can be formed. In most cases where any such network can be formed, an infinite sequence of networks is allowed. But in cases (b), (h), (i) and (j) just a single network turns out to be allowed. The network constraint systems shown here are analogs of the two-dimensional systems based on constraints discussed at the end of Chapter 5.
 
@@ -624,7 +624,7 @@ And I strongly believe that the second view is the one most likely to provide a 
 
 One possibility, illustrated in the pictures below, is to have a system that evolves in time according to explicit rules, but for these rules to have built into them a symmetry between space and time.
 
-![](_page_500_Figure_3.jpeg)
+![](images/_page_500_Figure_3.jpeg)
 
 Examples of one-dimensional cellular automata which exhibit a symmetry between space and time. Each picture can be generated by starting from initial conditions at the top, and then just evolving down the page repeatedly applying the cellular automaton rule. The particular rules shown are reversible second-order ones with numbers 90R and 150R.
 
@@ -654,7 +654,7 @@ If an observer could tell what was happening on every step, then it would be eas
 
 To see in more detail how this works it could be that it would be necessary to make a specific model for the observer. But in fact, it turns out that it is sufficient just to look at the evolution of the mobile automaton not in terms of individual steps, but rather in terms of updating events and the causal relationships between them.
 
-![](_page_502_Picture_8.jpeg)
+![](images/_page_502_Picture_8.jpeg)
 
 A mobile automaton in which only the single active cell indicated by a dot is updated at each step, thereby avoiding the issue of global synchronization.
 
@@ -668,7 +668,7 @@ And this notion then suggests a quite different representation for the whole evo
 
 A sequence of views of the evolution of a mobile automaton, showing how a network of causal relationships between updating events can be created. This network provides a very simple model for spacetime in the universe. Picture (a) is essentially the standard representation of mobile automaton evolution that I have used in this book. Picture (b) includes gray blobs to indicate updating events. Picture (c) merges cells that are not being updated. Picture (d) emphasizes the role of vertical stripes as connections between updating events. Pictures (e) through (g) show how a network can be formed with nodes corresponding to updating events. Pictures (h) and (i) demonstrate that with the particular underlying rule used here, a highly regular network is produced. <sup>▶</sup>
 
-![](_page_504_Picture_1.jpeg)
+![](images/_page_504_Picture_1.jpeg)
 
 Picture (e) shows the updating events and stripes from the top of picture (d), with the updating events now explicitly numbered. Pictures (f) and (g) then show how one can take the pattern of connectivity from picture (e) and lay out the updating events as nodes so as to produce an orderly network. And for the particular mobile automaton rule used here, the network one gets ends up being highly regular, as illustrated in pictures (h) and (i).
 
@@ -696,13 +696,13 @@ Rules (a) and (b) yield very simple repetitive networks in which there is in eff
 
 The other rules shown do not, however, suffer from this problem: in all of them progressively more points are reached in space as time goes on. Rules (c) and (d) yield networks that can be laid out in a quite regular manner. But with rules (e), (f) and (g) the networks are more complicated, and begin to seem somewhat random.
 
-![](_page_507_Figure_1.jpeg)
+![](images/_page_507_Figure_1.jpeg)
 
 Examples of mobile automata from Chapter 3 and the causal networks they generate. In each case the picture on the left is essentially the standard representation of mobile automaton evolution used in Chapter 3. The pictures on the right are then causal network representations of the same evolution. The networks are laid out in analogy to the space networks on page 479, with nodes being placed on successive rows if they take progressively more connections to reach from the top node.
 
-![](_page_508_Figure_2.jpeg)
+![](images/_page_508_Figure_2.jpeg)
 
-![](_page_508_Figure_4.jpeg)
+![](images/_page_508_Figure_4.jpeg)
 
 Note that a single connection can join events that occur at very different steps in the evolution of the underlying mobile automaton. And indeed to construct even a small part of the causal network can require an arbitrarily long computation in the underlying mobile automaton. Thus for example to make the causal networks in pictures (e), (f) and (g) requires looking respectively at 2447, 731 and 322 steps of mobile automaton evolution. And indeed in some cases there can be connections that are in effect never resolved. And thus for example in picture (a) there are downward connections that never reach any other node—reflecting the presence of positions on the left in the mobile automata evolution to which the active cell never returns.
 
@@ -716,7 +716,7 @@ But despite this uniformity at the level of causal networks, the transformation 
 
 And what we see is that even nodes that are close to the top of the causal network can correspond to events which occur after a large number of steps of mobile automaton evolution. Indeed, to fill in just twenty rows of the causal networks for rules (e) and (f) requires following the underlying mobile automaton evolution for 2447 and 731 steps respectively.
 
-![](_page_510_Picture_1.jpeg)
+![](images/_page_510_Picture_1.jpeg)
 
 Causal networks corresponding to rules (e) and (f) from page 493, with each node explicitly labelled to specify from which step of mobile automaton evolution it is derived. Even to fill in the first few rows of such causal networks, many steps of underlying mobile automaton evolution must be traced.
 
@@ -728,7 +728,7 @@ Looking at the causal networks we have seen so far, one may wonder to what exten
 
 For example, one might think that the fact that all the networks we have seen so far grow at most linearly with time must be an inevitable consequence of the one-dimensional character of the mobile automaton rules we have used. But the picture below demonstrates that even with such one-dimensional rules, it is actually possible to get causal networks that grow more rapidly. And in fact in the case shown below there are roughly a factor 1.22 more nodes on each successive row—corresponding to overall approximate exponential growth.
 
-![](_page_511_Picture_3.jpeg)
+![](images/_page_511_Picture_3.jpeg)
 
 A one-dimensional mobile automaton which yields a causal network that in effect grows exponentially with time. The underlying mobile automaton acts like a binary counter, yielding a pattern whose width grows logarithmically with the number of steps. The three cases not shown in the rule are never used with the initial conditions given here.
 
@@ -746,9 +746,9 @@ One can think of mobile automata as being special cases of substitution systems 
 
 The picture below shows an example of one such system, and illustrates how—just like in a mobile automaton—relations between updating events can be represented by a causal network.
 
-![](_page_512_Figure_5.jpeg)
+![](images/_page_512_Figure_5.jpeg)
 
-![](_page_513_Figure_1.jpeg)
+![](images/_page_513_Figure_1.jpeg)
 
 Examples of sequential substitution systems of the type discussed on page 88, and the causal networks that emerge from them. In a sequential substitution system only the first replacement that is found to apply in a left-to-right scan is ever performed at any step. Rule (a) above yields a causal network that is purely repetitive and thus yields no meaningful notion of space. Rules (b), (c) and (d) yield causal networks that in effect grow roughly linearly with time. In rule (f) the causal network grows exponentially, while in rule (e) the causal network also grows quite rapidly, though its overall growth properties are not clear. Note that to obtain the 10 levels shown here in the causal network for rule (e), it was necessary to follow the evolution of the underlying substitution system for a total of 258 steps.
 
@@ -764,7 +764,7 @@ In the case of rules (a) and (b) the result is to update every single element at
 
 So what happens with replacements that involve more than just one element? In many cases, the behavior is still quite simple. But as several of the pictures on the next page demonstrate, fairly simple rules are sufficient—as in so many other systems that we have discussed in this book—to obtain highly complex behavior.
 
-![](_page_515_Figure_1.jpeg)
+![](images/_page_515_Figure_1.jpeg)
 
 Examples of general substitution systems and the causal networks that emerge from them. In the pictures shown here, every replacement that is found to fit in a left-to-right scan is performed at each step. Rules (a) and (b) act like neighbor-independent substitution systems of the type discussed on page 84, and yield exponentially growing tree-like causal networks. The plots at the bottom show the growth rates of the patterns produced by rules (f) and (g). In the case of rule (f) the pattern turns out to be repetitive, with a period of 796 steps.
 
@@ -772,7 +772,7 @@ One may wonder, however, to what extent the behavior one sees depends on the exa
 
 But remarkably enough there do exist rules for which exactly the same causal network is obtained regardless of what scheme is used. And as it turns out, rules (a) and (b) from the picture on the facing page provide simple examples of this phenomenon, as illustrated in the pictures below.
 
-![](_page_516_Figure_4.jpeg)
+![](images/_page_516_Figure_4.jpeg)
 
 The behavior of rules (a) and (b) from the facing page when replacements are performed at random. Even though the detailed patterns obtained are different, the causal networks in these particular rules that represent relationships between replacement events are always exactly the same.
 
@@ -782,7 +782,7 @@ This is certainly not true for every substitution system. Indeed, the pictures o
 
 So what could ensure that no such situation would ever arise in a particular substitution system? Essentially what needs to be true is that the sequence of elements alone must always uniquely determine what replacements can be made in every part of the system. One still has a choice of whether actually to perform a given replacement at a particular step, or whether to delay that replacement until a subsequent step. But what must be true is that there can never be any ambiguity about what replacement will eventually be made in any given part of the system.
 
-![](_page_516_Picture_9.jpeg)
+![](images/_page_516_Picture_9.jpeg)
 
 Examples of two different ways of performing replacements in rule (e) from the facing page, yielding two different causal networks.
 
@@ -790,17 +790,17 @@ In rules like the ones at the top of page 500 where each replacement involves ju
 
 The pictures below show two examples of rules that do. In the first picture for each rule, replacements are made at randomly chosen steps, while in the second picture, they are in a sense always made at the earliest possible step. But the point is that in no case is there any ambiguity about what replacement will eventually be made at any particular place in the system. And as a result, the causal network that represents the relationships between different updating events is always exactly the same.
 
-![](_page_517_Picture_4.jpeg)
+![](images/_page_517_Picture_4.jpeg)
 
-![](_page_517_Picture_5.jpeg)
+![](images/_page_517_Picture_5.jpeg)
 
-![](_page_517_Picture_6.jpeg)
+![](images/_page_517_Picture_6.jpeg)
 
-![](_page_517_Picture_7.jpeg)
+![](images/_page_517_Picture_7.jpeg)
 
-![](_page_517_Picture_8.jpeg)
+![](images/_page_517_Picture_8.jpeg)
 
-![](_page_517_Picture_9.jpeg)
+![](images/_page_517_Picture_9.jpeg)
 
 Examples of substitution systems in which the same causal networks are obtained regardless of the way in which replacements are performed. In the first picture for each rule, the replacements are performed essentially at random. In the second picture they are performed on the earliest possible step. Note that rule (a) effectively sorts the elements in its initial conditions, always placing black before white.
 
@@ -832,7 +832,7 @@ Both types of systems perform the same type of replacements on strings of elemen
 
 The picture below shows a simple example of how this works. On the first step in this particular picture, there happens to be only one replacement that can be performed consistent with the rules, so only a single string is produced. But on subsequent steps several different replacements are possible, so several strings are produced. And in general every path through a picture like this corresponds to a possible history that exists in the evolution of the multiway system.
 
-![](_page_519_Picture_8.jpeg)
+![](images/_page_519_Picture_8.jpeg)
 
 A simple example of a multiway system in which replacements are applied in all possible ways to each string at each step.
 
@@ -858,21 +858,21 @@ But if one looks not just at individual strings but rather at the sequences of s
 
 In general, each path in a multiway system can be thought of as being defined by a possible sequence of ways in which the replacements specified by a multiway system rule can be applied. And each such path in turn then defines a causal network of the kind we discussed in the previous section. But as we saw there, certain underlying rules have the property that the form of this causal network ends up being the same regardless of the order in which replacements are applied—and thus regardless of the path that is followed in the multiway system.
 
-![](_page_521_Figure_7.jpeg)
+![](images/_page_521_Figure_7.jpeg)
 
 A multiway system in which strings of any length can be generated—but in which only specific sequences of lengths actually occur on any path.
 
 The pictures below show some simple examples of rules with this property. And as it turns out, it is fairly easy to recognize the presence of the property from the overall pattern of multiway system paths that occur.
 
-![](_page_522_Picture_4.jpeg)
+![](images/_page_522_Picture_4.jpeg)
 
-![](_page_522_Picture_5.jpeg)
+![](images/_page_522_Picture_5.jpeg)
 
 Examples of multiway systems in which the causal network associated with every path is exactly the same. All such multiway systems have the property that every pair of paths which diverge at a particular step can converge again on the following step. The first rule shown has the effect of sorting the elements in the string.
 
-![](_page_522_Picture_7.jpeg)
+![](images/_page_522_Picture_7.jpeg)
 
-![](_page_522_Picture_8.jpeg)
+![](images/_page_522_Picture_8.jpeg)
 
 If one starts from a given initial string, then typically one will generate different strings by applying different replacements. But if one is going to get the same causal network, then it must always be the case that there are replacements one can apply to the strings one has generated that yield the same final string. So what this means is that any pair of paths in the multiway system that diverge must be able to converge again within just one step—so that all the arrows in pictures like the ones above must lie on the edges of quadrilaterals.
 
@@ -894,19 +894,19 @@ The pictures at the top of the facing page show two very simple examples. Starti
 
 This setup is very much similar to the neighbor-independent substitution systems that we discussed on pages 83 and 187. And just as in these systems, it is possible for intricate structures to be produced, but the structures always turn out to have a highly regular nested form.
 
-![](_page_524_Picture_1.jpeg)
+![](images/_page_524_Picture_1.jpeg)
 
 Network evolution in which each node is replaced at each step by a fixed cluster of nodes. The resulting networks have a regular nested form. The dimensions of the limiting networks are respectively $Log[2, 3] \simeq 1.58$ and $Log[3, 7] \simeq 1.77$.
 
 So what about more general substitution systems? Are there analogs of these for networks? The answer is that there are, and they are based on making replacements not just for individual nodes, but rather for clusters of nodes, as shown in the pictures below.
 
-![](_page_524_Picture_4.jpeg)
+![](images/_page_524_Picture_4.jpeg)
 
 Examples of rules that involve replacing clusters of nodes in a network by other clusters of nodes. All these rules preserve the planarity of a network. Notice that some of them cannot be reversed since their right-hand sides are too symmetrical to determine which orientation of the left-hand side should be used.
 
 In the substitution systems for strings discussed in previous sections, the rules that are given can involve replacing any block of elements by any other. But in networks there are inevitably some restrictions. For example, if a cluster of nodes has a certain number of connections to the rest of the network, then it cannot be replaced by a cluster which has a different number of connections. And in addition, one cannot have replacements like the one on the left that go from a symmetrical cluster to one for which a particular orientation has to be chosen.
 
-![](_page_525_Picture_1.jpeg)
+![](images/_page_525_Picture_1.jpeg)
 
 A replacement whose outcome orientation cannot be determined.
 
@@ -916,9 +916,9 @@ So given a replacement for a cluster of a particular form, how should such a rep
 
 But in general this will not work. For as the picture below illustrates, a particular form of cluster can in general appear in many overlapping ways within a given network.
 
-![](_page_525_Picture_7.jpeg)
+![](images/_page_525_Picture_7.jpeg)
 
-![](_page_525_Picture_8.jpeg)
+![](images/_page_525_Picture_8.jpeg)
 
 The 12 ways in which the cluster of nodes on the left occurs in a particular network. In the particular case shown, each way turns out to overlap with nodes in exactly four others.
 
@@ -928,11 +928,11 @@ Nevertheless, it is still possible to devise schemes for deciding where in a net
 
 In each pair of pictures in the upper part of the page, the top one shows the form of the network before the replacement, and the bottom one shows the result after doing the replacement—with the cluster of nodes involved in the replacement being highlighted in both cases. In the 3D pictures in the lower part of the page, networks that arise on successive steps are shown stacked one on top of the other, with the nodes involved in each replacement joined by gray lines.
 
-![](_page_526_Picture_2.jpeg)
+![](images/_page_526_Picture_2.jpeg)
 
-![](_page_526_Picture_3.jpeg)
+![](images/_page_526_Picture_3.jpeg)
 
-![](_page_526_Picture_4.jpeg)
+![](images/_page_526_Picture_4.jpeg)
 
 Examples of the evolution of networks in which a single cluster of nodes is replaced at each step according to the rules shown. Each pair of pictures above represents the state of the network before and after each replacement. The nodes affected by the replacement are highlighted in both cases. The location at which the replacement is performed is determined by requiring that it involve the oldest possible nodes in the network. The nodes in the pictures above are drawn with a “clock”. The angle of the beginning of the black sector in the clock indicates when the node was created, while the angle of its end represents the current step, so that older nodes have larger black sectors.
 
@@ -944,7 +944,7 @@ So what about more complicated behavior? It turns out that even with rule (c), w
 
 The picture below shows a few more steps in the evolution of this rule. And the behavior obtained never seems to repeat, nor do the networks produced exhibit any kind of obvious nested form.
 
-![](_page_527_Picture_5.jpeg)
+![](images/_page_527_Picture_5.jpeg)
 
 More steps in the evolution of rule (c) from the previous page. The number of nodes increases irregularly (though roughly linearly) with successive steps.
 
@@ -952,13 +952,13 @@ What about other schemes for applying replacements? The pictures on the facing p
 
 It takes fewer steps for networks to be built up, but the results are qualitatively similar to those on the previous page: rule (a) yields a nested structure, rule (b) gives repetitive behavior, while rule (c) produces behavior that seems complicated and in some respects random.
 
-![](_page_528_Figure_1.jpeg)
+![](images/_page_528_Figure_1.jpeg)
 
 Just as for substitution systems on strings, one can find causal networks that represent the causal connections between different updating events on networks. And as an example the pictures below show such causal networks for the evolution processes on the previous page.
 
-![](_page_529_Picture_2.jpeg)
+![](images/_page_529_Picture_2.jpeg)
 
-![](_page_529_Picture_3.jpeg)
+![](images/_page_529_Picture_3.jpeg)
 
 Causal networks that represent the relationship between updating events for the network evolution processes shown on the previous page.
 
@@ -968,7 +968,7 @@ So what kinds of underlying replacement rules lead to causal networks that are i
 
 The pictures below show all possible distinct clusters with up to five nodes—and all but three of these already can overlap themselves.
 
-![](_page_529_Picture_8.jpeg)
+![](images/_page_529_Picture_8.jpeg)
 
 All possible distinct clusters containing up to five nodes, with planarity not required.
 
@@ -976,7 +976,7 @@ But among slightly larger clusters there turn out to be many that do not overlap
 
 The first few examples are shown below. And in almost all of these, there is no overlap not only within a single cluster, but also between different clusters. And this means that rules based on replacements for collections of these clusters will have the property that the causal networks they produce are independent of the updating scheme used.
 
-![](_page_530_Picture_3.jpeg)
+![](images/_page_530_Picture_3.jpeg)
 
 The simplest clusters that have no overlaps with themselves—and mostly have no overlaps with each other. Replacements for sets of clusters that do not overlap have the property of causal invariance.
 
@@ -996,7 +996,7 @@ As we saw in earlier sections, if one has an explicit evolution history for a sy
 
 The picture below shows an example of how successive steps in a particular evolution history can be recovered from a particular set of slices through the causal network derived from it. But what if one were to choose a different set of slices? In general, the sequence of strings that one would get would not correspond to anything that could arise from the same underlying substitution system.
 
-![](_page_531_Picture_6.jpeg)
+![](images/_page_531_Picture_6.jpeg)
 
 An example of how the succession of states in an evolution history can be recovered by taking appropriate slices through a causal network. Any consistent choice of such slices will correspond to a possible evolution history—with the same underlying rules, but potentially a different scheme for determining the order in which to apply replacements.
 
@@ -1010,13 +1010,13 @@ One might have thought that if one just had an underlying system which did not c
 
 In practice I certainly do not expect that even parts of our universe where nothing much seems to be going on will actually have causal networks as simple as at the top of the next page. And in fact, as I mentioned at the end of the previous section, what I expect instead is that there will always tend to be all sorts of complicated and seemingly random behavior at small scales—though at larger scales this will typically get washed out to yield the kind of consistent average properties that we ordinarily associate with space.
 
-![](_page_533_Picture_1.jpeg)
+![](images/_page_533_Picture_1.jpeg)
 
-![](_page_533_Picture_2.jpeg)
+![](images/_page_533_Picture_2.jpeg)
 
-![](_page_533_Picture_3.jpeg)
+![](images/_page_533_Picture_3.jpeg)
 
-![](_page_533_Picture_4.jpeg)
+![](images/_page_533_Picture_4.jpeg)
 
 A very simple substitution system whose causal network has slices that can be thought of as corresponding to a highly regular idealization of one-dimensional ordinary space. The rule effectively just sorts elements so that black ones come first, and yields the same causal network regardless of what updating scheme is used.
 
@@ -1024,13 +1024,13 @@ One of the defining features of space as we normally experience it is a certain 
 
 Such locality is built into the basic structure of systems like cellular automata. For in such systems the underlying rules allow the color of a particular cell to affect only its immediate neighbors at each step. And this has the consequence that effects in such systems can spread only at a limited rate, as manifest for example in a maximum slope for the edges of patterns like those in the pictures below.
 
-![](_page_533_Picture_8.jpeg)
+![](images/_page_533_Picture_8.jpeg)
 
-![](_page_533_Picture_9.jpeg)
+![](images/_page_533_Picture_9.jpeg)
 
-![](_page_533_Picture_10.jpeg)
+![](images/_page_533_Picture_10.jpeg)
 
-![](_page_533_Picture_11.jpeg)
+![](images/_page_533_Picture_11.jpeg)
 
 Examples of patterns produced by cellular automata, illustrating the fact discussed in Chapter 6 that the edge of each pattern has a maximum slope equal to one cell per step, corresponding to an absolute upper limit on the rate of information transmission—similar to the speed of light in physics.
 
@@ -1048,7 +1048,7 @@ In the case of substitution systems for strings, locality of underlying replacem
 
 If one is dealing with an underlying system based on networks, however, then the situation can be somewhat more complicated. For as we discussed several sections ago—and will discuss again in the final sections of this chapter—there will typically be only an approximate correspondence between the structure of the network and the structure of ordinary space. And so for example—as we will discuss later in connection with quantum phenomena—there may sometimes be a kind of thread that connects parts of the network that would not normally be considered nearby in three-dimensional space. And so when clusters of nodes that are nearby with respect to connections on the network get updated, they can potentially propagate effects to what might be considered distant points in space.
 
-![](_page_534_Picture_9.jpeg)
+![](images/_page_534_Picture_9.jpeg)
 
 Schematic illustration of a light cone in physics. Light emitted at a point in space will normally spread out with time into a cone, whose cross-section is shown schematically here.
 
@@ -1076,7 +1076,7 @@ One might have thought that states obtained from slices at different angles woul
 
 It is slightly more complicated to represent uniform motion in causal networks that are not as regular as the one on page 518. But whenever there is sufficient uniformity to give a stable structure to space one can still think of something like parallel slices at different angles as representing motion at different fixed speeds.
 
-![](_page_536_Picture_9.jpeg)
+![](images/_page_536_Picture_9.jpeg)
 
 Graphical representation in space and time of motion at fixed speeds
 
@@ -1102,7 +1102,7 @@ The black line is always assumed to be moving at the speed of light—so that it
 
 The dark gray region in each picture represents a fixed amount of time for the clock—corresponding to a fixed number of sweeps of the black line. But as the pictures indicate, it is then essentially just a matter of geometry to see that this dark gray region will correspond to progressively larger amounts of time for a system at rest—in just the way predicted by the standard formula of relativistic time dilation.
 
-![](_page_539_Picture_2.jpeg)
+![](images/_page_539_Picture_2.jpeg)
 
 A simple derivation of the classic phenomenon of relativistic time dilation. The pictures show the behavior of a very simple idealized clock going at different fractions of the speed of light. The clock can be thought of as consisting of a photon of light bouncing backwards and forwards between mirrors a fixed distance apart. (At a more general level in my approach it can also be thought of as a fragment of a causal network.) Time is shown going down the page, so that the photon in the clock traces out a zig-zag path. The fundamental assumption—that in my approach is just a consequence of basic properties of causal networks—is that the photon always goes at the speed of light, so that its path always lies on the surface of light cones like the ones in the top row of pictures. A fixed interval of time for the clock—as indicated by the length of the darker gray regions—corresponds to a progressively longer interval of time at rest. The amount of this time dilation is given by the classic relativistic formula $1/\sqrt{1-v^2/c^2}$, where $v/c$ is the ratio of the speed of the clock to the speed of light. Such time dilation is routinely observed in particle accelerators—and has to be corrected for in GPS satellites. It leads to the so-called twin paradox in which less time will pass for a member of a twin going at high speed in a spacecraft than one staying at rest. The fact that time dilation is a general phenomenon not restricted to something like the simple clock shown relies in my approach on general properties of causal networks. Once the basic assumptions are established, the derivation of time dilation given here is no different in principle from the original one given in 1905, though I believe it is in many ways considerably clearer. Note that it is necessary to consider motion in two dimensions—so that the clock as a whole can be moving perpendicular to the path of the photon inside it. If these were parallel, one would inevitably get not just pure time dilation, but a mixture of it and length contraction.
 
@@ -1120,21 +1120,21 @@ In networks it can be somewhat difficult to visualize localized structures. But 
 
 Both the examples on this page show structures that exist on very regular backgrounds. But to get any kind of realistic model for actual particles in physics one must consider structures on much more complicated and random backgrounds. For any network that has a serious chance of representing actual space—even a supposedly empty part—will no doubt show all sorts of seemingly random activity. So any localized structure that might represent a particle will somehow have to persist even on this kind of random background.
 
-![](_page_540_Picture_9.jpeg)
+![](images/_page_540_Picture_9.jpeg)
 
 Typical examples of particle-like localized structures in class 4 cellular automata.
 
-![](_page_540_Picture_11.jpeg)
+![](images/_page_540_Picture_11.jpeg)
 
-![](_page_540_Picture_12.jpeg)
+![](images/_page_540_Picture_12.jpeg)
 
 A particle-like localized structure in a network.
 
 Yet at first one might think that such randomness would inevitably disrupt any kind of definite persistent structure. But the pictures below show two simple examples where it does not. In the first case, there are localized cracks that persist. And in the second case, there are two different types of regions, separated by boundaries that act like localized structures with definite properties, and persist until they annihilate.
 
-![](_page_541_Picture_3.jpeg)
+![](images/_page_541_Picture_3.jpeg)
 
-![](_page_541_Picture_4.jpeg)
+![](images/_page_541_Picture_4.jpeg)
 
 Examples of one-dimensional cellular automata that support various forms of persistent structures even on largely random backgrounds. These are 3-color totalistic rules with codes 294 and 1893.
 
@@ -1144,7 +1144,7 @@ Starting off with a network that is planar—so that it can be drawn flat on a p
 
 And if one starts off with a network like the one on the left that can only be drawn with lines crossing, then what will happen is that the non-planarity of the network will be preserved. But to what extent does this non-planarity correspond to a definite structure in the network?
 
-![](_page_541_Picture_9.jpeg)
+![](images/_page_541_Picture_9.jpeg)
 
 A network with a single irreducible crossing of lines.
 
@@ -1164,13 +1164,13 @@ But what is most relevant here is that it seems likely that—much as for non-pl
 
 Before the results of this book it might have seemed completely implausible that anything like this could be correct. For independent of any specific arguments about networks and their evolution, traditional intuition would tend to make one think that the elaborate properties of particles must inevitably be the result of an elaborate underlying setup. But what we have now seen over and over again in this book is that in fact it is perfectly possible to get phenomena of great complexity even with a remarkably simple underlying setup. And I suspect that particles in physics—with all their various properties and interactions—are just yet another example of this very general phenomenon.
 
-![](_page_542_Picture_10.jpeg)
+![](images/_page_542_Picture_10.jpeg)
 
-![](_page_542_Picture_11.jpeg)
+![](images/_page_542_Picture_11.jpeg)
 
 The K<sub>5</sub> and K<sub>3,3</sub> forms that lead to non-planarity in networks.
 
-![](_page_542_Picture_13.jpeg)
+![](images/_page_542_Picture_13.jpeg)
 
 How K<sub>3,3</sub> is embedded in the network from the facing page.
 
@@ -1204,7 +1204,7 @@ Something like a magnetic field in general has different effects on objects made
 
 In the absence of any gravity or forces, our normal definition of space implies that when an object moves from one point to another, it always goes along a straight line, which corresponds to the shortest path. But when gravity is present, objects in general move on curved paths. Yet these paths can still be the shortest—or so-called geodesics—if one takes space to be curved. And indeed if space has appropriate curvature one can get all sorts of paths, as in the pictures below.
 
-![](_page_546_Picture_3.jpeg)
+![](images/_page_546_Picture_3.jpeg)
 
 Examples of the effect of curvature in space on paths taken by objects. In each case all the paths shown start parallel, but do not remain so when there is curvature. The paths are geodesics which go the minimum distance on the surface to get to all the points they reach. (In general, the minimum may only be local.) Case (b) shows the top of a sphere, which is a surface of positive curvature. Case (c) shows the negatively curved surface $z = x^2 - y^2$, (d) a paraboloid $z = x^2 + y^2$, and (e,f) $z = 1/(r + \delta)$—a rough analog of curvature in space produced by a sphere of mass.
 
@@ -1216,13 +1216,13 @@ But it turns out that one can actually also recognize curvature in the basic str
 
 So what this suggests is that in a network just changing the pattern of connections can in effect change the overall curvature. And indeed the pictures below show a succession of networks that in effect have curvatures with a range of negative and positive values.
 
-![](_page_547_Picture_5.jpeg)
+![](images/_page_547_Picture_5.jpeg)
 
-![](_page_547_Picture_6.jpeg)
+![](images/_page_547_Picture_6.jpeg)
 
 A hexagonal array corresponding to flat two-dimensional space.
 
-![](_page_547_Picture_8.jpeg)
+![](images/_page_547_Picture_8.jpeg)
 
 Networks with various limiting curvatures. If every region in the network is in effect a hexagon—as in the picture at the top of the page—then the network will behave as if it is flat. But if pentagons are introduced, as in the cases on the left, the network will increasingly behave as if it has positive curvature—like part of a sphere. And if heptagons are introduced, as in the cases on the right, the network will behave as if it has negative curvature. In the bottom row of pictures, the networks are laid out as on page 479, so that successive heights give the number of nodes at successive distances $r$ from a particular node. In the limit of large $r$, this number is approximately $r^2 (1 - k r^2 + ...)$ where $k$ turns out to be exactly proportional to the curvature.
 
@@ -1236,7 +1236,7 @@ But in trying to see a more detailed correspondence there are immediately a vari
 
 If one starts, say, from an ordinary continuous surface, then it is straightforward to approximate it as in the picture on the right by a collection of flat faces. And one might think that the edges of these faces would define a network of the kind I have been discussing.
 
-![](_page_548_Picture_7.jpeg)
+![](images/_page_548_Picture_7.jpeg)
 
 A surface approximated by flat faces whose edges form a trivalent network.
 
@@ -1304,7 +1304,7 @@ As I discussed in the last two sections, causal invariance of the underlying rul
 
 So what about interactions? If the structures corresponding to different particles are isolated, then the underlying rules will make them persist. But if they somehow overlap, these same rules will usually make some different configuration of particles be produced.
 
-![](_page_555_Picture_1.jpeg)
+![](images/_page_555_Picture_1.jpeg)
 
 A collision between localized structures in the rule 110 class 4 cellular automaton.
 

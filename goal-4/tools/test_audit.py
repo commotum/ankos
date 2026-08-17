@@ -1223,7 +1223,7 @@ def _route_only_candidate_replay_errors(
         after,
         {
             "source_paths": [
-                "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
+                "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md"
             ]
         },
         trigger_hit_ids={"H999999"},

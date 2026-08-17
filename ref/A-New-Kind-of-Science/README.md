@@ -12,3 +12,7 @@ It contains 29 ordered book documents and their referenced figures:
 
 Start with [Contents.md](Contents.md). The contents page is repository
 navigation; the book text itself is contained in the linked documents.
+
+Each chapter is stored in its own ordered directory under `CHAPTERS/`. The
+chapter retains its full Markdown filename, and its referenced figures are
+stored in the adjacent `images/` directory.

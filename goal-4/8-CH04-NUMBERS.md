@@ -13,7 +13,7 @@ Status: **COMPLETE**.
   `SEARCH_APPEND` transactions, one narrowly scoped epoch-2 `REOPEN`, and two
   epoch-2 `SEARCH_APPEND` transactions.
 - Stage 8 owns exactly two canonical documents:
-  - `CHAPTERS/04-Systems-Based-on-Numbers.md`;
+  - `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md`;
   - `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
 - The main chapter contains 306 source units, `U000641..U000946`, and owns 63
   referenced physical images.
@@ -88,7 +88,7 @@ Once sequential review begins, each isolated reviewer may additionally use
 only its own sealed assignment:
 
 - the main reviewer: `U000641..U000946` and the 63 images owned by
-  `CHAPTERS/04-Systems-Based-on-Numbers.md`;
+  `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md`;
 - the Notes reviewer: `U005637..U006075` and the 82 images owned by
   `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`;
 - sanitized blind-discovery instructions, blind schemas, and write-free
@@ -162,7 +162,7 @@ closures are complete.
 - The epoch-1 dispositions per round are 1,383 governed candidate/support,
   6 cross-reference, 367 control/relationship, and 436 exclusion hits.
 - The main-only asset-role correction opened review epoch 2. Its exact local
-  scope is therefore only `CHAPTERS/04-Systems-Based-on-Numbers.md`:
+  scope is therefore only `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md`:
   - `S011`: 856 hits across 285 unique units with no semantic delta;
   - `S012`: the identical normalized hit projection and another zero delta.
 - The epoch-2 dispositions per round are 435 governed candidate/support,

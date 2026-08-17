@@ -9,7 +9,7 @@ Status: **COMPLETE**.
   images, 320 active blind candidates, 178 routes (37 resolved and 141
   pending cross-range), and 8 closed LOCAL rounds.
 - Stage 7 owns exactly two canonical documents in manifest order:
-  - `CHAPTERS/03-The-World-of-Simple-Programs.md`;
+  - `CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md`;
   - `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md`.
 - The paired paths contain 653 deterministic source units:
   `U000306..U000640` and `U005319..U005636`.

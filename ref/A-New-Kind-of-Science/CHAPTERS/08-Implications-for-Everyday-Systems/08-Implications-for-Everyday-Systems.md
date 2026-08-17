@@ -1,4 +1,4 @@
-![](_page_378_Picture_0.jpeg)
+![](images/_page_378_Picture_0.jpeg)
 
 ## Implications for Everyday Systems
 
@@ -68,13 +68,13 @@ At a microscopic level crystals consist of regular arrays of atoms laid out much
 
 As an idealization of this process, one can consider a cellular automaton in which black cells represent regions of solid and white cells represent regions of liquid or gas. If one assumes that any cell which is adjacent to a black cell will itself become black on the next step, then one gets the patterns of growth shown below.
 
-![](_page_384_Picture_8.jpeg)
+![](images/_page_384_Picture_8.jpeg)
 
 Cellular automata with rules that specify that a cell should become black if any of its neighbors are already black. The patterns produced have a simple faceted form that reflects directly the structure of the underlying lattice of cells.
 
 The shapes produced in each case are very simple, and ultimately consist just of flat facets arranged in a way that reflects directly the structure of the underlying lattice of cells. And many crystals in nature—including for example most gemstones—have similarly simple faceted forms. But some do not. And as one well-known example, snowflakes can have highly intricate forms, as illustrated below.
 
-![](_page_385_Picture_2.jpeg)
+![](images/_page_385_Picture_2.jpeg)
 
 Examples of typical forms of snowflakes. Note that the scales for different pictures are different.
 
@@ -84,7 +84,7 @@ One can capture this basic effect by having a cellular automaton with rules in w
 
 From looking at the behavior of the cellular automaton, one can immediately make various predictions about snowflakes. For example, one expects that during the growth of a particular snowflake there should be alternation between tree-like and faceted shapes, as new branches grow but then collide with each other.
 
-![](_page_386_Figure_1.jpeg)
+![](images/_page_386_Figure_1.jpeg)
 
 The evolution of a cellular automaton in which each cell on a hexagonal grid becomes black whenever exactly one of its neighbors was black on the step before. This rule captures the basic growth inhibition effect that occurs in snowflakes. The resulting patterns obtained at different steps look remarkably similar to many real snowflakes.
 
@@ -104,7 +104,7 @@ So what about other types of crystals?
 
 In nature a variety of forms are seen. And as the pictures on the facing page demonstrate, the same is true even in cellular automata with very simple rules. Indeed, much as in nature, the diversity of behavior is striking. Sometimes simple faceted forms are produced. But in other cases there are needle-like forms, tree-like or dendritic forms, as well as rounded forms, and forms that seem in many respects random.
 
-![](_page_388_Picture_2.jpeg)
+![](images/_page_388_Picture_2.jpeg)
 
 case take a cell to become black if the specified number of its neighbors (including diagonals) on a square grid are black on the step before. These rules are such that once a cell has become black, corresponding to solid, it never reverts to white again. In each case a row of initial black cells of the specified length was used.
 
@@ -132,7 +132,7 @@ There are many factors which affect the details of displacements and vibrations 
 
 The pictures below show the behavior that one gets with a simple model of this kind. And even though there is no explicit randomness inserted into the model in any way, the paths of the cracks that emerge nevertheless appear to be quite random.
 
-![](_page_390_Figure_4.jpeg)
+![](images/_page_390_Figure_4.jpeg)
 
 A very simple cellular automaton model for fracture. At each step, the color of each cell, which roughly represents the displacement of an element of the solid, is updated according to a cellular automaton rule. The black dot, representing the location of a crack, moves from one cell to another based on the displacements of neighboring cells, at each step setting the cell it reaches to be white. Even though no randomness is inserted from outside, the paths of the cracks that emerge from this model nevertheless appear to a large extent random. There is some evidence from physical experiments that dislocations around cracks can form patterns that look similar to the gray and white backgrounds above.
 
@@ -154,13 +154,13 @@ Traditional science, with its basis in mathematical equations, has never really 
 
 But can simple programs really reproduce the particular kinds of behavior we see in fluids? At a microscopic level, physical fluids consist of large numbers of molecules moving around and colliding with each other. So as a simple idealization, one can consider having a large number of particles move around on a fixed discrete grid, and undergo collisions governed by simple cellular-automaton-like rules.
 
-![](_page_392_Figure_1.jpeg)
+![](images/_page_392_Figure_1.jpeg)
 
 Examples of typical patterns generated in various kinds of fluid flow. Note the frequent occurrence of seemingly random turbulence.
 
 The pictures below give an example of such a system. In the top row of pictures—as well as picture (a)—all one sees is a collection of discrete particles bouncing around. But if one zooms out, and looks at average motion of increasingly large blocks of particles—as in pictures (b) and (c)—then what begins to emerge is behavior that seems smooth and continuous—just like one expects to see in a fluid.
 
-![](_page_393_Figure_2.jpeg)
+![](images/_page_393_Figure_2.jpeg)
 
 A simple cellular automaton system set up to emulate the microscopic behavior of molecules in a fluid. At each step the configuration of particles is updated according to the simple collision rules shown above. Particles are reflected whenever they hit the plate. A steady stream of particles is inserted in a regular way far to the left, with an average speed 3/10 of the maximum possible. Picture (a) shows the configuration of individual particles; pictures (b) and (c) show total velocities of successively larger blocks of particles. Picture (d) is obtained by transforming to a reference frame in which the fluid is on average at rest.
 
@@ -180,19 +180,19 @@ So where does this randomness come from?
 
 In the past couple of decades it has come to be widely believed that randomness in turbulent fluids must somehow be associated with sensitive dependence on initial conditions, and with the chaos phenomenon that we discussed in Chapter 4.
 
-![](_page_395_Figure_1.jpeg)
+![](images/_page_395_Figure_1.jpeg)
 
-![](_page_395_Figure_2.jpeg)
+![](images/_page_395_Figure_2.jpeg)
 
-![](_page_395_Step_30000.jpeg)
+![](images/_page_395_Step_30000.jpeg)
 
-![](_page_395_Picture_4.jpeg)
+![](images/_page_395_Picture_4.jpeg)
 
-![](_page_395_Step_50000.jpeg)
+![](images/_page_395_Step_50000.jpeg)
 
-![](_page_395_Picture_6.jpeg)
+![](images/_page_395_Picture_6.jpeg)
 
-![](_page_395_Picture_7.jpeg)
+![](images/_page_395_Picture_7.jpeg)
 
 A larger example of the cellular automaton system shown on the previous page. In each picture there are a total of 30 million underlying cells. The individual velocity vectors drawn correspond to averages over 20 × 20 blocks of cells. Particles are inserted in a regular way at the left-hand end so as to maintain an overall flow speed equal to about 0.4 of the maximum possible. To make the patterns of flow easier to see, the velocities shown are transformed so that the fluid is on average at rest, and the plate is moving. The underlying density of particles is approximately 1 per cell, or 1/6 the maximum possible—a density which more or less minimizes the viscosity of the fluid. The Reynolds number of the flow shown is then approximately 100. The agreement with experimental results on actual fluid flows is striking.
 
@@ -208,7 +208,7 @@ So what this means is that the randomness we observe in fluid flow cannot simply
 
 And so, once again, just as for many other systems that we have studied in this book, there is little choice but to conclude that in a turbulent fluid most of the randomness we see is not in any way inserted from outside but is instead intrinsically generated inside the system itself. In the pictures on page 378 considerable randomness was already evident at the level of individual particles. But since changes in the configurations of such particles do not seem to have any discernible effect on overall patterns of flow, one cannot realistically attribute the large-scale randomness that one sees in a turbulent fluid to randomness that exists at the level of individual particles.
 
-![](_page_397_Picture_1.jpeg)
+![](images/_page_397_Picture_1.jpeg)
 
 A cellular automaton (rule 225) whose behavior is reminiscent of turbulent fluid flow.
 
@@ -252,7 +252,7 @@ But in fact, as it turns out, a rather large fraction of the most obvious exampl
 
 Examples of highly regular forms occurring in biological systems. Most of these forms are simple enough that it seems immediately plausible that they could in effect be generated by simple programs. The majority show either simple geometrical shapes, or repetition of identical elements. A few, however, show various types of nesting. Note that there seems to be no obvious correlation between the sophistication of a form and when in geological time it first appeared. <sup>▶</sup>
 
-![](_page_400_Picture_2.jpeg)
+![](images/_page_400_Picture_2.jpeg)
 
 But just how are the programs for these and other features of organisms actually determined? Over the past century or so it has become almost universally believed that at some level these programs must end up being the ones that maximize the fitness of the organism, and the number of viable offspring it produces.
 
@@ -324,7 +324,7 @@ Traditional intuition would suggest that if the programs were to become still lo
 
 And from this one concludes that biological systems should in a sense be capable of generating essentially arbitrary complexity by using short programs formed by just a few mutations.
 
-![](_page_406_Picture_1.jpeg)
+![](images/_page_406_Picture_1.jpeg)
 
 The behavior of a sequence of cellular automaton programs obtained by successive random mutations. The first program contains no rules for changing the color of a cell with any neighborhood. Mutations in successive programs add rules for changing the colors of cells with specific neighborhoods, or modify these rules. Each program in the sequence differs from the previous one by a single mutation, made completely at random. The sequence provides a very simple idealization of biological evolution without explicit natural selection. The cellular automata shown here all have 3 possible colors and nearest-neighbor rules. The label for each picture gives a representation of the rules for each of the 27 possible 3-cell neighborhoods. A dot signifies that the rule does not change the color of the center cell in the neighborhood.
 
@@ -418,7 +418,7 @@ There are a number of situations where fairly complicated structures appear to h
 
 But I would be very surprised if this explanation were correct. And instead what I strongly suspect is that the reason certain structures appear repeatedly is just that they are somehow common among programs of certain kinds—just as, for example, we have seen that the intricate nested pattern shown on the left arises from many different simple programs.
 
-![](_page_413_Picture_1.jpeg)
+![](images/_page_413_Picture_1.jpeg)
 
 An example of a basic pattern that is produced in several variants by a wide range of simple programs.
 
@@ -454,7 +454,7 @@ With this setup the succession of branchings can then be represented by steps in
 
 Two examples of such substitution systems are shown in the pictures below. In both cases the rules are set up so that every stem in effect just branches into exactly three new stems at each step. And this means that the network of connections between stems necessarily has a very simple nested form. But if one looks at the actual geometrical arrangement of stems there is no longer such simplicity; indeed, despite the great simplicity of the underlying rules, considerable complexity is immediately evident even in the pictures at the bottom of the facing page.
 
-![](_page_415_Figure_6.jpeg)
+![](images/_page_415_Figure_6.jpeg)
 
 Steps in the evolution of substitution systems that provide simple models for the growth of plants. At each step every growing stem is replaced by a collection of three new stems according to the rules shown. For individual stems this type of branching is known in botany as monopodial.
 
@@ -472,11 +472,11 @@ There are patterns with smooth edges that look like lily pads. There are pattern
 
 It has never in the past been at all clear how leaves get the shapes they do. Presumably most of the processes that are important take place while leaves are still folded up inside buds, and are not yet very solid.
 
-![](_page_417_Figure_1.jpeg)
+![](images/_page_417_Figure_1.jpeg)
 
 Limiting patterns produced by substitution systems of the type shown in the previous picture. The patterns on each row are obtained from rules that are set up to give branches with particular relative lengths. The angles between the branches are taken to increase by 15° in successive pictures across the row. Note that pictures shown on different rows are scaled differently—so that the initial vertical stem does not always appear with the same height. The similarity between pictures on this page and overall branching patterns and shapes of leaves in many kinds of plants is striking.
 
-![](_page_418_Picture_2.jpeg)
+![](images/_page_418_Picture_2.jpeg)
 
 Examples of different kinds of leaves, mostly from common flowering plants. The diversity of shapes is remarkable, as is the similarity to the forms shown on the facing page. The leaves range in size from under an inch to many feet.
 
@@ -504,11 +504,11 @@ The areas of solid black thus correspond to ranges of parameters in the underlyi
 
 So what this suggests is that it is almost inevitable that features such as the shapes of leaves can sometimes change greatly even when the underlying properties of plants change only slightly. And I suspect that this is precisely why such diverse shapes of leaves are occasionally seen even in plants that otherwise appear very similar.
 
-![](_page_421_Picture_1.jpeg)
+![](images/_page_421_Picture_1.jpeg)
 
 The full array of patterns that can be produced by simple substitution systems in which each stem branches into exactly two symmetrical stems at each step. The patterns are arranged on the page so that the pattern shown at a particular position corresponds to what is obtained with a rule in which the tip of the right-hand stem goes to that position (corrected for the aspect ratio of the array) relative to the original stem shown as a vertical line on the left-hand side of the page. In each case the result of 10 steps of evolution is shown, and the pictures are scaled so that all points above the bottom of the original stem can be included. Note that for rules outside of a distorted semicircle centered on the dot at the left-hand side of the page, and touching the three other sides of the page, the patterns generated grow at each step, rather than tending to a limit of fixed size.
 
-![](_page_422_Picture_2.jpeg)
+![](images/_page_422_Picture_2.jpeg)
 
 Maps of where in the space of parameters for the substitution systems on the facing page the patterns obtained overlap the region indicated in the icon at the top left of each picture. Black corresponds to complete overlap, while white corresponds to no overlap. The maps shown can be thought of as being made by taking an infinitely dense limit of the array of pictures on the facing page, but keeping only what one sees in each picture by looking through a peephole at a particular position relative to the original stem.
 
@@ -524,7 +524,7 @@ And no doubt in large part because of this elegant mathematical connection, it h
 
 But I do not believe that this is in fact the case. And instead what I strongly suspect is that the patterns are just inevitable consequences of a rather simple process of growth not unlike one that was already discussed, at least in general terms, nearly a century ago.
 
-![](_page_424_Picture_2.jpeg)
+![](images/_page_424_Picture_2.jpeg)
 
 Examples of spiral arrangements of elements in various plant systems. The details of the final geometry are different in different cases. But in all cases it turns out that the original angle between successive elements is almost exactly 137.5°. The first row shows red cabbage (cut open), artichoke, asparagus, raspberry and strawberry. The first two objects on the last row are a pinecone and an acorn.
 
@@ -532,7 +532,7 @@ The positions of new plant organs or other elements around a stem are presumably
 
 But as soon as an element is formed, one can expect that it will deplete the concentration of the chemical in its local neighborhood, and thus inhibit further elements from forming nearby. Nevertheless, general processes in the growing stem will presumably make the concentration steadily rise throughout the ring of active material, and eventually this concentration will again get high enough at some position that it will cause another element to be formed.
 
-![](_page_425_Picture_1.jpeg)
+![](images/_page_425_Picture_1.jpeg)
 
 A simple model for the arrangement of leaves or other elements produced at the growing tip of a plant stem. The stem is taken to grow up the page, and for purposes of display it is unrolled into a line. The positions of leaves or other elements are indicated by black dots. The concentration of a chemical is indicated by gray level, and for the top line at each step, it is also plotted. The rule for the system places a new black dot at whatever position this concentration is largest. The black dot is then assumed to deplete the concentration around it, but the overall concentration is uniformly increased before the next step. It turns out that successive black dots rapidly become spaced at almost exactly 137.5°.
 
@@ -542,17 +542,17 @@ The way the pictures are drawn, the angles between successive elements correspon
 
 So what happens if one changes the details of the model? In the extreme case where all memory of previous behavior is immediately damped out the first picture at the top of the facing page shows that successive elements form at 180° angles. And in the case where there is very little damping the last two pictures show that at least for a while elements can form at fairly random angles. But in the majority of cases one sees rather rapid convergence to almost precisely 137.5°.
 
-![](_page_426_Figure_2.jpeg)
+![](images/_page_426_Figure_2.jpeg)
 
 Examples of changing the amount of damping used in the model on the facing page. 100% damping corresponds to increasing the overall concentration at each step so much that no memory of previous steps remains. 0% corresponds to no increase in overall concentration at each step. Away from these extreme cases, rapid convergence is seen to a spacing between black dots of almost exactly 137.5°.
 
 So just how does this angle show up in actual plant systems? As the top pictures below demonstrate, the details depend on the geometry and relative growth rates of new elements and of the original stem. But in all cases very characteristic patterns are produced.
 
-![](_page_426_Picture_5.jpeg)
+![](images/_page_426_Picture_5.jpeg)
 
 Examples of structures formed in various geometries by successively adding elements at a golden ratio angle 137.5°. Each of these structures is seen in one type of plant growth or another, as illustrated on page 409.
 
-![](_page_426_Picture_7.jpeg)
+![](images/_page_426_Picture_7.jpeg)
 
 Overall patterns formed by successively adding elements at a variety of different angles. In each case the $n^{\rm th}$ element appears at coordinates $\sqrt{n}\,\{Cos[n\,\theta], Sin[n\,\theta]\}$. Stripes are seen if $\theta/\pi$ (with $\theta$ in radians) is easy to approximate by a rational number. (The size of the region before stripes appear depends on $Length[ContinuedFraction[\theta/\pi]]$.)
 
@@ -564,7 +564,7 @@ But when plants form sheets of material as in leaves or petals there is usually 
 
 If more material is added near the center than near the edge, as in case (b), then the disk is forced to take on a cup shape similar to many flowers. But if more material is added near the edge than near the center, as in case (c), then the sheet will become wavy at the edge, much like some leaves. And if the amount of material increases sufficiently rapidly from the center to the edge, as in case (d), then the disk will be forced to become highly corrugated, somewhat like a lettuce leaf.
 
-![](_page_427_Picture_6.jpeg)
+![](images/_page_427_Picture_6.jpeg)
 
 Disks with varying amounts of material at different distances from their centers. In the top row the disks are always flat, forcing the cells of material to vary in size and shape. In the bottom row, the disks form shapes in three dimensions in which all cells are the same size and shape. Relative to case (a), the amount of material going out from the center decreases linearly in case (b), increases linearly in case (c), and increases exponentially in case (d).
 
@@ -574,7 +574,7 @@ As a first example, consider a horn. One might have thought that, like a stem in
 
 But on the other hand coiling is common. For in order to get a structure that is perfectly straight, the rate at which material is added must be exactly the same on each side of the base. And if there is any difference, one edge of the structure that is produced will always end up being longer than the other, so that coiling will inevitably result, as in the pictures below.
 
-![](_page_428_Picture_6.jpeg)
+![](images/_page_428_Picture_6.jpeg)
 
 Idealized horns generated by progressively adding new material, with the amount of material on the upper edge of the base always being the specified percentage larger than the amount on the lower edge. These pictures can be viewed as one-dimensional analogs of those on the facing page.
 
@@ -582,11 +582,11 @@ And as has been thought for several centuries, it turns out that a three-dimensi
 
 The pictures below show three examples of what can happen, while the facing page shows the effects of systematically varying certain growth rates. And what one sees is that even though the same very simple underlying model is used, there are all sorts of visually very different geometrical forms that can nevertheless be produced.
 
-![](_page_429_Picture_4.jpeg)
+![](images/_page_429_Picture_4.jpeg)
 
 A simple model for the growth of mollusc shells. In each case new shell material is progressively added at the open end of the shell. The rule on the left shows the amount of material added at each stage at different points around the opening; the line from the center indicates the progressive lateral displacement of the opening. Case (a) is typical of a nautilus shell, (b) of a cone shell and (c) of one-half of a clam shell. All shells produced by adding material according to fixed rules of the kind shown here have the property that throughout their growth they maintain the same overall shape.
 
-![](_page_430_Picture_2.jpeg)
+![](images/_page_430_Picture_2.jpeg)
 
 The effects of varying five simple features of the rule for the growth of a mollusc shell: (a) the overall factor by which the size increases in the course of each revolution; (b) the relative amount by which the opening is displaced downward at each revolution; (c) the size of the opening relative to the overall size of the shell; (d) the elongation of the opening; (e) the orientation of elongation in the opening. The pictures at the beginning and end of each row correspond roughly to the following: (a) pond snail shell, cockle shell; (b) pond snail shell, horn shell; (c) worm shell, bonnet shell; (d) periwinkle shell, cowrie shell; (e) olive shell, sundial shell.
 
@@ -594,7 +594,7 @@ So out of all the possible forms, which ones actually occur in real molluscs? Th
 
 If one just saw a single mollusc shell, one might well think that its elaborate form must have been carefully crafted by some long process of natural selection. But what we now see is that in fact all the different forms that are observed are in effect just consequences of the application of three-dimensional geometry to very simple underlying rules of growth. And so once again therefore natural selection cannot reasonably be considered the source of the elaborate forms we see.
 
-![](_page_431_Picture_2.jpeg)
+![](images/_page_431_Picture_2.jpeg)
 
 Shell shapes generated by the simple model and found in nature. The array shows systematic variation of the first two parameters from the previous page. Similar arrays could be made for the other parameters.
 
@@ -610,7 +610,7 @@ Probably the most important of these is folding. For folding is not only involve
 
 Folding seems to occur for a variety of reasons. Sometimes it is most likely the direct result of tugging by microscopic fibers. And in other cases it is probably a consequence of growth occurring at different rates in different places, as in the pictures on page 412.
 
-![](_page_433_Picture_1.jpeg)
+![](images/_page_433_Picture_1.jpeg)
 
 Curves obtained by varying the local curvature according to definite rules as one goes from one end to the other. Each sequence of curves shows what happens when the local curvature is multiplied by a progressively larger factor. The local curvature at any particular point is defined to be the reciprocal of the radius of a circle that approximates the curve at that point. The formulas for local curvature as a function of arc length for each set of pictures are as follows: 1 (circle); $s$ (Cornu spiral or clothoid); $s^2$; $1/\sqrt{s}$ (involute of circle); $1/s$ (logarithmic or equiangular spiral); $1/s^2$; $e^{-s^2}$; $Sin[s]$; $s\,Sin[s]$. The curvature functions $f[s]$ can be thought of as specifying how much to turn a vehicle at every moment in order to keep it driving along the curve. The curves have been rotated so as to fit into the frames provided.
 
@@ -634,7 +634,7 @@ If at every stage the tissue in each region produced grows at the same rate, and
 
 A schematic illustration of the successive subdivisions which presumably occur in the growth of animals. Here the subdivisions are taken to occur in two directions, always giving three simple rectangles which all grow at the same rate. In practice, the geometry will usually be much more complex.
 
-![](_page_435_Picture_5.jpeg)
+![](images/_page_435_Picture_5.jpeg)
 
 But in most cases there is no such obvious nesting of this kind. One reason for this is that a region may break not into a simple line of smaller regions, but into concentric circles or into some collection of regions in a much more complicated arrangement—say of the kind that I discuss in the next section. And perhaps even more important, a region may break into smaller regions that grow at different rates, and that potentially fold over or deform in other ways. And when this happens, the geometry that develops will in turn affect the way that subsequent regions break up.
 
@@ -668,13 +668,13 @@ Following the discoveries in this book, however, what I strongly suspect is that
 
 The pictures below shows some typical examples of patterns found on mollusc shells. Many of these patterns are quite simple. But some are highly complex. Yet looking at these patterns one notices a remarkable similarity to patterns that we have seen many times before in this book—generated by simple one-dimensional cellular automata.
 
-![](_page_438_Picture_4.jpeg)
+![](images/_page_438_Picture_4.jpeg)
 
 Typical examples of pigmentation patterns on mollusc shells. In each close-up the pattern grows from top to bottom, just like in a one-dimensional cellular automaton. Patterns with triangles are often said to have a “tent” or “divaricate” form. The shell on the bottom right is a slightly rare specimen where something close to an explicit nested pattern can be seen. Most of the shells are between one and four inches long; the one on the bottom right is nine inches long. The patterns are all various shades of brown on roughly white backgrounds. The shells are the following types: first row: Elliot’s volute, vexillate volute, lettered cone; second row: music volute, banded marble cone, tent olive; third row: bough cone, textile cone, false melon volute (*Livonia mammilla*).
 
 This similarity is, I believe, no coincidence. A mollusc shell, like a one-dimensional cellular automaton, in effect grows one line at a time, with new shell material being produced by a lip of soft tissue at the edge of the animal inside the shell. Quite how the pigment on the shell is laid down is not completely clear. There are undoubtedly elements in the soft tissue that at any point either will or will not secrete pigment. And presumably these elements have certain interactions with each other. And given this, the simplest hypothesis in a sense is that the new state of the element is determined from the previous state of its neighbors—just as in a one-dimensional cellular automaton.
 
-![](_page_439_Figure_3.jpeg)
+![](images/_page_439_Figure_3.jpeg)
 
 Examples of patterns produced by the evolution of each of the simplest possible symmetrical one-dimensional cellular automaton rules, starting from a random initial condition. The types of patterns obtained show striking similarities to those seen on mollusc shells from the previous page.
 
@@ -688,7 +688,7 @@ So what about pigmentation patterns on other kinds of animals? Mollusc shells ar
 
 Most often what seems to happen is that at some point in the growth of an embryo, precursors of pigment-producing cells appear on its surface, and groups of these cells associated with pigments of different colors then become arranged in a definite pattern. Typically each individual group of cells is initially some fraction of a tenth of a millimeter across. But since different parts of an animal usually grow at different rates, the final pattern that one sees on an adult animal ends up being scaled differently in different places—so that, for example, the pattern is smaller in scale on the head of an animal, since the head grows more slowly.
 
-![](_page_441_Picture_2.jpeg)
+![](images/_page_441_Picture_2.jpeg)
 
 Typical examples of pigmentation patterns on animals. Note that many very different animals end up having remarkably similar patterns.
 
@@ -698,19 +698,19 @@ The idea is that when a pattern forms, the color of each element will tend to be
 
 The pictures below show what happens with two slightly different choices for the relative importance of elements that are further away. In both cases, starting from a random distribution of black and white elements there quickly emerge definite patterns—in the first case a collection of spots, and in the second case a maze-like or labyrinthine structure.
 
-![](_page_442_Figure_5.jpeg)
+![](images/_page_442_Figure_5.jpeg)
 
 Evolution of simple two-dimensional cellular automata in which the color of each cell at each step is determined by looking at a weighted sum of the average colors of cells up to distance 3 away. In both rules shown the cell itself and its nearest neighbors enter with weight 1. Cells at distances 2 and 3 enter with negative weights— -0.4 per cell for the first rule, and -0.2 for the second. A cell becomes black if the weighted sum is positive, and white otherwise. Starting from random initial conditions, both rules quickly evolve to stationary states that look very much like pigmentation patterns seen in animals.
 
 The next page shows the final patterns obtained with a whole array of different choices of weightings for elements at different distances. A certain range of patterns emerges—almost all of which turn out to be quite similar to patterns that one sees on actual animals.
 
-![](_page_443_Picture_1.jpeg)
+![](images/_page_443_Picture_1.jpeg)
 
 Patterns generated by rules of the type shown on the previous page, with a range of choices for the weights of cells at distances 2 and 3. Weights vary from -0.9 to 0 down the page for distance 2, and from -0.7 to 0.4 across the page for distance 3. In all cases the evolution starts from the same random initial condition, and is continued until it stabilizes. Note that pigmentation patterns for actual animals may contain either larger or smaller numbers of elements than the patterns shown here.
 
 But all of these patterns in a sense have the same basic form in every direction. Yet there are many animals whose pigmentation patterns exhibit stripes with a definite orientation. Sometimes these stripes are highly regular, and can potentially arise from any of the possible mechanisms that yield repetitive behavior. But in cases where the stripes are less regular they typically look very much like the patterns generated in the pictures at the top of the facing page using a version of the simple mechanism described above.
 
-![](_page_444_Picture_1.jpeg)
+![](images/_page_444_Picture_1.jpeg)
 
 Examples of rules in which cells in the horizontal and vertical directions are weighted differently. In the first case, cells at distances 2 and 3 only have an effect in the vertical direction; in the second case, they only have an effect in the horizontal direction. The result is the formation of either vertical or horizontal stripes.
 
@@ -754,11 +754,11 @@ And so as a minimal idealization one can for example try viewing a market as bei
 
 With traditional intuition one would assume that such a simple model must have extremely simple behavior, and certainly nothing like what is seen in a real market. But as we have discovered in this book, simple models do not necessarily have simple behavior. And indeed the picture below shows an example of the behavior that can occur.
 
-![](_page_447_Picture_3.jpeg)
+![](images/_page_447_Picture_3.jpeg)
 
-![](_page_447_Figure_4.jpeg)
+![](images/_page_447_Figure_4.jpeg)
 
-![](_page_447_Figure_8.jpeg)
+![](images/_page_447_Figure_8.jpeg)
 
 An example of a very simple idealized model of a market. Each cell corresponds to an entity that either buys or sells on each step. The behavior of a given cell is determined by looking at the behavior of its two neighbors on the step before according to the rule shown. The plot below gives as a rough analog of a market price the running difference of the total numbers of black and white cells at successive steps. And although there are patches of predictability that can be seen in the complete behavior of the system the plot on the right looks in many respects random.
 

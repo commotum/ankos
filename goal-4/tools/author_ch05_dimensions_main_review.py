@@ -21,7 +21,7 @@ WORKER_ID = "ch05-dimensions-main-reader-e2"
 STAGE = "9"
 EPOCH = "2"
 REVIEWER = WORKER_ID
-SOURCE_PATH = "CHAPTERS/05-Two-Dimensions-and-Beyond.md"
+SOURCE_PATH = "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md"
 EXPECTED_BUNDLE_SHA = "c24385f9a8116f9b5fe0e7b02781ad3ee7a8b5bda5bea2ea8f5290aa239a327e"
 EXPECTED_PROMPT_SHA = "b07f7cb1657c5b43b395424d78f6bf4404b0631312aef6b85dd9782651c33781"
 EXPECTED_SCHEMA_SHA = "0dc082f9e1e434ca8c6c1839320044a89a18772c6179d831940fc35dd5955a17"
@@ -336,7 +336,7 @@ def load_bundle(bundle: Path) -> dict[str, Any]:
         for line in (bundle / "input/source-units.jsonl").read_text().splitlines()
     ]
     source = (
-        bundle / "input/sources/CHAPTERS/05-Two-Dimensions-and-Beyond.md"
+        bundle / "input/sources/CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md"
     ).read_bytes()
     assert [row["source_unit_id"] for row in readings] == [u["id"] for u in units]
     assert readings[0]["source_unit_id"] == "U000947"

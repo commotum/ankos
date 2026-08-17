@@ -9,7 +9,7 @@ Status: **COMPLETE**.
   91 active blind candidates, 101 routes (10 resolved and 91 pending
   cross-range), and 6 closed LOCAL rounds.
 - Stage 6 owns exactly two canonical documents in manifest order:
-  - `CHAPTERS/02-The-Crucial-Experiment.md`;
+  - `CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md`;
   - `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md`.
 - The paired paths contain 489 deterministic source units:
   `U000174..U000305` and `U004962..U005318`.

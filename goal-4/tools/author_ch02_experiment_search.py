@@ -24,7 +24,7 @@ from audit_contract import GOAL_DIR, REPO_ROOT, canonical_json_bytes
 
 
 STAGE_PATHS = [
-    "CHAPTERS/02-The-Crucial-Experiment.md",
+    "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
     "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md",
 ]
 

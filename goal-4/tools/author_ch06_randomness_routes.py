@@ -43,7 +43,7 @@ IDENTITY_FIELDS = (
     "expected_topic",
 )
 STAGE_PATHS = (
-    "CHAPTERS/06-Starting-from-Randomness.md",
+    "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
     "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md",
 )
 EXPECTED_SPEC_COUNTS = {"incoming": 14, "within": 58}

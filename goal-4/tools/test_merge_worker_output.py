@@ -33,7 +33,7 @@ from audit_contract import (  # noqa: E402
 ASSIGNMENT_PATH = "FRONT-MATTER/01-Preface.md"
 FIRST_STAGE_4_PATH = "FRONT-MATTER/00-Publication-and-Contents.md"
 INITIAL_STAGE_4_PREFIX = [FIRST_STAGE_4_PATH, ASSIGNMENT_PATH]
-STAGE_5_PATH = "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
+STAGE_5_PATH = "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md"
 STAGE_5_NOTES_PATH = (
     "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
 )

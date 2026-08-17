@@ -3580,7 +3580,7 @@
           "pattern": "elementary cellular automata",
           "query_id": "Q0019",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3592,7 +3592,7 @@
           "pattern": "\\bcellular automat(?:on|a)\\b",
           "query_id": "Q0020",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3604,7 +3604,7 @@
           "pattern": "random initial conditions",
           "query_id": "Q0021",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3616,7 +3616,7 @@
           "pattern": "\\b(?:disks?|particles?|collid(?:e|es|ed|ing|isions?)|square grid|conservation laws?)\\b",
           "query_id": "Q0022",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3628,7 +3628,7 @@
           "pattern": "middle-square",
           "query_id": "Q0023",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3640,7 +3640,7 @@
           "pattern": "\\b(?:initial conditions?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
           "query_id": "Q0024",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3652,7 +3652,7 @@
           "pattern": "\\b(?:random(?:ness)?|randomization|probabilistic|probability|stochastic|Bernoulli)\\b",
           "query_id": "Q0025",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3664,7 +3664,7 @@
           "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential|logic)\\b",
           "query_id": "Q0026",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3676,7 +3676,7 @@
           "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|register machines?|mobile automata|automaton)\\b",
           "query_id": "Q0027",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3688,7 +3688,7 @@
           "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
           "query_id": "Q0028",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -3700,7 +3700,7 @@
           "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
           "query_id": "Q0029",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5455,7 +5455,7 @@
           "pattern": "elementary cellular automata",
           "query_id": "Q0030",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5467,7 +5467,7 @@
           "pattern": "\\bcellular automat(?:on|a)\\b",
           "query_id": "Q0031",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5479,7 +5479,7 @@
           "pattern": "random initial conditions",
           "query_id": "Q0032",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5491,7 +5491,7 @@
           "pattern": "\\b(?:disks?|particles?|collid(?:e|es|ed|ing|isions?)|square grid|conservation laws?)\\b",
           "query_id": "Q0033",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5503,7 +5503,7 @@
           "pattern": "middle-square",
           "query_id": "Q0034",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5515,7 +5515,7 @@
           "pattern": "\\b(?:initial conditions?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
           "query_id": "Q0035",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5527,7 +5527,7 @@
           "pattern": "\\b(?:random(?:ness)?|randomization|probabilistic|probability|stochastic|Bernoulli)\\b",
           "query_id": "Q0036",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5539,7 +5539,7 @@
           "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential|logic)\\b",
           "query_id": "Q0037",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5551,7 +5551,7 @@
           "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|register machines?|mobile automata|automaton)\\b",
           "query_id": "Q0038",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5563,7 +5563,7 @@
           "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
           "query_id": "Q0039",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -5575,7 +5575,7 @@
           "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
           "query_id": "Q0040",
           "scope_paths": [
-            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+            "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
             "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
@@ -12652,7 +12652,7 @@
           "pattern": "\\b(?:computer experiments?|possible simple programs?|enumerat(?:e|es|ed|ing|ion)|systematic surveys?|survey of)\\b",
           "query_id": "Q0041",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12664,7 +12664,7 @@
           "pattern": "\\b(?:CellularAutomaton|GeneralCARule|FunctionCARule|CAStep|CAEvolveList|rules?\\s*(?:10|20|30|60|90|102|110|170|250|254|3702|921408)|totalistic code\\s*(?:10|20|867|3702)|totalistic|outer[- ]totalistic|additive|weighted)\\b",
           "query_id": "Q0042",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12676,7 +12676,7 @@
           "pattern": "\\b(?:CenterList|single black cell|seeds?|backgrounds?|cyclic|periodic|offsets?|time slices?|space slices?|center columns?|row populations?|black positions?)\\b",
           "query_id": "Q0043",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12688,7 +12688,7 @@
           "pattern": "\\b(?:Pascal(?:'s)? triangle|binomial|multinomial|StirlingS[12]|DigitCount|PolynomialMod|Cantor(?: set)?|GCD|JacobiSymbol|modulo|BitAnd|BitOr|BitXor|bitwise functions?|munching squares?|munching foos?|formulas?)\\b",
           "query_id": "Q0044",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12700,7 +12700,7 @@
           "pattern": "\\b(?:labyrinths?|mazes?|rosettes?|mosaics?|Cosmati|Alc[aá]zar|Persian gardens?|Truchet|Pylos|Desborough|Phoenician|paperfolding|wire ropes?|sestina|terza rima|rhymes?|games?|puzzles?|Game of Life|Conway)\\b",
           "query_id": "Q0045",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12712,7 +12712,7 @@
           "pattern": "\\b(?:von Neumann|self[- ]reproduc(?:e|es|ed|ing|tion)|Ulam|Fredkin|feedback shift registers?|LFSR|nonlinear FSR|symbolic dynamics|block maps?)\\b",
           "query_id": "Q0046",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12724,7 +12724,7 @@
           "pattern": "\\b(?:initial conditions?|initial states?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
           "query_id": "Q0047",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12736,7 +12736,7 @@
           "pattern": "\\b(?:random(?:ness)?|randomization|probabilistic|probability|stochastic|Bernoulli)\\b",
           "query_id": "Q0048",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12748,7 +12748,7 @@
           "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential|logic)\\b",
           "query_id": "Q0049",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12760,7 +12760,7 @@
           "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|register machines?|mobile automata)\\b",
           "query_id": "Q0050",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12772,7 +12772,7 @@
           "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
           "query_id": "Q0051",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -12784,7 +12784,7 @@
           "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
           "query_id": "Q0052",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20222,7 +20222,7 @@
           "pattern": "\\b(?:computer experiments?|possible simple programs?|enumerat(?:e|es|ed|ing|ion)|systematic surveys?|survey of)\\b",
           "query_id": "Q0053",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20234,7 +20234,7 @@
           "pattern": "\\b(?:CellularAutomaton|GeneralCARule|FunctionCARule|CAStep|CAEvolveList|rules?\\s*(?:10|20|30|60|90|102|110|170|250|254|3702|921408)|totalistic code\\s*(?:10|20|867|3702)|totalistic|outer[- ]totalistic|additive|weighted)\\b",
           "query_id": "Q0054",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20246,7 +20246,7 @@
           "pattern": "\\b(?:CenterList|single black cell|seeds?|backgrounds?|cyclic|periodic|offsets?|time slices?|space slices?|center columns?|row populations?|black positions?)\\b",
           "query_id": "Q0055",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20258,7 +20258,7 @@
           "pattern": "\\b(?:Pascal(?:'s)? triangle|binomial|multinomial|StirlingS[12]|DigitCount|PolynomialMod|Cantor(?: set)?|GCD|JacobiSymbol|modulo|BitAnd|BitOr|BitXor|bitwise functions?|munching squares?|munching foos?|formulas?)\\b",
           "query_id": "Q0056",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20270,7 +20270,7 @@
           "pattern": "\\b(?:labyrinths?|mazes?|rosettes?|mosaics?|Cosmati|Alc[aá]zar|Persian gardens?|Truchet|Pylos|Desborough|Phoenician|paperfolding|wire ropes?|sestina|terza rima|rhymes?|games?|puzzles?|Game of Life|Conway)\\b",
           "query_id": "Q0057",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20282,7 +20282,7 @@
           "pattern": "\\b(?:von Neumann|self[- ]reproduc(?:e|es|ed|ing|tion)|Ulam|Fredkin|feedback shift registers?|LFSR|nonlinear FSR|symbolic dynamics|block maps?)\\b",
           "query_id": "Q0058",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20294,7 +20294,7 @@
           "pattern": "\\b(?:initial conditions?|initial states?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
           "query_id": "Q0059",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20306,7 +20306,7 @@
           "pattern": "\\b(?:random(?:ness)?|randomization|probabilistic|probability|stochastic|Bernoulli)\\b",
           "query_id": "Q0060",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20318,7 +20318,7 @@
           "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential|logic)\\b",
           "query_id": "Q0061",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20330,7 +20330,7 @@
           "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|register machines?|mobile automata)\\b",
           "query_id": "Q0062",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20342,7 +20342,7 @@
           "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
           "query_id": "Q0063",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -20354,7 +20354,7 @@
           "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
           "query_id": "Q0064",
           "scope_paths": [
-            "CHAPTERS/02-The-Crucial-Experiment.md",
+            "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
             "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
@@ -35559,7 +35559,7 @@
           "pattern": "\\b(?:cellular automat(?:on|a)|CellularAutomaton|CA(?:Step|EvolveList)|elementary rules?|totalistic|two[- ]cell(?:[- ]neighbou?rhood)?|staggered|algebraic systems?|Times|quaternions?|multiplication tables?|S[₃3]|BooleanFunction|rules?\\s*(?:number\\s*)?\\d+|codes?\\s*(?:number\\s*)?\\d+)\\b",
           "query_id": "Q0065",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35571,7 +35571,7 @@
           "pattern": "\\b(?:mobile automat(?:on|a)|generalized mobile automat(?:on|a)|active cells?|MA(?:Step|EvolveList)|GMAStep|active[- ]cell (?:position|motion|displacement)|split in two)\\b",
           "query_id": "Q0066",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35583,7 +35583,7 @@
           "pattern": "\\b(?:Turing machines?|TM(?:Step|EvolveList|Rule)|tapes?|head states?|blank tape|halt states?|halting|Busy Beaver|rule 1953|states?)\\b",
           "query_id": "Q0067",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35595,7 +35595,7 @@
           "pattern": "\\b(?:substitution systems?|neighbor[- ]independent|neighbor[- ]dependent|SS(?:2)?EvolveList|Thue[- ]Morse|Fibonacci|Lucas|Perrin|Cantor|paperfolding|period[- ]doubling|Sturmian)\\b",
           "query_id": "Q0068",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35607,7 +35607,7 @@
           "pattern": "\\b(?:sequential substitution systems?|SSSEvolveList|search[- ]and[- ]replace|scan(?:ned|ning)? (?:the )?string|left to right|first (?:matching )?(?:sequence|replacement)|replacement order|replacements?)\\b",
           "query_id": "Q0069",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35619,7 +35619,7 @@
           "pattern": "\\b(?:tag systems?|Post(?: tag)?|cyclic tag systems?|CT(?:Step|EvolveList)|TSEvolveList|deletion number|append(?:ed)? blocks?|tagged onto|Kolakoski|remove[ds]?|removing|leading elements?|rules? for case \\(a\\) on page 94)\\b",
           "query_id": "Q0070",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35631,7 +35631,7 @@
           "pattern": "\\b(?:register machines?|RM(?:Step|Execute)|program counter|increment instructions?|decrement[- ]jumps?|instruction lists?|register vectors?|registers?|instructions?)\\b",
           "query_id": "Q0071",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35643,7 +35643,7 @@
           "pattern": "\\b(?:symbolic systems?|symbolic expressions?|operator systems?|expression\\s*/\\.\\s*rule|LeafCount|Church[- ]Rosser|Church numerals?|combinators?|Polish notation|opening and closing brackets|fixed configurations?)\\b|e\\[x_?\\]\\[y_?\\]",
           "query_id": "Q0072",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35655,7 +35655,7 @@
           "pattern": "\\b(?:sequences?|functions?|recurrences?|representations?|transducers?|finite automat(?:on|a)|rule[- ]number(?:ing| decoder)?|decod(?:e|es|ed|ing)|GegenbauerC|GoldenRatio|DigitCount|IntegerDigits|maximi[sz](?:e|es|ed|ing|ation))\\b",
           "query_id": "Q0073",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35667,7 +35667,7 @@
           "pattern": "(?:^|\\n)\\s*(?:```|!\\[[^\\]]*\\]\\([^)]+\\))|`[^`\\n]*(?:->|∘|Mod\\[|Floor\\[|Sqrt\\[|Nest|Table|IntegerDigits|DigitCount|GegenbauerC)[^`\\n]*`",
           "query_id": "Q0074",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35679,7 +35679,7 @@
           "pattern": "\\b(?:initial conditions?|initial states?|seeds?|backgrounds?|boundar(?:y|ies)|current states?|successors?|steps?|evol(?:ve|ves|ved|ving|ution)|updates?|replacements?|rewrit(?:e|es|ing)|remove[ds]?|append(?:s|ed|ing)?|moves?|scans?|neighbou?rs?|active|heads?|registers?|fixed points?|halts?|termination)\\b",
           "query_id": "Q0075",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35691,7 +35691,7 @@
           "pattern": "\\b(?:enumerat(?:e|es|ed|ing|ion)|possible rules?|rule numbers?|code numbers?|lookup(?: table)?|multiplication tables?|base[- ]?[234k]|randomly (?:chosen|selected) rules?|programs? (?:of )?length|states? and (?:two|three|four|five) (?:colors?|states?))\\b",
           "query_id": "Q0076",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35703,7 +35703,7 @@
           "pattern": "\\b(?:random(?:ness|ly|ization)?|probabilistic|probability|stochastic|Bernoulli|sample[sd]?|sampling|constraints?|equations?|solutions?|relations?|inequalit(?:y|ies)|differential equations?|partial differential|Lorenz|iterated maps?|algebraic constants?)\\b",
           "query_id": "Q0077",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -35715,7 +35715,7 @@
           "pattern": "\\b(?:compress(?:ed|ion)|plots?|displays?|pictures?|render(?:s|ed|ing)?|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|observers?|analy[sz](?:e|es|ed|ing)|measur(?:e|es|ed|ing|ement)|trees?|boxes?|brackets?|Mathematica)\\b",
           "query_id": "Q0078",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51513,7 +51513,7 @@
           "pattern": "\\b(?:cellular automat(?:on|a)|CellularAutomaton|CA(?:Step|EvolveList)|elementary rules?|totalistic|two[- ]cell(?:[- ]neighbou?rhood)?|staggered|algebraic systems?|Times|quaternions?|multiplication tables?|S[₃3]|BooleanFunction|rules?\\s*(?:number\\s*)?\\d+|codes?\\s*(?:number\\s*)?\\d+)\\b",
           "query_id": "Q0079",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51525,7 +51525,7 @@
           "pattern": "\\b(?:mobile automat(?:on|a)|generalized mobile automat(?:on|a)|active cells?|MA(?:Step|EvolveList)|GMAStep|active[- ]cell (?:position|motion|displacement)|split in two)\\b",
           "query_id": "Q0080",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51537,7 +51537,7 @@
           "pattern": "\\b(?:Turing machines?|TM(?:Step|EvolveList|Rule)|tapes?|head states?|blank tape|halt states?|halting|Busy Beaver|rule 1953|states?)\\b",
           "query_id": "Q0081",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51549,7 +51549,7 @@
           "pattern": "\\b(?:substitution systems?|neighbor[- ]independent|neighbor[- ]dependent|SS(?:2)?EvolveList|Thue[- ]Morse|Fibonacci|Lucas|Perrin|Cantor|paperfolding|period[- ]doubling|Sturmian)\\b",
           "query_id": "Q0082",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51561,7 +51561,7 @@
           "pattern": "\\b(?:sequential substitution systems?|SSSEvolveList|search[- ]and[- ]replace|scan(?:ned|ning)? (?:the )?string|left to right|first (?:matching )?(?:sequence|replacement)|replacement order|replacements?)\\b",
           "query_id": "Q0083",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51573,7 +51573,7 @@
           "pattern": "\\b(?:tag systems?|Post(?: tag)?|cyclic tag systems?|CT(?:Step|EvolveList)|TSEvolveList|deletion number|append(?:ed)? blocks?|tagged onto|Kolakoski|remove[ds]?|removing|leading elements?|rules? for case \\(a\\) on page 94)\\b",
           "query_id": "Q0084",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51585,7 +51585,7 @@
           "pattern": "\\b(?:register machines?|RM(?:Step|Execute)|program counter|increment instructions?|decrement[- ]jumps?|instruction lists?|register vectors?|registers?|instructions?)\\b",
           "query_id": "Q0085",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51597,7 +51597,7 @@
           "pattern": "\\b(?:symbolic systems?|symbolic expressions?|operator systems?|expression\\s*/\\.\\s*rule|LeafCount|Church[- ]Rosser|Church numerals?|combinators?|Polish notation|opening and closing brackets|fixed configurations?)\\b|e\\[x_?\\]\\[y_?\\]",
           "query_id": "Q0086",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51609,7 +51609,7 @@
           "pattern": "\\b(?:sequences?|functions?|recurrences?|representations?|transducers?|finite automat(?:on|a)|rule[- ]number(?:ing| decoder)?|decod(?:e|es|ed|ing)|GegenbauerC|GoldenRatio|DigitCount|IntegerDigits|maximi[sz](?:e|es|ed|ing|ation))\\b",
           "query_id": "Q0087",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51621,7 +51621,7 @@
           "pattern": "(?:^|\\n)\\s*(?:```|!\\[[^\\]]*\\]\\([^)]+\\))|`[^`\\n]*(?:->|∘|Mod\\[|Floor\\[|Sqrt\\[|Nest|Table|IntegerDigits|DigitCount|GegenbauerC)[^`\\n]*`",
           "query_id": "Q0088",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51633,7 +51633,7 @@
           "pattern": "\\b(?:initial conditions?|initial states?|seeds?|backgrounds?|boundar(?:y|ies)|current states?|successors?|steps?|evol(?:ve|ves|ved|ving|ution)|updates?|replacements?|rewrit(?:e|es|ing)|remove[ds]?|append(?:s|ed|ing)?|moves?|scans?|neighbou?rs?|active|heads?|registers?|fixed points?|halts?|termination)\\b",
           "query_id": "Q0089",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51645,7 +51645,7 @@
           "pattern": "\\b(?:enumerat(?:e|es|ed|ing|ion)|possible rules?|rule numbers?|code numbers?|lookup(?: table)?|multiplication tables?|base[- ]?[234k]|randomly (?:chosen|selected) rules?|programs? (?:of )?length|states? and (?:two|three|four|five) (?:colors?|states?))\\b",
           "query_id": "Q0090",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51657,7 +51657,7 @@
           "pattern": "\\b(?:random(?:ness|ly|ization)?|probabilistic|probability|stochastic|Bernoulli|sample[sd]?|sampling|constraints?|equations?|solutions?|relations?|inequalit(?:y|ies)|differential equations?|partial differential|Lorenz|iterated maps?|algebraic constants?)\\b",
           "query_id": "Q0091",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -51669,7 +51669,7 @@
           "pattern": "\\b(?:compress(?:ed|ion)|plots?|displays?|pictures?|render(?:s|ed|ing)?|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|observers?|analy[sz](?:e|es|ed|ing)|measur(?:e|es|ed|ing|ement)|trees?|boxes?|brackets?|Mathematica)\\b",
           "query_id": "Q0092",
           "scope_paths": [
-            "CHAPTERS/03-The-World-of-Simple-Programs.md",
+            "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
             "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
@@ -78865,7 +78865,7 @@
           "pattern": "\\b(?:positional|radix|bases?|binary|ternary|decimal|digits?|DigitCount|IntegerDigits|IntegerReverse|continued fractions?|Gray codes?|place values?|prime exponents?|negative bases?|representations?)\\b",
           "query_id": "Q0093",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78877,7 +78877,7 @@
           "pattern": "\\b(?:repeated (?:addition|multiplication)|multiply|multiplies|multiplying|multiplication|Collatz|3\\s*n\\s*\\+\\s*1|parity|revers(?:e|al|ing)|run[- ]length|look[- ]and[- ]say|BitXor|BitOr|fractional parts?|integer maps?|iterations?|maps?)\\b",
           "query_id": "Q0094",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78889,7 +78889,7 @@
           "pattern": "\\b(?:recurrences?|recursive|recursion|Fibonacci|factorial|Ackermann|primitive recursive|mu[- ]search|self[- ]indexed|triangular|plus|times|Fold|Jacobi|memoiz(?:e|ed|ation)|evaluation polic(?:y|ies)|composition)\\b|μ",
           "query_id": "Q0095",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78901,7 +78901,7 @@
           "pattern": "\\b(?:primes?|sieve|divisors?|aliquot|perfect numbers?|Goldbach|Mersenne|Lucas[- ]Lehmer|M[oö]bius|Mertens|relatively prime|squares?|Waring|Fermat|Josephus|Ulam sequence)\\b",
           "query_id": "Q0096",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78913,7 +78913,7 @@
           "pattern": "(?:\\b(?:Pi|constants?|square roots?|cube roots?|fourth roots?|logarithm|exponential|normal numbers?|Stoneham|Benford|digit(?:s| sequences?| generators?| extractors?)|Bailey|Borwein|Plouffe|Newton|arithmetic[- ]geometric)\\b|π|Log\\[)",
           "query_id": "Q0097",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78925,7 +78925,7 @@
           "pattern": "\\b(?:continued fractions?|rational|Euclidean|Farey|Egyptian fractions?|nested radicals?|digital slopes?|operator trees?|Lissajous|special functions?)\\b",
           "query_id": "Q0098",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78937,7 +78937,7 @@
           "pattern": "\\b(?:sine|cosine|Sin|Cos|Fourier|Riemann|zeta|Riemann[- ]Siegel|zeros?|trigonometric|Weierstrass|harmonic|lacunary)\\b",
           "query_id": "Q0099",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78949,7 +78949,7 @@
           "pattern": "\\b(?:iterated maps?|shift maps?|tent maps?|logistic maps?|Gauss maps?|Anosov|Lyapunov|unit interval|finite precision|FractionalPart|chaos|trajector(?:y|ies))\\b",
           "query_id": "Q0100",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78961,7 +78961,7 @@
           "pattern": "\\b(?:functions?|sequences?|relations?|equations?|constraints?|systems?|rules?|maps?|algorithms?|generators?|solvers?|predicates?|obligations?|solutions?|approximat(?:e|es|ed|ing|ion)|continuous cellular automat(?:on|a)|partial differential|PDE|ordinary differential|ODE|diffusion|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky|scalar fields?|Lagrangian|Hamiltonian|single black cell|unbounded|growth|increas(?:e|es|ed|ing))\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```|<table>)|Mod\\[|Integrate\\[",
           "query_id": "Q0101",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78973,7 +78973,7 @@
           "pattern": "(?:^|\\n)\\s*(?:```|!\\[[^\\]]*\\]\\([^)]+\\))|`[^`\\n]*(?:->|→|==|:=|Mod\\[|Floor\\[|Sqrt\\[|Nest|Table|IntegerDigits|DigitCount|BitXor|BitOr|FractionalPart|Sin\\[|Cos\\[|D\\[)[^`\\n]*`",
           "query_id": "Q0102",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78985,7 +78985,7 @@
           "pattern": "\\b(?:continuous(?:ly)?[- ]valued|continuous cellular automat(?:on|a)|probabilistic cellular automat(?:on|a)|partial differential equations?|PDE|ordinary differential equations?|ODE|diffusion|wave equation|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky)\\b",
           "query_id": "Q0103",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -78997,7 +78997,7 @@
           "pattern": "\\b(?:initial conditions?|initial values?|initial states?|seeds?|backgrounds?|boundar(?:y|ies)|current states?|successors?|steps?|evol(?:ve|ves|ved|ving|ution)|iterations?|updates?|recurrences?|rewrit(?:e|es|ing)|moves?|neighbou?rs?|fixed points?|halts?|termination|converges?|diverges?)\\b",
           "query_id": "Q0104",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -79009,7 +79009,7 @@
           "pattern": "\\b(?:random(?:ness|ly|ization)?|probabilistic|probability|stochastic|Bernoulli|sample[sd]?|sampling|constraints?|equations?|solutions?|relations?|inequalit(?:y|ies)|boundary values?|initial values?|existence|universal|necessary and sufficient)\\b",
           "query_id": "Q0105",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -79021,7 +79021,7 @@
           "pattern": "\\b(?:plots?|displays?|pictures?|render(?:s|ed|ing)?|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|observers?|analy[sz](?:e|es|ed|ing)|measur(?:e|es|ed|ing|ement)|approximat(?:e|es|ed|ing|ion)|digits?|trajector(?:y|ies)|Mathematica)\\b",
           "query_id": "Q0106",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107076,7 +107076,7 @@
           "pattern": "\\b(?:positional|radix|bases?|binary|ternary|decimal|digits?|DigitCount|IntegerDigits|IntegerReverse|continued fractions?|Gray codes?|place values?|prime exponents?|negative bases?|representations?)\\b",
           "query_id": "Q0107",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107088,7 +107088,7 @@
           "pattern": "\\b(?:repeated (?:addition|multiplication)|multiply|multiplies|multiplying|multiplication|Collatz|3\\s*n\\s*\\+\\s*1|parity|revers(?:e|al|ing)|run[- ]length|look[- ]and[- ]say|BitXor|BitOr|fractional parts?|integer maps?|iterations?|maps?)\\b",
           "query_id": "Q0108",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107100,7 +107100,7 @@
           "pattern": "\\b(?:recurrences?|recursive|recursion|Fibonacci|factorial|Ackermann|primitive recursive|mu[- ]search|self[- ]indexed|triangular|plus|times|Fold|Jacobi|memoiz(?:e|ed|ation)|evaluation polic(?:y|ies)|composition)\\b|μ",
           "query_id": "Q0109",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107112,7 +107112,7 @@
           "pattern": "\\b(?:primes?|sieve|divisors?|aliquot|perfect numbers?|Goldbach|Mersenne|Lucas[- ]Lehmer|M[oö]bius|Mertens|relatively prime|squares?|Waring|Fermat|Josephus|Ulam sequence)\\b",
           "query_id": "Q0110",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107124,7 +107124,7 @@
           "pattern": "(?:\\b(?:Pi|constants?|square roots?|cube roots?|fourth roots?|logarithm|exponential|normal numbers?|Stoneham|Benford|digit(?:s| sequences?| generators?| extractors?)|Bailey|Borwein|Plouffe|Newton|arithmetic[- ]geometric)\\b|π|Log\\[)",
           "query_id": "Q0111",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107136,7 +107136,7 @@
           "pattern": "\\b(?:continued fractions?|rational|Euclidean|Farey|Egyptian fractions?|nested radicals?|digital slopes?|operator trees?|Lissajous|special functions?)\\b",
           "query_id": "Q0112",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107148,7 +107148,7 @@
           "pattern": "\\b(?:sine|cosine|Sin|Cos|Fourier|Riemann|zeta|Riemann[- ]Siegel|zeros?|trigonometric|Weierstrass|harmonic|lacunary)\\b",
           "query_id": "Q0113",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107160,7 +107160,7 @@
           "pattern": "\\b(?:iterated maps?|shift maps?|tent maps?|logistic maps?|Gauss maps?|Anosov|Lyapunov|unit interval|finite precision|FractionalPart|chaos|trajector(?:y|ies))\\b",
           "query_id": "Q0114",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107172,7 +107172,7 @@
           "pattern": "\\b(?:functions?|sequences?|relations?|equations?|constraints?|systems?|rules?|maps?|algorithms?|generators?|solvers?|predicates?|obligations?|solutions?|approximat(?:e|es|ed|ing|ion)|continuous cellular automat(?:on|a)|partial differential|PDE|ordinary differential|ODE|diffusion|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky|scalar fields?|Lagrangian|Hamiltonian|single black cell|unbounded|growth|increas(?:e|es|ed|ing))\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```|<table>)|Mod\\[|Integrate\\[",
           "query_id": "Q0115",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107184,7 +107184,7 @@
           "pattern": "(?:^|\\n)\\s*(?:```|!\\[[^\\]]*\\]\\([^)]+\\))|`[^`\\n]*(?:->|→|==|:=|Mod\\[|Floor\\[|Sqrt\\[|Nest|Table|IntegerDigits|DigitCount|BitXor|BitOr|FractionalPart|Sin\\[|Cos\\[|D\\[)[^`\\n]*`",
           "query_id": "Q0116",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107196,7 +107196,7 @@
           "pattern": "\\b(?:continuous(?:ly)?[- ]valued|continuous cellular automat(?:on|a)|probabilistic cellular automat(?:on|a)|partial differential equations?|PDE|ordinary differential equations?|ODE|diffusion|wave equation|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky)\\b",
           "query_id": "Q0117",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107208,7 +107208,7 @@
           "pattern": "\\b(?:initial conditions?|initial values?|initial states?|seeds?|backgrounds?|boundar(?:y|ies)|current states?|successors?|steps?|evol(?:ve|ves|ved|ving|ution)|iterations?|updates?|recurrences?|rewrit(?:e|es|ing)|moves?|neighbou?rs?|fixed points?|halts?|termination|converges?|diverges?)\\b",
           "query_id": "Q0118",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107220,7 +107220,7 @@
           "pattern": "\\b(?:random(?:ness|ly|ization)?|probabilistic|probability|stochastic|Bernoulli|sample[sd]?|sampling|constraints?|equations?|solutions?|relations?|inequalit(?:y|ies)|boundary values?|initial values?|existence|universal|necessary and sufficient)\\b",
           "query_id": "Q0119",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -107232,7 +107232,7 @@
           "pattern": "\\b(?:plots?|displays?|pictures?|render(?:s|ed|ing)?|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|observers?|analy[sz](?:e|es|ed|ing)|measur(?:e|es|ed|ing|ement)|approximat(?:e|es|ed|ing|ion)|digits?|trajector(?:y|ies)|Mathematica)\\b",
           "query_id": "Q0120",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md",
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
             "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
@@ -119715,7 +119715,7 @@
           "pattern": "\\b(?:positional|radix|bases?|binary|ternary|decimal|digits?|DigitCount|IntegerDigits|IntegerReverse|continued fractions?|Gray codes?|place values?|prime exponents?|negative bases?|representations?)\\b",
           "query_id": "Q0121",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119726,7 +119726,7 @@
           "pattern": "\\b(?:repeated (?:addition|multiplication)|multiply|multiplies|multiplying|multiplication|Collatz|3\\s*n\\s*\\+\\s*1|parity|revers(?:e|al|ing)|run[- ]length|look[- ]and[- ]say|BitXor|BitOr|fractional parts?|integer maps?|iterations?|maps?)\\b",
           "query_id": "Q0122",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119737,7 +119737,7 @@
           "pattern": "\\b(?:recurrences?|recursive|recursion|Fibonacci|factorial|Ackermann|primitive recursive|mu[- ]search|self[- ]indexed|triangular|plus|times|Fold|Jacobi|memoiz(?:e|ed|ation)|evaluation polic(?:y|ies)|composition)\\b|μ",
           "query_id": "Q0123",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119748,7 +119748,7 @@
           "pattern": "\\b(?:primes?|sieve|divisors?|aliquot|perfect numbers?|Goldbach|Mersenne|Lucas[- ]Lehmer|M[oö]bius|Mertens|relatively prime|squares?|Waring|Fermat|Josephus|Ulam sequence)\\b",
           "query_id": "Q0124",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119759,7 +119759,7 @@
           "pattern": "(?:\\b(?:Pi|constants?|square roots?|cube roots?|fourth roots?|logarithm|exponential|normal numbers?|Stoneham|Benford|digit(?:s| sequences?| generators?| extractors?)|Bailey|Borwein|Plouffe|Newton|arithmetic[- ]geometric)\\b|π|Log\\[)",
           "query_id": "Q0125",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119770,7 +119770,7 @@
           "pattern": "\\b(?:continued fractions?|rational|Euclidean|Farey|Egyptian fractions?|nested radicals?|digital slopes?|operator trees?|Lissajous|special functions?)\\b",
           "query_id": "Q0126",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119781,7 +119781,7 @@
           "pattern": "\\b(?:sine|cosine|Sin|Cos|Fourier|Riemann|zeta|Riemann[- ]Siegel|zeros?|trigonometric|Weierstrass|harmonic|lacunary)\\b",
           "query_id": "Q0127",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119792,7 +119792,7 @@
           "pattern": "\\b(?:iterated maps?|shift maps?|tent maps?|logistic maps?|Gauss maps?|Anosov|Lyapunov|unit interval|finite precision|FractionalPart|chaos|trajector(?:y|ies))\\b",
           "query_id": "Q0128",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119803,7 +119803,7 @@
           "pattern": "\\b(?:functions?|sequences?|relations?|equations?|constraints?|systems?|rules?|maps?|algorithms?|generators?|solvers?|predicates?|obligations?|solutions?|approximat(?:e|es|ed|ing|ion)|continuous cellular automat(?:on|a)|partial differential|PDE|ordinary differential|ODE|diffusion|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky|scalar fields?|Lagrangian|Hamiltonian|single black cell|unbounded|growth|increas(?:e|es|ed|ing))\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```|<table>)|Mod\\[|Integrate\\[",
           "query_id": "Q0129",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119814,7 +119814,7 @@
           "pattern": "(?:^|\\n)\\s*(?:```|!\\[[^\\]]*\\]\\([^)]+\\))|`[^`\\n]*(?:->|→|==|:=|Mod\\[|Floor\\[|Sqrt\\[|Nest|Table|IntegerDigits|DigitCount|BitXor|BitOr|FractionalPart|Sin\\[|Cos\\[|D\\[)[^`\\n]*`",
           "query_id": "Q0130",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119825,7 +119825,7 @@
           "pattern": "\\b(?:continuous(?:ly)?[- ]valued|continuous cellular automat(?:on|a)|probabilistic cellular automat(?:on|a)|partial differential equations?|PDE|ordinary differential equations?|ODE|diffusion|wave equation|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky)\\b",
           "query_id": "Q0131",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119836,7 +119836,7 @@
           "pattern": "\\b(?:initial conditions?|initial values?|initial states?|seeds?|backgrounds?|boundar(?:y|ies)|current states?|successors?|steps?|evol(?:ve|ves|ved|ving|ution)|iterations?|updates?|recurrences?|rewrit(?:e|es|ing)|moves?|neighbou?rs?|fixed points?|halts?|termination|converges?|diverges?)\\b",
           "query_id": "Q0132",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119847,7 +119847,7 @@
           "pattern": "\\b(?:random(?:ness|ly|ization)?|probabilistic|probability|stochastic|Bernoulli|sample[sd]?|sampling|constraints?|equations?|solutions?|relations?|inequalit(?:y|ies)|boundary values?|initial values?|existence|universal|necessary and sufficient)\\b",
           "query_id": "Q0133",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -119858,7 +119858,7 @@
           "pattern": "\\b(?:plots?|displays?|pictures?|render(?:s|ed|ing)?|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|observers?|analy[sz](?:e|es|ed|ing)|measur(?:e|es|ed|ing|ement)|approximat(?:e|es|ed|ing|ion)|digits?|trajector(?:y|ies)|Mathematica)\\b",
           "query_id": "Q0134",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         }
@@ -131004,7 +131004,7 @@
           "pattern": "\\b(?:positional|radix|bases?|binary|ternary|decimal|digits?|DigitCount|IntegerDigits|IntegerReverse|continued fractions?|Gray codes?|place values?|prime exponents?|negative bases?|representations?)\\b",
           "query_id": "Q0135",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131015,7 +131015,7 @@
           "pattern": "\\b(?:repeated (?:addition|multiplication)|multiply|multiplies|multiplying|multiplication|Collatz|3\\s*n\\s*\\+\\s*1|parity|revers(?:e|al|ing)|run[- ]length|look[- ]and[- ]say|BitXor|BitOr|fractional parts?|integer maps?|iterations?|maps?)\\b",
           "query_id": "Q0136",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131026,7 +131026,7 @@
           "pattern": "\\b(?:recurrences?|recursive|recursion|Fibonacci|factorial|Ackermann|primitive recursive|mu[- ]search|self[- ]indexed|triangular|plus|times|Fold|Jacobi|memoiz(?:e|ed|ation)|evaluation polic(?:y|ies)|composition)\\b|μ",
           "query_id": "Q0137",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131037,7 +131037,7 @@
           "pattern": "\\b(?:primes?|sieve|divisors?|aliquot|perfect numbers?|Goldbach|Mersenne|Lucas[- ]Lehmer|M[oö]bius|Mertens|relatively prime|squares?|Waring|Fermat|Josephus|Ulam sequence)\\b",
           "query_id": "Q0138",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131048,7 +131048,7 @@
           "pattern": "(?:\\b(?:Pi|constants?|square roots?|cube roots?|fourth roots?|logarithm|exponential|normal numbers?|Stoneham|Benford|digit(?:s| sequences?| generators?| extractors?)|Bailey|Borwein|Plouffe|Newton|arithmetic[- ]geometric)\\b|π|Log\\[)",
           "query_id": "Q0139",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131059,7 +131059,7 @@
           "pattern": "\\b(?:continued fractions?|rational|Euclidean|Farey|Egyptian fractions?|nested radicals?|digital slopes?|operator trees?|Lissajous|special functions?)\\b",
           "query_id": "Q0140",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131070,7 +131070,7 @@
           "pattern": "\\b(?:sine|cosine|Sin|Cos|Fourier|Riemann|zeta|Riemann[- ]Siegel|zeros?|trigonometric|Weierstrass|harmonic|lacunary)\\b",
           "query_id": "Q0141",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131081,7 +131081,7 @@
           "pattern": "\\b(?:iterated maps?|shift maps?|tent maps?|logistic maps?|Gauss maps?|Anosov|Lyapunov|unit interval|finite precision|FractionalPart|chaos|trajector(?:y|ies))\\b",
           "query_id": "Q0142",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131092,7 +131092,7 @@
           "pattern": "\\b(?:functions?|sequences?|relations?|equations?|constraints?|systems?|rules?|maps?|algorithms?|generators?|solvers?|predicates?|obligations?|solutions?|approximat(?:e|es|ed|ing|ion)|continuous cellular automat(?:on|a)|partial differential|PDE|ordinary differential|ODE|diffusion|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky|scalar fields?|Lagrangian|Hamiltonian|single black cell|unbounded|growth|increas(?:e|es|ed|ing))\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```|<table>)|Mod\\[|Integrate\\[",
           "query_id": "Q0143",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131103,7 +131103,7 @@
           "pattern": "(?:^|\\n)\\s*(?:```|!\\[[^\\]]*\\]\\([^)]+\\))|`[^`\\n]*(?:->|→|==|:=|Mod\\[|Floor\\[|Sqrt\\[|Nest|Table|IntegerDigits|DigitCount|BitXor|BitOr|FractionalPart|Sin\\[|Cos\\[|D\\[)[^`\\n]*`",
           "query_id": "Q0144",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131114,7 +131114,7 @@
           "pattern": "\\b(?:continuous(?:ly)?[- ]valued|continuous cellular automat(?:on|a)|probabilistic cellular automat(?:on|a)|partial differential equations?|PDE|ordinary differential equations?|ODE|diffusion|wave equation|sine[- ]Gordon|Klein[- ]Gordon|finite difference|Courant|Kardar|Parisi|Zhang|Burgers|Schr[oö]dinger|Kuramoto|Sivashinsky)\\b",
           "query_id": "Q0145",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131125,7 +131125,7 @@
           "pattern": "\\b(?:initial conditions?|initial values?|initial states?|seeds?|backgrounds?|boundar(?:y|ies)|current states?|successors?|steps?|evol(?:ve|ves|ved|ving|ution)|iterations?|updates?|recurrences?|rewrit(?:e|es|ing)|moves?|neighbou?rs?|fixed points?|halts?|termination|converges?|diverges?)\\b",
           "query_id": "Q0146",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131136,7 +131136,7 @@
           "pattern": "\\b(?:random(?:ness|ly|ization)?|probabilistic|probability|stochastic|Bernoulli|sample[sd]?|sampling|constraints?|equations?|solutions?|relations?|inequalit(?:y|ies)|boundary values?|initial values?|existence|universal|necessary and sufficient)\\b",
           "query_id": "Q0147",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         },
@@ -131147,7 +131147,7 @@
           "pattern": "\\b(?:plots?|displays?|pictures?|render(?:s|ed|ing)?|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|observers?|analy[sz](?:e|es|ed|ing)|measur(?:e|es|ed|ing|ement)|approximat(?:e|es|ed|ing|ion)|digits?|trajector(?:y|ies)|Mathematica)\\b",
           "query_id": "Q0148",
           "scope_paths": [
-            "CHAPTERS/04-Systems-Based-on-Numbers.md"
+            "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"
           ],
           "whole_word": false
         }
@@ -155883,7 +155883,7 @@
           "pattern": "\\b(?:cellular automat(?:on|a)|CAStep|NetCAStep|5[- ](?:cell|neighbou?r)|9[- ](?:cell|neighbou?r)|outer totalistic|growth totalistic|totalistic rules?|rule codes?|code numbers?|Ulam systems?|Game of Life)\\b",
           "query_id": "Q0149",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155895,7 +155895,7 @@
           "pattern": "\\b(?:Turing machines?|TM2DStep|Langton(?:'s)? ant|vants?|turmites?|turning machines?|mobile automata|mobile turtles?|heads?)\\b",
           "query_id": "Q0150",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155907,7 +155907,7 @@
           "pattern": "\\b(?:substitution systems?|subdivid(?:e|es|ed|ing)|replac(?:e|es|ed|ing|ement|ements)|geometrical rules?|geometric substitution|fractal(?:s| geometry| dimensions?)?|Sierpi[nń]ski|Penrose|dragon curve|Koch curve|affine transformations?|M[oö]bius transformations?|Julia sets?|Mandelbrot set|Flatten2D|SSEvolve|SS2DEvolve)\\b",
           "query_id": "Q0151",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155919,7 +155919,7 @@
           "pattern": "\\b(?:network systems?|CyclicNet|Follow\\[|NeighborNumbers|NetEvolve|ConnectedNodes|RenumberNodes|NetCAStep|nodes?|connections?|rerout(?:e|ed|ing)|outgoing connections?|sequential networks?|Boolean networks?|garbage collection)\\b",
           "query_id": "Q0152",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155931,7 +155931,7 @@
           "pattern": "\\b(?:multiway systems?|MWStep|MWEvolveList|rewrite systems?|semi[- ]Thue systems?|production systems?|associative calculi|semigroups?|monoids?|groups?|Cayley graphs?|generative grammars?|regular grammars?|context[- ]free grammars?|context[- ]sensitive grammars?|unrestricted grammars?|nondeterministic systems?|game systems?|nim)\\b",
           "query_id": "Q0153",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155943,7 +155943,7 @@
           "pattern": "\\b(?:constraints?|allowed (?:blocks?|templates?|patterns?)|local templates?|satisf(?:y|ies|ied|ying)|witness(?:es)?|backtracking|enumerat(?:e|es|ed|ing|ion)|square spiral|de Bruijn|subshifts? of finite type|fixed[- ]point|undecidab(?:le|ility)|NP[- ]complete|SatisfiedQ|repetitive patterns?)\\b",
           "query_id": "Q0154",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155955,7 +155955,7 @@
           "pattern": "\\b(?:partial differential equations?|initial[- ]value|boundary[- ]value|Laplace equation|wave equation|diffusion equation|linear equations?|nonlinear equations?|LinearSolve|variational principles?|minimiz(?:e|es|ed|ing)|maximiz(?:e|es|ed|ing)|finite difference|finite element)\\b|u\\s*==\\s*m",
           "query_id": "Q0155",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155967,7 +155967,7 @@
           "pattern": "\\b(?:tilings?|polyominoes?|spin systems?|Ising model|spin glass|ground states?|sequence equations?|pattern[- ]avoiding sequences?|identical blocks?|square[- ]free|cube[- ]free|formal languages?|multiplication tables?|Ammann|Robinson|Cook aperiodic)\\b",
           "query_id": "Q0156",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155979,7 +155979,7 @@
           "pattern": "\\b(?:Diophantine equations?|Pell equation|Pythagorean triples?|Fermat(?:'s)? Last Theorem|integer relations?|ExtendedGCD|algebraic equations?|constraints? on formulas|LeafCount|quadratic equations?)\\b|x\\^\\d|y\\^\\d|z\\^\\d",
           "query_id": "Q0157",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -155991,7 +155991,7 @@
           "pattern": "\\b(?:rules?|systems?|algorithms?|generators?|solvers?|relations?|functions?|transformations?|maps?|constraints?|equations?|games?|initial conditions?|evolution|positions?|patterns?|counts?|cardinalit(?:y|ies)|growth rates?|first appears?|number of)\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```)|`[^`\\n]*(?:->|→|==|:=|:>|Nest|NestList|Map|Table|Replace|Rule|Step|Evolve)[^`\\n]*`|`[^`\\n]*\\[[^`\\n]*\\][^`\\n]*`",
           "query_id": "Q0158",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -156003,7 +156003,7 @@
           "pattern": "\\b(?:states?|steps?|updates?|evol(?:ve|ves|ved|ving|ution)|initial conditions?|seeds?|successors?|replace(?:s|d|ment|ments)?|appl(?:y|ies|ied|ying)|parallel|sequential|active nodes?|halts?|terminat(?:e|es|ed|ion)|dies out|fixed points?)\\b",
           "query_id": "Q0159",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -156015,7 +156015,7 @@
           "pattern": "\\b(?:one[- ]dimensional|two[- ]dimensional|three[- ]dimensional|higher[- ]dimensional|d[- ]dimensional|grids?|lattices?|arrays?|planes?|networks?|graphs?|topolog(?:y|ical)|geometr(?:y|ical)|neighbou?rhoods?|neighbou?rs?|offsets?|boundar(?:y|ies)|wrap around|orientations?|connections?)\\b",
           "query_id": "Q0160",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -156027,7 +156027,7 @@
           "pattern": "\\b(?:branch(?:es|ed|ing)|multiway|possible states?|all possible|nondeterministic|deterministic|merg(?:e|es|ed|ing)|Union|distinct states?|solutions?|witness(?:es)?|unique|exist(?:s|ence)|no patterns?|kept|dropped)\\b",
           "query_id": "Q0161",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -156039,7 +156039,7 @@
           "pattern": "\\b(?:pictures?|plots?|plott(?:ed|ing)|displays?|visualiz(?:e|es|ed|ing|ation)|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|projections?|slices?|stack(?:s|ed|ing)|paths?|measure(?:s|d|ment)|Mathematica|applications?|history)\\b",
           "query_id": "Q0162",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -156051,7 +156051,7 @@
           "pattern": "\\b(?:pages?|page|chapter)\\s+(?:\\d+|[IVX]+)(?:[–-]\\d+)?\\b|\\b(?:the\\s+)?(?:(?:top|bottom)\\s+of\\s+(?:the\\s+)?)?(?:facing|previous|next)(?:\\s+(?:one|two|three))?\\s+pages?\\b",
           "query_id": "Q0163",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180630,7 +180630,7 @@
           "pattern": "\\b(?:cellular automat(?:on|a)|CAStep|NetCAStep|5[- ](?:cell|neighbou?r)|9[- ](?:cell|neighbou?r)|outer totalistic|growth totalistic|totalistic rules?|rule codes?|code numbers?|Ulam systems?|Game of Life)\\b",
           "query_id": "Q0164",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180642,7 +180642,7 @@
           "pattern": "\\b(?:Turing machines?|TM2DStep|Langton(?:'s)? ant|vants?|turmites?|turning machines?|mobile automata|mobile turtles?|heads?)\\b",
           "query_id": "Q0165",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180654,7 +180654,7 @@
           "pattern": "\\b(?:substitution systems?|subdivid(?:e|es|ed|ing)|replac(?:e|es|ed|ing|ement|ements)|geometrical rules?|geometric substitution|fractal(?:s| geometry| dimensions?)?|Sierpi[nń]ski|Penrose|dragon curve|Koch curve|affine transformations?|M[oö]bius transformations?|Julia sets?|Mandelbrot set|Flatten2D|SSEvolve|SS2DEvolve)\\b",
           "query_id": "Q0166",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180666,7 +180666,7 @@
           "pattern": "\\b(?:network systems?|CyclicNet|Follow\\[|NeighborNumbers|NetEvolve|ConnectedNodes|RenumberNodes|NetCAStep|nodes?|connections?|rerout(?:e|ed|ing)|outgoing connections?|sequential networks?|Boolean networks?|garbage collection)\\b",
           "query_id": "Q0167",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180678,7 +180678,7 @@
           "pattern": "\\b(?:multiway systems?|MWStep|MWEvolveList|rewrite systems?|semi[- ]Thue systems?|production systems?|associative calculi|semigroups?|monoids?|groups?|Cayley graphs?|generative grammars?|regular grammars?|context[- ]free grammars?|context[- ]sensitive grammars?|unrestricted grammars?|nondeterministic systems?|game systems?|nim)\\b",
           "query_id": "Q0168",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180690,7 +180690,7 @@
           "pattern": "\\b(?:constraints?|allowed (?:blocks?|templates?|patterns?)|local templates?|satisf(?:y|ies|ied|ying)|witness(?:es)?|backtracking|enumerat(?:e|es|ed|ing|ion)|square spiral|de Bruijn|subshifts? of finite type|fixed[- ]point|undecidab(?:le|ility)|NP[- ]complete|SatisfiedQ|repetitive patterns?)\\b",
           "query_id": "Q0169",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180702,7 +180702,7 @@
           "pattern": "\\b(?:partial differential equations?|initial[- ]value|boundary[- ]value|Laplace equation|wave equation|diffusion equation|linear equations?|nonlinear equations?|LinearSolve|variational principles?|minimiz(?:e|es|ed|ing)|maximiz(?:e|es|ed|ing)|finite difference|finite element)\\b|u\\s*==\\s*m",
           "query_id": "Q0170",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180714,7 +180714,7 @@
           "pattern": "\\b(?:tilings?|polyominoes?|spin systems?|Ising model|spin glass|ground states?|sequence equations?|pattern[- ]avoiding sequences?|identical blocks?|square[- ]free|cube[- ]free|formal languages?|multiplication tables?|Ammann|Robinson|Cook aperiodic)\\b",
           "query_id": "Q0171",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180726,7 +180726,7 @@
           "pattern": "\\b(?:Diophantine equations?|Pell equation|Pythagorean triples?|Fermat(?:'s)? Last Theorem|integer relations?|ExtendedGCD|algebraic equations?|constraints? on formulas|LeafCount|quadratic equations?)\\b|x\\^\\d|y\\^\\d|z\\^\\d",
           "query_id": "Q0172",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180738,7 +180738,7 @@
           "pattern": "\\b(?:rules?|systems?|algorithms?|generators?|solvers?|relations?|functions?|transformations?|maps?|constraints?|equations?|games?|initial conditions?|evolution|positions?|patterns?|counts?|cardinalit(?:y|ies)|growth rates?|first appears?|number of)\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```)|`[^`\\n]*(?:->|→|==|:=|:>|Nest|NestList|Map|Table|Replace|Rule|Step|Evolve)[^`\\n]*`|`[^`\\n]*\\[[^`\\n]*\\][^`\\n]*`",
           "query_id": "Q0173",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180750,7 +180750,7 @@
           "pattern": "\\b(?:states?|steps?|updates?|evol(?:ve|ves|ved|ving|ution)|initial conditions?|seeds?|successors?|replace(?:s|d|ment|ments)?|appl(?:y|ies|ied|ying)|parallel|sequential|active nodes?|halts?|terminat(?:e|es|ed|ion)|dies out|fixed points?)\\b",
           "query_id": "Q0174",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180762,7 +180762,7 @@
           "pattern": "\\b(?:one[- ]dimensional|two[- ]dimensional|three[- ]dimensional|higher[- ]dimensional|d[- ]dimensional|grids?|lattices?|arrays?|planes?|networks?|graphs?|topolog(?:y|ical)|geometr(?:y|ical)|neighbou?rhoods?|neighbou?rs?|offsets?|boundar(?:y|ies)|wrap around|orientations?|connections?)\\b",
           "query_id": "Q0175",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180774,7 +180774,7 @@
           "pattern": "\\b(?:branch(?:es|ed|ing)|multiway|possible states?|all possible|nondeterministic|deterministic|merg(?:e|es|ed|ing)|Union|distinct states?|solutions?|witness(?:es)?|unique|exist(?:s|ence)|no patterns?|kept|dropped)\\b",
           "query_id": "Q0176",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180786,7 +180786,7 @@
           "pattern": "\\b(?:pictures?|plots?|plott(?:ed|ing)|displays?|visualiz(?:e|es|ed|ing|ation)|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|projections?|slices?|stack(?:s|ed|ing)|paths?|measure(?:s|d|ment)|Mathematica|applications?|history)\\b",
           "query_id": "Q0177",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -180798,7 +180798,7 @@
           "pattern": "\\b(?:pages?|page|chapter)\\s+(?:\\d+|[IVX]+)(?:[–-]\\d+)?\\b|\\b(?:the\\s+)?(?:(?:top|bottom)\\s+of\\s+(?:the\\s+)?)?(?:facing|previous|next)(?:\\s+(?:one|two|three))?\\s+pages?\\b",
           "query_id": "Q0178",
           "scope_paths": [
-            "CHAPTERS/05-Two-Dimensions-and-Beyond.md",
+            "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
             "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
@@ -216892,7 +216892,7 @@
           "pattern": "\\b(?:cellular automata?|rules?\\s*(?:4|18|20|22|30|45|60|73|90|94|105|110|126|128|150|170|182|184|218|225|250|254|255)\\b|rule[- ]?(?:number|code)|codes?\\s*(?:20|224|357|1329|1659|1815|2007|2043|4067213884)\\b|Game of Life|Life[- ]like|outer[- ]totalistic|totalistic|nearest[- ]neighbor|next[- ]nearest[- ]neighbor|von Neumann)\\b",
           "query_id": "Q0179",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216904,7 +216904,7 @@
           "pattern": "\\b(?:random(?:ness|ly)?|pseudorandom|stochastic|probabilit(?:y|ies)|probability law|Bernoulli|mean[- ]field|statistical|density|densities|initial conditions?|initial configurations?|initial fields?|seeds?|starting configurations?|starting from|generate(?:s|d|r|rs|tion)?|ensemble|independent(?:ly)?|distribution|measure)\\b",
           "query_id": "Q0180",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216916,7 +216916,7 @@
           "pattern": "\\b(?:states?|configurations?|cells?|values?|colors?|neighbou?rs?|neighbou?rhoods?|ranges?|rules?|codes?|steps?|updates?|successors?|evol(?:ve|ves|ved|ving|ution)|iterations?|maps?|transitions?|apply|applied|replac(?:e|es|ed|ing|ement)|parallel|synchronous|cyclic boundar(?:y|ies)|wrap(?:s|ped)? around|finite sizes?|limited sizes?|lattices?|grids?)\\b",
           "query_id": "Q0181",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216928,7 +216928,7 @@
           "pattern": "\\b(?:class(?:es)?\\s*(?:1|2|3|4|one|two|three|four)?|four classes|behavior|behaviour|order(?:ed)?|chaos|chaotic|complex(?:ity)?|pattern(?:s|ed)?|uniform|stable|localized|nested|irregular|regular|symmetr(?:y|ies|ic)|growth|dies out|surviv(?:e|es|ed|ing|al))\\b",
           "query_id": "Q0182",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216940,7 +216940,7 @@
           "pattern": "\\b(?:attractors?|basins?(?: of attraction)?|preimages?|fixed points?|period(?:s|ic|icity)?|repetition|repeat(?:s|ed|ing)?|cycles?|cyclic|recurr(?:ence|ent)|return(?:s|ed|ing)?|oscillat(?:e|es|ed|ing|ion|ions|or|ors)|transients?|long[- ]run|asymptotic|limit(?:ing)?|maximum period|eventually)\\b",
           "query_id": "Q0183",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216952,7 +216952,7 @@
           "pattern": "\\b(?:persistent structures?|structures?|particles?|localized structures?|backgrounds?|domains?|defects?|collisions?|gliders?|glider guns?|still lifes?|blinkers?|spaceships?|spacefillers?|puffers?|puffer trains?|switch engines?|pulsars?|beehives?|blocks?|Gosper|propagat(?:e|es|ed|ing)|displacements?|velocit(?:y|ies)|width conservation)\\b",
           "query_id": "Q0184",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216964,7 +216964,7 @@
           "pattern": "\\b(?:constraints?|relations?|queries?|decid(?:e|es|ed|ing|able|ability)|accept(?:s|ed|ing|ance)?|allowed|forbidden|languages?|regular expressions?|finite automata?|finite state machines?|nondeterministic finite automata?|NDFA|DFA|MinNet|TrimNet|sofic|subshifts?|surjectiv(?:e|ity)|injectiv(?:e|ity)|bijectiv(?:e|ity)|reversib(?:le|ility)|automorphisms?|one[- ]to[- ]one|onto|satisf(?:y|ies|ied|action)|solutions?|models?|all possible sequences?|no adjacent)\\b",
           "query_id": "Q0185",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216976,7 +216976,7 @@
           "pattern": "\\b(?:generators?|generate(?:s|d|ing|tion)?|analy[sz](?:e|es|ed|ing|er|ers|is)|observers?|surveys?|experiments?|transform(?:s|ed|ing|ation)?|encod(?:e|es|ed|ing|er|ers)|decod(?:e|es|ed|ing|er|ers)|represent(?:s|ed|ing|ation)?|emulat(?:e|es|ed|ing|ion)|simulat(?:e|es|ed|ing|ion)|inputs?|outputs?|results?|functions?|statistics?|counts?|classif(?:y|ies|ied|ication)|search(?:es|ed|ing)?|enumerat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|display(?:s|ed|ing)?|plots?|pictures?)\\b",
           "query_id": "Q0186",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -216988,7 +216988,7 @@
           "pattern": "\\b(?:maps?|functions?|formulas?|equations?|polynomials?|eigenvalues?|matrices?|coefficients?|modulo|modular|addition|multiplication|fractional|continued fractions?|logistic|Anosov|Sarkovskii|Lyapunov|renormalization|entropy|entropies|information|dimensions?|zeta|generating functions?|Perron|Myhill|Nerode|semigroups?|monoids?|associative|differential operators?|mean field)\\b|`[^`\\n]*(?:->|→|==|:=|:>|Nest|NestList|Map|Table|Replace|Rule|Step|Evolve|LinearSolve)[^`\\n]*`",
           "query_id": "Q0187",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -217000,7 +217000,7 @@
           "pattern": "\\b(?:rules?|systems?|programs?|processes?|algorithms?|procedures?|constructions?|presets?|families|models?|relations?|constraints?|functions?|maps?|generators?|analyzers?|observers?|transformations?|automata?|networks?|sequences?|configurations?|patterns?|structures?|initial conditions?|evolution|steps?|states?|results?|inputs?|outputs?|examples?|cases?)\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```)",
           "query_id": "Q0188",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -217012,7 +217012,7 @@
           "pattern": "(?:^|\\n)\\s*(?:#{1,6}\\s+[^\\n]+|!\\[[^\\]]*\\]\\([^)]+\\)|```)|\\b(?:figure|picture|diagram|table|caption|shown|displayed|illustrated|above|below|left|right|top|bottom)\\b",
           "query_id": "Q0189",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -217024,7 +217024,7 @@
           "pattern": "\\b(?:pictures?|plots?|displays?|visualiz(?:e|es|ed|ing|ation)|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|projections?|slices?|histories|history|trajector(?:y|ies)|spacetime|space[- ]time|difference patterns?|gray trails?|fog|networks?|graphs?|statistics?|measure(?:s|d|ment)?|Mathematica)\\b",
           "query_id": "Q0190",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -217036,7 +217036,7 @@
           "pattern": "\\b(?:probability laws?|initial[- ]state generators?|initial[- ]condition generators?|configuration constraints?|sampling|sample(?:s|d)?|random fields?|random sequences?|random networks?|random mappings?|functional digraphs?|fair random|bias(?:ed)?|black[- ]cell density|survival time|periodic backgrounds?|repeating blocks?|nested sequences?)\\b",
           "query_id": "Q0191",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -217048,7 +217048,7 @@
           "pattern": "\\b(?:neighbor[- ]difference|fractional[- ]average|prior[- ]time|gray[- ]trail|single[- ]cell perturbation|superposition|block self[- ]emulation|pair[- ]block emulation|period[- ]dividing|return points?|blocking transformation|fractal dimension|Cauchy[- ]additive|irrational modulus|image[- ]set network|topological entropy|spacetime entropy|dynamical zeta|hard square|hard hexagon|domino covering|Cantor[- ]set encoding|global[- ]state transition graph|necklace cycles?|functional[- ]network|period/displacement|collision[- ]based|exact[- ]period|velocity[- ]class)\\b",
           "query_id": "Q0192",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -217060,7 +217060,7 @@
           "pattern": "\\b(?:pages?|page|chapter)\\s+(?:\\d+|[IVX]+)(?:[–-]\\d+)?\\b|\\b(?:the\\s+)?(?:(?:top|bottom)\\s+of\\s+(?:the\\s+)?)?(?:facing|previous|next)(?:\\s+(?:one|two|three))?\\s+pages?\\b|\\b(?:previous section|next chapter|next few chapters|later in (?:this|the) book)\\b",
           "query_id": "Q0193",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -253997,7 +253997,7 @@
           "pattern": "\\b(?:cellular automata?|rules?\\s*(?:4|18|20|22|30|45|60|73|90|94|105|110|126|128|150|170|182|184|218|225|250|254|255)\\b|rule[- ]?(?:number|code)|codes?\\s*(?:20|224|357|1329|1659|1815|2007|2043|4067213884)\\b|Game of Life|Life[- ]like|outer[- ]totalistic|totalistic|nearest[- ]neighbor|next[- ]nearest[- ]neighbor|von Neumann)\\b",
           "query_id": "Q0194",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254009,7 +254009,7 @@
           "pattern": "\\b(?:random(?:ness|ly)?|pseudorandom|stochastic|probabilit(?:y|ies)|probability law|Bernoulli|mean[- ]field|statistical|density|densities|initial conditions?|initial configurations?|initial fields?|seeds?|starting configurations?|starting from|generate(?:s|d|r|rs|tion)?|ensemble|independent(?:ly)?|distribution|measure)\\b",
           "query_id": "Q0195",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254021,7 +254021,7 @@
           "pattern": "\\b(?:states?|configurations?|cells?|values?|colors?|neighbou?rs?|neighbou?rhoods?|ranges?|rules?|codes?|steps?|updates?|successors?|evol(?:ve|ves|ved|ving|ution)|iterations?|maps?|transitions?|apply|applied|replac(?:e|es|ed|ing|ement)|parallel|synchronous|cyclic boundar(?:y|ies)|wrap(?:s|ped)? around|finite sizes?|limited sizes?|lattices?|grids?)\\b",
           "query_id": "Q0196",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254033,7 +254033,7 @@
           "pattern": "\\b(?:class(?:es)?\\s*(?:1|2|3|4|one|two|three|four)?|four classes|behavior|behaviour|order(?:ed)?|chaos|chaotic|complex(?:ity)?|pattern(?:s|ed)?|uniform|stable|localized|nested|irregular|regular|symmetr(?:y|ies|ic)|growth|dies out|surviv(?:e|es|ed|ing|al))\\b",
           "query_id": "Q0197",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254045,7 +254045,7 @@
           "pattern": "\\b(?:attractors?|basins?(?: of attraction)?|preimages?|fixed points?|period(?:s|ic|icity)?|repetition|repeat(?:s|ed|ing)?|cycles?|cyclic|recurr(?:ence|ent)|return(?:s|ed|ing)?|oscillat(?:e|es|ed|ing|ion|ions|or|ors)|transients?|long[- ]run|asymptotic|limit(?:ing)?|maximum period|eventually)\\b",
           "query_id": "Q0198",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254057,7 +254057,7 @@
           "pattern": "\\b(?:persistent structures?|structures?|particles?|localized structures?|backgrounds?|domains?|defects?|collisions?|gliders?|glider guns?|still lifes?|blinkers?|spaceships?|spacefillers?|puffers?|puffer trains?|switch engines?|pulsars?|beehives?|blocks?|Gosper|propagat(?:e|es|ed|ing)|displacements?|velocit(?:y|ies)|width conservation)\\b",
           "query_id": "Q0199",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254069,7 +254069,7 @@
           "pattern": "\\b(?:constraints?|relations?|queries?|decid(?:e|es|ed|ing|able|ability)|accept(?:s|ed|ing|ance)?|allowed|forbidden|languages?|regular expressions?|finite automata?|finite state machines?|nondeterministic finite automata?|NDFA|DFA|MinNet|TrimNet|sofic|subshifts?|surjectiv(?:e|ity)|injectiv(?:e|ity)|bijectiv(?:e|ity)|reversib(?:le|ility)|automorphisms?|one[- ]to[- ]one|onto|satisf(?:y|ies|ied|action)|solutions?|models?|all possible sequences?|no adjacent)\\b",
           "query_id": "Q0200",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254081,7 +254081,7 @@
           "pattern": "\\b(?:generators?|generate(?:s|d|ing|tion)?|analy[sz](?:e|es|ed|ing|er|ers|is)|observers?|surveys?|experiments?|transform(?:s|ed|ing|ation)?|encod(?:e|es|ed|ing|er|ers)|decod(?:e|es|ed|ing|er|ers)|represent(?:s|ed|ing|ation)?|emulat(?:e|es|ed|ing|ion)|simulat(?:e|es|ed|ing|ion)|inputs?|outputs?|results?|functions?|statistics?|counts?|classif(?:y|ies|ied|ication)|search(?:es|ed|ing)?|enumerat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|display(?:s|ed|ing)?|plots?|pictures?)\\b",
           "query_id": "Q0201",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254093,7 +254093,7 @@
           "pattern": "\\b(?:maps?|functions?|formulas?|equations?|polynomials?|eigenvalues?|matrices?|coefficients?|modulo|modular|addition|multiplication|fractional|continued fractions?|logistic|Anosov|Sarkovskii|Lyapunov|renormalization|entropy|entropies|information|dimensions?|zeta|generating functions?|Perron|Myhill|Nerode|semigroups?|monoids?|associative|differential operators?|mean field)\\b|`[^`\\n]*(?:->|→|==|:=|:>|Nest|NestList|Map|Table|Replace|Rule|Step|Evolve|LinearSolve)[^`\\n]*`",
           "query_id": "Q0202",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254105,7 +254105,7 @@
           "pattern": "\\b(?:rules?|systems?|programs?|processes?|algorithms?|procedures?|constructions?|presets?|families|models?|relations?|constraints?|functions?|maps?|generators?|analyzers?|observers?|transformations?|automata?|networks?|sequences?|configurations?|patterns?|structures?|initial conditions?|evolution|steps?|states?|results?|inputs?|outputs?|examples?|cases?)\\b|(?:^|\\n)\\s*(?:!\\[[^\\]]*\\]\\([^)]+\\)|```)",
           "query_id": "Q0203",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254117,7 +254117,7 @@
           "pattern": "(?:^|\\n)\\s*(?:#{1,6}\\s+[^\\n]+|!\\[[^\\]]*\\]\\([^)]+\\)|```)|\\b(?:figure|picture|diagram|table|caption|shown|displayed|illustrated|above|below|left|right|top|bottom)\\b",
           "query_id": "Q0204",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254129,7 +254129,7 @@
           "pattern": "\\b(?:pictures?|plots?|displays?|visualiz(?:e|es|ed|ing|ation)|represent(?:s|ed|ing|ation)?|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|projections?|slices?|histories|history|trajector(?:y|ies)|spacetime|space[- ]time|difference patterns?|gray trails?|fog|networks?|graphs?|statistics?|measure(?:s|d|ment)?|Mathematica)\\b",
           "query_id": "Q0205",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254141,7 +254141,7 @@
           "pattern": "\\b(?:probability laws?|initial[- ]state generators?|initial[- ]condition generators?|configuration constraints?|sampling|sample(?:s|d)?|random fields?|random sequences?|random networks?|random mappings?|functional digraphs?|fair random|bias(?:ed)?|black[- ]cell density|survival time|periodic backgrounds?|repeating blocks?|nested sequences?)\\b",
           "query_id": "Q0206",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254153,7 +254153,7 @@
           "pattern": "\\b(?:neighbor[- ]difference|fractional[- ]average|prior[- ]time|gray[- ]trail|single[- ]cell perturbation|superposition|block self[- ]emulation|pair[- ]block emulation|period[- ]dividing|return points?|blocking transformation|fractal dimension|Cauchy[- ]additive|irrational modulus|image[- ]set network|topological entropy|spacetime entropy|dynamical zeta|hard square|hard hexagon|domino covering|Cantor[- ]set encoding|global[- ]state transition graph|necklace cycles?|functional[- ]network|period/displacement|collision[- ]based|exact[- ]period|velocity[- ]class)\\b",
           "query_id": "Q0207",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -254165,7 +254165,7 @@
           "pattern": "\\b(?:pages?|page|chapter)\\s+(?:\\d+|[IVX]+)(?:[–-]\\d+)?\\b|\\b(?:the\\s+)?(?:(?:top|bottom)\\s+of\\s+(?:the\\s+)?)?(?:facing|previous|next)(?:\\s+(?:one|two|three))?\\s+pages?\\b|\\b(?:previous section|next chapter|next few chapters|later in (?:this|the) book)\\b",
           "query_id": "Q0208",
           "scope_paths": [
-            "CHAPTERS/06-Starting-from-Randomness.md",
+            "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
             "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
@@ -287156,7 +287156,7 @@
           "pattern": "\\b(?:cellular autom(?:aton|ata)|rules?\\s*(?:0|18|30|50|54|62|90|94|110|128|146|150|160|184|254)\\b|rule[- ]?(?:number|code)|codes?\\s*(?:746|976|1893|294869764523995749814890097794812493824)\\b|totalistic|outer[- ]totalistic|next[- ]nearest|transition rules?|domain walls?|domains?|phase[- ]selecting|Toom|Gacs|Kurdyumov|Levin|sandpiles?|toppl(?:e|es|ed|ing))\\b",
           "query_id": "Q0209",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287168,7 +287168,7 @@
           "pattern": "\\b(?:random(?:ness|ly)?|pseudorandom|stochastic|probabilistic|probabilit(?:y|ies)|noise|shot noise|Johnson noise|flicker|entropy(?: pool)?|quantum|thermal|Monte Carlo|ensemble|distribution|measure|Boltzmann|microcanonical|canonical|percolation|Ising|biased|unbiased|independent|microscopic fluctuations?|breakdown|amplif(?:y|ies|ied|ication)|sparks?)\\b",
           "query_id": "Q0210",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287180,7 +287180,7 @@
           "pattern": "\\b(?:mechanical|motion|trajector(?:y|ies)|billiards?|balls?|rolling|spinning|toss(?:ed|ing)?|friction|collisions?|elastic|pegboard|three[- ]body|planet|moon|gravitational|scatter(?:ing)?|knead(?:ing)?|stretch|cut|stack|doubling map|fractional part|left[- ]shift|shift(?:s|ed|ing)?[^.\\n]{0,60}\\b(?:left|right)\\b|transcription|maps?|iterat(?:e|es|ed|ing|ion)|finite[- ]state|periodic(?:ity)?|recurr(?:ence|ent)|closed curves?)\\b",
           "query_id": "Q0211",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287192,7 +287192,7 @@
           "pattern": "\\b(?:random walks?|self[- ]avoiding walks?|lattice walks?|diffusion|absorbers?|reflectors?|sources?|population|aggregation|aggregate|Eden|DLA|diffusion[- ]limited|templates?|point growth|interfaces?|growth|nucleation|phases?|phase transitions?|checkerboards?)\\b",
           "query_id": "Q0212",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287204,7 +287204,7 @@
           "pattern": "\\b(?:constraints?|satisf(?:y|ies|ied|action)|solutions?|search(?:es|ed|ing)?|cost functions?|minimi[sz](?:e|es|ed|ing)|maximi[sz](?:e|es|ed|ing)|optimization|downhill|gradient|Newton|anneal(?:ing)?|genetic algorithms?|packing|circles?|spheres?|pack(?:s|ed|ing)?|granular|settling|shaking|Apollonian|Voronoi|Dirichlet|Wigner[- ]Seitz|Brillouin|tessellations?|adjacency|nearest centers?|fixed points?|invariants?)\\b",
           "query_id": "Q0213",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287216,7 +287216,7 @@
           "pattern": "\\b(?:equations?|differential equations?|partial differential|PDE|continuum|continuous|finite differences?|rate equations?|dispersion|linear stability|wavelengths?|Fourier|power spectra?|spectr(?:um|a|al)|isotrop(?:y|ic)|tensors?|multipoles?|central limit|Gaussian|lognormal|Fisher|Tippett|extreme[- ]value|random matrices?|Wigner|chemical rates?)\\b|`[^`\\n]*(?:=|->|→|Nest|NestList|Fourier|Solve|Table)[^`\\n]*`|(?:^|\\n)\\s*(?:\\$\\$|\\\\\\[)|(?:^|\\n)\\s*\\$[^$\\n]+\\$\\s*(?:\\n|$)",
           "query_id": "Q0214",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287228,7 +287228,7 @@
           "pattern": "\\b(?:substitutions?|replac(?:e|es|ed|ing|ement)|recursive|recursion|branch(?:es|ed|ing)?|Y[- ]branching|children|creation|annihilation|nested|nesting|blocks?|pairs?|parentheses|brackets?|balanced|Catalan|languages?)\\b",
           "query_id": "Q0215",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287240,7 +287240,7 @@
           "pattern": "\\b(?:random[- ]number generators?|congruential|linear feedback|shift registers?|Fibonacci|stream ciphers?|middle[- ]square|riffle|shuffle|permutations?|sampling|samplers?|heat[- ]bath|Monte Carlo|simulated annealing|genetic|entropy pool|Random\\[Integer\\]|multipliers?|base[- ]2 digits?)\\b",
           "query_id": "Q0216",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287252,7 +287252,7 @@
           "pattern": "\\b(?:observers?|analy[sz](?:e|es|ed|ing|er|ers|is)|plots?|coordinates?|displays?|pictures?|transform(?:s|ed|ation)?|coarse[- ]grain(?:ing)?|averag(?:e|es|ed|ing)|compression|sequences?|center columns?|perturbations?|position distribution|power spectra?|isotropy|count(?:s|ed|ing)?|denotation|membership|region construction|diagram)\\b",
           "query_id": "Q0217",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287264,7 +287264,7 @@
           "pattern": "\\b(?:rules?|systems?|programs?|processes?|algorithms?|procedures?|constructions?|presets?|families|models?|relations?|constraints?|functions?|maps?|generators?|analyzers?|observers?|transformations?|autom(?:aton|ata)|languages?|sequences?|configurations?|patterns?|structures?|equations?|initial conditions?|evolution|steps?|states?|inputs?|outputs?|examples?|cases?)\\b|(?:^|\\n)\\s*(?:#{1,6}\\s+[^\\n]+|!\\[[^\\]]*\\]\\([^)]+\\)|```)",
           "query_id": "Q0218",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287276,7 +287276,7 @@
           "pattern": "\\b(?:states?|configurations?|cells?|sites?|elements?|values?|colors?|neighbou?rs?|neighbou?rhoods?|frontiers?|active|schedules?|parallel|synchronous|asynchronous|randomly selected|updates?|successors?|evol(?:ve|ves|ved|ving|ution)|iterations?|transitions?|replac(?:e|es|ed|ing|ement)|boundar(?:y|ies)|lattices?|grids?|rings?|toroidal)\\b",
           "query_id": "Q0219",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287288,7 +287288,7 @@
           "pattern": "\\b(?:represent(?:s|ed|ing|ation)?|visualiz(?:e|es|ed|ation)|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|observers?|projections?|plots?|diagrams?|pictures?|trajector(?:y|ies)|histories|spacetime|statistics?|measure(?:s|d|ment)?|applications?|models? of|Mathematica)\\b",
           "query_id": "Q0220",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287300,7 +287300,7 @@
           "pattern": "\\b(?:left[- ]shift|intrinsic randomness|half[- ]colored|kneading|pegboard|center[- ]cell sequence|congruential|Eden|constraint[- ]satisfaction|invariant[- ]state|Gray[- ]path|point[- ]growth|branching preset|creation[- ]and[- ]annihilation|shot[- ]noise|Johnson noise|flicker noise|entropy[- ]pool|riffle[- ]shuffle|feedback shift register|extreme[- ]value|source[- ]absorber[- ]reflector|template aggregation|multipole isotropy|Toom|Boltzmann[- ]weight|heat[- ]bath|simulated[- ]annealing|Apollonian|higher[- ]order Voronoi|dispersion analyzer|balanced[- ]parentheses|sandpile)\\b",
           "query_id": "Q0221",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287312,7 +287312,7 @@
           "pattern": "\\b(?:unclear|ambiguous|defect(?:ive)?|missing|unknown|not specified|not stated|appears?|presumably|approximately|idealized|simplif(?:y|ies|ied)|only|rather than|except|however|may|might|could|seems?)\\b",
           "query_id": "Q0222",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -287324,7 +287324,7 @@
           "pattern": "\\b(?:pages?|page|chapter)\\s+(?:\\d+|[IVX]+)(?:[–-]\\d+)?\\b|\\b(?:the\\s+)?(?:(?:top|bottom)\\s+of\\s+(?:the\\s+)?)?(?:facing|previous|next)(?:\\s+(?:one|two|three))?\\s+pages?\\b|\\b(?:previous section|next chapter|next few chapters|later in (?:this|the) book|linear feedback shift registers?|ultimate forms of behavior|undecidable|non[- ]deterministic Turing machines?|tiling problems?|halting problems?)\\b",
           "query_id": "Q0223",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -319936,7 +319936,7 @@
           "pattern": "\\b(?:cellular autom(?:aton|ata)|rules?\\s*(?:0|18|30|50|54|62|90|94|110|128|146|150|160|184|254)\\b|rule[- ]?(?:number|code)|codes?\\s*(?:746|976|1893|294869764523995749814890097794812493824)\\b|totalistic|outer[- ]totalistic|next[- ]nearest|transition rules?|domain walls?|domains?|phase[- ]selecting|Toom|Gacs|Kurdyumov|Levin|sandpiles?|toppl(?:e|es|ed|ing))\\b",
           "query_id": "Q0224",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -319948,7 +319948,7 @@
           "pattern": "\\b(?:random(?:ness|ly)?|pseudorandom|stochastic|probabilistic|probabilit(?:y|ies)|noise|shot noise|Johnson noise|flicker|entropy(?: pool)?|quantum|thermal|Monte Carlo|ensemble|distribution|measure|Boltzmann|microcanonical|canonical|percolation|Ising|biased|unbiased|independent|microscopic fluctuations?|breakdown|amplif(?:y|ies|ied|ication)|sparks?)\\b",
           "query_id": "Q0225",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -319960,7 +319960,7 @@
           "pattern": "\\b(?:mechanical|motion|trajector(?:y|ies)|billiards?|balls?|rolling|spinning|toss(?:ed|ing)?|friction|collisions?|elastic|pegboard|three[- ]body|planet|moon|gravitational|scatter(?:ing)?|knead(?:ing)?|stretch|cut|stack|doubling map|fractional part|left[- ]shift|shift(?:s|ed|ing)?[^.\\n]{0,60}\\b(?:left|right)\\b|transcription|maps?|iterat(?:e|es|ed|ing|ion)|finite[- ]state|periodic(?:ity)?|recurr(?:ence|ent)|closed curves?)\\b",
           "query_id": "Q0226",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -319972,7 +319972,7 @@
           "pattern": "\\b(?:random walks?|self[- ]avoiding walks?|lattice walks?|diffusion|absorbers?|reflectors?|sources?|population|aggregation|aggregate|Eden|DLA|diffusion[- ]limited|templates?|point growth|interfaces?|growth|nucleation|phases?|phase transitions?|checkerboards?)\\b",
           "query_id": "Q0227",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -319984,7 +319984,7 @@
           "pattern": "\\b(?:constraints?|satisf(?:y|ies|ied|action)|solutions?|search(?:es|ed|ing)?|cost functions?|minimi[sz](?:e|es|ed|ing)|maximi[sz](?:e|es|ed|ing)|optimization|downhill|gradient|Newton|anneal(?:ing)?|genetic algorithms?|packing|circles?|spheres?|pack(?:s|ed|ing)?|granular|settling|shaking|Apollonian|Voronoi|Dirichlet|Wigner[- ]Seitz|Brillouin|tessellations?|adjacency|nearest centers?|fixed points?|invariants?)\\b",
           "query_id": "Q0228",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -319996,7 +319996,7 @@
           "pattern": "\\b(?:equations?|differential equations?|partial differential|PDE|continuum|continuous|finite differences?|rate equations?|dispersion|linear stability|wavelengths?|Fourier|power spectra?|spectr(?:um|a|al)|isotrop(?:y|ic)|tensors?|multipoles?|central limit|Gaussian|lognormal|Fisher|Tippett|extreme[- ]value|random matrices?|Wigner|chemical rates?)\\b|`[^`\\n]*(?:=|->|→|Nest|NestList|Fourier|Solve|Table)[^`\\n]*`|(?:^|\\n)\\s*(?:\\$\\$|\\\\\\[)|(?:^|\\n)\\s*\\$[^$\\n]+\\$\\s*(?:\\n|$)",
           "query_id": "Q0229",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320008,7 +320008,7 @@
           "pattern": "\\b(?:substitutions?|replac(?:e|es|ed|ing|ement)|recursive|recursion|branch(?:es|ed|ing)?|Y[- ]branching|children|creation|annihilation|nested|nesting|blocks?|pairs?|parentheses|brackets?|balanced|Catalan|languages?)\\b",
           "query_id": "Q0230",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320020,7 +320020,7 @@
           "pattern": "\\b(?:random[- ]number generators?|congruential|linear feedback|shift registers?|Fibonacci|stream ciphers?|middle[- ]square|riffle|shuffle|permutations?|sampling|samplers?|heat[- ]bath|Monte Carlo|simulated annealing|genetic|entropy pool|Random\\[Integer\\]|multipliers?|base[- ]2 digits?)\\b",
           "query_id": "Q0231",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320032,7 +320032,7 @@
           "pattern": "\\b(?:observers?|analy[sz](?:e|es|ed|ing|er|ers|is)|plots?|coordinates?|displays?|pictures?|transform(?:s|ed|ation)?|coarse[- ]grain(?:ing)?|averag(?:e|es|ed|ing)|compression|sequences?|center columns?|perturbations?|position distribution|power spectra?|isotropy|count(?:s|ed|ing)?|denotation|membership|region construction|diagram)\\b",
           "query_id": "Q0232",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320044,7 +320044,7 @@
           "pattern": "\\b(?:rules?|systems?|programs?|processes?|algorithms?|procedures?|constructions?|presets?|families|models?|relations?|constraints?|functions?|maps?|generators?|analyzers?|observers?|transformations?|autom(?:aton|ata)|languages?|sequences?|configurations?|patterns?|structures?|equations?|initial conditions?|evolution|steps?|states?|inputs?|outputs?|examples?|cases?)\\b|(?:^|\\n)\\s*(?:#{1,6}\\s+[^\\n]+|!\\[[^\\]]*\\]\\([^)]+\\)|```)",
           "query_id": "Q0233",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320056,7 +320056,7 @@
           "pattern": "\\b(?:states?|configurations?|cells?|sites?|elements?|values?|colors?|neighbou?rs?|neighbou?rhoods?|frontiers?|active|schedules?|parallel|synchronous|asynchronous|randomly selected|updates?|successors?|evol(?:ve|ves|ved|ving|ution)|iterations?|transitions?|replac(?:e|es|ed|ing|ement)|boundar(?:y|ies)|lattices?|grids?|rings?|toroidal)\\b",
           "query_id": "Q0234",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320068,7 +320068,7 @@
           "pattern": "\\b(?:represent(?:s|ed|ing|ation)?|visualiz(?:e|es|ed|ation)|implement(?:s|ed|ing|ation)?|simulat(?:e|es|ed|ing|ion)|render(?:s|ed|ing)?|observers?|projections?|plots?|diagrams?|pictures?|trajector(?:y|ies)|histories|spacetime|statistics?|measure(?:s|d|ment)?|applications?|models? of|Mathematica)\\b",
           "query_id": "Q0235",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320080,7 +320080,7 @@
           "pattern": "\\b(?:left[- ]shift|intrinsic randomness|half[- ]colored|kneading|pegboard|center[- ]cell sequence|congruential|Eden|constraint[- ]satisfaction|invariant[- ]state|Gray[- ]path|point[- ]growth|branching preset|creation[- ]and[- ]annihilation|shot[- ]noise|Johnson noise|flicker noise|entropy[- ]pool|riffle[- ]shuffle|feedback shift register|extreme[- ]value|source[- ]absorber[- ]reflector|template aggregation|multipole isotropy|Toom|Boltzmann[- ]weight|heat[- ]bath|simulated[- ]annealing|Apollonian|higher[- ]order Voronoi|dispersion analyzer|balanced[- ]parentheses|sandpile)\\b",
           "query_id": "Q0236",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320092,7 +320092,7 @@
           "pattern": "\\b(?:unclear|ambiguous|defect(?:ive)?|missing|unknown|not specified|not stated|appears?|presumably|approximately|idealized|simplif(?:y|ies|ied)|only|rather than|except|however|may|might|could|seems?)\\b",
           "query_id": "Q0237",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
@@ -320104,7 +320104,7 @@
           "pattern": "\\b(?:pages?|page|chapter)\\s+(?:\\d+|[IVX]+)(?:[–-]\\d+)?\\b|\\b(?:the\\s+)?(?:(?:top|bottom)\\s+of\\s+(?:the\\s+)?)?(?:facing|previous|next)(?:\\s+(?:one|two|three))?\\s+pages?\\b|\\b(?:previous section|next chapter|next few chapters|later in (?:this|the) book|linear feedback shift registers?|ultimate forms of behavior|undecidable|non[- ]deterministic Turing machines?|tiling problems?|halting problems?)\\b",
           "query_id": "Q0238",
           "scope_paths": [
-            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+            "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
             "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false

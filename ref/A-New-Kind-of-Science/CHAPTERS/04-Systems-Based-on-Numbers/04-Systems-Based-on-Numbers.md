@@ -1,4 +1,4 @@
-![](_page_130_Chapter_Opener.jpeg)
+![](images/_page_130_Chapter_Opener.jpeg)
 
 ## Systems Based on Numbers
 
@@ -56,15 +56,15 @@ The result of this process is to generate the successive numbers 1, 2, 3, 4, 5, 
 
 But if one looks not at these overall sizes, but rather at digit sequences, then what one sees is considerably more complicated. And in fact, as the picture on the right demonstrates, these successive digit sequences form a pattern that shows an intricate nested structure.
 
-![](_page_132_Figure_10_Overview.jpeg)
+![](images/_page_132_Figure_10_Overview.jpeg)
 
-![](_page_132_Figure_10.jpeg)
+![](images/_page_132_Figure_10.jpeg)
 
 Digit sequences of successive numbers written in base 2. The overall pattern has an intricate nested form.
 
 The pictures below show what happens if one adds a number other than 1 at each step. Near the right-hand edge, each pattern is somewhat different. But at an overall level, all the patterns have exactly the same basic nested structure.
 
-![](_page_133_Picture_2.jpeg)
+![](images/_page_133_Picture_2.jpeg)
 
 Digit sequences in base 2 of numbers obtained by starting with 1 and then successively adding a constant at each step. All these patterns ultimately have the same overall nested form.
 
@@ -72,9 +72,9 @@ If instead of addition one uses multiplication, however, then the results one ge
 
 It turns out that if one represents numbers as digit sequences in base 2, then the operation of multiplying by 2 has a very simple effect: it just shifts the digit sequence one place to the left, adding a 0 digit on the right. And as a result, the overall pattern obtained by successive multiplication by 2 has a very simple form.
 
-![](_page_134_Figure_2.jpeg)
+![](images/_page_134_Figure_2.jpeg)
 
-![](_page_134_Figure_3.jpeg)
+![](images/_page_134_Figure_3.jpeg)
 
 Patterns produced by starting with the number 1, and then successively multiplying by a factor of 2, and a factor of 3. In each case, the digit sequence of the number obtained at each step is shown in base 2. Multiplication by 2 turns out to correspond just to shifting all digits in base 2 one position to the left, so that the overall pattern produced in this case is very simple. But multiplication by 3 yields a much more complicated pattern, as the picture on the right shows. Note that in these pictures the complete numbers obtained at each step correspond respectively to the successive integer powers of 2 and of 3.
 
@@ -90,19 +90,19 @@ A few examples, however, will show that this is not the case.
 
 To begin the first example, consider what happens if one multiplies by $3/2$, or 1.5, at each step. Starting with 1, the successive numbers that one obtains in this way are 1, $3/2 = 1.5$, $9/4 = 2.25$, $27/8 = 3.375$, $81/16 = 5.0625$, $243/32 = 7.59375$, $729/64 = 11.390625$, …
 
-![](_page_135_Figure_2.jpeg)
+![](images/_page_135_Figure_2.jpeg)
 
 The first 500 powers of 3, shown in base 2. Some small-scale structure is visible, but on a larger scale the pattern seems for all practical purposes random. Note that the pattern shown here has been truncated at the edge of the page on the left, although in fact the whole pattern continues to expand to the left forever with an average slope of $Log[2, 3] \approx 1.58$.
 
 The picture below shows the digit sequences for these numbers given in base 2. The digits that lie directly below and to the left of the original 1 at the top of the pattern correspond to the whole number part of each successive number (e.g. 3 in 3.375), while the digits that lie to the right correspond to the fractional part (e.g. 0.375 in 3.375).
 
-![](_page_136_Figure_2.jpeg)
+![](images/_page_136_Figure_2.jpeg)
 
 Successive powers of $3/2$, shown in base 2. Multiplication by $3/2$ can be thought of as multiplication by 3 combined with division by 2. But division by 2 just does the opposite of multiplication by 2, so in base 2 it simply shifts all digits one position to the right. The overall pattern is thus a shifted version of the pattern shown on the facing page.
 
 And instead of looking explicitly at the complete pattern of digits, one can consider just finding the size of the fractional part of each successive number. These sizes are plotted at the top of the next page. And the picture shows that they too exhibit the kind of complexity and apparent randomness that is evident at the level of digits.
 
-![](_page_137_Figure_1.jpeg)
+![](images/_page_137_Figure_1.jpeg)
 
 Sizes of the fractional parts of successive powers of $3/2$. These sizes are completely independent of what base is used to represent the numbers. Only the dots are significant; the shading and lines between them are just included to make the plot easier to read.
 
@@ -110,9 +110,9 @@ The example just given involves numbers with fractional parts. But it turns out 
 
 As a first example, consider a slight variation on the operation of multiplying by $3/2$ used above: if the number at a particular step is even (divisible by 2), then simply multiply that number by $3/2$, getting a whole number as the result. But if the number is odd, then first add 1—so as to get an even number—and only then multiply by $3/2$.
 
-![](_page_137_Digit_Matrix.jpeg)
+![](images/_page_137_Digit_Matrix.jpeg)
 
-![](_page_137_Picture_7.jpeg)
+![](images/_page_137_Picture_7.jpeg)
 
 Results of starting with the number 1, then applying the following rule: if the number at a particular step is even, multiply by $3/2$; otherwise, add 1, then multiply by $3/2$. This procedure yields a succession of whole numbers whose digit sequences in base 2 are shown at the right. The rightmost digits obtained at each step are shown above. The digit is 0 when the number is even and 1 when it is odd, and, as shown, the digits alternate in a seemingly random way. It turns out that the system described here is closely related to one that arose in studying the register machine shown on page 100. The system here can be represented by the rule $n \rightarrow If[EvenQ[n], 3\,n/2, 3\,(n+1)/2]$, while the one on page 100 follows the rule $n \rightarrow If[EvenQ[n], 3\,n/2, (3\,n+1)/2]$. After the first step these systems give the same sequence of numbers, except for an overall factor of 3.
 
@@ -126,13 +126,13 @@ As an example, consider the following procedure: if the number obtained at a par
 
 If one starts with 1, then this procedure simply gives 1 at every step. And indeed with many starting numbers, the procedure yields purely repetitive behavior. But as the picture below shows, it can also give more complicated behavior.
 
-![](_page_138_Figure_6.jpeg)
+![](images/_page_138_Figure_6.jpeg)
 
 Results of applying the rule $n \rightarrow If[EvenQ[n], 5\,n/2, (n+1)/2]$, starting with different initial choices of $n$. In many cases, the behavior obtained is purely repetitive. But in some cases it is not.
 
 Starting for example with the number 6, the sizes of the numbers obtained on successive steps show a generally increasing trend, but there are considerable fluctuations, and these fluctuations seem to be essentially random. Indeed, even after a million steps, when the number obtained has 48,554 (base 10) digits, there is still no sign of repetition or of any other significant regularity.
 
-![](_page_139_Figure_1.jpeg)
+![](images/_page_139_Figure_1.jpeg)
 
 The results of following the same rule as on the previous page, starting from the value 6. Plotted on the right are the overall sizes of the numbers obtained for the first thousand steps. The plot is on a logarithmic scale, so the height of each point is essentially the length of the digit sequence for the number that it represents—or the width of the row on the left.
 
@@ -150,15 +150,15 @@ So just like for the various kinds of programs that we discussed in the previous
 
 Indeed, despite the lack of locality in their underlying rules, the pictures below and on the pages that follow show that it is even possible to find systems based on numbers that exhibit something like the localized structures that we saw in cellular automata on page 32.
 
-![](_page_140_Picture_5.jpeg)
+![](images/_page_140_Picture_5.jpeg)
 
 An example of a system defined by the following rule: at each step, take the number obtained at that step and write its base 2 digits in reverse order, then add the resulting number to the original one. For many possible starting numbers, the behavior obtained is very simple. This picture shows what happens when one starts with the number 16. After 180 steps, it turns out that all that survives are a few objects that one can view as localized structures.
 
-![](_page_141_Picture_2.jpeg)
+![](images/_page_141_Picture_2.jpeg)
 
 A thousand steps in the evolution of a system with the same rule as on the previous page, but now starting with the number 512. Localized structures are visible, but the overall pattern never seems to take on any kind of simple repetitive form.
 
-![](_page_142_Picture_2.jpeg)
+![](images/_page_142_Picture_2.jpeg)
 
 Continuation of the pattern on the facing page, starting at the millionth step. The picture shows the right-hand edge of the pattern; the complete pattern extends about 700 times the width of the page to the left.
 
@@ -172,7 +172,7 @@ In the simplest cases, $f[n]$ depends only on the number immediately before it i
 
 The table below gives results obtained with a few specific rules. In all the cases shown, these results are quite simple, consisting of sequences that increase uniformly or fluctuate in a purely repetitive way.
 
-![](_page_143_Figure_6.jpeg)
+![](images/_page_143_Figure_6.jpeg)
 
 Examples of some simple recursive sequences. The $n^{\text{th}}$ element in each sequence is denoted $f[n]$, and the rule specifies how this element is determined from previous ones. With all the rules shown here, successive elements either increase smoothly or fluctuate in a purely repetitive way. Sequence (c) is the powers of two; (d) is the so-called Fibonacci sequence, related to powers of the golden ratio $(1 + \sqrt{5})/2 \approx 1.618$. All rules of the kind shown here lead to sequences where $f[n]$ can be expressed in terms of a simple sum of powers of the form $a^n$.
 
@@ -180,11 +180,11 @@ But it turns out that with slightly more complicated rules it is possible to get
 
 There is some subtlety here because in the abstract nothing guarantees that $n-f[n-1]$ will necessarily be a positive number. And if it is not, then results obtained by applying the rule can involve meaningless quantities such as $f[0]$, $f[-1]$ and $f[-2]$.
 
-![](_page_144_Figure_3.jpeg)
+![](images/_page_144_Figure_3.jpeg)
 
 Examples of sequences generated by rules that do not depend only on elements a fixed distance back. Most such rules eventually end up involving meaningless quantities such as $f[0]$ and $f[-1]$, but the particular rules shown here all avoid this problem.
 
-![](_page_145_Figure_1.jpeg)
+![](images/_page_145_Figure_1.jpeg)
 
 Fluctuations in the overall increase of sequences from the previous page. In cases (c) and (d), the fluctuations have a regular nested form, and turn out to be directly related to the base 2 digit sequence of $n$. In the other cases, the fluctuations are more complicated, and seem in many respects random. All the rules shown start with $f[1] = f[2] = 1$.
 
@@ -210,13 +210,13 @@ In the sequence of all possible numbers 1, 2, 3, 4, 5, 6, 7, 8, … most are div
 
 The picture below shows a simple rule by which such primes can be obtained. The idea is to start out on the top line with all possible numbers. Then on the second line, one removes all numbers larger than 2 that are divisible by 2. On the third line one removes numbers divisible by 3, and so on. As one goes on, fewer and fewer numbers remain. But some numbers always remain, and these numbers are exactly the primes.
 
-![](_page_147_Figure_4.jpeg)
+![](images/_page_147_Figure_4.jpeg)
 
 A filtering process that yields the prime numbers. One starts on the top line with all numbers between 1 and 100. Then on the second line, one removes numbers larger than 2 that are divisible by 2—as indicated by the gray dots. On the third line, one removes numbers larger than 3 that are divisible by 3. If one then continues forever, there are some numbers that always remain, and these are exactly the primes. The process shown is essentially the sieve of Eratosthenes, already known in 200 BC.
 
 Given the simplicity of this rule, one might imagine that the sequence of primes it generates would also be correspondingly simple. But just as in so many other examples in this book, in fact it is not. And indeed the plots on the facing page show various features of this sequence which indicate that it is in many respects quite random.
 
-![](_page_148_Figure_1.jpeg)
+![](images/_page_148_Figure_1.jpeg)
 
 Features of the sequence of primes. Despite the simplicity of the rule on the facing page that generates the primes, the actual sequence of primes that is obtained seems in many respects remarkably random.
 
@@ -234,15 +234,15 @@ Some of this complexity can be understood if we look at each number not in terms
 
 And indeed the only reasonable conclusion seems to be that just as in so many other systems in this book, such sequences of numbers exhibit complexity that somehow arises as a fundamental consequence of the rules by which the sequences are generated.
 
-![](_page_150_Figure_1.jpeg)
+![](images/_page_150_Figure_1.jpeg)
 
-![](_page_150_Figure_2.jpeg)
+![](images/_page_150_Figure_2.jpeg)
 
-![](_page_150_Figure_3.jpeg)
+![](images/_page_150_Figure_3.jpeg)
 
-![](_page_150_Figure_4.jpeg)
+![](images/_page_150_Figure_4.jpeg)
 
-![](_page_150_Figure_5.jpeg)
+![](images/_page_150_Figure_5.jpeg)
 
 *(d) The number of ways of expressing* $n$ *as a sum of four squares*
 
@@ -262,11 +262,11 @@ One might suppose that at some level it must be quite simple and regular. For th
 
 But it turns out that even though this definition is simple, the digit sequence of $\pi$ is not simple at all. The facing page shows the first 4000 digits in the sequence, both in the usual case of base 10, and in base 2. And the picture below shows a pictorial representation of the first 20,000 digits in the sequence.
 
-![](_page_151_Figure_7.jpeg)
+![](images/_page_151_Figure_7.jpeg)
 
 A pictorial representation of the first 20,000 digits of $\pi$ in base 2. The curve drawn goes up every time a digit is 1, and down every time it is 0. Great complexity is evident. If the curve were continued further, it would spend more time above the axis, and no aspect of what is seen provides any evidence that the digit sequence is anything but perfectly random.
 
-![](_page_152_Pi_Digits.jpeg)
+![](images/_page_152_Pi_Digits.jpeg)
 
 The first 4000 digits of $\pi$ in bases 10 and 2. Despite the simple definition of $\pi$ as the ratio of the circumference to the diameter of a circle, its digit sequence is sufficiently complicated as to seem for practical purposes random.
 
@@ -300,7 +300,7 @@ Digit sequences for various rational numbers, given in base 10 (above) and base 
 
 We can get some understanding of why this is so by looking at the details of how processes for performing division work. The pictures below show successive steps in a particular method for computing the base 2 digit sequence for the rational numbers $p/q$.
 
-![](_page_154_Figure_2.jpeg)
+![](images/_page_154_Figure_2.jpeg)
 
 Successive steps in the computation of various rational numbers. In each case, the column on the right shows the sequence of base 2 digits in the number, while the box on the left shows the remainder at each of the steps in the computation.
 
@@ -344,7 +344,7 @@ The procedure is only slightly more complicated than the one for division discus
 
 As the picture shows, the results of the procedure exhibit considerable complexity. And indeed, it seems that just like so many other examples that we have discussed in this book, the procedure for generating square roots is based on simple rules but nevertheless yields behavior of great complexity.
 
-![](_page_156_Figure_1.jpeg)
+![](images/_page_156_Figure_1.jpeg)
 
 A procedure for generating the digit sequences of square roots. Two numbers, $r$ and $s$, are involved. To find $\sqrt{n}$ one starts by setting $r=n$ and $s=0$. Then at each step one applies the rule $\{r,s\} \rightarrow If[r>s, \{4(r-s-1), 2(s+2)\}, \{4r,2s\}]$. The result is that the digits of $s$ in base 2 turn out to correspond exactly to the digits of $\sqrt{n}$. Note that if $n$ is not between 1 and 4, it must be multiplied or divided by an appropriate power of 4 before starting this procedure.
 
@@ -441,13 +441,13 @@ The last section showed that individual numbers obtained by applying various sim
 
 The pictures below show curves obtained by plotting standard mathematical functions. All of these curves have fairly simple, essentially repetitive forms. And indeed it turns out that almost all the standard mathematical functions that are defined, for example, in *Mathematica*, yield similarly simple curves.
 
-![](_page_160_Figure_4.jpeg)
+![](images/_page_160_Figure_4.jpeg)
 
 Plots of some standard mathematical functions. The top row shows three trigonometric functions. The bottom row shows three so-called special functions that are commonly encountered in mathematical physics and other areas of traditional science. In all cases the curves shown have fairly simple repetitive forms.
 
 But if one looks at combinations of these standard functions, it is fairly easy to get more complicated results. The pictures on the next page show what happens, for example, if one adds together various sine functions. In the first picture, the curve one gets has a fairly simple repetitive structure. In the second picture, the curve is more complicated, but still has an overall repetitive structure. But in the third and fourth pictures, there is no such repetitive structure, and indeed the curves look in many respects random.
 
-![](_page_161_Figure_1.jpeg)
+![](images/_page_161_Figure_1.jpeg)
 
 Curves obtained by adding together various sine functions. In the first two cases, the curves are ultimately repetitive; in the second two cases they are not. If viewed as waveforms for sounds, then these curves correspond to chords. The first curve yields a perfect fifth, while the third curve yields a diminished fifth (or tritone) in an equal temperament scale.
 
@@ -455,7 +455,7 @@ In the third picture, however, the points where the curve crosses the axis come 
 
 When $\alpha$ is a square root, then as discussed in the previous section, the continued fraction representation is purely repetitive, making the generated pattern nested. But when $\alpha$ is not a square root the pattern can be more complicated. And if more than two sine functions are involved there no longer seems to be any particular connection to generalized substitution systems or continued fractions.
 
-![](_page_162_Figure_1.jpeg)
+![](images/_page_162_Figure_1.jpeg)
 
 Curves obtained by adding or subtracting exactly two sine or cosine functions turn out to have a pattern of axis crossings that can be reproduced by a generalized substitution system. In general there is an axis crossing within an interval when the corresponding element in the generalized substitution system is black, and there is not when the element is white. In the case of $Cos[x]-Cos[\alpha x]$ each step in the generalized substitution system has a rule determined as shown on the left from a term in the continued fraction representation of $(\alpha-1)/(\alpha+1)$. In the first two examples shown $\alpha$ is a quadratic irrational, so that the continued fraction is repetitive, and the pattern obtained is purely nested. (The second example is analogous to the Fibonacci substitution system on page 83.) In the last two examples, however, there is no such regularity. Note that successive terms in each continued fraction are shown alongside successive steps in the substitution system going up the page.
 
@@ -463,7 +463,7 @@ Among all the various mathematical functions defined, say, in *Mathematica* it t
 
 The basic definition of this function is fairly simple. But in the end the function turns out to be related to the distribution of primes—and the curve it generates is quite complicated. Indeed, despite immense mathematical effort for over a century, it has so far been impossible even to establish for example the so-called Riemann Hypothesis, which in effect just states that all the peaks in the curve lie above the axis, and all the valleys below.
 
-![](_page_163_Figure_4.jpeg)
+![](images/_page_163_Figure_4.jpeg)
 
 A curve associated with the so-called Riemann zeta function. The zeta function $Zeta[s]$ is defined as $Sum[1/k^s, \{k, \infty\}]$. The curve shown here is the so-called Riemann-Siegel Z function, which is essentially $Zeta[1/2 + i\,t]$. The celebrated Riemann Hypothesis in effect states that all peaks after the first one in this curve must lie above the axis.
 
@@ -483,11 +483,11 @@ If one looks at digit sequences, it is rather clear why this happens. For as the
 
 It is important to realize, however, that in no real sense is any randomness actually being generated by the evolution of this system. Instead, it is just that randomness that was inserted in the digit sequence of the original number shows up in the results one gets.
 
-![](_page_165_Figure_1.jpeg)
+![](images/_page_165_Figure_1.jpeg)
 
 Examples of iterated maps starting from simple initial conditions. At each step there is a number $x$ between 0 and 1 that is updated by applying a fixed mapping. The four mappings considered here are given above both as formulas and in terms of plots. The pictures at the top of the page show the base 2 digit sequences of successive numbers obtained by iterating this mapping, while the pictures in the middle of the page plot the sizes of these numbers. In all cases, the initial conditions consist of the number $1/2$—which has a very simple digit sequence. Yet despite this simplicity, cases (a) and (b) show considerable complexity in both the digit sequences and the sizes of the numbers produced (compare page 122). In case (c), the digit sequences are complicated but the sizes of the numbers tend rapidly to zero. And finally, in case (d), neither the digit sequences nor the sizes of numbers are anything but trivial. Note that in the pictures above each horizontal row of digits corresponds to a number, and that digits further to the left contribute progressively more to the size of this number.
 
-![](_page_166_Figure_2.jpeg)
+![](images/_page_166_Figure_2.jpeg)
 
 The same iterated maps as on the facing page, but now started from the initial condition $\pi/4$—a number with a seemingly random digit sequence. After fairly few steps, cases (a) and (b) yield behavior that is almost indistinguishable from what was seen with simple initial conditions on the facing page. And in case (c), the same exponential decay in the sizes of numbers occurs as before. But in case (d), the behavior is much more complicated. Indeed, if one just looked at the sizes of numbers produced, then one sees the same kind of complexity as in cases (a) and (b). But looking at digit sequences one realizes that this complexity is actually just a direct transcription of complexity introduced by giving an initial condition with a seemingly random digit sequence. Case (d) is the so-called shift map—a classic example of a system that exhibits the sensitive dependence on initial conditions often known as chaos.
 
@@ -503,15 +503,15 @@ The pictures at the top of the facing page show what happens if one uses as the 
 
 And at least if one looks only at the sizes of numbers, this seems rather mysterious. But as soon as one looks at digit sequences, it immediately becomes much clearer. For as the pictures at the top of the facing page show, the fact that the numbers which are used as initial conditions differ only by a very small amount in size just means that their first several digits are the same. And for a while these digits are what is important. But since the evolution of the system continually shifts digits to the left, it is inevitable that the differences that exist in later digits will eventually become important.
 
-![](_page_168_Picture_1.jpeg)
+![](images/_page_168_Picture_1.jpeg)
 
-![](_page_168_Picture_2.jpeg)
+![](images/_page_168_Picture_2.jpeg)
 
-![](_page_168_Picture_3.jpeg)
+![](images/_page_168_Picture_3.jpeg)
 
-![](_page_168_Figure_4.jpeg)
+![](images/_page_168_Figure_4.jpeg)
 
-![](_page_168_Figure_5.jpeg)
+![](images/_page_168_Figure_5.jpeg)
 
 The effect of making a small change in the initial conditions for the shift map—shown as case (d) on pages 150 and 151. The first picture shows results for the same initial condition as on page 151. The second picture shows what happens if one changes the size of the number in this initial condition by just one part in a billion billion. The plots to the left indicate that for a while the sizes of numbers obtained by the evolution of the system in these two cases are indistinguishable. But suddenly the results diverge and become completely different. Looking at the digit sequences above shows why this happens. The point is that a small change in the size of the number in the initial conditions corresponds to a change in digits far to the right. But the evolution of the system progressively shifts digits to the left, so that the digits which differ eventually become important. The much-investigated chaos phenomenon consists essentially of this effect.
 
@@ -531,7 +531,7 @@ But a crucial discovery in this book is that systems like (a) and (b) on pages 1
 
 Yet the fact that systems like (a) and (b) can intrinsically generate randomness even from simple initial conditions does not mean that they do not also show sensitive dependence on initial conditions. And indeed the pictures below illustrate that even in such cases changes in digit sequences are progressively amplified—just like in the shift map case (d).
 
-![](_page_170_Picture_2.jpeg)
+![](images/_page_170_Picture_2.jpeg)
 
 Differences in digit sequences produced by a small change in initial conditions for the four iterated maps discussed in this section. Cases (a), (b) and (d) exhibit sensitive dependence on initial conditions, in the sense that a change in insignificant digits far to the right eventually grows to affect all digits. Case (c) does not show such sensitivity to initial conditions, but instead always evolves to 0, independent of its initial conditions.
 
@@ -547,7 +547,7 @@ And to address this question, what I will do in this section is to consider a ge
 
 The idea is to look at the average gray level of a cell and its immediate neighbors, and then to get the gray level for that cell at the next step by applying a fixed mapping to the result. The picture below shows a very simple case in which the new gray level of each cell is exactly the average of the one for that cell and its immediate neighbors. Starting from a single black cell, what happens in this case is that the gray essentially just diffuses away, leaving in the end a uniform pattern.
 
-![](_page_171_Picture_5.jpeg)
+![](images/_page_171_Picture_5.jpeg)
 
 <table>
   <tbody>
@@ -564,7 +564,7 @@ A continuous cellular automaton in which each cell can have any level of gray be
 
 The picture on the facing page shows what happens with a slightly more complicated rule in which the average gray level is multiplied by $3/2$, and then only the fractional part is kept if the result of this is greater than 1.
 
-![](_page_172_Picture_1.jpeg)
+![](images/_page_172_Picture_1.jpeg)
 
 <table>
   <tbody>
@@ -594,9 +594,9 @@ In fact, it turns out that in continuous cellular automata it takes only extreme
   </tbody>
 </table>
 
-![](_page_173_Picture_3.jpeg)
+![](images/_page_173_Picture_3.jpeg)
 
-![](_page_173_Picture_4.jpeg)
+![](images/_page_173_Picture_4.jpeg)
 
 $FractionalPart[x+1/4]$
 
@@ -608,9 +608,9 @@ And in fact, as the picture in the middle of page 160 shows, it is even possible
 
 Continuous cellular automata with the same kind of rules as in the picture above, but with a variety of different constants being added. Note that it is not so much the size of the constant as properties like its digit sequence that seem to determine the overall form of behavior produced in each case. <sup>▶</sup>
 
-![](_page_174_Picture_2.jpeg)
+![](images/_page_174_Picture_2.jpeg)
 
-![](_page_175_Figure_2.jpeg)
+![](images/_page_175_Figure_2.jpeg)
 
 More steps in the evolution of continuous cellular automata with the same kind of rules as on the previous page. In order to remove the uniform stripes, the picture in the middle shows the difference between the gray level of each cell and its immediate neighbor. Note the presence of discrete localized structures even though the underlying rules for the system involve continuous gray levels.
 
@@ -646,21 +646,21 @@ And as we have seen, these equations yield only simple behavior.
 
 So is it in fact possible to get more complicated behavior in partial differential equations? The results in this book on other kinds of systems strongly suggest that it should be. But traditional mathematical methods give very little guidance about how to find such behavior. Indeed, it seems that the best approach is essentially just to search through many different partial differential equations, looking for ones that turn out to show complex behavior.
 
-![](_page_178_Picture_2.jpeg)
+![](images/_page_178_Picture_2.jpeg)
 
-![](_page_178_Picture_3.jpeg)
+![](images/_page_178_Picture_3.jpeg)
 
 *diffusion equation:* $\partial_t u[t,x] = 1/4\,\partial_{xx}u[t,x]$
 
-![](_page_178_Picture_5.jpeg)
+![](images/_page_178_Picture_5.jpeg)
 
-![](_page_178_Picture_6.jpeg)
+![](images/_page_178_Picture_6.jpeg)
 
 *wave equation:* $\partial_{tt}u[t,x] = \partial_{xx}u[t,x]$
 
-![](_page_178_Picture_8.jpeg)
+![](images/_page_178_Picture_8.jpeg)
 
-![](_page_178_Picture_9.jpeg)
+![](images/_page_178_Picture_9.jpeg)
 
 *sine-Gordon soliton equation:* $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + Sin[u[t,x]]$
 
@@ -680,35 +680,35 @@ Indeed, strangely enough, even though the underlying equations are continuous, t
 
 But the main point that the pictures on the next two pages make is that the kind of complex behavior that we have seen in this book is in no way restricted to systems that are based on discrete elements. It is certainly much easier to find and to study such behavior in these discrete systems, but from what we have learned in this section, we now know that the same kind of behavior can also occur in completely continuous systems such as partial differential equations.
 
-![](_page_180_Picture_2.jpeg)
+![](images/_page_180_Picture_2.jpeg)
 
-![](_page_180_Picture_3.jpeg)
+![](images/_page_180_Picture_3.jpeg)
 
 $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + (1-u[t,x]^2)(1+u[t,x])$
 
-![](_page_180_Picture_5.jpeg)
+![](images/_page_180_Picture_5.jpeg)
 
-![](_page_180_Picture_6.jpeg)
+![](images/_page_180_Picture_6.jpeg)
 
 $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + (1-u[t,x]^2)(1+2u[t,x])$
 
-![](_page_180_Picture_8.jpeg)
+![](images/_page_180_Picture_8.jpeg)
 
-![](_page_180_Picture_9.jpeg)
+![](images/_page_180_Picture_9.jpeg)
 
 $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + (1-u[t,x]^2)(1+4u[t,x])$
 
 Examples of partial differential equations I have found that have more complicated behavior. The background in each case purely is repetitive, but the main part of the pattern is complex, and reminiscent of what is produced by continuous cellular automata and many other kinds of systems discussed in this book.
 
-![](_page_181_Picture_2.jpeg)
+![](images/_page_181_Picture_2.jpeg)
 
 $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + (1-u[t,x]^2)(1+u[t,x])$
 
-![](_page_181_Picture_4.jpeg)
+![](images/_page_181_Picture_4.jpeg)
 
 $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + (1-u[t,x]^2)(1+2u[t,x])$
 
-![](_page_181_Picture_6.jpeg)
+![](images/_page_181_Picture_6.jpeg)
 
 $\partial_{tt}u[t,x] = \partial_{xx}u[t,x] + (1-u[t,x]^2)(1+4u[t,x])$
 

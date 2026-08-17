@@ -79,32 +79,32 @@ consolidation:
 
 - `L1417`: synchronous displacement-field CA coupled to a mobile crack marker
   that selects a neighbor and destructively writes its destination
-  (`CHAPTERS/08-Implications-for-Everyday-Systems.md:131-138`).
+  (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:131-138`).
 - `L1418`, `L1458–L1459`: hexagonal lattice-gas/block CA with discrete particle
   motion and collisions, alternating hexagon/dual-triangle blocks, reflective
   boundaries, injected flow, and an energy/temperature extension
-  (`CHAPTERS/08-Implications-for-Everyday-Systems.md:155-165`;
+  (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:155-165`;
   `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:107,124-126`).
 - `L1421`: a metasystem that mutates a three-color nearest-neighbor CA program
-  by adding or modifying rules (`CHAPTERS/08-Implications-for-Everyday-Systems.md:319-329`).
+  by adding or modifying rules (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:319-329`).
 - `L1425`, `L1465–L1467`: phyllotaxis by repeatedly selecting the global field
   maximum, placing an element, applying a translated depletion kernel, and
   updating the cyclic concentration field; simultaneous placement is a
-  scheduling variant (`CHAPTERS/08-Implications-for-Everyday-Systems.md:531-547`;
+  scheduling variant (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:531-547`;
   `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:223-225`).
 - `L1427` and part of `L1467`: differential sheet growth with an equal-cell-size
   embedding constraint. It remains open whether the Book defines an iterative
   relaxation or only a relation over acceptable outputs
-  (`CHAPTERS/08-Implications-for-Everyday-Systems.md:563-569`;
+  (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:563-569`;
   `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:226`).
 - `L1429`, `L1468`: shell generation by progressive addition at a moving
   opening versus a direct parametric surface relation, including outside-only
   handling of self-intersection
-  (`CHAPTERS/08-Implications-for-Everyday-Systems.md:581-591`;
+  (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:581-591`;
   `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:234-246`).
 - `L1430`, `L1469`: curve generation from intrinsic curvature as a function of
   arc length, integrated into position and heading
-  (`CHAPTERS/08-Implications-for-Everyday-Systems.md:613-617`;
+  (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:613-617`;
   `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:253-271`).
 - `L1443–L1447`: one overpacked source group covering ordinary DLA, its
   conserved-mobile-particle CA analogue, and a boiling continuous CA. These
@@ -163,7 +163,7 @@ The following remain `UNREVIEWED`, with their dependency recorded here:
 
 - `L1489` (`RESOLVED`): discrete large-scale eddies at discrete positions
   interacting through an ordinary CA rule
-  (`CHAPTERS/08-Implications-for-Everyday-Systems.md:215`).
+  (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:215`).
 - `L1490` (`RESOLVED`): rapid dynamics of a third CA color used to emulate an
   effectively long-range field; an implementation technique
   (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:45`).

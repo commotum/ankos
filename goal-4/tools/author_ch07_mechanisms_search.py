@@ -37,7 +37,7 @@ SPEC.loader.exec_module(core)
 
 
 STAGE_PATHS = [
-    "CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
+    "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
     "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md",
 ]
 STAGE = 11

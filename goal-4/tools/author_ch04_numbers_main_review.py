@@ -2,7 +2,7 @@
 """Author the sealed Stage 8 Chapter 4 main-text blind review reproducibly.
 
 This helper is bound to the exact epoch-1 bundle for
-``CHAPTERS/04-Systems-Based-on-Numbers.md``.  It records the judgments made
+``CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md``.  It records the judgments made
 after the 306 units were read in canonical order and all 63 assigned assets
 were screened.  It refuses to modify anything except a pristine nonsemantic
 worksheet for that exact assignment.
@@ -33,7 +33,7 @@ EXPECTED_CONTENT_SET = (
     "0b5a50b9f6214e4b3600bf8ba55f2064739bf3f835113a135b0c09b7f877ab4d"
 )
 EXPECTED_WORKER = "ch04-main-reader-e1"
-EXPECTED_PATHS = ["CHAPTERS/04-Systems-Based-on-Numbers.md"]
+EXPECTED_PATHS = ["CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md"]
 STAGE = 8
 
 

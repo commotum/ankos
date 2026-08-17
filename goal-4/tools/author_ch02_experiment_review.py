@@ -27,7 +27,7 @@ EXPECTED_CONTENT_SET = (
 )
 EXPECTED_WORKER = "ch02-experiment-reader-e1"
 EXPECTED_PATHS = [
-    "CHAPTERS/02-The-Crucial-Experiment.md",
+    "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
     "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md",
 ]
 

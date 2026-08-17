@@ -261,18 +261,18 @@ Stage 2 independently derived this map from the canonical files:
 |---|---|---:|
 | Publication and printed contents | `FRONT-MATTER/00-Publication-and-Contents.md` | 1–94 |
 | Preface | `FRONT-MATTER/01-Preface.md` | 95–167 |
-| Chapter 1 | `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md` | 168–375 |
-| Chapter 2 | `CHAPTERS/02-The-Crucial-Experiment.md` | 376–639 |
-| Chapter 3 | `CHAPTERS/03-The-World-of-Simple-Programs.md` | 640–1309 |
-| Chapter 4 | `CHAPTERS/04-Systems-Based-on-Numbers.md` | 1310–2045 |
-| Chapter 5 | `CHAPTERS/05-Two-Dimensions-and-Beyond.md` | 2046–2601 |
-| Chapter 6 | `CHAPTERS/06-Starting-from-Randomness.md` | 2602–3311 |
-| Chapter 7 | `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` | 3312–4183 |
-| Chapter 8 | `CHAPTERS/08-Implications-for-Everyday-Systems.md` | 4184–4953 |
-| Chapter 9 | `CHAPTERS/09-Fundamental-Physics.md` | 4954–6327 |
-| Chapter 10 | `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` | 6328–7341 |
-| Chapter 11 | `CHAPTERS/11-The-Notion-of-Computation.md` | 7342–8215 |
-| Chapter 12 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` | 8216–9901 |
+| Chapter 1 | `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md` | 168–375 |
+| Chapter 2 | `CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md` | 376–639 |
+| Chapter 3 | `CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md` | 640–1309 |
+| Chapter 4 | `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md` | 1310–2045 |
+| Chapter 5 | `CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md` | 2046–2601 |
+| Chapter 6 | `CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md` | 2602–3311 |
+| Chapter 7 | `CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md` | 3312–4183 |
+| Chapter 8 | `CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md` | 4184–4953 |
+| Chapter 9 | `CHAPTERS/09-Fundamental-Physics/09-Fundamental-Physics.md` | 4954–6327 |
+| Chapter 10 | `CHAPTERS/10-Processes-of-Perception-and-Analysis/10-Processes-of-Perception-and-Analysis.md` | 6328–7341 |
+| Chapter 11 | `CHAPTERS/11-The-Notion-of-Computation/11-The-Notion-of-Computation.md` | 7342–8215 |
+| Chapter 12 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/12-The-Principle-of-Computational-Equivalence.md` | 8216–9901 |
 | General Notes | `BACK-MATTER/NOTES/00-General-Notes.md` | 9902–10092 |
 | Chapter 1 Notes | `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md` | 10093–10167 |
 | Chapter 2 Notes | `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md` | 10168–11082 |
@@ -467,7 +467,7 @@ Blindly audit Chapter 1 main text and Chapter 1 Notes for construction-bearing s
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md` and `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
+- Sequentially review `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md` and `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
 - Inspect all owned captions, code/formulas, tables, and images in their canonical document context.
 - Record B candidates and full provisional semantic fingerprints.
 - Run a range-local trigger/alias search only after sequential reading.
@@ -490,7 +490,7 @@ Blindly audit Chapter 2 main text and Chapter 2 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/02-The-Crucial-Experiment.md` and `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md`.
+- Sequentially review `CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md` and `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md`.
 - Apply the same source-unit, image, candidate, local-search, and cross-reference protocol established in Stage 5.
 - Treat rules, initial conditions, behavior classes, properties, renderings, and historical commentary as distinct roles.
 
@@ -511,7 +511,7 @@ Blindly audit Chapter 3 main text and Chapter 3 Notes without using the catalog 
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/03-The-World-of-Simple-Programs.md` and `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md`.
+- Sequentially review `CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md` and `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md`.
 - Inspect implementation code, rule tables, figure-only mechanics, variants, histories, and cross-system comparisons.
 - Allocate B candidates independently of T IDs or familiar names.
 - Preserve distinctions among native construction, restriction, representation, emulation, observer, and behavior.
@@ -531,7 +531,7 @@ Blindly audit Chapter 4 main text and Chapter 4 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/04-Systems-Based-on-Numbers.md` and `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
+- Sequentially review `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md` and `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
 - Separate immutable definitions, representation queries, iterative work procedures, sequences, filters, maps, continuous systems, equations, observations, and numerical methods.
 - Inspect every formula, implementation fragment, caption, and governed image.
 - Record exactness, partiality, completion, and hidden-work-state requirements in candidate fingerprints.
@@ -553,7 +553,7 @@ Blindly audit Chapter 5 main text and Chapter 5 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/05-Two-Dimensions-and-Beyond.md` and `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md`.
+- Sequentially review `CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md` and `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md`.
 - Record topology, dimensionality, structural replacement, graph identity, branching, constraints, schedules, and witness semantics explicitly.
 - Inspect rule diagrams and construction-bearing images in full context.
 - Preserve underdetermined variants rather than choosing convenient conventions.
@@ -594,7 +594,7 @@ Blindly audit Chapter 6 main text and Chapter 6 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/06-Starting-from-Randomness.md` and `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md`.
+- Sequentially review `CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md` and `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md`.
 - Distinguish behavior classes, ensembles, random seeds, attractors, perturbations, finite-size protocols, and any native construction changes.
 - Record probability laws only where the Book specifies them.
 - Inspect all captions/images and run local saturation after reading.
@@ -649,7 +649,7 @@ Blindly audit Chapter 7 main text and Chapter 7 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` and `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md`.
+- Sequentially review `CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md` and `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md`.
 - Pay explicit attention to stochastic movement, aggregation, constraint satisfaction, continuity/discreteness mechanisms, and systems introduced as explanatory examples.
 - Record event selection, probability, frontier growth, and ensemble/observer distinctions.
 - Inspect every construction-bearing figure and follow local references.
@@ -721,7 +721,7 @@ mutable-ledger hashes are:
 
 | Assignment | Pending source units | Pending physical images |
 |---|---:|---:|
-| `CHAPTERS/08-Implications-for-Everyday-Systems.md` | 385, `U002012..U002396` | 45 referenced: `A001122..A001126`, `A001128..A001138`, `A001142..A001143`, `A001148..A001151`, `A001153..A001162`, `A001165..A001177` |
+| `CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md` | 385, `U002012..U002396` | 45 referenced: `A001122..A001126`, `A001128..A001138`, `A001142..A001143`, `A001148..A001151`, `A001153..A001162`, `A001165..A001177` |
 | `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 125, `U006870..U006994` | 12 referenced + 29 unreferenced: referenced `A000019`, `A000024`, `A000034..A000038`, `A000046`, `A000049`, `A000054..A000055`, `A000059`; unreferenced `A000020..A000023`, `A000025..A000033`, `A000039..A000045`, `A000047..A000048`, `A000050..A000053`, `A000056..A000058` |
 | **Total** | **510** | **86** |
 
@@ -740,7 +740,7 @@ Blindly audit Chapter 8 main text and Chapter 8 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/08-Implications-for-Everyday-Systems.md` and `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md`.
+- Sequentially review `CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md` and `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md`.
 - Determine whether each application merely instantiates earlier mechanics or specifies new coupling, mutation, global selection, growth, stochastic, or hybrid semantics.
 - Keep physical interpretation and display conventions outside native construction identity unless the Book makes them causal.
 - Inspect all figures and implementation details.
@@ -760,7 +760,7 @@ Blindly audit Chapter 9 main text and Chapter 9 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/09-Fundamental-Physics.md` and `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md`.
+- Sequentially review `CHAPTERS/09-Fundamental-Physics/09-Fundamental-Physics.md` and `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md`.
 - Record multi-time state, reversibility constructions, block schedules, conserved systems, network rewrites, causal event structures, branching, and sequencing evidence without forcing them into prior categories.
 - Distinguish derived causal representations from native evolution and distinguish property restrictions from construction-enforced mechanics.
 - Inspect all relevant rule diagrams, network figures, and formulas.
@@ -780,7 +780,7 @@ Blindly audit Chapter 10 main text and Chapter 10 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` and `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md`.
+- Sequentially review `CHAPTERS/10-Processes-of-Perception-and-Analysis/10-Processes-of-Perception-and-Analysis.md` and `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md`.
 - Separate analyzers and compression/view procedures from generative probabilistic models, transducers, automata, and stochastic cellular systems.
 - Record consumed input, hidden state, output semantics, likelihood/probability roles, and learning/fitting procedures where specified.
 - Inspect code, formulas, captions, and all governed images.
@@ -800,7 +800,7 @@ Blindly audit Chapter 11 main text and Chapter 11 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/11-The-Notion-of-Computation.md` and `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md`.
+- Sequentially review `CHAPTERS/11-The-Notion-of-Computation/11-The-Notion-of-Computation.md` and `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md`.
 - Distinguish native constructions from emulations, universal presets, encodings, proof artifacts, and computational properties.
 - Record any construction mechanics introduced only to establish universality.
 - Inspect all diagrams, encodings, implementation passages, and cross-references.
@@ -820,7 +820,7 @@ Blindly audit Chapter 12 main text and Chapter 12 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` and `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md`.
+- Sequentially review `CHAPTERS/12-The-Principle-of-Computational-Equivalence/12-The-Principle-of-Computational-Equivalence.md` and `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md`.
 - Separate philosophical claims, mathematical examples, axiom systems, proof/search relations, computations, and actual formal constructions.
 - Record any explicitly instantiated rewrite, proof, equation, machine, or generative mechanism.
 - Inspect all images and follow every locally resolvable route.
