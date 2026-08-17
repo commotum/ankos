@@ -35,7 +35,7 @@ GrayCode[m_] :=
 
 The succession of sizes and digit sequences of numbers ordered in this way are shown below. (Note that the digit sequence picture is turned on its side relative to those in the main text). The number which appears at position *i* is given by `BitXor[i, Floor[i/2]]`. (Iterating the related function `BitXor[i, 2 i]` yields numbers whose digit sequences correspond to the rule 60 cellular automaton).
 
-![](_page_916_Figure_12.jpeg)
+![](images/_page_916_Figure_12.jpeg)
 
 ■ **A note for mathematicians.** Some mathematicians will at first find what I say in this chapter quite bizarre. It may help however to point out that the traditional view of numbers already shows signs of breaking down in many studies of dynamical systems done over the past few decades. Thus for example, instead of getting results in terms of continuous functions, Cantor sets very often appear. Indeed, the symbolic dynamics approach that is often used in dynamical systems theory is quite close to the digit sequence approach I use here—Markov partitions in dynamical systems theory are essentially just generalizations of digit expansions.
 
@@ -59,21 +59,21 @@ Independent of pure mathematics, however, practical applications of numbers have
 
 Straightforward generalizations of `DigitCount` can be defined for integer and non-integer bases and by looking not only at the total number of digits but also at correlations between digits. In all cases the analogs of the picture below have a nested structure.
 
-![](_page_917_Figure_9.jpeg)
+![](images/_page_917_Figure_9.jpeg)
 
 ■ **Negative bases.** Given a suitable list of digits from 0 to *k* - 1 one can obtain any positive or negative number using `FromDigits[list, -k]`. The picture below shows the digit sequences of successive numbers in base -2; the row *j* from the bottom turns out to consist of alternating black and white blocks of length `2^j`. (In ordinary base 2 a number -*n* can be represented as on a typical electronic computer by complementing each digit, including leading 0’s.) (See also page 1093.)
 
-![](_page_917_Picture_11.jpeg)
+![](images/_page_917_Picture_11.jpeg)
 
 ■ **Non-power bases.** One can consider representing numbers by `Sum[a[n] f[n], {n, 0, Infinity}]` where the `f[n]` need not be `k^n`. So long as `f[n]` grows less rapidly than `2^n` (as when `f = Fibonacci` or `f = Prime`), digits 0 and 1 will suffice, though the representation is not generally unique. (See page 1070.)
 
 ■ **Multiplicative digit sequences.** One can consider generalizations of digit sequences in which numbers are broken into parts combined not by addition but by multiplication. Since numbers can be factored uniquely into products of powers of primes, a number can be specified by a list in which 1’s appear at the positions of the appropriate `Prime[m]^n` (which can be sorted by size) and 0’s appear elsewhere, as shown below. Note that unlike the case of ordinary additive digits, far more than `Log[m]` digits are required to specify a number *m*.
 
-![](_page_918_Figure_2.jpeg)
+![](images/_page_918_Figure_2.jpeg)
 
 ■ **Page 120 · Powers of three in base 2.** The *n*th row in the pattern shown can be obtained simply as `IntegerDigits[3^n, 2]`. Even such individual rows seem in many respects random. The picture below shows the fraction of 1’s that appear on successive rows. The fraction seems to tend to 1/2.
 
-![](_page_918_Figure_4.jpeg)
+![](images/_page_918_Figure_4.jpeg)
 
 If one looks only at the rightmost *s* columns of the pattern, one sees repetition—but the period of the repetition grows like `2^s`. Typical vertical columns have one obvious deviation from randomness: it is twice as probable for the same colors to occur on successive steps than for opposite colors. (For multiplier *m* in base *k*, the relative frequencies of pairs `{i, j}` are given by `Quotient[a i - j - 1 + m, k] - Quotient[m i - j - 1, k]`.)
 
@@ -98,7 +98,7 @@ In base 6, `(3/2)^n` is a cellular automaton with rule
 
 ■ **Multiples of irrational numbers.** Instead of powers one can consider successive multiples `Mod[h n, 1]` of a number *h*. The pictures below show results obtained as a function of *n* for various choices of *h*. (These correspond to positions of a particle bouncing around in an idealized box, as discussed on pages 971 and 1022.)
 
-![](_page_918_Figure_16.jpeg)
+![](images/_page_918_Figure_16.jpeg)
 
 When *h* is a rational number, the sequence always repeats. But in all other cases, the sequence does not repeat, and in fact it is known that a uniform distribution of values is obtained. (The average difference of successive values is maximized for `h = GoldenRatio`, as mentioned on page 891.)
 
@@ -135,7 +135,7 @@ If one applies the same kind of argument to the standard 3n+1 problem, then one 
 
 The pictures below show how many steps are needed to reach value 1 starting from different values of *n*. Case (a) is the standard 3n+1 problem. Cases (b) and (c) use somewhat different rules that yield considerably simpler behavior. In case (b), the number of steps is equal to the number of base 2 digits in *n*, while in case (c) it is determined by the number of 1’s in the base 2 digit sequence of *n*.
 
-![](_page_919_Figure_10.jpeg)
+![](images/_page_919_Figure_10.jpeg)
 
 ■ **3n+1 problem as cellular automaton.** If one writes the digits of *n* in base 6, then the rule for updating the digit sequence is a cellular automaton with 7 possible colors (color 6 works as an end marker that appears to the left and right of the actual digit sequence):
 
@@ -165,7 +165,7 @@ it is always possible to go backwards by the rule
 
 The picture shows the number of base 10 digits in numbers obtained by backward and forward evolution from `n = 8`. For `n < 8`, the system always enters a short cycle. Starting at `n = 44`, there is also a length 12 cycle. But apart from these cycles, the numbers produced always seem to grow without bound at an average rate of `3/(2 Sqrt[2])` in the forward direction, and `2 4^(1/3)/3` in the backward direction (at least all numbers up to 10,000 grow to above `10^100`). Approximately one number in 20 has the property that evolution either backward or forward from it never leads to a smaller number.
 
-![](_page_920_Figure_8.jpeg)
+![](images/_page_920_Figure_8.jpeg)
 
 ■ **Page 125 · Reversal-addition systems.** The operation that is performed here is
 
@@ -173,7 +173,7 @@ The picture shows the number of base 10 digits in numbers obtained by backward a
 
 After a few steps, the digit sequence obtained is typically reversal symmetric (a generalized palindrome) except for the interchange of 0 and 1, and for the presence of localized structures. The sequence expands by at least one digit every two steps; more rapid expansion is typically correlated with increased randomness. For most initial n, the overall pattern obtained quickly becomes repetitive, with an effective period of 4 steps. But with the initial condition n = 512, no repetition occurs for at least a million steps, at which point n has 568418 base 2 digits. The plot below shows the lengths of the successive regions of regularity visible on the right-hand edge of the picture on page 126 over the course of the first million steps.
 
-![](_page_920_Figure_12.jpeg)
+![](images/_page_920_Figure_12.jpeg)
 
 If one works directly with a digit sequence of fixed length, dropping any carries on the left, then a repetitive pattern is typically obtained fairly quickly. If one always includes one new digit on the left at every step, even when it is 0, then a rather random pattern is produced.
 
@@ -188,7 +188,7 @@ Table[FromDigits[
 
 shown below appear in algorithms such as the fast Fourier transform and, with different values of k for different coordinates, in certain quasi-Monte Carlo schemes. (See pages 1073 and 1085.) Such sequences were considered by Johannes van der Corput in 1935.
 
-![Three digit-reversal sequence plots](_page_920_digit_reversal_three_panel_row.jpeg)
+![Three digit-reversal sequence plots](images/_page_920_digit_reversal_three_panel_row.jpeg)
 
 ■ **Iterated run-length encoding.** Starting say with `{1}` consider repeatedly replacing `list` by (see page 1070)
 
@@ -208,11 +208,11 @@ Join[list, IntegerDigits[Apply[Plus, list], 2]]
 
 The resulting sequences grow in length roughly like `n Log[n]`. The picture below shows the fluctuations around *m*/2 of the cumulative number of 1’s up to position *m* in the sequence obtained at step 1000. A definite nested structure similar to picture (c) on page 130 is evident.
 
-![](_page_920_Figure_30.jpeg)
+![](images/_page_920_Figure_30.jpeg)
 
 ■ **Iterated bitwise operations.** The pictures below show digit sequences generated by repeatedly applying combinations of bitwise and arithmetic operations. The first example corresponds to elementary cellular automaton rule 60. Note that any cellular automaton rule can be reproduced by some appropriate combination of bitwise and arithmetic operations.
 
-![Six digit-sequence panels generated by iterated bitwise operations](_page_921_iterated_bitwise_operations_six_panel_row.jpeg)
+![Six digit-sequence panels generated by iterated bitwise operations](images/_page_921_iterated_bitwise_operations_six_panel_row.jpeg)
 
 ### Recursive Sequences
 
@@ -307,7 +307,7 @@ Note that the positive and negative fluctuations in sequence (f) are not complet
 
 In the sequences discussed here, `f[n_]` always has the form `f[p[n]] + f[q[n]]`. The plots at the top of the next page show `p[n]` and `q[n]` as a function of *n*.
 
-![](_page_922_Figure_2.jpeg)
+![](images/_page_922_Figure_2.jpeg)
 
 The process of evaluating f[n] for a particular n can be thought of as yielding a tree where each node is a particular f[k] which has two successors, f[p[k]] and f[q[k]]. The distinct nodes reached starting from f[12] for sequence (f) are then for example {{12}, {3, 7}, {1, 2, 4}, {1, 2}, {1}}. The total lengths of these chains (corresponding to the depth of the evaluation tree) seem to increase roughly like Log[n] for all the rules on this page. For the Fibonacci sequence, it is instead n-1. The maximum number of distinct nodes at any level in the tree has large fluctuations but its peaks seem to increase roughly linearly for all the rules on this page (in the Fibonacci case it is Ceiling[n/2]).
 
@@ -385,11 +385,11 @@ Fold[Fold[2^Ceiling[Log[2, Ceiling[(#1 + 2)/(#2 + 2)]]]
 
 Its first zeros are at `{4, 126, 813, 966, 1166, 1177, 1666, 1897}`.
 
-![](_page_923_Figure_10.jpeg)
+![](images/_page_923_Figure_10.jpeg)
 
 Each zero is immediately followed by a maximum equal to x, and as picture below shows, values tend to accumulate for example on lines of the form  $\pm x/2^u \pm (2m + 1)2^v$ .
 
-![](_page_923_Figure_12.jpeg)
+![](images/_page_923_Figure_12.jpeg)
 
 Note that functions of the form Nest[r[c[s, z], #] &, c[s, s], n] are given in terms of the original Ackermann function in the note above by f[n + 1, 2, # + 1] - 1 &.
 
@@ -397,7 +397,7 @@ Before the example above one might have thought that primitive recursive functio
 
 Among functions with simple explicit definitions, essentially the only examples known fundamentally to be not primitive recursive are ones closely related to the Ackermann function. But given an enumeration of primitive recursive functions (say ordered first by LeafCount, then with Sort) in which the  $m^{th}$  function is w[m] diagonalization (see page 1128) yields the function w[x][x] shown below which cannot be primitive recursive. It is inevitable that the function shown must eventually grow faster than any primitive recursive function (at x = 356 its value is 63190, while at x = 1464 it is 1073844). But by reducing the results modulo 2 one gets a function that does not grow—and has seemingly quite random behavior—yet is presumably again not primitive recursive.
 
-![](_page_923_Figure_17.jpeg)
+![](images/_page_923_Figure_17.jpeg)
 
 (Note that multiple arguments to a recursive function can be encoded as a single argument using functions like the  $\beta$  of page 1120—though the irregularity of such functions tends to make it difficult then to tell what is going on in the underlying recursive function.)
 
@@ -407,7 +407,7 @@ Among functions with simple explicit definitions, essentially the only examples 
 
 With this initial condition, the sequence is known to go on forever. At least up to `n = 10^6` terms, it increases roughly like `13.5 n`, but as shown below the fluctuations seem random.
 
-![](_page_923_Figure_21.jpeg)
+![](images/_page_923_Figure_21.jpeg)
 
 ### The Sequence of Primes
 
@@ -424,13 +424,13 @@ Module[{q = n + k - 1, s = 1},
 
 If a cell is going to survive for *s* steps, then it turns out that this can be determined by looking at the last *s* digits in the base *k* representation of its position. For `k = 2`, a cell survives for *s* steps if these digits are all 0 (so that `s == IntegerExponent[n, k]`). But for `k > 2`, no such simple characterization appears to exist.
 
-![](_page_924_Figure_7.jpeg)
+![](images/_page_924_Figure_7.jpeg)
 
 If the cells are arranged on a circle of size *n*, the question of which cell is removed last is the so-called Josephus problem. The solution is `Fold[Mod[#1 + k, #2, 1] &, 0, Range[n]]`, or `FromDigits[RotateLeft[IntegerDigits[n, 2]], 2]` for `k = 2`.
 
 ■ **Page 132 · Divisors.** The picture below shows as black squares the divisors of each successive number (which correspond to the gray dots in the picture in the main text). Primes have divisors 1 and *n* only. (See also pages 902 and 747.)
 
-![Divisor-count and divisor-sum sequence plots](_page_924_divisors_two_panel_row.jpeg)
+![Divisor-count and divisor-sum sequence plots](images/_page_924_divisors_two_panel_row.jpeg)
 
 ■ **Page 133 · Results about primes.** `Prime[n]` is given approximately by `n Log[n] + n Log[Log[n]]`. (`Prime[10^9]` is 22,801,763,489 while the approximation gives `2.38 × 10^10`.) A first approximation to `PrimePi[n]` is `n/Log[n]`. A somewhat better approximation is `LogIntegral[n]`, equal to `Integrate[1/Log[t], {t, 2, n}]`. This was found empirically by Carl Friedrich Gauss in 1792, based on looking at a table of primes. (`PrimePi[10^9]` is 50,847,534 while `LogIntegral[10^9]` is about 50,849,235.) A still better approximation is obtained by subtracting `Sum[LogIntegral[n^r[i]], {i, -Infinity, Infinity}]` where the `r[i]` are the complex zeros of the Riemann zeta function `Zeta[s]`, discussed on page 918. According to the Riemann Hypothesis, the difference between `PrimePi[n]` and `LogIntegral[n]` is of order `Sqrt[n] Log[n]`. More refined analytical estimates of `PrimePi[n]` are good enough that they are used by *Mathematica* to compute `Prime[n]` for large *n*.
 
@@ -476,17 +476,17 @@ It was proved in 1937 by Ivan Vinogradov that any large odd integer can be expre
 
 ■ **Spectra.** The pictures below show frequency spectra obtained from the sequences in the main text. Some regularity is evident, and in cases (a) and (b) it can be understood from trigonometric sum formulas of Ramanujan discussed above (see also pages 586 and 1081).
 
-![](_page_926_Figure_9.jpeg)
+![](images/_page_926_Figure_9.jpeg)
 
 ■ **Perfect numbers.** Perfect numbers with the property that `Apply[Plus, Divisors[n]] == 2 n` have been studied since at least the time of Pythagoras around 500 BC. The first few perfect numbers are `{6, 28, 496, 8128, 33550336}` (a total of 39 are currently known). It was shown by Euclid in 300 BC that `2^(n - 1) (2^n - 1)` is a perfect number whenever `2^n - 1` is prime. Leonhard Euler then proved around 1780 that every even perfect number must have this form. The values of *n* for the known Mersenne primes `2^n - 1` are shown below. These values can be found using the so-called Lucas-Lehmer test `Nest[Mod[#^2 - 2, 2^n - 1] &, 4, n - 2] == 0`, and in all cases *n* itself must be prime.
 
-![](_page_926_Figure_11.jpeg)
+![](images/_page_926_Figure_11.jpeg)
 
 Whether any odd perfect numbers exist is probably the single oldest unsolved problem in mathematics. It is known that any odd perfect number must be greater than  $10^{300}$ , must have a factor of at least  $10^6$ , and must be less than  $4^{4^s}$  if it has only s prime factors. Looking at curve (b) on page 135, however, it does not seem inconceivable that an odd perfect number could exist. For odd n up to 500 million the only values near 0 that appear in the curve are {-6, -5, -4, -2, -1, 6, 18, 26, 30, 36}, with, for example, the first 6 occurring at n = 8925 and last 18 occurring at n = 159030135. Various generalizations of perfect numbers have been considered, requiring for example IntegerQ[DivisorSigma[1, n]/n] (pluperfect) or Abs[DivisorSigma[1, n] - 2n] < r (quasiperfect).
 
 ■ **Iterated aliquot sums.** Related to case (b) above is a system which repeats the replacement `n -> Apply[Plus, Divisors[n]] - n` or equivalently `n -> DivisorSigma[1, n] - n`. The fixed points of this procedure are the perfect numbers (see above). Other numbers usually evolve to perfect numbers, or to short repetitive sequences of numbers. But if one starts, for example, with the number 276, then the picture below shows the number of base 10 digits in the value obtained at each step.
 
-![](_page_926_Figure_14.jpeg)
+![](images/_page_926_Figure_14.jpeg)
 
 After 500 steps, the value is the 53-digit number
 
@@ -538,7 +538,7 @@ Sum[16^-k (4/(8 k + 1) - 2/(8 k + 4) -
 
 A similar approach can also be used for many other constants that can be viewed as related to values of *PolyLog*.
 
-![](_page_927_Figure_14.jpeg)
+![](images/_page_927_Figure_14.jpeg)
 
 ■ **Page 139 · Rational numbers.** The pictures above show the base 2 digit sequences of numbers m/n for successive m.
 
@@ -568,15 +568,15 @@ The fact that nested digit sequences do not correspond to algebraic numbers foll
 
 ■ **Concatenation sequences.** One can consider forming sequences by concatenating digits of successive integers in base k, as in Flatten[Table[IntegerDigits[i, k], {i, n}]]. In the limit, such sequences contain with equal frequency all possible blocks of any given length, but as shown on page 597, they exhibit other obvious deviations from randomness. The picture below shows the k = 2 sequence chopped into length 256 blocks.
 
-![](_page_928_Figure_9.jpeg)
+![](images/_page_928_Figure_9.jpeg)
 
 Applying FoldList[Plus, 0, 2 list - 1] to the whole sequence yields the pattern shown below.
 
-![](_page_928_Figure_11.jpeg)
+![](images/_page_928_Figure_11.jpeg)
 
 The systematic increase is a consequence of the leading 1 in each concatenated sequence. Dropping this 1 yields the pattern below.
 
-![](_page_928_Figure_13.jpeg)
+![](images/_page_928_Figure_13.jpeg)
 
 This is similar to picture (c) on page 131, and is a digit-by-digit version of
 
@@ -609,7 +609,7 @@ k/(k - 1)^2 - (k - 1) Sum[
 
 Concatenation sequences can also be generated by joining together digits from other representations of numbers; the picture below shows results for the Gray code representation from page 901.
 
-![](_page_928_Figure_22.jpeg)
+![](images/_page_928_Figure_22.jpeg)
 
 ■ **Specially constructed transcendental numbers.** Numbers known to be transcendental include ones whose digit sequences contain 1’s only at positions *n*!, $2^n$ or `Fibonacci[n]`. Concatenation sequences, as well as generalizations formed by concatenating values of polynomials at successive integer points, are also known to yield numbers that are transcendental.
 
@@ -630,7 +630,7 @@ Fold[1/#1+#2 &, Last[list], Rest[Reverse[list]]]
 
 The pictures below show the digit sequences of successive iterates obtained from NestList[1/Mod[#, 1] &, x, n] for several numbers x.
 
-![Six continued-fraction digit-sequence examples](_page_929_continued_fraction_iterates_six_panel_row.jpeg)
+![Six continued-fraction digit-sequence examples](images/_page_929_continued_fraction_iterates_six_panel_row.jpeg)
 
 Unlike ordinary digits, the individual terms in a continued fraction can be of any size. In the continued fraction for a randomly chosen number, the probability to find a term of size s is Log[2, (1+1/s)/(1+1/(s+1))], so that the probability of getting a 1 is about 41.50%, and the probability of getting a large term falls off like  $1/s^2$ . If one looks at many terms, then their geometric mean is finite, and approaches Khinchin’s constant *Khinchin*  $\approx 2.68545$ .
 
@@ -658,7 +658,7 @@ is 1,501,790. The presence of a large term indicates a close approximation to a 
 
 Numbers with digits given by concatenation sequences in any base k (see note above) seem to have unusual continued fractions, in which most terms are fairly small, but some are extremely large. Thus with k = 2, term 30 is 4,534,532, term 64 is 4,682,854,730,443,938, term 152 is about  $2 \times 10^{34}$  and term 669,468 is about  $2 \times 10^{78902}$ . (For the k = 10 case of the original Champernowne number, even term 18 is already about  $5 \times 10^{165}$ .) The plots below of the numbers of digits in successive terms turn out to have patterns of peaks that show some signs of nesting.
 
-![](_page_930_Picture_4.jpeg)
+![](images/_page_930_Picture_4.jpeg)
 
 In analogy to digits in a concatenation sequence the terms in the sequence
 
@@ -673,15 +673,15 @@ The pictures below show as a function of *n* the quantity
 
 which gives a measure of the closeness of successive rational approximations to x. For any irrational number this quantity cannot be less than 2, while for algebraic irrationals Klaus Roth showed in 1955 that it can only have finitely many peaks that reach above any specified level.
 
-![](_page_930_Figure_10.jpeg)
+![](images/_page_930_Figure_10.jpeg)
 
 ■ **History.** Euclid’s algorithm states that starting from integers `{a, b}` iterating `{a_, b_} -> If[a > b, {a - b, b}, {a, b - a}]` eventually leads to `{GCD[a, b], 0}`. (See page 1093.) The pictures below show how this works. The numbers of successively smaller squares (corresponding to the numbers of steps in the algorithm) turn out to be exactly `ContinuedFraction[a/b]`.
 
-![](_page_930_Picture_12.jpeg)
+![](images/_page_930_Picture_12.jpeg)
 
 It was discovered in antiquity that Euclid’s algorithm starting with  $\{x, 1\}$  terminates only when x is rational. In all cases, however, the relationship with continued fractions remains, as below.
 
-![](_page_930_Picture_14.jpeg)
+![](images/_page_930_Picture_14.jpeg)
 
 Infinite continued fractions appear to have first been explicitly written down in the mid-1500s, and to have become popular in many problems in number theory by the 1700s. Leonhard Euler studied many continued fractions, while Joseph Lagrange seems to have thought that it might be possible to recognize any algebraic number from its continued fraction. The periodicity of continued fractions for quadratic irrationals was proved by Evariste Galois in 1828. From the late 1800s interest in continued fractions as such waned; it finally increased again in the 1980s in connection with problems in dynamical systems theory.
 
@@ -704,14 +704,14 @@ Union[Flatten[Table[a/b, {b, n}, {a, 0, b}]]]
 
 (See also pages 892, 932 and 1084.)
 
-![Five digital-slope examples](_page_931_digital_slope_five_panel_row.jpeg)
+![Five digital-slope examples](images/_page_931_digital_slope_five_panel_row.jpeg)
 
 ■ **Representations for integers.** See page 560.
 ■ **Operator representations.** Instead of repeatedly applying an operation to a sequence of digits one can consider forming integers (or other numbers) by performing trees of operations on a single constant. Thus, for example, any integer *m* can be obtained by a tree of *m* - 1 additions of 1’s such as `(1 + (1 + 1)) + 1`. Another operator that can be used to generate any integer is $a \circ b = 2a + b - 1$. In this case 6 is $(1 \circ (1 \circ 1)) \circ 1$, and an integer *m* can be obtained by `Tr[1 + IntegerDigits[m, 2]] - 2` or at most `Log[2, m]` applications of $\circ$. The operator $k a + b - k + 1$ can be used for any *k*. It also turns out that `BitXor[2 a, b] + 1` works, though in this case even for 2 the smallest representation is $(1 \circ 1) \circ (1 \circ ((1 \circ 1) \circ 1))$. (For `BitOr[2 a, b] - 1` the number of applications needed is `With[{i = IntegerDigits[m, 2]}, Tr[i + 1] + i[[2]] (1 + i[[3]]) - 1]`.) The pictures below show the smallest number of operator applications required for successive integers. With the pair of operators *a* + *b* and $a \times b$ (a case considered in recreational
 
 mathematics for n-ary operators) numbers of the form  $3^s$  have particularly small representations. Note that in all cases the size of the smallest representation must at some level increase like Log[m] (compare pages 1067 and 1070), but there may be some “algorithmically simple” integers that have shorter representations.
 
-![](_page_931_Figure_17.jpeg)
+![](images/_page_931_Figure_17.jpeg)
 
 ■ **Number classification.** One can imagine classifying real numbers in terms of what kinds of operations are needed to obtain them from integers. Rational numbers require only division (or solving linear equations), while algebraic numbers require solving polynomial equations. Rather little is known about numbers that require solving transcendental equations—and indeed it can even be undecidable (see page 1138) whether two equations can yield the same number. Starting with integers and then applying arithmetic operations and fractional powers one can readily reproduce all algebraic numbers up to degree 4, but not beyond. The sets of numbers that can be obtained by applying elementary functions like Exp, Log and Sin seem in various ways to be disjoint from algebraic numbers. But if one applies multivariate elliptic or hypergeometric functions it was established in the late 1800s and early 1900s that one can in principle reach any algebraic number. One can also ask what numbers can be generated by integrals (or by solving differential equations). For rational functions `f[x]`, `Integrate[f[x], {x, 0, 1}]` must always be a linear function of `Log` and `ArcTan` applied to algebraic numbers (`f[x] = 1/(1 + x^2)` for example yields $\pi/4$). Multiple integrals of rational functions can be more complicated, as in
 
@@ -729,7 +729,7 @@ and presumably often cannot be expressed at all in terms of standard mathematica
 
 ■ **Lissajous figures.** Plotting multiple sine functions each on different coordinate axes yields so-called Lissajous or Bowditch figures, as illustrated below. If the coefficients inside all the sine functions are rational, then going from *t* = 0 to `t = 2 Pi Apply[LCM, Map[Denominator, list]]` yields a closed curve. Irrational ratios of coefficients lead to curves that never close and eventually fill space uniformly.
 
-![](_page_932_Figure_6.jpeg)
+![](images/_page_932_Figure_6.jpeg)
 
 ■ **Page 146 · Two sine functions.** Sin[ax] + Sin[bx] can be rewritten as 2 Sin[1/2(a+b)x] Cos[1/2(a-b)x] (using TrigFactor), implying that the function has two families of equally spaced zeros:  $2 \pi n/(a+b)$  and  $2 \pi (n+1/2)/(b-a)$ .
 ■ **Differential equations.** The function  $Sin[x] + Sin[\sqrt{2} x]$  can be obtained as the solution of the differential equation y''[x] + 2y[x] - Sin[x] == 0 with the initial conditions y[0] == 0, y'[0] == 2.
@@ -738,13 +738,13 @@ and presumably often cannot be expressed at all in terms of standard mathematica
 
 real axis (even say for a = 1, b = 3/2, c = 5/3), as shown in the pictures below.
 
-![](_page_932_Figure_12.jpeg)
+![](images/_page_932_Figure_12.jpeg)
 
-![Lower contour plot for three incommensurate sine terms](_page_932_three_sine_functions_lower_contour.jpeg)
+![Lower contour plot for three incommensurate sine terms](images/_page_932_three_sine_functions_lower_contour.jpeg)
 
 If a, b and c are rational, Sin[ax] + Sin[bx] + Sin[cx] is periodic with period  $2\pi/GCD[a, b, c]$ , and there are a limited number of different spacings between zeros. But in a case like  $Sin[x] + Sin[\sqrt{2} x] + Sin[\sqrt{3} x]$  there is a continuous distribution of spacings between zeros, as shown on a logarithmic scale below. (For  $0 < x < 10^6$  there are a total of 448,494 zeros, with maximum spacing  $\simeq 4.6$  and minimum spacing  $\simeq 0.013$ .)
 
-![Two zero-spacing distributions for three-sine functions](_page_932_zero_spacing_two_panel_row.jpeg)
+![Two zero-spacing distributions for three-sine functions](images/_page_932_zero_spacing_two_panel_row.jpeg)
 
 ■ **Page 147 · Substitution systems.** Cos[ax] - Cos[bx] has two families of zeros:  $2\pi n/(a+b)$  and  $2\pi n/(b-a)$ . Assuming b > a > 0, the number of zeros from the second family which appear between the  $n^{th}$  and  $n + 1^{th}$  zero from the first family is
 
@@ -754,7 +754,7 @@ and as discussed on page 903 this sequence can be obtained by applying a sequenc
 
 ■ **Many sine functions.** Adding many sine functions yields a so-called Fourier series (see page 1074). The pictures below show  $Sum[Sin[nx]/n, \{n, k\}]$  for various numbers of terms k. Apart from a glitch that gets narrower with increasing k (the so-called Gibbs phenomenon), the result has a simple triangular form. Other so-called Fourier series in which the coefficient of Sin[mx] is a smooth function of m for all integer m yield similarly simple results.
 
-![](_page_932_Figure_20.jpeg)
+![](images/_page_932_Figure_20.jpeg)
 
 The pictures below show  $Sum[Sin[n^2 x]/n^2, \{n, k\}]$ , where in effect all coefficients of Sin[mx] other than those where m is
 
@@ -762,15 +762,15 @@ a perfect square are set to zero. The result is a much more complicated curve. N
 
 `(Pi/(2 q))^2 Sum[Sin[n^2 p Pi/q]/Sin[n Pi/(2 q)]^2, {n, q - 1}]`
 
-![](_page_933_Figure_3.jpeg)
+![](images/_page_933_Figure_3.jpeg)
 
 The pictures below show  $Sum[Cos[2^n x], \{n, k\}]$  (as studied by Karl Weierstrass in 1872). The curves obtained in this case show a definite nested structure, in which the value at a point x is essentially determined directly from the base 2 digit sequence of x. (See also page 1080.)
 
-![](_page_933_Figure_5.jpeg)
+![](images/_page_933_Figure_5.jpeg)
 
 The curves below are approximations to  $Sum[Cos[2^n x]/2^{an}, \{n, \infty\}]$ . They can be thought of as having dimensions 2-a and smoothed power spectra  $\omega^{-(1+2a)}$ .
 
-![](_page_933_Figure_7.jpeg)
+![](images/_page_933_Figure_7.jpeg)
 
 ■ **FM synthesis.** More complicated curves can be obtained for example using FM synthesis, as discussed on page 1079.
 ■ **Page 148 · Zeta function.** For real *s* the Riemann zeta function `Zeta[s]` is given by `Sum[1/n^s, {n, Infinity}]` or `Product[1/(1 - Prime[n]^-s), {n, Infinity}]`. The zeta function as analytically continued for complex *s* was studied by Bernhard Riemann in 1859, who showed that `PrimePi[n]` could be approximated (see page 909) up to order $\sqrt{n}$ by `LogIntegral[n] - Sum[LogIntegral[n^r[i]], {i, -Infinity, Infinity}]`, where the `r[i]` are the complex zeros of `Zeta[s]`. The Riemann Hypothesis then states that all `r[i]` satisfy `Re[r[i]] == 1/2`, which implies a certain randomness in the distribution of prime numbers, and a bound of order $\sqrt{n}\,Log[n]$ on `PrimePi[n] - LogIntegral[n]`. The Riemann Hypothesis is also equivalent to the statement that a bound of order $\sqrt{n}\,Log[n]^2$ exists on `Abs[Log[Apply[LCM, Range[n]]] - n]`.
@@ -823,13 +823,13 @@ on the computer, and
 
 on the calculator. In both cases the limited number of digits implies behavior that ultimately repeats—but only long after the other effects we discuss have occurred.)
 
-![](_page_934_Picture_17.jpeg)
+![](images/_page_934_Picture_17.jpeg)
 
 For the first several steps, the results as shown at the top of each corresponding picture agree. But as soon as the effect of sampling beyond the digits explicitly stored in the initial condition becomes important, the results are completely different. The computer gives simply 0, but the pocket calculator yields apparently random sequences—which turn out to be analogous to those discussed on page 319.
 
 Other chaotic systems have a similar sensitivity to the details of computer arithmetic. But the simple behavior of the shift map turns out to be rather rare: in most cases—such as the multiplication by 3/2 shown in the pictures below—apparent randomness is produced, even on a typical computer.
 
-![](_page_935_Picture_3.jpeg)
+![](images/_page_935_Picture_3.jpeg)
 
 It is important to realize however that this randomness has little to do with the details of the initial conditions. Instead, just as in other examples in this book, the randomness arises from an intrinsic process that occurs even with the simple repetitive initial condition shown in pictures (c) and (d) above.
 
@@ -850,7 +850,7 @@ Many mathematicians may object that digit sequences are just too fragile an enti
 
 sequences obtained with this map starting from x = 1/8 are shown below for various values of a. The quadratic nature of the map typically causes the total number of digits to double at each step. But at least for small a, progressively more digits on the left show purely repetitive behavior. As a increases, the repetition period goes through a series of doublings. The detailed behavior is different for every value of a, but whenever the repetition period is  $2^{j}$ , it turns out that with any initial condition the leftmost digit always eventually follows a sequence that consists of repetitions of step j in the evolution of the substitution system  `{1 -> {1, 0}, 0 -> {1, 1}}`  starting either from  $\{0\}$  or  $\{1\}$ . As a approaches 3.569946, the period doublings get closer and closer together, and eventually a point is reached at which the sequence of leftmost digits is no longer repetitive but instead corresponds to the nested pattern formed after an infinite number of steps in the evolution of the substitution system. (An important result discovered by Mitchell Feigenbaum in 1975 is that this basic setup is universal to all smooth maps whose functions have a single hump.) When a is increased further, there is usually no longer repetitive or nested behavior. And although there are typically some constraints, the behavior obtained tends to depend on the details of the digit sequence of the initial conditions. In the special case a = 4, it turns out that replacing x by  $Sin[\pi u]^2$ makes the mapping become just  $u \rightarrow FractionalPart[2u]$ , revealing simple shift map dependence on the initial digit sequence. (See pages 1090 and 1098.)
 
-![](_page_936_Picture_3.jpeg)
+![](images/_page_936_Picture_3.jpeg)
 
 ■ **Higher-dimensional generalizations.** One can consider so-called Anosov maps such as `{x, y} -> Mod[m . {x, y}, 1]` where *m* is a matrix such as `{{2, 1}, {1, 1}}`. Any initial condition containing only rational numbers will then yield repetitive behavior, much as in the shift map. But as soon as *m* itself contains rational numbers, complicated behavior can be obtained even with an initial condition such as `{1, 1}`.
 ■ **Distribution of chaotic behavior.** For iterated maps, unlike for discrete systems such as cellular automata, one can get continuous ranges of rules by varying parameters. With maps based on piecewise linear functions the regions of parameters in which chaotic behavior occurs typically have simple shapes; with maps based, say, on quadratic
@@ -882,7 +882,7 @@ to be studied with extensive computer simulations in the early 1980s, probably f
 
 ■ **Page 158 · Properties.** At step t the background is FractionalPart[at]. For rational a this always repeats, cycling through Denominator[a] possible values (compare page 255). In most patterns generated from initial conditions containing say a single black cell most cells whose values are not forced to be the same end up being at least slightly different—even in cases like a = 0.375. Note that in cases like a = 0.475 there is some trace of a pattern at every step—but it only becomes obvious when it makes values wrap around from 1 to 0. The pictures below show successive colors of (a) the background (compare page 950) and (b) the center cell for each a = n/500 from 0 to 1 for the systems on page 159. (Compare page 243.)
 
-![Background and center-cell colors across continuous cellular-automaton parameters](_page_937_continuous_ca_successive_colors_clean.jpeg)
+![Background and center-cell colors across continuous cellular-automaton parameters](images/_page_937_continuous_ca_successive_colors_clean.jpeg)
 
 If *a* is not a rational number the background never repeats, but the main features of patterns obtained seem similar.
 
@@ -892,7 +892,7 @@ Mod[RotateLeft[list] + RotateRight[list], 1]
 
 With a single nonzero initial cell with value 1/k the pattern produced is just Pascal’s triangle modulo k. If k is a rational number only a limited set of values appear, and the pattern has a nested form analogous to those shown on page 870. If k is irrational then equidistribution of Mod[Binomial[t, x], k] implies that all possible values eventually appear; the corresponding patterns seem fairly irregular, as shown below. (Compare pages 953 and 1092.)
 
-![](_page_937_Picture_8.jpeg)
+![](images/_page_937_Picture_8.jpeg)
 
 ■ **Probabilistic cellular automata.** As an alternative to having continuous values at each cell, one can consider ordinary cellular automata with discrete values, but introduce probabilities for, say, two different rules to be applied at each cell. Examples of probabilistic cellular automata are shown on page 591; their behavior is typically quite similar to continuous cellular automata.
 
@@ -914,11 +914,11 @@ The wave equation represents the propagation of linear waves, for example along 
 
 ■ **Nonlinearity.** The pictures below show behavior with initial conditions containing two Gaussians (and periodic boundary conditions). The diffusion and wave equations are linear, so that results are linear sums of those with single Gaussians. The sine-Gordon equation is nonlinear, but its solutions satisfy a generalized linear superposition principle. The equation from page 165 shows no such simple superposition principle. Note that even with a linear equation, fairly complicated patterns of behavior can sometimes emerge as a result of boundary conditions.
 
-![Wave, sine-Gordon, and page-165 equation superposition examples](_page_938_pde_nonlinearity_three_panel_row.jpeg)
+![Wave, sine-Gordon, and page-165 equation superposition examples](images/_page_938_pde_nonlinearity_three_panel_row.jpeg)
 
 ■ **Higher dimensions.** The pictures below show as examples the solution to the wave equation in 1D, 2D and 3D starting from a stationary square pulse.
 
-![Wave-equation solutions in one, two, and three dimensions](_page_938_wave_equation_1d_2d_3d_time_slices.jpeg)
+![Wave-equation solutions in one, two, and three dimensions](images/_page_938_wave_equation_1d_2d_3d_time_slices.jpeg)
 
 In each case a 1D slice through the solution is shown, and the solution is multiplied by  $r^{d-1}$ . For the wave equation, and for a fair number of other equations, even and odd dimensions behave differently. In 1D and 3D, the value at the origin quickly becomes exactly 0; in 2D it is given by  $1-t/Sqrt[t^2-1]$ , which tends to zero only like  $-1/(2t^2)$ (which means that a sound pulse cannot propagate in a normal way in 2D).
 
@@ -982,7 +982,7 @@ In all cases (except when $-8/3 < a < -1/\sqrt{6}$), the solution is periodic an
 
 Several things can go wrong, however. The pictures below show as one example what happens with the diffusion equation when the cells have size dt in time and dx in space. So long as the so-called Courant condition dt/dx < 1/2 is satisfied, the results are correct. But when dt/dx is made larger, an instability develops, and the discrete approximation yields completely different results from the continuous PDE.
 
-![](_page_939_Picture_14.jpeg)
+![](images/_page_939_Picture_14.jpeg)
 
 Many methods beyond finite differences have been invented over the past 30 years for finding numerical solutions to PDEs. All however ultimately involve discretization, and can suffer from difficulties that are similar—though often more insidious—to those for finite differences.
 
@@ -1021,7 +1021,7 @@ PDEEvolveList[PDEKernel[
 
 For both this example and the middle one the results converge rapidly as dx decreases. But for the bottom example, the pictures below show that convergence is not so rapid, and indeed, as is typical in working with PDEs, despite having used large amounts of computer time I do not know whether the details of the picture in the main text are really correct. The energy function (see above) is at least roughly conserved, but it seems quite likely that the “shocks” visible are merely a consequence of the discretization procedure used.
 
-![Three PDE convergence examples at decreasing spatial step sizes](_page_939_pde_convergence_three_panel_row.jpeg)
+![Three PDE convergence examples at decreasing spatial step sizes](images/_page_939_pde_convergence_three_panel_row.jpeg)
 
 ■ **Different powers.** The equations
 
@@ -1029,7 +1029,7 @@ $$\partial_{tt} u[t, x] = \partial_{xx} u[t, x] + (1 - u[t, x]^n) (1 + a u[t, x]
 
 with n = 4, 6, 8, etc. appear to show similar behavior to the n = 2 equation in the main text.
 
-![](_page_940_Picture_4.jpeg)
+![](images/_page_940_Picture_4.jpeg)
 
 ■ **Other PDEs.** The pictures above show three PDEs that have been studied in recent years. All are of the so-called parabolic type, so that, unlike my equation, they have no limit on the rate of information propagation, and thus a solution in any region immediately depends on values on the boundary—which in the pictures below is taken to be periodic. (The deterministic Kardar-Parisi-Zhang equation $\partial_t u[t, x] = a \partial_{xx} u[t, x] + \frac{1}{2} b (\partial_x u[t, x])^2$ yields behavior like Burger’s equation, but symmetrical. Note that `Abs[u]` is plotted in the second picture, while for the last equation a common less symmetrical form replaces the last term by $u[t, x] \partial_x u[t, x]$.)
 

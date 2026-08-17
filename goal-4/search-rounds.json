@@ -813,7 +813,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -827,7 +827,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -841,7 +841,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -855,7 +855,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -869,7 +869,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -883,7 +883,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -897,7 +897,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -911,7 +911,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -925,7 +925,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1780,7 +1780,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1794,7 +1794,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1808,7 +1808,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1822,7 +1822,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1836,7 +1836,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1850,7 +1850,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1864,7 +1864,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1878,7 +1878,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -1892,7 +1892,7 @@
           "scope_paths": [
             "FRONT-MATTER/00-Publication-and-Contents.md",
             "FRONT-MATTER/01-Preface.md",
-            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             "BACK-MATTER/Colophon.md"
           ],
           "whole_word": false
@@ -3581,7 +3581,7 @@
           "query_id": "Q0019",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3593,7 +3593,7 @@
           "query_id": "Q0020",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3605,7 +3605,7 @@
           "query_id": "Q0021",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3617,7 +3617,7 @@
           "query_id": "Q0022",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3629,7 +3629,7 @@
           "query_id": "Q0023",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3641,7 +3641,7 @@
           "query_id": "Q0024",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3653,7 +3653,7 @@
           "query_id": "Q0025",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3665,7 +3665,7 @@
           "query_id": "Q0026",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3677,7 +3677,7 @@
           "query_id": "Q0027",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3689,7 +3689,7 @@
           "query_id": "Q0028",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -3701,7 +3701,7 @@
           "query_id": "Q0029",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         }
@@ -5456,7 +5456,7 @@
           "query_id": "Q0030",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5468,7 +5468,7 @@
           "query_id": "Q0031",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5480,7 +5480,7 @@
           "query_id": "Q0032",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5492,7 +5492,7 @@
           "query_id": "Q0033",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5504,7 +5504,7 @@
           "query_id": "Q0034",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5516,7 +5516,7 @@
           "query_id": "Q0035",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5528,7 +5528,7 @@
           "query_id": "Q0036",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5540,7 +5540,7 @@
           "query_id": "Q0037",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5552,7 +5552,7 @@
           "query_id": "Q0038",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5564,7 +5564,7 @@
           "query_id": "Q0039",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         },
@@ -5576,7 +5576,7 @@
           "query_id": "Q0040",
           "scope_paths": [
             "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md",
-            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+            "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
           ],
           "whole_word": false
         }
@@ -12653,7 +12653,7 @@
           "query_id": "Q0041",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12665,7 +12665,7 @@
           "query_id": "Q0042",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12677,7 +12677,7 @@
           "query_id": "Q0043",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12689,7 +12689,7 @@
           "query_id": "Q0044",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12701,7 +12701,7 @@
           "query_id": "Q0045",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12713,7 +12713,7 @@
           "query_id": "Q0046",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12725,7 +12725,7 @@
           "query_id": "Q0047",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12737,7 +12737,7 @@
           "query_id": "Q0048",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12749,7 +12749,7 @@
           "query_id": "Q0049",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12761,7 +12761,7 @@
           "query_id": "Q0050",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12773,7 +12773,7 @@
           "query_id": "Q0051",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -12785,7 +12785,7 @@
           "query_id": "Q0052",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         }
@@ -20223,7 +20223,7 @@
           "query_id": "Q0053",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20235,7 +20235,7 @@
           "query_id": "Q0054",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20247,7 +20247,7 @@
           "query_id": "Q0055",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20259,7 +20259,7 @@
           "query_id": "Q0056",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20271,7 +20271,7 @@
           "query_id": "Q0057",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20283,7 +20283,7 @@
           "query_id": "Q0058",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20295,7 +20295,7 @@
           "query_id": "Q0059",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20307,7 +20307,7 @@
           "query_id": "Q0060",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20319,7 +20319,7 @@
           "query_id": "Q0061",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20331,7 +20331,7 @@
           "query_id": "Q0062",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20343,7 +20343,7 @@
           "query_id": "Q0063",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         },
@@ -20355,7 +20355,7 @@
           "query_id": "Q0064",
           "scope_paths": [
             "CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md",
-            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md"
+            "BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md"
           ],
           "whole_word": false
         }
@@ -35560,7 +35560,7 @@
           "query_id": "Q0065",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35572,7 +35572,7 @@
           "query_id": "Q0066",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35584,7 +35584,7 @@
           "query_id": "Q0067",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35596,7 +35596,7 @@
           "query_id": "Q0068",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35608,7 +35608,7 @@
           "query_id": "Q0069",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35620,7 +35620,7 @@
           "query_id": "Q0070",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35632,7 +35632,7 @@
           "query_id": "Q0071",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35644,7 +35644,7 @@
           "query_id": "Q0072",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35656,7 +35656,7 @@
           "query_id": "Q0073",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35668,7 +35668,7 @@
           "query_id": "Q0074",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35680,7 +35680,7 @@
           "query_id": "Q0075",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35692,7 +35692,7 @@
           "query_id": "Q0076",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35704,7 +35704,7 @@
           "query_id": "Q0077",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -35716,7 +35716,7 @@
           "query_id": "Q0078",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         }
@@ -51514,7 +51514,7 @@
           "query_id": "Q0079",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51526,7 +51526,7 @@
           "query_id": "Q0080",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51538,7 +51538,7 @@
           "query_id": "Q0081",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51550,7 +51550,7 @@
           "query_id": "Q0082",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51562,7 +51562,7 @@
           "query_id": "Q0083",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51574,7 +51574,7 @@
           "query_id": "Q0084",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51586,7 +51586,7 @@
           "query_id": "Q0085",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51598,7 +51598,7 @@
           "query_id": "Q0086",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51610,7 +51610,7 @@
           "query_id": "Q0087",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51622,7 +51622,7 @@
           "query_id": "Q0088",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51634,7 +51634,7 @@
           "query_id": "Q0089",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51646,7 +51646,7 @@
           "query_id": "Q0090",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51658,7 +51658,7 @@
           "query_id": "Q0091",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         },
@@ -51670,7 +51670,7 @@
           "query_id": "Q0092",
           "scope_paths": [
             "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+            "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
           ],
           "whole_word": false
         }
@@ -78866,7 +78866,7 @@
           "query_id": "Q0093",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78878,7 +78878,7 @@
           "query_id": "Q0094",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78890,7 +78890,7 @@
           "query_id": "Q0095",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78902,7 +78902,7 @@
           "query_id": "Q0096",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78914,7 +78914,7 @@
           "query_id": "Q0097",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78926,7 +78926,7 @@
           "query_id": "Q0098",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78938,7 +78938,7 @@
           "query_id": "Q0099",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78950,7 +78950,7 @@
           "query_id": "Q0100",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78962,7 +78962,7 @@
           "query_id": "Q0101",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78974,7 +78974,7 @@
           "query_id": "Q0102",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78986,7 +78986,7 @@
           "query_id": "Q0103",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -78998,7 +78998,7 @@
           "query_id": "Q0104",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -79010,7 +79010,7 @@
           "query_id": "Q0105",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -79022,7 +79022,7 @@
           "query_id": "Q0106",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         }
@@ -107077,7 +107077,7 @@
           "query_id": "Q0107",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107089,7 +107089,7 @@
           "query_id": "Q0108",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107101,7 +107101,7 @@
           "query_id": "Q0109",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107113,7 +107113,7 @@
           "query_id": "Q0110",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107125,7 +107125,7 @@
           "query_id": "Q0111",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107137,7 +107137,7 @@
           "query_id": "Q0112",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107149,7 +107149,7 @@
           "query_id": "Q0113",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107161,7 +107161,7 @@
           "query_id": "Q0114",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107173,7 +107173,7 @@
           "query_id": "Q0115",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107185,7 +107185,7 @@
           "query_id": "Q0116",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107197,7 +107197,7 @@
           "query_id": "Q0117",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107209,7 +107209,7 @@
           "query_id": "Q0118",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107221,7 +107221,7 @@
           "query_id": "Q0119",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         },
@@ -107233,7 +107233,7 @@
           "query_id": "Q0120",
           "scope_paths": [
             "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md"
           ],
           "whole_word": false
         }
@@ -155884,7 +155884,7 @@
           "query_id": "Q0149",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155896,7 +155896,7 @@
           "query_id": "Q0150",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155908,7 +155908,7 @@
           "query_id": "Q0151",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155920,7 +155920,7 @@
           "query_id": "Q0152",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155932,7 +155932,7 @@
           "query_id": "Q0153",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155944,7 +155944,7 @@
           "query_id": "Q0154",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155956,7 +155956,7 @@
           "query_id": "Q0155",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155968,7 +155968,7 @@
           "query_id": "Q0156",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155980,7 +155980,7 @@
           "query_id": "Q0157",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -155992,7 +155992,7 @@
           "query_id": "Q0158",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -156004,7 +156004,7 @@
           "query_id": "Q0159",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -156016,7 +156016,7 @@
           "query_id": "Q0160",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -156028,7 +156028,7 @@
           "query_id": "Q0161",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -156040,7 +156040,7 @@
           "query_id": "Q0162",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -156052,7 +156052,7 @@
           "query_id": "Q0163",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         }
@@ -180631,7 +180631,7 @@
           "query_id": "Q0164",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180643,7 +180643,7 @@
           "query_id": "Q0165",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180655,7 +180655,7 @@
           "query_id": "Q0166",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180667,7 +180667,7 @@
           "query_id": "Q0167",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180679,7 +180679,7 @@
           "query_id": "Q0168",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180691,7 +180691,7 @@
           "query_id": "Q0169",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180703,7 +180703,7 @@
           "query_id": "Q0170",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180715,7 +180715,7 @@
           "query_id": "Q0171",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180727,7 +180727,7 @@
           "query_id": "Q0172",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180739,7 +180739,7 @@
           "query_id": "Q0173",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180751,7 +180751,7 @@
           "query_id": "Q0174",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180763,7 +180763,7 @@
           "query_id": "Q0175",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180775,7 +180775,7 @@
           "query_id": "Q0176",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180787,7 +180787,7 @@
           "query_id": "Q0177",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         },
@@ -180799,7 +180799,7 @@
           "query_id": "Q0178",
           "scope_paths": [
             "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
           ],
           "whole_word": false
         }
@@ -216893,7 +216893,7 @@
           "query_id": "Q0179",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216905,7 +216905,7 @@
           "query_id": "Q0180",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216917,7 +216917,7 @@
           "query_id": "Q0181",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216929,7 +216929,7 @@
           "query_id": "Q0182",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216941,7 +216941,7 @@
           "query_id": "Q0183",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216953,7 +216953,7 @@
           "query_id": "Q0184",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216965,7 +216965,7 @@
           "query_id": "Q0185",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216977,7 +216977,7 @@
           "query_id": "Q0186",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -216989,7 +216989,7 @@
           "query_id": "Q0187",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -217001,7 +217001,7 @@
           "query_id": "Q0188",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -217013,7 +217013,7 @@
           "query_id": "Q0189",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -217025,7 +217025,7 @@
           "query_id": "Q0190",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -217037,7 +217037,7 @@
           "query_id": "Q0191",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -217049,7 +217049,7 @@
           "query_id": "Q0192",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -217061,7 +217061,7 @@
           "query_id": "Q0193",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         }
@@ -253998,7 +253998,7 @@
           "query_id": "Q0194",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254010,7 +254010,7 @@
           "query_id": "Q0195",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254022,7 +254022,7 @@
           "query_id": "Q0196",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254034,7 +254034,7 @@
           "query_id": "Q0197",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254046,7 +254046,7 @@
           "query_id": "Q0198",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254058,7 +254058,7 @@
           "query_id": "Q0199",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254070,7 +254070,7 @@
           "query_id": "Q0200",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254082,7 +254082,7 @@
           "query_id": "Q0201",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254094,7 +254094,7 @@
           "query_id": "Q0202",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254106,7 +254106,7 @@
           "query_id": "Q0203",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254118,7 +254118,7 @@
           "query_id": "Q0204",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254130,7 +254130,7 @@
           "query_id": "Q0205",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254142,7 +254142,7 @@
           "query_id": "Q0206",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254154,7 +254154,7 @@
           "query_id": "Q0207",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         },
@@ -254166,7 +254166,7 @@
           "query_id": "Q0208",
           "scope_paths": [
             "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md"
           ],
           "whole_word": false
         }
@@ -287157,7 +287157,7 @@
           "query_id": "Q0209",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287169,7 +287169,7 @@
           "query_id": "Q0210",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287181,7 +287181,7 @@
           "query_id": "Q0211",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287193,7 +287193,7 @@
           "query_id": "Q0212",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287205,7 +287205,7 @@
           "query_id": "Q0213",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287217,7 +287217,7 @@
           "query_id": "Q0214",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287229,7 +287229,7 @@
           "query_id": "Q0215",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287241,7 +287241,7 @@
           "query_id": "Q0216",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287253,7 +287253,7 @@
           "query_id": "Q0217",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287265,7 +287265,7 @@
           "query_id": "Q0218",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287277,7 +287277,7 @@
           "query_id": "Q0219",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287289,7 +287289,7 @@
           "query_id": "Q0220",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287301,7 +287301,7 @@
           "query_id": "Q0221",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287313,7 +287313,7 @@
           "query_id": "Q0222",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -287325,7 +287325,7 @@
           "query_id": "Q0223",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         }
@@ -319937,7 +319937,7 @@
           "query_id": "Q0224",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -319949,7 +319949,7 @@
           "query_id": "Q0225",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -319961,7 +319961,7 @@
           "query_id": "Q0226",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -319973,7 +319973,7 @@
           "query_id": "Q0227",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -319985,7 +319985,7 @@
           "query_id": "Q0228",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -319997,7 +319997,7 @@
           "query_id": "Q0229",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320009,7 +320009,7 @@
           "query_id": "Q0230",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320021,7 +320021,7 @@
           "query_id": "Q0231",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320033,7 +320033,7 @@
           "query_id": "Q0232",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320045,7 +320045,7 @@
           "query_id": "Q0233",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320057,7 +320057,7 @@
           "query_id": "Q0234",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320069,7 +320069,7 @@
           "query_id": "Q0235",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320081,7 +320081,7 @@
           "query_id": "Q0236",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320093,7 +320093,7 @@
           "query_id": "Q0237",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         },
@@ -320105,7 +320105,7 @@
           "query_id": "Q0238",
           "scope_paths": [
             "CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md"
           ],
           "whole_word": false
         }

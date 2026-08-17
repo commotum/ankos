@@ -122,7 +122,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.substitua", "append_only_sequence_generation", "covered",
         ("seed", "emitter", "control_schema", "support"),
         (
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
             "L203-210,L569-599",
         ),
         "goal-5/api-pressure.md:F002",
@@ -157,7 +157,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.dynamica", "continuous_event_dynamics", "addition",
         ("seed", "geometry", "flow_law", "reset_law", "terminal_condition"),
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L60-61",
         ),
         "goal-5/api-pressure.md:F006",
@@ -184,7 +184,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.automata", "driven_relaxation", "addition",
         ("seed", "drive_law", "toppling_law", "boundary", "relaxation_form"),
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L665-676",
         ),
         "goal-5/api-pressure.md:F009",
@@ -240,7 +240,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         ("seed", "walk_law", "contact", "release", "boundary", "target"),
         (
             "N08:L50",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L359-360",
         ),
         "goal-5/api-pressure.md:F016",
@@ -305,7 +305,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.substitua", "history_dependent_growth_rewrite", "addition",
         ("seed", "eligibility", "provenance_law", "boundary"),
         (
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:"
             "L130-151",
         ),
         "goal-5/api-pressure.md:F023",
@@ -429,7 +429,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.dynamica", "ordinary_differential_flow", "addition",
         ("seed", "rhs", "parameters", "duration_or_event"),
         (
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
             "L901-902,L953-980",
         ),
         "goal-5/api-pressure.md:F037",
@@ -474,7 +474,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
             "size",
         ),
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L556-560",
         ),
         "goal-5/api-pressure.md:F043",
@@ -514,7 +514,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.substitua", "random_functional_graph_construction", "addition",
         ("nodes", "successor_measure"),
         (
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md:"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md:"
             "L589-590",
         ),
         "goal-5/api-pressure.md:F046",
@@ -525,7 +525,7 @@ FAMILY_ENTRIES: tuple[FamilyEntry, ...] = (
         "ca.catalog.machina", "recursive_function_evaluator", "covered",
         ("call", "definitions", "evaluation_order", "cache"),
         (
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
             "L237-268,L316-364",
         ),
         "goal-5/api-pressure.md:F047",
@@ -690,7 +690,7 @@ ROLE_ENTRIES: tuple[RoleEntry, ...] = (
         "percolation-connectivity-analysis",
         "observer",
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L497-498",
         ),
         (
@@ -1431,7 +1431,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for append-only-sequence-generation.",
         (),
         (
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
             "L203-210,L569-599",
         ),
     ),
@@ -1459,7 +1459,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for continuous-event-dynamics.",
         (),
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L60-61",
         ),
     ),
@@ -1482,7 +1482,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for driven-relaxation.",
         (),
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L665-676",
         ),
     ),
@@ -1523,7 +1523,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         (),
         (
             "N08:L50",
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L359-360",
         ),
     ),
@@ -1569,7 +1569,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for history-dependent-growth-rewrite.",
         (),
         (
-            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:"
+            "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:"
             "L130-151",
         ),
     ),
@@ -1658,7 +1658,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for ordinary-differential-flow.",
         (),
         (
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
             "L901-902,L953-980",
         ),
     ),
@@ -1691,7 +1691,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for population-evolutionary-search.",
         (),
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L556-560",
         ),
     ),
@@ -1713,7 +1713,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for random-functional-graph-construction.",
         (),
         (
-            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md:"
+            "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md:"
             "L589-590",
         ),
     ),
@@ -1723,7 +1723,7 @@ NAME_ENTRIES: tuple[NameEntry, ...] = (
         "Canonical five-component profile for recursive-function-evaluator.",
         ("T41",),
         (
-            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:"
+            "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:"
             "L237-268,L316-364",
         ),
     ),

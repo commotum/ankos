@@ -44,7 +44,7 @@ IDENTITY_FIELDS = (
 )
 STAGE_PATHS = (
     "CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md",
-    "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md",
+    "BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md",
 )
 EXPECTED_SPEC_COUNTS = {"incoming": 14, "within": 58}
 EXPECTED_UPDATE_COUNT = 72

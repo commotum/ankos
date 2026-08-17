@@ -10,7 +10,7 @@ The density of triangles of size n goes roughly like  $2^{-n}$  for rules 126, 3
 
 In the algebraic representation discussed on page 869, rule 22 is  $Mod[p+q+r+p\,q\,r,\,2]$ , rule 126 is  $Mod[(p+q)\,(q+r)+(p+r),\,2]$ , rule 150 is  $Mod[p+q+r,\,2]$  and rule 182 is  $Mod[p\,r\,(1+q)+(p+q+r),\,2]$ .
 
-![](_page_962_Picture_7.jpeg)
+![](images/_page_962_Picture_7.jpeg)
 
 ■ **Continual injection of randomness.** In the main text we discuss what happens when one starts from random initial conditions and then evolves according to a definite cellular automaton rule. As an alternative one can consider starting with very simple initial conditions, such as all cells white, and then at each step randomly changing the color of the center cell. Some examples of what happens are shown at the bottom of the previous column. The results are usually very similar to those obtained with random initial conditions.
 ■ **History.** The fact that despite initial randomness processes like friction can make systems settle down into definite configurations has been the basis for all sorts of engineering throughout history. The rise of statistical mechanics in the late 1800s emphasized the idea of entropy increase and the fundamental tendency for systems to become progressively more disordered as they evolve to thermodynamic equilibrium. Theories were nevertheless developed for a few cases of spontaneous pattern formation—notably in convection, cirrus clouds and ocean waves. When the study of feedback and stability became popular in the 1940s, there were many results about how specific simple fixed or repetitive behaviors in time could emerge despite random input. In the 1950s it was suggested that reaction-diffusion processes might be responsible for spontaneous pattern formation in biology (see page 1012)—and starting in the 1970s such processes were discussed as prime examples of the phenomenon of self-organization. But in their usual form, they yield essentially only rather simple repetitive patterns. Ever since around 1900 it tended to be assumed that any fundamental theory of systems with many components must be based on statistical mechanics. But almost all work in the field of statistical mechanics concentrated on systems in or very near thermal equilibrium—in which in a sense there is almost complete disorder. In the 1970s there began to be more discussion of phenomena far from equilibrium, although typically it got no further than to consider how external forces could lead to reaction-diffusion-like phenomena. My own work on cellular automata in 1981 emerged in part from thinking about self-gravitating systems (see page 880) where it seemed conceivable that there might be very basic rules quite different from those usually studied in statistical mechanics. And when I first generated pictures of the behavior of arbitrary cellular automaton rules, what struck me most was the order that emerged even from random initial conditions. But while it was immediately clear that most cellular automata do not have the kind of reversible underlying rules assumed in traditional statistical mechanics, it still seemed initially very surprising that their overall behavior could be so elaborate—and so far from the complete orderlessness one might expect on the basis of traditional ideas of entropy maximization.
@@ -23,7 +23,7 @@ In the algebraic representation discussed on page 869, rule 22 is  $Mod[p+q+r+p\
 ■ **Page 235 · Class 4 rules.** Other examples of class 4 totalistic rules with *k* = *3* colors include 357 (page 282), 438, 600, 792, 924, 1038, 1041, 1086, 1329 (page 282), 1572, 1599 (see page 70), 1635 (see page 67), 1662, 1815 (page 236), 2007 (page 237) and 2049 (see page 68).
 ■ **Frequencies of classes.** The pie charts below show results for 1D totalistic cellular automata with *k* colors and range *r*. Class 3 tends to become more common as the number of elements in the rule increases because as soon as any of these elements yield class 3 behavior, that behavior dominates the system.
 
-![](_page_963_Frequencies_of_Classes_Four_Pie_Charts.jpeg)
+![](images/_page_963_Frequencies_of_Classes_Four_Pie_Charts.jpeg)
 
 ■ **History.** I discovered the classification scheme for cellular automata described here late in 1983, and announced it in January 1984. Much work has been done by me and others on ways to make the classification scheme precise. The notion that class 4 can be viewed as intermediate between class 2 and class 3 was studied particularly by Christopher Langton, Wentian Li and Norman Packard in 1986 for ordinary cellular automata, by Hyman Hartman in 1985 for probabilistic cellular automata and by Hugues Chaté and Paul Manneville in 1990 for continuous cellular automata.
 ■ **Subclasses within class 4.** Different class 4 systems can show localized structures with strikingly similar forms, and this may allow subclasses within class 4 to be identified. In addition, class 4 systems show varying levels of activity, and it is possible that there may be discrete transitions—perhaps analogous to percolation—that can be used to define boundaries between subclasses.
@@ -62,7 +62,7 @@ LifeStep3D[{p_, q_, r_}, a_List] := MapThread[If[
 
 Carter Bays discovered between 1986 and 1990 the three examples {5, 7, 6}, {4, 5, 5}, and {5, 6, 5}. The pictures below show successive steps in the evolution of a moving structure in the second of these rules.
 
-![](_page_964_Picture_11.jpeg)
+![](images/_page_964_Picture_11.jpeg)
 
 ■ **Random initial conditions in other systems.** Whenever the initial conditions for a system can involve an infinite sequence of elements these elements can potentially be chosen at random. In systems like mobile automata and Turing machines the colors of initial cells can be random, but the active cell must start at a definite location, and depending on the behavior only a limited region of initial cells near this location may ever be sampled. Ordinary substitution systems can operate on infinite sequences of elements chosen at random. Sequential substitution systems, however, rely on scanning limited sequences of elements, and so cannot readily be given infinite random initial conditions. The same is true of ordinary and cyclic tag systems. Systems based on continuous numbers involve infinite sequences of digits which can readily be chosen at random (see page 154). But systems based on integers (including register machines) always deal with finite sequences of digits, for which there is no unique definition of randomness. (See however the discussion of number representations on page 1070.) Random networks (see pages 963 and 1038) can be used to provide random initial conditions for network systems. Multiway systems cannot meaningfully be given infinite random initial conditions since these would typically lead to an infinite number of possible states. Systems based on constraints do not have initial conditions. (See also page 920.)
 
@@ -86,7 +86,7 @@ For any additive or partially additive class 3 cellular automaton (such as rule 
 
 An alternative interpretation of the system discussed here involves arranging the possible positions in a circle, so that at each step the dot goes a fraction m/n of the way around the circle. The repetition period is maximal when m/n is a fraction in lowest terms. The picture below shows the repetition periods as a function of the numerical size of the quantity m/n.
 
-![](_page_965_Figure_8.jpeg)
+![](images/_page_965_Figure_8.jpeg)
 
 ■ **Page 257 · Cyclic multiplication.** With multiplication by k at each step the dot will be at position  $Mod[k^t, n]$  after t steps. If k and n have no factors in common, there will be a t for which  `Mod[k^t, n] == 1` , so that the dot returns to position 1. The smallest such t is given by MultiplicativeOrder[k, n], which always divides EulerPhi[n] (see page 1093), and has a value between Log[k, n] and n-1, with the upper limit being attained only if n is prime. (This value is related to the repetition period for the digit sequence of 1/n in base k, as discussed on page 912). When `GCD[k, n] == 1` the dot can never visit position 0. But if  `n == k^s` , the dot reaches 0 after s steps, and then stays there. In general, the dot will visit position  `m = k^IntegerExponent[n, k]` every `MultiplicativeOrder[k, n/m]` steps.
 
@@ -129,7 +129,7 @@ The exponent here always lies between Log[k, n] and (n-1)/2, with the upper boun
 ■ **Rules 30 and 45.** Maximum periods are often achieved with initial conditions consisting of a single black cell. Particularly for rule 30, however, there are quite a few exceptions. For n = 13, for example, the maximum period is 832 but the period with a single black cell is 260. For rule 45, the maximum possible period discussed above is achieved for n = 9, but does not appear to be achieved for any larger n. (See page 962.)
 ■ **Comparison of rules.** Rules 45, 30 and 60, together with their conjugates and reflections, yield the longest repetition periods of all elementary rules (see page 1087). The picture below compares their periods as a function of n.
 
-![](_page_966_Figure_12.jpeg)
+![](images/_page_966_Figure_12.jpeg)
 
 ■ **Implementing boundary conditions.** In the bitwise representation discussed on page 865, 0's outside of a width n can be implemented by applying  $BitAnd[a, 2^n - 1]$  at each step. Cyclic boundary conditions can be implemented efficiently in assembler on computers that support cyclic shift instructions.
 
@@ -138,18 +138,18 @@ The exponent here always lies between Log[k, n] and (n-1)/2, with the upper boun
 ■ **Page 263 · Rule 22.** Randomness is obtained with initial conditions consisting of two black squares $4^m$ positions apart for any  $m \ge 2$ . The base 2 digit sequences for 19, 25, 37, 39, 41, 45, 47, 51, 57, 61, ... also give initial conditions that yield randomness. Despite its overall randomness there are some regularities in the pattern shown at the bottom of the page. The overall density of black cells is not 1/2 but is instead approximately 0.35, just as for random initial conditions. And if one looks at the center cell in the pattern one finds that it is never black on two successive steps, and the probability for white to follow white is about twice the probability for black to follow white. There is also a region of repetitive behavior on each side of the pattern; the random part in the middle expands at about 0.766 cells per step—the same speed that we found on page 949 that changes spread in this rule.
 ■ **Rule 225.** With initial conditions consisting of a single black cell, this class 3 rule yields a regular nested pattern, as shown on page 58. But with the initial condition ■■□■, it yields the much more complicated pattern shown below. With a background consisting of repetitions of the block ■□, insertion of a single initial white cell yields a largely random pattern that expands by one cell per step. Rule 225 can be expressed as ¬ p ⊻ (q ∨ r).
 
-![](_page_966_Figure_17.jpeg)
+![](images/_page_966_Figure_17.jpeg)
 
 ■ **Rule 94.** With appropriate initial conditions this class 2 rule can yield both nested and random behavior, as shown below.
 
-![](_page_966_Figure_19.jpeg)
+![](images/_page_966_Figure_19.jpeg)
 
 ■ **Rule 218.** If pairs of adjacent black cells appear anywhere in its initial conditions this class 2 rule gives uniform black, but if none do it gives a rule 90 nested pattern.
 ■ **Additive rules.** Of the 256 elementary cellular automata 8 are additive: {0, 60, 90, 102, 150, 170, 204, 240}. All of these are either trivial or essentially equivalent to rules 90 or 150.
 
 Of all  $k^{k^{2r+1}}$  rules with k colors and range r it turns out that there are always exactly  $k^{2r+1}$  additive ones—each obtained by taking the cells in the neighborhood and adding them modulo k with weights between 0 and k-1. As discussed on page 955, any rule based on addition modulo k must yield a nested pattern, and it therefore follows that any rule that is additive must give a nested pattern, as in the examples below. (See also page 870.)
 
-![](_page_967_Picture_4.jpeg)
+![](images/_page_967_Picture_4.jpeg)
 
 Note that each step in the evolution of any additive cellular automaton can be computed as
 
@@ -165,17 +165,17 @@ Mod[ListCorrelate[w, list, Ceiling[Length[w]/2]], k]
 
 (In mathematical terms this is equivalent to the statement that  $\phi$  is conjugate to itself under the action of  $\oplus$ —or alternatively that  $\phi$  defines a homomorphism with respect to the  $\oplus$  operation.) In the usual case,  $u \oplus v$  is just Mod[u+v,k], yielding say for rule 90 the results below.
 
-![](_page_967_Rule_90_Generalized_Additivity_Four_Panel_Row.jpeg)
+![](images/_page_967_Rule_90_Generalized_Additivity_Four_Panel_Row.jpeg)
 
 But it turns out that some elementary rules show additivity with respect to other addition operations. An example as shown below is rule 250 with  $u \oplus v$  taken as Max[u, v] (Or).
 
-![](_page_967_Rule_250_Generalized_Additivity_Four_Panel_Row.jpeg)
+![](images/_page_967_Rule_250_Generalized_Additivity_Four_Panel_Row.jpeg)
 
 If a system is additive it means that one can work out how the system will behave from any initial condition just by combining the patterns ("Green's functions") obtained from certain basic initial conditions—say ones containing a single black cell. To get all the familiar properties of additivity one needs an addition operation that is associative (Flat) and commutative (Orderless), and has an identity element (white or 0 in the cases above)—so that it defines a commutative monoid. (Usually it is also convenient to be able to get all possible elements by combining a small number of basic generator elements.)
 
 The inequivalent commutative monoids with up to k = 4 colors are (in total there are 1, 2, 5, 19, 78, 421, 2637, ... such objects):
 
-![](_page_967_Picture_22.jpeg)
+![](images/_page_967_Picture_22.jpeg)
 
 For k = 2, r = 1 the number of rules additive with respect to these is respectively: {8, 9}; for k = 2, r = 2: {32, 33}; for k = 3, r = 1: {28, 27, 35, 244, 28}; for k = 4, r = 1: {1001, 65, 540, 577, 126, 4225, 540, 9065, 757, 408, 65, 133, 862, 224, 72, 72, 91, 4096, 64}
 
@@ -202,9 +202,9 @@ Simplify[probs . IntegerDigits[m, 2, 8]]
 
 For rule 22, for example, this means that if the density at a particular step is p, then the density on the next step should be  $3p(1-p)^2$ , and the densities on subsequent steps should be obtained by iterating this function. (At least for the 256 elementary cellular automata this iterated map is never chaotic.) The stable density after many steps is then given by `Solve[3 p (1 - p)^2 == p, p]`, so that `p -> 1 - 1/Sqrt[3]`, or approximately 0.42. The actual density for rule 22 is however 0.35095. The reason for the discrepancy is that the probabilities for different cells are in fact correlated. One can systematically include more such correlations by looking at more steps of evolution at once. For two steps, one must consider probabilities for all 32 combinations of 5 cells, and for rule 22 the function becomes  $p(1-p)^2(2+3p^2)$ , yielding density 0.35012; for three steps it is  $p(1-p)^2(p^4-18p^3+41p^2-22p+6)$  yielding density 0.379. The plot below shows what happens with more steps: the results seem to converge slowly to the exact result indicated by the gray line.
 
-![](_page_968_Figure_9.jpeg)
+![](images/_page_968_Figure_9.jpeg)
 
-![](_page_968_Figure_10.jpeg)
+![](images/_page_968_Figure_10.jpeg)
 
 (For rules 90 and 30 the functions obtained after one step are respectively 2p(1-p) and  $p(2p^2-5p+3)$ , both of which turn out to imply correct final densities of 1/2).
 
@@ -222,17 +222,17 @@ Probabilistic estimates can also be used for other quantities, such as growth ra
 
 Page 339 shows a cellular automaton with very different behavior.
 
-![](_page_969_Figure_2.jpeg)
+![](images/_page_969_Figure_2.jpeg)
 
 ■ **Density oscillations in rule 73.** Although there are always some fluctuations, most rules yield densities that converge more or less uniformly to their final values. One exception is rule 73, which yields densities that continue to oscillate with a period of 3 steps forever. The origin of this phenomenon is that with completely random initial conditions rule 73 evolves to a collection of independent regions, as in the picture below, and many of these regions contain patterns that repeat with period 3. The boundaries between regions come from blocks of even numbers of black cells in the initial conditions, and if one does not allow any such blocks, the density oscillations no longer occur. (See also page 699.)
 
-![](_page_969_Picture_4.jpeg)
+![](images/_page_969_Picture_4.jpeg)
 
 ### Special Initial Conditions
 
 ■ **Page 267 · Repeating blocks.** The discussion in the main text is mostly about repetition strictly every p steps, and no sooner. (If a system repeats for example every 3 steps, then it is inevitable that it will also repeat in the same way every 6, 9, 12, 15, etc. steps.) Finding configurations in a 1D cellular automaton that repeat with a particular period is equivalent to satisfying the kind of constraints we discussed on page 211. And as described there, if such constraints can be satisfied at all, then it must be possible to satisfy them with a configuration that consists of a repetition of identical blocks. Indeed, for period p, the length of blocks required is at most  $2^{2p}$  (or  $2^{2pr}$  for range r rules).
 
-![](_page_969_Picture_7.jpeg)
+![](images/_page_969_Picture_7.jpeg)
 
 The pictures at the bottom of the previous column summarize which periods can be obtained with various rules. Periods from 1 to 15 are represented by different rows, with period 1 at the bottom. Within each row a gray bar indicates that a particular period can be obtained with blocks of some length. The black dots indicate specific block sizes up to 25 that work.
 
@@ -351,12 +351,12 @@ If one starts from more than a single non-0 element, then it is still true that 
 ■ **Nesting in rule 45.** As illustrated on page 701, starting from a single black cell on a background of repeated ■■□ blocks, rule 45 yields a slanted version of the nested rule 90 pattern.
 ■ **Uniqueness of patterns.** Starting from a particular initial condition, different rules can often yield the same pattern. The picture below shows in sorted order the configurations obtained at each successive step in the evolution of all 256 elementary cellular automata starting from a single black cell. After a large number of steps, between 94 and 105 distinct individual configurations are obtained, together with 143 distinct complete patterns. (Compare page 1186.)
 
-![](_page_971_Figure_11.jpeg)
+![](images/_page_971_Figure_11.jpeg)
 
 ■ **Square root of rule 30.** Although rule 30 cannot apparently be decomposed into other k = 2, r = 1 cellular automata, it can be viewed as the square of the k = 3, r = 1/2 cellular automata with rule numbers 11736, 11739 and 11742.
 ■ **Page 272 · Nested initial conditions.** The pictures below show patterns generated by rule 90 starting from the nested sequences on page 83. (See page 1091.)
 
-![](_page_971_Nested_Initial_Conditions_Three_Panel_Row.jpeg)
+![](images/_page_971_Nested_Initial_Conditions_Three_Panel_Row.jpeg)
 
 ### The Notion of Attractors
 
@@ -513,7 +513,7 @@ Even when a cellular automaton mapping is surjective, it is still often many-to-
 
 ■ **Temporal sequences.** So far we have considered possible sequences of cells that can occur at a particular step in the evolution of a cellular automaton. But one can also consider sequences formed from the color of a particular cell on a succession of steps. For class 1 and 2 cellular automata, there are typically only a limited number of possible sequences of any length allowed. And when the length is large, the sequences are almost always either just uniform or repetitive. For class 3 cellular automata, however, the number of sequences of length n typically grows rapidly with n. For additive rules such as 60 and 90, and for partially additive rules such as 30 and 45, any possible sequence can occur if an appropriate initial condition is given. For rule 18, it appears that any sequence can occur that never contains more than one adjacent black cell. I know of no general characterization of temporal sequences analogous to the finite automaton one used for spatial sequences above. However, if one defines the entropy or dimension $h_t$ for temporal sequences by analogy with the definition for spatial sequences above, then it follows for example that  $h_t \le 2 \lambda h_x$ , where  $\lambda$  is the maximum rate at which changes grow in the cellular automaton. The origin of this inequality is indicated in the picture below. The basic idea is that the size of the region that can affect a given cell in the course of t steps is  $2 \lambda t$ . But for large sizes x the total number of possible configurations of this region is  $k^{h_x x}$ . (Inequalities between entropies and Lyapunov exponents are also common in dynamical systems based on numbers, but are more difficult to derive.) Note that in effect,  $h_x$  gives the information content of spatial sequences in units of bits per unit distance, while  $h_t$  gives the corresponding quantity for temporal sequences in units of bits per unit time. (One can also define directional entropies based on sequences at different slopes; the values of such entropies tend to change discontinuously when the slope crosses  $\lambda$ .)
 
-![](_page_975_Picture_7.jpeg)
+![](images/_page_975_Picture_7.jpeg)
 
 Different classes of cellular automata show characteristically different entropy values. Class 1 has  $h_x = 0$  and  $h_t = 0$ . Class 2 has  $h_x \neq 0$  but  $h_t = 0$ . Class 3 has  $h_x \neq 0$  and  $h_t \neq 0$ . Class 4 tends to show fluctuations which prevent definite values of  $h_x$  and  $h_t$  from being found.
 
@@ -535,31 +535,31 @@ When I started working on cellular automata in the early 1980s I wanted to see h
 ■ **Attractors in Turing machines.** In theoretical studies Turing machines are often set up so that if their initial conditions follow a particular formal grammar (see page 938) then they evolve to "accept" states—which can be thought of as being somewhat like attractors.
 ■ **Systems of limited size.** For any system with a limited total number of states, it is possible to create a finite network that gives a global representation of the behavior of the system. The idea of this network (which is very different from the finite automata networks discussed above) is to have each node represent a complete state of the system. At each step in the evolution of the system, every state evolves to some new state, and this process is represented in the network by an arc that joins each node to a new node. The picture below gives the networks obtained for systems of the kind shown on page 255. Each node is labelled by a possible position for the dot. In the first case shown, starting for example at position 4 the dot then visits positions 5, 0, 1, 2 and so on, at each step going from one node in the network to the next.
 
-![](_page_976_Figure_10.jpeg)
+![](images/_page_976_Figure_10.jpeg)
 
 The pictures below give networks obtained from the system shown on page 257 for various values of n. For odd n, the networks consist purely of cycles. But for even n, there are also trees of states that lead to these cycles.
 
-![](_page_977_Figure_1.jpeg)
+![](images/_page_977_Figure_1.jpeg)
 
 In general, any network that represents the evolution of a system with definite rules will have the same basic form. There are cycles which contain states that are visited repeatedly, and there can also be trees that represent transient states that can each only ever occur at most once in the evolution of the system.
 
 The picture below shows the network obtained from a class 1 cellular automaton (rule 254) with 4 cells and thus 16 possible states. All but one of these 16 states evolve after at most two steps to state 15, which corresponds to all cells being black.
 
-![](_page_977_Picture_4.jpeg)
+![](images/_page_977_Picture_4.jpeg)
 
 The pictures below show networks obtained when more cells are included in the cellular automaton above. The same convergence to a single fixed point is observed.
 
-![](_page_977_Picture_6.jpeg)
+![](images/_page_977_Picture_6.jpeg)
 
 The pictures below give corresponding results for a class 2 cellular automaton (rule 132). The number of distinct cycles now increases with the size of the system. (As discussed below, identical pieces of the network are often related by symmetries of the underlying cellular automaton system.)
 
-![](_page_977_Figure_8.jpeg)
+![](images/_page_977_Figure_8.jpeg)
 
 In class 3, larger cycles are usually obtained, and often the whole network is dominated by a single largest cycle. The second set of pictures below summarize the results for some larger cellular automata. Each distinct region corresponds to a disjoint part of the network, with the area of the region being proportional to the number of nodes involved. The dark blobs represent cycles. (See page 1087.)
 
-![](_page_977_Figure_10.jpeg)
+![](images/_page_977_Figure_10.jpeg)
 
-![](_page_978_Figure_2.jpeg)
+![](images/_page_978_Figure_2.jpeg)
 
 For large sizes there is a rough correspondence with the infinite size case, but many features are still different. (To recover correct infinite size results one must increase size while keeping the number of steps of evolution fixed; the networks shown above, however, effectively depend on arbitrarily many steps of evolution.)
 
@@ -578,27 +578,27 @@ Factor[x^(k^n - 1) - 1, Modulus -> k]
 
 (See page 975.)
 
-![](_page_978_Shift_Rule_170_Size_4_to_8_Five_Panel_Row.jpeg)
+![](images/_page_978_Shift_Rule_170_Size_4_to_8_Five_Panel_Row.jpeg)
 
 ■ **Additive rules.** The pictures below show networks obtained for the additive cellular automata with rules 60 and 90. The networks are highly regular and can be analyzed by the algebraic methods mentioned on page 951. The lengths of the longest cycles are given on page 951; all other cycles must have lengths which divide these. Rooted at every state on each cycle is an identical structure. When the number of cells n is odd this structure consists of a single arc, so that half of all states lie on cycles. When n is even, the structure is a balanced tree of depth 2^IntegerExponent[n, 2] and degree 2 for rule 60, and depth 2^IntegerExponent[n/2, 2] and degree 4 for rule 90. The total fraction of states on cycles is in both cases 2^(-2^IntegerExponent[n, 2]). States with a single black cell are always on the longest cycles. The state with no black cells always forms a cycle of length 1.
 
-![](_page_978_Figure_14.jpeg)
+![](images/_page_978_Figure_14.jpeg)
 
-![](_page_978_Picture_15.jpeg)
+![](images/_page_978_Picture_15.jpeg)
 
 ■ **Random networks.** The pictures below show networks in which each of a set of n nodes has as its successor a node that is chosen at random from the set. The total number of possible such networks is  $n^n$ . For large n, the average number of distinct cycles in all such networks is  $Sqrt[\pi/2]Log[n]$ , and the average length of these cycles is  $Sqrt[\pi n/8]$ . The average fraction of nodes that have no predecessor is  $(1 - 1/n)^n$  or 1/e in the limit  $n \to \infty$ . Note that processes such as cellular automaton evolution do not yield networks whose properties are particularly close to those of purely random ones.
 
-![](_page_979_Figure_1.jpeg)
+![](images/_page_979_Figure_1.jpeg)
 
 ### Structures in Class 4 Systems
 
 ■ **Page 283 · Survival data.** The number of steps for which the pattern produced by each of the first 1000 initial conditions in code 20 survive are indicated in the picture below. 72 of these initial conditions lead to persistent structures. Among the first million initial conditions, 60,171 lead to persistent structures and among the first billion initial conditions the number is 71,079,205.
 
-![](_page_979_Figure_4.jpeg)
+![](images/_page_979_Figure_4.jpeg)
 
 ■ **Page 290 · Background.** At every step the background pattern in rule 110 consists of repetitions of the block  $b = \{1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0\}$ , as shown in the picture below. On step t the color of a cell at position x is given by b[[Mod[x+4t, 14]+1]].
 
-![](_page_979_Picture_6.jpeg)
+![](images/_page_979_Picture_6.jpeg)
 
 ■ **Page 292 · Structures.** The persistent structures shown can be obtained from the following  $\{n, w\}$  by inserting the sequences IntegerDigits[n, 2, w] between repetitions of the background block b:
 
@@ -621,45 +621,45 @@ Note that in most cases multiple copies of the same structure can travel next to
 ■ **Page 294 · Collisions.** A fundamental result is that the sum of the widths of all persistent structures involved in an interaction must be conserved modulo 14.
 ■ **The Game of Life.** The 2D cellular automaton described on page 949 supports a whole range of persistent structures, many of which have been given quaint names by its enthusiasts. With typical random initial conditions the most common structures to occur are:
 
-![](_page_979_Picture_18.jpeg)
+![](images/_page_979_Picture_18.jpeg)
 
 The next most common moving structure is the so-called "spaceship":
 
-![](_page_979_Picture_20.jpeg)
+![](images/_page_979_Picture_20.jpeg)
 
 The complete set of structures with less than 8 black cells that remain unchanged at every step in the evolution are:
 
-![](_page_979_Picture_22.jpeg)
+![](images/_page_979_Picture_22.jpeg)
 
 More complicated repetitive and moving structures are shown in the pictures below. If one looks at the history of a single row of cells, it typically looks much like the complete histories we have seen in 1D class 4 cellular automata.
 
-![](_page_979_Picture_24.jpeg)
+![](images/_page_979_Picture_24.jpeg)
 
 Structures with all repetition periods up to 18 have been found in Life; examples are shown in the pictures below.
 
-![](_page_980_Figure_3.jpeg)
+![](images/_page_980_Figure_3.jpeg)
 
 Persistent structures with various speeds in the horizontal and vertical direction have also been found, as shown below.
 
-![](_page_980_Picture_5.jpeg)
+![](images/_page_980_Picture_5.jpeg)
 
 The first example of unbounded growth in Life was the so-called "glider gun", discovered by William Gosper in 1970 and shown below. This object emits a glider every 30 steps. The simplest known initial condition which leads to a glider gun contains 21 black cells. The so-called "switch engine" discovered in 1971 generates unbounded growth by leaving a trail behind when it moves; it is now known that it can be obtained from an initial condition with 10 black cells, or black cells in just a 5×5 or 39×1 region. It is also known that from less than 10 initial black cells no unbounded growth is ever possible.
 
-![](_page_980_Picture_7.jpeg)
+![](images/_page_980_Picture_7.jpeg)
 
 Many more elaborate structures similar to the glider gun were found in the 1970s and 1980s; two are illustrated below.
 
-![](_page_980_Life_Elaborate_Structures_Four_Panel_Group.jpeg)
+![](images/_page_980_Life_Elaborate_Structures_Four_Panel_Group.jpeg)
 
 A simpler kind of unbounded growth occurs if one starts from an infinite line of black cells. In that case, the evolution is effectively 1D, and turns out to follow elementary rule 22, thus producing the infinitely growing nested pattern shown on page 263.
 
 For a long time it was not clear whether Life would support any kind of uniform unbounded growth from a finite initial region of black cells. However, in 1993 David Bell found starting from 206 black cells the "spacefiller" shown below. This object is closely analogous to those shown for code 1329 on page 287.
 
-![](_page_980_Life_Spacefiller_Three_Panel_Row.jpeg)
+![](images/_page_980_Life_Spacefiller_Three_Panel_Row.jpeg)
 
 As in other class 4 cellular automata, there are structures in Life which take a very long time to settle down. The so-called "puffer train" below which starts from 23 black cells becomes repetitive with period 140 only after more than 1100 steps.
 
-![](_page_980_Life_Puffer_Train_Four_Panel_Group.jpeg)
+![](images/_page_980_Life_Puffer_Train_Four_Panel_Group.jpeg)
 
 ■ **Other 2D cellular automata.** The general problem of finding persistent structures is much more difficult in 2D than in 1D, and there is no completely general procedure, for example, for finding all structures of any size that have a certain repetition period.
 ■ **Structures in Turing machines.** See page 888.

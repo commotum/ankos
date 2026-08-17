@@ -44,7 +44,7 @@ IDENTITY_FIELDS = (
 )
 STAGE_PATHS = (
     "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-    "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md",
+    "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md",
 )
 EXPECTED_SPEC_COUNTS = {"incoming": 16, "within": 20}
 EXPECTED_UPDATE_COUNT = 36

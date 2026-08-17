@@ -46,7 +46,7 @@ IDENTITY_FIELDS = (
 )
 STAGE_PATHS = (
     "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-    "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md",
+    "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md",
 )
 EXPECTED_SPEC_COUNTS = {"incoming": 23, "within": 15}
 EXPECTED_UPDATE_COUNT = 38

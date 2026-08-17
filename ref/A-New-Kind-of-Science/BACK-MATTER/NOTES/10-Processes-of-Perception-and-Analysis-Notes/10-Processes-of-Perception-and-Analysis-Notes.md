@@ -18,7 +18,7 @@ As a reduced analog of algorithmic information theory one can for example ask wh
 
 ■ **Inevitable regularities and Ramsey theory.** One might have thought that there could be no meaningful type of regularity that would be present in all possible data of a given kind. But through the development since the late 1920s of Ramsey theory it has become clear that this is not the case. As one example, consider looking for runs of *m* equally spaced squares of the same color embedded in sequences of black and white squares of length n. The pictures below show results with m=3 for various n. For n<9 there are always some sequences in which no runs of length 3 exist. But it turns out that for  $n \ge 9$  every single possible sequence contains at least one run of length 3. For any m the same is true for sufficiently large n; it is known that m=4 requires  $n \ge 35$  and m=5 requires  $n \ge 178$ . (In problems like this the analog of n often grows extremely rapidly with m.) If one has a sufficiently long sequence, therefore, just knowing that a run of equally spaced identical elements exists in it does not narrow down at all what the sequence actually is, and can so cannot ultimately be considered a useful regularity.
 
-![](_page_1083_Figure_4.jpeg)
+![](images/_page_1083_Figure_4.jpeg)
 
 (Compare pattern-avoiding sequences on page 944.)
 
@@ -71,11 +71,11 @@ Apply[Join, Map[Last,
 
 Shown on a logarithmic scale, representations (b) through (e) (given here for numbers 1 through 500) all grow roughly linearly:
 
-![](_page_1085_Figure_16.jpeg)
+![](images/_page_1085_Figure_16.jpeg)
 
 ■ **Completeness.** If one successively reads 0’s and 1’s from an infinite sequence then the representations (c), (d) and (e) have the property that eventually one will always accumulate a valid representation for some number or another. The pictures below show which sequences of 0’s and 1’s correspond to complete numbers in these representations. Every vertical column is a possible sequence of 0’s and 1’s, and the column is shown to terminate when a complete number is obtained.
 
-![](_page_1085_Picture_18.jpeg)
+![](images/_page_1085_Picture_18.jpeg)
 
 With an infinite random sequence of 0’s and 1’s, different number representations yield different distributions of sizes of numbers. Representation (b), for example, is more weighted towards large numbers, while (c) is more weighted towards small numbers. Maximal compression for a sequence of numbers with a particular distribution of sizes is obtained by choosing a representation that yields a matching such distribution. (See also page 949.)
 
@@ -148,7 +148,7 @@ With completely random input, the probability that the length b subsequence whic
 
 $1 - Sum[(1 - 2^{-b})^i Product[1 + (1 - 2^{-b})^j - (1 - 2^{-b-1})^j, {j, i - b + 1, i - 1}], {i, b, n - b}]/(n - 2 b + 1)$
 
-![](_page_1087_Repeat_Probability_Six_Panel_Row.jpeg)
+![](images/_page_1087_Repeat_Probability_Six_Panel_Row.jpeg)
 
 ■ **LZW algorithms.** Practical implementations of pointer-based encoding can maintain only a limited dictionary of possible repeats. Various schemes exist for optimizing the construction, storage and rewriting of such dictionaries.
 ■ **Page 568 · Recursive subdivision.** In one dimension, encoding can be done using
@@ -170,7 +170,7 @@ Subdivide[a_, n_] := With[{s = Table[1, {n}]}, Flatten[
 
 ■ **2D run-length encoding.** A simple way to generalize run-length encoding to two dimensions is to scan data one row after another, always finding the largest rectangle of uniform color that starts at each particular point. The pictures below show regions with an area of more than 10 cells found in this way. The presence of so many thin and overlapping regions prevents good compression.
 
-![](_page_1087_2D_Run_Length_Two_Panel_Row.jpeg)
+![](images/_page_1087_2D_Run_Length_Two_Panel_Row.jpeg)
 
 2D run-length encoding can also be done by scanning the data according to a more complicated space-filling curve, of the kind discussed on page 893.
 
@@ -186,11 +186,11 @@ The concept of orthogonal bases was historically worked out first in the conside
 
 The pictures below show how 1D arrays of data values can be built up by adding together 1D Walsh functions. At each step the Walsh function used is given underneath the array of values obtained so far.
 
-![](_page_1087_Figure_27.jpeg)
+![](images/_page_1087_Figure_27.jpeg)
 
 The components of the vectors for 1D Walsh functions can be ordered in many ways. The pictures below show the complete matrices of basis vectors obtained with three common orderings.
 
-![](_page_1088_Walsh_Ordering_Three_Matrix_Row.jpeg)
+![](images/_page_1088_Walsh_Ordering_Three_Matrix_Row.jpeg)
 
 The matrices for size  $n = 2^s$  can be obtained from
 
@@ -207,7 +207,7 @@ Nest[Flatten2D[Map[# {{1, 1}, {1, -1}} &, #, {2}]] &, {{1}}, s]
 Flatten2D[a_] := Apply[Join, Apply[Join, Map[Transpose, a], {2}]]
 ```
 
-![](_page_1088_Hadamard_Construction_Five_Stage_Row.jpeg)
+![](images/_page_1088_Hadamard_Construction_Five_Stage_Row.jpeg)
 
 (c) is known as dyadic or Paley order. It is related to (a) by Gray code reordering of the rows, and to (b) by reordering according to (see page 905)
 
@@ -237,7 +237,7 @@ Walsh functions were used by electrical engineers such as Frank Fowle in the 189
 
 ■ **Page 575 · Walsh spectra.** The arrays of absolute values of weights of basic forms for successive images are as follows:
 
-![](_page_1088_Picture_26.jpeg)
+![](images/_page_1088_Picture_26.jpeg)
 
 ■ **Hadamard matrices.** Hadamard matrices are $n \times n$ matrices with elements -1 and +1, whose rows are orthogonal, so that `m . Transpose[m] == n IdentityMatrix[n]`. The matrices used in Walsh transforms are special cases with  $n = 2^s$ . There are thought to be Hadamard matrices with every size $n = 4 k$ (and for $n > 2$ no other sizes are possible); the number of distinct such matrices for each k up to 7 is 1, 1, 1, 5, 3, 60, 487. The so-called Paley family of Hadamard matrices for $n = 4 k = p + 1$ with $p$ prime are given by
 
@@ -250,12 +250,12 @@ Originally introduced by Jacques Hadamard in 1893 as the matrices with elements 
 
 ■ **Image averaging.** Walsh functions yield significantly better compression than simple successive averaging of 2×2 blocks of cells, as shown below.
 
-![](_page_1088_Picture_31.jpeg)
+![](images/_page_1088_Picture_31.jpeg)
 
 ■ **Practical image compression.** Two basic phenomena contribute to our ability to compress images in practice. First, that typical images of relevance tend to be far from random—indeed they often involve quite limited numbers of distinct objects. And second, that many fine details of images go unnoticed by the human visual system (see the next section).
 ■ **Fourier transforms.** In a typical Fourier transform, one uses basic forms such as  $Exp[i\pi r x/n]$  with r running from 1 to n. The weights associated with these forms can be found using Fourier, and given these weights the original data can also be reconstructed using InverseFourier. The pictures below show what happens in such a so-called discrete cosine transform when different fractions of the weights are kept, and others are effectively set to zero. High-frequency wiggles associated with the so-called Gibbs phenomenon are typical near edges.
 
-![](_page_1089_Picture_3.jpeg)
+![](images/_page_1089_Picture_3.jpeg)
 
 Fourier[data] can be thought of as multiplication by the  $n \times n$  matrix  $Array[Exp[2\pi i\#1\#2/n]\&, \{n, n\}, 0]$ . Applying BitReverseOrder to this matrix yields a matrix which has an essentially nested form, and for size  $n = 2^s$  can be obtained from
 
@@ -279,11 +279,11 @@ With[{n = Length[data]}, Fold[Flatten[Map[With[
 ■ **JPEG compression.** In common use since the early 1990s JPEG compression works by first assigning color values to definite bins, then applying a discrete Fourier cosine transform, then applying Huffman encoding to the resulting weights. The “quality” of the image is determined by how many weights are kept; a typical default quality factor, used say by Export in *Mathematica*, is 75.
 ■ **Wavelets.** Each basic form in an ordinary Walsh or Fourier transform has nonzero elements spread throughout. With wavelets the elements are more localized. As noted in the late 1980s basic forms can be set up by scaling and translating just a single appropriately chosen underlying shape. The (a) Haar and (b) Daubechies wavelets  $\psi[x]$  shown below both have the property that the basic forms  $2^{m/2} \psi[2^m x - n]$  (whose 2D analogs are shown as on page 573) are orthogonal for every different m and n.
 
-![](_page_1089_Figure_11.jpeg)
+![](images/_page_1089_Figure_11.jpeg)
 
 The pictures below show images built up by keeping successively more of these basic forms. Sharp edges have fewer wiggles than with Fourier transforms.
 
-![](_page_1089_Figure_13.jpeg)
+![](images/_page_1089_Figure_13.jpeg)
 
 ■ **Sound compression.** See page 1080.
 
@@ -298,7 +298,7 @@ The fact that white light is a mixture of colors was noticed by Isaac Newton in 
 ■ **Nerve cells.** In the retina and the brain, nerve cells typically have an irregular tree-like structure, with between a few and a few thousand dendrites carrying input signals, and one or more axons carrying output signals. Nerve cells can respond on timescales of order milliseconds to changes in their inputs by changing their rate of generating output electrical spikes. As has been believed since the 1940s, most often nerve cells seem to operate at least roughly by effectively adding up their inputs with various positive or negative weights, then going into an excited state if the result exceeds some threshold. The weights seem to be determined by detailed properties of the synapses between nerve cells. Their values can presumably change to reflect certain aspects of the activity of the cell, thus forming a basis for memory (see page 1102). In organisms with a total of only a few thousand nerve cells, each individual cell typically has definite connections and a definite function. But in humans with perhaps 100 billion nerve cells, the physical connections seem quite haphazard, and most nerve cells probably develop their function as a result of building up weights associated with their actual pattern of behavior, either spontaneous or in response to external stimuli.
 ■ **The visual system.** Connected to the 100 million or so light-sensitive photoreceptor cells on the retina are roughly two layers of nerve cells, with various kinds of cross-connections, out of which come the million fibers that form the optic nerve. After essentially one stop, most of these go to the primary visual cortex at the back of the brain, which itself contains more than 100 million nerve cells. Physical connections between nerve cells have usually been difficult to map. But starting in the 1950s it became possible to record electrical activity in single cells, and from this the discovery was made that many cells respond to rather specific visual stimuli. In the retina, most common are center-surround cells, which respond when there is a higher level of light in the center of a roughly circular region and a lower level outside, or vice versa. In the first few layers of the visual cortex about half the cells respond to elongated versions of similar stimuli, while others seem sensitive to various forms of change or motion. In the fovea at the center of the retina, a single center-surround cell seems to get input from just a few nearby photoreceptors. In successive layers of the visual cortex cells seem to get input from progressively larger regions. There is a very direct mapping of positions on the retina to regions in the visual cortex. But within each region there are different cells responding to stimuli at different angles, as well as to stimuli from different eyes. Cells with particular kinds of responses are usually found to be arranged in labyrinthine patterns very much like those shown on page 427. And no doubt the processes which produce these patterns during the development of the organism can be idealized by simple 2D cellular automata. Quite what determines the pattern of illumination to which a given cell will respond is not yet clear, although there is some evidence that it is the result of adaptation associated with various kinds of test inputs. Since the late 1970s, it has been common to assume that the response of a cell can be modelled by derivatives of Gaussians such as those shown below, or perhaps by Gabor functions given by products of trigonometric functions and Gaussians. Experiments have determined responses to these and other specific stimuli, but inevitably no experiment can find all the stimuli to which a cell is sensitive.
 
-![](_page_1090_Picture_7.jpeg)
+![](images/_page_1090_Picture_7.jpeg)
 
 The visual systems of a number of specific higher and lower organisms have now been studied, and despite a few differences (such as cross-connections being behind the photoreceptors on the retinas of octopuses and squids, but in front in most higher animals), the same general features are usually seen. In lower organisms, there tend to be fewer layers of cells, with individual cells more specialized to particular visual stimuli of relevance to the organism.
 
@@ -307,7 +307,7 @@ The visual systems of a number of specific higher and lower organisms have now b
 ■ **Scale invariance.** In a first approximation our recognition of objects does not seem to be much affected by overall size or overall light level. For light level—as with color constancy—this is presumably achieved by responding only to differences between levels at different positions. Probably the same effect contributes to scale invariance by emphasizing only edges and corners. And if one is looking at objects like letters, it helps that one has learned them at many different sizes. But also similar cells most likely receive inputs from regions with a range of different sizes on the retina—making even unfamiliar textures seem the same over at least a certain range of scales. When viewed at a normal reading distance of 12 inches each square in the picture on page 578 covers a region about 5 cells across on the retina. With good lighting and good eyesight the textures in the picture can still be distinguished at a distance of 5 feet, where each square covers only one cell. But if the picture is enlarged by a factor of 3 or more then at normal reading distance it can become difficult to distinguish the textures—perhaps because the squares cover regions larger than the templates used at the lowest levels in our visual system.
 ■ **History.** Ever since antiquity the visual arts have yielded practical schemes and sometimes also fairly abstract frameworks for determining what features of images will have what impact. In fact, even in prehistoric times it seems to have been known, for example, that edges are often sufficient to communicate visual forms, as in the pictures below.
 
-![](_page_1091_Visual_History_Four_Panel_Row.jpeg)
+![](images/_page_1091_Visual_History_Four_Panel_Row.jpeg)
 
 Visual perception has been used for centuries as an example in philosophical discussions about the nature of experience. Traditional mathematical methods began to be applied to it in the second half of the 1800s, particularly through the development of psychophysics. Studies of visual illusions around the end of the 1800s raised many questions that were not readily amenable to numerical measurement or traditional mathematical analysis, and this led in part to the Gestalt approach to psychology which attempted to formulate various global principles of visual perception.
 
@@ -315,11 +315,11 @@ In the 1940s and 1950s, the idea emerged that visual images might be processed u
 
 Attempts to characterize human abilities to perceive texture appear to have started in earnest with the work of Bela Julesz around 1962. At first it was thought that the visual system might be sensitive only to the overall autocorrelation of an image, given by the probability that randomly selected points have the same color. But within a few years it became clear that images could be constructed—notably with systems equivalent to additive cellular automata (see below)—that had the same autocorrelations but looked completely different. Julesz then suggested that discrimination between textures might be based on the presence of “textons”, loosely defined as localized regions like those shown below with some set of distinct geometrical or topological properties.
 
-![](_page_1091_Picture_11.jpeg)
+![](images/_page_1091_Picture_11.jpeg)
 
 In the 1970s, two approaches to vision developed. One was largely an outgrowth of work in artificial intelligence, and concentrated mostly on trying to use traditional mathematics to characterize fairly high-level perception of objects and their geometrical properties. The other, emphasized particularly by David Marr, concentrated on lower-level processes, mostly based on simple models of the responses of single nerve cells, and very often effectively applying <code>ListConvolve</code> with simple kernels, as in the pictures below.
 
-![](_page_1091_Image_Processing_Four_Panel_Row.jpeg)
+![](images/_page_1091_Image_Processing_Four_Panel_Row.jpeg)
 
 In the 1980s, approaches based on neural networks capable of learning became popular, and attempts were made in the context of computational neuroscience to create models combining higher- and lower-level aspects of visual perception.
 
@@ -329,7 +329,7 @@ The basic idea that early stages of visual perception involve extraction of loca
 ■ **Testing the model.** Although it is difficult to get good systematic data, the many examples I have tried indicate that the levels of discrimination between textures that we achieve with our visual system agree remarkably well with those suggested by my simple model. A practical issue that arises is that if one repeatedly tries experiments with the same set of textures, then after a while one learns to discriminate these particular textures better. Shifting successive rows or even just making an overall rotation seems, however, to avoid this effect.
 ■ **Related models.** Rather than requiring particular templates to be matched, one can consider applying arbitrary cellular automaton rules. The pictures below show results from a single step of the 16 even-numbered totalistic 5-neighbor rules. The results are surprisingly easy to interpret in terms of feature extraction.
 
-![](_page_1092_Picture_6.jpeg)
+![](images/_page_1092_Picture_6.jpeg)
 
 ■ **Image processing.** The release of programs like Photoshop in the late 1980s made image processing operations such as smoothing, sharpening and edge detection widely available on general-purpose computers. Most of these operations are just done by applying ListConvolve with simple kernels. (Even before computers, such convolutions could be done using the fact that diffraction of light effectively performs Fourier transforms.) Ever since the 1960s all sorts of schemes for nonlinear processing of images have been discussed and used in particular communities. An example originally popular in the earth and environmental sciences is so-called mathematical morphology, based on “dilation” of data consisting of 0’s and 1’s with a “structuring element”  $\sigma$ according to  `Sign[ListConvolve[σ, data, 1, 0]]`  (as well as the dual operation of “erosion”). Most schemes like this can ultimately be thought of as picking out templates or applying simple cellular automaton rules.
 
@@ -343,7 +343,7 @@ Nest[Flatten2D[{{4 # + 0, 4 # + 2},
   {4 # + 3, 4 # + 1}}] &, {{0}}, n]
 ```
 
-![](_page_1092_Ordered_Dither_Progression.jpeg)
+![](images/_page_1092_Ordered_Dither_Progression.jpeg)
 
 An alternative to this so-called ordered dither approach is the Floyd-Steinberg or error-diffusion method invented in 1976. This scans sequentially, accumulating and spreading total gray level in the data, then generating a black pixel whenever a threshold is exceeded. The method can be implemented using
 
@@ -357,37 +357,37 @@ Module[{a = Flatten[data], r, s},
 
 In its original version  $m = \{7, 3, 5, 1\}/16$ , as in the first row of pictures below. But even with  $m = \{1, 0, 1, 0\}/2$  the method generates fairly random patterns, as in the second row below. (Note that significantly different results can be obtained if different boundary conditions are used for each row.)
 
-![](_page_1093_Picture_2.jpeg)
+![](images/_page_1093_Picture_2.jpeg)
 
 To give the best impression of uniform gray, one must in general minimize features detected by the human visual system. One simple way to do this appears to be to use nested patterns like the ones below.
 
-![](_page_1093_Picture_4.jpeg)
+![](images/_page_1093_Picture_4.jpeg)
 
 ■ **Generating textures.** As discussed on page 217, it is in general difficult to find 2D patterns which at all points match some definite set of templates. With 2×2 templates, there turn out to be just 7 minimal such patterns, shown below. Constructing patterns in which templates occur with definite densities is also difficult, although randomized iterative schemes allow some approximation to be obtained.
 
-![](_page_1093_Picture_6.jpeg)
+![](images/_page_1093_Picture_6.jpeg)
 
 One-dimensional cellular automata are especially convenient generators of distinctive textures. Indeed, as was noticed around 1980, generalizations of additive rules involving cells in different relative locations can produce textures with similar statistics, but different visual appearance, as shown below. (All the examples shown turn out to correspond to ordinary, sequential and reversible cellular automata seen elsewhere in this book.) (See also page 1018.)
 
-![](_page_1093_Picture_8.jpeg)
+![](images/_page_1093_Picture_8.jpeg)
 
 ■ **Moire patterns.** The pictures below show moire patterns formed by superimposing grids of points at different angles. Our visual system does not immediately perceive the grids, but instead mainly picks up features formed from local arrangements of dots. The second picture below is similar to patterns of halftone screens visible in 4-color printing under a magnifying glass.
 
-![](_page_1093_Picture_11.jpeg)
+![](images/_page_1093_Picture_11.jpeg)
 
 In the first two pictures below, bands with spacing  $1/2 \, Csc[\theta/2]$  are visible wherever lines cross. In the second two pictures there is also an apparent repetitive pattern with approximately the same repetition period.
 
-![](_page_1093_Picture_13.jpeg)
+![](images/_page_1093_Picture_13.jpeg)
 
 The patterns are exactly repetitive only when  $Tan[\theta] == u/v$ , where u and v are elements of a primitive Pythagorean triple (so that u, v and  $Sqrt[u^2 + v^2]$  are all integers, and `GCD[u, v] == 1`). This occurs when  $u = r^2 - s^2$ , $v = 2 r s$ (see page 945), and in this case the minimum displacement that leaves the whole pattern unchanged is  $\{s, r\}$ .
 
-![](_page_1093_Picture_15.jpeg)
+![](images/_page_1093_Picture_15.jpeg)
 
 The second row of pictures illustrates what happens if points closer than distance  $1/\sqrt{2}$  are joined. The results appear to capture at least some of the features picked out by our visual system.
 
 ■ **Perception and presentation.** In writing this book it has been a great challenge to find graphical representations that make the behavior of systems as clear as possible for the purposes of human visual perception. Even small changes in representation can greatly affect what properties are noticed. As a simple example, the pictures below are identical, except for the fact that the colors of cells on alternate rows have been reversed.
 
-![](_page_1094_Perception_Presentation_Two_Panel_Row.jpeg)
+![](images/_page_1094_Perception_Presentation_Two_Panel_Row.jpeg)
 
 ### Auditory Perception
 
@@ -412,7 +412,7 @@ With  $\omega \simeq 500 \, Hz$ , one can explicitly hear the time variation of 
 
 In music it is usually thought that chords consisting of tones with frequencies whose ratios have small denominators (such as 3/2, corresponding to a perfect fifth) yield the most pleasing sounds. The mechanics of the ear imply that if two tones of reasonable amplitude are played together, progressively smaller additional signals will effectively be generated at frequencies  $Abs[n_1 \omega_1 \pm n_2 \omega_2]$ . The picture below shows the extent to which such frequencies tend to be in the range that yield grating effects. The minima at values of  $\omega_2/\omega_1$  corresponding to rationals with small denominators may explain why such chords seem more pleasing. (See also page 917.)
 
-![](_page_1094_Figure_15.jpeg)
+![](images/_page_1094_Figure_15.jpeg)
 
 ■ **History.** The notion of musical notes and of concepts such as octaves goes back at least five thousand years. Around 550 BC the Pythagoreans identified various potential connections between numbers and the perception of sounds. And over the course of time a wide range of mathematical and aesthetic principles were suggested. But it was not until the 1800s, particularly with the work of Hermann Helmholtz, that the physical basis for the perception of sound began to be seriously investigated. Work on speech sounds by Alexander Graham Bell and others was related to the development of the telephone in the late 1800s. In the past few decades, with better experiments, particularly on the emission of sound by the ear, and with ideas and analysis from electrical engineers and physicists the basic behavior of at least the cochlea is becoming largely understood.
 ■ **Sonification.** Sound has occasionally been used as a means of understanding scientific data. In the 1950s and 1960s analog computers (and sometimes digital computers) routinely had sound output. And in the 1970s some discoveries about chaos in differential equations were made using such output. In experimental neuroscience sounds are also routinely used to monitor impulses in nerve cells.
@@ -471,11 +471,11 @@ The same basic setup also applies to spectra associated with linear filters and 
 
 ■ **Spectra of cellular automata.** When cellular automata have non-trivial attractors as discussed in Chapter 6 the spectra of sequences obtained at particular steps can exhibit a variety of features, as shown below.
 
-![](_page_1097_Figure_7.jpeg)
+![](images/_page_1097_Figure_7.jpeg)
 
 ■ **2D spectra.** The pictures below give the 2D Fourier transforms of the nested patterns shown on page 583.
 
-![](_page_1097_Figure_9.jpeg)
+![](images/_page_1097_Figure_9.jpeg)
 
 ■ **Diffraction patterns.** X-ray diffraction patterns give Fourier transforms of the spatial arrangement of atoms in a material. For an ordinary crystal with atoms on a repetitive lattice, the patterns consist of a few isolated peaks. For quasicrystals with generalized Penrose tiling structures the patterns also contain a few large peaks, though as in example (b) on page 586 there are also a hierarchy of smaller peaks present. In general, materials with nested structures do not necessarily yield discrete diffraction patterns. In the early 1990s, experiments were done in which layers a few atoms thick of two different materials were deposited in a Thue-Morse sequence. The resulting object was found to yield X-ray diffraction patterns just like example (a) on page 586.
 
@@ -495,7 +495,7 @@ Classical statistical analysis mostly involves trying to use data to estimate pa
 ■ **Page 589 · Estimation of parameters.** One way to estimate parameters in simple probabilistic models is to compute the mean and other moments of the data and then to work out what values of the parameters will reproduce these. More general is the maximum likelihood method in which one finds the values of the parameters which maximize the probability of generating the observed data from the model. (Least squares fits do this for models in which the data exhibits independent Gaussian variations.) Various modifications can be made involving for example weighting with a risk function before maximizing. If one starts with a priori probability distributions for all parameters, then Bayes’s Theorem on conditional probabilities allows one to avoid the arbitrariness of methods such as maximum likelihood and explicitly to work out from the observed data what the probability is for each possible choice of parameters in the model. It is rare in practice, however, to be able to get convincing *a priori* probability distributions, although when there are physical or other reasons to expect entropy to be maximized the so-called maximum entropy method may be useful.
 ■ **Complexity of models.** The pictures at the top of the next page show least squares fits (found using Fit in *Mathematica*) to polynomials with progressively higher degrees and therefore progressively more parameters. Which fit should be considered best in any particular case must ultimately depend on external considerations. But since the 1980s there have been attempts to find general criteria, typically based on maximizing quantities such as -Log[p]-d (the Akaike information criterion), where p is the probability that the observed data would be generated from a given model (-Log[p] is proportional to variance in a least squares fit), and *d* is the number of parameters in the model.
 
-![](_page_1099_Figure_1.jpeg)
+![](images/_page_1099_Figure_1.jpeg)
 
 ■ **Page 590 · Markov processes.** The networks in the main text can be viewed as representing finite automata (see page 957) with probabilities associated with transitions between nodes or states. Given a vector of probabilities to be in each state, the evolution of the system corresponds to multiplication by the matrix of probabilities for each transition. (Compare the calculation of properties of substitution systems on page 890.) Markov processes first arose in the early 1900s and have been widely studied since the 1950s. In their first uses as models it was typically assumed that each state transition could explicitly be observed. But by the 1980s hidden Markov models were being studied, in which only some of the states or transitions could be distinguished by outside observations. Practical applications were made in speech understanding and text compression. And in the late 1980s, building on work of mine from 1984 (described on page 276), James Crutchfield made a study of such models in which he defined the complexity of a model to be equal to $-p Log[p]$ summed over all connections in the network. He argued that the best scientific model is one that minimizes this complexity—which with probabilities 0 and 1 is equivalent to minimizing the number of nodes in the network.
 ■ **Non-local processes.** It follows from the fact that any path in a finite network must always eventually return to a node where it has been before that any Markov process must be fundamentally local, in the sense that the probabilities it implies for what happens at a given point in a sequence must be independent of those for points sufficiently far away. But probabilistic models based on other underlying systems can yield sequences with long-range correlations. As an example, probabilistic neighbor-independent substitution systems can yield sequences with hierarchical structures that have approximate nesting. And since the mid-1990s such systems (usually characterized as random trees or random context-free languages) have sometimes been used in analyzing data that is expected to have grammatical structure of some kind.
@@ -521,7 +521,7 @@ In a cryptographic system with keys of length n there will typically be a total 
 
 ■ **Text.** As the picture below illustrates, English text typically remains intelligible until about half its characters have been deleted, indicating that it has a redundancy of around 0.5. Most other languages have slightly higher redundancies, making documents in those languages slightly longer than their counterparts in English.
 
-![](_page_1101_English_Text_Redundancy_Strip.jpeg)
+![](images/_page_1101_English_Text_Redundancy_Strip.jpeg)
 
 Redundancy can in principle be estimated by breaking text into blocks of length b, then looking for the limit of the entropy as  $b \to \infty$  (see page 1084). Statistically uniform samples of text do not in practice, however, tend to be large enough to allow more than about b = 6 to be reached, and the presence of correlations (even though exponentially damped) between far-separated letters means that computed entropies usually decrease continually with b, making it difficult to estimate their limit (see page 1084). Note that particularly in computer languages higher redundancy is found if one takes account of grammatical structure.
 
@@ -562,14 +562,14 @@ Cases[Map[Fold[Prepend[#1, If[#2 == 1 ⊻
   {a_, b_, c___, a_, b_} -> {b, c, a}]
 ```
 
-![](_page_1102_Rule_30_Predecessor_Five_Column_Row.jpeg)
+![](images/_page_1102_Rule_30_Predecessor_Five_Column_Row.jpeg)
 
 ■ **Directional sampling.** One can consider sampling cells not in a vertical column but on lines at any angle. In a rule 30 system of infinite size, it turns out that at 45  $^{\circ}$  clockwise from vertical all possible sequences can occur on any two adjacent lines, probably making cryptanalysis more difficult in this case. (Note that directional sampling is always equivalent to looking at a vertical column in the evolution of a cellular automaton whose basic rule has been composed with an appropriate shift rule.)
 ■ **Alternative rules.** Among elementary rules, rule 45 is the only plausible alternative to rule 30. It usually yields longer repetition periods (see page 260), but shows slightly slower responses to changes in the key. (Changes expand about 1.24 cells per step in rule 30, and about 1.17 in rule 45.) Rule 45 shares with rule 30 the property of one-sided additivity. With the occasional exception of the additive rule 60, elementary rules not equivalent to 30 or 45 tend to exhibit vastly shorter repetition periods. (The completely non-additive rule with largest typical repetition period is rule 110.) (See page 951.)
 
 If one considers rules that depend on 4 rather than 3 cells, then the results turn out to be surprisingly similar: out of all 65536 possible such rules the ones with longest periods essentially always seem to be variants of rules 45, 30 or 60. In a region of size 15, for example, the longest period is 20460, and this is achieved by rule 13251, which is just rule 45 applied to the first three cells in the neighborhood. (Rule 45 itself has period 6820 in this case.) After a few rules with long periods, the periods obtained drop off rapidly. (In general the number of rules with a given period seems to decrease roughly exponentially with period.) For size 15, the 33 rules with the longest periods are all additive with respect to one position. The pictures below show the first rules that are not additive with respect to any position.
 
-![](_page_1103_Picture_4.jpeg)
+![](images/_page_1103_Picture_4.jpeg)
 
 Among the 4,294,967,296 r = 2 rules which depend on 5 cells, there are again just a few that give long periods, but now only a small fraction of these seem directly related to rules 45 and 30, and perhaps half are not additive with respect to any position. The pictures below show the rules with longest periods for size 15; these same rules also yield the longest periods for many other sizes. The first two are additive with respect to one position, but do not appear to be directly related to rules 45 or 30; the last two are not additive with respect to any position. Formulas for the rules are respectively:
 
@@ -586,7 +586,7 @@ $$
 
 Note that for size 15 the maximum possible period is 32730 (see page 950).
 
-![](_page_1103_Figure_7.jpeg)
+![](images/_page_1103_Figure_7.jpeg)
 
 ■ **Nonlinear feedback shift registers.** Linear feedback shift registers of the kind discussed on page 974 can be generalized to allow any function f (note the slight analogy with cyclic tag systems):
 
@@ -601,27 +601,27 @@ Nonlinear feedback shift registers were apparently studied in the context of mil
 
 `f[{w_, x_, y_, z_}] := Mod[w + y + z + x y + x z + y z, 2]` (apparently chosen to have balance between 0’s and 1’s that would minimize correlations). Tap positions `{1, 2, 3, 4}` were among those studied, but nothing like the pictures below were apparently ever explicitly generated—and nearly three decades passed before I noticed the remarkable behavior of the rule 30 cellular automaton.
 
-![](_page_1103_Nonlinear_Feedback_Shift_Register_Two_Panel_Row.jpeg)
+![](images/_page_1103_Nonlinear_Feedback_Shift_Register_Two_Panel_Row.jpeg)
 
 Sequences of states in any shift register must correspond to paths through a network of the kind shown on page 941. And as noted by Nicolaas de Bruijn in 1946 there are  $2^{2^{n-1}-n}$  such paths with length  $2^n$ , and thus this number of functions f out of the  $2^{2^n}$  possible must yield sequences of maximal length. (For *k* colors, the number of paths is  $k!^{k^{n-1}}/k^n$ .)
 
 ■ **Backtracking.** If one wants to find out which of the 2<sup>n</sup> possible initial conditions of width n evolve to yield a specific column of colors in a system like an elementary cellular automaton one can usually do somewhat better than just testing all possibilities. The picture below illustrates a typical approach, applied to 3 steps of rule 30. The idea is successively to look at each numbered cell, and to make a tree of possibilities representing what happens if one tries to fill in each possible color for each cell. A branch in the resulting tree continues only if it corresponds to a configuration of cell colors whose evolution is consistent with the specified column of colors.
 
-![](_page_1104_Backtracking_Four_Component_Group.jpeg)
+![](images/_page_1104_Backtracking_Four_Component_Group.jpeg)
 
 The picture below shows trees obtained for the column
 
-![](_page_1104_Target_Column_Swatch.jpeg)
+![](images/_page_1104_Target_Column_Swatch.jpeg)
 
 in various elementary cellular automata. In cases like rules 250 and 254 no initial condition gives the specified column, so all branches eventually die out. In class 2 examples like rule 10 many intermediate configurations are possible. Rules like 90 and to some extent 30 that allow sideways evolution yield comparatively simple trees.
 
-![](_page_1104_Picture_9.jpeg)
+![](images/_page_1104_Picture_9.jpeg)
 
 If one wants to find just a single initial condition that works then one can set up a recursive algorithm that in effect does a depth-first traversal of the tree. No doubt in many cases the number of nodes that have to be visited eventually increases like $2^t$, but many branches usually die off quickly, greatly reducing the typical effort required in practice.
 
 ■ **Deducing cellular automaton rules.** Given a complete cellular automaton pattern it is easy to deduce the rule which produced it just by identifying examples of places where each element in the rule was used, as in the picture at the top of the next column. Given an incomplete pattern, deducing the rule in effect requires solving Boolean equations.
 
-![](_page_1104_Figure_12.jpeg)
+![](images/_page_1104_Figure_12.jpeg)
 
 ■ **Linear congruential generators.** Cryptanalysis of linear congruential generators is fairly straightforward. Given only an output list `NestList[Mod[a #, m] &, x, n]` parameters {a, m} that generate the list can be found for sufficiently large n from
 
@@ -649,7 +649,7 @@ Module[{f = Mod[#^2 + 1, n] &, a = 2, b = 5, c},
 
 Most existing methods depend on facts in number theory that are fairly easy to state, though implementing them for maximum efficiency tends to lead to complex programs. Typical running times for FactorInteger[n] in *Mathematica* 4 are shown below for the first 1000 numbers with each of 15 through 30 digits. Different current methods asymptotically require slightly different numbers of steps—but all typically at least Exp[Sqrt[Log[n]]]. Nevertheless, to test whether a number is prime (PrimeQ) it is known that only a few more than Log[n] steps suffice.
 
-![](_page_1105_Figure_7.jpeg)
+![](images/_page_1105_Figure_7.jpeg)
 
 ■ **RSA cryptography.** Widely used in practice, the idea is to encode messages using a public key specified by a number n, but to make it so that to decode the messages requires a private key based on the factors of n. An element m in a message is encoded as c = PowerMod[m, d, n]. It can then be decoded as PowerMod[c, e, n], where e = PowerMod[d, -1, EulerPhi[n]]. But to find EulerPhi[n] (see page 1093) is equivalent in difficulty to finding the factors of n.
 
@@ -659,7 +659,7 @@ Most existing methods depend on facts in number theory that are fairly easy to s
 
 discussed on page 975 has the property that if $m = p q$ with $p$ and $q$ primes (congruent to 3 modulo 4) then any systematic regularities detected in the sequence can eventually be used to discover factors of m. What is behind this is that each of the numbers in the basic sequence here must be a so-called quadratic residue of the form  $Mod[v^2, m]$ , and given any such quadratic residue x the expression  $GCD[x + Mod[x^2, m], m]$ turns out always to be a factor of m—and at least sometimes a non-trivial one. So if one could reconstruct sufficiently many complete numbers x from the sequence of Mod[x, 2] values then this would provide a way to factor m (compare the Pollard rho method above). But in practice it is difficult to do this, because without knowing the factors of m one cannot even readily tell whether a given x is a quadratic residue modulo m. The pictures below show as black squares all the quadratic residues for each successive m going down the page (the ordinary squares 1, 4, 9, 16, … show up as vertical black stripes). If m is a prime p, then the simple tests JacobiSymbol[x, p] == 1 (see page 1081) or  $Mod[x^{(p-1)/2}, p] == 1$ determine whether x is a quadratic residue. But with m = p q, one has to factor m and find p and q in order to carry out similar tests. The condition `Mod[p, 4] == Mod[q, 4] == 3` ensures that only one of the solutions +v and -v to  $x == Mod[v^2, m]$  is ever a quadratic residue, with the result that the iterated mapping  $x \rightarrow Mod[x^2, m]$  always has a unique inverse. But unlike in a cellular automaton even given a complete x (the analog of a complete cellular automaton state) it is difficult to invert the mapping and solve for the x on the previous step.
 
-![](_page_1105_Quadratic_Residue_Two_Panel_Row.jpeg)
+![](images/_page_1105_Quadratic_Residue_Two_Panel_Row.jpeg)
 
 ### Traditional Mathematics and Mathematical Formulas
 
@@ -667,7 +667,7 @@ discussed on page 975 has the property that if $m = p q$ with $p$ and $q$ primes
 
 ■ **Difference tables and polynomials.** A common mathematical approach to analyzing sequences is to form a difference table by repeatedly evaluating  `d[list_] := Drop[list, 1] - Drop[list, -1]` . If the elements of list correspond to values of a polynomial of degree n at successive integers, then Nest[d, list, n+1] will contain only zeros. If the differences are computed modulo k then the difference table corresponds essentially to the evolution of an additive cellular automaton (see page 597). The pictures below show the results with k = 2 (rule 60) for (a) Fibonacci[n], (b) Thue-Morse sequence, (c) Fibonacci substitution system, (d) (Prime[n] - 1)/2, (e) digits of  $\pi$ . (See also page 956.)
 
-![](_page_1106_Picture_4.jpeg)
+![](images/_page_1106_Picture_4.jpeg)
 
 ■ **Page 607 · Implementation.** The color of a cell at position `{x, y}` in the pattern shown is given by  `Extract[{{1, 0, 1}, {0, 1, 0}}, Mod[{y, x}, {2, 3}] + 1]`.
 ■ **Page 608 · Nested patterns and numbers.** See page 931.
@@ -682,7 +682,7 @@ This works in any number of dimensions so long as each replacement yields a bloc
 
 ■ **Arbitrary digit operations.** If the operation on digit sequences that determines whether a square will be black can be performed by a finite automaton (see page 957) then the pattern generated must always be either repetitive or nested. The pictures below show examples with more general operations. Picture (a) in effect shows which words in a simple context-free language of parenthesis matching (see page 939) are syntactically correct. Scanning the digit sequences from the left, one starts with 0 open parentheses, then adds 1 whenever corresponding digits in the x and y coordinates differ, and subtracts 1 whenever they are the same. A square is black if no negative number ever appears. Picture (b) has a black square wherever digits at more than half the possible positions differ between the x and y coordinates. Picture (c) has a black square wherever the maximum run of either identical or different digits has a length which is an odd number. All the patterns shown have the kind of intricate substructure typical of nesting. But none of the patterns are purely nested.
 
-![](_page_1106_Arbitrary_Digit_Operations_Three_Panel_Row.jpeg)
+![](images/_page_1106_Arbitrary_Digit_Operations_Three_Panel_Row.jpeg)
 
 ■ **Page 610 · Generating functions.** A convenient algebraic way to describe a sequence of numbers a[n] is to give a generating function  $Sum[a[n] x^n, \{n, 0, \infty\}]$ . 1/(1-x) thus corresponds to the constant sequence and  $1/(1-x-x^2)$  to the Fibonacci sequence (see page 890). A 2D array can be described by  $Sum[a[t, n] x^n y^t, \{n, -\infty, \infty\}, \{t, -\infty, \infty\}]$ . The array for rule 60 is then 1/(1-(1+x) y), for rule 90 1/(1-(1/x+x) y), for rule 150 1/(1-(1/x+1+x) y) and for second-order reversible rule 150 (see page 439)  $1/(1-(1/x+1+x) y-y^2)$ . Any rational function is the generating function for some additive cellular automaton.
 ■ **Page 611 · Pascal’s triangle.** See notes on page 870.
@@ -717,19 +717,19 @@ $$
 
 ■ **Multidimensional additive rules.** The 2D analog of rule 90 yields the patterns shown below. The colors of cells are given essentially by Mod[Multinomial[t, x, y], 2]. In d dimensions  $(2 d)^DigitCount[t, 2, 1]$  cells are black at step t. The fractal dimension of the (d+1)-dimensional structure formed from all black cells is `Log[2, 1 + 2 d]`.
 
-![](_page_1107_2D_Rule_90_Eight_Case_Group.jpeg)
+![](images/_page_1107_2D_Rule_90_Eight_Case_Group.jpeg)
 
 The 2D analog of rule 150 yields the patterns below; the fractal dimension of the structure in this case is `Log[2, (1 + Sqrt[1 + 4/d]) d]`.
 
-![](_page_1107_2D_Rule_150_Eight_Case_Group.jpeg)
+![](images/_page_1107_2D_Rule_150_Eight_Case_Group.jpeg)
 
 ■ **Continuous generalizations.** Functions such as Binomial[t, n] and GegenbauerC[n, -t, -1/2] can immediately be evaluated for continuous t and n. The pictures on the right below show  $Sin[1/2\pi a[t, n]]^2$  for these functions (equivalent to Mod[a[t, n], 2] for integer a[t, n]). The discrete results on the left can be obtained by sampling only where integer grid lines cross. Note that without further conditions the continuous forms cannot be considered unique extensions of the discrete ones. The presence of poles in quantities such as GegenbauerC[1/2, -t, -1/2] leads to essential singularities in the rightmost picture below. (Compare page 922.)
 
-![](_page_1108_Continuous_Generalizations_Three_Part_Group.jpeg)
+![](images/_page_1108_Continuous_Generalizations_Three_Part_Group.jpeg)
 
 ■ **Nested continuous functions.** Most standard continuous mathematical functions never show any kind of nested behavior. Elliptic theta and elliptic modular functions are exceptions. Each of these functions has definite finite values only in a limited region of the complex plane, and on the boundary of this region they exhibit singularities at every single rational point. The picture below shows `Im[ModularLambda[x + I y]]`. Like other elliptic modular functions, ModularLambda satisfies `f[z] == f[(a + b z)/(c + d z)]` with a, b, c, d integers such that `a c - b d == 1`. The function can be obtained as the solution to a second-order nonlinear ordinary differential equation. Nested behavior is also found for example in EllipticTheta[3, 0, z], which is given essentially by  $Sum[z^{n^2}, \{n, \infty\}]$ .
 
-![](_page_1108_Nested_Continuous_Functions_Two_Panel_Row.jpeg)
+![](images/_page_1108_Nested_Continuous_Functions_Two_Panel_Row.jpeg)
 
 ■ **Page 613 · GCD array.** (See also page 950.) There are various deviations from perfect randomness. The density of white squares is asymptotically  $6/\pi^2 \approx 0.61$ . (The probability for s randomly chosen integers to be relatively prime is 1/Zeta[s].) No 2×2 or larger block of white squares can ever occur. An arrangement of black squares with any list of relative offsets will always eventually occur. (This follows from the Chinese Remainder Theorem.) The first 2×2 block of black squares occurs at {14, 20}, the first 3×3 block at {1274, 1308} and the first 4×4 block at {7247643, 10199370}. The densities of such blocks are respectively about 0.002, 2×10<sup>-6</sup> and 10<sup>-14</sup>. In general the density for an arrangement of white squares with offsets v is given in s dimensions by (no simple closed formula seems to exist except for the 1×1 case)
 
@@ -740,7 +740,7 @@ Product[With[{p = Prime[n]},
 
 White squares correspond to lattice points that are directly visible from the origin at the top left of the picture, so that lines to them do not pass through any other integer points. On row n the number of white squares encountered before reaching the leading diagonal is EulerPhi[n]. This function is shown below. Its computation is known in general to be equivalent in difficulty to factoring n (see page 1090). GCD can be computed using Euclid’s algorithm as discussed on page 915.
 
-![](_page_1108_Figure_13.jpeg)
+![](images/_page_1108_Figure_13.jpeg)
 
 ■ **Power cellular automata.** Multiplication by m in base k corresponds to a local cellular automaton operation on digit sequences when every prime that divides m also divides k. The first non-trivial cases for which this is so are k = 6,  $m = 2^{i} 3^{j}$  and k = 10,  $m = 2^i 5^j$ . When m itself divides k, the cellular automaton rule is  `{_, b_, c_} -> m Mod[b, k/m] + Quotient[c, k/m]` ; in other cases the rule can be obtained by composition. A similar result holds for rational m, obtained for example by allowing i and j above to be negative. In all cases the cellular automaton rule, like the original operation on numbers, is invertible. The inverse rule, corresponding to multiplication by 1/m, can be obtained by applying the rule for multiplication by the integer  $k^q/m$ , then shifting right by q positions. (See page 903.)
 
@@ -774,7 +774,7 @@ FixedPoint[Flatten[Map[If[# < k, #, With[
 
 The pictures below show stages in the computation of $3^{20}$ (a) by a power tree in base 2 and (b) by conversion from base 3. Both approaches seem to require about the same number of underlying steps. Note that even though one may only want to find a single digit in  $m^t$ , I know of no way to do this without essentially computing all the other digits in  $m^t$  as well.
 
-![](_page_1109_Power_Computation_Two_Panel_Row.jpeg)
+![](images/_page_1109_Power_Computation_Two_Panel_Row.jpeg)
 
 ■ **Complex powers.** The pictures below show successive powers of complex numbers z with digits extracted according to
 
@@ -785,7 +785,7 @@ d[x_, w_] := If[x < 0, 1 - d[-x, w], IntegerDigits[x, 2, w]]
 
 Non-trivial cases of complex number multiplication never correspond to local cellular automaton operations. (Compare page 933.)
 
-![](_page_1109_Complex_Powers_Four_Panel_Row.jpeg)
+![](images/_page_1109_Complex_Powers_Four_Panel_Row.jpeg)
 
 ■ **Additive cellular automata.** As discussed on page 951 a step in the evolution of an additive cellular automaton can be thought of as multiplication by a polynomial modulo k. After t steps, therefore, the configuration of such a system is given by  $PolynomialMod[poly^t, k]$ . This quantity can be computed using power tree methods (see below), though as discussed on page 609, even more efficient methods are also available. (A similar formalism can be set up for any of the cellular automata with generalized additivity discussed on page 952; see also page 886.)
 ■ **The more general case.** One can think of a single step in the evolution of any system as taking a rule r and state s, and producing a new state h[r, s]. Usually the representations that are used for r and s will be quite different, and the function h will have no special properties. But for both multiplication rules and additive cellular automata it turns out that rules and states can be represented in the same way, and the evolution functions h have the property of being associative, so that `h[a, h[b, c]] == h[h[a, b], c]`. This means that in effect one can always choose to evolve the rule rather than a state. A consequence is that for example 4 steps of evolution can be computed not only as `h[r, h[r, h[r, h[r, s]]]]` but also as `h[h[h[r, r], h[r, r]], s]` or `u = h[r, r]; h[h[u, u], s]`—which requires only 3 applications of h. And in general if h is associative the result `Nest[h[r, #] &, s, t]` of t steps of evolution can be rewritten for example using the repeated squaring method as
@@ -845,7 +845,7 @@ The number of steps required in this procedure can increase exponentially with t
 ■ **Formula sizes.** There are a total of  $2^{2^n}$  possible Boolean functions of n variables. The maximum number of terms needed to represent any of these functions in DNF is  $2^{n-1}$ . The actual numbers of functions which require 0, 1, 2, … terms is for n = 2: {1, 9, 6}; for n = 3: {1, 27, 130, 88, 10}, and for n = 4: {1, 81, 1804, 13472, 28904, 17032, 3704, 512, 26}. The maximal length turns out always to be realized for the simple parity function Xor, as well as its negation. The reason for this is essentially that these functions are the ones that make the coloring of the Boolean hypercube maximally fragmented. (Other functions with maximal length are never additive, at least for  $n \le 4$ .)
 ■ **Cellular automaton formulas.** See page 869. The maximum length DNF for elementary rules after 1 step is 4, and this is achieved by rules 105, 107, 109, 121, 150, 151, 158, 182, 214 and 233. These rules have behavior of quite varying complexity. Rules 150 and 105 are additive, and correspond to Xor and its negation. After t steps the maximum conceivable DNF would be of length  $2^{2 t}$ . In practice, after 2 steps, the maximum length is 9, achieved by rules 107, 121 and 182; after 3 steps, it is 33 achieved by rule 182; after 4 steps, 78 achieved by rule 129; after 5 steps 256 achieved by rules 105 and 150. The distributions of lengths for all elementary rules are shown below.
 
-![](_page_1111_Figure_4.jpeg)
+![](images/_page_1111_Figure_4.jpeg)
 
 Note that the length of a minimal DNF representation cannot be considered a reliable measure of the complexity of a function, since among other things, just exchanging the role of black and white can substantially change this length (as in the case of rule 126 versus rule 129).
 
@@ -868,7 +868,7 @@ $$
 
 The pictures below show the distributions of numbers of *Nand* operations needed for all  $2^{2^n}$  *n*-input Boolean functions. For n = 2, the largest number of such operations is 6, achieved by *Nor*; for n = 3, it is 14, achieved by *Xor* (rule 150); for n = 4, it is 27, achieved by rule 5737, which is Not[Xor[##]] & except when all inputs are *True*. The average number of operations needed when n = 2, 3, 4 is about {2.875, 6.09, 12.23}.
 
-![](_page_1111_NAND_Distributions_Three_Panel_Row.jpeg)
+![](images/_page_1111_NAND_Distributions_Three_Panel_Row.jpeg)
 
 The maximum depths for the expressions of minimal size are respectively 4, 6 and 7, always achieved among others for the function taking the most *Nand* operations. The total numbers of functions involving successive depths are: n = 2:  $\{2, 3, 5, 6\}$ , n = 3:  $\{3, 6, 22, 99, 72, 54\}$ , n = 4:  $\{4, 10, 64, 923, 9663, 54622, 250\}$ , corresponding to averages  $\{2.9, 4.5, 5.8\}$ .
 
@@ -884,7 +884,7 @@ Map[FromDigits[#, 2] &, NestWhile[Append[#,
 
 The results for 2-step cellular automaton evolution in the main text were found by a recursive procedure. First, expressions containing progressively more Nand operations were enumerated, and those for functions that had not been seen before were kept. It then turned out that this made it possible to get to expressions at least half as large as any needed, so that it could be assumed that remaining expressions could be decomposed as  $f[##] ⊼ g[##] \&$ , where f had already been found. The pictures below show some more results obtained in this way.
 
-![](_page_1112_Picture_5.jpeg)
+![](images/_page_1112_Picture_5.jpeg)
 
 ■ **Cellular automaton formulas.** For 1 step, the elementary cellular automaton rules are exactly the 256 n = 3 Boolean functions. For 2 steps, they represent a small subset of the  $2^{32}$ n = 5 functions. They require an average of about 11.6 Nand operations, and a maximum of 27 (achieved by rules 107 and 121).
 
@@ -987,11 +987,11 @@ Even given two specific words it can be difficult to find out whether they shoul
 
 ■ **Numerical data.** In situations where pieces of data can be thought of as points in space similarity can often be defined in terms of spatial distance. And this means that around every point corresponding to a piece of data in memory there is a region of points that can be considered more similar to that point than to any other. Picture (a) shows a so-called Voronoi diagram (see page 1038) obtained in this way in two dimensions. Particularly in higher dimensions, it becomes rather difficult in practice to determine for certain which existing point is closest to some new point. But to do it approximately is considerably easier. One approach, illustrated in picture (b), is to use a d-dimensional tree. Another approach, illustrated in picture (c), is to set up a continuous function with minima at the existing points, and then to search for the closest minimum. In most cases, this search will be done using some iterative scheme such as Newton’s method; the result is that the boundaries between regions typically take on an intricate nested form. (The case shown corresponds to iteration of the map  $z \rightarrow z - (z^3 - 1)/(3 z^2)$  corresponding to Newton’s method for finding the complex roots of  $z^3 == 1$ .)
 
-![](_page_1116_Picture_4.jpeg)
+![](images/_page_1116_Picture_4.jpeg)
 
 The pictures below show how one can build up a kind of memory landscape by successively adding points. In a first approximation, the regions considered similar to a particular minimum are delimited by sharp watersheds corresponding to local maxima in the landscape. But if an iterative scheme for minimization is used, these watersheds are typically no longer sharp, but take on a local nested structure, much as in picture (c) above.
 
-![](_page_1116_Picture_6.jpeg)
+![](images/_page_1116_Picture_6.jpeg)
 
 In numbers earlier digits are traditionally considered more important than later ones, and this allows numbers to be arranged in a simple one-dimensional sequence. But in strings where each element is considered equally important, no such layout is possible. A vague approximation, perhaps useful for some applications, is nevertheless to use a space-filling curve (see page 893).
 
@@ -1082,7 +1082,7 @@ Computer languages emerged in the early 1950s as higher-level alternatives to pr
 
 ■ **Games between programs.** One can set up a game between two programs generating single bits of output by for example taking the input at each step to be the concatenation of the historical sequences of outputs from the two programs. The pictures below show what happens if the programs operate by applying elementary cellular automaton rules t times to 2 t + 1 inputs. The plots on the left show cumulative scores in the Evens and Odds game; the array on the right indicates for each of the 256 possible rules the average number of wins it gets against each of the 256 rules. At some level considerable complexity is evident. But the rules that win most often typically seem to do so in rather simple ways.
 
-![](_page_1120_Games_Between_Programs_Full_Group.jpeg)
+![](images/_page_1120_Games_Between_Programs_Full_Group.jpeg)
 
 ### Higher Forms of Perception and Analysis
 

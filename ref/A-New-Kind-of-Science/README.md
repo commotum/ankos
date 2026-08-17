@@ -16,3 +16,6 @@ navigation; the book text itself is contained in the linked documents.
 Each chapter is stored in its own ordered directory under `CHAPTERS/`. The
 chapter retains its full Markdown filename, and its referenced figures are
 stored in the adjacent `images/` directory.
+
+The notes documents follow the same layout under `BACK-MATTER/NOTES/`, with
+source and component figures kept alongside each document in `images/`.

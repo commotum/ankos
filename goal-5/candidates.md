@@ -14,7 +14,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: rewrite nearby edges or nodes then move activity; one atomic sequential commit
 - Termination/output: stops if activity is trapped or no rule applies; outputs graph and active-node path
 - Defining variants: connection-following choices; local topology tests; node insertion
-- Representative sources: BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L453-457
+- Representative sources: BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L453-457
 - Distinguishing test: only one node acts per step, unlike a parallel network rewrite
 
 ## C002 — `alternating-block-cellular-automaton`
@@ -26,7 +26,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: apply block collision permutation or unitary then shift alignment for next step / flip eligible active cells in parallel, then toggle parity; two half-step commits conserve energy
 - Termination/output: fixed-step lattice particle trace or amplitudes / fixed steps or indefinite; outputs spin history, energy, or magnetization
 - Defining variants: hex lattice gas; temperature state; reversible conserved; unitary / initial spin density and energy; checkerboard phase
-- Representative sources: CH08:L155-165;N08:L107,L124-126;CH09:L303-321;N09:L923-927 / BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L458-468
+- Representative sources: CH08:L155-165;N08:L107,L124-126;CH09:L303-321;N09:L923-927 / BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L458-468
 - Distinguishing test: the partition alignment alternates and a whole block is transformed as one unit / adjacent sites never update in the same half-step and total nearest-neighbor energy remains invariant
 
 ## C003 — `append-only-sequence-generator`
@@ -38,7 +38,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: append encoded symbols sequentially; the existing prefix is never rewritten
 - Termination/output: normally unbounded; output is the limiting or finite generated sequence
 - Defining variants: successive-integer concatenation; append digits of current symbol sum
-- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L203-210;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L569-599
+- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L203-210;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L569-599
 - Distinguishing test: after every step the previous state must remain an exact prefix of the next
 
 ## C004 — `arithmetic-equation-constraint`
@@ -50,7 +50,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: uniterated evaluate both sides and accept equality / no transition schedule; accept tuples satisfying the equation
 - Termination/output: Boolean result witnesses or existential solution set / external enumeration may not terminate; output is the full or queried solution set
 - Defining variants: polynomial; exponential; auxiliary compilation variables / linear equations; Pell equations; general Diophantine equations
-- Representative sources: CH12:L885-905;N12:L901-966 / BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L721-747
+- Representative sources: CH12:L885-905;N12:L901-966 / BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L721-747
 - Distinguishing test: unknowns are nonnegative integers constrained by exact arithmetic equations / membership is decided by one global arithmetic relation, not overlapping local templates
 
 ## C005 — `associative-evolution-by-squaring`
@@ -158,7 +158,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: continuous flight followed by event-driven boundary reflection and immediate velocity commit
 - Termination/output: normally unbounded; outputs trajectory or ordered boundary-hit sequence
 - Defining variants: table geometry and starting slope
-- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L60-61
+- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L60-61
 - Distinguishing test: update times are collision events determined by geometry rather than fixed discrete timesteps
 
 ## C014 — `coordinate-automaton-evaluator`
@@ -194,7 +194,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: random-walk until contact then irreversibly attach; repeat / random-walk sequentially; at first cluster contact commit the walker as one new occupied cell
 - Termination/output: target particle count or cluster / target cluster size; outputs the accumulated cluster
 - Defining variants: random-walker DLA; Laplace-field sampling equivalent / lattice; dimension; walker release and escape boundary policies
-- Representative sources: N08:L50 / BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L359-360
+- Representative sources: N08:L50 / BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L359-360
 - Distinguishing test: a new particle performs a random walk before first-contact attachment / frontier-site probability is induced by first-hit random-walk paths, not direct uniform frontier sampling
 
 ## C017 — `digit-emitting-register-transducer`
@@ -218,7 +218,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: add load at a center or random site, then apply conservative local topplings until a fixed point
 - Termination/output: each avalanche ends when all sites are subthreshold; outer drive cycles output stable states and durations
 - Defining variants: center or random drive; dimension d; threshold 2d; one-dimensional and two-dimensional rules
-- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L665-676
+- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L665-676
 - Distinguishing test: one drive event can trigger zero or many internal toppling steps before the next load is admitted
 
 ## C019 — `einstein-spacetime-relation`
@@ -254,7 +254,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: minimize summed broken-bond strength and commit the selected path / no intrinsic step rule; sum local energies and select global minimizers
 - Termination/output: minimum path and total strength / external minimization may be difficult; output is the ground-state set
 - Defining variants: random bond distributions / Ising-like energies; generalized local couplings; spin-glass couplings
-- Representative sources: N08:L59 / BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L704
+- Representative sources: N08:L59 / BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L704
 - Distinguishing test: the crack is selected by a global minimum-total-strength objective / two locally admissible configurations can both pass hard tests yet have different energy
 
 ## C022 — `enumerative-semidecision`
@@ -386,7 +386,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: add all eligible sites and their provenance per growth round; prior sites persist
 - Termination/output: normally unbounded; output is occupied support together with retained ancestry
 - Defining variants: Ulam growth rules and partial-rule variants
-- Representative sources: BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L130-151
+- Representative sources: BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L130-151
 - Distinguishing test: two equal current occupancy patterns with different ancestry can evolve differently
 
 ## C033 — `intrinsic-curvature-curve-integration`
@@ -422,7 +422,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: delete the selected subset and commit the reduced support once per round
 - Termination/output: finite domains exhaust or stabilize; output survivors, primes, or survival times
 - Defining variants: Eratosthenes sieve; every-kth decimation; circular Josephus variant
-- Representative sources: CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L211-214;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L418-430
+- Representative sources: CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L211-214;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L418-430
 - Distinguishing test: support only shrinks and current survivor rank can affect the next deletion
 
 ## C036 — `iterated-history-dependent-game`
@@ -446,7 +446,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: select one arithmetic transform by residue or first applicable multiplier then repeat / replace the entire tuple by one deterministic image in one atomic discrete step / commit x := x - a grad(f(x)) once per iteration
 - Termination/output: halt condition or integer trajectory / usually an unbounded orbit; optional halt, cycle, or target test; output is the orbit / gradient tolerance, fixed point, or step budget; outputs the final point and objective value
 - Defining variants: residue-indexed functions; ordered fraction multipliers / add or multiply; parity maps; reverse-add; Euclid pairs; shift, logistic, Newton, and matrix maps / scalar or vector state; fixed or varying step size; Newton iteration is a related variant
-- Representative sources: CH11:L377-393;N11:L525-570 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L53-54;CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L111-118;CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L472-491;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L678-683 / BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L542-549
+- Representative sources: CH11:L377-393;N11:L525-570 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L53-54;CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L111-118;CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L472-491;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L678-683 / BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L542-549
 - Distinguishing test: exact arithmetic predicates choose one of several integer transformations at each step / the next state is one selected image computable from only the current finite tuple / a zero-gradient local minimum halts even when another point has a lower global objective
 
 ## C038 — `least-unique-sum-sequence`
@@ -458,7 +458,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: globally search upward and append the least uniquely representable sum
 - Termination/output: continues while a qualifying integer exists; output is the generated sequence
 - Defining variants: Ulam-sequence seeds and related uniqueness predicates
-- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L404-409
+- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L404-409
 - Distinguishing test: choosing the next term requires a global least search over all prior pairs
 
 ## C039 — `lightcone-boolean-compiler`
@@ -518,7 +518,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: uniterated accept iff every local neighborhood matches an allowed template / no intrinsic iteration; a valid output satisfies every local predicate simultaneously
 - Termination/output: Boolean acceptance or zero-one-many satisfying networks / solver is external and may not terminate; output is any or all satisfying configurations
 - Defining variants: template radius; label sets / one- and two-dimensional templates; polyomino tilings; CA histories as spacetime constraints
-- Representative sources: CH09:L595-615;N09:L324-330 / CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L433-479;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L677-696
+- Representative sources: CH09:L595-615;N09:L324-330 / CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L433-479;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L677-696
 - Distinguishing test: no update occurs; validity is a universal local constraint on a complete network / validity is unchanged by solver order and requires no distinguished time direction
 
 ## C044 — `local-template-feature-extractor`
@@ -590,7 +590,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: write one cell, update head state or orientation, then move one edge; sequential commit
 - Termination/output: halts on a missing or halting rule or runs forever; outputs grid and head trajectory
 - Defining variants: absolute-direction 2D Turing rules; relative-turn turmites; higher-dimensional grids
-- Representative sources: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L127-131;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L190-216
+- Representative sources: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L127-131;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L190-216
 - Distinguishing test: exactly one local cell can be rewritten per step and the acting locus moves
 
 ## C050 — `moving-opening-shell-accretion`
@@ -614,7 +614,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: form one successor per possible single replacement, then union and deduplicate by generation
 - Termination/output: halts when no successor exists or branches indefinitely; outputs state sets or evolution graph
 - Defining variants: strings; multidimensional arrays; grammars; group and semigroup presentations
-- Representative sources: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L355-369;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L549-574
+- Representative sources: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L355-369;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L549-574
 - Distinguishing test: two applicable matches create alternative global states rather than one state with both edits
 
 ## C052 — `multiway-tag-evolution`
@@ -662,7 +662,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: compute context-selected replacement blocks in parallel and commit the assembled array
 - Termination/output: normally run for a requested depth; output is the sequence of expanded arrays
 - Defining variants: neighborhood shape; boundary mode; replacement-block dimensions
-- Representative sources: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L225-227;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L360
+- Representative sources: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L225-227;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L360
 - Distinguishing test: identical center symbols in different neighborhoods can receive different replacements
 
 ## C056 — `neighbor-updating-mobile-automaton`
@@ -722,7 +722,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: all variables follow one simultaneous continuous flow
 - Termination/output: runs to a horizon, fixed point, cycle, singularity, or blow-up; output is a trajectory
 - Defining variants: autonomous and driven equations; Lorenz, van der Pol, and field-background reductions
-- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L901-902;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L953-980
+- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L901-902;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L953-980
 - Distinguishing test: the rule specifies derivatives at every time rather than a discrete next-state map
 
 ## C061 — `parallel-independent-substitution`
@@ -734,7 +734,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: replace all eligible items per generation; deterministic or sampled offspring / replacement blocks may be empty; commit a generation together / replace all elements by finite children in parallel, then concatenate or union atomically
 - Termination/output: generation trace or final word tree or fragments / fixed point extinction or fixed-generation word / usually a requested depth; output is the nested symbolic or geometric state
 - Defining variants: ordered block substitution; stochastic binary fragmentation / creation-deletion balance; multicolor / 1D scheduled rules; 2D or 3D blocks; geometric, affine, and nonlinear point branches
-- Representative sources: CH03:L299-307;N08:L66 / CH03:L343-363 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L454-461;CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L175-205;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L333-335
+- Representative sources: CH03:L299-307;N08:L66 / CH03:L343-363 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L454-461;CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L175-205;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L333-335
 - Distinguishing test: each item chooses offspring without reading adjacent items / a valid rule can replace a symbol by the empty word / equal elements at the same step always produce equal children regardless of neighbors
 
 ## C062 — `parallel-network-rewrite`
@@ -758,7 +758,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: integrate simultaneous differential equations through continuous time / continuous field must satisfy the relation; evolution is unique only when data make it well posed
 - Termination/output: target time trajectory or boundary-value solution / ends at a horizon or singularity, or has no or many solutions; output is a solution field
 - Defining variants: Navier-Stokes PDE; vector reaction-diffusion / hyperbolic, parabolic, and scalar-field equations; negative diffusion; Burgers and nonlinear waves
-- Representative sources: N08:L84-105,L322-328 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L625-674;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L925-1035;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L591-595
+- Representative sources: N08:L84-105,L322-328 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L625-674;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L925-1035;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L591-595
 - Distinguishing test: state change is defined by continuous derivatives and requires numerical or analytic integration / with insufficient or inconsistent boundary data the same equation can have many or no solutions
 
 ## C064 — `population-evolutionary-search`
@@ -770,7 +770,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: select and sexually recombine candidates, committing a new population by generations
 - Termination/output: fitness threshold or generation budget; outputs the population or best candidate
 - Defining variants: population size; selection policy; crossover or mixing strategy; mutation policy
-- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L556-560
+- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L556-560
 - Distinguishing test: the system must retain multiple candidates and create offspring using information from distinct parents
 
 ## C065 — `post-correspondence-relation`
@@ -794,7 +794,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: sample a local rule outcome per cell and synchronously commit the random next configuration / synchronous CA evolution with one random center recoloring each step; relative ordering unstated
 - Termination/output: normally unbounded; output is a sample path or distribution over configurations / normally unbounded; state or spacetime history
 - Defining variants: mixtures of two or more local rules and probability parameters / random injection versus randomness confined to the initial condition
-- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L897-898 / BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md:L15-17
+- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L897-898 / BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md:L15-17
 - Distinguishing test: the same state and parameters can yield different next configurations / same initial state and rule can diverge across runs because fresh randomness enters after time zero
 
 ## C067 — `probabilistic-cellular-automaton-fitting`
@@ -830,7 +830,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: choose one successor uniformly for every node; one-shot graph construction
 - Termination/output: ends after n choices; outputs a functional digraph with cycles and in-trees
 - Defining variants: node count n; independently sampled successor assignments
-- Representative sources: BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md:L589-590
+- Representative sources: BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md:L589-590
 - Distinguishing test: every node has outdegree exactly one and the graph is sampled once rather than evolved by rewrites
 
 ## C070 — `random-lattice-percolation`
@@ -842,7 +842,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: one-shot random configuration followed by a spanning-cluster test; no temporal transition
 - Termination/output: ends after sampling and connectivity analysis; outputs clusters or a percolation boolean
 - Defining variants: square or triangular lattice; undirected or directed connectivity; density p
-- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L497-498
+- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L497-498
 - Distinguishing test: classification changes with global spanning connectivity even though occupation is sampled independently
 
 ## C071 — `random-stream-coalescence`
@@ -866,7 +866,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: expand and reduce calls according to evaluation order; cache or unwind where specified
 - Termination/output: returns an integer or diverges or is undefined; output is the evaluated value
 - Defining variants: Ackermann nesting; bounded primitive recursion; composition; unbounded minimization; eager or lazy order
-- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L237-268;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L316-364
+- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L237-268;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L316-364
 - Distinguishing test: changing call-evaluation order can change definedness even when the written recurrence is unchanged
 
 ## C073 — `register-machine`
@@ -902,7 +902,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: replace every run by its length-symbol pair and concatenate for the next sequential step
 - Termination/output: normally unbounded; output is the sequence of rewritten lists
 - Defining variants: look-and-say seeds and equivalent large-alphabet substitution encodings
-- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L193-202
+- Representative sources: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L193-202
 - Distinguishing test: a symbol replacement cannot be chosen until maximal run boundaries are known
 
 ## C076 — `self-avoiding-random-walk`
@@ -914,7 +914,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: choose an unvisited neighbor randomly, append it, and permanently mark it visited
 - Termination/output: target length or trapped endpoint; outputs a non-self-intersecting path
 - Defining variants: direct growth; pivot or short-walk-combination samplers; dimension
-- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L312-313
+- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L312-313
 - Distinguishing test: a move onto any earlier site is forbidden even when that site is not locally recent
 
 ## C077 — `sequence-equation-relation`
@@ -938,7 +938,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: compute and append one term, committing it before the next index is evaluated
 - Termination/output: continues indefinitely or becomes undefined on an invalid dependency; output is the sequence
 - Defining variants: linear fixed-lag rules; Fibonacci-like rules; value-dependent backward references
-- Representative sources: CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L169-186;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md:L219-268
+- Representative sources: CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L169-186;BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md:L219-268
 - Distinguishing test: the written rule addresses retained terms by index, potentially reaching arbitrarily far back
 
 ## C079 — `sequential-geometric-packing`
@@ -950,7 +950,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: place one object at a time at the nearest feasible central position; each placement is permanent
 - Termination/output: target object count or no feasible placement; outputs packing and contact graph
 - Defining variants: equal or unequal radii; 2D circles; analogous 3D spheres touching two existing objects
-- Representative sources: CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md:L637-648;BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L561-562
+- Representative sources: CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md:L637-648;BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L561-562
 - Distinguishing test: each committed object is chosen greedily from current geometry, not by solving the final packing globally
 
 ## C080 — `sequential-substitution-system`
@@ -986,7 +986,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: no intrinsic evolution: retain an E shell or assign weight exp(-beta E) in one ensemble construction
 - Termination/output: one-shot distribution; outputs weighted configurations or magnetization statistics
 - Defining variants: microcanonical fixed-energy shell; canonical Boltzmann weighting; Monte Carlo is auxiliary sampling
-- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:L422-459
+- Representative sources: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:L422-459
 - Distinguishing test: within one energy shell weights are equal; across energies the canonical weight ratio is exp(-beta deltaE)
 
 ## C083 — `spring-threshold-fracture`
@@ -1082,7 +1082,7 @@ This is the compact Stage 8 shortlist. Candidate identity is mechanical, not a c
 - Effect, schedule, commit: update all cells synchronously from a two-input rule / apply two or more CA rules sequentially inside each macro-step / apply the algebra operation synchronously at every cell / average synchronously add heat and keep fractional part above threshold / compute all node values from the old state and synchronously commit one new state
 - Termination/output: fixed-step spacetime or final row / fixed macro-step trace or final configuration / fixed-step lattice or trace / fixed-step temperature and bubble-event trace / normally unbounded or reaches a cycle or fixed point; output is the configuration orbit
 - Defining variants: multicolor; base-k rule encoding / noncommuting order; effective larger radius / semigroup; group; non-Abelian; table-defined / heating rates; neighborhoods / one to three dimensions; irregular tilings; real-valued cells; homogeneous or node-specific rules
-- Representative sources: N03:L135-150 / N03:L190 / N03:L192-225 / N08:L51 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L546-551;CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L27-34;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md:L474-482
+- Representative sources: N03:L135-150 / N03:L190 / N03:L192-225 / N08:L51 / CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md:L546-551;CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md:L27-34;BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md:L474-482
 - Distinguishing test: each output has exactly two predecessor inputs instead of an odd centered neighborhood / one reported step contains multiple ordered CA rule applications / the local rule is the multiplication table of a finite algebra / threshold crossing wraps temperature by its fractional part to model latent heat / topology stays fixed and every node has exactly one committed next value per step
 
 ## C091 — `tag-system`

@@ -120,11 +120,11 @@ FromDigits[Map[Last, Sort[Flatten[Map[Thread,
 
 ■ **Growth rules.** The pictures below show examples of rules in which a cell becomes black if it has exactly the specified numbers of black neighbors (the initial conditions used have the minimal number of black cells for growth). The code numbers in these cases are given by  $2/3(4^n-1) + Apply[Plus, 4^{list}]$  where n is the number of neighbors, here 5. (See also the 9-neighbor examples on page 373.)
 
-![](_page_943_Growth_Rules_Five_Panel_Row.jpeg)
+![](images/_page_943_Growth_Rules_Five_Panel_Row.jpeg)
 
 ■ **Page 171 · Code 942 slices.** The following is the result of taking vertical slices through the pattern with a sequence of offsets from the center:
 
-![](_page_943_Figure_17.jpeg)
+![](images/_page_943_Figure_17.jpeg)
 
 ■ **History.** As indicated on pages 876–878, 2D cellular automata were historically studied more extensively than 1D ones—though rarely with simple initial conditions. The 5-cell neighborhood on page 170 was considered by John von Neumann in 1952; the 9-cell one on page 177 by Edward Moore in 1962. (Both are also common in finite difference approximations in numerical analysis.) (The 7-cell hexagonal neighborhood of page 369 was considered for image processing purposes by Marcel Golay in 1959.) Ever since the invention of the Game of Life around 1970 a remarkable number of hardware and software simulators have been built to watch its evolution. But until after my work in the 1980s simulators for more general 2D cellular automata were rare. A sequence of hardware simulators were nevertheless built starting in the mid-1970s by Tommaso Toffoli and later Norman Margolus. And as mentioned on page 1077, going back to the 1950s some image processing systems have been based on particular families of 2D cellular automaton rules.
 ■ **Ulam systems.** Having formulated the system around 1960, Stanislaw Ulam and collaborators (see page 877) in 1967 simulated 120 steps of the process shown below, with black cells after *t* steps occurring at positions
@@ -146,15 +146,15 @@ qq[{x_, u_}, {y_, v_}, a_] := x == y || Max[Abs[x - y]] > 1 ||
   u == y || First[Cases[a, {u, z_} -> z]] == y
 ```
 
-![](_page_943_Picture_21.jpeg)
+![](images/_page_943_Picture_21.jpeg)
 
 These rules are fairly complicated, and involve more history than ordinary cellular automata. But from the discoveries in this book we now know that much simpler rules can also yield very complicated behavior. And as the pictures below show, this is true even just for parts of the rules above (s alone yields outer totalistic code 686 in 2D, and rule 90 in 1D).
 
-![](_page_944_Simple_Rules_Five_Panel_Row.jpeg)
+![](images/_page_944_Simple_Rules_Five_Panel_Row.jpeg)
 
 Ulam also in 1967 considered the pure 2D cellular automaton with outer totalistic code 12 (though he stated its rule in a complicated way). As shown in the pictures below, when started from blocks of certain sizes this rule yields complex patterns—although nothing like this was noted in 1967.
 
-![](_page_944_Picture_9.jpeg)
+![](images/_page_944_Picture_9.jpeg)
 
 ■ **Limiting shapes.** When growth occurs at the maximum rate the outer boundaries of a cellular automaton pattern reflect the neighborhood involved in its underlying rule (in rough analogy to the Wulff construction for shapes of crystals). When growth occurs at a slower rate, a wide range of polygonal and other shapes can be obtained, as illustrated in the main text.
 ■ **Additive rules.** See page 1092.
@@ -163,25 +163,25 @@ Ulam also in 1967 considered the pure 2D cellular automaton with outer totalisti
 ■ **Page 178 · Code 746.** The pattern generated is not perfectly circular, as discussed on page 979. Its interior is mostly fixed, but there are scattered small regions that cycle with a variety of periods.
 ■ **Page 181 · Code 174826.** The pictures below show the upper-right quadrant for more steps. Most of the lines visible are 8 cells across, and grow by 4 cells every 12 steps. They typically survive being hit by more complicated growth from the side. But occasionally runners 3 cells wide will start on the side of a line. And since these go 2 cells every 3 steps they always catch up with lines, producing complicated growth, often terminating the lines.
 
-![](_page_944_Code_174826_Three_Step_Row.jpeg)
+![](images/_page_944_Code_174826_Three_Step_Row.jpeg)
 
 ■ **Page 183 · Projections from 3D.** Looking from above, with closer cells shown darker, the following show patterns generated after 30 steps, by (a) the rule at the top of page 183, (b) the rule at the bottom of page 183, (c) the rule where a cell becomes black if exactly 3 out of 26 neighbors were black and (d) the same as (c), but with a  $3\times3\times1$  rather than a  $3\times1\times1$ initial block of black cells:
 
-![](_page_944_3D_Projections_Four_Panel_Row.jpeg)
+![](images/_page_944_3D_Projections_Four_Panel_Row.jpeg)
 
 ■ **Other geometries.** Systems like cellular automata can readily be set up on any geometrical structure in which a limited number of types of cells can be identified, with every cell of a given type having a similar neighborhood.
 
 In the simplest case, the cells are all identical, and are laid out in the same orientation in a repetitive array. The centers of the cells form a lattice, with coordinates that are integer multiples of some set of basis vectors. The possible complete symmetries of such lattices are much studied in crystallography. But for the purpose of nearest-neighbor cellular automaton rules, what matters is not detailed geometry, but merely what cells are adjacent to a given cell. This can be determined by looking at the Voronoi region (see page 987) for each point in the lattice. In any given dimension, this region (variously known as a Dirichlet domain or Wigner-Seitz cell, and dual to the primitive cell, first Brillouin zone or Wulff shape) has a limited number of possible overall shapes. The most symmetrical versions of these shapes in 2D are the square (4 neighbors) and hexagon (6) and in 3D (as found by Evgraf Fedorov in 1885) the cube (6), hexagonal prism (8), rhombic dodecahedron (12) (e.g. face-centered cubic crystals), rhombo-hexagonal or elongated dodecahedron (12) and truncated octahedron or tetradecahedron (14) (e.g. body-centered cubic crystals), as shown below. (In 4D, 8, 16 and 24 nearest neighbors are possible; in higher dimensions possibilities have been investigated in connection with sphere packing.) (Compare pages 1029 and 986.)
 
-![](_page_945_Picture_2.jpeg)
+![](images/_page_945_Picture_2.jpeg)
 
 In general, there is no need for individual cells in a cellular automaton to have the same orientation. A triangular lattice is one example where they do not. And indeed, any tiling of congruent figures can readily be used to make a cellular automaton, as illustrated by the pentagonal example below. (Outer totalistic codes specify rules; the first rule makes a particular cell black when any of its five neighbors are black and has code 4094. Note that even though individual cells are pentagonal, large-scale cellular automaton patterns usually have 2-, 4- or 8-fold symmetry.)
 
-![](_page_945_Picture_4.jpeg)
+![](images/_page_945_Picture_4.jpeg)
 
 There is even no need for the tiling to be repetitive; the picture below shows a cellular automaton on a nested Penrose tiling (see page 932). This tiling has two different shapes of tile, but here both are treated the same by the cellular automaton rule, which is given by an outer totalistic code number. The first example is code 254, which makes a particular cell become black when any of its three neighbors are black. (Large-scale cellular automaton patterns here can have 5-fold symmetry.) (See also page 1027.)
 
-![](_page_945_Picture_6.jpeg)
+![](images/_page_945_Picture_6.jpeg)
 
 ■ **Networks.** Cellular automata can be set up so that each cell corresponds to a node in a network. (See page 936.) The only requirement is that around each node the network must have the same structure (or at least a limited number of possible structures). For nearest-neighbor rules, it suffices that each node has the same number of connections. For longer-range rules, the network must satisfy constraints of the kind discussed on page 483. (Cayley graphs of groups always have the necessary homogeneity.) If the connections at each node are not labelled, then only totalistic cellular automaton rules can be implemented. Many topological and geometrical properties of the underlying network can affect the overall behavior of a cellular automaton on it.
 
@@ -206,11 +206,11 @@ has been called Langton's ant, and various studies of it were done in the 1990s.
 
 ■ **Visualization.** The pictures below show the 2D position of the head at 500 successive steps for the rules on page 185.
 
-![](_page_946_Picture_4.jpeg)
+![](images/_page_946_Picture_4.jpeg)
 
 Some 2D Turing machines exhibit elements of randomness at some steps, but then fill in every so often to form simple repetitive patterns. An example is the 3-state rule
 
-![](_page_946_Turing_3_State_Rule_Strip.jpeg)
+![](images/_page_946_Turing_3_State_Rule_Strip.jpeg)
 
 ■ **Rules based on turning.** The rules used in the main text specify the displacement of the head at each step in terms of fixed directions in the underlying grid. An alternative is to specify the turns to make at each step in the motion of the head. This is how turtles in the Logo computer language are set up. (Compare the discussion of paths in substitution systems on page 892.)
 ■ **2D mobile automata.** Mobile automata can be generalized just like Turing machines. Even in the simplest case, however, with only four neighbors involved there are already  $(4k)^{k^5}$ possible rules, or nearly  $10^{29}$  even for k = 2.
@@ -263,7 +263,7 @@ DisplayForm[Nest[SubsuperscriptBox[#, #, #] &, "1", n]]
 
 ■ **Non-white backgrounds.** The pictures below show substitution systems in which white squares are replaced by blocks which contain black squares. There is still a nested structure but it is usually not visually as obvious as before. (See page 583.)
 
-![](_page_947_Figure_4.jpeg)
+![](images/_page_947_Figure_4.jpeg)
 
 ■ **Higher-dimensional generalizations.** The state of a d-dimensional substitution system can be represented by a nested list of depth d. The evolution of the system for t steps can be obtained from
 
@@ -285,13 +285,13 @@ Note that in d dimensions, each black cell must be replaced by at least d+1 blac
 
 ■ **Other shapes.** The systems on pages 187 and 188 are based on subdividing squares into smaller squares. But one can also set up substitution systems that are based on subdividing other geometrical figures, as shown below.
 
-![](_page_947_Picture_10.jpeg)
+![](images/_page_947_Picture_10.jpeg)
 
 The second example involves two distinct shapes: a square and a GoldenRatio aspect ratio rectangle. Labelling each shape and orientation with a different color, the behavior of this system can be reproduced with equal-sized squares using the rule `{3 -> {{1, 0}, {3, 2}}, 2 -> {{1}, {3}}, 1 -> {{3, 2}}, 0 -> {{3}}}` starting from initial condition `{{3}}`.
 
 ■ **Penrose tilings.** The nested pattern shown below was studied by Roger Penrose in 1974 (see page 943).
 
-![](_page_947_Picture_14.jpeg)
+![](images/_page_947_Picture_14.jpeg)
 
 The arrangement of triangles at step t can be obtained from a substitution system according to
 
@@ -327,7 +327,7 @@ In the particular case of base i-q with digits 0 through  $q^2$ , it turns out t
 
 ■ **Visualization.** The 3D pictures below show successive steps in the evolution of each of the geometric substitution systems from the main text
 
-![](_page_948_Picture_8.jpeg)
+![](images/_page_948_Picture_8.jpeg)
 
 ■ **Parameter space sets.** See pages 407 and 1006 for a discussion of varying parameters in geometrical substitution systems.
 ■ **Affine transformations.** Any set of so-called affine transformations that take the vector for each point, multiply it by a fixed matrix and then add a fixed vector, will yield nested patterns similar to those shown in the main text. Linear operations on complex numbers of the kind discussed above correspond geometrically to rotations, translations and rescalings. General affine transformations also allow reflection and skewing. In addition, affine transformations can readily be generalized to any number of dimensions, while complex numbers represent only two dimensions.
@@ -335,7 +335,7 @@ In the particular case of base i-q with digits 0 through  $q^2$ , it turns out t
 ■ **Complex maps.** Many kinds of nonlinear transformations on complex numbers yield nested patterns. Sets of so-called Möbius transformations of the form  $z \rightarrow (az + b)/(cz + d)$ always yield such patterns (and correspond to so-called modular groups when ad-bc == 1). Transformations of the form  $z \rightarrow \{Sqrt[z-c], -Sqrt[z-c]\}$  yield so-called Julia sets which form nested patterns for many values of c (see note below). In fact, a fair fraction of all possible transformations based on algebraic functions will yield nested patterns. For typically the continuity of such functions implies that only a limited number of shapes not related by limited variations in local magnification can occur at any scale.
 ■ **Fractal dimensions.** Certain features of nested patterns can be characterized by so-called fractal dimensions. The pictures below show five patterns with three successively finer grids superimposed. The dimension of a pattern can be computed by looking at how the number of grid squares that have any gray in them varies with the length a of the edge of each grid square. In the first case shown, this number varies like  $(1/a)^1$  for small a, while in the last case, it varies like  $(1/a)^2$ . In general, if the number varies like  $(1/a)^d$ , one can take d to be the dimension of the pattern. And in the intermediate cases shown, it turns out that d has non-integer values.
 
-![](_page_948_Picture_13.jpeg)
+![](images/_page_948_Picture_13.jpeg)
 
 The grid in the pictures above fits over the pattern in a very regular way. But even when this does not happen, the limiting behavior for small a is still  $(1/a)^d$  for any nested pattern. This form is inevitable if the underlying pattern effectively has the same structure on all scales. For some of the more complex patterns encountered in this book, however, there continues to be different structure on different scales, so that the effective value of d fluctuates as the scale changes, and may not converge to any definite value. (Precise definitions of dimension based for example on the maximum ever achieved by d will often in general imply formally noncomputable values, as in the discussion of page 1138.)
 
@@ -345,17 +345,17 @@ Fractal dimensions characterize some aspects of nested patterns, but patterns wi
 
 ■ **The Mandelbrot set.** The pictures below show Julia sets produced by the procedure of taking the transformation  $z \rightarrow \{Sqrt[z-c], -Sqrt[z-c]\}$  discussed above and iterating it starting at z=0 for an array of values of c in the complex plane.
 
-![](_page_949_Figure_4.jpeg)
+![](images/_page_949_Figure_4.jpeg)
 
 The Mandelbrot set introduced by Benoit Mandelbrot in 1979 is defined as the set of values of c for which such Julia sets are connected. This turns out to be equivalent to the set of values of c for which starting at z = 0 the inverse mapping  $z \rightarrow z^2 + c$  leads only to bounded values of z. The Mandelbrot set turns out to have many intricate features which have been widely reproduced for their aesthetic value, as well as studied by mathematicians. The first picture below shows the overall form of the set; subsequent pictures show successive magnifications of the regions indicated. All parts of the Mandelbrot set are known to be connected. The whole set is not self-similar. However, as seen in the third and fourth pictures, within the set are isolated small copies of the whole set. In addition, as seen in the last picture, near most values of c the boundary of the Mandelbrot set looks very much like the Julia set for that value of *c*.
 
-![](_page_949_Figure_6.jpeg)
+![](images/_page_949_Figure_6.jpeg)
 
 On pages 407 and 1006 I discuss parameter space sets that are somewhat analogous to the Mandelbrot set, but whose properties are in many respects much clearer. And from this discussion there emerges the following interpretation of the Mandelbrot set that appears not to be well known but which I find most illuminating. Look at the array of Julia sets and ask for each c whether the Julia set includes the point z = 0.
 
 The set of values of c for which it does corresponds exactly to the boundary of the Mandelbrot set. The pictures below show a generalization of this idea, in which gray level indicates the minimum distance  $Abs[z-z_0]$  of any point z in the Julia set from a fixed point  $z_0$ . The first picture shows the case  $z_0 = 0$ , corresponding to the usual Mandelbrot set.
 
-![](_page_950_Mandelbrot_Neighbor_Systems_Three_Panel_Row.jpeg)
+![](images/_page_950_Mandelbrot_Neighbor_Systems_Three_Panel_Row.jpeg)
 
 ■ **Page 192 · Neighbor-dependent substitution systems.** Given a list of individual replacement rules such as `{{_, 1}, {0, 1}} -> {{1, 0}, {1, 1}}`, each step in the evolution shown corresponds to
 
@@ -452,7 +452,7 @@ d[{___, p : ((1) ..), 1, 0}] := 4 Length[{p}] + 2
 
 ■ **Sequential network systems.** In the network systems discussed in the main text, every node is updated in parallel at each step. It is however also possible to consider systems in which there is only a single active node, and operations are performed only on that node at any particular step. The active node can move by following its above or below connections, in a way that is determined by a rule which depends on the local structure of the network. The pictures below show examples of sequential network systems; the path of the active node is indicated by a thick black line.
 
-![](_page_951_Sequential_Networks_Three_Panel_Row.jpeg)
+![](images/_page_951_Sequential_Networks_Three_Panel_Row.jpeg)
 
 It is rather common for the active node eventually to get stuck at a particular position in the network; the picture below shows the effect of this on the total number of nodes in the last case illustrated above. The rule for this system is
 
@@ -465,11 +465,11 @@ It is rather common for the active node eventually to get stuck at a particular 
  {2, 4} -> {{{2, 2}, {{2, 1}, {}}}, 1}}
 ```
 
-![](_page_951_Figure_11.jpeg)
+![](images/_page_951_Figure_11.jpeg)
 
 ■ **Dimensionality of networks.** As discussed on page 479, if a sufficiently large network has a  *d*-dimensional form, then by following r connections in succession from a given node, one should reach about  *r*<sup>*d*</sup>  distinct nodes. The plots below show the actual numbers of nodes reached as a function of r for the systems on pages 202 and 203 at steps 1, 10, 20, ..., 200.
 
-![](_page_951_Figure_13.jpeg)
+![](images/_page_951_Figure_13.jpeg)
 
 ■ **Cellular automata on networks.** The cellular automata that we have considered so far all have cells arranged in regular arrays. But one can also set up generalizations in which the cells correspond to nodes in arbitrary networks. Given a network of the kind discussed in the main text of this section, one can assign a color to each node, and then update this color at each step according to a rule that depends on the colors of the nodes to which the connections from that node go. The behavior obtained depends greatly on the form of the network, but with networks of finite size the results are typically like those obtained for other finite size cellular automata of the kind discussed on page 259.
 ■ **Implementation.** Given a network represented as a list in which element i is  $\{a, i, b\}$ , where a is the node reached by the above connection from node i, and b is the node reached by the below connection, each step corresponds to
@@ -537,11 +537,11 @@ Select[Union[Flatten[Outer[Plus, diff, list, 1], 1]],
 
 The pictures below show in stacked form (as on page 208) all sequences generated at various steps of evolution. Note that after just a few steps, the sequences produced always seem to consist of white elements followed by black, with possibly one block of black in the white region. Without this additional block of black, only the first case in the rule can ever apply.
 
-![](_page_952_Multiway_Steps_Four_Panel_Row.jpeg)
+![](images/_page_952_Multiway_Steps_Four_Panel_Row.jpeg)
 
 In analogy with page 796 the picture below shows wh different strings with lengths up to 10 are reached in the evolution of the system.
 
-![](_page_952_Figure_24.jpeg)
+![](images/_page_952_Figure_24.jpeg)
 
 Different initial conditions for this multiway system lead to behavior that either dies out (as for "ABA"), or grows exponentially forever (as for "ABAABABA").
 
@@ -599,7 +599,7 @@ Given a partial differential equation with initial or boundary values, there is 
 ■ **Explanations based on constraints.** In some areas of science it is common to give explanations in terms of constraints rather than mechanisms. Thus, for example, in physics there are so-called variational principles which state that physical systems will behave in ways that minimize or maximize certain quantities. One such principle implies that atoms in molecules will tend to arrange themselves so as to minimize their energy. For simple molecules, this is a useful principle. But for complicated molecules of the kind that are common in living systems, this principle becomes much less useful. In fact, in finding out what configuration such molecules actually adopt, it is usually much more relevant to know how the molecule evolves in time as it is created than which of its configurations formally has minimum energy. (See pages 342 and 1185.)
 ■ **Page 211 · 1D constraints.** The constraints in the main text can be thought of as specifying that only some of the  $k^n$  possible blocks of cells of length n (with k possible colors for each cell) are allowed. To see the consequences of such constraints consider breaking a sequence of colors into blocks of length n, with each block overlapping by n-1 cells with its predecessor, as in Partition[list, n, 1]. If all possible sequences of colors were allowed, then there would be k possibilities for what block could follow a given block, given by  $Map[Rest, Table[Append[list, i], \{i, 0, k-1\}]]$ . The possible sequences of length n blocks that can occur are conveniently represented by possible paths by so-called de Bruijn networks, of the kind shown for k = 2 and n = 2 through 5 below.
 
-![](_page_956_Picture_2.jpeg)
+![](images/_page_956_Picture_2.jpeg)
 
 Given the network for a particular n, it is straightforward to see what happens when only certain length n blocks are allowed: one just keeps the arcs in the network that correspond to allowed blocks, and drops all other ones. Then if one can still form an infinite path by going along the arcs that remain, this path will correspond to a pattern that satisfies the constraints. Sometimes there will be a unique such path; in other cases there will be choices that can be made along the path. But the crucial point is that since there are only  $k^{n-1}$  nodes in the network, then if any infinite path is possible, there must be such a path that visits the same node and thus repeats itself after at most  $k^{n-1}$  cells. The constraint on page 210 has k = 2 and n = 3; the pattern that satisfies it repeats with period 4, thus saturating the bound. (See also page 266.)
 
@@ -609,7 +609,7 @@ Given the network for a particular n, it is straightforward to see what happens 
 
 ■ **Numbering scheme.** The constraint numbered *n* allows the templates at `Position[IntegerDigits[n, 2, 32], 1]` in the list below. (See also page 927.)
 
-![](_page_956_Picture_8.jpeg)
+![](images/_page_956_Picture_8.jpeg)
 
 ■ **Identifying the 171 patterns.** The number of constraints to consider can be reduced by symmetries, by discarding sets of templates that are supersets of ones already known to be satisfiable, and by requiring that each template in the set be compatible with itself or with at least one other in each of the eight immediately adjacent positions. The remaining constraints can then be analyzed by attempting to build up explicit patterns that satisfy them, as discussed below.
 ■ **Checking constraints.** A set of allowed templates can be specified by a *Mathematica* pattern of the form  `t1 | t2 | t3`  etc. where the  $t_i$  are for example  `{{_, 1, _}, {0, 0, 1}, {_, 0, _}}` . To check whether an array list contains only arrangements of colors corresponding to allowed templates one can then use
@@ -656,7 +656,7 @@ The origin of the x,y coordinates is the only freedom in this pattern. The neste
 
 ■ **Other types of constraints.** Constraints based on smaller templates simply require smaller numbers of repetitive patterns:
 
-![](_page_957_Constraint_Template_Icons_and_Ratios.jpeg)
+![](images/_page_957_Constraint_Template_Icons_and_Ratios.jpeg)
 
 To extend the class of systems considered in the main text, one can increase the size of the templates, or increase the number of possible colors for each cell. For 3×3 templates with two colors extensive randomized searches have failed to discover examples where non-repetitive patterns are forced to occur. Another extension of the constraints in the main text is to require that not just a single template, but every template in the set, must occur somewhere in the pattern. Searches of such systems have also failed to discover examples of forced non-repetitive patterns beyond the one shown in the text.
 
@@ -672,13 +672,13 @@ To extend the class of systems considered in the main text, one can increase the
 
 This yields the nested pattern below which contains only 51 of the 65,536 possible 2×2 blocks of cells with 16 colors. It then turns out that with the constraint that the only 2×2 arrangements of colors that can occur are ones that match these 51 blocks, one is forced to get the nested pattern below.
 
-![](_page_957_Picture_14.jpeg)
+![](images/_page_957_Picture_14.jpeg)
 
 ■ **Relation to 2D cellular automata.** The kind of constraints discussed are exactly those that must be satisfied by configurations that remain unchanged in the evolution of a 2D cellular automaton. The argument for this is similar to the one on pages 941 and 954 for 1D cellular automata. The point is that of the 32 5-cell neighborhoods involved in the 2D cellular automaton rule, only some subset will have the property that the center cell remains unchanged after applying the rule. And any configuration which does not change must involve only these subsets. Using the results of this section it then follows that in the evolution of all 2D cellular automata of the type discussed on page 170 there exist purely repetitive configurations that remain unchanged.
 
 ■ **Relation to 1D cellular automata.** A picture that shows the evolution of a 1D cellular automaton can be thought of as a 2D array of cells in which the color of each cell satisfies a constraint that relates it to the cells above according to the cellular automaton rule. This constraint can then be represented in terms of a set of allowed templates; the set for rule 30 is as follows:
 
-![](_page_958_Picture_4.jpeg)
+![](images/_page_958_Picture_4.jpeg)
 
 To reproduce an ordinary picture of cellular automaton evolution, one would have to specify in advance a whole line of black and white cells. Below this line there would then be a unique pattern corresponding to the application of the cellular automaton rule. But above the line, except for reversible rules, there is no guarantee that any pattern satisfying the constraints can exist.
 
@@ -695,11 +695,11 @@ In addition, in no case has a simple set of tiles been found which force a patte
 
 ■ **Polyominoes.** An example of a tiling problem that is in some respects particularly close to the grid-based constraint systems discussed in the main text concerns covering the plane with polyominoes that are formed by gluing collections of squares together. Tiling by polyominoes has been investigated since at least the late 1950s, particularly by Solomon Golomb, but it is only very recently that sets of polyominoes which force non-periodic patterns have been found. The set (a) below was announced by Roger Penrose in 1994; the slightly smaller set (b) was found by Matthew Cook as part of the development of this book.
 
-![](_page_958_Polyomino_Sets_Two_Panel_Row.jpeg)
+![](images/_page_958_Polyomino_Sets_Two_Panel_Row.jpeg)
 
 Both of these sets yield nested patterns. Steps in the construction of the pattern for set (b) are shown below. At stage n the number of polyominoes of each type is `Fibonacci[2 n - {2, 0, 1}] / {1, 2, 1}` . Set (a) works in a roughly similar way, but with a considerably more complicated recursion.
 
-![](_page_958_Picture_17.jpeg)
+![](images/_page_958_Picture_17.jpeg)
 
 ■ **Ground states of spin systems.** The constraints discussed in the main text are similar to those that arise in the physics of 2D spin systems. An example of such a system is the so-called Ising model discussed on page 981. The idea in all such systems is to have an array of spins, each of which can be either up or down. The energy associated with each spin is then given by some function which depends on the configuration of neighboring spins. The ground state of the system corresponds to an arrangement of spins with the smallest total energy. In the ordinary Ising model, this ground state is simply all spins up or all spins down. But in generalizations of the Ising model with more complicated energy functions, the conditions to get a state of the lowest possible energy can correspond exactly to the constraints discussed in the main text. And from the results shown one sees that in some cases random-looking ground states should occur. Note that a rather different way to get a somewhat similar ground state is to consider a spin glass, in which the standard Ising model energy function is used, but multiplied by -1 or +1 at random for each spin.
 ■ **Correspondence systems.** For a discussion of a class of 1D systems based on constraints see page 757.
@@ -722,7 +722,7 @@ For any given *k*, many combinations of blocks will inevitably occur in sufficie
 
 Linear Diophantine equations such as `a x == b y + c` yield simple repetitive results, as in the pictures below, and can be handled essentially just by knowing `ExtendedGCD[a, b]`.
 
-![](_page_959_Linear_Diophantine_Four_Panel_Row.jpeg)
+![](images/_page_959_Linear_Diophantine_Four_Panel_Row.jpeg)
 
 Even the simplest quadratic Diophantine equations can already show much more complex behavior. The equation  `x^2 == a y^2`  has no solution except when a is a perfect square. But the Pell equation  `x^2 == a y^2 + 1`  (already studied in antiquity) has infinitely many solutions whenever a is positive and not a perfect square. The smallest solution for x is given by
 
@@ -734,15 +734,15 @@ Numerator[FromContinuedFraction[
 
 This is plotted below; complicated variation and some very large values are seen (with a = 61 for example x == 1766319049).
 
-![](_page_960_Figure_3.jpeg)
+![](images/_page_960_Figure_3.jpeg)
 
 In three variables, the equation  `x^2 + y^2 == z^2`  yields so-called Pythagorean triples {3, 4, 5}, {5, 12, 13}, etc. And even in this case the set of possible solutions for x and y in the pictures below looks fairly complicated—though after removing common factors, they are in fact just given by  `{x == r^2 - s^2, y == 2 r s, z == r^2 + s^2}` . (See page 1078.)
 
-![](_page_960_Figure_5.jpeg)
+![](images/_page_960_Figure_5.jpeg)
 
 The pictures below show the possible solutions for *x* and *y* in various Diophantine equations. As in other systems based on numbers, nested patterns are not common—though page 1160 shows how they can in principle be achieved with an equation whose solutions satisfy `Mod[Binomial[x, y], 2] == 1`. (The equation `(2 x + 1) y == z` also for example has solutions only when z is not of the form  $2^{j}$ .)
 
-![](_page_960_Picture_7.jpeg)
+![](images/_page_960_Picture_7.jpeg)
 
 Many Diophantine equations have at most very sparse solutions. And indeed for example Fermat's Last Theorem states that `x^n + y^n == z^n` can never be satisfied for *n* > 2. With four variables one has for example `3^3 + 4^3 + 5^3 == 6^3`, `1^3 + 6^3 + 8^3 == 9^3`—but with fourth powers the smallest result is `95800^4 + 217519^4 + 414560^4 == 422481^4`.
 
@@ -751,7 +751,7 @@ Many Diophantine equations have at most very sparse solutions. And indeed for ex
 ■ **Matrices satisfying constraints.** One can consider for example magic squares, Latin squares (quasigroup multiplication tables), and matrices having the Hadamard property discussed on page 1073. One can also consider matrices whose powers contain certain patterns. (See also page 805.)
 ■ **Finite groups and semigroups.** Any finite group or semigroup can be thought of as defined by having a multiplication table which satisfies the constraints given on page 887. The total number of semigroups increases faster than exponentially with size in a seemingly quite uniform way. But the number of groups varies in a complicated way with size, as in the picture below. (The peaks are known to grow roughly like  `n^(2/27 Log[2, n]^2)` —intermediate between polynomial and exponential.) As mentioned on page 938, through major mathematical effort, a complete classification of all finite so-called simple groups that in effect have no factors is known. Most such groups come in families that are easy to characterize; a handful of so-called sporadic ones are much more difficult to find. But this classification does not immediately provide a practical way to enumerate all possible groups. (See also pages 938 and 1032.)
 
-![](_page_960_Figure_13.jpeg)
+![](images/_page_960_Figure_13.jpeg)
 
 ■ **Constraints on formulas.** Many standard problems of algebraic computation can be viewed as consisting in finding formulas that satisfy certain constraints. An example is exact solution of algebraic equations. For quadratic equations the standard formula gives solutions for arbitrary coefficients in terms of square roots. Similar formulas in terms of n<sup>th</sup> roots have been known since the 1500s for equations with degrees *n* up to 4, although their *LeafCount* starting at *n* = 1 increases like 6, 25, 183, 718. For higher degrees it is known that such general formulas must involve other functions. For degrees 5 and 6 it was shown in the late 1800s that EllipticTheta or Hypergeometric2F1 are sufficient, although for degrees 5 and 6 respectively the necessary formulas have a LeafCount in the billions. (Sharing common subexpressions yields a LeafCount in the thousands.) (See also page 1129.)
 

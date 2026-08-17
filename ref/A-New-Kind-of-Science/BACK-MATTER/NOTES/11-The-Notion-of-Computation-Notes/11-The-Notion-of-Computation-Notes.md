@@ -28,9 +28,9 @@ A crucial achievement in practical computing over the past several decades has b
 
 ■ **Page 639 · Other examples.** Rule 152 and rule 144, which effectively compute Ceiling[n/2] and Ceiling[n/4], respectively, are shown below with n = 18 initial black cells.
 
-![](_page_1124_Picture_6.jpeg)
+![](images/_page_1124_Picture_6.jpeg)
 
-![](_page_1124_Picture_7.jpeg)
+![](images/_page_1124_Picture_7.jpeg)
 
 As discussed on page 989 rule 184 effectively determines whether its initial conditions correspond to a balanced sequence of open and close parentheses. (Rule 132 can be viewed as being like a syntax checker for a regular language; rule 184 for a context-free language.)
 
@@ -69,9 +69,9 @@ and the initial conditions consist of {10, 0, 4, 8} surrounded by 0’s. The rig
 
 ■ **Random initial conditions.** The pictures below show the squaring and primes cellular automata starting from random initial conditions. Note that for both systems the majority of cases in their rules are not used in the specific computations for which they were constructed. Changing these cases can lead to different behavior with random initial conditions.
 
-![](_page_1124_Picture_16.jpeg)
+![](images/_page_1124_Picture_16.jpeg)
 
-![](_page_1124_Picture_17.jpeg)
+![](images/_page_1124_Picture_17.jpeg)
 
 ■ **Efficiency of computations.** Present-day practical computers almost always process data in a basically sequential manner. Cellular automata, however, intrinsically operate in parallel, and can thus presumably perform at least some computations in fundamentally fewer steps. (Compare the discussion of P completeness on page 1149.)
 ■ **Minimal programs for sequences.** See page 1186.
@@ -157,7 +157,7 @@ f = If[#1 == 1, 1, #1 #0[#1 - 1]] &
 
 where the numbers correspond to the icons shown in the main text according to
 
-![](_page_1126_Universal_CA_Color_Icon_Legend.jpeg)
+![](images/_page_1126_Universal_CA_Color_Icon_Legend.jpeg)
 
 The block in the initial conditions for the universal cellular automaton corresponding to a cell with color a is given by
 
@@ -565,7 +565,7 @@ fracs = {17/91, 78/85, 19/51, 23/38, 29/33, 77/29, 95/
 
 starting at 2 the result for Log[2, list] is as shown below, where Rest[Log[2, Select[list, IntegerQ[Log[2, #]] &]]] gives exactly the primes.
 
-![](_page_1130_Figure_11.jpeg)
+![](images/_page_1130_Figure_11.jpeg)
 
 (Compare the discussion of universality in integer equations on page 786.)
 
@@ -641,7 +641,7 @@ sadd[{d[x_, y_], b_}, {d[dx_, dy_], st_}] :=
 
 CTToR110[{{}}, {1}] yields blocks of lengths {7204, 1873, 7088}. But even CTToR110[{{0, 0, 0, 0, 0, 0}, {}, {1, 1, 1, 1, 1, 1}, {}}, {1}] already yields blocks of lengths {105736, 34717, 95404}. The picture below shows what happens if one chops these blocks into rows and arranges these in 2D arrays. In the first two blocks, much of what one sees is just padding to prevent clock pulses on the left from hitting data in the middle too early on any given step. The part of the middle block that actually encodes an initial condition grows like 180 Length[init]. The core of the right-hand block grows approximately like 500 (Length[Flatten[rules]] + Length[rules]), but to make a block that can just be repeated without shifts, between 1 and 30 repeats of this core can be needed.
 
-![](_page_1131_Figure_8.jpeg)
+![](images/_page_1131_Figure_8.jpeg)
 
 ■ **Page 689 · Tag systems.** The discussion in the main text and the construction above require a cyclic tag system with blocks that are a multiple of 6 long, and in which at least one block is added at some point in each complete cycle. By inserting k = 6 Ceiling[Length[subs]/6] in the definition of TS1ToCT from page 1113 one can construct a cyclic tag system of this kind to emulate any one-element-dependence tag system.
 
@@ -649,31 +649,31 @@ CTToR110[{{}}, {1}] yields blocks of lengths {7204, 1873, 7088}. But even CTToR1
 
 ■ **2-neighbor rules.** Among 3-color 2-neighbor rules class 4 behavior seems to be comparatively rare; the picture at the top of the facing page shows an example with rule number 2144.
 
-![](_page_1132_Picture_2.jpeg)
+![](images/_page_1132_Picture_2.jpeg)
 
 ■ **Totalistic rules.** It is straightforward to show that totalistic cellular automata can be universal. Explicit simple candidates include k = 2, r = 2 rules with codes 20 and 52, as well as the various k = 3, r = 1 class 4 rules shown in Chapter 3.
 ■ **Page 693 · 2D cellular automata.** Universality was essentially built in explicitly to the underlying rules for the 2D cellular automaton constructed by John von Neumann in 1952 as a model for self-reproduction. For among the 29 possible states allowed for each cell were ones set up to behave quite directly like components for practical electronic computers like the EDVAC—as well as to grow new memory areas and so on. In the mid-1960s Edgar Codd showed that a system similar to von Neumann’s could be constructed with only 8 possible states for each cell. Then in 1970 Roger Banks managed to show that the 2-state 5-neighbor symmetric 2D rule 4005091440 was able to reproduce all the same logical elements. (This system, like rule 110, requires an infinite repetitive background in order to support universality.) Following the invention of the Game of Life, considerable work was done in the early 1970s to identify structures that could be used to make the analog of logic circuits. John Conway worked on an explicit proof of universality based on emulating register machines, but this was apparently never completed. Yet by the 1980s it had come to be generally believed that the Game of Life had in fact been proved universal. No particularly rigorous treatments of the system were given, and the mere existence of configurations that can act for example like logic gates was often assumed immediately to imply universality. From the discoveries I have made, I have no doubt at all that the Game of Life is in the end universal, and indeed I believe that the kind of elaborate behavior needed to support various components is in fact good evidence for this. But the fact remains that a complete and rigorous proof of universality has apparently still never been given for the Game of Life. Particularly in recent years elaborate constructions have been made of for example Turing machines. But so far they have always had only a fixed number of elements on their tape, which is not sufficient for universality. Extending constructions is often very tricky; much as in rule 110 it is easy for there to be subtle bugs associated with rare mismatches in the placement of structures and timing of interactions. The pictures below nevertheless show a rather simple implementation of a NAND gate in Life. The input comes from the left encoded as the presence or absence of spaceships 92 cells apart. The spaceships are converted to gliders. When only one glider is present, a new spaceship emerges on the right as the output. But when two gliders are present, their collision forms a wall, which prevents output of the spaceship.
 
-![](_page_1132_Picture_6.jpeg)
+![](images/_page_1132_Picture_6.jpeg)
 
 If one considers rules with more than two colors, it becomes straightforward to emulate standard logic circuits. The pictures below show how 1D cellular automata can be implemented in the 4-color WireWorld cellular automaton of Brian Silverman from 1987, whose rules find the new value of a cell from its old value a and the number u of its 8 neighbors that are 1’s according to
 
  $a /. \{0 \rightarrow 0, 1 \rightarrow 2, 2 \rightarrow 3, 3 :> If[0 < u < 3, 1, 3]\}$ 
 
-![](_page_1132_Figure_9.jpeg)
+![](images/_page_1132_Figure_9.jpeg)
 
 ### The Threshold of Universality in Cellular Automata
 
 ■ **Claims of non-universality.** Over the years, there have been a few erroneous claims of proofs that universality is impossible in particular kinds of simple cellular automata. The basic mistake is usually to make the implicit assumption that computation must be done in some rather specific way—that does not happen to be consistent with the way we have for example seen that it can be done in rule 110.
-■ **Page 700 · Rule 73.** ![](_page_1133_Rule_73_Initial_Condition.jpeg) on a white background yields a pattern that contains the last structure shown here.
-■ **Page 700 · Rule 30.** For the first background shown, no initial region up to size 25 yields a truly localized structure, though for example ![](_page_1133_Rule_30_Initial_Condition.jpeg) starts off growing quite slowly.
-■ **Rule 41.** Various rules like rule 41 below can perhaps be viewed as having localized structures—though ones that apparently always travel in the same direction at the same speed. None of the first million initial conditions for rule 41 yield unbounded growth, though some can still generate fairly wide patterns, as in the pictures below. (The initial condition consisting ![](_page_1133_Rule_41_Left_Background.jpeg) repeated, followed by ![](_page_1133_Rule_41_Single_Cell.jpeg), followed by ![](_page_1133_Rule_41_Right_Background.jpeg) repeated nevertheless yields a region that grows forever.)
+■ **Page 700 · Rule 73.** ![](images/_page_1133_Rule_73_Initial_Condition.jpeg) on a white background yields a pattern that contains the last structure shown here.
+■ **Page 700 · Rule 30.** For the first background shown, no initial region up to size 25 yields a truly localized structure, though for example ![](images/_page_1133_Rule_30_Initial_Condition.jpeg) starts off growing quite slowly.
+■ **Rule 41.** Various rules like rule 41 below can perhaps be viewed as having localized structures—though ones that apparently always travel in the same direction at the same speed. None of the first million initial conditions for rule 41 yield unbounded growth, though some can still generate fairly wide patterns, as in the pictures below. (The initial condition consisting ![](images/_page_1133_Rule_41_Left_Background.jpeg) repeated, followed by ![](images/_page_1133_Rule_41_Single_Cell.jpeg), followed by ![](images/_page_1133_Rule_41_Right_Background.jpeg) repeated nevertheless yields a region that grows forever.)
 
-![](_page_1133_Picture_6.jpeg)
+![](images/_page_1133_Picture_6.jpeg)
 
 ■ **Page 702 · Rule emulations.** The network below shows which quiescent symmetric elementary rules can emulate which with blocks of length 8 or less. (Compare page 269.)
 
-![](_page_1133_Picture_8.jpeg)
+![](images/_page_1133_Picture_8.jpeg)
 
 In all cases things are set up so that several steps in one rule emulate a single step in another. The examples shown in detail in the main text all have the feature that the block size b and number of steps t are matched, so that rt = b (where the range r = 1 for elementary rules). It is also possible to set up emulations where this equality does not hold—and indeed some of the cases listed in the main text and shown in the picture above are of this type. In those where  $r \, t < b$  there are more cells that are in principle determined by a given set of initial blocks—but the outermost of these cells are ignored when the outcome for a particular cell is deduced. In cases where  $r \, t > b$  there are more initial cells whose values are specified—but the outermost of these turn out to be irrelevant in determining the outcome for a particular cell. This lack of dependence makes it somewhat inevitable that the only rules that end up being emulated in this way are ones with very simple behavior.
 
@@ -707,7 +707,7 @@ surrounded by 0’s, with the head on the leftmost 2, in state 1. An element -1 
 
 ■ **History.** Alan Turing gave the first construction for a universal Turing machine in 1936. His construction was complicated and had several bugs. Claude Shannon showed in 1956 that 2 colors were sufficient so long as enough states were used. (See page 669; conversion of Minsky’s machine using this method yields a {43, 2} machine.) After Minsky’s 1962 result, comparatively little more was published about small universal Turing machines. In the 1980s and 1990s, however, Yurii Rogozhin found examples of universal Turing machines for which the number of states and number of colors were: {24, 2}, {10, 3}, {7, 4}, {5, 5}, {4, 6}, {3, 10}, and {2, 18}. The smallest product of these numbers is 24 (compare note below), and the rule he gave in this case is:
 
-![](_page_1134_Rogozhin_24_State_2_Color_Turing_Machine_Rule.jpeg)
+![](images/_page_1134_Rogozhin_24_State_2_Color_Turing_Machine_Rule.jpeg)
 
 Note that these results concern Turing machines which can halt (see page 1137); the Turing machines that I consider do not typically have this feature.
 
@@ -770,11 +770,11 @@ NestList[Join[{0}, Mod[1 + Rest[FoldList[Plus, 0, #]], 2],
 
 Inside the right-hand part of this pattern the cell values can then be obtained from an upside-down version of the rule 60 additive cellular automaton, and starting from a sequence of 1’s the picture below shows that a typical rule 60 nested pattern can be produced, at least in a limited region.
 
-![](_page_1135_Figure_14.jpeg)
+![](images/_page_1135_Figure_14.jpeg)
 
 The presence of glitches on the right-hand edge of the whole pattern means, however, that overall there is nothing as simple as nested behavior—making it conceivable that (possibly with analogies to tag systems) behavior complex enough to support universality can occur. The plot below shows the distances between successive outward glitches on the right-hand side; considerable complexity is evident.
 
-![](_page_1135_Figure_16.jpeg)
+![](images/_page_1135_Figure_16.jpeg)
 
 ■ **Page 710 · s=3, k=2 Turing machines.** Compare page 763 and particularly the discussion of machine 600720 on page 1145.
 ■ **Tag systems.** Marvin Minsky showed in 1961 that one-element-dependence tag systems (see page 670) can be universal. Hao Wang in 1963 constructed an example that deletes just 2 elements at each step and adds at most 3 elements—but has a large number of colors. I suspect that universal examples with blocks of the same size exist with just 3 colors.
@@ -803,7 +803,7 @@ Mod[x, Prime[Rest[NestList[NestWhile[# + 1 &, # + 1,
 
 ■ **Register machines.** The results of page 100 suggest that with 2 registers and up to 8 instructions no universal register machines (URMs) exist. Using the method of page 672 one can construct a URM with 3 registers and 175 instructions (or 2 registers and 4694 instructions) that emulates the universal Turing machine on page 706. Using work by Ivan Korec from the 1980s and 1990s one can also construct URMs which directly emulate other register machines. An example with 8 registers and 41 instructions is:
 
-![](_page_1136_Picture_5.jpeg)
+![](images/_page_1136_Picture_5.jpeg)
 
 or
 

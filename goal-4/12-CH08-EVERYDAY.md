@@ -66,7 +66,7 @@ The two disjoint sequential-review assignments are:
 | Assignment | Source units | Physical images |
 |---|---:|---:|
 | `CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md` | 385, `U002012..U002396` | 45 referenced: `A001122..A001126`, `A001128..A001138`, `A001142..A001143`, `A001148..A001151`, `A001153..A001162`, `A001165..A001177` |
-| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 125, `U006870..U006994` | 12 referenced + 29 unreferenced: referenced `A000019`, `A000024`, `A000034..A000038`, `A000046`, `A000049`, `A000054..A000055`, `A000059`; unreferenced `A000020..A000023`, `A000025..A000033`, `A000039..A000045`, `A000047..A000048`, `A000050..A000053`, `A000056..A000058` |
+| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md` | 125, `U006870..U006994` | 12 referenced + 29 unreferenced: referenced `A000019`, `A000024`, `A000034..A000038`, `A000046`, `A000049`, `A000054..A000055`, `A000059`; unreferenced `A000020..A000023`, `A000025..A000033`, `A000039..A000045`, `A000047..A000048`, `A000050..A000053`, `A000056..A000058` |
 | **Total** | **510** | **86** |
 
 Workers may read only their sealed assignment bundle. The coordinator may use

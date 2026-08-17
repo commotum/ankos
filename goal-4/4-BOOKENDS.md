@@ -13,7 +13,7 @@ Status: **COMPLETE**.
 - Stage 4 owns four canonical documents in manifest order:
   - `FRONT-MATTER/00-Publication-and-Contents.md`;
   - `FRONT-MATTER/01-Preface.md`;
-  - `BACK-MATTER/NOTES/00-General-Notes.md`;
+  - `BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md`;
   - `BACK-MATTER/Colophon.md`.
 - Those paths contain 157 deterministic source units and own 2 physical
   images.

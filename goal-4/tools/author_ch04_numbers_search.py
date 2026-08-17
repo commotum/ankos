@@ -29,7 +29,7 @@ from audit_contract import GOAL_DIR, REPO_ROOT, canonical_json_bytes
 
 STAGE_PATHS = [
     "CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md",
-    "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md",
+    "BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md",
 ]
 
 ASSUMPTION = (

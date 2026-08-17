@@ -35,7 +35,7 @@ FIRST_STAGE_4_PATH = "FRONT-MATTER/00-Publication-and-Contents.md"
 INITIAL_STAGE_4_PREFIX = [FIRST_STAGE_4_PATH, ASSIGNMENT_PATH]
 STAGE_5_PATH = "CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md"
 STAGE_5_NOTES_PATH = (
-    "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
+    "BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md"
 )
 
 
@@ -2134,7 +2134,7 @@ def test_bundle_rejects_mixed_pending_and_reviewed_projection(
             4,
             [
                 ASSIGNMENT_PATH,
-                "BACK-MATTER/NOTES/00-General-Notes.md",
+                "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
             ],
             epoch=1,
         )

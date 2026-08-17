@@ -37,7 +37,7 @@ from audit_contract import (
 STAGE_PATHS = [
     "FRONT-MATTER/00-Publication-and-Contents.md",
     "FRONT-MATTER/01-Preface.md",
-    "BACK-MATTER/NOTES/00-General-Notes.md",
+    "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md",
     "BACK-MATTER/Colophon.md",
 ]
 

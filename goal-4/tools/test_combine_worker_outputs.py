@@ -28,7 +28,7 @@ from audit_contract import (  # noqa: E402
 
 FIRST_PATH = "FRONT-MATTER/00-Publication-and-Contents.md"
 SECOND_PATH = "FRONT-MATTER/01-Preface.md"
-GENERAL_NOTES_PATH = "BACK-MATTER/NOTES/00-General-Notes.md"
+GENERAL_NOTES_PATH = "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md"
 
 
 def _fresh_goal(root: Path) -> Path:

@@ -39,7 +39,7 @@ from audit_contract import (
 
 STAGE_PATHS = [
     "CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md",
-    "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md",
+    "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md",
 ]
 NOTES_PATH = STAGE_PATHS[1]
 

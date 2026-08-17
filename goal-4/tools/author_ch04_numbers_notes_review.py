@@ -4170,7 +4170,7 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         "## Scope and source boundary",
         "",
         f"- Worker: `{WORKER}`; stage `{STAGE}`; discovery epoch `{EPOCH}`.",
-        "- Assigned canonical source: `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md` only.",
+        "- Assigned canonical source: `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md` only.",
         "- Canonical review was performed sequentially over every supplied unit before any audit enumeration.",
         "- No search round was run by this worker. No catalog IDs, prior goals, API/runtime material, other Book ranges, web source, or outside source was consulted.",
         f"- Final prohibited-input declaration: `{str(output['prohibited_input_nonuse']).lower()}`.",

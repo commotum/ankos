@@ -43,7 +43,7 @@ IDENTITY_FIELDS = (
 )
 STAGE_PATHS = (
     "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-    "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md",
+    "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md",
 )
 EXPECTED_SPEC_COUNTS = {"incoming": 11, "within": 16}
 EXPECTED_SPEC_SHA256 = (

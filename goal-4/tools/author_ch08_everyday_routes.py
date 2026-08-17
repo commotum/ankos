@@ -51,7 +51,7 @@ IDENTITY_FIELDS = (
 )
 STAGE_PATHS = (
     "CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md",
-    "BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md",
+    "BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md",
 )
 EXPECTED_PREVIOUS_REVIEW_ID = "V000034"
 EXPECTED_PREVIOUS_EVENT_SHA256 = (

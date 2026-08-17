@@ -20,7 +20,7 @@ from typing import Any
 WORKER = "ch05-dimensions-notes-reader-e2"
 STAGE = "9"
 EPOCH = "2"
-SOURCE_PATH = "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md"
+SOURCE_PATH = "BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md"
 EXPECTED = {
     "input/reading-input.csv": "2d34c7161c30c90d69a57a461703209750af3c371b523e8fb1d33a53d2bbfd92",
     "input/asset-input.csv": "eacf77ccc7c765f44c00dec4dc943ef2a9ffb25d25c219f081057560538452c4",

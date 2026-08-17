@@ -279,7 +279,7 @@ Stage 10 owns exactly two still-pending canonical assignments:
 | Assignment | Source units | Physical images |
 |---|---:|---:|
 | `CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md` | 354, `U001223..U001576` | 105 referenced, `A000923..A001027` |
-| `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md` | 253, `U006339..U006591` | 42 referenced + 30 unreferenced, `A000589..A000660` |
+| `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md` | 253, `U006339..U006591` | 42 referenced + 30 unreferenced, `A000589..A000660` |
 | **Total** | **607** | **177** |
 
 All 607 Stage 10 reading rows and all 177 Stage 10 asset rows are `PENDING`.

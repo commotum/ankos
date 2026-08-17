@@ -84,43 +84,43 @@ consolidation:
   motion and collisions, alternating hexagon/dual-triangle blocks, reflective
   boundaries, injected flow, and an energy/temperature extension
   (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:155-165`;
-  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:107,124-126`).
+  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:107,124-126`).
 - `L1421`: a metasystem that mutates a three-color nearest-neighbor CA program
   by adding or modifying rules (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:319-329`).
 - `L1425`, `L1465–L1467`: phyllotaxis by repeatedly selecting the global field
   maximum, placing an element, applying a translated depletion kernel, and
   updating the cyclic concentration field; simultaneous placement is a
   scheduling variant (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:531-547`;
-  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:223-225`).
+  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:223-225`).
 - `L1427` and part of `L1467`: differential sheet growth with an equal-cell-size
   embedding constraint. It remains open whether the Book defines an iterative
   relaxation or only a relation over acceptable outputs
   (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:563-569`;
-  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:226`).
+  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:226`).
 - `L1429`, `L1468`: shell generation by progressive addition at a moving
   opening versus a direct parametric surface relation, including outside-only
   handling of self-intersection
   (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:581-591`;
-  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:234-246`).
+  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:234-246`).
 - `L1430`, `L1469`: curve generation from intrinsic curvature as a function of
   arc length, integrated into position and heading
   (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:613-617`;
-  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:253-271`).
+  `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:253-271`).
 - `L1443–L1447`: one overpacked source group covering ordinary DLA, its
   conserved-mobile-particle CA analogue, and a boiling continuous CA. These
   mechanics must be split during Stage 8 before fingerprinting
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:50-51`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:50-51`).
 - `L1448–L1453`: alternative fracture constructions: minimum-total-strength
   paths through random-strength bonds, identical springs that fail past a
   stretch threshold, a three-color CA without a special crack marker, and
   stochastic repeated binary fragmentation
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:59-66`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:59-66`).
 - `L1460`: discrete streams choose random directions and coalesce irreversibly
   on meeting, producing a drainage tree
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:130`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:130`).
 - `L1477–L1478`: a continuous vector concentration field with diffusion and
   nonlinear reaction terms
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:322-328`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:322-328`).
 
 This is a shortlist of leads, not a claim that Chapter 8 contains 28 distinct
 types.
@@ -166,14 +166,14 @@ The following remain `UNREVIEWED`, with their dependency recorded here:
   (`CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md:215`).
 - `L1490` (`RESOLVED`): rapid dynamics of a third CA color used to emulate an
   effectively long-range field; an implementation technique
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:45`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:45`).
 - `L1491` (`RESOLVED`): multiple crystal seeds and optional per-seed
   characteristics yielding Voronoi-like boundaries; a seed recipe plus
   observation
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:46`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:46`).
 - `L1492` (`UNREVIEWED`, later dependency): discrete-vorticity fluid elements
   with no local transition supplied
-  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md:109`).
+  (`BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md:109`).
 
 ### Selective figure inspection
 

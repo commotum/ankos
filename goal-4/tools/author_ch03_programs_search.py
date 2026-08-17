@@ -30,7 +30,7 @@ from audit_contract import GOAL_DIR, REPO_ROOT, canonical_json_bytes
 
 STAGE_PATHS = [
     "CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md",
-    "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md",
+    "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md",
 ]
 
 ASSUMPTION = (

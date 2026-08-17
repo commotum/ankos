@@ -18,31 +18,31 @@ inherited lead cites the document.
 |---|---:|---|---:|---:|
 | `FRONT-MATTER/00-Publication-and-Contents.md` | 8/8 | `INHERITED` | — | 0 |
 | `FRONT-MATTER/01-Preface.md` | 1/1 | `INHERITED` | — | 0 |
-| `BACK-MATTER/NOTES/00-General-Notes.md` | 1/1 | `INHERITED` | — | 2 |
+| `BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md` | 1/1 | `INHERITED` | — | 2 |
 | `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md` | 5/5 | `INHERITED` | — | 1 |
-| `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md` | 4/4 | `INHERITED` | — | 3 |
+| `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md` | 4/4 | `INHERITED` | — | 3 |
 | `CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md` | 4/4 | `INHERITED` | — | 8 |
-| `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md` | 5/5 | `INHERITED` | — | 86 |
+| `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md` | 5/5 | `INHERITED` | — | 86 |
 | `CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md` | 13/13 | `INHERITED` | — | 120 |
-| `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md` | 11/11 | `INHERITED` | — | 109 |
+| `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md` | 11/11 | `INHERITED` | — | 109 |
 | `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md` | 11/11 | `INHERITED` | — | 148 |
-| `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md` | 11/11 | `INHERITED` | — | 188 |
+| `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md` | 11/11 | `INHERITED` | — | 188 |
 | `CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md` | 8/8 | `INHERITED` | — | 210 |
-| `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md` | 8/8 | `INHERITED` | — | 219 |
+| `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md` | 8/8 | `INHERITED` | — | 219 |
 | `CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md` | 9/9 | `INHERITED` | — | 60 |
-| `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md` | 9/9 | `INHERITED` | — | 121 |
+| `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md` | 9/9 | `INHERITED` | — | 121 |
 | `CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md` | 10/10 | `INHERITED` | — | 82 |
-| `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 10/10 | `INHERITED` | — | 81 |
+| `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md` | 10/10 | `INHERITED` | — | 81 |
 | `CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md` | 9/9 | `COMPLETE` | 2 | 25 |
-| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md` | 9/9 | `COMPLETE` | 2 | 54 |
+| `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md` | 9/9 | `COMPLETE` | 2 | 54 |
 | `CHAPTERS/09-Fundamental-Physics/09-Fundamental-Physics.md` | 17/17 | `COMPLETE` | 3 | 8 |
-| `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md` | 16/16 | `COMPLETE` | 3 | 15 |
+| `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes/09-Fundamental-Physics-Notes.md` | 16/16 | `COMPLETE` | 3 | 15 |
 | `CHAPTERS/10-Processes-of-Perception-and-Analysis/10-Processes-of-Perception-and-Analysis.md` | 14/14 | `COMPLETE` | 4 | 21 |
-| `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md` | 12/12 | `COMPLETE` | 4 | 32 |
+| `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes/10-Processes-of-Perception-and-Analysis-Notes.md` | 12/12 | `COMPLETE` | 4 | 32 |
 | `CHAPTERS/11-The-Notion-of-Computation/11-The-Notion-of-Computation.md` | 13/13 | `COMPLETE` | 5 | 2 |
-| `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md` | 11/11 | `COMPLETE` | 5 | 6 |
+| `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes/11-The-Notion-of-Computation-Notes.md` | 11/11 | `COMPLETE` | 5 | 6 |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/12-The-Principle-of-Computational-Equivalence.md` | 13/13 | `COMPLETE` | 6 | 8 |
-| `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md` | 13/13 | `COMPLETE` | 6 | 12 |
+| `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes/12-The-Principle-of-Computational-Equivalence-Notes.md` | 13/13 | `COMPLETE` | 6 | 12 |
 | `BACK-MATTER/Index.md` | 1/1 | `COMPLETE CHECKLIST` | 7 | 0 |
 | `BACK-MATTER/Colophon.md` | 1/1 | `INHERITED` | — | 0 |
 

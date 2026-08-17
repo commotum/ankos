@@ -28,7 +28,7 @@ When textbooks of computer science began to be written some confusion developed 
 ■ **Page 725 · Universal objects.** A more direct way to create a universal object is to set up, say, a 4D array in which two of the dimensions range respectively over possible 1D cellular automaton rules and over possible initial conditions, while the other two dimensions correspond to space and time in the evolution of each cellular automaton from each initial condition. (Compare the parameter space sets of page 1006.)
 ■ **Page 725 · Block occurrences.** The pictures below show at which step each successive block of length up to 8 first appears in evolution according to various cellular automaton rules starting from a single black cell. For rule 30, the numbers of steps needed for each block of lengths 1 through 10 to appear at least once is {1, 2, 4, 12, 22, 24, 33, 59, 69, 113}. (See also page 871.)
 
-![](_page_1142_Figure_7.jpeg)
+![](images/_page_1142_Figure_7.jpeg)
 
 ### The Validity of the Principle
 
@@ -83,7 +83,7 @@ As I discuss on page 1137, almost all known proofs of undecidability in practice
 
 The pictures at the top of the facing page show successive steps in the evolution of an analog of their system. The input is an integer that gives a position in either of the two rows of cells at the bottom of each picture. All these cells are initially white, but some eventually become black—and the system is considered to halt for a particular input if the corresponding cell ever becomes black.
 
-![](_page_1146_Figure_2.jpeg)
+![](images/_page_1146_Figure_2.jpeg)
 
 The rules for the system are quite complicated, and in essence work by progressively implementing a generalization of a diagonal argument of the kind discussed on page 1128. Note first that the configuration of cells in the rows at the bottom of each picture can be thought of as successive finite approximations to tables for an oracle (see page 1126) which gives the solution to the halting problem for each possible input to the system. To set up the generalized diagonal argument one needs a way to list all possible programs. Any type of program that supports universality can be used for this purpose; the pictures shown use essentially the register machines from page 97. Each row above the bottom one corresponds in effect to a successive register machine—and shows, if relevant, its output when given as input the integer corresponding to that position in the row, together with the complete bottom row of cells found so far. (A dot indicates that the register machine does not halt.) The way the system works is to put down new black cells in the bottom row in just such a way as to arrange that for any register machine at least the output shown will ultimately not agree with the cells in the bottom row. As indicated by vertical gray lines, there is sometimes temporary agreement, but this is always removed within a finite number of steps.
 
@@ -200,9 +200,9 @@ Young children, animals and the insane are typically held less responsible for t
 ■ **Mathematical impossibilities.** It is sometimes said that in the 1800s problems such as trisecting angles, squaring the circle, solving quintics, and integrating functions like  $Exp[x^2]$  were proved mathematically impossible. But what was actually done was just to show that these problems could not be solved in terms of particular levels of mathematical constructs—say square roots (as in ruler and compass constructions discussed on page 1129), arbitrary roots, or elementary transcendental functions. And in each case higher mathematical constructs that seem in some sense no less implementable immediately allow the problems to be solved. Yet with undecidability one believes that there is absolutely no construct that can explicitly exist in our universe that allows the problem to be solved in any finite way. And unlike traditional mathematical impossibilities, undecidability is normally formulated purely in terms of ordinary integers—making it in a sense necessary to collapse basic distinctions between finite and infinite quantities if any higher-level constructs are to be included.
 ■ **Page 755 · Code 1004600.** In cases (c) and (d) steady growth at about 0.035 and 0.039 cells per step (of which 28% on average are non-white) is seen up to at least 20 million steps, though there continue to be fluctuations as shown below.
 
-![](_page_1152_Figure_5.jpeg)
+![](images/_page_1152_Figure_5.jpeg)
 
-![](_page_1152_Figure_6.jpeg)
+![](images/_page_1152_Figure_6.jpeg)
 
 ■ **Halting problems.** A classic example of a problem that is known in general to be undecidable is whether a given Turing machine will ever halt when started from a given initial condition. Halting is usually defined by the head of the Turing machine reaching a special halt state. But other criteria can equally well be used—say the head reaching a particular position (see page 759), or a certain pattern of colors being formed on the tape. And in a system like a cellular automaton a halting problem can be set up by asking whether a cell at a particular position ever turns a particular color, or whether, more globally, the complete state of the system ever reaches a fixed point and no longer changes.
 
@@ -246,7 +246,7 @@ Correspondence systems were introduced by Emil Post in 1945 to give simple examp
 
 With r string pairs and n = `StringLength`[`StringJoin`[p]] there are  $2^n$  `Binomial`[n-1, 2 r-1] possible constraints (assuming no strings of zero length), each being related to at most 8 r! others by straightforward symmetries (or altogether 4<sup>n-1</sup> for given n). The number of constraints which yield solutions of specified lengths `Length`[s] for r = 2 and r = 3 are as follows (the boxes at the end give the number of cases with no solution):
 
-![](_page_1154_Figure_8.jpeg)
+![](images/_page_1154_Figure_8.jpeg)
 
 With r = 2, as n increases an exponentially decreasing fraction of possible constraints have solutions; with r = 3 it appears that a fraction more than 1/4 continue to do so. With r = 2, it appears that if a solution exists, it must have length n + 4 or less. With  $r \le 3$ , the longest minimal solution lengths for  $n \le 10$  are given above. (Allowing r > 3 yields no greater lengths for these values of n.) With n = 11, example (l) yields a solution of length 112. The only possible longer n = 11 case is {{"AAB", `"B"`}, {`"B"`, `"A"`}, {`"A"`, "AABB"}}, for which any possible solution must be longer than 200. With n = 12, {{"AABAAB", `"B"`}, {`"B"`, `"A"`}, {`"A"`, "AB"}} has minimal solution length 120 and {{`"A"`, "AABB"}, {"AAB", `"B"`}, {`"B"`, "AA"}} has minimal solution length 132.
 
@@ -284,7 +284,7 @@ This correspondence with tag systems can be used in practice to search for PCP s
 
 The pictures below show which possible sequences of up to 6 blocks yield upper and lower strings that agree in each of the PCP systems in the main text. As indicated in the first picture for the case of two blocks, each possible successively longer sequence corresponds to a rectangle in the picture (compare page 594). When a sequence of blocks leads to upper and lower strings that disagree, the rectangle is left white. If the strings agree so far, then the rectangle is colored with a gray that is darker if the strings are closer in length. Rectangles that are black (as visible in cases (a) and (b)) correspond to actual PCP solutions where the strings are the same length. Note that in case (c) the presence of only one color in either block means that strings will always agree so far. In cases (m) through (s) there is ultimately no solution, but as the pictures indicate, in these specific PCP systems there are always strings that agree as far as they have gone—it is just that they never end up the same length.
 
-![](_page_1155_Figure_12.jpeg)
+![](images/_page_1155_Figure_12.jpeg)
 
 As one example of how one proves that a PCP constraint cannot be satisfied, consider case (s). From looking at the structure of the individual pairs one can see that if there is a solution it must begin with pair 1 or pair 3, and end with pair 1. But in fact it cannot begin with pair 1 because this would mean that the upper string would have to start off being longer, then at some point cross over to being shorter. However, the only way that such a crossover can occur is by pair 3 appearing with its upper `A` aligned with its second lower `A`. Yet starting with pair 1, the upper string is longer by 2 As, and the pairs are such that the length difference must always remain even—preventing the crossover from occurring. This means that any solution must begin with pair 3. But this pair must then be followed by another pair 3, which leaves `BAAB` sticking out on the bottom. So how can this `BAAB` be removed? The only way is to use the sequence of pairs 2, 3, 3, 2—yet doing this will just produce another `BAAB` further on. And thus one concludes that there is no way to satisfy these particular PCP constraints.
 
@@ -332,7 +332,7 @@ Other examples include the fast Fourier transform (page 1074) and related algori
 
  $PairSort[a_, p: \{_, _\}] := Block[\{t = a\}, t[[p]] = Sort[t[[p]]]; t]$ (Different comparisons often do not interfere and so can be done in parallel.) The pictures below show a few sequences of pair comparisons that sort lists of length n = 16.
 
-![](_page_1157_Figure_7.jpeg)
+![](images/_page_1157_Figure_7.jpeg)
 
 The top two (both with 120 comparisons) have a repetitive structure and correspond to standard sorting algorithms: transposition sort and insertion sort. (Quicksort does not use a fixed sequence of comparisons.) The first one on the bottom (with 63 comparisons) has a nested structure and uses the method invented by Kenneth Batcher in 1964:
 
@@ -376,7 +376,7 @@ Among the  $2^{32}$  Turing machines with s = 4, k = 2 about 80% at least someti
 
 ■ **Functions.** The plots below show the values of the functions f[x] for x from 0 to 1023 computed by the Turing machines on pages 761 and 763. Many of the plots use logarithmic scales. Rarely are the values close to their absolute maximum t[x].
 
-![](_page_1159_Figure_6.jpeg)
+![](images/_page_1159_Figure_6.jpeg)
 
 ■ **Machine 1507.** This machine shows in some ways the most complicated behavior of any s = 2, k = 2 Turing machine. As suggested by picture (k) it fails to halt if and only if its configuration at some step matches  $\{(0), ..., \{1, 1\}, 1, \_\_\_\}$  (in the alternative form of page 888). For any input x one can test whether the machine will ever halt using
 
@@ -406,7 +406,7 @@ This test takes at most n/3 recursive steps, even though the original machine ca
 - (l)  $5 (2^{n-2}-1)$
 ■ **Longest halting times.** The pictures below show the largest numbers of steps t[x] that it takes any machine of a particular type to halt when given successive inputs x. For s=2, k=2 the largest results for all inputs of sizes 0 to 4 are  $\{7, 17, 31, 49, 71\}$ , all obtained with machine 1447. For n>4 the largest results are  $2^{n+2}-3$ , achieved for  $x=2^n-1$  with machines 378 and 1351. For s=3, k=2 the largest results for successive sizes are  $\{25, 53, 159, 179, 1021, 5419\}$  (often achieved by machine 600720; see below) and for s=2, k=3  $\{35, 83, 843, 8335\}$  (often achieved by machine 840971). Note the similarity to the busy beaver problem discussed on page 889.
 
-![](_page_1159_Figure_21.jpeg)
+![](images/_page_1159_Figure_21.jpeg)
 
 ■ **Growth rates.** Some Turing machine can always be found that has halting times that grow at any specified rate. (See page 103 for a symbolic system with halting times that grow like `Nest`[2# &, 0, n].) As discussed on page 1162, if the growth rate is too high then it may not be possible to prove that the machines halt using, say, the standard axioms of arithmetic. The maximum halting times above increase faster than the halting times for any specific Turing machine, and are therefore ultimately not computable by any single Turing machine.
 ■ **Machine 600720.** (Case (h) of page 763.) The maximum halting times for the first few sizes *n* are
@@ -731,7 +731,7 @@ Boolean algebra (basic logic) is a special case of lattice theory, as is the the
 
 The axioms given here are illustrated below. They were developed by Alfred Tarski and others in the 1940s and 1950s. (Unlike Hilbert’s axioms they require only first-order predicate logic.) The first six give basic properties of betweenness of points and congruence of line segments. The second- and third-to-last axioms specify that space has two dimensions; they can be modified for other dimensions. The last axiom is a schema that asserts the continuity of space. (The system is not finitely axiomatizable.)
 
-![](_page_1169_Picture_4.jpeg)
+![](images/_page_1169_Picture_4.jpeg)
 
 The axioms given can prove most of the results in an elementary geometry textbook—indeed all results that are about geometrical figures such as triangles and circles specified by a fixed finite number of points, but which do not involve concepts like area. The axioms are complete and consistent—and thus not universal. They can however be made universal if axioms from set theory are added.
 
@@ -783,7 +783,7 @@ FoldList[Function[{u, v},
 
 and treats it as rule 6, then the main proof can be shortened:
 
-![](_page_1170_Figure_15.jpeg)
+![](images/_page_1170_Figure_15.jpeg)
 
 When one just applies axioms from the original axiom system one is in effect following a single line of steps. But when one proves a lemma one is in effect on a separate branch, which only merges with the main proof when one uses the lemma. And if one has nested lemmas one can end up with a proof that is in effect like a tree. (Repeated use of a single lemma can also lead to cycles.) Allowing lemmas can in extreme cases probably make proofs as much as exponentially shorter. (Note that lemmas can also be used in multiway systems.)
 
@@ -809,13 +809,13 @@ In the past it was sometimes claimed that using computers is somehow fundamental
 
 whose `LeafCount` grows like $3^t$. The distribution of sizes of statements generated at each step is shown below.
 
-![](_page_1172_Figure_6.jpeg)
+![](images/_page_1172_Figure_6.jpeg)
 
-![](_page_1172_Figure_7.jpeg)
+![](images/_page_1172_Figure_7.jpeg)
 
-![](_page_1172_Figure_8.jpeg)
+![](images/_page_1172_Figure_8.jpeg)
 
-![](_page_1172_Figure_9.jpeg)
+![](images/_page_1172_Figure_9.jpeg)
 
 Even with the same underlying axioms the tautologies are generated in a somewhat different order if one uses a different strategy—say one based on paramodulation (see page 1156). Pages 818 and 1175 discuss the sequence of all NAND theorems listed in order of increasing complexity.
 
@@ -855,7 +855,7 @@ The picture on page 786 can be viewed as a modern proof of Gödel’s Theorem ba
 
 In addition to what is usually called Gödel’s Theorem, Kurt Gödel established a second incompleteness theorem: that the statement that the axioms of arithmetic are consistent cannot be proved by using those axioms (see page 1168). He also established what is often called the Completeness Theorem for predicate logic (see page 1152)—though here “completeness” is used in a different sense.
 
-■ **Page 783 · Properties.** The first multiway system here generates all strings that end in ![](_page_1174_Page_783_End_White_Black.jpeg); the third all strings that end in ![](_page_1174_Page_783_End_Black.jpeg). The second system generates all strings where the second-to-last element is white, or the string ends with a run of black elements delimited by white ones.
+■ **Page 783 · Properties.** The first multiway system here generates all strings that end in ![](images/_page_1174_Page_783_End_White_Black.jpeg); the third all strings that end in ![](images/_page_1174_Page_783_End_Black.jpeg). The second system generates all strings where the second-to-last element is white, or the string ends with a run of black elements delimited by white ones.
 ■ **Page 783 · Essential incompleteness.** If a consistent axiom system is complete this means that any statement in the system can be proved true or false using its axioms, and the question of whether a statement is true can always be decided by a finite procedure. If an axiom system is incomplete then this means that there are statements that cannot be proved true or false using its axioms—and which must therefore be considered independent of those axioms. But even given this it is still possible that a finite procedure can exist which decides whether a given statement is true, and indeed this happens in the theory of commutative groups (see note below). But often an axiom system will not only be incomplete, but will also be what is called essentially incomplete. And what this means is that there is no finite set of axioms that can consistently be added to make the system complete. A consequence of this is that there can be no finite procedure that always decides whether a given statement is true—making the system what is known as essentially undecidable. (When I use the term “undecidable” I normally mean “essentially undecidable”. Early work on mathematical logic sometimes referred to statements that are independent as being undecidable.)
 
 One might think that adding rules to a system could never reduce its computational sophistication. And this is correct if with suitable input one can always avoid the new rules. But often these rules will allow transformations that in effect short-circuit any sophisticated computation. And in the context of axiom systems, adding axioms can be thought of as putting more constraints on a system—thus potentially in effect forcing it to be simpler. The result of all this is that an axiom system that is universal can stop being universal when more axioms are added to it. And indeed this happens when one goes from ordinary group theory to commutative group theory, and from general field theory to real algebra.
@@ -982,7 +982,7 @@ $$\begin{array}{c} \forall_a \, (\, \exists_b \, (\, \exists_c \, ((\Delta \Delt
 
 The last two statements have never been proved true or false, and remain unsolved problems of number theory. The picture shows spacings between n for which  $n^2 + 1$  is prime.
 
-![](_page_1177_Figure_9.jpeg)
+![](images/_page_1177_Figure_9.jpeg)
 
 ■ **Transfinite numbers.** For most mathematical purposes it is quite adequate just to have a single notion of infinity, usually denoted ∞. But as Georg Cantor began to emphasize in the 1870s, it is possible to distinguish different levels of infinity. Most of the details of this have not been widely used in typical mathematics, but they can be helpful in studying foundational issues. Cantor’s theory of ordinal numbers is based on the idea that every integer must have a successor. The next integer after all of the ordinary ones—the first infinite integer—is given the name  $\omega$ . In Cantor’s theory  $\omega + 1$  is still larger (though  $1 + \omega$  is not), as are  $2\omega$ ,  $\omega^2$  and  $\omega^{\omega}$ . Any arithmetic expression involving  $\omega$ specifies an ordinal number—and can be thought of as corresponding to a set containing all integers up to that number. The ordinary axioms of arithmetic do not apply, but there are still fairly straightforward rules for manipulating such expressions. In general there are many different expressions that correspond to a given number, though there is always a unique Cantor normal form—essentially a finite sequence of digits giving coefficients of descending powers of  $\omega$ . However, not all infinite integers can be represented in this way. The first one that cannot is  $\epsilon_0$ , given by the limit  $\omega^{\omega^\omega}$  , or effectively  $\textit{Nest}[\omega^\#\ \&,\ \omega,\ \omega]$  .  $\epsilon_0$  is the smallest solution to  $\omega^{\epsilon} == \epsilon$ . Subsequent solutions ( $\epsilon_1, ..., \epsilon_{\omega}$ ) ...,  $\epsilon_{\epsilon}$ , ...) define larger ordinals, and one can go on until one reaches the limit  $\epsilon_{\epsilon_{\epsilon}}$  , which is the first solution to  $\epsilon_{\alpha} == \alpha$  . Giving this ordinal a name, one can then go on again, until eventually one reaches another limit. And it turns out that in general one in effect has to introduce an infinite sequence of names in order to be able to specify all transfinite integers. (Naming a single largest or “absolutely infinite” integer is never consistent, since one can always then talk about its successor.) As Cantor noted, however, even this only allows one to reach the lowest class of transfinite numbers—in effect those corresponding to sets whose size corresponds to the cardinal number  $\aleph_0$ . Yet as discussed on page 1127, one can also consider larger cardinal numbers, such as  $\aleph_1$ , considered in connection with the number of real numbers, and so on. And at least for a while the ordinary axioms of set theory can be used to study the sets that arise.
 
@@ -1009,13 +1009,13 @@ f[{0, _}] = 0; f[{n_, k_}] := Apply[Plus, MapIndexed[#1
 
 As in the pictures below, g[1] is {1, 0}, g[2] is {2, 2, 1, 0} and g[3] is {3, 3, 3, 2, 1, 0}. g[4] increases quadratically for a long time, with only element $3 \times 2^{402653211} - 2$ finally being 0. And the point is that in a sense `Length`[g[n]] grows too quickly for its finiteness to be provable in general in Peano arithmetic.
 
-![](_page_1178_Figure_7.jpeg)
+![](images/_page_1178_Figure_7.jpeg)
 
-![](_page_1178_Figure_8.jpeg)
+![](images/_page_1178_Figure_8.jpeg)
 
-![](_page_1178_Figure_9.jpeg)
+![](images/_page_1178_Figure_9.jpeg)
 
-![](_page_1178_Figure_10.jpeg)
+![](images/_page_1178_Figure_10.jpeg)
 
 The argument for this as usually presented involves rather technical results from several fields. But the basic idea is roughly just to set up a correspondence between elements of g[n] and possible proofs in Peano arithmetic—then to use the fact that if one knew that g[n] always terminated this would establish the validity of all these proofs, which would in turn prove the consistency of arithmetic—a result which is known to be unprovable from within arithmetic.
 
@@ -1057,7 +1057,7 @@ If one wants to enumerate all possible Diophantine equations there are many ways
 - $x^2 == a y^2 + 1$  (Pell equation). As discussed on page 944, whenever a is not a perfect square, there are always an infinite number of solutions given in terms of `ContinuedFraction`[ $\sqrt{a}$ ]. Note that even when the smallest solution is not very large, subsequent solutions can rapidly get large. Thus for example when a = 13, the second solution is already {842401, 233640}.
 - $x^2 == y^3 + a$  (Mordell equation). First studied in the 1600s, a complete theory of this so-called elliptic curve equation was only developed in the late 1900s—using fairly sophisticated algebraic number theory. The picture below shows as a function of a the minimum x that solves the equation. For a = 68, the only solution is x = 1874; for a = 1090, it is x = 149651610621. The density of cases with solutions gradually thins out as a increases (for  $0 < a \le 10000$  there are 2468 such cases). There are always only a finite number of solutions (for 0 < a < 10000 the maximum is 12, achieved for a = 8900).
 
-![](_page_1180_Figure_11.jpeg)
+![](images/_page_1180_Figure_11.jpeg)
 
 - $x^2 == a y^3 + 1$ . Also an elliptic curve equation.
 - $x^3 == y^4 + x y + a$ . For most values of a (including specifically a = 1) the continuous version of this equation defines a surface of genus 3, so there are at most a finite number of integer solutions. (An equation of degree d generically defines a surface of genus 1/2 (d-1) (d-2).) Note that  $x^3 == y^4 + a$  is equivalent to  $x^3 == z^2 + a$  by a simple substitution.
@@ -1074,7 +1074,7 @@ The equation  $x^x y^y == z^z$  is known to have smallest non-trivial solution (
 
 ■ **Nearby powers.** One can potentially find integer equations with large solutions but small coefficients by looking say for pairs of integer powers close in value. The pictures below show what happens if one computes  $x^m$  and  $y^n$  for many x and y, sorts these values, then plots successive differences. The differences are trivially zero when  $x = s^n$ ,  $y = s^m$ . Often they are large, but surprisingly small ones can sometimes occur (despite various suggestions from the so-called ABC conjecture). Thus, for example,  $5853886516781223^3 - 1641843$  is a perfect square, as found by Noam Elkies in 1998. (Another example is  $55^5 - 22434^2 == 19$ .)
 
-![](_page_1181_Figure_8.jpeg)
+![](images/_page_1181_Figure_8.jpeg)
 
 ■ **Page 791 · Unsolved problems.** Problems in number theory that are simple to state (say in the notation of Peano arithmetic) but that so far remain unsolved include:
 - Is there any odd number equal to the sum of its divisors?
@@ -1129,7 +1129,7 @@ $$
 
 asserts that a particular localized structure occurs in the evolution of rule 110 from a single black cell. But page 38 shows that this happens for the first time after 2867 steps. (A proof of this without lemmas would probably have to be of length at least 32,910,300.)
 
-The axioms as they are stated apply to any rule 110 evolution, regardless of initial conditions. One can establish that the statement at the bottom on the right cannot be proved either true or false from the axioms by showing that it is true for some initial conditions and false for others. Note from page 279 that the sequence ![](_page_1183_Rule_110_Forbidden_Sequence.jpeg) cannot occur in rule 110 evolution except as an initial condition. So this means that the statement is false if the initial condition is ![](_page_1183_Rule_110_Single_Black_Cell.jpeg) and true if the initial condition is ![](_page_1183_Rule_110_Allowed_Initial_Sequence.jpeg).
+The axioms as they are stated apply to any rule 110 evolution, regardless of initial conditions. One can establish that the statement at the bottom on the right cannot be proved either true or false from the axioms by showing that it is true for some initial conditions and false for others. Note from page 279 that the sequence ![](images/_page_1183_Rule_110_Forbidden_Sequence.jpeg) cannot occur in rule 110 evolution except as an initial condition. So this means that the statement is false if the initial condition is ![](images/_page_1183_Rule_110_Single_Black_Cell.jpeg) and true if the initial condition is ![](images/_page_1183_Rule_110_Allowed_Initial_Sequence.jpeg).
 
 ■ **Practical programs.** Any equivalence between programs in a programming language can be thought of as a theorem. Simple examples in *Mathematica* include:
 
@@ -1148,7 +1148,7 @@ One can set up axiom systems say by combining definitions of programming languag
 
 - (b) All strings of length *n* containing exactly one black cell are produced—after at most 2 n-1 steps.
 - (c) All strings containing even-length runs of white cells are produced.
-- (d) The set of strings produced is complicated. The last length 4 string produced is ![](_page_1184_Page_799_Last_Length_4_String.jpeg), after 16 steps; the last length 6 one is ![](_page_1184_Page_799_Last_Length_6_String.jpeg), after 26 steps.
+- (d) The set of strings produced is complicated. The last length 4 string produced is ![](images/_page_1184_Page_799_Last_Length_4_String.jpeg), after 16 steps; the last length 6 one is ![](images/_page_1184_Page_799_Last_Length_6_String.jpeg), after 26 steps.
 - (e) All strings that begin with a black element are produced.
 - (f) All strings that end with a white element but contain at least one black element, or consist of all white elements ending with black, are produced. Strings of length n take n steps to produce.
 - (g) The same strings as in (f) are produced, but now a string of length n with m black elements takes n + m - 1 steps.
@@ -1158,11 +1158,11 @@ One can set up axiom systems say by combining definitions of programming languag
 - (k) Above length 1, the strings produced are exactly those starting with a white element. Those of length n appear after at most 3 n-3 steps.
 - (l) The same strings as in (k) are produced, taking now at most 2 n + 1 steps.
 - (m) All strings beginning with a black element are produced, after at most 3 n + 1 steps.
-- (n) The set of strings produced is complicated, and seems to include many but not all that do not end with ![](_page_1184_Page_799_Item_n_Ending.jpeg).
-- (o) All strings that do not end in ![](_page_1184_Page_799_Item_o_Ending.jpeg) are produced.
-- (p) All strings are produced, except ones in which every element after the first is white. The state ![](_page_1184_Page_799_Item_p_State.jpeg) takes 14 steps.
+- (n) The set of strings produced is complicated, and seems to include many but not all that do not end with ![](images/_page_1184_Page_799_Item_n_Ending.jpeg).
+- (o) All strings that do not end in ![](images/_page_1184_Page_799_Item_o_Ending.jpeg) are produced.
+- (p) All strings are produced, except ones in which every element after the first is white. The state ![](images/_page_1184_Page_799_Item_p_State.jpeg) takes 14 steps.
 - (q) All strings are produced, with a string of length *n* with m white elements taking n + 2 m steps.
-- (r) All strings are ultimately produced—which is inevitable after the lemmas ![](_page_1184_Page_799_First_Lemma_Input.jpeg) → ![](_page_1184_Page_799_First_Lemma_Output.jpeg) and ![](_page_1184_Page_799_Second_Lemma_Input.jpeg) → ![](_page_1184_Page_799_Second_Lemma_Output.jpeg) appear at steps 12 and 13. (See the first rule on page 778.)
+- (r) All strings are ultimately produced—which is inevitable after the lemmas ![](images/_page_1184_Page_799_First_Lemma_Input.jpeg) → ![](images/_page_1184_Page_799_First_Lemma_Output.jpeg) and ![](images/_page_1184_Page_799_Second_Lemma_Input.jpeg) → ![](images/_page_1184_Page_799_Second_Lemma_Output.jpeg) appear at steps 12 and 13. (See the first rule on page 778.)
 ■ **Page 800 · Non-standard arithmetic.** Goodstein’s result from page 1163 is true for all ordinary integers. But since it is independent of the axioms of arithmetic there must be objects that still satisfy the axioms but for which it is false. It turns out however that any such objects must in effect be infinite. For any set of objects that satisfy the axioms of arithmetic must include all finite ordinary integers, since each of these can be reached just by using 4 repeatedly. And the axioms then turn out to imply that any additional objects must be larger than all these integers—and must therefore be infinite. But for any such truly infinite objects operations like + and x cannot be computed by finite procedures, making it difficult to describe such objects in an explicit way. Ever since the work of Thoralf Skolem in 1933 non-standard models of arithmetic have been discussed, particularly in the context of ultrafilters and constructs like infinite trees. (See also page 1172.)
 
 ■ **Page 800 · Reduced arithmetic.** (See page 1152.) Statements that can be proved with induction but are not provable only with Robinson’s axioms are:  $x \neq \Delta x$ ; x + y == y + x; x + (y + z) == (x + y) + z; 0 + x == x;  $\exists_x (\Delta x + y == z \Rightarrow y \neq z);$  $x \times y == y \times x; x \times (y \times z) == (x \times y) \times z; x \times (y + z) == x \times y + x \times z.$
@@ -1275,11 +1275,11 @@ Another example is the cellular automaton axiom system of page 794; see also pag
 ■ **Pure equational logic.** Proofs in operator systems always rely on certain underlying rules about equality, such as the equivalence of u == v and v == u, and of u == v and  $u == v /. a \rightarrow b$ . And as Garrett Birkhoff showed in 1935, any equivalence between expressions that holds for all possible forms of operator must have a finite proof using just these rules. (This is the analog of Gödel’s Completeness Theorem from page 1152 for pure predicate logic.) But as soon as one introduces actual axioms that constrain the operators this is no longer true—and in general it can be undecidable whether or not a particular equivalence holds.
 ■ **Multiway systems.** One can use ideas from operator systems to work out equivalences in multiway systems (compare page 1169). One can think of concatenation of strings as being an operator, in terms of which a string like `"ABB"` can be written f[f[a, b], b]. (The arguments to o should strictly be distinct constants, but no equivalences are lost by allowing them to be general variables.) Assuming that the rules for a multiway system come in pairs  $p \rightarrow q$ ,  $q \rightarrow p$ , like `"AB"`  $\rightarrow$  `"AAA"`, `"AAA"`  $\rightarrow$  `"AB"`, these can be written as statements about operators, like f[a, b] == f[f[a, a], a]. The basic properties of concatenation then also imply that f[f[a, b], c] == f[a, f[b, c]]. And this means that the possible forms for the operator o correspond to possible semigroups. Given a particular such semigroup satisfying axioms derived from a multiway system, one can see whether the operator representations of particular strings are equal—and if they are not, then it follows that the strings can never be reached from each other through evolution of the multiway system. (Such operator representations are a rough analog for multiway systems of truth tables.) As an example, with the multiway system  $"AB" \leftrightarrow "BA"$  some possible forms of operators are shown below. (In this case these are the commutative semigroups. With k = 2, elements 6 out of the total of 8 possible semigroups appear; with k = 3, 63 out of 113, and with k = 4, 1140 out of 3492—all as shown on page 805.) (See also page 952.)
 
-![](_page_1188_Picture_3.jpeg)
+![](images/_page_1188_Picture_3.jpeg)
 
 Taking o to be each of these operators, one can work out a representation for any given string like `"ABAA"` by for example constructing the expression f[f[f[a, b], a], a] and finding its value for each of the  $k^2$  possible pairs of values of a and b. Then for each successive operator, the sets of strings where the arrays of values are the same are as shown below.
 
-![](_page_1188_Figure_5.jpeg)
+![](images/_page_1188_Figure_5.jpeg)
 
 Ultimately the sets of strings equivalent under the multiway system are exactly those containing particular numbers of black and white elements. But as the pictures above suggest, only some of the distinctions between sets of strings are ever captured when any specific form for the operator is used.
 
@@ -1296,7 +1296,7 @@ The Laws of Form presented by George Spencer Brown in 1969 introduce a compact s
 ■ **Page 806 · Properties.** Page 813 lists theorems satisfied by each function. {0, 1, 6, 7, 8, 9, 14, 15} are commutative (orderless) so that  $a \circ b = b \circ a$ , while {0, 6, 8, 9, 10, 12, 14, 15} are associative (flat), so that  $a \circ (b \circ c) = (a \circ b) \circ c$ . (Compare page 886.)
 ■ **Notations.** Among those in current use are (highlighted ones are supported directly in *Mathematica*):
 
-![](_page_1188_Figure_14.jpeg)
+![](images/_page_1188_Figure_14.jpeg)
 
 The grouping of terms is normally inferred from precedence of operators (typically ordered ==, $\neg$, $\bar{\land}$, $\land$, $\veebar$, $\bar{\lor}$, $\lor$, $\Rightarrow$  ), or explicitly indicated by parentheses, function brackets, or sometimes nested underbars or dots. So-called Polish notation given second-to-last above avoids all explicit delimiters (see page 896).
 
@@ -1418,7 +1418,7 @@ and in 1969 Meredith also gave the system
 
 ■ **Page 812 · Theorem distributions.** The picture below shows which of the possible theorems from page 812 hold for each of the numbered standard mathematical theories from page 805. The theorem close to the right-hand end valid in many cases is  $(p \circ p) \circ p = p \circ (p \circ p)$ . The lack of regularity in this picture can be viewed as a sign that it is difficult to tell which theorems hold, and thus in effect to do mathematics.
 
-![](_page_1190_Figure_6.jpeg)
+![](images/_page_1190_Figure_6.jpeg)
 
 ■ **Page 814 · Multivalued logic.** As noted by Jan Łukasiewicz and Emil Post in the early 1920s, it is possible to generalize ordinary logic to allow k values `Range`[0, 1, 1/(k-1)], say with 0 being `False`, and 1 being `True`. Standard operations in logic can be generalized as  $Not[a\_] = 1 - a$ ,  $And[a\_, b\_] = Min[a, b]$ ,  $Or[a\_, b\_] = Max[a, b], Xor[a\_, b\_] = Abs[a - b],$  $Equal[a\_, b\_] = 1 - Abs[a - b],$
 
@@ -1430,7 +1430,7 @@ The idea of intermediate truth values has been discussed intermittently ever sin
 
 In practice it is usually extremely difficult to find the absolute shortest proof of a given logic theorem—and the exact length will depend on what axiom system is used, and what kinds of steps are allowed. In fact, as mentioned on page 1155, if one does not allow lemmas some proofs perhaps have to become exponentially longer. The picture below shows in each of the axiom systems from page 808 the lengths of the shortest proofs found by a version of Waldmeister (see page 1158) for all 582 equivalences (see page 818) that involve two variables and up to 3 NANDs on either side.
 
-![](_page_1190_Figure_13.jpeg)
+![](images/_page_1190_Figure_13.jpeg)
 
 The longest of these are respectively {57, 94, 42, 57, 55, 53, 179, 157} and occur for theorems
 
@@ -1478,7 +1478,7 @@ Most of the axioms from page 808 are too long to appear early in the list of the
 
 The picture below shows the network of theorems associated with Euclid’s *Elements*. Each stated theorem is represented by a node connected to the theorems used in its stated proof. (Only the shortest connection from each theorem is shown explicitly.) The axioms (postulates and common notions) are given in the first column on the left, and successive columns then show theorems with progressively longer proofs. (Explicit annotations giving theorems used in proofs were apparently added to editions of Euclid only in the past few centuries; the picture below extends the usual annotations in a few cases.) The theorem with the longest proof is the one that states that there are only five Platonic solids.
 
-![](_page_1191_Picture_20.jpeg)
+![](images/_page_1191_Picture_20.jpeg)
 
 ■ **Speedups in other systems.** Multiway systems are almost unique in being able to be sped up just by adding “results” already derived in the multiway system. In other systems, there is no such direct way to insert such results into the rules for the system.
 ■ **Character of mathematics.** Since at least the early 1900s several major schools of thought have existed:
@@ -1621,27 +1621,27 @@ and takes $3 n$ steps. Rule (c) is $k = 3$, $r = 1$ rule 5407067979 and takes $3
 ■ **Page 833 · Properties.** The number of steps increases irregularly but roughly quadratically with n in rule (a), and roughly linearly in (d) and (e). Rule (b) in the end repeats every 128 steps. The center of the complex pattern in both (d) and (e) emulates k = 2 rule 90.
 ■ **Other functions.** The first three pictures below show rules that yield 3 n (no k = 3 rules yield 4 n, 5 n or  $n^2$ ), and the last picture 2 n-2 (corresponding to doubling with initial conditions analogous to page 639).
 
-![](_page_1201_Picture_4.jpeg)
+![](images/_page_1201_Picture_4.jpeg)
 
 ■ **Page 834 · Minimal cellular automata for sequences.** Given any particular sequence of black and white cells one can look for the simplest cellular automaton which generates that sequence as its center column when evolving from a single black cell (compare page 956). The pictures below show the lowest-numbered cellular automaton rules that manage to generate repetitive sequences containing black cells with successively greater separations s.
 
-![](_page_1201_Picture_6.jpeg)
+![](images/_page_1201_Picture_6.jpeg)
 
 Elementary (k = 2, r = 1) cellular automata can be found only up to separations s = 2. But k = 2, r = 2 cellular automata can be found for all separations up to 15, as well as 17, 19 and 23. (Note that for example in the s = 15 case the lowest-numbered rule exhibits a complex 350-step transient away from the center column.)
 
 The pictures below show the lowest-numbered cellular automata that generate respectively powers of two, squares and the nested Thue-Morse sequence of page 83 (compare rule 150). Of the 4 billion k = 2, r = 2 cellular automata none turn out to be able to produce for example sequences corresponding to the cubes, powers of 3, Fibonacci numbers, primes, digits of  $\sqrt{2}$ , or concatenation sequences.
 
-![](_page_1201_Picture_9.jpeg)
+![](images/_page_1201_Picture_9.jpeg)
 
-![](_page_1201_Picture_10.jpeg)
+![](images/_page_1201_Picture_10.jpeg)
 
-![](_page_1201_Picture_11.jpeg)
+![](images/_page_1201_Picture_11.jpeg)
 
-If one looks not just at specific sequences, but instead at all 2<sup>n</sup> possible sequences of length n, one can ask how many cellular automaton rules (say with k = 2, r = 2) one has to go through in order to generate every one of these. The pictures below show on the left the last rules needed to generate any sequence of each successive length—and on the right the form of the sequence (as well as its continuation after length n). Since some different rules generate the same sequences (see page 956) one needs to go through somewhat more than  $2^n$  rules to get every sequence of length n. The sequences shown below can be thought of as being in a sense the ones of each length that are the most difficult to generate—or have the highest algorithmic information content. (Note that the sequence ![](_page_1201_Page_834_First_Ungeneratable_Sequence.jpeg) is the first one that cannot be generated by any of the 256 elementary cellular automata; the first sequence that cannot be generated by any k = 2, r = 2 cellular automata is probably of length 26.)
+If one looks not just at specific sequences, but instead at all 2<sup>n</sup> possible sequences of length n, one can ask how many cellular automaton rules (say with k = 2, r = 2) one has to go through in order to generate every one of these. The pictures below show on the left the last rules needed to generate any sequence of each successive length—and on the right the form of the sequence (as well as its continuation after length n). Since some different rules generate the same sequences (see page 956) one needs to go through somewhat more than  $2^n$  rules to get every sequence of length n. The sequences shown below can be thought of as being in a sense the ones of each length that are the most difficult to generate—or have the highest algorithmic information content. (Note that the sequence ![](images/_page_1201_Page_834_First_Ungeneratable_Sequence.jpeg) is the first one that cannot be generated by any of the 256 elementary cellular automata; the first sequence that cannot be generated by any k = 2, r = 2 cellular automata is probably of length 26.)
 
-![](_page_1201_Picture_13.jpeg)
+![](images/_page_1201_Picture_13.jpeg)
 
-![](_page_1201_Picture_14.jpeg)
+![](images/_page_1201_Picture_14.jpeg)
 
 ■ **Other examples.** Minimal systems achieving particular purposes are shown on page 619 for Boolean functions evaluated with NANDs, pages 759 and 889 for Turing machines, page 1142 for sorting networks, and page 1035 for firing squad synchronization.
 ■ **Page 834 · Minimal theories.** Particularly in fundamental physics it has been found that the correct theory is often the minimal one consistent with basic observations. Yet barring supernatural intervention, the laws of physics embodied in such a theory presumably cannot be considered to have been created for any particular purpose. (See page 1025.)
@@ -1701,7 +1701,7 @@ When the Pioneer 10 spacecraft was launched in 1972 it carried a physical plaque
 
 In 1974 the bitmap image below was sent as a radio signal from the Arecibo radio telescope. At the left-hand end is a version of the pattern of digits from page 117—but distorted so it has no obvious nested structure. There follow atomic numbers for various elements, and bitvectors for components of DNA. Next are idealized pictures of a DNA molecule, a human, and the telescope. All these parts seem to depend almost completely on detailed common conventions—and I suspect that without all sorts of human context their meaning would be essentially impossible to recognize.
 
-![](_page_1205_Figure_3.jpeg)
+![](images/_page_1205_Figure_3.jpeg)
 
 In all, remarkably few messages have been sent—perhaps in part because of concerns that they might reveal us to extraterrestrial predators (see page 1191). There has also been a strong tendency to make messages hard even for humans to understand—perhaps on the belief that they must then be more scientific and more universal.
 
@@ -1813,7 +1813,7 @@ In general the main way large molecules have traditionally ended up being consid
 
 ■ **Alkane properties.** The picture on the facing page shows melting points measured for alkanes. (Note that even when alkanes are listed in chemical databases—as discussed above—their melting points may not be given.) Unbranched alkanes yield melting points that increase smoothly for *n* even and for *n* odd. Highly symmetrical branched alkanes tend to have high melting points, presumably because they pack well in space. No reliable general method for predicting melting points is however known (see note above), and in fact for large *n* alkanes tend to form jellies with no clear notion of melting.
 
-![](_page_1210_Figure_2.jpeg)
+![](images/_page_1210_Figure_2.jpeg)
 
 Things appear somewhat simpler with boiling points, and as noticed by Harry Wiener in 1947 (and increasingly discussed since the 1970s) these tend to be well fit as being linearly proportional to the so-called topological index given by the sum of the smallest numbers of connections visited in getting between all pairs of carbon atoms in an alkane molecule.
 
@@ -1839,5 +1839,5 @@ Particularly since the work of Jean Piaget in the 1940s, young children are ofte
 ■ **Human future.** The Principle of Computational Equivalence and the results of this book at first suggest a rather bleak view of the end point of the development of technology. As I argued in Chapter 10 computers will presumably be able to emulate human thinking. And particularly using the methods of this book one will be able to use progressively smaller physical components as elements of computers. So before too long it will no doubt be possible to implement all the processes of thinking that go on in a single human—or even in billions of humans—in a fairly small piece of material. Each piece of human thinking will then correspond to some microscopic pattern of changes in the atoms of the material. In the past one might have assumed that these changes would somehow show fundamental evidence of representing sophisticated human thinking. But the Principle of Computational Equivalence implies that many ordinary physical processes are computationally just as sophisticated as human thinking. And this means that the pattern of microscopic changes produced by such processes can at some level be just as sophisticated as those corresponding to human thinking. So given, say, an ordinary piece of rock in which there is all sorts of complicated electron motion this may in a fundamental sense be doing no less than some system of the future constructed with nanotechnology to implement operations of human thinking. And while at first this might seem to suggest that the rich history of biology, civilization and technology needed to reach this point would somehow be wasted, what I believe instead is that this just highlights the extent to which such history is what is ultimately the defining feature of the human condition.
 ■ **Philosophical implications.** The Principle of Computational Equivalence has implications for many issues long discussed in the field of philosophy. Most important are probably those in epistemology (theory of knowledge). In the past, it has usually been assumed that if we could only build up in our minds an adequate model of the world, then we would immediately know whatever we want about the world. But the Principle of Computational Equivalence now implies that even given a model it may be irreducibly difficult to work out its consequences. In effect, computational irreducibility introduces a new kind of limit to knowledge. And it implies that one needs a criterion more sophisticated than immediate predictability to assess a scientific theory—since when computational irreducibility is present this will inevitably be limited. In the past, it has sometimes been assumed that truths that can be deduced purely by operations like those in logic must somehow always be trivial. But computational irreducibility implies that in general they are not. Indeed it implies that even once the basic laws are known there are still an endless series of questions that are worth investigating in science. It is often assumed that one cannot learn much about the world just by studying purely formal systems—and that one has to rely on empirical input. But the Principle of Computational Equivalence implies that at some level there are inevitably common features across both abstract and natural systems. In ontology (theory of being) the Principle of Computational Equivalence implies that special components are vastly less necessary than might have been thought. For it shows that all sorts of sophisticated characteristics can emerge from the very same kinds of simple components. (My discussion of fundamental physics in Chapter 9 also suggests that no separate entities beyond simple rules are needed to capture space, time or matter.) Arguments in several areas of philosophy involve in effect considering fundamentally different intelligences. But the Principle of Computational Equivalence implies that in fact above a certain threshold there is an ultimate equivalence between possible intelligences. In addition, the Principle of Computational Equivalence implies that all sorts of systems in nature and elsewhere will inevitably exhibit features that in the past have been considered unique to intelligence—and this has consequences for the mind-body problem, the question of free will, and recognition of other minds. It has often been thought that traditional logic—and to some extent mathematics—are somehow fundamentally special and provide in a sense unique foundations. But the Principle of Computational Equivalence implies that in fact there are a huge range of other formal systems, equivalent in their ultimate richness, but different in their details, and in the questions to which they naturally lead. In philosophy of science the Principle of Computational Equivalence forces a new methodology based on formal experiments—that is ultimately the foundation for the whole new kind of science that I describe in this book.
 
-![](_page_1214_Picture_0.jpeg)
+![](images/_page_1214_Picture_0.jpeg)
 

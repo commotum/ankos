@@ -10,7 +10,7 @@ Status: **COMPLETE**.
   LOCAL rounds.
 - Stage 5 owns exactly two canonical documents in manifest order:
   - `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md`;
-  - `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
+  - `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
 - The paired paths contain 142 deterministic source units:
   `U000070..U000173` and `U004924..U004961`.
 - They own 3 physical images, all referenced from the main chapter; the Notes

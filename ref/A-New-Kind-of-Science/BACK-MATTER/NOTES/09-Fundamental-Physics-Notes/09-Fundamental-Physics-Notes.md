@@ -17,7 +17,7 @@ For 2D cellular automata an analogous procedure can in principle be used, though
 ■ **Numbers of reversible rules.** For $k = 2$, $r = 1$, there are 6 reversible rules, as shown on page 436. For $k = 2$, $r = 2$ there are 62 reversible rules, in 20 families inequivalent under symmetries, out of a total of  $2^{32}$  or about 4 billion possible rules. For $k = 3$, $r = 1$ there are 1800 reversible rules, in 172 families. For $k = 4$, $r = 1$, some of the reversible rules can be constructed from the second-order cellular automata below. Note that for any *k* and *r*, no non-trivial totalistic rule can ever be reversible.
 ■ **Inverse rules.** Some reversible rules are self-inverse, so that applying the same rule twice yields the identity. Other rules come in distinct pairs. Most often a rule that involves *r* neighbors has an inverse that also involves at most *r* neighbors. But for both $k = 2$, $r = 2$ and $k = 3$, $r = 1$ there turn out to be reversible rules whose inverses involve larger numbers of neighbors. For any given rule one can define the neighborhood size *s* to be the largest block of cells that is ever needed to determine the color of a single new cell. In general  $s \le 2r + 1$ , and for a simple identity or shift rule, $s = 1$. For $k = 2$, $r = 1$, it then turns out that all the reversible rules and their inverses have $s = 1$. For $k = 2$, $r = 2$, the reversible rules have values of *s* from 1 to 5, but their inverses have values  $\overline{s}$  from 1 to 6. There are only 8 rules (the inequivalent ones being 16740555 and 3327051468) where  $\overline{s} > s$ , and in each case  $\overline{s} = 6$  while $s = 5$. For $k = 3$, $r = 1$, there are a total of 936 rules with this property: 576, 216 and 144 with  $\overline{s} = 4$, $5$ and $6$, and in all cases $s = 3$. Examples with  $\overline{s} = 3$, $4$, $5$ and $6$ are shown below. For arbitrary *k* and *r*, it is not clear what the maximum  $\overline{s}$  can be; the only bound rigorously established so far is  $\overline{s} \le r + 1/2 k^{2r+1} (k^{2r} - 1)$ .
 
-![](_page_1032_Inverse_Rules_Four_Panel_Row.jpeg)
+![](images/_page_1032_Inverse_Rules_Four_Panel_Row.jpeg)
 
 ■ **Surjectivity and injectivity.** See page 959.
 
@@ -66,7 +66,7 @@ Table[(IntegerDigits[i, 2, 3] ->
 
 where `perm` is an element of `Permutations[Range[8]]`. An example that exhibits complex behavior is:
 
-![](_page_1033_Picture_14.jpeg)
+![](images/_page_1033_Picture_14.jpeg)
 
 Systems based on numbers are typically reversible whenever the mathematical operations they involve are invertible. Thus, for example, the system on page 121 based on successive multiplication by 3/2 is reversible by using division by 3/2. Page 905 gives another example of a reversible system based on numbers.
 
@@ -121,7 +121,7 @@ where *w* can be taken to be  $k^{2r}$ , and perhaps smaller. Among the 256 elem
 
 ■ **More general conserved quantities.** Some rules conserve not total numbers of cells with given colors, but rather total numbers of blocks of cells with given forms—or combinations of these. The pictures below show the simplest quantities of these kinds that end up being conserved by various elementary rules.
 
-![](_page_1037_Picture_13.jpeg)
+![](images/_page_1037_Picture_13.jpeg)
 
 Among the 256 elementary rules, the total numbers that have conserved quantities involving at most blocks of lengths 1 through 10 are $\{5, 38, 66, 88, 102, 108, 108, 114, 118, 118\}$.
 
@@ -166,7 +166,7 @@ Compressing each block into a single cell, and *n* steps into one, any block cel
 
 ■ **Page 461 · Block rules.** These pictures show the behavior of rule (c) starting from some special initial conditions.
 
-![](_page_1038_Block_Rules_Five_Panel_Row.jpeg)
+![](images/_page_1038_Block_Rules_Five_Panel_Row.jpeg)
 
 The repetition period with a total of *n* cells can be  $3^n$  steps. With random initial conditions, the period is typically up to about  $3^{n/2}$ . Starting with a block of *q* black cells, the period can get close to this. For $n = 20$, $q = 17$, for example, it is 31,300.
 
@@ -237,13 +237,13 @@ With the rise of computers there began to be occasional discussion—though larg
 - Edge connectivity: the minimum number of connections that must be removed to make the network disconnected.
 - Diameter: the maximum distance between any two nodes in the network. The pictures below show the largest planar trivalent networks with diameters 1, 2 and 3, and the largest known ones with diameters 4, 5 and 6.
 
-![](_page_1044_Diameter_Six_Network_Row.jpeg)
+![](images/_page_1044_Diameter_Six_Network_Row.jpeg)
 
 - Circumference: the length of the longest cycle in the network. Although difficult to determine in particular cases, many networks allow so-called Hamiltonian cycles that include every node. (Up to 8 nodes, all 8 trivalent networks have this property; up to 10 nodes 25 of 27 do.)
 
 - Girth: the length of the shortest cycle in the network. The pictures below show the smallest trivalent networks with girths 3 through 8 (so-called cages). Girth can be relevant in seeing whether a particular cluster can ever occur in network.
 
-![](_page_1044_Girth_Six_Network_Row.jpeg)
+![](images/_page_1044_Girth_Six_Network_Row.jpeg)
 
 - Chromatic number: the minimum of colors that can be assigned to nodes so that no adjacent nodes end up the same color. It follows from the Four-Color Theorem that the maximum for planar networks is 4. It turns out that for all trivalent networks the maximum is also 4, and is almost always 3.
 ■ **Regular polytopes.** In 3D, of the five regular polyhedra, only the tetrahedron, cube and dodecahedron have three edges meeting at each vertex, corresponding to a trivalent network. (Of the 13 additional Archimedean solids, 7 yield trivalent networks.) In 4D the six regular polytopes have 4, 4, 6, 8, 4 and 12 edges meeting at each vertex, and in higher dimensions the simplex ($d + 1$ vertices) and hypercube ($2^d$ vertices) have *d* edges meeting at each vertex, while the co-cube ($2 d$ vertices) has $2(d-1)$. (See also symmetric graphs on page 1032, and page 929.)
@@ -331,7 +331,7 @@ If one does allow dangling connections to be joined within a single template, th
 
 ■ **Symmetric graphs.** The constraints in a network constraint system require that the structure around each node agrees with a template that contains some number of nodes. A symmetric graph satisfies the same type of constraint, but with the template being the whole network. The pictures below show the smallest few symmetric graphs with 3 connections at each node (with up to 100 nodes there are still only 37 such graphs; compare page 1029).
 
-![](_page_1047_Picture_11.jpeg)
+![](images/_page_1047_Picture_11.jpeg)
 
 ■ **Cayley graphs.** As discussed on page 938, the structure of a group can be represented by a Cayley graph where nodes correspond to elements in the group, and connections specify results of multiplying by generators. The transitivity of group multiplication implies that Cayley graphs always have the property of being symmetric (see above). The number of connections at each node is fixed, and given by the number of distinct generators and inverses. In cases such as the tetrahedral group  $A_4$  there are 3 connections at each node. The relations among the generators of a group can be thought of as constraints defining the Cayley graph. As mentioned on page 938, there are finite groups that have simple relations but at least very large Cayley graphs. For infinite groups, it is known (see page 938) that in most cases Cayley graphs are locally like trees, and so do not have finite dimension. It appears that only when the group is nilpotent (so that certain combinations of elements commute much as they do on a lattice) is there polynomial growth in the Cayley graph and thus finite dimension.
 ■ **Page 485 · Spacetime symmetric rules.** With $k = 2$ and the neighborhoods shown here, only the additive rules 90R, 105R, 150R and 165R are space-time symmetric. For larger *k* and larger neighborhoods, there presumably begin to be non-additive rules with this property.
@@ -408,19 +408,19 @@ Map[StringJoin, Map[{"AAABB", "ABABB", "ABAABB"}[[# + 1]] &,
 
 The pictures below show the behavior of several sequential cellular automata with $k = 2$, $r = 1$ elementary rules. In the top picture of each pair every individual update is indicated by a black dot. In the bottom picture each line represents one complete step of evolution, including one update of each cell. Note that in this representation, effects can propagate all the way across the system in a single step.
 
-![](_page_1049_Picture_5.jpeg)
+![](images/_page_1049_Picture_5.jpeg)
 
 *Size dependence.* Because effects can propagate all the way across the system in a single step, the overall size, as well as boundary conditions, for the system can be significant after just a few steps, as illustrated in the pictures of rule 60 below.
 
-![](_page_1049_Size_Dependent_Rule_60_Three_Panel_Row.jpeg)
+![](images/_page_1049_Size_Dependent_Rule_60_Three_Panel_Row.jpeg)
 
 *Additive rules.* Among elementary sequential cellular automata, those with additive rules turn out to yield some of the most complex behavior, as illustrated below. The top row shows evolution with the boundary forced to be white; the bottom row shows cyclic boundary conditions. Even though the basic rule is additive, there seems to be no simple traditional mathematical description of the results.
 
-![](_page_1049_Additive_Rules_Three_Column_Group.jpeg)
+![](images/_page_1049_Additive_Rules_Three_Column_Group.jpeg)
 
 *Updating orders.* Somewhat different results are typically obtained if one allows different updating orders. For each complete update of a rule 90 sequential cellular automaton, the pictures below show results with (a) left-to-right scan, (b) random ordering of all cells, the same for each pass through the whole system, (c) random ordering of all cells, different for different passes, (d) completely random ordering, in which a particular cell can be updated twice before other cells have even been updated once.
 
-![](_page_1049_Figure_14.jpeg)
+![](images/_page_1049_Figure_14.jpeg)
 
 *History.* Sequential cellular automata have a similar relationship to ordinary cellular automata as implicit updating schemes in finite difference methods have to explicit ones, or as infinite impulse response digital filters have to finite ones. There were several studies of sequential or asynchronous cellular automata done following my work on ordinary cellular automata in the early 1980s.
 
@@ -440,11 +440,11 @@ Fold[Insert[#1, #2, Random[Integer, Length[#1]] + 1] &,
 
 ■ **Intrinsic synchronization in cellular automata.** Taking the rules for an ordinary cellular automaton and applying them sequentially will normally yield very different results. But it turns out that there are variants on cellular automata in which the rules can be applied in any order and the overall behavior obtained—or at least the causal network—is always the same. The picture below shows how this works for a simple block cellular automaton. The basic idea is that to each cell is added an arrow, and any pair of cells is updated only when their arrows point at each other. This in a sense forces cells to wait to be updated until the data they need is ready. Note that the rules can be thought of as replacements such as `"A><B" -> "<AB>"` for blocks of length 4 with 4 colors.
 
-![](_page_1050_Intrinsic_Synchronization_Rule_and_Spacetime.jpeg)
+![](images/_page_1050_Intrinsic_Synchronization_Rule_and_Spacetime.jpeg)
 
 ■ **“Firing squad” synchronization.** By choosing appropriate rules it is possible to achieve many forms of synchronization directly within cellular automata. One version posed as a problem by John Myhill in 1957 consists in setting up a rule in which all cells in a region go into a special state after exactly the same number of steps. The problem was first solved in the early 1960s; the solution using 6 colors and a minimal number of steps shown on the right below was found in 1988 by Jacques Mazoyer, who also determined that no similar 4-color solutions exist. Note that this solution in effect constructs a nested pattern of any width (it does this by optionally including or excluding one additional cell at each nesting level, using a mechanism related to the decimation systems of page 909). If one drops the requirement of cells going into a special state, then even the 2-color elementary rule 60 shown on the left can be viewed as solving the problem—but only for widths that are powers of 2.
 
-![](_page_1050_Firing_Squad_Five_Width_Group.jpeg)
+![](images/_page_1050_Firing_Squad_Five_Width_Group.jpeg)
 
 ■ **Distributed computing.** Many of the basic issues about the progress of time in a universe consisting of many separate elements have analogs in the progress of computations that are distributed across many separate computing elements. In practice, such computations are most often done by requiring explicit synchronization of all elements at appropriate points, and implementing this using a mechanism that is outside of the computation. But more theoretical investigations of formal concurrent systems, temporal logics, dataflow systems, Petri nets and so on have led to ideas about distributed computing that are somewhat closer to the ones I discuss here for the universe. And, as it happens, in the mid-1980s I tried hard, though at the time without much success, to use updating rules for networks as the basis for a new kind of programming language intended for massively parallel computers.
 
@@ -458,7 +458,7 @@ Fold[Insert[#1, #2, Random[Integer, Length[#1]] + 1] &,
 
 It is fairly straightforward to generate in this way networks of any dimension. For example, starting with *n* *A*’s the rule  $\{"A" \rightarrow "AB", "AB" \rightarrow "A"\}$  yields a regular *n*-dimensional grid, as shown below.
 
-![](_page_1051_Spacetime_Networks_Three_Panel_Row.jpeg)
+![](images/_page_1051_Spacetime_Networks_Three_Panel_Row.jpeg)
 
 If each node in a network is associated with a point in spacetime, then one slightly peculiar feature is that every such point would have an associated string—something like an encoded position coordinate. And it then becomes somewhat difficult to understand why different regions of spacetime seem to behave so similarly—and do not, for example, seem to depend on the details of their coordinates.
 
@@ -475,13 +475,13 @@ Confluence is important in defining a notion of equivalence for strings. One can
 
 Most often confluence is studied in the context of terminating multiway systems—multiway systems in which eventually strings are produced to which no further replacements apply. If a terminating multiway system has the confluence property, then this implies that regardless of the path taken, a given string will always evolve to a unique string that can be thought of as giving a canonical or normal form for the original string. Examples (a) through (c) below have this property; (d) does not. In example (a), the canonical form is all elements black; in (b) it is a single black element, and in (c) all elements are black, except the last one, which is white if there were any initial white elements. Note that the first example on page 507 has a canonical form consisting of a sorted string.
 
-![](_page_1052_Confluence_Four_Case_Row.jpeg)
+![](images/_page_1052_Confluence_Four_Case_Row.jpeg)
 
 The process of evaluation in mathematics or in a computer language such as *Mathematica* can be thought of as involving the application of a sequence of replacement rules. Only if these rules have the confluence property will the results always be unique, and independent of the order of rule application.
 
 The evaluation of functions with attribute `Flat` in *Mathematica* provides an example of confluence. If `f` is `Flat`, then in evaluating `f[a, b, c]` one can equally well start with `f[f[a, b], c]` or `f[a, f[b, c]]`. Showing only the arguments to `f`, the pictures below illustrate how the flat functions `Xor` and `And` are confluent, while the non-flat function `Implies` is not.
 
-![](_page_1052_Flat_Functions_Three_Case_Row.jpeg)
+![](images/_page_1052_Flat_Functions_Three_Case_Row.jpeg)
 
 ■ **Completion.** If one has a multiway system that terminates but is not confluent then it turns out often to be possible to make it confluent by adding a finite set of new rules. Given a string *p* which gets transformed either to *q* or *r* by the original rules, one can always imagine adding a new rule  $q \rightarrow r$  or  $r \rightarrow q$  that makes the paths from *p* immediately converge. To do this explicitly for all possible *p* that can occur would however entail having infinitely many new rules. But as noted by Donald Knuth and Peter Bendix in 1970 it turns out often to be sufficient just iteratively to add new rules only for each so-called critical pair *q*, *r* that is obtained from strings *p* that represent minimal overlaps in the left-hand sides of the rules one has. To decide whether to add  $q \rightarrow r$  or  $r \rightarrow q$  in each case one can have some kind of ordering on strings. For the procedure to work this ordering must be such that the strings generated on successive steps in every possible evolution of the multiway system follow the ordering. A number of variations of the basic procedure—using different orderings and with different schemes for dropping redundant rules—have been proposed for systems arising in different kinds of applications. The original Knuth-Bendix procedure was for equations (of the form  $a \leftrightarrow b$ ) had the feature that it could terminate yet not give a confluent multiway system. But in the 1980s so-called unfailing completion algorithms (see page 1158) were developed that—if they terminate—guarantee to give confluent systems. (The question of whether any procedure of this type will terminate in a particular case is nevertheless in general undecidable.)
 
@@ -507,7 +507,7 @@ Attributes[u] = {Flat, Orderless}; Attributes[v] = Orderless
 
 Updating rules can then be written in terms of ordinary *Mathematica* patterns. A slight complication is that the patterns have to include all nodes whose connections go to nodes whose labels are changed by the update. The rule at the top of page 509 must therefore be written out as
 
-![](_page_1053_Neighbor_Independent_Update_Rule.jpeg)
+![](images/_page_1053_Neighbor_Independent_Update_Rule.jpeg)
 
 and this corresponds to the *Mathematica* rule
 
@@ -533,11 +533,11 @@ Note that just as we discussed for strings on page 1033 the direct use of /. her
 ■ **Planar networks.** One feature of a planar network is that it is always possible to identify definite regions or faces bounded by connections in the network. And from Euler’s formula $f + n = e + 2$, it then follows that the average number of edges of each face is always $6(1-2/f)$, where *f* is the total number of faces. Note that with my definition of dimension for networks, the fact that a network is planar does not necessarily mean that it has be two-dimensional—and for example the networks on page 509 are not.
 ■ **Arbitrary transformations.** By applying the string transformation rules on page 1035 at appropriate locations, it is possible to transform any string of *A*’s and *B*’s to any other. And the analog of this for networks is that by applying the rules shown below at appropriate locations it is possible to transform any network into any other. These rules correspond to the moves invented by James Alexander in 1923 in connection with transforming one knot into another. (Note that the first two rules suffice for all planar networks, and are sometimes called respectively T2 and T1.)
 
-![](_page_1053_Picture_14.jpeg)
+![](images/_page_1053_Picture_14.jpeg)
 
 As an example, the pictures below show how a tetrahedron network can be transformed into a cube.
 
-![](_page_1053_Picture_16.jpeg)
+![](images/_page_1053_Picture_16.jpeg)
 
 ■ **Random networks.** One way to generate the connections for a “completely random” trivalent network with *n* nodes is just to apply a random permutation:
 
@@ -551,7 +551,7 @@ Networks obtained in this way are usually connected, but will almost always cont
 
 ■ **Random replacements.** As indicated in the note above, applying the second rule (T1, shown as (b) on page 511) at an appropriate sequence of positions can transform one planar network into any other with the same number of nodes. The pictures below show what happens if this rule is repeatedly applied at random positions in a network. Each time it is applied, the rule adds two edges to one face, and removes them from another. After many steps the pictures below show that faces with large numbers of edges appear. The average number of edges must always be 6 (see note above), but in a sufficiently large network the probability for a face to have *n* edges eventually approaches an equilibrium value of  $8(n-2)(2n-3)!!(3/8)^n/n!$ . (For large *n* this is approximately  $\lambda^n$  with  $\lambda = 3/4$ ; if 1- and 2-edged regions are allowed then  $\lambda = (3 + \sqrt{3})/6 \approx 0.79$ .) There may be some easy way to derive such results, but so far it has only been done using fairly sophisticated techniques from quantum field theory developed in the late 1970s. The starting point is to look at a  $\phi^3$  field theory with $SU(n)$ internal symmetry and to note that in the limit  $n \to \infty$  what dominates are Feynman diagrams that have the structure of planar trivalent networks (see page 1040). And it then turns out that in zero spacetime dimensions the complete path integral for the theory can be evaluated exactly—yielding in effect a generating function for the number of possible networks. Parametric differentiation (to yield *n*-point correlation functions) then gives results for *n*-sided regions. Another result that has been derived is that the average total number $m[n]$ of edges of all faces around a given face with *n* edges is $7n + 3 + 9/(n + 1)$. Note that the networks obtained always have dimension 2 according to my definitions.
 
-![](_page_1054_Figure_3.jpeg)
+![](images/_page_1054_Figure_3.jpeg)
 
 ■ **Cellular structures.** There are many systems in nature that consist of assemblies of discrete regions—and the lines that define the interfaces between these regions form networks. In many cases the regions are fixed once established (compare page 988). But in other cases there is continuing evolution, as for example in soap and other foams and froths, grains in metals and perhaps some biological tissues. In 2D situations the lines between regions generically form a trivalent planar network. In a soap foam, the geometrical layout of this network is determined by surface tension forces—with connections meeting at 120° at each node, though being slightly curved and of different lengths. Pressure differences lead to diffusion of gas and on average to von Neumann’s Law that the area of an *n*-sided region changes linearly with time, at a rate proportional to $n-6$. Typically the network topology of a foam continually rearranges itself through cascades of seemingly random T1 processes (rule (b) from page 511), with regions that reach zero size disappearing through T2 processes (reversed rule (a)). And as noted for example by Cyril Smith in the early 1950s there is a characteristic coarsening that occurs. Something similar is already visible in the pure T1 pictures in the note above. But results such as the so-called Aboav-Weaire law that $m[n]$ from the note above is in practice about $5n + c$ suggest that T2 processes are also important. (Processes like cell division in 2D biological tissue in effect directly add connections to a network. But this can again be thought of as a combination of T1 and T2 processes, and in appropriate idealizations can lead to very similar results.)
 
@@ -577,7 +577,7 @@ Networks obtained in this way are usually connected, but will almost always cont
 
 Most clusters that can overlap will be able to do so in an infinite number of possible networks. (One can see this by noting that they can overlap inside clusters with dangling connections, not just closed networks.) But there are some clusters that can overlap only in a few small networks. The pictures below show examples where this happens. The pictures in the main text still treat such clusters as non-overlapping.
 
-![](_page_1054_Overlapping_Clusters_Three_Example_Group.jpeg)
+![](images/_page_1054_Overlapping_Clusters_Three_Example_Group.jpeg)
 
 If two clusters overlap, then this means that there is some network in which there are copies of these clusters that involve some of the same nodes. And it is possible to search for such a network by starting from a single node and then sequentially trying to take corresponding pieces from the two clusters.
 
@@ -593,7 +593,7 @@ If two clusters overlap, then this means that there is some network in which the
 
 ■ **Network mobile automata.** The analog of a mobile automaton can be defined for networks by setting up a single active node, then having rules which replace clusters of nodes around this active node, and move its position. The pictures below show two simple examples.
 
-![](_page_1055_Picture_8.jpeg)
+![](images/_page_1055_Picture_8.jpeg)
 
 The total number of replacements that can be used in the rules of a network mobile automaton and which involve clusters with up to four nodes and have from 1 to 4 dangling connections is $\{14, 10, 2727, 781\}$. Despite looking at several hundred thousand cases I have not been able to find network mobile automata with especially complicated behavior.
 
@@ -601,7 +601,7 @@ Note that by having a cluster of nodes with a unique form it is possible to emul
 
 ■ **Directed network systems.** If one adds directionality to the connections in a network it becomes particularly easy to set up rules for clusters of nodes that cannot overlap. For no two clusters whose dangling connections all point inwards can ever overlap, at least so long as neither of these clusters themselves contain subclusters whose dangling connections similarly all point inwards. The pictures below show a few examples of such clusters. Note that in a random network of *n* nodes, about $n/8$ such clusters typically occur.
 
-![](_page_1055_Picture_12.jpeg)
+![](images/_page_1055_Picture_12.jpeg)
 
 ### Space, Time and Relativity
 
@@ -611,7 +611,7 @@ Standard examples of posets include subsets of a set ordered by the subset relat
 
 The pictures below show the first few distinct possible Hasse diagrams for posets. For successive numbers of elements the total numbers of these are 1, 2, 5, 16, 63, 318, 2045, 16999, ...
 
-![](_page_1056_Picture_5.jpeg)
+![](images/_page_1056_Picture_5.jpeg)
 
 ■ **Page 517 · Spacelike slices.** The definition of spacelike slices used here is directly analogous to what is used in traditional relativity theory (typically under names like spacelike hypersurfaces and Cauchy surfaces). There will normally be many different possible choices of spacelike slices, but in all cases a particular such slice is set up to represent what can consistently be thought of as all of space at a given time. One definition of a spacelike slice is then a maximal set of points in which no pair are causally related (corresponding to a maximal antichain in a poset). Another definition (equivalent for any connected causal network) is that spacelike slices are what consistently divide a causal network into a past and a future. And an intermediate definition is that a spacelike slice contains points that are not themselves causally related, but which appear in either the past or the future of every other point. Given a spacelike slice in a causal network, it is always possible to construct another such slice by finding all those points whose immediate predecessors are all included either in the original slice or its predecessors.
 ■ **Page 518 · Speed of light.** In a vacuum the speed of light is 299,792,458 meters/second (and this is actually what is taken to define a meter). In materials light mostly travels slower—basically because there are delays when it is absorbed and reemitted by atoms. In a first approximation, the slowdown factor is the refractive index. But particularly in materials which can amplify light a whole sequence of peculiar effects have been observed—and it is fairly subtle to account correctly for incoming and outgoing signals, and to show that at least no energy or information is transmitted faster than *c*. The standard mathematical framework of relativity theory implies that any massless particle must propagate at *c* in a vacuum—so that not only light but also gravitational waves presumably go at this speed (and the same is at least approximately true of neutrinos). The effective mass for massive particles increases by a factor  $1/Sqrt[1-v^2/c^2]$  at speed *v*, making it take progressively more energy to increase *v*. At a formal mathematical level it is possible to imagine tachyons which always travel faster than *c*. But the structure of modern physics would find it difficult to accommodate interactions between these and ordinary particles.
@@ -624,7 +624,7 @@ $$\{t, x\} \rightarrow \{t - v x/c^2, x - v t\}/Sqrt[1 - v^2/c^2]$$
 
 And from this the time dilation factor  $1/Sqrt[1-v^2/c^2]$ shown on page 524 follows, as well as the length contraction factor  $Sqrt[1-v^2/c^2]$ . An important feature of the Lorentz transformation is that it preserves the quantity  $c^2 t^2 - x^2$  with the result that as *v* changes in the pictures below a given point in the grid traces out a hyperbola whose asymptotes lie on a light cone. Note that on a light cone  $c^2 t^2 - x^2$  always vanishes. Note also that the intersection of the past and future light cones for two events separated by a distance *x* in space and *t* in time always has a volume proportional exactly to  $c^2 t^2 - x^2$ .
 
-![](_page_1057_Figure_6.jpeg)
+![](images/_page_1057_Figure_6.jpeg)
 
 ■ **Inferences from relativity.** The pictures on page 524 show that an idealized clock based on bouncing light between mirrors will exhibit relativistic time dilation. And from such derivations it is often assumed that the same result must hold for any possible clock system. But as a practical matter it does not. And indeed for example the clocks in GPS satellites are specifically set up so as to remove the effects of time dilation. And in the twin paradox one can certainly imagine that each twin could have an accelerometer whose readings they use to correct their clocks. Indeed, even when it comes to individual particles there are subtle effects associated with acceleration and radiation (see page 1062)—so that in the end not entirely clear that something like a biological system would actually in practice exhibit just standard time dilation.
 
@@ -663,7 +663,7 @@ One can generalize the question of planarity to asking whether networks can be l
 
 ■ **Knot theory.** Somewhat analogous to the problem in the note above is the problem of classifying knots. The pictures below show some of the simplest distinct knots. But given presentations of two knots, no finite procedure is known that determines in general whether the knots are equivalent (or constructs a sequence of Reidemeister moves that transform one into the other). Quite probably this is in general undecidable, though since the 1920s a few polynomial invariants have been discovered—with recent ones being related to ideas from quantum field theory—that have allowed some progress to be made. (Even the problem of determining whether a knot specified by line segments is trivial is known to be NP-complete.)
 
-![](_page_1061_Picture_3.jpeg)
+![](images/_page_1061_Picture_3.jpeg)
 
 ■ **Page 528 · Charge quantization.** It is an observed fact that the electric and other charges of all particles are simple rational multiples of each other. In the context of electromagnetism alone, there would be no particular reason to expect this (unless magnetic monopoles exist). But as soon as different particles are related by a non-Abelian symmetry group, then the discreteness of the representations of such a group immediately implies that all charges must be rational multiples of each other.
 ■ **Spin.** Even when they appear to be of zero size, particles exhibit intrinsic angular momentum known as spin. The total spin is always a fixed multiple of the basic unit  $\hbar$ : 1/2 for quarks and leptons, 1 for photons and other ordinary gauge bosons, 2 for gravitons, and in theory 0 for Higgs particles. (Observed mesons have spins up to perhaps 5 and nuclei up to more than 50.) Particles of higher spin in effect require more information to specify their orientation (or polarization or its analog). And in the context of network models it could be that spin is somehow related to something as simple as the number of places at which the core of a particle is attached to the rest of the network. Spin values can be thought of as specifying which irreducible representation of the group of symmetries of spacetime is needed to describe a particle after momentum has been factored out. For ordinary massive particles in *d*-dimensional space the group is $\operatorname{Spin}(d)$, while for massless particles it is $\mathrm{E}(d - 1)$ (the Euclidean group). (For tachyons, it would be fundamentally non-compact, forcing continuous spin values.) For small transformations, $\operatorname{Spin}(d)$ is just the ordinary rotation group $\mathrm{SO}(d)$, but globally it is its universal cover, or $\mathrm{SU}(2)$ in 3D. And this can be thought of as what allows half-integer spins, which must be described by spinors rather than vectors or tensors. Such objects have the property that they are not left invariant by 360 ° rotations, but only by 720 ° ones—a feature potentially fairly easy to reproduce with networks, perhaps even without definite integer dimensions. In the standard formalism of quantum field theory it can be shown that (above 2D) half-integer spins must always be associated with fermions (which for example satisfy the exclusion principle), and integer spins with bosons. (This spin-statistics connection also seems to hold for various kinds of objects defined by extended field configurations.)
@@ -740,13 +740,13 @@ together with the corresponding equation for `y''`, as already noted by Leonhard
 
 ■ **Page 532 · Spherical networks.** One can construct networks of constant positive curvature by approximating the surface of a sphere—starting with a dodecahedron and adding hexagons. (Euler’s theorem implies that at any stage there must always be exactly 12 pentagonal faces.) The following are examples with 20, 60, 80, 180 and 320 nodes:
 
-![](_page_1064_Spherical_Networks_Five_Panel_Row.jpeg)
+![](images/_page_1064_Spherical_Networks_Five_Panel_Row.jpeg)
 
 The object with 60 nodes is a truncated icosahedron—the shape of a standard soccer ball, as well the shape of the fullerene molecule  $C_{60}$ . (Note that in  $C_{60}$  one of the connections at each node is always a double chemical bond, since carbon has valence 4.) Geodesic domes are typically duals of such networks—with three edges on each face.
 
 ■ **Hyperbolic networks.** Any surface that always has positive curvature must eventually close up to form something like a sphere. But a surface that has negative curvature (and no holes) must in some sense be infinite—more like cases (c) and (d) on page 412. Yet even in such a case one can always define coordinates that nominally allow the surface to be drawn in a finite way—and the Poincaré disk model used in the pictures below is the standard way of doing this. In ordinary flat space, regular polygons with more than 6 sides can never form a tessellation. But in a space with negative curvature this is possible for polygons with arbitrarily many sides—and the networks that result have been much studied as Cayley graphs of Fuchsian groups. One feature of these networks is that the number of nodes reached in them by following *r* connections always grows like  $2^r$ . But if one intersperses hexagons in the networks (as in the main text) then one finds that for small *r* the number of nodes just grows like  $r^2$ —as one would expect for something like a 2D surface. But if one tries to look at growth rates on scales that are not small compared to characteristic lengths associated with curvature then one again sees exponential growth—just as in the case of a uniform tessellation without hexagons.
 
-![](_page_1065_Hyperbolic_Networks_Four_Panel_Row.jpeg)
+![](images/_page_1065_Hyperbolic_Networks_Four_Panel_Row.jpeg)
 
 ■ **Page 533 · Sphere volumes.** In ordinary flat Euclidean space the area of a 2D circle is  $\pi r^2$ , and the volume of a 3D sphere  $4 \pi r^3/3$ . In general, the volume of a sphere in *d*-dimensional Euclidean space is  $s[d]r^d$  where  $s[d] = \pi^{d/2}/(d/2)!$  (the surface area is  $d s[d] r^{d-1}$ ). (The function $s[d]$ has a maximum around $d = 5.26$, then decreases rapidly with *d*.)
 
@@ -815,7 +815,7 @@ In such Lorentzian spaces, however, there is no useful immediate analog of a sph
 ■ **Torsion.** In standard geometry, one assumes that the distance from one point to another is the same as the distance back, so that the metric tensor can be taken to be symmetric, and there is zero so-called torsion. But in for example a causal network, connections have definite directions, and there is in general no such symmetry. And if one looks at the volume of a cone this can then introduce a correction proportional to *r*. But as soon as there is enough uniformity to define a reasonable notion of static space, it seems that this effect must vanish. (Note that in pure mathematics there are several different uses of the word “torsion”. Here I use it to refer to the antisymmetric parts of the metric tensor.)
 ■ **Random causal networks.** If one assumes that there are events at random positions in continuous spacetime, then one can construct an effective causal network for them by setting up connections between each event and all events in its future light cone—then deleting connections that are redundant in the sense that they just provide shortcuts to events that could otherwise be reached by following multiple connections. The pictures below show examples of causal networks obtained in this way. The number of connections generally increases faster than linearly with the number of events. Most links end up being at angles that are close to the edge of the light cone.
 
-![](_page_1067_Random_Event_Causal_Networks_Three_Panel_Row.jpeg)
+![](images/_page_1067_Random_Event_Causal_Networks_Three_Panel_Row.jpeg)
 
 ■ **Page 534 · Einstein equations.** In the absence of matter, the standard statement of the Einstein equations is that all components of the Ricci tensor—and thus also the Ricci scalar—must be zero (or formally that  $R_{ij} = 0$ ). But since the vanishing of all components of a tensor must be independent of the coordinates used, it follows that the vacuum Einstein equations are equivalent to the statement `RicciTensor . e . e == 0` for all timelike unit vectors *e*—a statement that can readily be applied to networks of the kind I consider in the main text. (A related statement is that the 3D Ricci scalar curvature of all spacelike hypersurfaces must vanish wherever these have vanishing extrinsic curvature.)
 
@@ -859,7 +859,7 @@ Even if one assumes that spacetime is in a sense ultimately continuous one can i
 
 Over the years, various attempts have been made to derive quantum gravity from fundamentally discrete models of spacetime (compare page 1027). In recent times the most widely discussed have been spin networks—which despite their name ultimately seem to have fairly little to do with the systems I consider. Spin networks were introduced in 1964 by Roger Penrose as a way to set up an intrinsically quantum mechanical model of spacetime. A simple analog involves a 2D surface made out of triangles whose edges have integer lengths  $j_i$ . If one computes the product of  $Exp[i(j_1 + j_2 - j_3)]$  for all triangles, then it turns out for example that this quantity is extremized exactly when the whole surface is flat. In 3D one imagines breaking space into tetrahedra whose edge lengths correspond to discrete quantum spin values. And in 1968 Tullio Regge and Giorgio Ponzano suggested—almost as an afterthought in technical work on $6j$ symbols—that the quantum probability amplitude for any form of space might perhaps be given by the product of $6j$ symbols for the spins on each tetrahedron. The  $SixJSymbol[\{j_1, j_2, j_3\}, \{j_4, j_5, j_6\}]$  are slightly esoteric objects that correspond to recoupling coefficients for the 3D rotation group SO(3), and that arose in 1940s studies of combinations of three angular momenta in atomic physics—and were often represented graphically as networks. For large *j*, they are approximated by  $Cos[\theta + \pi/4]/Sqrt[12 \pi v]$ , where *v* is the volume of the tetrahedron and  $\theta$  is a deficit angle. And from this it turns out that limits of products of $6j$ symbols correspond essentially to `Exp[i s]`, where *s* is the discrete form of the Einstein-Hilbert action—extremized by flat 3D space. (The picture below shows for example `Abs[SixJSymbol[{j, j, j}, {j, j, j}]]`. Note that for any *j* the $6j$ symbols can be given in terms of `HypergeometricPFQ`.)
 
-![](_page_1070_Figure_3.jpeg)
+![](images/_page_1070_Figure_3.jpeg)
 
 In the early 1990s there was again interest in spin networks when the Turaev-Viro invariant for 3D spaces was discovered from a topological field theory involving triangulations weighted with $6j$ symbols of the quantum group $SU(2)_q$—and it was seen that invariance under Alexander moves on the triangulation corresponded to the Biedenharn-Elliott identity for $6j$ symbols. In the mid-1990s it was then found that states in 3D loop quantum gravity (see above) could be represented in terms of spin networks—leading for example to quantization of all areas and volumes. In attempting extensions to 4D, spin foams have been introduced—and variously interpreted in terms of simplified Feynman diagrams, constructs in multidimensional category theory, and possible evolutions of spin networks. In all cases, however, spin networks and spin foams seem to be viewed just as calculational constructs that must be evaluated and added together to get quantum amplitudes—quite different from my idea of associating an explicit evolution history for the universe with the evolution of a network.
 
@@ -922,13 +922,13 @@ All of these effects are implied by the standard mathematical formalism of quant
 ■ **Reproducing quantum phenomena.** Given molecular dynamics it is much easier to see how to reproduce fluid mechanics than rigid-body mechanics—since to get rigid bodies with only a few degrees of freedom requires taking all sorts of limits of correlations between underlying molecules. And I strongly suspect that given a discrete underlying model of the type I discuss here it will similarly be much easier to reproduce quantum field theory than ordinary quantum mechanics. And indeed even with traditional formalism, it is usually difficult to see how quantum mechanics can be obtained as a limit of quantum field theory. (Classical limits are slightly easier: they tend to be associated with stationary features or caustics that occur at large quantum numbers—or coherent states that represent eigenstates of raising or particle creation operators. Note that the exclusion principle makes classical limits for fermions difficult—but crucial for the stability of bulk matter.)
 ■ **Discrete quantum mechanics.** While there are many issues in finding a complete underlying discrete model for quantum phenomena, it is quite straightforward to set up continuous cellular automata whose limiting behavior reproduces the evolution of probability amplitudes in standard quantum mechanics. One starts by assigning a continuous complex number value to each cell. Then given the list of such values the crucial constraint imposed by the standard formalism of quantum mechanics is unitarity: that the quantity `Tr[Abs[list]^2]` representing total probability should be conserved. This is in a sense analogous to conservation of total density in diffusion processes. From the discussion of page 1024 one can reproduce the 1D diffusion equation with a continuous block cellular automaton in which the new value of each block is given by  $\{\{1-\xi, \xi\}, \{\xi, 1-\xi\}\} \cdot \{a_1, a_2\}$ . So in the case of quantum mechanics one can consider having each new block be given by  $\{\{Cos[\theta], i Sin[\theta]\}, \{i Sin[\theta], Cos[\theta]\}\} \cdot \{a_1, a_2\}$ . The pictures below show examples of behavior obtained with this rule. (Gray levels represent magnitude for each cell, and arrows phase.) And it turns out that in suitable limits one generally gets essentially the behavior expected from either the Dirac or Klein-Gordon equations for relativistic particles, or the Schrödinger equation for non-relativistic particles. (Versions of this were noticed by Richard Feynman in the 1940s in connection with his development of path integrals, and were pointed out again several times in the 1980s and 1990s.)
 
-![](_page_1075_Picture_3.jpeg)
+![](images/_page_1075_Picture_3.jpeg)
 
 One might hope to be able to get an ordinary cellular automaton with a limited set of possible values by choosing a suitable  $\theta$ . But in fact in non-trivial cases most of the cells generated at each step end up having distinct values. One can generalize the setup to more dimensions or to allow  $n \times n$ matrices that are elements of $SU(n)$. Such matrices can be viewed in the context of ordinary quantum formalism as S matrices for elementary evolution events—and can in general represent interactions. (Note that all rules based on matrices are additive, reflecting the usual assumption of linearity at the level of amplitudes in quantum mechanics. Non-additive unitary rules can also be found. The analog of an external potential can be introduced by progressively changing values of certain cells at each step. Despite their basic setup the systems discussed here are not direct analogs of standard quantum spin systems, since these normally have local Hamiltonians and non-local evolution functions, while the systems here have local evolution functions but seem always to require non-local Hamiltonians.)
 
 ■ **Page 540 · Feynman diagrams.** The pictures below show a typical set of Feynman diagrams used to do calculations in QED—in this case for so-called Compton scattering of a photon by an electron. The straight lines in the diagrams represent electrons; the wavy ones photons. At some level each diagram can be thought of as representing a process in which an electron and photon come in from the left, interact in some way, then go out to the right. The incoming and outgoing lines correspond to real particles that propagate to infinity. The lines inside each diagram correspond to virtual particles that in effect propagate only a limited distance, and have a distribution of energy-momentum and polarization properties that can differ from real particles. (Exchanges of virtual photons can be thought of as producing familiar electromagnetic forces; exchanges of virtual electrons as yielding an analog of covalent forces in chemistry.)
 
-![](_page_1075_Picture_7.jpeg)
+![](images/_page_1075_Picture_7.jpeg)
 
 To work out the total probability for a process from Feynman diagrams, what one does is to find the expression corresponding to each diagram, then one adds these up, and squares the result. The first two blocks of pictures above show all the diagrams for Compton scattering that involve 2 or 3 photons—and contribute through order  $\alpha^3$ . Since for QED  $\alpha \simeq 1/137$ , one might expect that this would give quite an accurate result—and indeed experiments suggest that it does. But the number of diagrams grows rapidly with order, and in fact the  $k^{th}$  order term can be about  $(-1)^k \alpha^k (k/2)!$ , yielding a series that formally diverges. In simpler examples where exact results are known, however, the first few terms typically still seem to give numerically accurate results for small  $\alpha$ . (The high-order terms often seem to be associated with asymptotic series for things like  $Exp[-1/\alpha]$ .)
 

@@ -178,7 +178,7 @@ def document_kind(relative_path: str) -> str:
         return "preface"
     if relative_path.startswith("CHAPTERS/"):
         return "chapter"
-    if relative_path == "BACK-MATTER/NOTES/00-General-Notes.md":
+    if relative_path == "BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md":
         return "general_notes"
     if relative_path.startswith("BACK-MATTER/NOTES/"):
         return "chapter_notes"

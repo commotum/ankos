@@ -10,7 +10,7 @@ Status: **COMPLETE**.
   cross-range), and 6 closed LOCAL rounds.
 - Stage 6 owns exactly two canonical documents in manifest order:
   - `CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md`;
-  - `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md`.
+  - `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md`.
 - The paired paths contain 489 deterministic source units:
   `U000174..U000305` and `U004962..U005318`.
 - They own 78 physical images: 22 referenced from the main chapter and 56

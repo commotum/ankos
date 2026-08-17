@@ -21,7 +21,7 @@ from audit_contract import canonical_json_bytes  # noqa: E402
 
 BUNDLE_HASH = "c1d14d069b2aef917d531d03ebe0f6ca9946f52a123cbb5754ecbd5fc6d5389b"
 WORKER = "ch03-notes-reader-e1"
-SOURCE_PATH = "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md"
+SOURCE_PATH = "BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md"
 
 base.ALL_CANDIDATE_SPECS.clear()
 base.ALL_ROUTE_SPECS.clear()

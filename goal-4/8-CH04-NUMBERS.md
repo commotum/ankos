@@ -14,7 +14,7 @@ Status: **COMPLETE**.
   epoch-2 `SEARCH_APPEND` transactions.
 - Stage 8 owns exactly two canonical documents:
   - `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md`;
-  - `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
+  - `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md`.
 - The main chapter contains 306 source units, `U000641..U000946`, and owns 63
   referenced physical images.
 - The Notes contain 439 source units, `U005637..U006075`, and own 82 physical
@@ -90,7 +90,7 @@ only its own sealed assignment:
 - the main reviewer: `U000641..U000946` and the 63 images owned by
   `CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md`;
 - the Notes reviewer: `U005637..U006075` and the 82 images owned by
-  `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`;
+  `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md`;
 - sanitized blind-discovery instructions, blind schemas, and write-free
   verification material included in the sealed bundle.
 

@@ -28,7 +28,7 @@
 
 ■ **Power spectra.** Many random processes in nature show power spectra `Abs[Fourier[data]]^2` with fairly simple forms. Most common are white noise uniform in frequency and  $1/f^2$ noise associated with random walks. Other pure power laws  $1/f^{\alpha}$  are also sometimes seen; the pictures below show some examples. (Note that the correlations in such data in some sense go like  $t^{\alpha-1}$ .) Particularly over the past few decades all sorts of examples of “1/f noise” have been identified with  $\alpha \simeq 1$ , including flicker noise in resistors, semiconductor devices and vacuum tubes, as well as thunderstorms, earthquake and sunspot activity, heartbeat intervals, road traffic density and some DNA sequences. A pure  $1/f^{\alpha}$ spectrum presumably reflects some form of underlying nesting or self-similarity, although exactly what has usually been difficult to determine. Mechanisms that generally seem able to give  $\alpha \simeq 1$  include random walks with exponential waiting times, power-law distributions of step sizes (Lévy flights), or white noise variations of parameters, as well as random processes with exponentially distributed relaxation times (as from Boltzmann factors for uniformly distributed barrier heights), fractional integration of white noise, intermittency at transitions to chaos, and random substitution systems. (There was confusion in the late 1980s when theoretical studies of self-organized criticality failed correctly to take squares in computing power spectra.) Note that the Weierstrass function of page 918 yields a 1/f spectrum, and presumably suitable averages of spectra from any substitution system should also have  $1/f^{\alpha}$  forms (compare page 586).
 
-![](_page_984_Power_Spectra_Five_Panel_Row.jpeg)
+![](images/_page_984_Power_Spectra_Five_Panel_Row.jpeg)
 
 ■ **Page 303 · Spark chambers.** The sensitivity of sparks to microscopic details of the environment is highlighted by the several devices which essentially use them to detect the passage of individual elementary particles such as protons. Such particles leave a tiny trail of ionized gas, which becomes the path of the spark. This principle was used in Geiger counters, and later in spark chambers and wire chambers.
 ■ **Physical randomness generators.** It is almost universally assumed that at some level physical processes must be the best potential sources of true randomness. But in practice their record has actually been very poor. It does not help that unlike algorithms physical devices can be affected by their environment, and can also not normally be copied identically. But in almost every case I know where detailed analysis has been done substantial deviations from perfect randomness have been found. This has however typically been attributed to engineering mistakes—or to sampling data too quickly—and not to anything more fundamental that is for example worth describing in publications.
@@ -59,7 +59,7 @@ Flagellated microorganisms can show random changes in direction as a result of t
 
 ■ **Billiards.** A somewhat related system is formed by a billiard ball bouncing around on a table. The issue of which sequence of horizontal and vertical sides the ball hits depends on the exact slope with which the ball is started (in the picture below it is  $1/\sqrt{2}$ ). In general, it is given by the successive terms in the continued fraction form (see page 914) of this slope, and is related to substitution systems (see page 903). (See also page 1022.)
 
-![](_page_986_Billiards_Five_Panel_Row.jpeg)
+![](images/_page_986_Billiards_Five_Panel_Row.jpeg)
 
 ■ **Fluttering.** If one releases a stationary piece of paper in air, then unlike a coin, it does not typically maintain the same orientation as it falls. Small pieces of paper spin in a repetitive way; but larger pieces of paper tend to flutter in a seemingly random way (as discussed, among others, by James Clerk Maxwell in 1853). A similar phenomenon can be seen if one drops a coin in water. I suspect that in these cases the randomness that occurs has an intrinsic origin, rather than being the result of sensitive dependence on initial conditions.
 ■ **History of chaos theory.** The idea that small causes can sometimes have large effects has been noted by historians and others since antiquity, and captured for example in “for want of a nail … a kingdom was lost”. In 1860 James Clerk Maxwell discussed how collisions between hard sphere molecules could lead to progressive amplification of small changes and yield microscopic randomness in gases. In the 1870s Maxwell also suggested that mechanical instability and amplification of infinitely small changes at occasional critical points might explain apparent free will (see page 1135). (It was already fairly well understood that for example small changes could determine which way a beam would buckle.) In 1890 Henri Poincaré found sensitive dependence on initial conditions in a particular case of the three-body problem (see below), and later proposed that such phenomena could be common, say in meteorology. In 1898 Jacques Hadamard noted general divergence of trajectories in spaces of negative curvature, and Pierre Duhem discussed the possible general significance of this in 1908. In the 1800s there had been work on nonlinear oscillators—particularly in connection with models of musical instruments—and in 1927 Balthazar van der Pol noted occasional “noisy” behavior in a vacuum tube oscillator circuit presumably governed by a simple nonlinear differential equation. By the 1930s the field of dynamical systems theory had begun to provide characterizations of possible forms of behavior in differential equations. And in the early 1940s Mary Cartwright and John Littlewood noted that van der Pol’s equation could exhibit solutions somehow sensitive to all digits in its initial conditions. The iterated map  $x \rightarrow 4x(1-x)$ was also known to have a similar property (see page 918). But most investigations centered on simple and usually repetitive behavior—with any strange behavior implicitly assumed to be infinitely unlikely. In 1962, however, Edward Lorenz did a computer simulation of a set of simplified differential equations for fluid convection (see page 998) in which he saw complicated behavior that seemed to depend sensitively on initial conditions—in a way that he suggested was like the map  $x \to FractionalPart[2x]$ . In the mid-1960s, notably through the work of Steve Smale, proofs were given that there could be differential equations in which such sensitivity is generic. In the late 1960s there began to be all sorts of simulations of differential equations with complicated behavior, first mainly on analog computers, and later on digital computers. Then in the mid-1970s, particularly following discussion by Robert May, studies of iterated maps with sensitive dependence on initial conditions became common. Work by Robert Shaw in the late 1970s clarified connections between information content of initial conditions and apparent randomness of behavior. The term “chaos” had been used since antiquity to describe various forms of randomness, but in the late 1970s it became specifically tied to the phenomenon of sensitive dependence on initial conditions. By the early 1980s at least indirect signs of chaos in this sense (see note below) had been seen in all sorts of mechanical, electrical, fluid and other systems, and there emerged a widespread conviction that such chaos must be the source of all important randomness in nature. So in 1985 when I raised the possibility that intrinsic randomness might instead be a key phenomenon this was greeted with much hostility by some younger proponents of chaos theory. Insofar as what they had to say was of a scientific nature, their main point was that somehow what I had seen in cellular automata must be specific to discrete systems, and would not occur in the continuous systems assumed to be relevant in nature. But from many results in this book it is now clear that this is not correct. (Note that James Gleick’s 1987 popular book *Chaos* covers somewhat more than is usually considered chaos theory—including some of my results on cellular automata from the early 1980s.)
@@ -71,11 +71,11 @@ Flagellated microorganisms can show random changes in direction as a result of t
 
 In Henri Poincaré’s study of the collection of possible trajectories for three-body systems he identified sensitive dependence on initial conditions (see above), noted the general complexity of what could happen (particularly in connection with so-called homoclinic tangles), and developed topology to provide a simpler overall description. With appropriate initial conditions one can get various forms of simple behavior. The pictures below show some of the possible repetitive orbits of an idealized planet moving in the plane of a pair of stars that are in a perfect elliptical orbit.
 
-![](_page_987_Idealized_Planet_Orbits_Five_Panel_Row.jpeg)
+![](images/_page_987_Idealized_Planet_Orbits_Five_Panel_Row.jpeg)
 
 The pictures below show results for a fairly typical sequence of initial conditions where all three bodies interact. (The two bodies at the bottom are initially at rest; the body at the top is given progressively larger rightward velocities.) What generically happens is that one of the bodies escapes from the other two (like *t* or sometimes  $t^{2/3}$ ). Often this happens quickly, but sometimes all three bodies show complex and apparently random behavior for quite a while. (The delay before escaping is reminiscent of resonant scattering.)
 
-![](_page_988_Figure_3.jpeg)
+![](images/_page_988_Figure_3.jpeg)
 
 ■ **Page 314 · Simple case.** The position of the idealized planet in the case shown satisfies the differential equation
 
@@ -83,11 +83,11 @@ The pictures below show results for a fairly typical sequence of initial conditi
 
 where $e$ is the eccentricity of the elliptical orbit of the stars ($e = 0.1$ in the picture). (Note that the physical situation is unstable: if the planet is perturbed so that there is a difference between its distance to each star, this will tend to increase.) Except when $e = 0$, the equation has no solution in terms of standard mathematical functions. It can be solved numerically in *Mathematica* using `NDSolve`, although a working precision of 40 decimal digits was used to obtain the results shown. Following work by Kirill Sitnikov in 1960 and by Vladimir Alekseev in 1968, it was established that with suitably chosen initial conditions, the equation yields any sequence `Floor[t[i + 1] - t[i]]` of successive zero-crossing times `t[i]`. The pictures below show the dependence of `z[t]` on $t$ and `z[0]`. As $t$ increases, `z[t]` typically begins to vary more rapidly with `z[0]`—reflecting sensitive dependence on initial conditions.
 
-![](_page_988_Figure_7.jpeg)
+![](images/_page_988_Figure_7.jpeg)
 
 ■ **Page 314 · Randomness in the solar system.** Most motion observed in the solar system on human timescales is highly regular—though sometimes intricate, as in the sequence of numbers of days between successive new moons shown below. In the mid-1980s, however, work by Jack Wisdom and others established that randomness associated with sensitive dependence on initial conditions could occur in certain current situations in the solar system, notably in the orbits of asteroids. Various calculations suggest that there should also be sensitive dependence on initial conditions in the orbits of planets in the solar system—with effects doubling every few million years. But there are so far no observational signs of randomness resulting from this, and indeed the planets—at least now—mostly just seem to have orbits that are within a few percent of circles. If a planet moved in too random a way then it would tend to collide or escape from the solar system. And indeed it seems quite likely that in the past there may have been significantly more planets in our solar system—with only those that maintained regular orbits now being left. (See also page 1021.)
 
-![](_page_988_Figure_10.jpeg)
+![](images/_page_988_Figure_10.jpeg)
 
 ### The Intrinsic Generation of Randomness
 
@@ -105,7 +105,7 @@ s[list_] := Flatten[
 
 with or without the `Reverse`, is able to produce orderings which at least in some respects seem quite random. But by doing `Nest[s, Range[52], 26]` one ends up with a simple reversal of the original deck, as in the pictures below.
 
-![](_page_989_Picture_7.jpeg)
+![](images/_page_989_Picture_7.jpeg)
 
 ■ **Random number generators.** A fairly small number of different types of random number generators have been used in practice, so it is possible to describe all the major ones here.
 
@@ -146,7 +146,7 @@ NestList[Nest[LFSRStep, #, n] &,
   Append[Table[0, {n - 1}], 1], t]
 ```
 
-![](_page_990_Figure_6.jpeg)
+![](images/_page_990_Figure_6.jpeg)
 
 Like additive cellular automata as discussed on page 951, states in a linear feedback shift register can be represented by a polynomial `FromDigits[list, x]`. Starting from a single 1, the state after $t$ steps is then given by
 
@@ -225,7 +225,7 @@ Examples where I have seen evidence of repeatable randomness as a function of ti
 
 The mean  $\mu$  and standard deviation  $\sigma$  are determined by properties of the random numbers, but the form of the distribution is always the same. The only conditions are that the random numbers should be statistically independent, and that their distribution should have bounded variance, so that, for example, the probability for very large numbers is rapidly damped. (The limit of an infinite collection of numbers gives  $\sigma \rightarrow 0$  in accordance with the law of large numbers.) The pictures at the top of the next page show how averages of successively larger collections of uniformly distributed numbers converge to a Gaussian distribution.
 
-![](_page_992_Picture_2.jpeg)
+![](images/_page_992_Picture_2.jpeg)
 
 The Central Limit Theorem leads to a self-similarity property for the Gaussian distribution: if one takes $n$ numbers that follow Gaussian distributions, then their average should also follow a Gaussian distribution, though with a standard deviation that is  $1/\sqrt{n}$  times smaller.
 
@@ -303,7 +303,7 @@ and not on products of more of the `e[[s]]`.
 
 There are nevertheless some properties of random walks that are not isotropic. The picture below, for example, shows the so-called extreme value distribution of positions furthest from the origin reached after 10 steps and 100 steps by random walks on various lattices.
 
-![](_page_993_Random_Walk_Extreme_Distributions_Five_Panel_Row.jpeg)
+![](images/_page_993_Random_Walk_Extreme_Distributions_Five_Panel_Row.jpeg)
 
 In the pictures in the main text, all particles start out at a particular position, and progressively spread out from there. But in general, one can consider sources that emit new particles every step, or absorbers and reflectors of particles. The average distribution of particles is given in general by the diffusion equation shown on page 163. The solutions to this equation are always smooth and continuous.
 
@@ -311,11 +311,11 @@ A physical example of an approximation to a random walk is the spreading of ink 
 
 ■ **Self-avoiding walks.** Any walk where the probabilities for a given step depend only on a fixed number of preceding steps gives the same kind of limiting Gaussian distribution. But imposing the constraint that a walk must always avoid anywhere it has been before (as for example in an idealized polymer molecule) leads to correlations over arbitrary times. If one adds individual steps at random then in 2D one typically gets stuck after perhaps a few tens of steps. But tricks are known for generating long self-avoiding walks by combining shorter walks or successively pivoting pieces starting with a simple line. The pictures below show some 1000-step examples. They look in many ways similar to ordinary random walks, but their limiting distribution is no longer strictly Gaussian, and their root mean square displacement after $t$ steps varies like  $t^{3/4}$ . (In  $d \le 4$ dimensions the exponent is close to the Flory mean field theory value $3/(2+d)$; for $d > 4$ the results are the same as without self-avoidance.)
 
-![](_page_993_Self_Avoiding_Walks_Three_Panel_Row.jpeg)
+![](images/_page_993_Self_Avoiding_Walks_Three_Panel_Row.jpeg)
 
 ■ **Page 331 · Basic aggregation model.** This model appears to have first been described by Murray Eden in 1961 as a way of studying biological growth, and was simulated by him on a computer for clusters up to about 32,000 cells. By the mid-1980s clusters with a billion cells had been grown, and a very surprising slight anisotropy had been observed. The pictures below show which cells occur in more than 10% of 1000 randomly grown clusters. There is a 2% or so anisotropy that appears to remain essentially fixed for clusters above perhaps a million cells, tucking them in along the diagonal directions. The width of the region of roughness on the surface of each cluster varies with the radius of the cluster approximately like  $r^{1/3}$ . The most extensive use of the model in practice has been for studying tumor growth: currently a typical tumor at detection contains about a billion cells, and it is important to predict what protrusions there will be that can break off and form additional tumors elsewhere.
 
-![](_page_993_Aggregation_Isotropy_Three_Panels_and_Two_Plots.jpeg)
+![](images/_page_993_Aggregation_Isotropy_Three_Panels_and_Two_Plots.jpeg)
 
 ■ **Implementation.** One way to represent a cluster is by giving a list of the coordinates at which each black cell occurs. Then starting with a single black cell at the origin, represented by `{{0, 0}}`, the cluster can be grown for $t$ steps as follows:
 
@@ -340,37 +340,37 @@ This implementation can readily be extended to generalized aggregation models (s
 
 ■ **Page 332 · Generalized aggregation models.** One can in general have rules in which new cells can be added only at positions whose neighborhoods match specific templates (compare page 213). There are 32 possible symmetric such rules with just 4 immediate neighbors—of which 16 lead to growth (from any seed), and all seem to yield at least approximately circular clusters (of varying densities). Without symmetry, all sorts of shapes can be obtained, as in the pictures below. (The rule numbers here follow the scheme on page 927 with offsets `{{-1, 0}, {0, -1}, {0, 1}, {1, 0}}`). Note that even though the underlying rule involves randomness definite geometrical shapes can be produced. An extreme case is rule 2, where only a single neighborhood with a single black cell is allowed, so that growth occurs along a single line.
 
-![](_page_994_Generalized_Aggregation_Five_Rule_Shapes.jpeg)
+![](images/_page_994_Generalized_Aggregation_Five_Rule_Shapes.jpeg)
 
 If one puts conditions on where cells can be added one can in principle get clusters where no further growth is possible. This does not seem to happen for rules that involve 4 neighbors, but with 8 neighbors there are cases in which clusters can get fairly large, but end up having no sites where further cells can be added. The pictures below show examples for a rule that allows growth except when there are exactly 1, 3 or 4 neighbors (totalistic constraint 242).
 
-![](_page_994_Constrained_Aggregation_Six_Step_Row.jpeg)
+![](images/_page_994_Constrained_Aggregation_Six_Step_Row.jpeg)
 
 The question of what ultimate forms of behavior can occur with any sequence of random choices, starting from a given configuration with a given rule, is presumably in general undecidable. (It has some immediate relations to tiling problems and to halting problems for non-deterministic Turing machines.) With the rule illustrated above, however, those clusters that do successfully grow exhibit complicated and irregular shapes, but nevertheless eventually seem to take on a roughly circular shape, as in the pictures below.
 
-![](_page_994_Aggregation_Growth_Five_Step_Row.jpeg)
+![](images/_page_994_Aggregation_Growth_Five_Step_Row.jpeg)
 
 At some level the basic aggregation model of page 331 has a deterministic outcome: after sufficiently many steps every cell will be black. But most generalized aggregation models do not have this property: instead, the form of their internal patterns depends on the sequence of random choices made. Particularly with more than two colors it is however possible to arrange that the internal pattern always ends up being the same, or at least has patches that are the same—essentially by using rules with the confluence property discussed on page 1036.
 
 The pictures below show 1D generalized aggregation systems with various templates. The second one is the analog of the system from page 331.
 
-![](_page_994_One_Dimensional_Generalized_Aggregation_Four_Panel_Row.jpeg)
+![](images/_page_994_One_Dimensional_Generalized_Aggregation_Four_Panel_Row.jpeg)
 
 ■ **Page 333 · Diffusion-limited aggregation (DLA).** While many 2D cellular automata produce intricate nested shapes, the aggregation models shown here seem to tend to simple limiting shapes. Most likely there are some generalized aggregation models for which this is not the case. And indeed this phenomenon has been seen in other systems with randomness in their underlying rules. An example studied extensively in the 1980s is diffusion-limited aggregation (DLA). The idea of this model is to add cells to a cluster one at a time, and to determine where a cell will be added by seeing where a random walk that starts far from the cluster first lands on a square adjacent to the cluster. An example of the behavior obtained in this model is shown below:
 
-![](_page_994_Figure_28.jpeg)
+![](images/_page_994_Figure_28.jpeg)
 
-![](_page_994_Picture_29.jpeg)
+![](images/_page_994_Picture_29.jpeg)
 
 The lack of smooth overall behavior in this case can perhaps be attributed to the global probing of the cluster that is effectively done by each incoming random walk. (See also page 994.)
 
 ■ **Page 334 · Code 746.** Much as in the aggregation model above, the pictures below show that there is a slight deviation from perfect circular growth, with an anisotropy that appears to remain roughly fixed at perhaps 4% above a few thousand steps (corresponding to patterns with a few million cells).
 
-![](_page_994_Code_746_Four_Growth_Panels_and_Three_Plots.jpeg)
+![](images/_page_994_Code_746_Four_Growth_Panels_and_Three_Plots.jpeg)
 
 ■ **Other rules.** The pictures below show patterns generated after 10,000 steps with several rules, starting respectively from rows of 7, 6, 7 and 11 cells (compare pages 177 and 181). The outer boundaries are somewhat smooth, though definitely not circular. In the second rule shown, the interior of the pattern always continues to change; in the others it remains essentially fixed.
 
-![](_page_995_Other_Rules_Four_Panel_Row.jpeg)
+![](images/_page_995_Other_Rules_Four_Panel_Row.jpeg)
 
 ■ **Isotropy.** Any pattern grown from a single cell according to rules that do not distinguish different directions on a lattice must show the same symmetry as the lattice. But we have seen that in fact many rules actually yield almost circular patterns with much higher symmetry. One can characterize the symmetry of a pattern by taking the list *v* of positions of cells it contains, and looking at tensors of successive ranks *n*:
 
@@ -410,7 +410,7 @@ The phenomenon of domains illustrated here is also found in various 2D cellular 
 
 The 4-color rule shown in the text is probably the clearest example available in one dimension. It has rule number 294869764523995749814890097794812493824.
 
-![](_page_996_One_Dimensional_Transitions_Four_Panel_Row.jpeg)
+![](images/_page_996_One_Dimensional_Transitions_Four_Panel_Row.jpeg)
 
 ■ **Page 340 · 2D transitions.** The simplest symmetrical rules (such as 4-neighbor totalistic code 56) which make the new color of a cell be the same as the majority of the cells in its neighborhood do not exhibit the discrete transition phenomenon, but instead lead to fixed regions of black and white. The 4-neighbor rule with totalistic code 52 can be used as an alternative to the second rule shown here. A probabilistic version of the first rule shown here was discussed by Andrei Toom in 1980.
 ■ **Phase transitions.** The discrete transitions shown in cellular automata in this section are examples of general phenomena known in physics as phase transitions. A phase transition can be defined as any discontinuous change that occurs in a system with a large number of components when a parameter associated with that system is varied. (Some physicists might argue for a somewhat narrower definition that allows only discontinuities in the so-called partition function of equilibrium statistical mechanics, but for many of the most interesting applications, the definition I use is the appropriate one.) Standard examples of phase transitions include boiling, melting, sublimation (solids such as dry ice turning into gases), loss of magnetization when a ferromagnet is heated, alignment of molecules in liquid crystals above a certain electric field (the basis for liquid crystal displays), and the onset of superconductivity and superfluidity at low temperatures.
@@ -432,7 +432,7 @@ so that each pair of adjacent spins contributes -1 when they are parallel and +1
 
 In physical ferromagnetic materials what is observed is that at high temperature, corresponding to high internal energy, there is no overall magnetization. But when the temperature goes below a critical value, spins tend to line up, and an overall magnetization spontaneously develops. In the context of the 2D Ising model this phenomenon is associated with the fact that those configurations of a large array of spins that have high total energy are overwhelmingly likely to have near zero overall magnetization, while those that have low total energy are overwhelmingly likely to have nonzero overall magnetization. For an  $n \times n$  array $s$ of spins there are a total of  $2^{n^2}$  possible configurations. The pictures below show the results of picking all configurations with a given energy `e[s]` (cyclic boundary conditions are assumed) and then working out their distribution of magnetization values `m[s]`. Even for small $n$ the pictures demonstrate that for large `e[s]` the magnetization `m[s]` is likely to be close to zero, but for smaller `e[s]` two branches approaching +1 and -1 appear. In the limit  $n \to \infty$  the distribution of magnetization values becomes sharp, and a definite discontinuous phase transition is observed.
 
-![](_page_997_Figure_3.jpeg)
+![](images/_page_997_Figure_3.jpeg)
 
 Following the work of Lars Onsager around 1944, it turns out that an exact solution in terms of traditional mathematical functions can be found in this case. (This seems to be true only in 2D, and not in 3D or higher.) Almost all spin configurations with  $e[s] > -\sqrt{2}$  (where here and below all quantities are divided by the total number of spins, so that  $-2 \le e[s] \le 2$  and  $-1 \le m[s] \le +1$ ) yield `m[s] == 0`. But for smaller `e[s]` one can show that
 
@@ -478,11 +478,11 @@ One can see a phase transition in this system by looking at the dependence of be
 
 The pictures at the top of the next page show the values of `m[s]` (densities of +1 cells) after 0, 10, 100 and 1000 steps for a  $500 \times 500$  system as a function of the initial values of `m[s]` and `e[s]`. Also shown is the result expected for an infinite system at infinite time. (The slow approach to this limit can be viewed as being a consequence of smallness of finite size scaling exponents in Ising-like systems.)
 
-![](_page_998_Figure_3.jpeg)
+![](images/_page_998_Figure_3.jpeg)
 
 The phase transition in the Ising model is associated with a lack of smoothness in the dependence of the final $m$ value on $e$ or the initial value $p$ of $m$ in limiting cases of the pictures above. The transition occurs at  $e = -\sqrt{2}$ , corresponding to  $p = (1 \pm 2^{-1/4})/2$ . The pictures show typical configurations generated after 1000 steps from various initial densities, as well as slices through their evolution.
 
-![](_page_998_Figure_5.jpeg)
+![](images/_page_998_Figure_5.jpeg)
 
 And what one sees at least roughly is that right around the phase transition there are patches of black and white of all sizes, forming an approximately nested random pattern. (See also pages 989 and 1149.)
 
@@ -499,17 +499,17 @@ A common feature of phase transitions is that right at the transition point, the
 ■ **Page 341 · Rate equations.** In standard chemical kinetics one assumes that molecules are uniformly distributed in space, so that the rates for particular reactions are proportional to the products of the densities of the molecules that react in them. Conditions for equilibrium where rates balance thus tend to be polynomial equations for densities—with discontinuous jumps in solutions sometimes occurring as parameters are changed. Analogous equations arise in probabilistic approximations to systems like cellular automata, as on page 953. But here—as well as in fast chemical reactions—correlations in spatial arrangements of elements tend to be important, invalidating simple probabilistic approaches. (For the cellular automaton on page 339 the simple condition for equilibrium is  $p == p^2 (3-2p)$ , which correctly implies that 0, 1/2 and 1 are possible equilibrium densities.)
 ■ **Discreteness in space.** Many systems with continuous underlying rules generate discrete cellular structures in space. One common mechanism is for a wave of a definite wavelength to form (see page 988), and then for some feature of each cycle of this wave to be picked out, as in the picture below. In Chladni figures of sand on vibrating plates and in cloud streets in the atmosphere what happens is that material collects at points of zero displacement. And when a stream of water breaks up into discrete drops what happens is that oscillation minima yield necks that break.
 
-![](_page_999_Picture_3.jpeg)
+![](images/_page_999_Picture_3.jpeg)
 
 Superpositions of waves at different angles can lead to various 2D cellular structures, as in the pictures below (compare page 1078).
 
-![](_page_999_Picture_5.jpeg)
+![](images/_page_999_Picture_5.jpeg)
 
 Various forms of focusing and accumulation can also lead to discreteness in continuous systems. The first picture below shows a caustic or catastrophe in which a continuous distribution of light rays are focused by a circular reflector onto a discrete line with a cusp. The second picture shows a shock wave produced by an accumulation of circular waves emanating from a moving object—as seen in wakes of ships, sonic booms from supersonic aircraft, and Cerenkov light from fast-moving charged particles.
 
-![](_page_999_Picture_7.jpeg)
+![](images/_page_999_Picture_7.jpeg)
 
-![](_page_999_Picture_8.jpeg)
+![](images/_page_999_Picture_8.jpeg)
 
 ### The Problem of Satisfying Constraints
 
@@ -560,19 +560,19 @@ FixedPoint[# - f[#]/f'[#] &, Subscript[x, 0]]
 
 For circles of unequal sizes rather little has been done. A procedure analogous to the one on page 350 was introduced by Charles Bennett in 1971 for 3D spheres (relevant for binary alloys). The picture below shows the network of contacts between circles in the cases from page 350. Note that with the procedure used, each new circle added must immediately touch two existing ones, though subsequently it may get touched by varying numbers of other circles.
 
-![](_page_1001_Picture_2.jpeg)
+![](images/_page_1001_Picture_2.jpeg)
 
 The distribution of numbers of circles that touch a given circle changes with the ratio of circle sizes, as in the picture below. The total filling fraction seems to vary fairly smoothly with this ratio, though I would not be surprised if some small-scale jumps were present.
 
-![](_page_1001_Picture_4.jpeg)
+![](images/_page_1001_Picture_4.jpeg)
 
 Note that even a single circle of different size in the center can have a large-scale effect on the results of the procedure, as illustrated in the pictures below.
 
-![](_page_1001_Picture_6.jpeg)
+![](images/_page_1001_Picture_6.jpeg)
 
 Finding densest packings of $n$ circles is in general like solving quadratic programming problems with about  $n^2$  constraints. But at least for many size ratios I suspect that the final result will simply involve each kind of circle forming a separated hexagonally-packed region. This will not happen, however, for size ratios  $\leq 2/\sqrt{3} - 1 \approx 0.15$ , since then the small circles can fit into the interstices of an ordinary hexagonal pattern, yielding a filling fraction  $1/18(17\sqrt{13}-24)\pi \approx 0.95$ . The picture below shows what happens if one repeatedly inserts circles to form a so-called Apollonian packing derived from the problem studied by Apollonius of finding a circle that touches three others. At step $t$,  $3^{t-1}$  circles are added for each original circle, and the network of tangencies among circles is exactly example (a) from page 509. Most of the circles added at a given step are not the same size, however, making the overall geometry not straightforwardly nested. (The total numbers of different sizes of circles for the first few steps are `{2, 3, 5, 10, 24, 63, 178, 521}`. At step 3, for example, the new circles have radii  $(25-12\sqrt{3})/193$  and  $(19-6\sqrt{3})/253$ . In general, the radius of a circle inscribed between three other touching circles that have radii $p$, $q$, $r$ is `p q r/(p q + p r + q r + 2 Sqrt[p q r (p + q + r)])`.) In the limit of an infinite number of steps the filling fraction tends to 1, while the region left unfilled has a fractal dimension of about 1.3057.
 
-![](_page_1001_Picture_9.jpeg)
+![](images/_page_1001_Picture_9.jpeg)
 
 To achieve filling fraction 1 requires arbitrarily small circles, but there are many different arrangements of circles that will work, some not even close to nested. When actual granular materials are formed by crushing, there is probably some tendency to generate smaller pieces by following essentially substitution system rules, and the result may be a nested distribution of sizes that allows an Apollonian-like packing.
 
@@ -588,7 +588,7 @@ It is common for shaking to cause granular materials (such as coffee or sand gra
 
 ■ **Discrete packings.** The pictures below show a discrete analog of circle packing in which one arranges as many circles as possible with a given diameter on a grid. (The grid is assumed to wrap around.)
 
-![](_page_1002_Figure_4.jpeg)
+![](images/_page_1002_Figure_4.jpeg)
 
 The pictures show all the distinct maximal cases that exist for a 7×7 grid, corresponding to possible circles with diameters `Sqrt[m^2 + n^2]`. Already some of these are difficult to find. And in fact in general finding such packings is an NP-complete problem: it is equivalent to the problem of finding the maximum clique (completely connected set) in the graph whose vertices are joined whenever they correspond to grid points on which non-overlapping circles could be centered.
 
@@ -596,7 +596,7 @@ On large grids, optimal packings seem to approach rational approximations to hex
 
 ■ **Voronoi diagrams.** The Voronoi diagram for a set of points shows the region around each point in which one is closer to that point than to any other. (The edges of the regions are thus like watersheds.) The pictures below show a few examples. In 2D the regions in a Voronoi diagram are always polygons, and in 3D polyhedra. If all the points lie on a repetitive lattice each region will always be the same, and is often known as a Wigner-Seitz cell or a Dirichlet domain. For a simple cubic lattice the regions are cubes with 6 faces. For an fcc lattice they are rhombic dodecahedra with 12 faces and for a bcc lattice they are truncated octahedra (tetradecahedra) with 14 faces. (Compare page 929.)
 
-![](_page_1002_Picture_9.jpeg)
+![](images/_page_1002_Picture_9.jpeg)
 
 Voronoi diagrams for irregularly distributed points have found many applications. In 2D they are used in studies of animal territories, retail store utilization and municipal districting. In 3D they are used as simple models of foams, grains in solids, assemblies of biological cells and self-gravitating regions in primordial galaxy formation. Voronoi diagrams are relevant whenever there is growth in all directions at an identical speed from a collection of seed points. (In high dimensions they also appear immediately in studying error-correcting codes.)
 
@@ -611,11 +611,11 @@ Modern computational geometry has provided efficient algorithms for constructing
 
 is an example of a system that generates discrete 1D Voronoi diagrams by having regions that grow from every initial black cell, but stop whenever they meet, as shown below.
 
-![](_page_1002_Picture_14.jpeg)
+![](images/_page_1002_Picture_14.jpeg)
 
 Analogous behavior can also be obtained in 2D, as shown for a 2D cellular automaton in the pictures below.
 
-![](_page_1002_Picture_16.jpeg)
+![](images/_page_1002_Picture_16.jpeg)
 
 ■ **Brillouin zones.** A region in an ordinary Voronoi diagram shows where a given point is closest. One can also consider higher-order Voronoi diagrams in which each region shows where a given point is the  $k^{th}$  closest. The total area of each region is the same for every $k$, but some complexity in shape is seen, though for large $k$ they always in a sense approximate circles. 3D versions of such regions have been encountered in studies of quantum mechanical properties of crystals since the 1930s.
 
@@ -634,7 +634,7 @@ Analogous behavior can also be obtained in 2D, as shown for a 2D cellular automa
 
 ■ **Nested lists.** One can think of structures that annihilate in pairs as being like parentheses or other delimiters that come in pairs, as in the picture below.
 
-![](_page_1004_Picture_4.jpeg)
+![](images/_page_1004_Picture_4.jpeg)
 
 A string of balanced parentheses is analogous to a nested *Mathematica* list such as `{{{}, {{}}}, {}}`. The *Mathematica* expression tree for this list then has a structure analogous to the nested pattern in the picture.
 
@@ -648,7 +648,7 @@ c[{m_, n_}, d_] :=
 
 Several types of structures are equivalent to strings of balanced parentheses, as illustrated below.
 
-![](_page_1004_Picture_9.jpeg)
+![](images/_page_1004_Picture_9.jpeg)
 
 ■ **Phase transitions.** Nesting in systems like rule 184 (see page 273) is closely related to the phenomenon of scaling studied in phase transitions and critical phenomena since the 1960s. As discussed on page 983 ordinary equilibrium statistical mechanics effectively samples configurations of systems like rule 184 after large numbers of steps of evolution. But the point is that when the initial number of black and white cells is exactly equal—corresponding to a phase transition point—a typical configuration of rule 184 will contain domains with a nested distribution of sizes. The properties of such configurations can be studied by considering invariance under rescalings of the kind discussed on page 955, in analogy to renormalization group methods. A typical result is that correlations between colors of different cells fall off like a power of distance—with the specific power depending only on general features of the nested patterns formed, and not on most details of the system.
 ■ **Self-organized criticality.** The fact that in traditional statistical mechanics nesting had been encountered only at the precise locations of phase transitions led in the 1980s to the notion that despite its ubiquity in nature nesting must somehow require fine tuning of parameters. Already in the early 1980s, however, my studies on simple additive and other cellular automata (see page 26) had for example made it rather clear that this is not the case. But in the late 1980s it became popular to think that in many systems nesting (as well as the largely unrelated phenomenon of $1/f$ noise) might be the result of fine tuning of parameters achieved through some automatic process of self-regulation. Computer experiments on various cellular automata and related systems were given as examples of how this might work. But in most of these experiments mistakes and misinterpretations were found, and in the end little of value was learned about the origins of nesting (or $1/f$ noise). Nevertheless, a number of interesting systems did emerge, the best known being the idealized sandpile model from the 1987 work of Per Bak, Chao Tang and Kurt Wiesenfeld. This is a $k = 8$ 2D cellular automaton in which toppling of sand above a critical slope is captured by updating an array of relative sand heights $s$ according to the rule
@@ -660,17 +660,17 @@ SandStep[s_] := s + ListConvolve[
 
 Starting from any initial condition, the rule eventually yields a fixed configuration with all values less than 4, as in the picture below. (With an  $n \times n$  initial block of 4’s, stabilization typically takes about  $0.4 n^2$  steps.).
 
-![](_page_1004_Picture_15.jpeg)
+![](images/_page_1004_Picture_15.jpeg)
 
 To model the pouring of sand into a pile one can consider a series of cycles, in which at each cycle one first adds 4 to the value of the center cell, then repeatedly applies the rule until a new fixed configuration `FixedPoint[SandStep, s]` is obtained. (The more usual version of the model adds to a random cell.) The picture below shows slices through the evolution at several successive cycles. Avalanches of different sizes occur, yielding activity that lasts for varying numbers of steps.
 
-![](_page_1004_Picture_17.jpeg)
+![](images/_page_1004_Picture_17.jpeg)
 
 The pictures at the top of the next page show some of the final fixed configurations, together with the number of steps needed to reach them. (The total value of $s$ at cycle $t$ is $4t$; the radius of the nonzero region is about  $0.74\sqrt{t}$ .) The behavior one sees is fairly complicated—a fact which in the past resulted in much confusion and some bizarre claims, but which in the light of the discoveries in this book no longer seems surprising.
 
-![](_page_1005_Sandpile_Fixed_Configurations_Four_Cycle_Row.jpeg)
+![](images/_page_1005_Sandpile_Fixed_Configurations_Four_Cycle_Row.jpeg)
 
-![](_page_1005_Figure_5.jpeg)
+![](images/_page_1005_Figure_5.jpeg)
 
 The system can be generalized to $d$ dimensions as a $k = 4d$ cellular automaton with $2d$ final values. The total value of $s$ is always conserved. In 1D, the update rule is simply
 
@@ -681,7 +681,7 @@ SandStep[s_] :=
 
 In this case the evolution obtained if one repeatedly adds to the center cell (as in the first picture below) is always quite simple. But as the pictures below illustrate, evolution from typical initial conditions yields behavior that often looks a little like rule 184. With a total initial $s$ value of $m$, the number of steps before a fixed point is reached seems to increase roughly like  $m^2$ .
 
-![](_page_1005_Picture_10.jpeg)
+![](images/_page_1005_Picture_10.jpeg)
 
 When $d > 1$, more complicated behavior is seen for evolution from at least some initial conditions, as indicated above.
 

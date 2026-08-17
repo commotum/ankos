@@ -6,7 +6,7 @@
 
 ■ **Page 55 · Rule equivalences.** The table below gives basic equivalences between elementary cellular automaton rules. In each block the second entry is the rule obtained by interchanging black and white, the third entry is the rule obtained by interchanging left and right, and the fourth entry the rule obtained by applying both operations. (The smallest rule number is given in boldface.) For a rule with number *n* the two operations correspond respectively to computing `1 - Reverse[list]` and `list[[{1, 5, 3, 7, 2, 6, 4, 8}]]` with `list = IntegerDigits[n, 2, 8]`.
 
-![](_page_898_Picture_8.jpeg)
+![](images/_page_898_Picture_8.jpeg)
 
 ■ **Special rules.** Rule 51: complement; rule 170: left shift; rule 204: identity; rule 240: right shift. These rules only ever depend on one cell in each neighborhood.
 
@@ -128,21 +128,21 @@ The value at step *t* in the column immediately adjacent to the center is the ne
 
 ■ **Alternating colors.** The pictures below show rules 45 and 73 with the colors of cells on alternate steps reversed.
 
-![](_page_900_Picture_25.jpeg)
+![](images/_page_900_Picture_25.jpeg)
 
-![](_page_900_Picture_26.jpeg)
+![](images/_page_900_Picture_26.jpeg)
 
 ■ **Two-cell neighborhoods.** By having cells on successive steps be arranged like hexagons or staggered bricks, as in the pictures below, one can set up cellular automata in which the new color of each cell depends on the previous colors of two rather than three neighboring cells.
 
-![](_page_900_Picture_28.jpeg)
+![](images/_page_900_Picture_28.jpeg)
 
-![](_page_900_Picture_29.jpeg)
+![](images/_page_900_Picture_29.jpeg)
 
-![](_page_900_Picture_30.jpeg)
+![](images/_page_900_Picture_30.jpeg)
 
 With *k* possible colors for each cell, there are a total of `k^(k^2)` possible rules of this type, each specified by a `k^2`-digit number in base *k* (7743 for the rule shown above). For *k* = 2, there are 16 possible rules, and the most complicated pattern obtained is nested like the rule 90 elementary cellular automaton. With *k* = 3, there are 19,683 possible rules, 1734 of which are fundamentally inequivalent, and many more complicated patterns are seen, as in the pictures at the top of the next page.
 
-![](_page_901_Picture_1.jpeg)
+![](images/_page_901_Picture_1.jpeg)
 
 With rule given by `IntegerDigits[num, k, k^2]` a single step of evolution can be implemented as
 
@@ -199,19 +199,19 @@ where *f* is the analog of multiplication for the system (see also page 1094). T
 
 The pictures below show results with *f* being `Times`, and cells having values (a) `{1, -1}`, (b) the unit complex numbers `{1, i, -1, -i}`, (c) the unit quaternions.
 
-![](_page_901_Picture_21.jpeg)
+![](images/_page_901_Picture_21.jpeg)
 
-![](_page_901_Picture_22.jpeg)
+![](images/_page_901_Picture_22.jpeg)
 
-![](_page_901_Picture_23.jpeg)
+![](images/_page_901_Picture_23.jpeg)
 
 In general, with *n* elements *f* can be specified by an *n* × *n* “multiplication table”. For *n* = 2, the patterns obtained are at most nested. Pictures (a) and (b) below however correspond to the *n* = 3 multiplication tables `{{1, 1, 3}, {3, 3, 2}, {2, 2, 1}}` and `{{3, 1, 3}, {1, 3, 1}, {3, 1, 2}}`. Note that for (b) the table is symmetric, corresponding to a commutative multiplication operation.
 
-![](_page_901_Picture_25.jpeg)
+![](images/_page_901_Picture_25.jpeg)
 
-![](_page_901_Picture_26.jpeg)
+![](images/_page_901_Picture_26.jpeg)
 
-![](_page_901_Picture_27.jpeg)
+![](images/_page_901_Picture_27.jpeg)
 
 If *f* is associative (flat), so that `f[f[i, j], k] == f[i, f[j, k]]`, then the algebraic system is known as a semigroup. (See also page 805.) With a single cell seed, no pattern more complicated than nested can be obtained in such a system. And with any seed, it appears to require a semigroup with at least six elements to obtain a more complicated pattern.
 
@@ -272,13 +272,13 @@ MAStep[rule_, {list_List, n_Integer}] /; 1 < n < Length[list] :=
 
 ■ **Page 72 · Distribution of behavior.** The pictures below show the distributions of transient and of period lengths for the 65,318 mobile automata of the type described here that yield ultimately repetitive behavior. Rule (f) has a period equal to the maximum of 16.
 
-![](_page_902_Figure_20.jpeg)
+![](images/_page_902_Figure_20.jpeg)
 
-![](_page_902_Figure_21.jpeg)
+![](images/_page_902_Figure_21.jpeg)
 
 ■ **Page 75 · Active cell motion.** The pictures below show the positions of the active cell for 20,000 steps of evolution in various mobile automata. (a), (b) and (c) correspond respectively to the rules on pages 73, 74 and 75. (c) has an outer envelope whose edges grow at rates `{-1.5, 0.3} Sqrt[t]`. (d) yields logarithmic growth as shown on page 496 (like Turing machine (f) on page 79). In most cases where the behavior is ultimately repetitive, transients and periods seem to follow the same approximate exponential distribution as in the note above. (g) however suddenly yields repetitive behavior with period 4032 after 405,941 steps. (h) does not appear to evolve to strict repetition or nesting, but does show progressively longer patches with fairly orderly behavior. (c) shows no obvious deviation from randomness in at least the first billion steps (after which the pattern it produces is 57,014 cells wide).
 
-![](_page_902_Figure_23.jpeg)
+![](images/_page_902_Figure_23.jpeg)
 
 ■ **Implementation of generalized mobile automata.** The state of a generalized mobile automaton at a particular step can be specified by `{list, nlist}`, where `list` gives the values of the cells, and `nlist` is a list of the positions of active cells. The rule can be given by specifying a list of cases such as `{0, 0, 0} -> {1, {1, -1}}`, where in each case the second sublist specifies the new relative positions of active cells. With this setup successive steps in the evolution of the system can be obtained from
 
@@ -347,23 +347,23 @@ The examples on page 79 have numbers 3024, 982, 925, 1971, 2506 and 1953.
 
 ■ **Page 80 · Distribution of behavior.** With 2 possible states and 2 possible colors for each cell, starting from a blank tape, the maximum repetition period obtained is 9 steps, and 12 out of the 4096 possible rules (or about 0.29%) yield non-repetitive behavior. With 3 states and 2 colors, the maximum period is 24, and about 0.37% of rules yield non-repetitive behavior, always nested. (Usually I have not found more complicated behavior in such rules even with initial conditions in which there are both black and white cells, though see page 761.) With 2 states and 3 colors, the maximum repetition period is again 24, about 0.65% of rules yield non-repetitive behavior, and the 14 rules discussed on page 709 yield more complex behavior. With more colors or more states, the percentage of rules that yield non-repetitive behavior steadily increases, as shown below, roughly like `0.28 (s - 1) (k - 1)`. (Compare page 1120.)
 
-![](_page_903_Figure_20.jpeg)
+![](images/_page_903_Figure_20.jpeg)
 
 ■ **Page 81 · Head motion.** The picture below shows the motion of the head for the first million steps. After about 20,000 steps, the width of the pattern produced grows at a rate close to `Sqrt[t]`.
 
-![](_page_903_Figure_22.jpeg)
+![](images/_page_903_Figure_22.jpeg)
 
 ■ **Localized structures.** Even when the overall behavior of a Turing machine is complicated, it is possible for simple localized structures to exist, much as in cellular automata such as rule 110. What can happen is that with certain specific repetitive backgrounds, the head can move in a simple repetitive way, as shown in the pictures below for the Turing machine from page 81.
 
-![](_page_904_Picture_3.jpeg)
+![](images/_page_904_Picture_3.jpeg)
 
-![](_page_904_Picture_4.jpeg)
+![](images/_page_904_Picture_4.jpeg)
 
-![](_page_904_Picture_5.jpeg)
+![](images/_page_904_Picture_5.jpeg)
 
-![](_page_904_Picture_6.jpeg)
+![](images/_page_904_Picture_6.jpeg)
 
-![](_page_904_Picture_7.jpeg)
+![](images/_page_904_Picture_7.jpeg)
 
 ■ **History.** Turing machines were invented by Alan Turing in 1936 to serve as idealized models for the basic processes of mathematical calculation (see page 1128). As discussed on page 1110, Turing's main interest was in showing what his machines could in principle be made to do, not in finding out what simple examples of them actually did. Indeed, so far as I know, even though he had access to the necessary technology, Turing never explicitly simulated any Turing machine on a computer.
 
@@ -371,19 +371,19 @@ Since Turing’s time, Turing machines have been extensively used as abstract mo
 
 As an offshoot of abstract studies of Turing machines, Tibor Radó in 1962 formulated what he called the Busy Beaver Problem: to find a Turing machine with a specified number of states that “keeps busy” for as many steps as possible before finally reaching a particular “halt state” (numbered 0 below). (A variant of the problem asks for the maximum number of black cells that are left when the machine halts.) By 1966 the results for 2, 3 and 4 states had been found: the maximum numbers of steps are 6, 21 and 107, respectively, with 4, 5 and 13 final black cells. Rules achieving these bounds are:
 
-![Busy Beaver rules for 2, 3 and 4 states](_page_904_busy_beaver_2_3_4_state_rules.jpeg)
+![Busy Beaver rules for 2, 3 and 4 states](images/_page_904_busy_beaver_2_3_4_state_rules.jpeg)
 
 The result for 5 states is still unknown, but a machine taking 47,176,870 steps and leaving 4098 black cells was found by Heiner Marxen and Jürgen Buntrock in 1990. Its rule is:
 
-![Busy Beaver 5-state rule](_page_904_busy_beaver_5_state_rule.jpeg)
+![Busy Beaver 5-state rule](images/_page_904_busy_beaver_5_state_rule.jpeg)
 
 The pictures below show (a) the first 500 steps of evolution, (b) the first million steps in compressed form and (c) the number of black cells obtained at each step. Perhaps not surprisingly for a system optimized to run as long as possible, the machine operates in a rather systematic and regular way. With 6 states, a machine is known that takes about `3.002 × 10^1730` steps to halt, and leaves about `1.29 × 10^865` black cells. (See also page 1144.)
 
-![](_page_904_Picture_16.jpeg)
+![](images/_page_904_Picture_16.jpeg)
 
-![](_page_904_Picture_17.jpeg)
+![](images/_page_904_Picture_17.jpeg)
 
-![](_page_904_Figure_18.jpeg)
+![](images/_page_904_Figure_18.jpeg)
 
 ### Substitution Systems
 
@@ -447,7 +447,7 @@ If[OddQ[n], Sign[Mod[Binomial[n - 1, (n - 1)/2], 3]], 0, 1]
 
 There are `3^t` elements after *t* steps, of which `2^t` are black. The picture below shows the number of black cells that occur before position *n*. The resulting curve has a nested form, with envelope `n^Log[3, 2]`.
 
-![](_page_905_Figure_8.jpeg)
+![](images/_page_905_Figure_8.jpeg)
 
 ■ **Growth rates.** The total number of elements of each color that occur at each step in a neighbor-independent substitution system can be found by forming the matrix *m* where `m[[i, j]]` gives the number of elements of color *j* + 1 that appear in the block that replaces an element of color *i* + 1. For case (c) above, `m = {{1, 1}, {1, 0}}`. A list that gives the number of elements of each color at step *t* can then be found from `init . MatrixPower[m, t]`, where `init` gives the initial number of elements of each color—`{1, 0}` for case (c) above. For large *t*, the total number of elements typically grows like `λ^t`, where `λ` is the largest eigenvalue of *m*; the relative numbers of elements of each color are given by the corresponding eigenvector. For case (c), `λ` is `GoldenRatio`, or `(1 + Sqrt[5])/2`. There are exceptional cases where `λ == 1`, so that the growth is not exponential. For the rule `{0 -> {0, 1}, 1 -> {1}}`, `m = {{1, 1}, {0, 1}}`, and the number of elements at step *t* starting with `{0}` is just *t*. For `{0 -> {0, 1}, 1 -> {1, 2}, 2 -> {2}}`, `m = {{1, 1, 0}, {0, 1, 1}, {0, 0, 1}}`, and the number of elements starting with `{0}` is `(t^2 - t + 2)/2`. For neighbor-independent rules, the growth for large *t* must follow an exponential or an integer power less than the number of possible colors. For neighbor-dependent rules, any form of growth can in principle be obtained.
 
@@ -494,7 +494,7 @@ The sequence `Mod[Fibonacci[n], k]` is always purely repetitive; the maximum per
 
 `Mod[Fibonacci[n], n]` has the fairly complicated form shown below. It appears to be zero only when *n* is of the form `5^m` or 12 *q*, where *q* is not prime (*q* > 5).
 
-![](_page_906_Figure_6.jpeg)
+![](images/_page_906_Figure_6.jpeg)
 
 The number `GoldenRatio` appears to have been used in art and architecture since antiquity. `1/GoldenRatio` is the default `AspectRatio` for *Mathematica* graphics. In addition:
 
@@ -502,7 +502,7 @@ The number `GoldenRatio` appears to have been used in art and architecture since
 
 ▪ The right-hand rectangle in
 
-![Golden-ratio rectangle](_page_906_golden_ratio_rectangle.jpeg)
+![Golden-ratio rectangle](images/_page_906_golden_ratio_rectangle.jpeg)
 
 is similar to the whole rectangle when the aspect ratio is `GoldenRatio`.
 
@@ -542,23 +542,23 @@ To treat examples such as case (c) where elements can subdivide into blocks of s
 
 ■ **Representation by paths.** An alternative to representing substitution systems by 1D sequences of black and white squares is to use 2D paths consisting of sequences of left and right turns. The paths obtained at successive steps for rule (b) above are shown below.
 
-![Paths for successive steps of rule (b)](_page_907_rule_b_path_evolution.jpeg)
+![Paths for successive steps of rule (b)](images/_page_907_rule_b_path_evolution.jpeg)
 
 The pictures below show paths obtained with the rule `{1 -> {1}, 0 -> {0, 0, 1}}`, starting from `{0}`. Note the similarity to the 2D system shown on page 190.
 
-![](_page_907_Picture_7.jpeg)
+![](images/_page_907_Picture_7.jpeg)
 
 When the paths do not cross themselves, nested structure is evident. But in a case like the rule `{1 -> {0, 0, 1}, 0 -> {1, 0}}` starting with `{1}`, the presence of many crossings tends to hide such regularity, as in the pictures below.
 
-![](_page_907_Picture_9.jpeg)
+![](images/_page_907_Picture_9.jpeg)
 
 ■ **Paperfolding sequences.** The sequence of up and down creases in a strip of paper that is successively folded in half is given by a substitution system; after *t* steps the sequence turns out to be `NestList[Join[#, {0}, Reverse[1 - #]] &, {0}, t]`. The corresponding path (effectively obtained by making each crease a right angle) is shown below. (See page 189.)
 
-![](_page_907_Picture_11.jpeg)
+![](images/_page_907_Picture_11.jpeg)
 
 ■ **2D representations.** Individual sequences from 1D substitution systems can be displayed in 2D by breaking them into a succession of rows. The pictures below show results for the substitution systems on page 83. In case (b), with rows chosen to be `2^j` elements in length, the leftmost column will always be identical to the beginning of the sequence, and in addition every interior element will be black exactly when the cell at the top of its column has the same color as the one at the beginning of its row. In case (c), stripes appear at angles related to `GoldenRatio`.
 
-![](_page_907_Figure_13.jpeg)
+![](images/_page_907_Figure_13.jpeg)
 
 ■ **Page 84 · Other examples.**
 
@@ -697,7 +697,7 @@ CTListStep[{rules_, list_}] :=
 
 ■ **Mechanical implementation.** Cyclic tag systems admit a particularly straightforward mechanical implementation. Black and white balls are kept in a trough as in the picture below. At each step the leftmost ball in the trough is released, and if this ball is black (as determined, for example, by size) a mechanism causes a new block of balls to be added at the right-hand end of the trough. This mechanism can work in several ways; typically it will involve a rotary element that determines which case of the rule to use at each step. Rule (e) from the main text allows a particularly simple supply of new balls. Note that the system will inevitably fail if the trough overflows with balls.
 
-![Mechanical cyclic tag system trough](_page_910_cyclic_tag_trough.jpeg)
+![Mechanical cyclic tag system trough](images/_page_910_cyclic_tag_trough.jpeg)
 
 ■ **Page 96 · Properties.** Assuming that black and white elements occur in an uncorrelated way, then the sequences in a cyclic tag system with *n* blocks should grow by an average of `Count[Flatten[rules], 1]/n - 1` elements at each step. With *n* = 2 blocks, this means that growth can occur only if the total number of black elements in both blocks is more than 3. Rules such as `{{1, 0}, {0, 1}}` and `{{1, 1}, {0}}` therefore yield repetitive behavior with sequences of limited length.
 
@@ -761,7 +761,7 @@ Note that by being able to add and subtract only 1 at each step, the register ma
 
 ■ **Representations.** Among the representations that can be used for expressions are:
 
-![Functional, Polish, operator and tree representations of symbolic expressions](_page_911_symbolic_representation_table.jpeg)
+![Functional, Polish, operator and tree representations of symbolic expressions](images/_page_911_symbolic_representation_table.jpeg)
 
 Typical transformation rules are non-local in all these representations. Polish representation (whose reverse form has been used in HP calculators) for an expression can be obtained using (see also page 1173)
 
@@ -806,7 +806,7 @@ FoldList[Plus, 0, Flatten[Table[
 
 This quantity alternates between value 1 at position `2^j` and value *j* at position `2^j - j + 1`. It reaches a fixed point as soon as the depth reaches 0. For initial conditions of size *n*, this occurs after at most `Sum[Nest[2^# &, 0, i] - 1, {i, n}] + 1` steps. (See also page 1145.)
 
-![](_page_912_Figure_15.jpeg)
+![](images/_page_912_Figure_15.jpeg)
 
 ■ **Other rules.** If only a single variable appears in the rule, then typically only nested behavior can be generated—though in an example like `e[x_][_] -> e[x[e[e][e]][e]]` it can be quite complex. The left-hand side of each rule can consist of any expression; `e[e[x_]][y_]` and `e[e][x_[y_]]` are two possibilities. However, at least with small initial conditions it seems easier to achieve complex behavior with rules based on `e[x_][y_]`. Note that rules with no explicit `e`’s on the left-hand side always give trees with regular nested structures; `x_[y_] -> x[y][x[y]]` (or `x_ -> x[x]` in *Mathematica*), for example, yields balanced binary trees.
 
@@ -814,11 +814,11 @@ This quantity alternates between value 1 at position `2^j` and value *j* at posi
 
 ■ **Trees.** The rules given on pages 103 and 104 correspond to the transformations on trees shown below.
 
-![](_page_912_Figure_19.jpeg)
+![](images/_page_912_Figure_19.jpeg)
 
 The first few steps in evolution from two initial conditions of the system on page 103 correspond to the sequences of trees below.
 
-![](_page_912_Figure_21.jpeg)
+![](images/_page_912_Figure_21.jpeg)
 
 ■ **Order dependence.** The operation `expr /. lhs -> rhs` in *Mathematica* has the effect of scanning the functional representation of `expr` from left to right, and applying rules whenever possible while avoiding overlaps. (Standard evaluation in *Mathematica* is equivalent to `expr //. rules` and uses the same ordering, while `Map` uses a different order.) One can have a rule be applied only once using
 
@@ -836,19 +836,19 @@ Constructs like combinators appear to have almost never been studied in mainstre
 
 `x_ -> x ∘ x`
 
-![](_page_913_Picture_8.jpeg)
+![](images/_page_913_Picture_8.jpeg)
 
 `x_ ∘ y_ -> (y ∘ x) ∘ y`
 
-![](_page_913_Picture_9.jpeg)
+![](images/_page_913_Picture_9.jpeg)
 
 `x_ ∘ y_ -> (y ∘ y) ∘ (x ∘ x)`
 
-![](_page_913_Picture_10.jpeg)
+![](images/_page_913_Picture_10.jpeg)
 
 `x_ ∘ y_ -> y ∘ (x ∘ x)`
 
-![](_page_913_Picture_11.jpeg)
+![](images/_page_913_Picture_11.jpeg)
 
 ■ **Network analogs.** The state of a symbolic system can always be viewed as corresponding to a tree. If a more general network is allowed then rules based on analogs of network substitution systems from page 508 can be used. (One can also construct an infinite tree from a general network by following all its possible paths, as on page 277, but in most cases there will be no simple way to apply symbolic system rules to such a tree.)
 

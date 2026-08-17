@@ -38,7 +38,7 @@ EXPECTED_ROLES = (
         "percolation-connectivity-analysis",
         "observer",
         (
-            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
+            "BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md:"
             "L497-498",
         ),
         (
