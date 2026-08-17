@@ -12,9 +12,8 @@
 3. [Goal 3](goal-3/0-plan.md) — source-verified correction and release of the
    canonical *A New Kind of Science* Markdown corpus. Complete; its compact
    historical plan and release record remain.
-4. [Goal 4](goal-4/0-plan.md) — superseded whole-book audit attempt. Inert
-   historical material only; it is not a live authority, dependency, or
-   execution goal.
+4. [Goal 4](goal-4/README.md) — retired whole-book audit attempt. Its stale
+   generated machinery was removed; one archival record remains.
 5. [Goal 5](goal-5/taxonomy-census.md) — completed whole-book construction
    taxonomy and five-field API audit. Complete: 60 executable semantic
    families, two close non-family roles, 41 family-level additions, and no
