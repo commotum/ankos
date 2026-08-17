@@ -326,37 +326,6 @@ def _preset_cases():
     )
 
 
-@pytest.mark.parametrize(
-    ("name", "delegate_name", "arguments"),
-    _preset_cases(),
-)
-def test_each_preset_delegates_to_its_canonical_family(
-    monkeypatch,
-    name: str,
-    delegate_name: str,
-    arguments: dict[str, object],
-) -> None:
-    expected = object()
-    received = []
-
-    def delegate(**components):
-        received.append(components)
-        return expected
-
-    monkeypatch.setattr(substitua, delegate_name, delegate)
-
-    assert getattr(substitua, name)(**arguments) is expected
-    assert len(received) == 1
-    assert tuple(received[0]) == (
-        "seed",
-        "alphabet",
-        "frontier",
-        "neighborhood",
-        "rule",
-    )
-    assert all(received[0][name] is not None for name in received[0])
-
-
 def test_constant_digit_and_fixed_recursive_sequences_apply_and_roundtrip() -> None:
     digit_program = substitua.constant_digit_sequence(
         base=10,

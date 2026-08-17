@@ -1,39 +1,21 @@
 """Whole-program constructors for continuous and differential relations.
 
-This module owns audited constructions defined by continuous flow, event, or
-differential-field laws.  It does not own numerical solvers, integration
-policy, component mechanics, metadata, application dispatch, or sampled
-approximations.  Its constructors compose exact or intensional five-field
-``SimpleProgram`` values whose realizations remain external.
-
-The three canonical constructors expose the five component values directly.
-The migration matrix's semantic parameter lists remain descriptive metadata.
-The one true alias copies its canonical delegate's exact parameter surface.
+This module retains the source-facing contracts for continuous flow, event,
+and differential-field builders.  They remain explicit progress stubs until
+their exact descriptor languages and lowerings are implemented.
 """
 
 from __future__ import annotations
 
-from .. import alphabets, frontiers, neighborhoods, rules, seeds
+from typing import NoReturn
+
 from ..program import SimpleProgram
 
 
-def _program(
-    *,
-    seed: seeds.Seed,
-    alphabet: alphabets.Alphabet,
-    frontier: frontiers.WritableRegion,
-    neighborhood: neighborhoods.ReadableRegion,
-    rule: rules.Rule,
-) -> SimpleProgram:
-    """Compose one ordinary catalog-free program value."""
+def _not_implemented() -> NoReturn:
+    """Mark one canonical family builder as unfinished."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    raise NotImplementedError("canonical family builder is not implemented")
 
 
 # ---------------------------------------------------------------------------
@@ -43,59 +25,39 @@ def _program(
 
 def continuous_event_dynamics(
     *,
-    seed: seeds.Seed,
-    alphabet: alphabets.Alphabet,
-    frontier: frontiers.WritableRegion,
-    neighborhood: neighborhoods.ReadableRegion,
-    rule: rules.Rule,
+    seed,
+    geometry,
+    flow_law,
+    reset_law,
+    terminal_condition,
 ) -> SimpleProgram:
     """SPF006 / F006: flow to an intrinsic event and apply its reset."""
 
-    return _program(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def ordinary_differential_flow(
     *,
-    seed: seeds.Seed,
-    alphabet: alphabets.Alphabet,
-    frontier: frontiers.WritableRegion,
-    neighborhood: neighborhoods.ReadableRegion,
-    rule: rules.Rule,
+    seed,
+    rhs,
+    parameters,
+    duration_or_event,
 ) -> SimpleProgram:
     """SPF036 / F037: denote a selected or maximal ordinary flow segment."""
 
-    return _program(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def partial_differential_relation(
     *,
-    seed: seeds.Seed,
-    alphabet: alphabets.Alphabet,
-    frontier: frontiers.WritableRegion,
-    neighborhood: neighborhoods.ReadableRegion,
-    rule: rules.Rule,
+    domain,
+    coefficients,
+    differential_relation,
+    side_data,
 ) -> SimpleProgram:
     """SPF039 / F041: denote every field satisfying a differential relation."""
 
-    return _program(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 # ---------------------------------------------------------------------------
@@ -105,20 +67,18 @@ def partial_differential_relation(
 
 def pde(
     *,
-    seed: seeds.Seed,
-    alphabet: alphabets.Alphabet,
-    frontier: frontiers.WritableRegion,
-    neighborhood: neighborhoods.ReadableRegion,
-    rule: rules.Rule,
+    domain,
+    coefficients,
+    differential_relation,
+    side_data,
 ) -> SimpleProgram:
     """An alias for SPF039 with the canonical differential-relation signature."""
 
     return partial_differential_relation(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
+        domain=domain,
+        coefficients=coefficients,
+        differential_relation=differential_relation,
+        side_data=side_data,
     )
 
 

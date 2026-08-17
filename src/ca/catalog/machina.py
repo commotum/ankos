@@ -1,15 +1,15 @@
-"""Ordinary five-component constructors for controllers and machines.
+"""Whole-program builders and implementation-progress stubs for machines.
 
-Canonical family names assemble already-closed components into
-:class:`~ca.program.SimpleProgram` values.  They attach no family identity,
-perform no execution dispatch, and contain no hidden interpreter.
+Concrete presets compile visible machine mechanics into ordinary programs.
+Canonical family names keep their semantic source surfaces and remain honest
+stubs until those general lowerings are implemented.
 """
 
 from __future__ import annotations
 
 from itertools import product as cartesian_product
 from math import prod
-from typing import TypeVar
+from typing import NoReturn, TypeVar
 import warnings
 
 from .. import alphabets, frontiers, loci, neighborhoods, rules, seeds
@@ -22,6 +22,25 @@ W = TypeVar("W")
 R = TypeVar("R")
 
 
+def _program(
+    *,
+    seed: seeds.Seed[C],
+    alphabet: alphabets.Alphabet[V],
+    frontier: frontiers.WritableRegion[C, W],
+    neighborhood: neighborhoods.ReadableRegion[C, R],
+    rule: rules.Rule[R, W, C],
+) -> SimpleProgram[C, V, W, R]:
+    """Compose one ordinary catalog-free program value for a real preset."""
+
+    return SimpleProgram(seed, alphabet, frontier, neighborhood, rule)
+
+
+def _not_implemented() -> NoReturn:
+    """Mark one canonical family builder as unfinished."""
+
+    raise NotImplementedError("canonical family builder is not implemented")
+
+
 # ---------------------------------------------------------------------------
 # Phase 1. Canonical families
 # ---------------------------------------------------------------------------
@@ -29,154 +48,100 @@ R = TypeVar("R")
 
 def enumerative_semidecision(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF010 / F011 structural profile."""
+    query,
+    enumeration,
+    predicate,
+    start,
+) -> SimpleProgram:
+    """SPF010 / F011: enumerate until the first witnessed positive answer."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def finite_gate_circuit(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF013 / F014 structural profile."""
+    inputs,
+    wiring,
+    gates,
+    schedule,
+    measurement,
+) -> SimpleProgram:
+    """SPF013 / F014: apply fixed wiring and visible gate-layer control."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def mobile_head_grid_rewrite(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF030 / F031 structural profile."""
+    tape,
+    transitions,
+    head,
+    stencil,
+    boundary,
+) -> SimpleProgram:
+    """SPF030 / F031: atomically rewrite a tagged head and its destination."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def nearest_neighbor_retrieval(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF035 / F036 structural profile."""
+    items,
+    query,
+    metric,
+    index,
+    traversal,
+) -> SimpleProgram:
+    """SPF035 / F036: traverse an index and return every nearest witness."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def recursive_function_evaluator(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF044 / F047 structural profile."""
+    call,
+    definitions,
+    evaluation_order,
+    cache,
+) -> SimpleProgram:
+    """SPF044 / F047: reduce recursive calls with visible frames and cache."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def register_machine(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF045 / F048 structural profile."""
+    program,
+    registers,
+    entry,
+) -> SimpleProgram:
+    """SPF045 / F048: commit one fetched register instruction atomically."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def stored_program_random_access_machine(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF048 / F051 structural profile."""
+    memory,
+    entry,
+    instruction_set,
+) -> SimpleProgram:
+    """SPF048 / F051: execute visible writable code and indirect memory."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 def priority_dovetailed_oracle_construction(
     *,
-    seed: seeds.Seed[C],
-    alphabet: alphabets.Alphabet[V],
-    frontier: frontiers.WritableRegion[C, W],
-    neighborhood: neighborhoods.ReadableRegion[C, R],
-    rule: rules.Rule[R, W, C],
-) -> SimpleProgram[C, V, W, R]:
-    """Assemble the SPF053 / F056 structural profile."""
+    approximations,
+    machines,
+    requirements,
+    priority,
+    fair_schedule,
+) -> SimpleProgram:
+    """SPF053 / F056: dovetail work with explicit priority and injury state."""
 
-    return SimpleProgram(
-        seed=seed,
-        alphabet=alphabet,
-        frontier=frontier,
-        neighborhood=neighborhood,
-        rule=rule,
-    )
+    _not_implemented()
 
 
 # ---------------------------------------------------------------------------
@@ -430,7 +395,7 @@ def _machine_program(
         conflict_policy=rules.ProposalConflictPolicy.REQUIRE_EQUAL,
         selection=rules.ClauseSelection.FIRST,
     )
-    return mobile_head_grid_rewrite(
+    return _program(
         seed=seeds.exact(source, value_profile=alphabet.value_profile),
         alphabet=alphabet,
         frontier=writable,
@@ -565,7 +530,7 @@ def _global_turing_program(
         ),
         selection=rules.ClauseSelection.FIRST,
     )
-    return mobile_head_grid_rewrite(
+    return _program(
         seed=seeds.exact(source, value_profile=alphabet.value_profile),
         alphabet=alphabet,
         frontier=writable,

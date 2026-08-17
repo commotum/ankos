@@ -1,8 +1,8 @@
 """Goal 7 exact sixty-family coverage join.
 
 G7-02 owns the mechanics partition, direct ordinary-program fixtures,
-secondary pressure joins, and exclusions.  G7-04 will add the canonical
-constructor and metadata joins without changing this mechanics ledger.
+secondary pressure joins, and exclusions.  These test-owned fixtures exercise
+the generic runtime; they do not claim that a public family builder exists.
 """
 
 from collections import Counter
@@ -11,7 +11,6 @@ import pytest
 
 from ca import loci
 from ca.catalog import entries
-import ca.catalog as catalog
 
 from g7_mechanics import (
     MECHANICS_ROWS,
@@ -23,8 +22,6 @@ from g7_mechanics import (
     run_mechanics_fixture,
     run_secondary_fixture,
 )
-from helpers import assert_closed_descriptor
-
 
 
 def test_primary_pressure_partition_contains_each_spf001_through_spf060_once() -> None:
@@ -41,32 +38,8 @@ def test_primary_pressure_partition_contains_each_spf001_through_spf060_once() -
     )
 
 
-def test_every_family_constructor_returns_a_closed_compatible_simple_program() -> None:
-    """One representative closed argument set expands each canonical constructor."""
-
-    metadata = {item.family_id: item for item in entries.FAMILY_ENTRIES}
-
-    for row in MECHANICS_ROWS:
-        execution = run_mechanics_fixture(row)
-        entry = metadata[row.spf]
-        owner = getattr(catalog, entry.home)
-        constructor = getattr(owner, entry.constructor_name)
-        actual = constructor(
-            seed=execution.simple_program.seed,
-            alphabet=execution.simple_program.alphabet,
-            frontier=execution.simple_program.frontier,
-            neighborhood=execution.simple_program.neighborhood,
-            rule=execution.simple_program.rule,
-        )
-
-        assert type(actual) is type(execution.simple_program)
-        assert actual == execution.simple_program
-        assert_closed_descriptor(actual)
-        assert getattr(catalog, entry.constructor_name) is constructor
-
-
 def test_every_family_joins_exact_spf_f_home_source_and_pressure_metadata() -> None:
-    """Callable expansion and callable-free provenance agree row by row."""
+    """Taxonomy provenance and the test mechanics ledger agree row by row."""
 
     metadata = {item.family_id: item for item in entries.FAMILY_ENTRIES}
 

@@ -38,21 +38,8 @@ _RESERVED_CATALOG_EXPORTS = {
 }
 
 
-def _program_arguments(simple_program: ca.SimpleProgram) -> dict[str, object]:
-    return {
-        name: getattr(simple_program, name)
-        for name in _FIVE_FIELDS
-    }
-
-
 def _canonical_rows_by_id() -> dict[str, tuple[str, ...]]:
     return {row[0]: row for row in CANONICAL_ROWS}
-
-
-def _canonical_callable(family_id: str):
-    row = _canonical_rows_by_id()[family_id]
-    slug, home = row[2], row[3]
-    return getattr(getattr(ca.catalog, home), slug.replace("-", "_"))
 
 
 def _evidence() -> rules.EvidenceTerm:
@@ -445,8 +432,8 @@ def _preset_programs() -> dict[str, ca.SimpleProgram]:
     return programs
 
 
-def test_sixty_canonical_constructors_have_exact_metadata_and_one_home() -> None:
-    """Every SPF row expands once through its locked category owner."""
+def test_sixty_family_rows_have_exact_metadata_and_one_home() -> None:
+    """Every SPF taxonomy row has one declared category owner."""
 
     actual_rows = tuple(
         (
@@ -485,18 +472,6 @@ def test_sixty_canonical_constructors_have_exact_metadata_and_one_home() -> None
         )
         for row in CANONICAL_ROWS
     )
-
-    reference = automata.eca(rule=30, width=5)
-    for row in CANONICAL_ROWS:
-        constructor = _canonical_callable(row[0])
-        constructed = constructor(**_program_arguments(reference))
-        reexpanded = constructor(**_program_arguments(constructed))
-
-        assert type(constructed) is ca.SimpleProgram
-        assert reexpanded == constructed
-        assert tuple(field.name for field in fields(constructed)) == _FIVE_FIELDS
-        assert set(constructed.__dict__) == set(_FIVE_FIELDS)
-
 
 def test_t01_through_t45_match_the_exact_expected_migration_manifest() -> None:
     """Targets, kinds, spellings, bindings, owners, and exports match row by row."""
@@ -557,7 +532,7 @@ def test_t01_through_t45_match_the_exact_expected_migration_manifest() -> None:
 
 
 def test_canonical_preset_alias_and_compatibility_relations_are_exact() -> None:
-    """C/P/A/K callables obey their expansion or total translation contracts."""
+    """Implemented presets and compatibility adapters retain their behavior."""
 
     programs = _preset_programs()
     expected_presets = {
@@ -569,44 +544,24 @@ def test_canonical_preset_alias_and_compatibility_relations_are_exact() -> None:
     assert set(programs) == expected_presets
     assert len(programs) == 40
 
-    target_by_spelling = {
-        row[0]: row[3]
-        for row in LEGACY_CALLABLE_ROWS
-        if row[2] == "P"
-    }
-    target_by_spelling["look_and_say"] = "SPF012"
     for spelling, simple_program in programs.items():
-        canonical = _canonical_callable(target_by_spelling[spelling])
-        expanded = canonical(**_program_arguments(simple_program))
         encoded = serialization.dumps(simple_program)
 
-        assert expanded == simple_program
-        assert serialization.dumps(expanded) == encoded
+        assert type(simple_program) is ca.SimpleProgram
         assert serialization.loads(encoded) == serialization.Decoded(
             simple_program
         )
         assert b"catalog:" not in encoded
         assert b"catalog-source-evidence" not in encoded
-        assert tuple(field.name for field in fields(expanded)) == _FIVE_FIELDS
-        assert not hasattr(expanded, "family_id")
-        assert not hasattr(expanded, "catalog_spelling")
+        assert tuple(field.name for field in fields(simple_program)) == _FIVE_FIELDS
+        assert not hasattr(simple_program, "family_id")
+        assert not hasattr(simple_program, "catalog_spelling")
 
     reference = automata.eca(rule=90, width=5)
     assert automata.elementary_cellular_automaton(
         rule=90,
         width=5,
     ) == reference
-    assert substitua.multiway_system(**_program_arguments(reference)) == (
-        substitua.multiway_rewrite(**_program_arguments(reference))
-    )
-    assert substitua.network_rewrite(**_program_arguments(reference)) == (
-        substitua.parallel_network_rewrite(**_program_arguments(reference))
-    )
-    assert ca.catalog.dynamica.pde(**_program_arguments(reference)) == (
-        ca.catalog.dynamica.partial_differential_relation(
-            **_program_arguments(reference)
-        )
-    )
 
     neighbor_arguments = {
         "initial": (0, 1, 0),

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import fields, is_dataclass
-from fractions import Fraction
 import inspect
 from itertools import product as cartesian_product
 from types import ModuleType
@@ -11,7 +10,7 @@ from types import ModuleType
 import pytest
 
 import ca
-from ca import alphabets, loci, rules, serialization
+from ca import loci
 from ca.catalog import automata, criteria, dynamica, entries, machina, substitua
 
 
@@ -24,16 +23,6 @@ NAVIGATION_NAMES = (
     "criteria",
     "dynamica",
 )
-
-
-def _components(simple_program: ca.SimpleProgram) -> dict[str, object]:
-    return {
-        "seed": simple_program.seed,
-        "alphabet": simple_program.alphabet,
-        "frontier": simple_program.frontier,
-        "neighborhood": simple_program.neighborhood,
-        "rule": simple_program.rule,
-    }
 
 
 def _assert_inert(value: object) -> None:
@@ -93,23 +82,24 @@ def test_catalog_flat_exports_are_explicit_and_collision_free() -> None:
     assert actual.isdisjoint(set(ca.__all__))
 
 
-def test_catalog_constructors_return_ordinary_expanded_simple_programs() -> None:
-    reference = automata.eca(rule=30, width=5)
-
+def test_canonical_builder_signatures_match_their_semantic_metadata() -> None:
     for entry in entries.FAMILY_ENTRIES:
         owner = getattr(ca.catalog, entry.home)
-        constructor = getattr(owner, entry.constructor_name)
-        constructed = constructor(**_components(reference))
+        builder = getattr(owner, entry.constructor_name)
+        parameters = tuple(inspect.signature(builder).parameters.values())
 
-        assert type(constructed) is ca.SimpleProgram
-        assert constructed == reference
-        assert getattr(ca.catalog, entry.constructor_name) is constructor
-        encoded = serialization.dumps(constructed)
-        assert serialization.loads(encoded) == serialization.Decoded(
-            constructed
+        assert tuple(parameter.name for parameter in parameters) == (
+            entry.closed_parameters
         )
-        assert b"SPF" not in encoded
-        assert b"catalog" not in encoded
+        assert all(
+            parameter.kind is inspect.Parameter.KEYWORD_ONLY
+            for parameter in parameters
+        )
+        assert all(
+            parameter.default is inspect.Parameter.empty
+            for parameter in parameters
+        )
+        assert getattr(ca.catalog, entry.constructor_name) is builder
 
 
 def test_catalog_metadata_is_immutable_and_callable_free() -> None:
@@ -132,65 +122,19 @@ def test_catalog_metadata_is_immutable_and_callable_free() -> None:
         assert "from .entries import" not in source
 
 
-def test_alias_preset_and_compatibility_relations_preserve_exact_expansion() -> None:
-    reference = automata.eca(rule=90, width=5)
-    components = _components(reference)
-
+def test_alias_and_compatibility_relations_preserve_their_public_contracts() -> None:
     for alias, delegate in (
         (substitua.multiway_system, substitua.multiway_rewrite),
         (substitua.network_rewrite, substitua.parallel_network_rewrite),
         (dynamica.pde, dynamica.partial_differential_relation),
     ):
         assert inspect.signature(alias) == inspect.signature(delegate)
-        assert alias(**components) == delegate(**components)
 
     assert inspect.signature(automata.elementary_cellular_automaton) == (
         inspect.signature(automata.eca)
     )
     assert automata.elementary_cellular_automaton(rule=110, width=7) == (
         automata.eca(rule=110, width=7)
-    )
-
-    eca = automata.eca(rule=30, width=5)
-    assert automata.synchronous_local_state_transform(
-        **_components(eca)
-    ) == eca
-
-    partial = alphabets.word_value((0,), tag="partial")
-    templates = alphabets.word_value((0,), tag="templates")
-    cardinality = rules.Undetermined(
-        rules.literal_expr("not-enumerated"),
-        rules.Certificate(
-            rules.CertificateKind.CARDINALITY,
-            rules.literal_expr("cardinality-obligation"),
-        ),
-    )
-    template = criteria.template_constraint_system(
-        partial_assignment=partial,
-        allowed_templates=templates,
-        relation=rules.literal_expr("satisfies"),
-        cardinality=cardinality,
-    )
-    assert criteria.local_satisfaction_relation(
-        **_components(template)
-    ) == template
-    assert inspect.signature(criteria.template_constraint_system) != (
-        inspect.signature(criteria.local_satisfaction_relation)
-    )
-
-    continuous = automata.continuous_cellular_automaton(
-        initial=(Fraction(1, 2),),
-        local_rule=rules.project(rules.group(0), 1),
-        boundary=loci.Boundary(
-            loci.BoundaryPolicy.FIXED,
-            Fraction(0),
-        ),
-    )
-    assert automata.synchronous_local_state_transform(
-        **_components(continuous)
-    ) == continuous
-    assert inspect.signature(automata.continuous_cellular_automaton) != (
-        inspect.signature(automata.synchronous_local_state_transform)
     )
 
     legacy_arguments = {
