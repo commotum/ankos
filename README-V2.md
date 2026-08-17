@@ -185,9 +185,13 @@ presets. Component constructors remain module-qualified, so
 
 ## Catalog
 
-The catalog contains one canonical constructor for each of the 60 audited
-executable semantic families. The six namespaces organize discovery by
-dominant mechanic; they do not define runtime classes:
+The catalog inventories 60 audited executable semantic families. Their 60
+canonical family spellings are currently **development stubs and progress
+markers**, not implemented family constructors. The presence of a callable or
+exported canonical name does not mean that it compiles the family's planned
+parameters, validates family membership, or certifies implementation
+coverage. The six namespaces organize discovery by dominant mechanic; they do
+not define runtime classes:
 
 | Namespace | Dominant mechanic |
 |---|---|
@@ -198,8 +202,10 @@ dominant mechanic; they do not define runtime classes:
 | `ca.catalog.criteria` | Admissibility, constraints, witnesses, or weighted alternatives |
 | `ca.catalog.dynamica` | Continuous differential, field, event, or flow laws |
 
-Canonical constructors are available both through their owner and through the
-collision-free catalog façade:
+Implemented parameter presets are a separate surface. A preset may bind and
+validate source-facing parameters even while its target canonical family name
+remains a stub. Presets are available both through their owner and through the
+collision-free catalog façade; `eca` is one implemented example:
 
 ```python
 qualified = ca.catalog.automata.eca(rule=30, width=79)
@@ -210,8 +216,9 @@ assert qualified == convenient
 
 Catalog metadata in `ca.catalog.entries` is immutable and callable-free.
 Family, audit, and legacy IDs support provenance and navigation only; none can
-select application behavior. Constructor spelling and arguments are not part
-of program identity.
+select application behavior. Catalog spelling and arguments are not part of
+program identity, and taxonomy coverage must not be reported as family
+implementation progress.
 
 ## Application results
 

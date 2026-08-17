@@ -22,21 +22,32 @@
 6. [Goal 6](goal-6/0-plan.md) — completed architecture remaster. It rebuilds
    the frozen Goal 2 plan around
    `SimpleProgram(seed, alphabet, frontier, neighborhood, rule)`, the finalized
-   core/catalog structure, and all 60 audited families without changing
-   runtime behavior. Its exact mechanics-first implementation contract is
+   core/catalog structure, and the design inventory for all 60 audited
+   families without changing runtime behavior. Its exact mechanics-first
+   implementation contract is
    [goal-7-handoff.md](goal-6/goal-7-handoff.md).
-7. [Goal 7](goal-7/0-plan.md) — five-field runtime implementation. Its
-   seven stages are complete: one immutable five-field `SimpleProgram`, one
-   family-blind `apply`, rollout through that operation, fail-closed canonical
-   serialization, and ordinary catalog constructors for all 60 audited
-   families now form the coherent `0.2.0` release candidate. Exact release
-   evidence is in [`7-RELEASE.md`](goal-7/7-RELEASE.md).
+
+## Reopened
+
+7. [Goal 7](goal-7/0-plan.md) — five-field runtime implementation. The
+   immutable `SimpleProgram`, family-blind `apply`, rollout, serialization,
+   and individually implemented presets are preserved. The prior claim that
+   callable wrappers implemented all 60 audited families is withdrawn: the 60
+   canonical family names are development stubs and progress markers, not
+   completed family builders or validators. Consequently the catalog portion
+   of Goal 7 is reopened and `0.2.0` is not a release candidate. The historical
+   stage and release records remain in `goal-7/` as records of the superseded
+   conclusion.
 
 ## Current State
 
-The live sequence—Goal 5 semantic authority, Goal 6 architecture, and Goal 7
-implementation—is complete. No later numbered goal is scaffolded. Goal 2
-remains frozen evidence; Goal 4 is superseded and excluded from the live path.
+Goal 5 remains the semantic authority and Goal 6 remains the architecture
+baseline. Goal 7's runtime core is preserved, but its catalog implementation
+is incomplete. No later numbered goal is scaffolded and there is currently no
+release candidate. Future progress must distinguish implemented presets from
+canonical family stubs and must not count a taxonomy name as an implementation.
+Goal 2 remains frozen evidence; Goal 4 is superseded and excluded from the live
+path.
 
 The canonical book source used by current and future work begins at
 [Contents.md](ref/A-New-Kind-of-Science/Contents.md), whose 29 document links

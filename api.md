@@ -117,16 +117,17 @@ components. A raw locus or selector grants neither read nor write permission.
 `frontiers.py` turns selectors into write capabilities;
 `neighborhoods.py` turns them into read views.
 
-## Catalog Constructors
+## Catalog Development Surface
 
-Whole-program semantic names live under `ca.catalog`:
+Whole-program catalog names live under `ca.catalog`:
 
 ```python
 same_kind_of_program = ca.catalog.eca(rule=30)
 ```
 
-The preferred convenience spelling is `ca.catalog.<constructor>`. Each
-constructor has exactly one source owner in one of six navigation modules:
+This example uses the implemented `eca` parameter preset. The preferred
+convenience spelling is `ca.catalog.<name>`. Each catalog name has exactly one
+source owner in one of six navigation modules:
 
 | Module | Dominant construction mechanic |
 |---|---|
@@ -138,15 +139,21 @@ constructor has exactly one source owner in one of six navigation modules:
 | `ca.catalog.dynamica` | Continuous differential, field, event, or flow laws |
 
 For example, `eca` is owned by `ca.catalog.automata` and is explicitly
-re-exported as `ca.catalog.eca`. These modules are for navigation and
-constructor ownership, not runtime classes.
+re-exported as `ca.catalog.eca`. These modules are for navigation and catalog
+ownership, not runtime classes.
 
-Every canonical constructor, parameter preset, compatibility name, and alias
-returns an ordinary five-field `SimpleProgram` and expands through ordinary
-component constructors. Catalog entries record status, sources, and name
-relations outside the five fields. Invoked spelling and arguments are not
-attached to the returned program. None has a privileged executor or influence
-on `ca.apply`.
+The 60 canonical family names are **development stubs and progress markers**.
+They do not, merely by existing, implement the semantic parameter inventory,
+validate membership in their named family, or certify that the family is
+supported. A family becomes implemented only when a real source-facing
+builder or validator and family-specific conformance evidence exist.
+
+Parameter presets have independent implementation status. An implemented
+preset binds or validates its documented source arguments and returns an
+ordinary five-field `SimpleProgram`; `eca` is one such preset. Catalog entries
+record taxonomy, sources, and name relations outside the five fields. Invoked
+spelling and arguments are not attached to a returned program, and no catalog
+name has a privileged executor or influence on `ca.apply`.
 
 Reusable pieces remain in the component modules. In particular,
 `ca.neighborhoods.eca()` is a Neighborhood preset, while
@@ -157,9 +164,10 @@ root-level `ca.eca`.
 is not an execution registry, and catalog IDs or family names never select an
 application algorithm.
 
-The 60 audited executable semantic families are coverage obligations and
-constructor destinations. They are not 60 subclasses, executor branches, or
-top-level fields.
+The 60 audited executable semantic families are design and coverage
+obligations. Their canonical names are currently stub destinations, not 60
+implemented constructors, subclasses, executor branches, or top-level fields.
+Presets may be implemented independently and must be assessed individually.
 
 ## Applying One Program
 
