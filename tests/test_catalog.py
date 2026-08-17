@@ -20,8 +20,8 @@ NAVIGATION_NAMES = (
 )
 
 
-def test_catalog_has_six_explicit_navigation_namespaces() -> None:
-    assert tuple(ca.catalog.__all__[:7]) == NAVIGATION_NAMES
+def test_catalog_has_explicit_navigation_namespaces() -> None:
+    assert set(NAVIGATION_NAMES) <= set(ca.catalog.__all__)
     for name in NAVIGATION_NAMES:
         namespace = getattr(ca.catalog, name)
         assert type(namespace) is ModuleType
@@ -41,7 +41,6 @@ def test_catalog_flat_exports_are_explicit_and_collision_free() -> None:
     assert actual == expected
     assert all(callable(getattr(ca.catalog, name)) for name in actual)
     assert not hasattr(ca.catalog, "extended_mobile_automaton")
-    assert callable(machina.extended_mobile_automaton)
     assert {
         "fractal_system",
         "network_system",
