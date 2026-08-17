@@ -1,6 +1,6 @@
 # `ca` 0.2.0 Public API
 
-Status: **runtime implemented and conformance-tested; canonical catalog builders unfinished**
+Status: **runtime implemented with minimal smoke coverage; canonical catalog builders unfinished**
 
 This documents the current 0.2.0-target public contract. It is not a release
 claim. The removed 0.1 `Dynamics` surface is retained only as a historical
