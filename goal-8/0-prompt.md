@@ -1,43 +1,31 @@
 # Goal 8 Copy-Paste Prompt
 
 ```text
-Work through goal-8/0-plan.md using the repeatable protocol in
-goal-8/0-loop.md.
+Work through goal-8/0-plan.md using goal-8/0-loop.md.
 
-The objective is to audit every one of the 60 canonical families in
-ref/types.csv against the canonical ref/A-New-Kind-of-Science corpus and the
-prior Goal 1, Goal 5, and Goal 6 evidence, then determine the complete
-evidence-backed range of SPACE coordinate specifications admitted by each
-family.
+Determine the complete evidence-backed SPACE coordinate range for every one of
+the 60 canonical families in ref/types.csv. Start real work immediately with
+Stage 1 and B001-B005, including SPF030 mobile-head-grid-rewrite.
 
-Time must always be explicit. For every discrete dynamic Space, application
-preserves every coordinate through t, adds a complete new slice at t+1,
-copies locations outside the Frontier into that slice unchanged, and never
-overwrites time t. Treat continuous, event-driven, one-shot, multiway, and
-relational cases honestly rather than forcing them into an integer-step grid.
+For each family, identify its minimal native Space, Book-shown or Book-stated
+variants, any broader range that can actually be proved, the boundary of that
+proof, and relevant encodings, exclusions, or honest unknowns. Time must be
+explicit. Discrete steps preserve all coordinates through t, add a complete
+slice at t+1, copy non-Frontier locations unchanged, and never overwrite t.
 
-Do not infer Space from family names, homes, CarrierKind, current stubs,
-runtime limits, renderings, or simulations. Resolve prior-goal references into
-the actual Book passages. Distinguish DEMONSTRATED, STATED, and rigorously
-ENTAILED Spaces from ENCODING_ONLY, CONJECTURAL, EXCLUDED, and
-UNDERDETERMINED claims. A phrase such as "probably 3D" is not evidence.
+Use Goal 5 only to locate mechanics, variants, and Book passages. Read the
+actual Book evidence. Consult Goal 1 or Goal 6 only for a concrete ambiguity.
+Do not rebuild old exhaustive audits, disposition irrelevant leads, or infer
+Space from names, CarrierKind, stubs, code, renderings, or simulations.
 
-Keep ref/types.csv, prior goals, and the canonical Book corpus unchanged.
-Produce normalized one-family-by-one-Space claims, a complete source ledger,
-an exact 60-row summary in book_index order, a generic Space vocabulary, a
-structural verifier, and a final synthesis inside goal-8/. Do not implement
-runtime or catalog changes.
+Create only goal-8/spaces.csv and goal-8/findings.md. Add conclusions as each
+family is reviewed; do not build preparatory ledgers or a custom verifier.
+Keep ref/types.csv, prior goals, runtime code, tests, and the Book unchanged.
 
-At each stage: sync actual files, update goal-8/0-plan.md with current facts,
-select the first incomplete stage, create or refresh its stage file from the
-template, perform only that stage, add evidence and no-cheating checks, run
-appropriate verification, record exact results, and fold the findings back
-into the plan before continuing.
-
-Completion means the original 60-family Space-range question is genuinely
-answered with exact source joins, explicit time, supported variants, rejected
-or encoding-only alternatives, and honestly bounded underdetermination. Do
-not treat passing tests or row counts as semantic evidence. Carry any separate
-publication or implementation work forward explicitly rather than pretending
-it is already complete.
+At each stage, sync actual state, update the plan only with material facts,
+perform the stage's family range, record concise results, run scope-appropriate
+checks, and continue. Completion means all 60 families directly answer the
+five questions in the plan, every supported claim has Book evidence or a
+bounded proof, and every remaining unknown is a genuine source limitation
+rather than unfinished work.
 ```
