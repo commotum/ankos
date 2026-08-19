@@ -1,549 +1,652 @@
-# `ca` 0.2.0 Public API
+# `ca` 0.2.0 Target Public API
 
-Status: **runtime implemented with minimal smoke coverage; canonical catalog builders unfinished**
+Status: **accepted architectural direction; runtime migration pending**
 
-This documents the current 0.2.0-target public contract. It is not a release
-claim. The removed 0.1 `Dynamics` surface is retained only as a historical
-source snapshot in
-[`README-V1.md`](README-V1.md).
+This document defines the target semantic API for the ANKoS refactor. The
+five-field runtime currently present in the repository still contains
+`frontier` and patch/disposition machinery; that implementation does **not**
+yet satisfy this contract.
 
-The complete validation, reconstruction, measure, and intensional contract is
-in [`goal-6/architecture.md`](goal-6/architecture.md).
+The ownership decisions in this document are authoritative for the refactor.
+Older Goal 6 documents remain useful historical records, but their
+`Seed + Alphabet + Frontier + Neighborhood + Rule` architecture and mutable
+patch vocabulary are superseded here.
 
-## One Program Value
+## One Definite Program Value
 
-Every executable construction is one immutable value with exactly five stored
-fields:
+Every executable `SimpleProgram` is one immutable value with exactly five
+definite fields, in this order:
 
 ```python
 @dataclass(frozen=True)
-class SimpleProgram(Generic[C, V, W, R]):
-    seed: Seed[C]
-    alphabet: Alphabet[V]
-    frontier: WritableRegion[C, W]
-    neighborhood: ReadableRegion[C, R]
-    rule: Rule[R, W, C]
+class SimpleProgram:
+    space: Space
+    alphabet: Alphabet
+    seed: Seed
+    neighborhood: Neighborhood
+    rule: Rule
 ```
-
-The fields have one responsibility each:
-
-| Field | Public meaning |
-|---|---|
-| `seed` | A closed source of valid initial configurations |
-| `alphabet` | The closed structural universe of semantic values |
-| `frontier` | The complete writable capability envelope for one application |
-| `neighborhood` | The complete readable view for one application |
-| `rule` | The closed relation from the readable/writable binding to typed atomic results |
-
-`C`, `V`, `W`, and `R` are type relationships, not additional fields.
-Configuration support, topology, geometry, defaults, boundary behavior,
-invariants, control, schedule, mutable program text, and visible entropy are
-ordinary typed data where the construction requires them.
-
-There is no `Domain`, `Shape`, `Boundary`, `ConfigurationSchema`,
-`UpdatePolicy`, scheduler, solver, RNG, or result-policy field.
-
-`Seed` produces immutable configurations. A configuration carries the
-structural information its program needs: carrier support, topology,
-geometry, defaults, side data, stable identities, invariants, and visible
-control state.
-Successors have the same configuration contract as their inputs, but they do
-not need to remain in the initial Seed's support. Seed governs initialization;
-Rule governs the transition or relation codomain.
-
-All five components are built from recognized, versioned structural
-descriptors. Closed does not mean finite: a descriptor may denote an infinite
-set, continuous field, probability measure, recursive object, or symbolic
-relation through a closed AST.
-Semantic descriptors may not contain arbitrary Python callbacks, generators,
-iterators, `Any`, executable formula strings, host CAS objects, ambient RNG
-state, or hidden solvers. Exact and represented numerical profiles remain
-explicit; machine floats never silently stand in for exact reals.
-
-## Constructing Programs
-
-The plural component modules construct one value for each program field:
-
-```python
-from fractions import Fraction
-
-import ca
-
-carrier = ca.loci.CarrierContract(
-    ca.loci.CarrierKind.GRID,
-    rank=1,
-    shape=(79,),
-    axes=("x",),
-)
-alphabet = ca.alphabets.boolean()
-boundary = ca.loci.Boundary(
-    ca.loci.BoundaryPolicy.FIXED,
-    False,
-)
-
-program = ca.SimpleProgram(
-    seed=ca.seeds.bernoulli(
-        ca.loci.literal(ca.loci.grid_loci((79,), axes=("x",))),
-        Fraction(1, 2),
-        configuration_contract=carrier,
-        value_profile=alphabet.value_profile,
-        boundary=boundary,
-    ),
-    alphabet=alphabet,
-    frontier=ca.frontiers.everywhere(
-        configuration_contract=carrier,
-        value_profile=alphabet.value_profile,
-    ),
-    neighborhood=ca.neighborhoods.eca(
-        configuration_contract=carrier,
-        value_profile=alphabet.value_profile,
-    ),
-    rule=ca.rules.elementary(30),
-)
-
-assert program == ca.catalog.eca(rule=30, width=79)
-```
-
-Within each plural module, the public progression is primitives, compounds,
-general constructors, then component presets.
-
-Composition always returns one component value. A product of several readable
-views is one `ReadableRegion`; a union of writable capabilities is one
-`WritableRegion`; a composition of clauses is one `Rule`. Construction does
-not add more fields to `SimpleProgram`.
-
-`loci.py` supplies shared identity and selector vocabulary for coordinates,
-spans, words, trees, graphs, products, fields, histories, and fresh
-components. A raw locus or selector grants neither read nor write permission.
-`frontiers.py` turns selectors into write capabilities;
-`neighborhoods.py` turns them into read views.
-
-## Catalog Development Surface
-
-Whole-program catalog names live under `ca.catalog`:
-
-```python
-same_kind_of_program = ca.catalog.eca(rule=30)
-```
-
-This example uses the implemented `eca` parameter preset. The preferred
-convenience spelling is `ca.catalog.<name>`. Each catalog name has exactly one
-source owner in one of six navigation modules:
-
-| Module | Dominant construction mechanic |
-|---|---|
-| `ca.catalog.automata` | Persistent carriers updated in place or in parallel |
-| `ca.catalog.substitua` | Matched structure replaced, grown, deleted, or branched |
-| `ca.catalog.machina` | Visible heads, control states, instructions, stacks, or schedules |
-| `ca.catalog.media` | Information transformed between distinct representations |
-| `ca.catalog.criteria` | Admissibility, constraints, witnesses, solutions, or weighted alternatives |
-| `ca.catalog.dynamica` | Continuous differential, field, event, or flow laws |
-
-For example, `eca` is owned by `ca.catalog.automata` and is explicitly
-re-exported as `ca.catalog.eca`. These modules are for navigation and catalog
-ownership, not runtime classes.
-
-The 60 canonical family names are **development stubs and progress markers**.
-They do not, merely by existing, implement the semantic parameter inventory,
-validate membership in their named family, or certify that the family is
-supported. A family becomes implemented only when a real source-facing
-builder or validator and family-specific conformance evidence exist.
-
-Parameter presets have independent implementation status. An implemented
-preset binds or validates its documented source arguments and returns an
-ordinary five-field `SimpleProgram`; `eca` is one such preset. Catalog entries
-record taxonomy, sources, and name relations outside the five fields. Invoked
-spelling and arguments are not attached to a returned program, and no catalog
-name has a privileged executor or influence on `ca.apply`.
-
-Reusable pieces remain in the component modules. In particular,
-`ca.neighborhoods.eca()` is a Neighborhood preset, while
-`ca.catalog.eca(...)` is a whole program. There is intentionally no ambiguous
-root-level `ca.eca`.
-
-`ca.catalog.entries` owns descriptive lookup, alias metadata, and sources. It
-is not an execution registry, and catalog IDs or family names never select an
-application algorithm.
-
-The 60 audited semantic-family taxonomy rows are design and implementation
-obligations. Their canonical names are currently stub destinations, not 60
-implemented constructors, subclasses, executor branches, or top-level fields.
-Presets may be implemented independently and must be assessed individually.
-
-## Applying One Program
-
-One family-blind operation is the semantic execution primitive:
-
-```python
-result = ca.apply(program, configuration)
-```
-
-Advanced callers may supply explicit trace lineage through the owned input
-record:
-
-```python
-application_input = ca.program.ApplicationInput(
-    configuration=configuration,
-    trace_lineage=ca.program.TraceLineage("caller-root"),
-)
-
-result = ca.apply(program, application_input)
-```
-
-`ApplicationInput` contains one immutable configuration and optional validated
-trace lineage. Direct application can derive root lineage canonically when it
-is omitted. Lineage is invocation evidence; it cannot alter Rule denotation,
-fresh structural identities, or semantic successor equality.
 
 Conceptually:
 
 ```text
-w = frontier.resolve(configuration)
-r = neighborhood.resolve(configuration)
-rule_result = rule.denote(r, w)
-application_result = validate_and_atomically_apply(rule_result)
+SimpleProgram =
+    SPACE
+  + ALPHABET
+  + SEED
+  + NEIGHBORHOOD
+  + RULE
 ```
 
-Frontier and Neighborhood resolve independently from the same immutable
-configuration. Rule receives only the readable view `R` and writable
-capability `W`; Frontier does not expose old values, and Rule does not receive
-unrestricted configuration access.
-
-The framework validates and reconstructs Rule results. It never chooses a
-match, schedule, collision winner, stochastic branch, deletion cascade, graph
-repair, or continuous endpoint. Those choices must already be explicit in
-Rule data and its result relation.
-
-### Rule results
-
-Each public boundary distinguishes a complete denotation from a rejected
-boundary with its own owned variants:
-
-```text
-RuleResult =
-    RuleComplete(outcome_space)
-  | RuleRejected(rule_fault)
-
-ApplicationResult =
-    ApplicationComplete(
-        source_outcomes,
-        applied_atoms,
-        no_successor_partition,
-        outcome_atom_cardinality,
-        derivation_cardinality,
-        successor_cardinality,
-        successor_quotient_with_derivation_fibers,
-        applied_atom_measure,
-        successor_submeasure,
-        no_successor_submeasure,
-        evidence,
-    )
-  | ApplicationRejected(application_fault)
-```
-
-`RuleComplete`, `RuleRejected`, `RuleFault`, and Rule atoms are owned by
-`ca.rules`. `ApplicationComplete`, `ApplicationRejected`, `ApplicationFault`,
-and applied records are owned by `ca.program`. The parallel sums deliberately
-do not share a public envelope that would reverse the `rules -> program`
-dependency. They remain public under their owners rather than being flattened
-into the root namespace.
-
-A complete Rule result has finite or intensional support containing:
-
-```text
-Derivation(
-    replacement=TotalDisposition(...),
-    progress=Progress.ADVANCED | Progress.QUIESCENT,
-    continuation=Continue() | Stop(reason, terminality_certificate),
-    witness=Witness(...),
-    provenance=(...),
-    certificate=derivation_certificate,
-    version=1,
-)
-NoSuccessor(
-    outcome=NoSuccessorOutcome.TERMINAL
-          | NoSuccessorOutcome.UNDEFINED
-          | NoSuccessorOutcome.DECLARED_FAILURE
-          | NoSuccessorOutcome.DIVERGENT,
-    reason=...,
-    witness=Witness(...),
-    provenance=(...),
-    certificate=outcome_certificate,
-    version=1,
-)
-```
-
-The shown `version=1` values are constructor defaults, but they are mandatory
-semantic record fields and mandatory codec fields.
-
-Each derivation gives a total disposition:
-
-```text
-existing writable capability -> Preserve | Replace(payload) | Delete
-fresh writable capability    -> Absent   | Create(payload)
-outside the frontier         -> Preserve
-```
-
-A sparse serialized form is allowed only when its declared defaults recover
-that total meaning. Generic application never merges proposals or invents a
-missing structural effect.
-
-### Outcomes are not list lengths
-
-| Case | Required representation |
+| Field | Public meaning |
 |---|---|
-| Ordinary change | `Derivation(progress=Progress.ADVANCED, ...)` |
-| Stable no-event identity | `Derivation(progress=Progress.QUIESCENT, ...)` |
-| Eventful same-state result | `Derivation(progress=Progress.ADVANCED, ...)` with retained witness |
-| Completed one-shot result | `Derivation(progress=Progress.ADVANCED, continuation=Stop(...), ...)` |
-| Exact halt or no solution | `NoSuccessor(outcome=NoSuccessorOutcome.TERMINAL, ...)` |
-| Partial mathematical domain | `NoSuccessor(outcome=NoSuccessorOutcome.UNDEFINED, ...)` |
-| Construction-defined failure | `NoSuccessor(outcome=NoSuccessorOutcome.DECLARED_FAILURE, ...)` |
-| Proven semantic noncompletion | `NoSuccessor(outcome=NoSuccessorOutcome.DIVERGENT, ...)` with the required certificate |
-| Invalid or unsupported Rule boundary | `RuleRejected(fault)` with no authoritative denotation |
-| Invalid or unsupported application boundary | `ApplicationRejected(fault)` with no authoritative successors |
+| `space` | The exact coordinate set or coordinate law, operative relations, support law, finite extent where applicable, and boundary/access behavior |
+| `alphabet` | The exact set or schema of values that may occur at Space coordinates |
+| `seed` | The exact complete initial slice at `t=0`, including its initial realized support |
+| `neighborhood` | The exact read/dependency relation used to observe earlier coordinates when constructing a new slice |
+| `rule` | The exact deterministic, relational, or stochastic law that constructs complete successor slices from admitted prior state |
 
-An exact zero-replacement result is never a bare empty list. It carries a
-typed `NoSuccessor` atom. An intensional relation may instead be complete with
-`Undetermined` cardinality; that does not justify inventing a terminal atom.
+“Definite” does not mean finite or exhaustively materialized. A field may
+denote an infinite lattice, continuous region, symbolic relation, closed
+probability kernel, or intensionally represented state. It means that the
+field contains no unresolved choice, range, missing parameter, or unrecorded
+ambient decision.
 
-Application reports outcome-atom, replacement-derivation, and
-distinct-successor cardinality separately. Each may be exactly zero, exactly
-one, many, or undetermined; an optional probability law over typed atoms is
-orthogonal to those claims.
+Choices and ranges belong to presets. Resolving a preset produces definite
+component values and ultimately definite `SimpleProgram` values.
 
-### Atomic application
+There is no top-level `FRONTIER`, `DOMAIN`, `SHAPE`, `BOUNDARY`, scheduler, or
+parameter bag:
 
-Before exposing any successor, application validates result completeness,
-witnesses, dispositions, values, and laws; binds fresh identities; reconstructs
-every alternative from the same snapshot; validates every successor and
-continuation; and only then groups semantically equal successors. A fault in
-any phase rejects the complete application. No partial commit or selected
-valid-looking subset becomes authoritative.
+- Space owns coordinate, shape, support, and boundary semantics.
+- Activity is represented in state values or derived from state and Space.
+- Shape and Boundary are not separate fields; they are applicable parts of a
+  concrete Space.
+- Component parameters belong to component presets before resolution.
+- Execution horizon, replay selection, projection, batching, and resources are
+  run or dataset concerns rather than program fields.
 
-Equal successors retain their complete derivation fibers. A two-path diamond
-can therefore have two witnessed derivations and one distinct successor
-without losing either path, probability contribution, or continuation flag.
+## Space, Slices, and Explicit Time
 
-## Compact Semantic Examples
-
-### Mobile head
-
-Suppose a tagged head is at `h` and can move left or right:
+Time is never implicit. For an ordinary discrete spatial system, a coordinate
+has the form:
 
 ```text
-W = {h - 1, h, h + 1}
-R = old values and identities at {h - 1, h, h + 1}
+(t, x)
+(t, x, y)
+(t, x, y, z)
+(t, v)             # relational/graph address
 ```
 
-For a right move, one Rule derivation returns:
+The Space defines the exact time relation as well as the non-temporal
+coordinates and relations. Discrete systems normally use `t in N`; one-shot,
+continuous, event-ordered, and partial-order systems declare their appropriate
+time structure explicitly.
 
-```text
-h - 1 -> Preserve
-h     -> Replace(Plain(new_symbol))
-h + 1 -> Replace(Head(new_control, old_right_symbol))
-```
+Let `K_t` be the realized non-temporal support at time `t`. A complete state
+slice is:
 
-The Rule is denoted once over the structured `(R, W)`. The runtime does not
-run it once per cell, collect proposals, or resolve a collision afterward.
+\[
+X_t:K_t\rightarrow A.
+\]
 
-### One-shot function and constraint
+One discrete application constructs a completely new slice:
 
-A function evaluation can use input and output slots in one configuration:
+\[
+X_t\longmapsto X_{t+1}.
+\]
 
-```text
-Input(3) -> Output(9), Progress.ADVANCED + Stop(completed, certificate)
-```
+The complete history through `T` is the immutable union of those disjoint
+time-addressed slices:
 
-It is complete after one `ca.apply`; it does not need a fake second step to
-discover that it should stop. Iteration is a different composed Rule/program
-that writes feedback state and returns `Continue`.
+\[
+H_T=\bigcup_{0\le t\le T}\{(t,c,X_t(c)):c\in K_t\}.
+\]
 
-A constraint Rule denotes every valid completion of its writable unknown
-region. Its result may be finite or intensional. Certified unsatisfiability is
-`Terminal(NoSolution)` with coverage evidence. A bounded solver may return
-verified members or partial evidence, but partial enumeration never
-masquerades as the complete Rule result.
+Nothing at time `t` is updated, replaced, deleted, or overwritten. Even when a
+logical value is unchanged, its next occurrence is written at a new address:
 
-### Continuous relation
+\[
+X_{t+1}(c)=X_t(c),
+\]
 
-A continuous Rule may return an exact or represented flow, event segment, or
-intensional solution relation. It may commit an endpoint only when a duration
-or selector is closed Rule data, visible in the readable configuration, or
-intrinsically determined by an event or singularity.
+where `(t,c)` and `(t+1,c)` are different coordinates.
 
-Without such a selector, an event-free flow normally returns its maximal
-flow/solution object as a one-shot result. An external time query may inspect
-that object; a rollout horizon cannot silently choose and commit a semantic
-endpoint.
+For dynamic-support systems, `K_{t+1}` may differ from `K_t`. A locus absent
+from the new slice has not been deleted from history; its earlier occurrence
+remains at time `t`. A newly appearing locus exists only in the new slice.
 
-## Rollout, Sampling, and Queries
+A complete slice may use a lossless intensional or default-compressed
+representation. “Complete” means that its value and presence are determined
+for every admitted coordinate, not that an infinite support must be enumerated.
 
-`ca.rollout` is tooling built by repeatedly invoking the same family-blind
-`ca.apply` relation:
+## What Space Owns
+
+Space answers: **where can state exist, how are those coordinates related, and
+what happens at the limits of the coordinate set?**
+
+| Concern | Owner |
+|---|---|
+| Time coordinate or time relation | Space |
+| Rank, axes, coordinate domains, and topology | Space |
+| Fixed extent such as length `7` or shape `(11, 11)` | Space |
+| Periodic, reflective, fixed-exterior, or rejecting access | Space |
+| Whether per-slice support is fixed, sparse, growing, shrinking, or otherwise constrained | Space |
+| Initial realized support and initial values | Seed |
+| Complete support and values of the next slice | Rule, constrained by Space |
+| Allowed values at every realized coordinate | Alphabet |
+
+For example, these are different Spaces:
 
 ```python
-episode = ca.rollout(
-    same_kind_of_program,
+FiniteLine(length=7, boundary=Periodic())
+FiniteLine(length=7, boundary=FixedExterior(0))
+FiniteLine(length=11, boundary=Periodic())
+InfiniteLine(default=0)
+```
+
+A finite extent is not a Seed property. The same seven values can mean either
+a complete finite world or a finite non-default patch in an infinite world:
+
+```python
+# A genuinely finite world.
+space = FiniteLine(length=7, boundary=Periodic())
+seed = LiteralSeed((0, 0, 0, 1, 0, 0, 0))
+```
+
+```python
+# An infinite world with a finite initial footprint.
+space = InfiniteLine(default=0)
+seed = FinitePatch(origin=-3, values=(0, 0, 0, 1, 0, 0, 0))
+```
+
+The input array alone cannot determine whether the world is finite, periodic,
+reflective, fixed-exterior, or infinite.
+
+Dense-Seed shape inference may exist as convenience syntax, but it must
+desugar into an explicit Space plus an exact Seed. Seed never becomes the
+semantic owner of geometry or boundary behavior.
+
+Some access laws contain values, such as `FixedExterior(0)` or an infinite
+Space's default value. Compatibility validation must ensure that those values
+belong to the resolved Alphabet.
+
+## Alphabet and Activity
+
+Alphabet defines semantic values, including tagged unions and product values.
+Persistent or mobile activity is ordinary state, not a separate Frontier.
+
+For a Turing-style machine with tape symbols `Gamma` and controller states
+`Q`, the per-coordinate Alphabet is:
+
+\[
+A=\operatorname{Inactive}(\Gamma)
+  \;\cup\;
+  \operatorname{Active}(Q\times\Gamma).
+\]
+
+For a binary tape and two controller states, the six values are:
+
+```text
+Inactive(0)
+Inactive(1)
+Active(0, 0)
+Active(0, 1)
+Active(1, 0)
+Active(1, 1)
+```
+
+Equivalently:
+
+```text
+BLACK
+WHITE
+UP_BLACK
+UP_WHITE
+DOWN_BLACK
+DOWN_WHITE
+```
+
+The size of this tagged Alphabet is:
+
+\[
+|A|=|\Gamma|+|Q||\Gamma|=(|Q|+1)|\Gamma|.
+\]
+
+This is a tagged union rather than the full product
+`is_active x head_state x symbol`, because an inactive cell has no controller
+state. The latter would introduce meaningless inactive-with-head-state values.
+
+The Seed establishes the exact initial activity pattern. For a single-head
+machine, exactly one coordinate contains `Active(q, symbol)`. Rule must
+construct successor slices that preserve that invariant.
+
+The general activity rule is:
+
+- Persistent mobile identity, such as a head, cursor, walker, crack, or active
+  graph node, is encoded in Alphabet values.
+- Activity derived from values, such as an unstable numeric cell, is computed
+  from those values.
+- Activity derived from coordinates or support, such as an append position or
+  current rim, is computed from Space and the current slice.
+- A compiler may derive an `active_sites` execution plan for efficiency, but
+  it is not a semantic field and is never serialized as the program's meaning.
+
+## Seed
+
+Seed is one exact complete `t=0` slice admitted by Space and Alphabet. It does
+not denote a collection, unresolved generator, or ambient random draw.
+
+Seed validation checks at least:
+
+- every realized initial coordinate is admitted by Space;
+- every initial value belongs to Alphabet;
+- the initial support obeys Space's support law; and
+- declared invariants, such as exactly one active head, hold.
+
+Structured and random seed *presets* may enumerate or sample many Seeds. Each
+result of that process is an exact Seed before it enters a `SimpleProgram`.
+Replay information needed to reproduce a sampled Seed belongs to preset or
+dataset provenance; the resolved Seed itself contains the exact realized
+state.
+
+## Neighborhood
+
+Neighborhood defines the exact observation/dependency interface used while
+constructing new coordinates. It may be:
+
+- a fixed finite offset stencil;
+- a compound set of independently summarized regions;
+- a graph-relative or port-labelled neighborhood;
+- an indirect lookup whose address is stored in state;
+- a read over earlier time coordinates;
+- a global finite observation; or
+- a closed intensional relation.
+
+Neighborhood does not grant write permission and does not select a mutable
+region. Space resolves coordinate and boundary access; Neighborhood specifies
+which resolved values and identities become Rule input.
+
+For ECA, Neighborhood is the ordered triple `(left, self, right)` from slice
+`t`. For the tagged-head machine, it must expose enough adjacent tagged values
+for Rule to move the unique `Active` tag while retaining tape symbols.
+
+## Rule
+
+Rule is the exact law relating admitted history and Neighborhood observations
+to complete successor slices. A Rule may be deterministic, branching,
+stochastic, algebraic, structural, differential, or intensional, but its law
+is fully bound in a `SimpleProgram`.
+
+For a deterministic discrete program:
+
+\[
+R(H_t)=X_{t+1}.
+\]
+
+For a relational program:
+
+\[
+R(H_t)\subseteq\{\text{complete admitted slices at }t+1\}.
+\]
+
+Every successor alternative is a complete slice. Rule does not return a CRUD
+patch, a set of replacements, or `KEEP`/`Preserve`/`Delete` dispositions.
+
+This does **not** mean that Rule secretly contains a Frontier. Where activity
+is dynamic, the current slice already records it through Alphabet values or
+makes it derivable from values, coordinates, and support. Rule propagates that
+explicit state while constructing the next complete slice.
+
+For a right-moving tagged head, the complete new slice contains:
+
+- `Inactive(written_symbol)` at the former head's logical coordinate;
+- `Active(next_control, old_destination_symbol)` at the destination's new
+  time coordinate; and
+- the corresponding copied value at every other admitted coordinate in the
+  new slice.
+
+No earlier coordinate is replaced. A local implementation may share unchanged
+persistent structure, but physical sharing is not part of semantic identity.
+
+## Constructing One Exact Program
+
+The target direct-construction spelling is:
+
+```python
+import ca
+
+program = ca.SimpleProgram(
+    space=ca.spaces.finite_line(
+        length=11,
+        boundary=ca.spaces.periodic(),
+    ),
+    alphabet=ca.alphabets.boolean(),
+    seed=ca.seeds.literal(
+        (False, False, False, False, False, True,
+         False, False, False, False, False),
+    ),
+    neighborhood=ca.neighborhoods.offsets(-1, 0, 1),
+    rule=ca.rules.elementary(30),
+)
+```
+
+This value contains no open width, boundary, rule-number, or Seed choice.
+Different widths, boundaries, exact Seeds, or rule tables produce different
+concrete `SimpleProgram` values, even when all belong to the same ECA preset
+and taxonomy family.
+
+Constructor spellings in this section describe the target namespace and may
+be introduced incrementally during migration. The five-field ownership and
+complete-slice semantics are not provisional.
+
+## Presets
+
+A preset is a declarative generator, enumerator, sampler, or constrained
+factory for **definite values**. A preset is not a sixth program field and is
+not itself executable as a `SimpleProgram`.
+
+Conceptually:
+
+```text
+Preset[T] -> one or more definite T values
+```
+
+Presets may exist independently for every field:
+
+```text
+SpacePreset
+AlphabetPreset
+SeedPreset
+NeighborhoodPreset
+RulePreset
+```
+
+They may also be composed into a whole-program `ProgramPreset`:
+
+```text
+field presets
+    ↓ compatibility-constrained composition
+ProgramPreset
+    ↓ resolve / enumerate / sample
+definite SimpleProgram values
+```
+
+For example:
+
+```python
+eca_programs = ca.presets.ProgramPreset(
+    spaces=ca.presets.spaces.finite_lines(
+        lengths=range(5, 101),
+        boundaries=(
+            ca.spaces.periodic(),
+            ca.spaces.fixed_exterior(False),
+        ),
+    ),
+    alphabets=ca.presets.exact(ca.alphabets.boolean()),
+    seeds=ca.presets.seeds.binary(
+        ca.presets.seeds.single_active(),
+        ca.presets.seeds.alternating(),
+        ca.presets.seeds.bernoulli(probabilities=(0.1, 0.5, 0.9)),
+    ),
+    neighborhoods=ca.presets.exact(
+        ca.neighborhoods.offsets(-1, 0, 1),
+    ),
+    rules=ca.presets.rules.elementary(rule_ids=range(256)),
+)
+```
+
+The Seed preset receives the resolved Space and Alphabet and produces exact
+Seeds of the correct extent and value schema. A Bernoulli preset may use
+replayable sampling during expansion, but no unresolved Bernoulli law remains
+in the resulting `SimpleProgram.seed`.
+
+Alphabet presets work the same way. A machine-Alphabet preset may range over:
+
+```text
+n_head in {1, 2, 3, 4, 5}
+n_cell in {1, 2, 3, 4, 5}
+```
+
+and generate 25 exact ordered `(n_head, n_cell)` combinations. Each resolved
+Alphabet contains:
+
+\[
+n_A=(n_\text{head}+1)n_\text{cell}
+\]
+
+tagged active/inactive values.
+
+### Compatibility, not a blind Cartesian product
+
+Program-preset resolution follows semantic dependencies:
+
+```text
+SPACE
+├── constrains Seed coordinates and support
+├── constrains Neighborhood relations and access
+└── constrains Rule's admitted successor support
+
+ALPHABET
+├── constrains Space exterior/default values
+├── constrains Seed values and invariants
+├── constrains Neighborhood observations
+└── constrains Rule inputs and outputs
+
+NEIGHBORHOOD
+└── constrains Rule's observation schema
+```
+
+Examples of incompatible combinations include:
+
+- a 2D offset Neighborhood with a 1D line Space;
+- an ECA Rule with a non-binary Alphabet;
+- a tagged-head Rule without exactly one active value in Seed;
+- a fixed exterior value absent from Alphabet; and
+- a Seed whose realized support violates the selected Space.
+
+The resolver rejects incompatible tuples with focused errors; it does not ask
+the user to repeat cross-field facts or write a global constraint expression.
+
+### Relationship to PE configs
+
+This resembles the config machinery in `/home/jake/Developer/pe` because one
+declarative Python file can expand into many concrete objects. The semantic
+level is different:
+
+```text
+PE ExperimentConfig
+    -> model alternatives, dataset mixtures, repetitions, evaluations
+
+ANKoS ProgramPreset
+    -> compatible, definite SimpleProgram values
+```
+
+A downstream `DatasetPlan` may then play the broader PE-like orchestration
+role by selecting programs, rollout horizons, repetitions, splits, mixtures,
+and projections.
+
+User preset files are ordinary Python modules built from public constructors
+and preset combinators. Their source spelling is provenance, not part of the
+resolved program's semantic identity.
+
+## Applying and Rolling Out Programs
+
+The family-blind semantic operation consumes a definite program and an
+admitted immutable history:
+
+```python
+result = ca.apply(program, history)
+```
+
+Conceptually it performs:
+
+```text
+1. Validate the complete current history against Space and Alphabet.
+2. Resolve Neighborhood observations through Space relations and access laws.
+3. Ask Rule for its complete successor-slice relation.
+4. Validate every complete candidate slice against Space, Alphabet, and the
+   program's invariants.
+5. Append each valid candidate as a new immutable branch at the next time
+   coordinate while preserving every earlier slice.
+```
+
+An application result distinguishes:
+
+```text
+ApplicationComplete(complete_successor_slices_and_evidence)
+ApplicationNoSuccessor(reason_and_evidence)
+ApplicationRejected(validation_fault)
+```
+
+Deterministic programs normally return one complete successor slice.
+Branching, stochastic, constraint, and intensional programs may denote many
+or a measured/intensional set of complete successor slices. Validation is
+atomic at the whole-slice level: no partial candidate becomes authoritative.
+
+Rollout starts from the exact Seed and repeatedly applies the same program:
+
+```python
+trajectory = ca.rollout(
+    program,
     steps=100,
     replay_key=1234,
 )
 ```
 
-Its exact public signature is:
+Its target signature is:
 
 ```text
-rollout(program, *, steps, initial=None, replay_key=None) -> RolloutResult
+rollout(program, *, steps, replay_key=None) -> RolloutResult
 ```
 
-The public result variants are:
+There is no `initial=` override. Supplying another initial state means
+constructing another definite Seed and therefore another `SimpleProgram`.
+
+`steps` selects a finite application prefix; it is not Space shape, Seed data,
+or necessarily physical time duration. Each discrete application still adds
+the explicitly addressed successor slice at `t+1`. Replay keys realize
+already-declared stochastic Rule laws; they do not repair an unresolved Seed
+or program preset.
+
+One-shot functions, static criteria, continuous relations, and event systems
+may use specialized exact time relations, but they retain the same principles:
+time is explicit, outputs are complete admitted states or relations, and
+earlier coordinates are never mutated.
+
+## Catalog and Taxonomy
+
+The 60 canonical SPF families remain descriptive taxonomy and development
+obligations. They are not runtime subclasses, executor branches, or
+automatically implemented program constructors.
+
+The six catalog homes remain navigation groupings:
 
 ```text
-RolloutResult =
-    RolloutComplete(raw_trace, closed_leaves)
-  | RolloutTruncated(raw_trace, continuing_leaves, cause)
-  | RolloutRejected(rollout_fault)
+automata
+substitua
+machina
+media
+criteria
+dynamica
 ```
 
-The cause is one of `TruncationCause.DEPTH_BOUND`,
-`TruncationCause.INTENSIONAL_SUPPORT`,
-`TruncationCause.RESOURCE_EXHAUSTED`, `TruncationCause.CANCELLED`, or
-`TruncationCause.PRUNED`. A truncated result retains the raw partial trace and
-continuing derivation fibers; it makes no terminal or exact-cardinality claim.
+A catalog family can own reusable presets without determining semantic
+identity. For example:
 
-With no explicit `initial`, traversal starts from the Seed result space. With
-no `replay_key`, finite or intensional Seed/Rule laws remain complete
-branching laws; a key authorizes a replayable realization where a draw is
-requested.
+```text
+SPF050 synchronous-local-state-transform    broad mechanics family
+ECA ProgramPreset                           constrained program suite
+Rule 30, width 11, one exact Seed            definite SimpleProgram
+```
 
-`steps` bounds application depth. It is not necessarily physical time, and
-reaching it produces a typed truncated run with continuing leaves rather than
-a false terminal outcome. A zero-step request therefore returns
-`DEPTH_BOUND`, even when the retained initial support is intensional; no
-enumeration or application was requested.
+Rule 30 and Rule 90 are distinct concrete program values but remain members
+of the same ECA preset and taxonomy family. Likewise, changing exact shape or
+Seed produces another concrete value without creating a new taxonomy family.
 
-Rollout realizes or binds the Seed with root replay evidence, expands every
-continuing configuration/lineage derivation fiber, retains raw applications
-and witnesses, propagates exact measures or replay subkeys, and stops a branch
-only on its own `Stop` or typed no-successor atom.
-
-A probability law is descriptor data; a draw is an external realization.
-The replay-key identity, sampler and numeric profiles, selected-witness
-identity, and derived-subkey identity are evidence in the realized trace. No
-ambient RNG state contributes semantics.
-
-Exhaustive rollout of a branching or intensional relation is itself branching
-or intensional. A query may sample, bound, or project it, but that request does
-not replace the complete denotation. Resource exhaustion, cancellation,
-pruning, and approximation do not prove terminality, divergence,
-unsatisfiability, or exact cardinality.
-
-One-shot functions, constraint completions, media transforms, and many
-continuous relations are normally consumed with `ca.apply`, not mandatory
-rollout.
-
-The public callable and its `RolloutResult`/trace records are owned by
-`ca.program`; `ca.rollout` is the convenience re-export. There is no
-same-named public submodule that can shadow the callable, and there is no
-`run.py` or second traversal implementation.
+Catalog IDs, names, aliases, sources, and Book order are metadata. They never
+select an executor or appear as a sixth field.
 
 ## Serialization
 
-Serialization is cross-cutting infrastructure, not a program component or
-execution registry:
-
-```python
-payload = ca.serialization.dumps(same_kind_of_program)
-decoded = ca.serialization.loads(payload)
-
-match decoded:
-    case ca.serialization.Decoded(value=restored):
-        ...
-    case ca.serialization.DecodeRejected(fault=fault):
-        ...
-```
-
-The exact failure shape is
-`DecodeResult[T] = Decoded[T] | DecodeRejected`. Unknown tags,
-versions, fields, primitives, and lossy migrations are typed decode
-rejections, not partially restored values or implicit defaults.
-
-The canonical program payload always contains the validated, expanded
-`seed`, `alphabet`, `frontier`, `neighborhood`, and `rule` fields.
-
-A canonical byte encoding has exactly the four outer fields `tag`, `version`,
-`payload`, and `digest`. The digest is mandatory, derived from the other three
-fields, and carries no independent semantics.
-Canonical codecs neither preserve nor recover the catalog spelling and
-arguments used to construct a program. Applications that need invocation
-history keep a separate user manifest; an alias-only recipe is never accepted
-as the authoritative lossless representation, and execution never dispatches
-on an alias.
-
-Canonical codecs:
-
-- preserve exact values, structural identities, order, multiplicity, and
-  explicit absence/unknown roles;
-- preserve finite and intensional descriptors without forced enumeration;
-- keep probability laws separate from concrete draw/replay evidence;
-- preserve typed results, cardinalities, dispositions, witnesses, fresh
-  bindings, successor fibers, and trace lineage;
-- reject unknown tags, versions, fields, primitives, or lossy migrations; and
-- derive identifiers and digests from validated canonical structure.
-
-Python class names, object addresses, host hashes, locale, NumPy defaults, and
-machine floating behavior are never semantic identity.
-
-## Migrating Source From 0.1
-
-The 0.1 `Dynamics` dictionaries were construction recipes, not an earlier
-canonical semantic format. Reconstruct each program through an implemented
-catalog preset or builder where one exists, for example:
-
-```python
-program = ca.catalog.eca(rule=30, width=79)
-```
-
-Otherwise use explicit five-field construction as shown above. Then serialize
-the expanded value with `ca.serialization.dumps`.
-
-The old call:
+Canonical program serialization contains the expanded, validated fields:
 
 ```text
-rollout(dynamics=..., rule_id=..., seed_state=..., steps=...)
+space
+alphabet
+seed
+neighborhood
+rule
 ```
 
-becomes:
+It preserves:
 
-```text
-rollout(program, steps=..., initial=..., replay_key=...)
-```
+- explicit time and non-temporal coordinates;
+- Space relations, support law, shape, and boundary/access behavior;
+- the exact complete `t=0` Seed slice;
+- Alphabet value identities and invariants;
+- Neighborhood dependency structure; and
+- Rule's complete-successor relation, including exact stochastic laws where
+  present.
 
-`RawEpisode` and `RawBatch` are not semantic result types in 0.2.0. Inspect
-`ca.program.RolloutComplete`, `RolloutTruncated`, or `RolloutRejected`, and use
-the explicit downstream dataset views only when dense tensors are needed.
+It does not serialize a preset alias in place of the resolved structure.
+Applications that need the preset filename, arguments, sampling key, dataset
+split, or human invocation history keep a separate provenance manifest.
 
-`ca.serialization.loads` rejects old `Dynamics` manifests. There is no
-compatibility executor, fallback decoder, or “try old then new” path. The
-canonical program wire tag is `ca.simple-program` at schema version `1`;
-that schema version is independent of the package version `0.2.0`.
+The current five-field wire schema containing `frontier` is incompatible with
+this contract and must receive a new schema version during implementation.
+Patch dispositions and writable capabilities are not migrated into the new
+canonical format.
 
-## Package and Import Ownership
+## Migration From the Current Runtime
 
-The package surface is:
+The architectural migration is:
+
+| Current runtime concept | Target concept |
+|---|---|
+| `CarrierContract` plus concrete Carrier boundary | Definite `Space` |
+| Seed-produced Configuration carrying geometry | Exact Seed slice validated against Space |
+| `WritableRegion` / `Frontier` | Removed from semantic API |
+| Active selector | Alphabet/state tag or predicate derived from state and Space |
+| `Preserve`, `Replace`, `Delete`, `Absent`, `Create` | Complete successor-slice construction |
+| Sparse write patch | Lossless representation of a complete slice |
+| `rollout(..., initial=...)` | Construct another program with another exact Seed |
+| Parameterized catalog convenience call | Preset resolving to definite program values |
+
+Removing Frontier does not require discarding every internal optimization. A
+compiler may derive active sites, affected neighborhoods, persistent-structure
+sharing, or a finite execution plan. Such artifacts must be observationally
+equivalent to complete-slice semantics and must not become serialized program
+meaning.
+
+No destructive in-place migration of old configurations is meaningful. A
+migrator must reconstruct explicit Space, Alphabet, exact `t=0` Seed,
+Neighborhood, and complete-slice Rule semantics, or reject the old recipe as
+ambiguous.
+
+## Target Package Ownership
+
+The target public organization is:
 
 ```text
 src/ca/
 ├── __init__.py
 ├── program.py
+├── spaces.py
 ├── loci.py
 ├── alphabets.py
 ├── seeds.py
-├── frontiers.py
 ├── neighborhoods.py
 ├── rules.py
 ├── serialization.py
 ├── py.typed
+├── presets/
+│   ├── __init__.py
+│   ├── spaces.py
+│   ├── alphabets.py
+│   ├── seeds.py
+│   ├── neighborhoods.py
+│   └── rules.py
 └── catalog/
     ├── __init__.py
     ├── entries.py
@@ -555,68 +658,90 @@ src/ca/
     └── dynamica.py
 ```
 
-| File or namespace | Cohesive responsibility |
+| Namespace | Responsibility |
 |---|---|
-| `ca.__init__` | Root façade and stable re-exports |
-| `program.py` | `SimpleProgram`; application and rollout inputs/results; `apply` and `rollout`; validation; private family-blind reconstruction/commit and traversal |
-| `loci.py` | Shared closed locus, identity, selector, and region vocabulary |
-| `alphabets.py` | Alphabet descriptors, composition, and presets |
-| `seeds.py` | Seed descriptors, composition, and presets |
-| `frontiers.py` | WritableRegion descriptors, capability resolution, composition, and presets |
-| `neighborhoods.py` | ReadableRegion descriptors, read resolution, composition, and presets |
-| `rules.py` | Rule descriptors, Rule results/atoms, total dispositions, composition, and presets |
-| `serialization.py` | Versioned canonical codecs, explicit schema registry, and typed decode results |
-| `py.typed` | Static-typing package marker; no runtime behavior |
-| `catalog/entries.py` | Descriptive family/name/provenance metadata |
-| six catalog modules | Canonical development stubs plus independently implemented whole-program presets and builders |
+| `ca.program` | `SimpleProgram`, complete-slice application, rollout, histories, and result records |
+| `ca.spaces` | Time and coordinate Spaces, relations, support laws, shapes/extents, and boundary/access behavior |
+| `ca.loci` | Shared coordinate, identity, and relation vocabulary used by Spaces |
+| `ca.alphabets` | Exact value schemas, tagged unions, products, and invariants |
+| `ca.seeds` | Exact complete initial slices and Seed validation |
+| `ca.neighborhoods` | Exact read/dependency relations |
+| `ca.rules` | Exact complete-successor laws and typed no-successor relations |
+| `ca.presets` | Preset protocols, choices, ranges, compatibility resolution, and whole-program composition |
+| `ca.serialization` | Versioned canonical codecs and typed decode results |
+| `ca.catalog.entries` | Descriptive family, name, source, and provenance metadata |
+| six catalog modules | Family-owned presets and unfinished canonical development surfaces |
 
-The root façade re-exports only:
+`frontiers.py` is removed from the target public component surface. If a
+compiled active-site plan remains useful internally, it belongs to private
+execution machinery and carries no independent semantics.
 
-- `ca.SimpleProgram`;
-- `ca.apply`;
-- `ca.rollout`; and
-- the `program`, `loci`, plural component, `serialization`, and `catalog`
-  module namespaces.
+## Downstream Dataset and PE Integration
 
-Application/rollout records remain under `ca.program`; Rule result records and
-atoms remain under `ca.rules`. Component constructors remain under their
-plural modules. Canonical family stubs and implemented whole-program presets
-or builders remain under `ca.catalog`; explicit construction remains available
-through `ca.SimpleProgram(...)`.
+Dataset construction remains downstream of the semantic API:
 
-There is no need for public `configuration.py`, `replacement.py`, `results.py`,
-`engine.py`, `rollout.py`, or `run.py`. Their legitimate responsibilities are
-already owned by Seed-produced configurations, `rules.py`, and `program.py`.
-
-## Downstream Auxiliaries
-
-The installed package retains `ca.datasets`, `ca.rng`, and `ca.viz` as
-explicit downstream submodules:
-
-```python
-from ca import datasets, rng, viz
+```text
+field presets
+    ↓
+ProgramPreset
+    ↓ resolve compatible choices
+definite SimplePrograms
+    ↓ rollout with horizons/replay choices
+semantic Trajectories
+    ↓ split/mix/project/tokenize
+PE-facing datasets and batches
 ```
 
-They are not root exports and are not loaded by `import ca`. These tools may
-consume Seeds, programs, application results, rollout traces, and canonical
-serialization. They may not become hidden program fields, alternate
-executors, entropy authorities, or definitions of semantic
-configuration/result identity.
+`DatasetPlan` may own:
 
-Generation, streams, generalized solvers, observers, and additional rendering
-or export organization remain outside this semantic API. Any later tooling
-must preserve the same downstream boundary.
+- enumeration or sampling policies;
+- preset-resolution provenance;
+- rollout horizons and repetitions;
+- train, evaluation, and out-of-distribution splits;
+- trajectory mixtures and weights;
+- coordinate and value serialization for ML;
+- padding, masking, and batch layout; and
+- replay keys and dataset-level reproducibility.
 
-## Documentation Roles
+It may not redefine Space, Alphabet, Seed, Neighborhood, or Rule semantics
+after a definite program has been constructed.
 
-`api.md` is the implemented runtime contract plus the unfinished catalog
-development surface;
-[`goal-6/architecture.md`](goal-6/architecture.md) is the frozen internal
-design baseline. Goal 7's authorized addition of
-`TruncationCause.INTENSIONAL_SUPPORT` supersedes only its four-cause rollout
-enumeration and is recorded in
-[`goal-7/7-RELEASE.md`](goal-7/7-RELEASE.md).
-[`simple_programs.md`](simple_programs.md) supplies non-competing conceptual
-rationale; and
-[`ref/notes/ca-scaffold.py`](ref/notes/ca-scaffold.py) is the compact
-code-shaped walkthrough.
+This recovers the useful separation from the old PE integration while making
+the ownership more explicit:
+
+```text
+ProgramPreset     chooses a space of compatible programs
+SimpleProgram     is one exact program and exact initial state
+rollout           produces one semantic trajectory prefix
+DatasetPlan       generates and organizes many trajectories
+projection        converts them into ML representations
+```
+
+## Short Form
+
+The complete direction is:
+
+```text
+SimpleProgram = SPACE + ALPHABET + SEED + NEIGHBORHOOD + RULE
+
+Preset[T]
+    generates definite T values
+
+ProgramPreset
+    combines field presets subject to compatibility
+    and resolves to definite SimplePrograms
+
+Rule
+    constructs complete new time slices
+
+Trajectory
+    preserves every earlier slice immutably
+
+DatasetPlan
+    selects, runs, mixes, and projects many programs
+```
+
+Shape belongs to Space when it limits which coordinates exist. Initial
+footprint belongs to Seed. Boundary behavior belongs to Space. Dynamic
+activity belongs to Alphabet/state or is derived from state and Space. There
+is no semantic Frontier and no CRUD transition model.
