@@ -265,3 +265,42 @@ successor slice and copy any explicitly uncovered loci. This proves fixed
 supports with scheduled graph or hypergraph partitions. Overlapping blocks
 need a collision law. Partition phase is derived from `t`; so it is Rule data
 rather than an independently addressed axis.
+
+## B055-B060 cross-family findings
+
+B055 makes sample time itself explicit Space. Predictor coefficients and
+residuals can remain product values at `[t]`; the finite lag relation reaches
+earlier time coordinates and does not create a second spatial axis.
+
+B056 has two bounded closures. Exact Euclidean nearest retrieval is unchanged
+for every fixed finite dimension because it still computes the same distances
+and selects an argmin; this stops at finite-dimensional, finite stored support.
+Exhaustive retrieval also works on any fixed finite metric set because only the
+metric and minimizer relation are used; this does not generalize spatial trees
+or Newton descent to arbitrary metrics. The Book's d-dimensional tree is
+operative auxiliary index Space in that variant, while the Newton example is
+an explicitly timed, approximate two-dimensional basin search.
+
+B057 exposes three different meanings of time without making time implicit:
+layer index for feedforward evaluation, recurrence or individual-write index
+for fixed recurrent networks, and optimization index when weights evolve.
+Mutable weights justify independently addressed edge loci; fixed weights may
+remain attributes of a fixed weighted relation.
+
+The B058 finite-agent closure preserves one invariant: every agent reads the
+same immutable joint history, all actions are emitted together, and one payoff
+function commits the resulting payoff vector. It stops at fixed finite agent
+sets with total strategies and payoff functions. The 256-by-256 rule
+tournament is an observer over many games, not the Space of one game.
+
+B059's numeric memory address is native because fetch, branch, indirect reads,
+and writes resolve through it. Packing the whole machine into one value is
+only an encoding. The cited practical-computer passage does not settle an
+unbounded random-access memory or its allocation boundary.
+
+B060's row and input axes are administrative rather than geometric, but they
+are native because the construction enumerates machine rows, independently
+addresses integer inputs and oracle cells, and compares or changes those
+entries over explicit construction stages. Merely describing all possible
+programs intensionally would not create these axes; their explicit enumeration
+and addressed dependencies do.
