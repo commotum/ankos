@@ -140,11 +140,16 @@ what happens at the limits of the coordinate set?**
 For example, these are different Spaces:
 
 ```python
-FiniteLine(length=7, boundary=Periodic())
-FiniteLine(length=7, boundary=FixedExterior(0))
-FiniteLine(length=11, boundary=Periodic())
-InfiniteLine(default=0)
+FiniteLine(time=DiscreteTime(start=0), length=7, boundary=Periodic())
+FiniteLine(time=DiscreteTime(start=0), length=7, boundary=FixedExterior(0))
+FiniteLine(time=DiscreteTime(start=0), length=11, boundary=Periodic())
+InfiniteLine(time=DiscreteTime(start=0), default=0)
 ```
+
+Names such as `FiniteLine` are convenience constructors, not distinct
+semantic classes. They resolve to one generic Space description containing
+explicit time and spatial coordinates, their relations, extent, support law,
+and boundary behavior.
 
 A finite extent is not a Seed property. The same dense seven-value input can
 mean either a complete finite world or a finite input window embedded in a
@@ -152,13 +157,17 @@ default-completed infinite world:
 
 ```python
 # A genuinely finite world.
-space = FiniteLine(length=7, boundary=Periodic())
+space = FiniteLine(
+    time=DiscreteTime(start=0),
+    length=7,
+    boundary=Periodic(),
+)
 seed = LiteralSeed((0, 0, 0, 1, 0, 0, 0))
 ```
 
 ```python
 # An infinite world represented intensionally, with one non-default locus.
-space = InfiniteLine(default=0)
+space = InfiniteLine(time=DiscreteTime(start=0), default=0)
 seed = DefaultCompletedSeed(default=0, overrides={0: 1})
 ```
 
@@ -297,9 +306,9 @@ For a relational discrete program:
 R(N(H_t))\subseteq\{\text{complete admitted slices at }t+1\}.
 \]
 
-Rule cannot inspect history outside the interface declared by Neighborhood.
-A law that needs historical or global information declares a correspondingly
-historical or global Neighborhood rather than receiving hidden ambient state.
+Neighborhood is simply Rule's declared input. A law that needs historical or
+global information uses a historical or global Neighborhood; this is an input
+contract, not a separate permissions system.
 
 Every successor alternative is a complete slice. Rule does not return a CRUD
 patch, a set of replacements, or `KEEP`/`Preserve`/`Delete` dispositions.
@@ -389,6 +398,7 @@ For example:
 ```python
 eca_programs = ca.presets.ProgramPreset(
     spaces=ca.presets.spaces.finite_lines(
+        time=ca.spaces.discrete_time(start=0),
         lengths=range(5, 101),
         boundaries=(
             ca.spaces.periodic(),
@@ -484,12 +494,16 @@ resolved program's semantic identity.
 
 ## Applying and Rolling Out Programs
 
-The family-blind semantic operation consumes a definite program and an
+The family-blind one-step operation consumes a definite program and an
 admitted immutable history:
 
 ```python
 result = ca.apply(program, history)
 ```
+
+`apply` is a transition helper, not a provenance system: it validates the
+supplied values against the program fields but does not police how the caller
+obtained them. Seed-rooted execution is the simpler `rollout` contract below.
 
 Conceptually it performs:
 
@@ -512,9 +526,9 @@ ApplicationRejected(validation_fault)
 ```
 
 Deterministic programs normally return one complete successor slice.
-Branching, stochastic, constraint, and intensional programs may denote many
-or a measured/intensional set of complete successor slices. Validation is
-atomic at the whole-slice level: no partial candidate becomes authoritative.
+Branching or stochastic programs may produce more than one possible successor.
+Validation is atomic at the whole-slice level: no partial candidate becomes
+authoritative.
 
 Rollout starts from the exact Seed and repeatedly applies the same program:
 
@@ -671,6 +685,7 @@ src/ca/
 
 | Namespace | Responsibility |
 |---|---|
+| `ca.__init__` | Stable façade exporting `SimpleProgram`, `apply`, `rollout`, and the public module namespaces below |
 | `ca.program` | `SimpleProgram`, complete-slice application, rollout, histories, and result records |
 | `ca.spaces` | Time and coordinate Spaces, relations, support laws, shapes/extents, and boundary/access behavior |
 | `ca.loci` | Shared coordinate, identity, and relation vocabulary used by Spaces |
@@ -686,6 +701,11 @@ src/ca/
 `frontiers.py` is removed from the target public component surface. If a
 compiled active-site plan remains useful internally, it belongs to private
 execution machinery and carries no independent semantics.
+
+The root façade supports the spellings used above: `ca.SimpleProgram`,
+`ca.apply`, `ca.rollout`, and the `ca.spaces`, `ca.alphabets`, `ca.seeds`,
+`ca.neighborhoods`, `ca.rules`, and `ca.presets` namespaces. Component
+constructors remain owned by their corresponding modules.
 
 ## Downstream Dataset and PE Integration
 
@@ -723,7 +743,7 @@ the ownership more explicit:
 ```text
 ProgramPreset     chooses a space of compatible programs
 SimpleProgram     is one exact program and exact initial state
-rollout           produces one semantic trajectory prefix
+rollout           produces one or more semantic trajectory prefixes
 DatasetPlan       generates and organizes many trajectories
 projection        converts them into ML representations
 ```
