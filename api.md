@@ -78,10 +78,11 @@ has the form:
 (t, v)             # relational/graph address
 ```
 
-The Space defines the exact time relation as well as the non-temporal
-coordinates and relations. Discrete systems normally use `t in N`; one-shot,
-continuous, event-ordered, and partial-order systems declare their appropriate
-time structure explicitly.
+The Space defines the exact time coordinate as well as the non-temporal
+coordinates and relations. This document specifies the discrete contract,
+with `t in N` and explicit transitions from `t` to `t+1`. Non-discrete
+families will specialize that contract when they are implemented; they do not
+need speculative machinery in this core API.
 
 Let `K_t` be the realized non-temporal support at time `t`. A complete state
 slice is:
@@ -145,8 +146,9 @@ FiniteLine(length=11, boundary=Periodic())
 InfiniteLine(default=0)
 ```
 
-A finite extent is not a Seed property. The same seven values can mean either
-a complete finite world or a finite non-default patch in an infinite world:
+A finite extent is not a Seed property. The same dense seven-value input can
+mean either a complete finite world or a finite input window embedded in a
+default-completed infinite world:
 
 ```python
 # A genuinely finite world.
@@ -155,13 +157,16 @@ seed = LiteralSeed((0, 0, 0, 1, 0, 0, 0))
 ```
 
 ```python
-# An infinite world with a finite initial footprint.
+# An infinite world represented intensionally, with one non-default locus.
 space = InfiniteLine(default=0)
-seed = FinitePatch(origin=-3, values=(0, 0, 0, 1, 0, 0, 0))
+seed = DefaultCompletedSeed(default=0, overrides={0: 1})
 ```
 
-The input array alone cannot determine whether the world is finite, periodic,
-reflective, fixed-exterior, or infinite.
+The second Seed denotes a complete infinite slice intensionally; its
+non-default footprint contains one coordinate. A dense input window can
+desugar to that representation, but the input array alone cannot determine
+whether the world is finite, periodic, reflective, fixed-exterior, or
+infinite.
 
 Dense-Seed shape inference may exist as convenience syntax, but it must
 desugar into an explicit Space plus an exact Seed. Seed never becomes the
@@ -217,9 +222,10 @@ This is a tagged union rather than the full product
 `is_active x head_state x symbol`, because an inactive cell has no controller
 state. The latter would introduce meaningless inactive-with-head-state values.
 
-The Seed establishes the exact initial activity pattern. For a single-head
-machine, exactly one coordinate contains `Active(q, symbol)`. Rule must
-construct successor slices that preserve that invariant.
+For a single-head machine, Seed places exactly one `Active(q, symbol)` value,
+and Rule preserves one active value by construction. Alphabet only defines
+which tagged values are legal; it does not acquire a separate global-invariant
+language.
 
 The general activity rule is:
 
@@ -242,7 +248,8 @@ Seed validation checks at least:
 - every realized initial coordinate is admitted by Space;
 - every initial value belongs to Alphabet;
 - the initial support obeys Space's support law; and
-- declared invariants, such as exactly one active head, hold.
+- the Seed satisfies Rule and Neighborhood preconditions, such as containing
+  exactly one active head when that program requires one.
 
 Structured and random seed *presets* may enumerate or sample many Seeds. Each
 result of that process is an exact Seed before it enters a `SimpleProgram`.
@@ -273,22 +280,26 @@ for Rule to move the unique `Active` tag while retaining tape symbols.
 
 ## Rule
 
-Rule is the exact law relating admitted history and Neighborhood observations
-to complete successor slices. A Rule may be deterministic, branching,
-stochastic, algebraic, structural, differential, or intensional, but its law
-is fully bound in a `SimpleProgram`.
+Rule is the exact law relating resolved Neighborhood observations to complete
+successor outcomes. A Rule may be deterministic, branching, stochastic,
+algebraic, structural, differential, or intensional, but its law is fully
+bound in a `SimpleProgram`.
 
 For a deterministic discrete program:
 
 \[
-R(H_t)=X_{t+1}.
+O_t=N(H_t),\qquad R(O_t)=X_{t+1}.
 \]
 
-For a relational program:
+For a relational discrete program:
 
 \[
-R(H_t)\subseteq\{\text{complete admitted slices at }t+1\}.
+R(N(H_t))\subseteq\{\text{complete admitted slices at }t+1\}.
 \]
+
+Rule cannot inspect history outside the interface declared by Neighborhood.
+A law that needs historical or global information declares a correspondingly
+historical or global Neighborhood rather than receiving hidden ambient state.
 
 Every successor alternative is a complete slice. Rule does not return a CRUD
 patch, a set of replacements, or `KEEP`/`Preserve`/`Delete` dispositions.
@@ -318,6 +329,7 @@ import ca
 
 program = ca.SimpleProgram(
     space=ca.spaces.finite_line(
+        time=ca.spaces.discrete_time(start=0),
         length=11,
         boundary=ca.spaces.periodic(),
     ),
@@ -429,7 +441,7 @@ SPACE
 
 ALPHABET
 ├── constrains Space exterior/default values
-├── constrains Seed values and invariants
+├── constrains Seed values
 ├── constrains Neighborhood observations
 └── constrains Rule inputs and outputs
 
@@ -485,8 +497,8 @@ Conceptually it performs:
 1. Validate the complete current history against Space and Alphabet.
 2. Resolve Neighborhood observations through Space relations and access laws.
 3. Ask Rule for its complete successor-slice relation.
-4. Validate every complete candidate slice against Space, Alphabet, and the
-   program's invariants.
+4. Validate every complete candidate slice against the five resolved program
+   fields.
 5. Append each valid candidate as a new immutable branch at the next time
    coordinate while preserving every earlier slice.
 ```
@@ -529,10 +541,9 @@ the explicitly addressed successor slice at `t+1`. Replay keys realize
 already-declared stochastic Rule laws; they do not repair an unresolved Seed
 or program preset.
 
-One-shot functions, static criteria, continuous relations, and event systems
-may use specialized exact time relations, but they retain the same principles:
-time is explicit, outputs are complete admitted states or relations, and
-earlier coordinates are never mutated.
+Non-discrete execution is deliberately deferred until those families are
+implemented. Its design must retain the two settled principles: time remains
+explicit, and earlier coordinates are never mutated.
 
 ## Catalog and Taxonomy
 
@@ -584,7 +595,7 @@ It preserves:
 - explicit time and non-temporal coordinates;
 - Space relations, support law, shape, and boundary/access behavior;
 - the exact complete `t=0` Seed slice;
-- Alphabet value identities and invariants;
+- Alphabet value identities;
 - Neighborhood dependency structure; and
 - Rule's complete-successor relation, including exact stochastic laws where
   present.
@@ -663,7 +674,7 @@ src/ca/
 | `ca.program` | `SimpleProgram`, complete-slice application, rollout, histories, and result records |
 | `ca.spaces` | Time and coordinate Spaces, relations, support laws, shapes/extents, and boundary/access behavior |
 | `ca.loci` | Shared coordinate, identity, and relation vocabulary used by Spaces |
-| `ca.alphabets` | Exact value schemas, tagged unions, products, and invariants |
+| `ca.alphabets` | Exact value schemas, tagged unions, and products |
 | `ca.seeds` | Exact complete initial slices and Seed validation |
 | `ca.neighborhoods` | Exact read/dependency relations |
 | `ca.rules` | Exact complete-successor laws and typed no-successor relations |
