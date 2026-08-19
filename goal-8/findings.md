@@ -27,6 +27,23 @@ that do not fit cleanly in `spaces.csv`. The CSV is authoritative.
   address; read; write; or relate locations through it.
 - **One-shot transform** uses explicit stages such as `t∈{0,1}`. It is never
   `t-only` merely because feedback is absent.
+- **Outer stage versus embedded time** must stay distinct. A one-shot query or
+  construction stage may be written `q`; `tau`; or `stage` when its input is
+  itself a history with physical or simulated time `t`. Renaming an axis does
+  not change its status; collapsing two independent orders does.
+- **Administrative coordinates** such as branch; replicate; program; input;
+  agent; or rule-entry IDs are genuine Space only when the mechanics
+  independently address or relate them. They are not Cartesian dimensions;
+  and an intensional description of possible items does not by itself create
+  an axis.
+- **Ambient geometry** is Space when metric; topology; or boundary selects an
+  operation—as in billiard collision or nearest-point retrieval. A drawn pose
+  remains a value when no mechanic addresses the ambient locations—as in an
+  ODE curve rendering or a freely embedded substitution occurrence.
+- **Structural depth is not execution time.** Tree depth; network layer; and
+  target-system time may coincide with an evaluation schedule in a concrete
+  construction; otherwise an explicit outer work or query stage is kept
+  separate.
 
 For every discrete admitted claim; the state is an immutable history over
 explicit `t`. An application preserves every coordinate through time `t`;
@@ -252,10 +269,12 @@ destination-write precedence. Multiple mobile loci; changing topology; or
 undefined write conflicts are outside the proof. The mobile locus is one
 distinguished address in the field; not another coordinate axis.
 
-The Book passage never textually identifies its Cartesian dimension. A generic
-cell-adjacency Space is supported; but `t+1D`; `t+2D`; and `t+3D` remain
-unresolved as Book-native claims. In particular; 2D must not be inferred from
-the illustration.
+The Book figure is a 1D cellular-automaton spacetime diagram: horizontal
+position is `x`; successive rows are `t`; and the black crack marker occupies
+one `x` at each step. Thus `[t,x]` is shown—not `[t,x,y]`. Replacing scalar
+offsets by finite vectors proves every finite Cartesian rank; replacing them
+by a fixed locally finite adjacency relation proves the graph form. The proof
+does not admit dynamic topology or multiple independently moving loci.
 
 ## B020 closure: alternating partitions
 
@@ -265,6 +284,35 @@ successor slice and copy any explicitly uncovered loci. This proves fixed
 supports with scheduled graph or hypergraph partitions. Overlapping blocks
 need a collision law. Partition phase is derived from `t`; so it is Rule data
 rather than an independently addressed axis.
+
+## Adversarial closure corrections: B021-B043
+
+Several initial `unknown` rows merely recorded that the Book did not draw
+another example. That is not the limit of a mechanics-based closure proof.
+
+- B021 separates outer mutation `m` from rollout time `tau`. A finite Alphabet
+  and finite neighborhood give a finite rule table on any fixed
+  finite-neighborhood Space; mutating a table entry and separately evaluating
+  the result therefore covers finite-rank lattices and fixed locally finite
+  graphs. It does not prove rule mutation during one rollout.
+- B023 is product accretion: support at stage `T` is `[0,T] x C`; the Frontier
+  is `{T} x C`; and one new copy of fixed cross-section `C` is appended. This
+  proves every fixed finite intrinsic rank but stops at branching; merging; or
+  topology-changing rims.
+- B027 and B029 lift rectangles to finite-dimensional hyperrectangles. Their
+  closures require a total scan; deterministic overlap and tie laws; and
+  respectively maximal-uniform-region or prior-equal-region predicates.
+  Merely saying “higher-dimensional” without these laws would not be a proof.
+- B030 depends on a rooted partition relation—not on rectangles as such. Any
+  finite; well-founded; exact partition hierarchy with decidable uniformity
+  supports the same accept-or-split recursion.
+- B033 extends to finite; countable; or continuous datum Spaces only when a
+  probability law and sampler are supplied. Without them a randomization test
+  is undefined; this is an exclusion rather than an unresolved geometry.
+- B043 depends on finite candidate adjacency and retained provenance. Those
+  operations lift from the shown 2D grid to any fixed locally finite relation;
+  they stop at dynamic topology; unbounded fanout; or missing provenance
+  identity.
 
 ## B055-B060 cross-family findings
 
