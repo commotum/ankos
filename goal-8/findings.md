@@ -125,3 +125,143 @@ uses its lack of an obvious stable neighbor relation as the contrast that
 motivates grid-based contextual substitution. Likewise a one-match scan is a
 different sequential mechanic; adding a 2D drawing to its scan does not make
 it a native `t+2D` Space.
+
+## B006 closure: structural pattern rewrite
+
+A finite rooted ordered expression tree has a finite traversal order. That
+order determines candidate matches and a nonoverlap set; selected subtrees can
+then be replaced while every other node is copied into a complete successor
+tree. Without rooted order; a separate match-selection relation is required.
+The Book explicitly rejects a native higher-dimensional sequential scan:
+imposing one merely linearizes the substrate.
+
+## B007 closure: front deletion and rear append
+
+Prefix deletion and suffix concatenation require only finite total order. The
+same construction therefore works on any finite ordered support; while a
+multidimensional realization whose adjacency is never read is only a queue
+linearization. Cyclic rule phase is determined by time and remains Rule data.
+
+## B008 closure: register machines
+
+For finite named keys `{pc;r1;...;rn}`; an instruction reads the program
+counter and its target registers; writes those keys into the new slice; and
+copies every untargeted register. This proves arbitrary finite named-register
+support. The proof stops at dynamically indexed arrays and pointers; which the
+Book explicitly excludes. Packing all registers into prime powers is an
+encoding because it hides the independently addressed keys.
+
+## B009 closure: iterated maps
+
+A deterministic self-map `F:A->A` always adds exactly one value at the next
+time coordinate. Scalar and fixed-tuple states therefore remain `t`-only;
+tuple fields belong to the value schema unless the rule independently
+addresses them as loci. Digit rows are renderings of each atomic value; not a
+native spatial axis. Branching or addressed fields end this closure.
+
+## B010 closure: indexed recurrence
+
+The recurrence index is explicit time. Whenever every dependency of
+`f[t+1]` is a defined earlier coordinate; the rule appends one value without
+rewriting history. A separate prefix axis only duplicates time. The proof
+stops at future; cyclic; or undefined dependencies.
+
+## B011 closure: iterative erasure
+
+Given old ordered live support `K_t`; compute a deletion set from persistent
+labels or current ranks and form `K_(t+1)=K_t-D_t`. This covers numeric lines;
+current-rank decimation; and cyclic Josephus support. No Book evidence or
+mechanics proof supplies an unordered multidimensional erasure neighborhood.
+
+## B012 closure: digit-emitting transduction
+
+The long-division and square-root procedures transform one fixed finite record
+and emit exactly one symbol per step. Because the register fields are fixed
+parts of that atomic record and are not dynamically selected as loci; emission
+time itself addresses the output sequence. A materialized copied output tape
+is therefore an encoding. Random-access storage or multiple independently
+addressed outputs would require more Space.
+
+## B013 closure: partial differential relations
+
+Replacing one spatial variable by a vector in `R^d`; and supplying the needed
+finite-dimensional partial derivatives; domain; and side data preserves the
+PDE relation for every finite `d>=1`. This dimensional proof does not establish
+existence; uniqueness; regularity; or infinite-dimensional fields. PDEs have
+no built-in evolution time; boundary-value uses therefore need only singleton
+outer query time. Finite-difference meshes remain approximating encodings; and
+a continuous `t`-only flow is an ordinary differential equation.
+
+## B014 closure and boundary: parallel network rewrite
+
+Represent each port by a relation `E_p(t;v)`. Bounded paths in the old graph
+determine every new port and fresh node; allowing one complete graph commit on
+any finite or locally finite fixed-port graph. Effective dimension; tree form;
+and nesting belong to adjacency. Drawn Euclidean positions do not.
+
+The spring-threshold fracture candidate remains genuinely unresolved. Its
+canonical note identifies bonds that break under stretch; but does not specify
+a complete time schedule or ambient dimension. Neither can be inferred from a
+simulation or illustration.
+
+## B015 closure: multiway rewrite
+
+Branch identity is a genuine coordinate because simultaneous complete states
+are independently related to parents and successors. For every enumerable
+single match; copy the parent substrate; perform one rewrite; and retain or
+deduplicate the complete child. This construction covers strings; arbitrary
+finite-dimensional arrays; expression trees; and atomic arithmetic states.
+It stops at non-enumerable matches; undecidable state identity; or continuous
+successor construction. The merged evolution graph is a derived one-shot
+encoding that suppresses generation copies.
+
+## B016 closure: local satisfaction
+
+For fixed support `K` and supplied neighborhood relation `N`; satisfaction is
+the one-shot conjunction of the same bounded predicate at every locus. The
+argument is independent of Cartesian rank and applies equally to fixed graphs;
+while explicit global occurrence obligations remain additional relations.
+Embedded cellular-automaton time is a coordinate of the candidate spacetime
+diagram; not an update schedule of the criteria family. Any search trajectory
+belongs to an external solver such as B018.
+
+## B017 closure: global-score sequential placement
+
+On a candidate locus `K`; compute eligibility and score for all candidates;
+choose one winner; and construct the complete successor with one placement and
+all induced field changes. This works when `K` is finite; sampleable; or has an
+attained maximum. It does not prove simultaneous multiwinner placement. The
+Book supports a cyclic score field; a planar frontier lattice; and metric
+circle and sphere placement. Unrolled plant diagrams are projections rather
+than new native Space.
+
+## B018 closure: stochastic local search
+
+A proposal copies the complete incumbent; changes sampled loci; compares the
+whole-state objective; and commits either the candidate or an unchanged new
+slice. This proves any finite sampleable addressed support and is independent
+of Cartesian rank. A rejected proposal still adds a complete `t+1` slice. The
+proof says nothing about convergence; infinite-support sampling; or continuum
+search.
+
+## B019 closure and boundary: coupled field plus mobile locus
+
+On any fixed locally finite adjacency relation; first compute the complete new
+field from old neighborhoods; then apply the uniquely selected mobile move and
+destination-write precedence. Multiple mobile loci; changing topology; or
+undefined write conflicts are outside the proof. The mobile locus is one
+distinguished address in the field; not another coordinate axis.
+
+The Book passage never textually identifies its Cartesian dimension. A generic
+cell-adjacency Space is supported; but `t+1D`; `t+2D`; and `t+3D` remain
+unresolved as Book-native claims. In particular; 2D must not be inferred from
+the illustration.
+
+## B020 closure: alternating partitions
+
+Let `P_t` partition support into disjoint finite blocks. Apply the block map to
+each old block independently; then union all outputs into the complete
+successor slice and copy any explicitly uncovered loci. This proves fixed
+supports with scheduled graph or hypergraph partitions. Overlapping blocks
+need a collision law. Partition phase is derived from `t`; so it is Rule data
+rather than an independently addressed axis.
