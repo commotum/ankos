@@ -62,11 +62,13 @@ infinite-rank stencil. The same invariant works on a fixed graph only when
 rooted neighborhoods have finitely many rule-understood types. Node or edge
 creation is outside the proof.
 
-The Book separately shows 1D; 2D; and 3D cellular automata; discusses 4D and
-higher lattices; and explicitly states the fixed-network generalization. A
-one-step raster filter remains the same synchronous transform with
-`t∈{0,1}`. Continuous or product-valued cell states enlarge the Alphabet; not
-Space.
+The Book separately shows 1D; square-grid 2D; and 3D cellular automata;
+discusses 4D and higher lattices; and explicitly states the fixed-network
+generalization. Triangular; pentagonal; and Penrose examples require a
+separate `[t,v]` tile-incidence claim: their 2D pose does not turn irregular
+tile addresses into Cartesian `[t,x,y]`. A one-step raster filter remains the
+same synchronous transform with `t∈{0,1}`. Continuous or product-valued cell
+states enlarge the Alphabet; not Space.
 
 ## B002 closure: mobile-head grid rewrite
 
@@ -84,10 +86,12 @@ finite displacement set in `Z^d` proves the same construction for every finite
 `d>=1`. Consequently SPF030 supports `[t,x]`; `[t,x,y]`; `[t,x,y,z]`; and all
 higher finite Cartesian ranks. Square and hexagonal adjacency are evidenced.
 
-This proof stops at fixed locally finite lattices. A head on an arbitrary
-irregular graph is mechanically plausible but the Book separates sequential
-network systems; the available evidence does not yet establish whether the
-canonical family absorbs that case. It remains an honest bounded unknown.
+The same transition is proved on a fixed finite-port edge-labelled graph:
+replace a displacement symbol by a port label; follow its one selected edge;
+and copy every other node. The proof requires finitely many rule-understood
+ports and a total missing-port result. What remains unresolved is narrower:
+arbitrary unlabelled irregular incidence supplies no canonical deterministic
+destination selector when several neighbors are indistinguishable.
 
 Factoring `{control; head position; tape}` into separate registers or tagging
 one tape value with the head changes the value encoding and concrete write
@@ -149,8 +153,14 @@ A finite rooted ordered expression tree has a finite traversal order. That
 order determines candidate matches and a nonoverlap set; selected subtrees can
 then be replaced while every other node is copied into a complete successor
 tree. Without rooted order; a separate match-selection relation is required.
-The Book explicitly rejects a native higher-dimensional sequential scan:
-imposing one merely linearizes the substrate.
+
+A total scan over an array is only a 1D encoding when matching never reads the
+array's multidimensional incidence. But if finite patterns actually match and
+replace rank-`d` blocks; those coordinates remain operative. Enumerating the
+finite matches; applying a total tie/nonoverlap order; replacing the selected
+blocks; and copying all other loci proves every fixed finite `d`. The proof
+stops at infinite match sets; missing overlap policy; or undefined reshaping at
+the array edge.
 
 ## B007 closure: front deletion and rear append
 
@@ -158,6 +168,10 @@ Prefix deletion and suffix concatenation require only finite total order. The
 same construction therefore works on any finite ordered support; while a
 multidimensional realization whose adjacency is never read is only a queue
 linearization. Cyclic rule phase is determined by time and remains Rule data.
+Front and rear are order roles; not boundary policies. The actual boundary is
+underflow: after complete erasure or when the queue is shorter than the delete
+width; the application must halt; be undefined; or use a declared short-queue
+law.
 
 ## B008 closure: register machines
 
@@ -186,9 +200,13 @@ stops at future; cyclic; or undefined dependencies.
 ## B011 closure: iterative erasure
 
 Given old ordered live support `K_t`; compute a deletion set from persistent
-labels or current ranks and form `K_(t+1)=K_t-D_t`. This covers numeric lines;
-current-rank decimation; and cyclic Josephus support. No Book evidence or
-mechanics proof supplies an unordered multidimensional erasure neighborhood.
+labels or current ranks and form `K_(t+1)=K_t-D_t`. The Book shows a finite
+interval and states the unbounded positive-integer process. Rank-based
+decimation extends to finite orders and discrete well-orders of type `N`; an
+arbitrary countable total order need not have a first or kth surviving element.
+A key-predicate deletion can use a broader keyed set; but then keys; not order;
+do the work. No evidence supplies an unordered multidimensional erasure
+neighborhood.
 
 ## B012 closure: digit-emitting transduction
 
@@ -213,8 +231,11 @@ a continuous `t`-only flow is an ordinary differential equation.
 
 Represent each port by a relation `E_p(t;v)`. Bounded paths in the old graph
 determine every new port and fresh node; allowing one complete graph commit on
-any finite or locally finite fixed-port graph. Effective dimension; tree form;
-and nesting belong to adjacency. Drawn Euclidean positions do not.
+a finite or countable rooted fixed-port graph when fresh identities are
+canonical. Effective dimension; tree form; and nesting belong to adjacency.
+Drawn Euclidean positions do not. A component-retention or drop decision must
+also be total; local finiteness alone neither supplies that policy nor makes an
+uncountable graph constructible.
 
 The spring-threshold fracture candidate remains genuinely unresolved. Its
 canonical note identifies bonds that break under stretch; but does not specify
@@ -223,34 +244,39 @@ simulation or illustration.
 
 ## B015 closure: multiway rewrite
 
-Branch identity is a genuine coordinate because simultaneous complete states
-are independently related to parents and successors. For every enumerable
-single match; copy the parent substrate; perform one rewrite; and retain or
-deduplicate the complete child. This construction covers strings; arbitrary
-finite-dimensional arrays; expression trees; and atomic arithmetic states.
-It stops at non-enumerable matches; undecidable state identity; or continuous
-successor construction. The merged evolution graph is a derived one-shot
-encoding that suppresses generation copies.
+A generation-state identity is a genuine coordinate because distinct complete
+states at one generation are independently related to parents and successors.
+It is not a persistent causal-path ID: two derivations can merge into one
+equal child with multiple parents. For every finite match set; copy the parent
+substrate; perform one rewrite; and retain or deduplicate each complete child.
+This construction covers strings; arbitrary finite-dimensional arrays;
+expression trees; and atomic arithmetic states. Countably infinite branching
+requires an explicitly admitted relational semantics; it cannot be completed
+by one ordinary executable application. The merged evolution graph is a
+derived one-shot encoding that suppresses generation copies.
 
 ## B016 closure: local satisfaction
 
 For fixed support `K` and supplied neighborhood relation `N`; satisfaction is
 the one-shot conjunction of the same bounded predicate at every locus. The
-argument is independent of Cartesian rank and applies equally to fixed graphs;
-while explicit global occurrence obligations remain additional relations.
+argument is independent of Cartesian rank and applies equally to fixed graphs.
+A separately evidenced existential occurrence requirement may be conjoined;
+but locality does not prove arbitrary global obligations.
 Embedded cellular-automaton time is a coordinate of the candidate spacetime
 diagram; not an update schedule of the criteria family. Any search trajectory
 belongs to an external solver such as B018.
 
 ## B017 closure: global-score sequential placement
 
-On a candidate locus `K`; compute eligibility and score for all candidates;
-choose one winner; and construct the complete successor with one placement and
-all induced field changes. This works when `K` is finite; sampleable; or has an
-attained maximum. It does not prove simultaneous multiwinner placement. The
-Book supports a cyclic score field; a planar frontier lattice; and metric
-circle and sphere placement. Unrolled plant diagrams are projections rather
-than new native Space.
+On a candidate locus `K`; compute eligibility; select one winner; and construct
+the complete successor with one placement and all induced field changes. A
+global-score selector requires an attained maximum and total tie law. A
+stochastic frontier selector instead requires a normalized probability kernel
+and sampleability; sampleability alone does not make an argmax exist. Neither
+form proves simultaneous multiwinner placement. The Book supports a cyclic
+score field; a stochastic planar frontier lattice; and metric circle and
+sphere placement. Unrolled plant diagrams are projections rather than new
+native Space.
 
 ## B018 closure: stochastic local search
 
@@ -263,18 +289,21 @@ search.
 
 ## B019 closure and boundary: coupled field plus mobile locus
 
-On any fixed locally finite adjacency relation; first compute the complete new
-field from old neighborhoods; then apply the uniquely selected mobile move and
-destination-write precedence. Multiple mobile loci; changing topology; or
-undefined write conflicts are outside the proof. The mobile locus is one
-distinguished address in the field; not another coordinate axis.
+On any fixed finite or countable locally finite adjacency relation with a
+total labelled or tie-resolved destination selector; first compute the
+complete new field from old neighborhoods; then apply the uniquely selected
+mobile move and destination-write precedence. Multiple mobile loci; changing
+topology; or undefined write conflicts are outside the proof. The mobile locus
+is one distinguished address in the field; not another coordinate axis.
 
 The Book figure is a 1D cellular-automaton spacetime diagram: horizontal
 position is `x`; successive rows are `t`; and the black crack marker occupies
-one `x` at each step. Thus `[t,x]` is shown—not `[t,x,y]`. Replacing scalar
-offsets by finite vectors proves every finite Cartesian rank; replacing them
-by a fixed locally finite adjacency relation proves the graph form. The proof
-does not admit dynamic topology or multiple independently moving loci.
+one `x` at each step. Thus `[t,x]` is shown—not `[t,x,y]`. The viewport does not
+prove whether the modeled line is finite or unbounded; that extent and its
+boundary remain unstated. Replacing scalar offsets by finite vectors proves
+every finite Cartesian rank; replacing them by a fixed labelled adjacency
+relation proves the graph form. The proof does not admit dynamic topology or
+multiple independently moving loci.
 
 ## B020 closure: alternating partitions
 
@@ -314,6 +343,47 @@ another example. That is not the limit of a mechanics-based closure proof.
   they stop at dynamic topology; unbounded fanout; or missing provenance
   identity.
 
+## Representation and time boundaries: B025-B054
+
+Several families required separating operative coordinates from convenient
+tables; drawings; or work schedules.
+
+- B025's native time is causal precedence itself: `[e]` plus producer edges
+  and their reachability order. A scalar update number or page row is an
+  encoding; not the event-time coordinate.
+- B026 and B050 use `[t,v]`. Edges are adjacency relations; not another axis.
+  Directional local laws require typed or ordered ports; an unlabelled graph
+  suffices only for permutation-invariant laws.
+- B030's tree addresses are partition paths. Breadthwise recursion depth is an
+  evaluation schedule; and rectangular page coordinates are an encoding of
+  the hierarchy.
+- B031 distinguishes a basis/sample/coefficient index from the geometric
+  coordinates at which a transformed field may be materialized. A continuous
+  basis parameter can still be a discrete address set of basis members.
+- B035 and B036 keep outer reconstruction or application stages separate from
+  target-system time and structural layer depth. B051 likewise separates
+  one-shot construction `tau` from continuous physical event time `t_phys`.
+- B032 closes over any fixed finite-neighborhood model Space. Learning or
+  changing its topology remains unresolved because the Book supplies no
+  topology hypothesis class; edit law; selection rule; or stopping law.
+- B046's event mechanic lifts from a rectangle to every finite-dimensional
+  hyperrectangle by taking the first positive face-hit time and reflecting the
+  corresponding velocity components. Tied hits and Zeno accumulation require
+  explicit resolution.
+- B047's Laplace or harmonic-measure construction reproduces the attachment
+  law without walker microtime. It is therefore a field-based encoding of
+  first-passage aggregation; not evidence that the walker occupies field
+  coordinates at every microstep.
+- B048 has a finite contemporaneous population `P_t`; the Book does not fix
+  persistent slots; survivor copying; cardinality; or identity allocation.
+- B052 uses one-shot aggregation `tau`; alternative history `h`; and whatever
+  coordinates belong to the measured base Space. A Monte Carlo sample index
+  is an alternative axis; not sampler evolution time unless an update kernel
+  is actually supplied.
+- B053 needs a half-open-bin or tie convention. Without it; interval endpoints
+  do not determine a total transduction even though the output remains a
+  finite variable-length ordered stream.
+
 ## B055-B060 cross-family findings
 
 B055 makes sample time itself explicit Space. Predictor coefficients and
@@ -341,10 +411,15 @@ function commits the resulting payoff vector. It stops at fixed finite agent
 sets with total strategies and payoff functions. The 256-by-256 rule
 tournament is an observer over many games, not the Space of one game.
 
-B059's numeric memory address is native because fetch, branch, indirect reads,
+B059's numeric memory address is native because fetch; branch; indirect reads;
 and writes resolve through it. Packing the whole machine into one value is
-only an encoding. The cited practical-computer passage does not settle an
-unbounded random-access memory or its allocation boundary.
+only an encoding. Countably unbounded memory is nevertheless proved by
+declaring addresses `N` and one blank word from the outset. Every fixed-arity
+instruction still fetches and writes only finitely many words; a first write
+does not allocate a new coordinate but changes the value at an already
+declared address. The proof stops at non-total address arithmetic; unbounded
+per-step writes; or negative; transfinite; uncountable; or continuous address
+sets.
 
 B060's row and input axes are administrative rather than geometric, but they
 are native because the construction enumerates machine rows, independently
