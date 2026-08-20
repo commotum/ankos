@@ -75,7 +75,7 @@ Seed does not own:
 - Neighborhood semantics;
 - the selected Rule;
 - rollout limits or resources; or
-- PE selection, streaming, serialization, or batching concerns.
+- downstream selection, serialization, or batching concerns.
 
 A Seed may contain active values such as `Active(head_state, cell_state)`, but
 those are ordinary values from a compatible Alphabet. Seed does not introduce

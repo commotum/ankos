@@ -49,12 +49,9 @@ fill this gap.
 
 Episode is not currently specified as:
 
-- a PE training example;
-- a serialized token row;
+- a downstream training example or serialized dataset record;
 - a batch element;
-- a manifest or stream item;
 - a fixed dense array type;
-- a `Trace` alias; or
 - an `initial state + horizon` request object.
 
 These may be downstream uses or future design options, but none is part of the

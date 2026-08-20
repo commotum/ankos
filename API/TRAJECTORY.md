@@ -89,8 +89,8 @@ Trajectory does not own:
 - a rollout step count, duration, depth, or stopping limit;
 - CPU, GPU, memory, timeout, or solver resources;
 - materialized Episode arrays;
-- batching or stream-selection policy;
-- PE serialization, tokenization, masks, or splits; or
+- downstream selection or batching policy;
+- serialization, tokenization, masks, or dataset splits; or
 - taxonomy metadata unrelated to semantic identity.
 
 Those concerns either belong to the later rollout design or remain downstream.
