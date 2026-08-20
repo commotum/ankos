@@ -110,9 +110,13 @@ X_{t+1}(c)=X_t(c).
 For a family whose support changes, the Rule defines the complete successor
 support and its values. Earlier time slices remain intact.
 
+This describes the ordinary discrete case. A definite Rule in another family
+may instead be an exact relation, stochastic law, continuous law, or
+event-driven law. How rollout realizes those laws is deliberately deferred.
+
 A definite Rule must therefore settle:
 
-- the exact observation-to-output mapping or exact transition function;
+- the exact observation-to-output mapping or other exact transition law;
 - all selected constants, coefficients, table entries, gates, and thresholds;
 - any state-dependent activity expressed through Alphabet values; and
 - any family-specific choice that changes the transition law.
@@ -133,9 +137,9 @@ Inactive(symbol)
 Active(controller_state, symbol)
 ```
 
-The Rule maps the complete current state to the complete next state using
-those values. It does not issue `KEEP`, `CREATE`, `UPDATE`, `REPLACE`, or
-`DELETE` commands against an existing state.
+The Rule defines complete successor state semantics using those values. It
+does not issue `KEEP`, `CREATE`, `UPDATE`, `REPLACE`, or `DELETE` commands
+against an existing state.
 
 An implementation may derive active coordinates to avoid unnecessary work,
 but that is an execution optimization and not part of Rule or SimpleProgram

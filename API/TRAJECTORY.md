@@ -19,8 +19,10 @@ Trajectory(
 )
 ```
 
-The Trajectory denotes the path implied by that pairing whether or not later
-states have been materialized.
+The Trajectory denotes the evolution implied by that pairing whether or not
+later states have been materialized. For deterministic dynamics this is one
+path. How the term is realized for branching, stochastic, continuous, or
+event-driven dynamics remains part of the deferred rollout design.
 
 ## Fields
 
@@ -77,10 +79,10 @@ variants, provided the relevant Alphabets admit its values.
 A Trajectory identifies **which path** is under discussion. It does not say how
 much of that path to compute now.
 
-The path begins with Seed at explicit time `t=0`. For ordinary discrete
-dynamics, later states occupy new time coordinates. Earlier coordinates remain
-immutable; logical persistence means copying a value into a later time slice,
-not updating an old coordinate.
+The evolution begins with Seed at its explicit initial time, ordinarily
+`t=0`. For ordinary discrete dynamics, later states occupy new time
+coordinates. Earlier coordinates remain immutable; logical persistence means
+copying a value into a later time slice, not updating an old coordinate.
 
 ## Non-Responsibilities
 
