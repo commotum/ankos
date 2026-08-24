@@ -27,7 +27,7 @@ States into an Episode.
 ## Detailed Implementation Plan
 
 - Add primitive Space helpers for finite box support, relational support,
-  fixed boundary values, periodic wrapping, and reflection.
+  fixed boundary values, and periodic wrapping.
 - Add Space read resolution that preserves the requested time and rejects an
   unavailable source time.
 - Implement `step(trajectory, state)` and `rollout(trajectory, limit)` in a new
@@ -58,7 +58,7 @@ States into an Episode.
 ## Stage Results
 
 - Added `src/ca/spaces.py` with plain Cartesian and relational coordinate
-  enumeration plus fixed, periodic, and reflective boundary resolution.
+  enumeration plus fixed and periodic boundary resolution.
 - Added `src/ca/rollout.py` with `step(trajectory, state)` and
   `rollout(trajectory, limit)`. Every step allocates a complete successor
   mapping at `t + 1`; the prior State is never edited or consulted through a

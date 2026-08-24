@@ -43,30 +43,6 @@ def box_wrap(
     return tuple(value % size for value, size in zip(address, seed.shape))
 
 
-def box_reflect(
-    address: tuple[object, ...],
-    seed: object,
-) -> tuple[object, ...]:
-    """Reflect one Cartesian spatial address through Seed dimensions."""
-
-    if not isinstance(seed, Seed) or not isinstance(seed.shape, tuple):
-        raise ValueError("reflective box resolution requires tuple Seed shape")
-    if len(address) != len(seed.shape):
-        raise ValueError("address rank does not match box Seed shape")
-    if any(not isinstance(value, int) for value in address):
-        raise TypeError("box addresses must contain integers")
-
-    reflected: list[int] = []
-    for value, size in zip(address, seed.shape):
-        if size == 1:
-            reflected.append(0)
-            continue
-        period = 2 * size
-        residue = value % period
-        reflected.append(residue if residue < size else period - residue - 1)
-    return tuple(reflected)
-
-
 def relation_coordinates(seed: object) -> tuple[tuple[object], ...]:
     """Enumerate stable addresses from an ordered Seed support."""
 
@@ -114,7 +90,7 @@ def read(
     ):
         return boundary[1]
 
-    if boundary in {"periodic", "reflective"}:
+    if boundary == "periodic":
         if space.normalize is None:
             raise ValueError(f"{boundary} Space requires a normalization function")
         normalized = space.normalize(spatial, seed)
@@ -130,7 +106,6 @@ def read(
 
 __all__ = [
     "box_coordinates",
-    "box_reflect",
     "box_wrap",
     "fixed",
     "read",
