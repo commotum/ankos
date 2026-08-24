@@ -16,6 +16,28 @@ fields, regions, or update mechanisms. Those are descriptions of particular
 families. The shared runtime only needs coordinates, values, reads, and one
 exact transition rule.
 
+## Package organization
+
+The five primitive value namespaces live together under `ca.core`:
+
+```text
+ca/core/
+    spaces.py
+    alphabets.py
+    neighborhoods.py
+    rules.py
+    seeds.py
+```
+
+`ca.simpleprograms` composes the first four values. Root-level `ca.rollout`
+pairs a SimpleProgram with a Seed as a Trajectory and produces an Episode.
+`ca.utils.selector` supplies shared coordinate mathematics, while
+`ca.utils.viz` is optional downstream presentation tooling. Named canonical
+families remain grouped under `ca.catalog`.
+
+The root `ca` package re-exports the ordinary public interface, so this
+internal organization does not add import ceremony for normal use.
+
 ## The five inputs
 
 | Value | Minimal representation | Responsibility |

@@ -57,6 +57,16 @@ class Episode:
 
 No inheritance hierarchy or generic framework is required.
 
+## Package layers
+
+The five primitive namespaces live under `ca.core`: `spaces`, `alphabets`,
+`neighborhoods`, `rules`, and `seeds`. Root-level `ca.simpleprograms` owns
+composition, while root-level `ca.rollout` owns Trajectory, Episode, and
+execution. Shared selection mathematics and optional visualization live under
+`ca.utils`; canonical named families live under `ca.catalog`.
+
+The root `ca` package re-exports the normal public names.
+
 ## Space and Seed divide responsibility
 
 Space defines the coordinate law, not a semantic kind of world. Its axes

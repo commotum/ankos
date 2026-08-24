@@ -6,8 +6,8 @@ from collections.abc import Callable, Mapping
 from itertools import product
 from math import ceil
 
-from . import selector
-from .core import Coordinate, Seed
+from ..utils import selector
+from .seeds import Coordinate, Seed
 
 
 def current(source: Coordinate, seed: Seed) -> tuple[Coordinate, ...]:

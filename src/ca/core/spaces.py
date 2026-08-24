@@ -1,11 +1,37 @@
-"""Plain coordinate enumeration and boundary resolution for Space values."""
+"""Definite Space values, coordinate enumeration, and boundary resolution."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from itertools import product
 
-from .core import Coordinate, Seed, Space, State, state_time
+from .seeds import Coordinate, Seed, State, state_time
+
+
+@dataclass(frozen=True)
+class Space:
+    """One definite coordinate, extent, and boundary law."""
+
+    axes: tuple[str, ...]
+    extent: str
+    boundary: object
+    coordinates: Callable[[object], tuple[tuple[object, ...], ...]]
+    normalize: Callable[[tuple[object, ...], object], tuple[object, ...]] | None = None
+
+    def __post_init__(self) -> None:
+        axes = tuple(self.axes)
+        object.__setattr__(self, "axes", axes)
+        if not axes or axes[0] != "t":
+            raise ValueError("Space axes must begin with explicit time axis 't'")
+        if len(set(axes)) != len(axes):
+            raise ValueError("Space axes must be unique")
+        if not isinstance(self.extent, str) or not self.extent:
+            raise ValueError("Space extent law must be a nonempty string")
+        if not callable(self.coordinates):
+            raise TypeError("Space coordinates must be callable")
+        if self.normalize is not None and not callable(self.normalize):
+            raise TypeError("Space normalize must be callable when supplied")
 
 
 def fixed(value: object) -> tuple[str, object]:
@@ -105,6 +131,7 @@ def read(
 
 
 __all__ = [
+    "Space",
     "box_coordinates",
     "box_wrap",
     "fixed",

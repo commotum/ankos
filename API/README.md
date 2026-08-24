@@ -17,6 +17,14 @@ SIMPLEPROGRAM + SEED                       -> TRAJECTORY
 rollout(TRAJECTORY, limit)                  -> EPISODE
 ```
 
+## Package layers
+
+The five primitive namespaces live under `ca.core`. Composition lives in
+root-level `ca.simpleprograms`, and execution lives in root-level `ca.rollout`.
+Mechanics-neutral selection helpers and optional visualization live under
+`ca.utils`; named family implementations live under `ca.catalog`. The root
+package re-exports the normal public API.
+
 The singular values are fully selected. The plural names are ordinary source
 functions or iterables that may produce several singular values.
 
