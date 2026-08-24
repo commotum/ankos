@@ -55,11 +55,11 @@ is not a sparse patch to be merged into mutable storage. The initial State is
 already the first complete slice of an Episode.
 
 Every Seed value must belong to the chosen Alphabet before execution. Its
-coordinate rank and support must match the chosen Space. Relation selectors
-must find the relation data they require.
+coordinate rank and support must match the chosen Space.
 
-These checks happen when `SimpleProgram` and Seed meet in a Trajectory. The Seed
-source does not need to know one exact Rule in advance.
+These checks happen when `SimpleProgram` and Seed meet in a Trajectory.
+Relation data is validated when a relation selector reads it during execution.
+The Seed source does not need to know one exact Rule in advance.
 
 ## Independence
 

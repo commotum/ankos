@@ -214,8 +214,10 @@ Compatibility is checked when a program and Seed meet:
 
 - coordinate rank and support match Space;
 - the initial State is complete at one explicit time;
-- every value belongs to Alphabet;
-- required relation data is available.
+- every value belongs to Alphabet.
+
+Plain relation data is validated when a relation-based Neighborhood actually
+selects from it.
 
 ## Plural sources and future presets
 

@@ -98,11 +98,12 @@ Examples include:
 
 - fixed exterior value;
 - periodic normalization;
-- no exterior boundary for an unbounded coordinate law.
+- no exterior resolution (`None`), requiring every selected address to remain
+  inside realized support.
 
-A fixed exterior value must be admitted by the Alphabet. Periodic and
-normalization uses the realized Seed shape. A coordinate law with no exterior
-need not invent a boundary value.
+A fixed exterior value must be admitted by the Alphabet. Periodic
+normalization uses the realized Seed shape. With `None`, an exterior read is a
+direct error rather than an invented value.
 
 Neighborhood is still responsible for selecting the candidate addresses.
 Space is responsible for resolving them. Rule receives only the resulting

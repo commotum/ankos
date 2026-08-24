@@ -1,6 +1,6 @@
 # Goal 9 — Primitive Kernel Refactor
 
-Status: stages 1 through 5 complete; `6-CUTOVER` is in progress.
+Status: stages 1 through 6 complete; `7-PRESET-READY` is in progress.
 
 ## Big Picture Objective
 
@@ -132,6 +132,10 @@ These facts were observed when this scaffold was created:
 - Ordinary generator functions and explicit loops now demonstrably produce
   multiple definite values, SimplePrograms, and compatible Trajectories. No
   production plural-source abstraction or preset layer was necessary.
+- The cutover removed the legacy runtime instead of hiding it. The live
+  package now imports only the primitive kernel and flat honest catalog, the
+  full retained suite passes, and the configured public documentation matches
+  that execution path.
 
 ## Assumptions To Verify
 

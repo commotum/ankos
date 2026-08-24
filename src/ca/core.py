@@ -119,6 +119,11 @@ class SimpleProgram:
             self.neighborhood, tuple
         ):
             raise TypeError("Neighborhood must be an offset tuple or callable")
+        if isinstance(self.neighborhood, tuple) and any(
+            not isinstance(offset, tuple) or len(offset) != len(self.space.axes)
+            for offset in self.neighborhood
+        ):
+            raise ValueError("Neighborhood offsets must match Space coordinate rank")
         if not callable(self.rule):
             raise TypeError("Rule must be callable")
         boundary_value = _fixed_boundary_value(self.space.boundary)

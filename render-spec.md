@@ -3,9 +3,9 @@
 > **Superseded design record:** The specification below was written against
 > the removed 0.1 `Dynamics`, `RawEpisode`, and `RawBatch` surface. Its bundle
 > format history remains useful, but its Python API examples are not current.
-> ankos 0.2.0 visualization consumes explicit downstream
-> `DatasetEpisode`/`DatasetBatch` views; see [`README-V2.md`](README-V2.md),
-> [`api.md`](api.md), and `src/ca/viz/`.
+> Only the existing-bundle decoder and local static viewer remain. Projection
+> from the new `Episode` and bundle export are future downstream work; see
+> [`README-V2.md`](README-V2.md), [`api.md`](api.md), and `src/ca/viz/`.
 
 ## Purpose
 

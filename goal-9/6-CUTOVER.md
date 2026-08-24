@@ -64,5 +64,31 @@ unimplemented progress markers.
 
 ## Stage Results
 
-- Pending final cutover verification.
-
+- Deleted the entire rejected runtime: semantic alphabet/seed/neighborhood/
+  rule modules, `loci.py`, `frontiers.py`, the old program executor, datasets,
+  RNG, serialization, categorized catalog package, viz exporter, dataset
+  example, and obsolete ECA/serialization smoke tests.
+- The live package is now `core.py`, `selector.py`, `spaces.py`, `rollout.py`,
+  a flat `catalog.py`, and an independent stdlib decoder/viewer for existing
+  bundles. A fresh import loads only `ca`, `ca.catalog`, `ca.core`,
+  `ca.selector`, `ca.spaces`, and `ca.rollout`.
+- Replaced the old categorized catalog with sixty explicit book-ordered
+  `NotImplementedError` progress functions and flattened the corresponding
+  `ref/types.csv` paths. The retained catalog test checks taxonomy integrity,
+  not signatures or permanent incompleteness.
+- Removed NumPy from `pyproject.toml` and `uv.lock`; no remaining Python source
+  imports it.
+- Rewrote `README-V2.md`, `api.md`, and `API/*.md` around the live primitive
+  contract. Historical visualization documents now carry explicit stale-API
+  banners.
+- Source size fell from roughly 31,600 Python lines before cutover to 930 live
+  kernel/catalog lines, plus 131 independent viewer lines.
+- Verification:
+  - `uv run pytest -q` -> `19 passed`.
+  - `uv build` successfully built the source distribution and wheel.
+  - A fresh import exposed exactly the intended kernel plus catalog.
+  - Searches found no stale legacy imports or packaging entry points.
+  - `git diff --check` passed.
+- One deliberately temporary condition remains for Stage 7 to audit: all sixty
+  catalog entries are currently stubs. This is not encoded as a permanent
+  test, so implementing the first real preset will not be punished.

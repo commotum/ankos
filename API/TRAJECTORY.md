@@ -28,8 +28,11 @@ checks that:
 - Seed coordinates match Space axes;
 - Seed shape/support can be interpreted by Space;
 - Seed supplies exactly one complete initial slice;
-- every Seed value belongs to Alphabet;
-- required relation data is present when it can be checked directly.
+- every Seed value belongs to Alphabet.
+
+Trajectory construction does not execute Neighborhood functions. A
+relation-based selector validates its required plain Seed relation when it is
+used by `step`.
 
 This allows Seed sources to remain reusable. They do not need to accept one
 exact SimpleProgram merely to exist.

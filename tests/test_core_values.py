@@ -101,3 +101,22 @@ def test_trajectory_rejects_values_outside_alphabet() -> None:
         assert "outside Alphabet" in str(error)
     else:
         raise AssertionError("Alphabet-invalid Seed was accepted")
+
+
+def test_program_rejects_neighborhood_offsets_with_wrong_rank() -> None:
+    try:
+        SimpleProgram(
+            space=Space(
+                axes=("t", "x"),
+                extent="finite-from-seed",
+                boundary=("fixed", 0),
+                coordinates=_line_coordinates,
+            ),
+            alphabet=frozenset({0, 1}),
+            neighborhood=((0, 0, 1),),
+            rule=_identity_rule,
+        )
+    except ValueError as error:
+        assert "match Space coordinate rank" in str(error)
+    else:
+        raise AssertionError("a wrong-rank Neighborhood was accepted")
