@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Iterator
 
-from ..core import spaces as space_values
-from ..core.seeds import Coordinate, Seed
-from ..core.spaces import Space
-from ..simpleprograms import SimpleProgram
+from ...core import spaces as space_values
+from ...core.seeds import Coordinate, Seed
+from ...core.spaces import Space
+from ...simpleprograms import SimpleProgram
 
 
 BINARY = frozenset({0, 1})

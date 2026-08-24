@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from ca import Seed, Trajectory, rollout
-from ca.presets import elementary_cellular_automata as eca
+from ca.catalog.automata import elementary_ca as eca
 
 
 def _row(

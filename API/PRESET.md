@@ -80,7 +80,7 @@ role.
 
 ## First concrete preset
 
-`ca.presets.elementary_cellular_automata` supplies binary t+1D Spaces, the
+`ca.catalog.automata.elementary_ca` supplies binary t+1D Spaces, the
 ordered left/self/right Neighborhood, exact Wolfram-numbered Rules, complete
 SimplePrograms, and separate centered Seed sources. Width is required by the
 Seed source rather than stored in Space or SimpleProgram.

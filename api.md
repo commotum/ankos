@@ -63,8 +63,8 @@ The five primitive namespaces live under `ca.core`: `spaces`, `alphabets`,
 `neighborhoods`, `rules`, and `seeds`. Root-level `ca.simpleprograms` owns
 composition, while root-level `ca.rollout` owns Trajectory, Episode, and
 execution. Shared selection mathematics and optional visualization live under
-`ca.utils`; canonical named families live under `ca.catalog`; runnable
-compositions live under `ca.presets`.
+`ca.utils`; canonical named families and their runnable compositions live under
+`ca.catalog`.
 
 The root `ca` package re-exports the normal public names.
 
@@ -156,7 +156,7 @@ Compatibility is checked where values meet. Sources may accept dependencies
 directly—for example, `neighborhoods(space)` and
 `rules(alphabet, neighborhood)`—instead of encoding a new framework.
 
-`ca.presets.elementary_cellular_automata` is the first concrete implementation.
+`ca.catalog.automata.elementary_ca` is the first concrete implementation.
 It keeps finite width in its Seed source and yields one exact callable for each
 selected Wolfram rule number.
 

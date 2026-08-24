@@ -85,4 +85,4 @@ for space in spaces():
 ```
 
 Dependencies and compatibility filters may be written directly in those
-loops. `ca.presets.elementary_cellular_automata` is the first concrete example.
+loops. `ca.catalog.automata.elementary_ca` is the first concrete example.

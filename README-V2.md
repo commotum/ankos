@@ -33,8 +33,7 @@ ca/core/
 pairs a SimpleProgram with a Seed as a Trajectory and produces an Episode.
 `ca.utils.selector` supplies shared coordinate mathematics, while
 `ca.utils.viz` is optional downstream presentation tooling. Named canonical
-families remain grouped under `ca.catalog`; runnable preset modules live under
-`ca.presets`.
+families and their runnable modules remain grouped under `ca.catalog`.
 
 The root `ca` package re-exports the ordinary public interface, so this
 internal organization does not add import ceremony for normal use.
@@ -286,7 +285,7 @@ shapes. Workload code pairs compatible programs and Seeds to make
 Trajectories, then selects a rollout limit to produce Episodes.
 
 Preset is a module convention, not a required class. The first concrete module
-is `ca.presets.elementary_cellular_automata`: it yields exact Wolfram-numbered
+is `ca.catalog.automata.elementary_ca`: it yields exact Wolfram-numbered
 SimplePrograms and separate centered Seeds whose widths are supplied explicitly.
 
 ## Execution scope
