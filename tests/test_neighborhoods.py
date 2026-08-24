@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ca import Seed, neighborhoods
+from ca import Seed, neighborhoods, selector
 
 
 def _relational_seed(adjacency: dict[str, list[str]]) -> Seed:
@@ -22,6 +22,20 @@ def test_resolve_accepts_offsets_and_address_functions() -> None:
         (4, 11),
     )
     assert neighborhoods.resolve(neighborhoods.current, (4, 10), seed) == ((4, 10),)
+
+
+def test_ball_is_a_definite_ordered_neighborhood_with_explicit_time() -> None:
+    assert neighborhoods.ball(
+        spatial_rank=2,
+        radius=1,
+        metric=selector.taxicab,
+    ) == (
+        (0, -1, 0),
+        (0, 0, -1),
+        (0, 0, 0),
+        (0, 0, 1),
+        (0, 1, 0),
+    )
 
 
 def test_relation_neighborhood_uses_seed_data_and_preserves_order() -> None:

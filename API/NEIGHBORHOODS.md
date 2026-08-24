@@ -46,6 +46,19 @@ The leading zero keeps every read at the current explicit time. Applied at
 Offsets match the complete coordinate rank. Their order is meaningful because
 an exhaustive Rule may distinguish left, self, and right.
 
+Regular metric neighborhoods can be constructed without a semantic class:
+
+```python
+neighborhood = neighborhoods.ball(
+    spatial_rank=2,
+    radius=1,
+    metric=selector.taxicab,
+)
+```
+
+This returns one definite ordered tuple of offsets, each beginning with a zero
+time displacement.
+
 ## Address functions
 
 Fixed offsets are not required. A relation-based Neighborhood can use ordinary

@@ -11,6 +11,7 @@ def test_selection_composes_named_axis_predicates_without_reordering() -> None:
         (0, -1),
         (0, 0),
         (0, 1),
+        (0, 1),
         (0, 2),
         (1, 1),
     )
@@ -23,6 +24,7 @@ def test_selection_composes_named_axis_predicates_without_reordering() -> None:
 
     assert selector.select(coordinates, interior_odd_at_t0) == (
         (0, -1),
+        (0, 1),
         (0, 1),
     )
 

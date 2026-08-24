@@ -113,6 +113,11 @@ offset tuples; relation-driven spaces use a small address function. Space
 resolves any selected address through its boundary law before the Rule sees
 the observed values.
 
+`ca.selector` provides shared coordinate mathematics beneath these values:
+predicate composition, metrics, filtering, translation, relation following,
+and deterministic ordering. Spaces, Neighborhoods, and Seed sources may use
+those helpers. Selector is not a sixth input and has no runtime object model.
+
 There is no separate Frontier field. When only some logical sites are active,
 activity is represented in ordinary Alphabet values and interpreted by the
 Rule. Every realized coordinate still receives a value at the new explicit

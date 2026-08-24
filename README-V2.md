@@ -176,6 +176,17 @@ def adjacent(source, seed):
 Space resolves selected addresses through the chosen boundary law. Rule then
 receives the ordered observed values.
 
+The package separates two implementation layers without adding another
+SimpleProgram field:
+
+- `ca.selector` contains reusable coordinate predicates, metrics, filtering,
+  translation, relation following, and ordering;
+- `ca.neighborhoods` resolves one definite Neighborhood for execution and
+  provides common relation-based constructions.
+
+These are ordinary function libraries. There is no `Selector` or
+`Neighborhood` class hierarchy.
+
 There is no separate Frontier in the SimpleProgram. A family with a moving
 active site can encode active and inactive cases directly in Alphabet values.
 Neighborhood reads the necessary local values, Rule moves the activity tag,

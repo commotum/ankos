@@ -39,7 +39,7 @@ def translate(
 
 def follow_relation(
     source: Coordinate,
-    relation: Mapping[object, tuple[object, ...]],
+    relation: Mapping[object, Sequence[object]],
     axis: int = -1,
 ) -> tuple[Coordinate, ...]:
     """Replace one source component with each ordered target in a relation."""
@@ -52,9 +52,7 @@ def follow_relation(
         raise ValueError("relation axis is outside the source coordinate") from error
     if origin not in relation:
         raise ValueError("relation does not define the source address")
-    targets = relation[origin]
-    if not isinstance(targets, tuple):
-        raise TypeError("ordered relation targets must be a tuple")
+    targets = tuple(relation[origin])
 
     resolved: list[Coordinate] = []
     for target in targets:
@@ -65,13 +63,13 @@ def follow_relation(
 
 
 def all_of(*predicates: Predicate) -> Predicate:
-    """Return a predicate requiring every supplied predicate."""
+    """Require every predicate; an empty conjunction accepts everything."""
 
     return lambda coordinate: all(predicate(coordinate) for predicate in predicates)
 
 
 def any_of(*predicates: Predicate) -> Predicate:
-    """Return a predicate requiring at least one supplied predicate."""
+    """Require any predicate; an empty disjunction accepts nothing."""
 
     return lambda coordinate: any(predicate(coordinate) for predicate in predicates)
 
@@ -130,7 +128,11 @@ def mod_equal(
     if modulus <= 0:
         raise ValueError("modulus must be positive")
     index = _axis_index(axis, axes)
-    return lambda coordinate: coordinate[index] % modulus == phase % modulus  # type: ignore[operator]
+
+    def matches_phase(coordinate: Coordinate) -> bool:
+        return coordinate[index] % modulus == phase % modulus  # type: ignore[operator]
+
+    return matches_phase
 
 
 def taxicab(delta: tuple[float, ...]) -> float:
@@ -160,7 +162,10 @@ def _displacement(
     if len(coordinate) != len(center):
         raise ValueError("coordinate and center must have the same rank")
     try:
-        return tuple(value - origin for value, origin in zip(coordinate, center))  # type: ignore[operator,return-value]
+        return tuple(  # type: ignore[return-value]
+            value - origin  # type: ignore[operator]
+            for value, origin in zip(coordinate, center)
+        )
     except TypeError as error:
         raise TypeError("metric predicates require subtractable coordinates") from error
 
@@ -196,15 +201,20 @@ def on_shell(
 
 def lexicographic_order(
     coordinates: Iterable[Coordinate],
-    axes: Sequence[int] | None = None,
+    components: Sequence[int] | None = None,
 ) -> tuple[Coordinate, ...]:
     """Return coordinates in deterministic lexicographic order."""
 
     realized = tuple(coordinates)
-    if axes is None:
+    if components is None:
         return tuple(sorted(realized))
-    indices = tuple(axes)
-    return tuple(sorted(realized, key=lambda coordinate: tuple(coordinate[i] for i in indices)))
+    indices = tuple(components)
+    return tuple(
+        sorted(
+            realized,
+            key=lambda coordinate: tuple(coordinate[index] for index in indices),
+        )
+    )
 
 
 __all__ = [

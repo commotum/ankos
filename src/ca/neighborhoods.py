@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from itertools import product
+from math import ceil
 
 from . import selector
 from .core import Coordinate, Seed
@@ -25,17 +27,27 @@ def relation(
 
     def resolve_relation(source: Coordinate, seed: Seed) -> tuple[Coordinate, ...]:
         if len(source) != 2:
-            raise ValueError("relation Neighborhoods require coordinates shaped as (t, address)")
+            raise ValueError(
+                "relation Neighborhoods require coordinates shaped as (t, address)"
+            )
         relation_data = seed.relations.get(name)
         if not isinstance(relation_data, Mapping):
             raise ValueError(f"Seed does not supply relation {name!r}")
 
-        vertices = {coordinate[1] for coordinate in seed.values if len(coordinate) == 2}
+        vertices = {
+            coordinate[1] for coordinate in seed.values if len(coordinate) == 2
+        }
         if set(relation_data) != vertices:
-            raise ValueError(f"relation {name!r} must define every realized address exactly once")
+            raise ValueError(
+                f"relation {name!r} must define every realized address exactly once"
+            )
 
         selected = selector.follow_relation(source, relation_data)
-        missing = tuple(coordinate[1] for coordinate in selected if coordinate[1] not in vertices)
+        missing = tuple(
+            coordinate[1]
+            for coordinate in selected
+            if coordinate[1] not in vertices
+        )
         if missing:
             raise ValueError(
                 f"relation {name!r} targets {len(missing)} address(es) outside Seed support"
@@ -47,6 +59,44 @@ def relation(
 
 
 adjacent = relation("adjacent")
+
+
+def ball(
+    spatial_rank: int,
+    radius: float,
+    *,
+    metric: Callable[[tuple[float, ...]], float] = selector.taxicab,
+) -> tuple[Coordinate, ...]:
+    """Return a lattice ball of full offsets with zero time displacement."""
+
+    if spatial_rank < 0:
+        raise ValueError("spatial rank must be nonnegative")
+    bound = ceil(radius)
+    candidates = product(range(-bound, bound + 1), repeat=spatial_rank)
+    selected = selector.select(
+        candidates,
+        selector.within_radius(radius, metric=metric),
+    )
+    return tuple((0, *offset) for offset in selected)
+
+
+def shell(
+    spatial_rank: int,
+    radius: float,
+    *,
+    metric: Callable[[tuple[float, ...]], float] = selector.taxicab,
+) -> tuple[Coordinate, ...]:
+    """Return a lattice shell of full offsets with zero time displacement."""
+
+    if spatial_rank < 0:
+        raise ValueError("spatial rank must be nonnegative")
+    bound = ceil(radius)
+    candidates = product(range(-bound, bound + 1), repeat=spatial_rank)
+    selected = selector.select(
+        candidates,
+        selector.on_shell(radius, metric=metric),
+    )
+    return tuple((0, *offset) for offset in selected)
 
 
 def resolve(
@@ -71,4 +121,4 @@ def resolve(
     return addresses
 
 
-__all__ = ["adjacent", "current", "relation", "resolve"]
+__all__ = ["adjacent", "ball", "current", "relation", "resolve", "shell"]
