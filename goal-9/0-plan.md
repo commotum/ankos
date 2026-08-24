@@ -1,6 +1,7 @@
 # Goal 9 — Primitive Kernel Refactor
 
-Status: stages 1 through 6 complete; `7-PRESET-READY` is in progress.
+Status: complete. All seven stages and all twelve success requirements are
+verified in `7-PRESET-READY.md`.
 
 ## Big Picture Objective
 
@@ -136,6 +137,9 @@ These facts were observed when this scaffold was created:
   package now imports only the primitive kernel and flat honest catalog, the
   full retained suite passes, and the configured public documentation matches
   that execution path.
+- The final audit verified the clean import graph, five-class value inventory,
+  behavioral fixtures, sixty honest current catalog stubs, absence of presets
+  and legacy files, successful package build, full tests, and whitespace.
 
 ## Assumptions To Verify
 
