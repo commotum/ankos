@@ -63,7 +63,8 @@ The five primitive namespaces live under `ca.core`: `spaces`, `alphabets`,
 `neighborhoods`, `rules`, and `seeds`. Root-level `ca.simpleprograms` owns
 composition, while root-level `ca.rollout` owns Trajectory, Episode, and
 execution. Shared selection mathematics and optional visualization live under
-`ca.utils`; canonical named families live under `ca.catalog`.
+`ca.utils`; canonical named families live under `ca.catalog`; runnable
+compositions live under `ca.presets`.
 
 The root `ca` package re-exports the normal public names.
 
@@ -133,7 +134,7 @@ activity is represented in ordinary Alphabet values and interpreted by the
 Rule. Every realized coordinate still receives a value at the new explicit
 time.
 
-## Plural sources and future presets
+## Plural sources and presets
 
 Plural names mean ordinary iterables or functions that yield singular values:
 
@@ -145,9 +146,9 @@ RULES         -> one or more definite Rule callables
 SEEDS         -> one or more definite Seed values
 ```
 
-A future preset is a normal Python module containing such functions and
-explicit loops. It is not a `Preset` class, parameter solver, or hidden product
-engine. A program preset may combine the first four sources into
+A preset is a normal Python module containing such functions and explicit
+loops. It is not a `Preset` class, parameter solver, or hidden product engine.
+A program preset may combine the first four sources into
 `SimpleProgram` values. A separate Seed source may then be paired with any
 compatible program to form Trajectories.
 
@@ -155,8 +156,9 @@ Compatibility is checked where values meet. Sources may accept dependencies
 directly—for example, `neighborhoods(space)` and
 `rules(alphabet, neighborhood)`—instead of encoding a new framework.
 
-Goal 9 stops at this preset-ready interface. It does not ship canonical preset
-implementations.
+`ca.presets.elementary_cellular_automata` is the first concrete implementation.
+It keeps finite width in its Seed source and yields one exact callable for each
+selected Wolfram rule number.
 
 ## Deferred execution questions
 

@@ -74,7 +74,7 @@ distinguished by their selected four components, including the exact Rule.
 
 ## From plural sources
 
-Future source code combines definite values with explicit loops:
+Source code combines definite values with explicit loops:
 
 ```python
 for space in spaces():
@@ -85,5 +85,4 @@ for space in spaces():
 ```
 
 Dependencies and compatibility filters may be written directly in those
-loops. Goal 9 requires the kernel to support this pattern but does not add
-canonical preset implementations.
+loops. `ca.presets.elementary_cellular_automata` is the first concrete example.

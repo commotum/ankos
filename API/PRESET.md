@@ -1,4 +1,4 @@
-# Future presets
+# Presets
 
 ## Preset is a module convention, not a class
 
@@ -49,7 +49,7 @@ injection container, factory protocol, or constraint solver.
 
 ## Field sources
 
-Future modules may provide reusable sources at any level:
+Modules may provide reusable sources at any level:
 
 - `spaces()` yields boundary and coordinate-law variants;
 - `alphabets()` yields definite admitted value sets;
@@ -78,10 +78,13 @@ This is more precise than saying either that all presets contain Seeds or that
 presets categorically exclude them. The actual returned value determines the
 role.
 
-## Goal 9 stopping point
+## First concrete preset
 
-Goal 9 makes the kernel ready for this code but does not implement canonical
-preset modules. The first real presets should be added one at a time, starting
-from a concrete documented family and tested through actual successor values.
+`ca.presets.elementary_cellular_automata` supplies binary t+1D Spaces, the
+ordered left/self/right Neighborhood, exact Wolfram-numbered Rules, complete
+SimplePrograms, and separate centered Seed sources. Width is required by the
+Seed source rather than stored in Space or SimpleProgram.
 
-Do not add placeholder preset classes or builders merely to reserve names.
+Additional presets should still be added one at a time from concrete documented
+families. Do not add placeholder preset classes or builders merely to reserve
+names.

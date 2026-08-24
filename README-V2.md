@@ -33,7 +33,8 @@ ca/core/
 pairs a SimpleProgram with a Seed as a Trajectory and produces an Episode.
 `ca.utils.selector` supplies shared coordinate mathematics, while
 `ca.utils.viz` is optional downstream presentation tooling. Named canonical
-families remain grouped under `ca.catalog`.
+families remain grouped under `ca.catalog`; runnable preset modules live under
+`ca.presets`.
 
 The root `ca` package re-exports the ordinary public interface, so this
 internal organization does not add import ceremony for normal use.
@@ -252,7 +253,7 @@ Compatibility is checked when a program and Seed meet:
 Plain relation data is validated when a relation-based Neighborhood actually
 selects from it.
 
-## Plural sources and future presets
+## Plural sources and presets
 
 Plural names describe ordinary source functions or iterables:
 
@@ -264,7 +265,7 @@ RULES         -> RULE
 SEEDS         -> SEED
 ```
 
-A future program preset can be one normal module with explicit loops:
+A program preset is one normal module with explicit loops:
 
 ```python
 def programs():
@@ -284,8 +285,9 @@ A seed preset can independently yield structured or random Seeds over several
 shapes. Workload code pairs compatible programs and Seeds to make
 Trajectories, then selects a rollout limit to produce Episodes.
 
-Preset is a module convention, not a required class. The initial refactor stops
-at a preset-ready kernel and does not add canonical preset implementations.
+Preset is a module convention, not a required class. The first concrete module
+is `ca.presets.elementary_cellular_automata`: it yields exact Wolfram-numbered
+SimplePrograms and separate centered Seeds whose widths are supplied explicitly.
 
 ## Execution scope
 
