@@ -57,4 +57,26 @@ States into an Episode.
 
 ## Stage Results
 
-- Pending implementation.
+- Added `src/ca/spaces.py` with plain Cartesian and relational coordinate
+  enumeration plus fixed, periodic, and reflective boundary resolution.
+- Added `src/ca/rollout.py` with `step(trajectory, state)` and
+  `rollout(trajectory, limit)`. Every step allocates a complete successor
+  mapping at `t + 1`; the prior State is never edited or consulted through a
+  mutation action.
+- Strengthened `Episode` so every stored State has exactly one explicit time
+  and successive States have consecutive times.
+- Added anonymous behavioral fixtures for finite Cartesian and relational
+  coordinates. They are deliberately not named or packaged as presets.
+- Verification:
+  - `uv run pytest -q tests/test_execution.py tests/test_selector.py tests/test_core_values.py`
+    -> `14 passed`.
+  - The execution tests prove exact Cartesian and relational successors,
+    fixed/periodic boundary differences, immutable earlier slices, zero-limit
+    behavior, rejected unavailable-time reads, and rejected Rule outputs
+    outside Alphabet.
+  - `rg` found no `loci`, `frontier`, writable capability, certificate,
+    denotation, disposition, or old `apply` reference in the new kernel and
+    execution tests.
+  - `git diff --check` passed.
+- Stage 5 can now test plural ordinary sources against real execution rather
+  than merely testing constructors.

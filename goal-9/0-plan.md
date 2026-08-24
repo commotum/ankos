@@ -1,6 +1,6 @@
 # Goal 9 — Primitive Kernel Refactor
 
-Status: stages 1 through 3 complete; `4-EXECUTE` is in progress.
+Status: stages 1 through 5 complete; `6-CUTOVER` is in progress.
 
 ## Big Picture Objective
 
@@ -125,6 +125,13 @@ These facts were observed when this scaffold was created:
   reference transition will therefore be `step(trajectory, state)`, allowing
   the Trajectory's Seed to provide realized bounds or adjacency while State
   remains a plain immutable explicit-time mapping.
+- The new reference executor passes fourteen focused behavioral checks across
+  Cartesian and relational spaces without importing any legacy execution
+  machinery. Complete successor slices and explicit time are now implemented,
+  not merely documented.
+- Ordinary generator functions and explicit loops now demonstrably produce
+  multiple definite values, SimplePrograms, and compatible Trajectories. No
+  production plural-source abstraction or preset layer was necessary.
 
 ## Assumptions To Verify
 

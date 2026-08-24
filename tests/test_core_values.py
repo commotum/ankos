@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ca import Seed, SimpleProgram, Space, Trajectory
+from ca import Seed, SimpleProgram, Space, Trajectory, rollout
 
 
 def _line_coordinates(seed: object) -> tuple[tuple[int], ...]:
@@ -46,6 +46,18 @@ def test_one_program_accepts_two_realized_seed_shapes() -> None:
     assert long.program is program
     assert short.seed.shape == (3,)
     assert long.seed.shape == (5,)
+    assert dict(rollout(short, 1).states[1]) == {
+        (1, 0): 0,
+        (1, 1): 1,
+        (1, 2): 0,
+    }
+    assert dict(rollout(long, 1).states[1]) == {
+        (1, 0): 0,
+        (1, 1): 0,
+        (1, 2): 1,
+        (1, 3): 0,
+        (1, 4): 0,
+    }
 
 
 def test_seed_detaches_mutable_input_state_and_relations() -> None:

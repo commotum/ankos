@@ -1,12 +1,9 @@
-# ANKoS Target API
+# Desired API
 
-Status: **normative greenfield specification**
+These files define the desired minimal ANKoS API. They are the design target,
+not a promise to preserve earlier abstractions.
 
-These documents define the desired semantic API without inheriting vocabulary,
-object boundaries, or implementation constraints from earlier runtimes or
-downstream applications.
-
-## Object Graph
+## Data flow
 
 ```text
 SPACES        -> SPACE
@@ -14,69 +11,35 @@ ALPHABETS     -> ALPHABET
 NEIGHBORHOODS -> NEIGHBORHOOD
 RULES         -> RULE
 
-SPACES + ALPHABETS + NEIGHBORHOODS + RULES -> PRESET
-
 SPACE + ALPHABET + NEIGHBORHOOD + RULE -> SIMPLEPROGRAM
-
-PRESET -> SIMPLEPROGRAMS
-SEEDS  -> SEED
-
-SIMPLEPROGRAM + SEED -> TRAJECTORY
-
-rollout(TRAJECTORY, RESOURCES/LIMIT) -> EPISODE
+SEEDS                                      -> SEED
+SIMPLEPROGRAM + SEED                       -> TRAJECTORY
+rollout(TRAJECTORY, limit)                  -> EPISODE
 ```
+
+The singular values are fully selected. The plural names are ordinary source
+functions or iterables that may produce several singular values.
 
 ## Documents
 
-| Specification | Defines |
-|---|---|
-| [SPACES.md](SPACES.md) | Generation and meaning of coordinate and boundary laws |
-| [ALPHABETS.md](ALPHABETS.md) | Generation and meaning of admissible values |
-| [NEIGHBORHOODS.md](NEIGHBORHOODS.md) | Generation and meaning of observation relations |
-| [RULES.md](RULES.md) | Rule schemes and generation of exact selected transition laws |
-| [SEEDS.md](SEEDS.md) | Independent generation of exact initial states and concrete extents |
-| [PRESET.md](PRESET.md) | Coherent generation of definite SimplePrograms |
-| [SIMPLEPROGRAM.md](SIMPLEPROGRAM.md) | One definite reusable dynamics |
-| [TRAJECTORY.md](TRAJECTORY.md) | One SimpleProgram paired with one Seed |
-| [EPISODE.md](EPISODE.md) | Reserved rollout result whose detailed contract is deferred |
+- [SPACES.md](SPACES.md): explicit coordinate axes, extent law, and boundary.
+- [ALPHABETS.md](ALPHABETS.md): admitted values.
+- [NEIGHBORHOODS.md](NEIGHBORHOODS.md): ordered read-address selection.
+- [RULES.md](RULES.md): one exact successor-value callable.
+- [SEEDS.md](SEEDS.md): realized support and complete initial values.
+- [SIMPLEPROGRAM.md](SIMPLEPROGRAM.md): reusable composition of the four
+  dynamics values.
+- [TRAJECTORY.md](TRAJECTORY.md): one program paired with one Seed.
+- [EPISODE.md](EPISODE.md): the complete immutable States produced by rollout.
+- [PRESET.md](PRESET.md): future ordinary source modules, not a class.
 
-## Central Ownership
+## Design line
 
-| Concern | Owner |
-|---|---|
-| Explicit time, rank, axes, coordinate relations | Space |
-| Finite/infinite/dynamic extent law | Space |
-| Boundary behavior | Space |
-| Concrete initial shape or extent | Seed |
-| Initial values and realized initial support | Seed |
-| Admitted values | Alphabet |
-| Read/dependency relation | Neighborhood |
-| One exact selected transition law | Rule |
-| Reusable dynamics | SimpleProgram |
-| Dynamics plus initial condition | Trajectory |
-| Rollout result | Episode, detailed meaning deferred |
+Coordinates remain ordinary tuples. Time is the first component of every
+coordinate. Shape and support belong to Seed; boundary behavior belongs to
+Space. Neighborhood reads addresses, and Rule maps the selected values to one
+new value.
 
-For a finite shape-polymorphic Space, Seed supplies the concrete dimensions.
-For an infinite Space, Seed support is only initial support and does not become
-world extent.
-
-## Plain Implementation Principle
-
-The uppercase singular and plural words describe roles, not mandatory class
-families. A plural source can be an ordinary iterable, generator function, or
-small declarative value. A singular result can be plain immutable data or a
-callable law.
-
-Prefer the smallest representation that preserves the specified meaning. Do
-not add framework layers, defensive type systems, or named intermediate
-objects without a concrete semantic need.
-
-## Rollout Boundary
-
-The specification deliberately stops at:
-
-```text
-rollout(TRAJECTORY, RESOURCES/LIMIT) -> EPISODE
-```
-
-The exact rollout call and Episode representation will be resolved later.
+The executor creates a complete new time slice and leaves every prior slice
+untouched. No public Frontier, mutation operation, semantic coordinate class,
+inheritance tree, or generic framework is part of this design.

@@ -1,18 +1,13 @@
-"""Downstream visualization export and local viewer conveniences.
+"""Independent helpers for reading and serving existing viewer bundles.
 
-This surface consumes only explicit ``DatasetEpisode`` and ``DatasetBatch``
-tensor views. It does not infer a
-representation from a semantic application or rollout result, define semantic
-serialization, or influence program execution. Bundle format version 1 and
-the local viewer remain independent presentation tooling.
+Episode projection and bundle export are deliberately outside the primitive
+kernel. This downstream module does not participate in program execution.
 """
 
-
-from .export import VizBundleInfo, save_viewer_bundle
+from .format import decode_header
 from .server import serve
 
 __all__ = [
-    "VizBundleInfo",
-    "save_viewer_bundle",
+    "decode_header",
     "serve",
 ]
