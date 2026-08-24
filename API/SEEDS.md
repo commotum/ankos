@@ -58,8 +58,8 @@ Every Seed value must belong to the chosen Alphabet before execution. Its
 coordinate rank and support must match the chosen Space.
 
 These checks happen when `SimpleProgram` and Seed meet in a Trajectory.
-Relation data is validated when a relation selector reads it during execution.
-The Seed source does not need to know one exact Rule in advance.
+Relation data is validated when a relation-based Neighborhood reads it during
+execution. The Seed source does not need to know one exact Rule in advance.
 
 ## Independence
 

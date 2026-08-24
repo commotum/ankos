@@ -40,6 +40,11 @@ coordinate. Shape and support belong to Seed; boundary behavior belongs to
 Space. Neighborhood reads addresses, and Rule maps the selected values to one
 new value.
 
+`ca.selector` is a supporting function library for coordinate predicates,
+metrics, translation, filtering, relations, and ordering. Spaces,
+Neighborhoods, and Seed sources may reuse it, but Selector is not an additional
+SimpleProgram component.
+
 The executor creates a complete new time slice and leaves every prior slice
 untouched. No public Frontier, mutation operation, semantic coordinate class,
 inheritance tree, or generic framework is part of this design.

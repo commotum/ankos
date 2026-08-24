@@ -53,7 +53,7 @@ Future modules may provide reusable sources at any level:
 
 - `spaces()` yields boundary and coordinate-law variants;
 - `alphabets()` yields definite admitted value sets;
-- `neighborhoods(space)` yields selectors matching the coordinate rank;
+- `neighborhoods(space)` yields Neighborhoods matching the coordinate rank;
 - `rules(alphabet, neighborhood)` yields exact callables;
 - `seeds()` yields shapes and complete initial States.
 

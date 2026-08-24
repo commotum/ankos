@@ -1,12 +1,34 @@
-"""Coordinate and relation selection without semantic locus classes."""
+"""Behavioral checks for the shared coordinate-selection helpers."""
 
 from __future__ import annotations
 
-from ca import Seed, selector
+from ca import selector
 
 
-def test_relative_offsets_preserve_order_and_explicit_time() -> None:
-    assert selector.relative(
+def test_selection_composes_named_axis_predicates_without_reordering() -> None:
+    coordinates = (
+        (0, -2),
+        (0, -1),
+        (0, 0),
+        (0, 1),
+        (0, 2),
+        (1, 1),
+    )
+    axes = ("t", "x")
+    interior_odd_at_t0 = selector.all_of(
+        selector.axis_equal("t", 0, axes=axes),
+        selector.axis_between("x", -1, 1, axes=axes),
+        selector.negate(selector.mod_equal("x", 2, axes=axes)),
+    )
+
+    assert selector.select(coordinates, interior_odd_at_t0) == (
+        (0, -1),
+        (0, 1),
+    )
+
+
+def test_translation_and_relation_following_preserve_declared_order() -> None:
+    assert selector.translate(
         (5, 10, 20),
         ((0, -1, 0), (0, 0, 0), (-1, 0, 2)),
     ) == (
@@ -14,46 +36,40 @@ def test_relative_offsets_preserve_order_and_explicit_time() -> None:
         (5, 10, 20),
         (4, 10, 22),
     )
+    assert selector.follow_relation(
+        (5, "b"),
+        {"a": ("b",), "b": ("c", "a"), "c": ("b",)},
+    ) == ((5, "c"), (5, "a"))
 
 
-def _relational_seed(adjacency: dict[str, list[str]]) -> Seed:
-    return Seed(
-        shape=("a", "b", "c"),
-        values={(0, "a"): 0, (0, "b"): 1, (0, "c"): 0},
-        relations={"edge": adjacency},
+def test_metrics_construct_reusable_ball_and_shell_predicates() -> None:
+    candidates = ((-1, -1), (-1, 0), (0, 0), (0, 1), (1, 0), (1, 1))
+
+    assert selector.taxicab((3, -4)) == 7
+    assert selector.euclidean((3, -4)) == 5
+    assert selector.chebyshev((3, -4)) == 4
+    assert selector.select(
+        candidates,
+        selector.within_radius(1, metric=selector.taxicab),
+    ) == ((-1, 0), (0, 0), (0, 1), (1, 0))
+    assert selector.select(
+        candidates,
+        selector.on_shell(1, metric=selector.chebyshev),
+    ) == ((-1, -1), (-1, 0), (0, 1), (1, 0), (1, 1))
+
+
+def test_predicate_alternatives_and_lexicographic_order_are_plain_functions() -> None:
+    endpoint = selector.any_of(
+        selector.axis_equal(1, -1),
+        selector.axis_equal(1, 1),
     )
 
-
-def test_relation_selector_preserves_seed_order() -> None:
-    seed = _relational_seed(
-        {"a": ["b"], "b": ["c", "a"], "c": ["b"]}
+    assert selector.select(((0, 0), (0, 1), (0, -1)), endpoint) == (
+        (0, 1),
+        (0, -1),
     )
-    edge_neighbors = selector.relation("edge")
-
-    assert edge_neighbors((0, "b"), seed) == ((0, "c"), (0, "a"))
-    assert selector.select(edge_neighbors, (0, "b"), seed) == (
-        (0, "c"),
-        (0, "a"),
+    assert selector.lexicographic_order(((0, 1), (0, -1), (0, 0))) == (
+        (0, -1),
+        (0, 0),
+        (0, 1),
     )
-
-
-def test_relation_selector_rejects_targets_outside_support() -> None:
-    seed = _relational_seed(
-        {"a": ["b"], "b": ["c", "missing"], "c": ["b"]}
-    )
-    edge_neighbors = selector.relation("edge")
-
-    try:
-        edge_neighbors((0, "b"), seed)
-    except ValueError as error:
-        assert "outside Seed support" in str(error)
-    else:
-        raise AssertionError("relation target outside support was accepted")
-
-
-def test_current_selects_the_plain_source_coordinate() -> None:
-    seed = _relational_seed(
-        {"a": ["b"], "b": ["a", "c"], "c": ["b"]}
-    )
-
-    assert selector.current((0, "a"), seed) == ((0, "a"),)

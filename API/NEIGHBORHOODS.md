@@ -13,6 +13,17 @@ There are two useful forms:
 
 No region, locus, graph, tile, or neighborhood class hierarchy is needed.
 
+## Shared selector helpers
+
+`ca.selector` is the small coordinate-selection library used to construct
+Spaces, Neighborhoods, and structured Seeds. It supplies ordinary functions
+for filtering and translating coordinates, composing predicates, measuring
+taxicab/Euclidean/Chebyshev distance, selecting balls and shells, following
+plain relations, and ordering results.
+
+Selector is not another SimpleProgram field and there is no `Selector` class.
+It is reusable mathematical vocabulary beneath the five API concepts.
+
 ## Relative offsets
 
 For a t+1D three-cell neighborhood:
@@ -37,8 +48,8 @@ an exhaustive Rule may distinguish left, self, and right.
 
 ## Address functions
 
-Fixed offsets are not required. A relation selector can use ordinary Seed
-data:
+Fixed offsets are not required. A relation-based Neighborhood can use ordinary
+Seed data:
 
 ```python
 def adjacent(source, seed):
@@ -48,8 +59,9 @@ def adjacent(source, seed):
 
 This supports `(t, v)` coordinate spaces, irregular adjacencies, and other
 address relationships without introducing semantic coordinate types. The
-selector returns coordinates; it does not return graph nodes or region
-objects.
+Neighborhood returns coordinates; it does not return graph nodes or region
+objects. `ca.neighborhoods.relation(name)` provides this common construction
+using the generic relation-following helper from `ca.selector`.
 
 ## Division of responsibility
 

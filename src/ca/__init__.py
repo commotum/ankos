@@ -1,6 +1,6 @@
 """Primitive, coordinate-first simple-program values."""
 
-from . import catalog, selector, spaces
+from . import catalog, neighborhoods, selector, spaces
 from .core import Episode, Seed, SimpleProgram, Space, Trajectory
 from .rollout import rollout, step
 
@@ -12,6 +12,7 @@ __all__ = [
     "Space",
     "Trajectory",
     "catalog",
+    "neighborhoods",
     "rollout",
     "selector",
     "spaces",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ca import Seed, SimpleProgram, Space, Trajectory, rollout, selector, spaces, step
+from ca import Seed, SimpleProgram, Space, Trajectory, neighborhoods, rollout, spaces, step
 
 
 def _binary_line(
@@ -102,7 +102,7 @@ def test_relational_rollout_uses_seed_adjacency() -> None:
             coordinates=spaces.relation_coordinates,
         ),
         alphabet=frozenset({0, 1}),
-        neighborhood=selector.adjacent,
+        neighborhood=neighborhoods.adjacent,
         rule=_any_observed,
     )
     seed = Seed(

@@ -1,17 +1,30 @@
-"""Coordinate selection with ordinary tuples and plain relation mappings."""
+"""Small, dependency-free helpers for selecting ordinary coordinates."""
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from math import isclose, sqrt
 
-from .core import Coordinate, Seed
+
+Coordinate = tuple[object, ...]
+Predicate = Callable[[Coordinate], bool]
+Metric = Callable[[tuple[float, ...]], float]
 
 
-def relative(
-    source: Coordinate,
-    offsets: tuple[Coordinate, ...],
+def select(
+    candidates: Iterable[Coordinate],
+    predicate: Predicate,
 ) -> tuple[Coordinate, ...]:
-    """Translate ordered numeric offsets relative to one full source address."""
+    """Return matching candidates in their original order."""
+
+    return tuple(candidate for candidate in candidates if predicate(candidate))
+
+
+def translate(
+    source: Coordinate,
+    offsets: Iterable[Coordinate],
+) -> tuple[Coordinate, ...]:
+    """Translate ordered numeric offsets relative to one coordinate."""
 
     selected: list[Coordinate] = []
     for offset in offsets:
@@ -20,82 +33,194 @@ def relative(
         try:
             selected.append(tuple(value + delta for value, delta in zip(source, offset)))
         except TypeError as error:
-            raise TypeError("relative offsets require additive coordinate components") from error
+            raise TypeError("translation requires additive coordinate components") from error
     return tuple(selected)
 
 
-def current(source: Coordinate, seed: Seed) -> tuple[Coordinate, ...]:
-    """Select only the current source address."""
-
-    del seed
-    return (source,)
-
-
-def relation(
-    name: str,
-) -> Callable[[Coordinate, Seed], tuple[Coordinate, ...]]:
-    """Return a selector that follows one ordered Seed relation."""
-
-    if not isinstance(name, str) or not name:
-        raise ValueError("relation name must be a nonempty string")
-
-    def select_relation(source: Coordinate, seed: Seed) -> tuple[Coordinate, ...]:
-        if len(source) != 2:
-            raise ValueError("relation selectors require coordinates shaped as (t, address)")
-        relation_data = seed.relations.get(name)
-        if not isinstance(relation_data, Mapping):
-            raise ValueError(f"Seed does not supply relation {name!r}")
-
-        vertices = {
-            coordinate[1]
-            for coordinate in seed.values
-            if len(coordinate) == 2
-        }
-        if set(relation_data) != vertices:
-            raise ValueError(
-                f"relation {name!r} must define every realized address exactly once"
-            )
-
-        vertex = source[1]
-        if vertex not in vertices:
-            raise ValueError("relation source is outside Seed support")
-        neighbors = relation_data[vertex]
-        if not isinstance(neighbors, tuple):
-            raise TypeError("ordered relation targets must be a tuple")
-        missing = tuple(neighbor for neighbor in neighbors if neighbor not in vertices)
-        if missing:
-            raise ValueError(
-                f"relation {name!r} targets {len(missing)} address(es) outside Seed support"
-            )
-        return tuple((source[0], neighbor) for neighbor in neighbors)
-
-    select_relation.__name__ = f"select_{name}"
-    return select_relation
-
-
-adjacent = relation("adjacent")
-
-
-def select(
-    neighborhood: object,
+def follow_relation(
     source: Coordinate,
-    seed: Seed,
+    relation: Mapping[object, tuple[object, ...]],
+    axis: int = -1,
 ) -> tuple[Coordinate, ...]:
-    """Resolve an offset tuple or address function into ordered addresses."""
+    """Replace one source component with each ordered target in a relation."""
 
-    if callable(neighborhood):
-        addresses = tuple(neighborhood(source, seed))
-    elif isinstance(neighborhood, tuple):
-        addresses = relative(source, neighborhood)
-    else:
-        raise TypeError("Neighborhood must be an offset tuple or callable")
+    if not source:
+        raise ValueError("a relation source cannot be empty")
+    try:
+        origin = source[axis]
+    except IndexError as error:
+        raise ValueError("relation axis is outside the source coordinate") from error
+    if origin not in relation:
+        raise ValueError("relation does not define the source address")
+    targets = relation[origin]
+    if not isinstance(targets, tuple):
+        raise TypeError("ordered relation targets must be a tuple")
 
-    if any(
-        not isinstance(address, tuple) or len(address) != len(source)
-        for address in addresses
-    ):
-        raise ValueError("Neighborhood returned an address with the wrong rank")
-    return addresses
+    resolved: list[Coordinate] = []
+    for target in targets:
+        coordinate = list(source)
+        coordinate[axis] = target
+        resolved.append(tuple(coordinate))
+    return tuple(resolved)
 
 
-__all__ = ["adjacent", "current", "relation", "relative", "select"]
+def all_of(*predicates: Predicate) -> Predicate:
+    """Return a predicate requiring every supplied predicate."""
+
+    return lambda coordinate: all(predicate(coordinate) for predicate in predicates)
+
+
+def any_of(*predicates: Predicate) -> Predicate:
+    """Return a predicate requiring at least one supplied predicate."""
+
+    return lambda coordinate: any(predicate(coordinate) for predicate in predicates)
+
+
+def negate(predicate: Predicate) -> Predicate:
+    """Return the Boolean complement of a predicate."""
+
+    return lambda coordinate: not predicate(coordinate)
+
+
+def _axis_index(axis: int | str, axes: Sequence[str] | None) -> int:
+    if isinstance(axis, int):
+        return axis
+    if axes is None:
+        raise ValueError("named-axis predicates require an axes sequence")
+    try:
+        return tuple(axes).index(axis)
+    except ValueError as error:
+        raise ValueError(f"unknown axis {axis!r}") from error
+
+
+def axis_equal(
+    axis: int | str,
+    value: object,
+    *,
+    axes: Sequence[str] | None = None,
+) -> Predicate:
+    """Select coordinates whose named or indexed component equals a value."""
+
+    index = _axis_index(axis, axes)
+    return lambda coordinate: coordinate[index] == value
+
+
+def axis_between(
+    axis: int | str,
+    low: object,
+    high: object,
+    *,
+    axes: Sequence[str] | None = None,
+) -> Predicate:
+    """Select coordinates whose component lies in one inclusive interval."""
+
+    index = _axis_index(axis, axes)
+    return lambda coordinate: low <= coordinate[index] <= high  # type: ignore[operator]
+
+
+def mod_equal(
+    axis: int | str,
+    modulus: int,
+    phase: int = 0,
+    *,
+    axes: Sequence[str] | None = None,
+) -> Predicate:
+    """Select integer coordinate components with one modular phase."""
+
+    if modulus <= 0:
+        raise ValueError("modulus must be positive")
+    index = _axis_index(axis, axes)
+    return lambda coordinate: coordinate[index] % modulus == phase % modulus  # type: ignore[operator]
+
+
+def taxicab(delta: tuple[float, ...]) -> float:
+    """Return the L1 norm of a coordinate displacement."""
+
+    return sum(abs(value) for value in delta)
+
+
+def euclidean(delta: tuple[float, ...]) -> float:
+    """Return the L2 norm of a coordinate displacement."""
+
+    return sqrt(sum(value * value for value in delta))
+
+
+def chebyshev(delta: tuple[float, ...]) -> float:
+    """Return the L-infinity norm of a coordinate displacement."""
+
+    return max((abs(value) for value in delta), default=0.0)
+
+
+def _displacement(
+    coordinate: Coordinate,
+    center: Coordinate | None,
+) -> tuple[float, ...]:
+    if center is None:
+        return coordinate  # type: ignore[return-value]
+    if len(coordinate) != len(center):
+        raise ValueError("coordinate and center must have the same rank")
+    try:
+        return tuple(value - origin for value, origin in zip(coordinate, center))  # type: ignore[operator,return-value]
+    except TypeError as error:
+        raise TypeError("metric predicates require subtractable coordinates") from error
+
+
+def within_radius(
+    radius: float,
+    *,
+    metric: Metric = taxicab,
+    center: Coordinate | None = None,
+) -> Predicate:
+    """Select coordinates at most ``radius`` from an optional center."""
+
+    if radius < 0:
+        raise ValueError("radius must be nonnegative")
+    return lambda coordinate: metric(_displacement(coordinate, center)) <= radius
+
+
+def on_shell(
+    radius: float,
+    *,
+    metric: Metric = taxicab,
+    center: Coordinate | None = None,
+) -> Predicate:
+    """Select coordinates exactly one metric radius from an optional center."""
+
+    if radius < 0:
+        raise ValueError("radius must be nonnegative")
+    return lambda coordinate: isclose(
+        metric(_displacement(coordinate, center)),
+        radius,
+    )
+
+
+def lexicographic_order(
+    coordinates: Iterable[Coordinate],
+    axes: Sequence[int] | None = None,
+) -> tuple[Coordinate, ...]:
+    """Return coordinates in deterministic lexicographic order."""
+
+    realized = tuple(coordinates)
+    if axes is None:
+        return tuple(sorted(realized))
+    indices = tuple(axes)
+    return tuple(sorted(realized, key=lambda coordinate: tuple(coordinate[i] for i in indices)))
+
+
+__all__ = [
+    "all_of",
+    "any_of",
+    "axis_between",
+    "axis_equal",
+    "chebyshev",
+    "euclidean",
+    "follow_relation",
+    "lexicographic_order",
+    "mod_equal",
+    "negate",
+    "on_shell",
+    "select",
+    "taxicab",
+    "translate",
+    "within_radius",
+]

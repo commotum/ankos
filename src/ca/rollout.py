@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import selector, spaces
+from . import neighborhoods, spaces
 from .core import (
     Episode,
     State,
@@ -41,7 +41,7 @@ def step(trajectory: Trajectory, state: State) -> State:
 
     for spatial in program.space.coordinates(seed):
         source = (time, *spatial)
-        addresses = selector.select(program.neighborhood, source, seed)
+        addresses = neighborhoods.resolve(program.neighborhood, source, seed)
         observed = tuple(
             spaces.read(program.space, current, address, seed)
             for address in addresses
