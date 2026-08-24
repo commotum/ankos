@@ -1,6 +1,6 @@
 # Goal 9 — Primitive Kernel Refactor
 
-Status: scaffolded; implementation has not started.
+Status: `1-CUTLINE` and `2-VALUES` complete; `3-SELECTOR` is next.
 
 ## Big Picture Objective
 
@@ -114,11 +114,23 @@ These facts were observed when this scaffold was created:
 - `API/` contains desired-direction documents, but they are not automatically
   authoritative where they conflict with the decisions in this goal.
 - The worktree was clean when this scaffold was created.
+- Stage 1 found no in-repository production consumer or packaging entry point
+  that requires backwards compatibility with the existing API.
+- The four baseline tests pass but none asserts a successor State. Existing
+  green status is therefore not evidence that the old dynamics are correct.
+- The old core is mutually dependent through `loci` and `frontiers`; a clean
+  coherent replacement is required rather than incremental compatibility
+  wrappers.
+- Relational Seed shape cannot be reconstructed from a bare State. The
+  reference transition will therefore be `step(trajectory, state)`, allowing
+  the Trajectory's Seed to provide realized bounds or adjacency while State
+  remains a plain immutable explicit-time mapping.
 
 ## Assumptions To Verify
 
 - Breaking the current Python API is acceptable for this refactor. Stage 1
-  must identify any real consumer before relying on this assumption.
+  found no in-repository consumer requiring compatibility; any external
+  compatibility request must be separately evidenced and authorized.
 - A plain immutable coordinate-to-value mapping is sufficient for the first
   reference executor. Dense arrays and graph-optimized storage can be added
   later without changing semantics.
@@ -289,7 +301,7 @@ complete immutable successor States.
 #### Detailed Implementation Plan
 
 - Implement direct Space reads, including exact finite boundary behavior.
-- Implement `step(program, state)` as complete successor construction:
+- Implement `step(trajectory, state)` as complete successor construction:
   - enumerate every required successor coordinate;
   - obtain prior addresses from Neighborhood;
   - read through Space boundary resolution;

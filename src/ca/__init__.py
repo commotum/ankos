@@ -1,35 +1,6 @@
-"""Closed, composable simple programs.
+"""Primitive, coordinate-first simple-program values."""
 
-The package root is intentionally small: component constructors remain under
-their plural owner modules, and complete named constructions live under the
-single ``ca.catalog`` namespace.
-"""
-
-from . import (
-    alphabets,
-    catalog,
-    frontiers,
-    loci,
-    neighborhoods,
-    program,
-    rules,
-    seeds,
-    serialization,
-)
-from .program import SimpleProgram, apply, rollout
+from .core import Episode, Seed, SimpleProgram, Space, Trajectory
 
 
-__all__ = [
-    "SimpleProgram",
-    "apply",
-    "rollout",
-    "program",
-    "catalog",
-    "loci",
-    "alphabets",
-    "seeds",
-    "frontiers",
-    "neighborhoods",
-    "rules",
-    "serialization",
-]
+__all__ = ["Episode", "Seed", "SimpleProgram", "Space", "Trajectory"]
