@@ -199,6 +199,9 @@ class Episode:
         frozen_states = tuple(freeze_state(state) for state in self.states)
         if not frozen_states:
             raise ValueError("Episode must contain at least its Seed state")
+        times = tuple(state_time(state) for state in frozen_states)
+        if any(later != earlier + 1 for earlier, later in zip(times, times[1:])):
+            raise ValueError("Episode States must have consecutive explicit times")
         object.__setattr__(self, "states", frozen_states)
 
 

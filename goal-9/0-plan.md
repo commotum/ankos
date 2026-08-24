@@ -1,6 +1,6 @@
 # Goal 9 — Primitive Kernel Refactor
 
-Status: `1-CUTLINE` and `2-VALUES` complete; `3-SELECTOR` is next.
+Status: stages 1 through 3 complete; `4-EXECUTE` is in progress.
 
 ## Big Picture Objective
 
