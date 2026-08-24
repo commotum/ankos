@@ -111,13 +111,25 @@ addresses are interpreted.
 Examples include:
 
 - fixed exterior value;
-- periodic normalization;
+- periodic boundary resolution;
 - no exterior resolution (`None`), requiring every selected address to remain
   inside realized support.
 
 A fixed exterior value must be admitted by the Alphabet. Periodic resolution
 uses the realized Seed shape. With `None`, an exterior read is a direct error
 rather than an invented value.
+
+The generic constructors keep these laws consistent:
+
+```python
+spaces.fixed(value)       # ("fixed", value)
+spaces.periodic()         # ("periodic", spaces.box_wrap)
+```
+
+`spaces.periodic(normalize=...)` may select another ordinary normalization
+function when a non-Cartesian coordinate law actually needs one. The function
+travels with the periodic boundary value rather than occupying a second Space
+field.
 
 Neighborhood is still responsible for selecting the candidate addresses.
 Space is responsible for resolving them. Rule receives only the resulting
@@ -129,10 +141,19 @@ Use a plural Space source only when the module genuinely varies Space. For
 example, a study may sweep boundary behavior:
 
 ```python
+from ca import spaces as space_values
+
+
 def spaces():
-    yield spaces.cartesian(("t", "x"), boundary=spaces.fixed(0))
-    yield spaces.cartesian(("t", "x"), boundary=spaces.fixed(1))
-    yield spaces.cartesian(("t", "x"), boundary=spaces.periodic())
+    yield space_values.cartesian(
+        ("t", "x"), boundary=space_values.fixed(0)
+    )
+    yield space_values.cartesian(
+        ("t", "x"), boundary=space_values.fixed(1)
+    )
+    yield space_values.cartesian(
+        ("t", "x"), boundary=space_values.periodic()
+    )
 ```
 
 It should not vary concrete dimensions such as 5 versus 11; those variants

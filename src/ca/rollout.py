@@ -101,7 +101,7 @@ def step(trajectory: Trajectory, state: State) -> State:
             spaces.read(program.space, current, address, seed)
             for address in addresses
         )
-        value = program.rule(observed, source)
+        value = program.rule(observed)
         if not alphabets.accepts(program.alphabet, value):
             raise ValueError(f"Rule output at {source!r} is outside Alphabet")
         successor[(time + 1, *spatial)] = value

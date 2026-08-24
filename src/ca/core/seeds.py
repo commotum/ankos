@@ -76,4 +76,28 @@ class Seed:
         return state_time(self.values)
 
 
-__all__ = ["Coordinate", "Seed", "State", "freeze_state", "state_time"]
+def dense(values: object, *, time: int = 0) -> Seed:
+    """Build a rectangular Seed from ordinary nested lists or tuples."""
+
+    realized: dict[tuple[int, ...], object] = {}
+
+    def visit(value: object, address: tuple[int, ...]) -> tuple[int, ...]:
+        if isinstance(value, (list, tuple)):
+            if not value:
+                raise ValueError("dense Seed axes must be nonempty")
+            child_shapes = tuple(
+                visit(child, (*address, index))
+                for index, child in enumerate(value)
+            )
+            if len(set(child_shapes)) != 1:
+                raise ValueError("dense Seed values must form a rectangular shape")
+            return (len(value), *child_shapes[0])
+        realized[address] = value
+        return ()
+
+    shape = visit(values, ())
+    state = {(time, *address): value for address, value in realized.items()}
+    return Seed(shape=shape, values=state)
+
+
+__all__ = ["Coordinate", "Seed", "State", "dense", "freeze_state", "state_time"]

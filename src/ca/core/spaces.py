@@ -1,4 +1,4 @@
-"""Definite Space values, coordinate enumeration, and boundary resolution."""
+"""Definite coordinate Spaces and their boundary resolution."""
 
 from __future__ import annotations
 
@@ -11,13 +11,11 @@ from .seeds import Coordinate, Seed, State, state_time
 
 @dataclass(frozen=True)
 class Space:
-    """One definite coordinate, extent, and boundary law."""
+    """One definite coordinate-support and boundary law."""
 
     axes: tuple[str, ...]
-    extent: str
     boundary: object
     coordinates: Callable[[object], tuple[tuple[object, ...], ...]]
-    normalize: Callable[[tuple[object, ...], object], tuple[object, ...]] | None = None
 
     def __post_init__(self) -> None:
         axes = tuple(self.axes)
@@ -26,12 +24,8 @@ class Space:
             raise ValueError("Space axes must begin with explicit time axis 't'")
         if len(set(axes)) != len(axes):
             raise ValueError("Space axes must be unique")
-        if not isinstance(self.extent, str) or not self.extent:
-            raise ValueError("Space extent law must be a nonempty string")
         if not callable(self.coordinates):
             raise TypeError("Space coordinates must be callable")
-        if self.normalize is not None and not callable(self.normalize):
-            raise TypeError("Space normalize must be callable when supplied")
 
 
 def fixed(value: object) -> tuple[str, object]:
@@ -46,7 +40,7 @@ def box_coordinates(seed: object) -> tuple[tuple[int, ...], ...]:
     if not isinstance(seed, Seed) or not isinstance(seed.shape, tuple):
         raise ValueError("box Space requires Seed shape to be a tuple of sizes")
     shape = seed.shape
-    if not shape or any(
+    if any(
         isinstance(size, bool) or not isinstance(size, int) or size <= 0
         for size in shape
     ):
@@ -67,6 +61,31 @@ def box_wrap(
     if any(not isinstance(value, int) for value in address):
         raise TypeError("box addresses must contain integers")
     return tuple(value % size for value, size in zip(address, seed.shape))
+
+
+def periodic(
+    normalize: Callable[
+        [tuple[object, ...], object],
+        tuple[object, ...],
+    ] = box_wrap,
+) -> tuple[str, Callable[[tuple[object, ...], object], tuple[object, ...]]]:
+    """Return one consistently represented periodic boundary law."""
+
+    return ("periodic", normalize)
+
+
+def cartesian(
+    axes: tuple[str, ...],
+    *,
+    boundary: object = None,
+) -> Space:
+    """Return a Seed-sized Cartesian coordinate Space."""
+
+    return Space(
+        axes=axes,
+        boundary=boundary,
+        coordinates=box_coordinates,
+    )
 
 
 def relation_coordinates(seed: object) -> tuple[tuple[object], ...]:
@@ -116,10 +135,13 @@ def read(
     ):
         return boundary[1]
 
-    if boundary == "periodic":
-        if space.normalize is None:
-            raise ValueError(f"{boundary} Space requires a normalization function")
-        normalized = space.normalize(spatial, seed)
+    if (
+        isinstance(boundary, tuple)
+        and len(boundary) == 2
+        and boundary[0] == "periodic"
+        and callable(boundary[1])
+    ):
+        normalized = boundary[1](spatial, seed)
         target = (coordinate[0], *normalized)
         if target not in state:
             raise ValueError("Space normalization did not resolve to realized support")
@@ -134,7 +156,9 @@ __all__ = [
     "Space",
     "box_coordinates",
     "box_wrap",
+    "cartesian",
     "fixed",
+    "periodic",
     "read",
     "relation_coordinates",
 ]

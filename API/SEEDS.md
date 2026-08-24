@@ -34,6 +34,19 @@ Seed(
 )
 ```
 
+The common dense case should not be rebuilt by every catalog family. A generic
+helper can derive shape and explicit initial coordinates from ordinary nested
+values:
+
+```python
+seed = seeds.dense((0, 0, 1, 0, 0))
+```
+
+This is the same complete finite row as the expanded mapping above. Family
+modules may provide named patterns such as a centered impulse, but those are
+thin conveniences over generic Seed construction rather than competing Seed
+representations.
+
 For `(t, v)`, `shape` may be an ordered set of realized addresses rather than
 a Cartesian dimension tuple, with adjacency supplied as a mapping in
 `relations`.
@@ -70,9 +83,9 @@ A Seed also need not be generated for only one boundary variant. An 11x11
 binary Seed can be compatible with fixed-zero, fixed-one, or periodic Spaces,
 provided its values and coordinate rank satisfy each resulting program.
 
-## Plural source
+## Optional plural source
 
-`SEEDS` means a normal iterable or function yielding definite Seeds:
+Use a Seed source when initial conditions or shapes genuinely vary:
 
 ```python
 def seeds(shapes, random_keys):

@@ -33,7 +33,7 @@ Use the smallest ordinary Python value that expresses each part:
 | `RULE` | small stable callable value | One exact map from observed values to one successor value |
 | `SEED` | small frozen record | Realized shape/support and complete initial values |
 
-Only compositions need their own records:
+Beyond the small primitive values above, the remaining records are compositions:
 
 ```python
 @dataclass(frozen=True)
@@ -128,8 +128,10 @@ the Seed State and then calls `step` exactly `limit` times.
 A Neighborhood selects read addresses. Regular spaces usually use ordered
 spatial offset tuples; relation-driven spaces use a small address function.
 Time remains explicit in every State coordinate but is not repeated as a zero
-component in every local offset. Space resolves any selected address through
-its boundary law before the Rule sees the observed values.
+component in every local offset. Callable Neighborhoods likewise accept and
+return spatial addresses; execution restores the current time. Space resolves
+any selected address through its boundary law before the Rule sees the observed
+values.
 
 `ca.selector` provides shared coordinate mathematics beneath these values:
 predicate composition, metrics, filtering, translation, relation following,
@@ -147,11 +149,11 @@ Plural names mean ordinary iterables or functions that yield singular values
 when a field actually varies:
 
 ```text
-SPACES        -> one or more definite Space values
-ALPHABETS     -> one or more definite Alphabet values
-NEIGHBORHOODS -> one or more definite Neighborhood values
-RULES         -> one or more definite Rule callables
-SEEDS         -> one or more definite Seed values
+SPACES        -> definite Space values
+ALPHABETS     -> definite Alphabet values
+NEIGHBORHOODS -> definite Neighborhood values
+RULES         -> definite Rule values
+SEEDS         -> definite Seed values
 ```
 
 A preset is a normal Python module containing constants, source functions, and

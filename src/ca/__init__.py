@@ -2,6 +2,7 @@
 
 from . import catalog, simpleprograms
 from .core import alphabets, neighborhoods, rules, seeds, spaces
+from .core.rules import Rule
 from .core.seeds import Seed
 from .core.spaces import Space
 from .rollout import Episode, Trajectory, rollout, step
@@ -11,6 +12,7 @@ from .utils import selector
 
 __all__ = [
     "Episode",
+    "Rule",
     "Seed",
     "SimpleProgram",
     "Space",

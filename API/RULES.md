@@ -2,23 +2,39 @@
 
 ## Definition
 
-A Rule is one exact callable selected for a SimpleProgram. It receives the
-ordered values read by Neighborhood for one source coordinate and returns the
-one Alphabet value placed at the corresponding coordinate in the successor
-State.
+A Rule is one exact stable callable value selected for a SimpleProgram. It
+receives the ordered values read by Neighborhood for one source coordinate and
+returns the one Alphabet value placed at the corresponding coordinate in the
+successor State.
 
 ```python
-def rule(observed, source):
+def transition(observed):
     ...
     return successor_value
 ```
 
-`observed` follows Neighborhood order. `source` is the full current coordinate,
-including explicit time.
+`observed` follows Neighborhood order. Coordinate and time arguments are not
+part of the default contract because most local laws do not need them.
 
-The callable should have an identifying Python name. A selected table index or
-other useful identifier may be attached as ordinary data where needed; it does
-not require a Rule object hierarchy.
+`ca.core.rules.Rule` is a tiny frozen callable value that pairs this function
+with stable scientific identity such as a name and optional index. It is not a
+Rule class hierarchy. Its purpose is to make equivalent selected Rules compare,
+serialize, cache, and cross process boundaries without relying on a freshly
+created closure or metadata attached with `setattr`.
+
+```python
+table_30 = tuple((30 >> pattern) & 1 for pattern in range(8))
+exact_rule = Rule(
+    name="eca_rule_30",
+    function=apply_eca,
+    parameters=(table_30,),
+    index=30,
+)
+```
+
+Calling `exact_rule(observed)` invokes `apply_eca(observed, table_30)`. The
+selected Rule therefore carries its exact lookup table as well as its familiar
+Wolfram index.
 
 ## Exact Rule versus rule source
 
@@ -32,7 +48,7 @@ For an elementary cellular automaton:
 - Alphabet supplies two admitted values;
 - Neighborhood supplies the ordered left/self/right reads;
 - a rules source enumerates or selects one of the 256 exact tables;
-- one yielded callable becomes `SimpleProgram.rule`.
+- one yielded stable Rule value becomes `SimpleProgram.rule`.
 
 Changing from one table to another produces a different selected
 SimpleProgram value within the same broader family or preset source.
@@ -80,11 +96,12 @@ def rules(alphabet, neighborhood):
         yield compile_table(index, alphabet, neighborhood)
 ```
 
-Each yielded callable is definite. Compatibility can be checked while
+Each yielded Rule is definite. Compatibility can be checked while
 producing it or while constructing a SimpleProgram.
 
-## Plural source
+## Optional plural source
 
-`RULES` is only an ordinary iterable or function that yields exact callables.
-It is not a parameter-solving framework, base class, or delayed Rule family
-stored inside `SimpleProgram`.
+`RULES` is only an ordinary iterable or function that yields exact Rule values,
+and is useful when choices really vary. A family with one law can expose one
+Rule constant. It is not a parameter-solving framework, subclass tree, or
+delayed Rule family stored inside `SimpleProgram`.

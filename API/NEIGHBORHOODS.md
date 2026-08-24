@@ -67,16 +67,18 @@ Fixed offsets are not required. A relation-based Neighborhood can use ordinary
 Seed data:
 
 ```python
-def adjacent(source, seed):
-    t, address = source
-    return tuple((t, other) for other in seed.relations["adjacent"][address])
+def adjacent(spatial, seed):
+    (address,) = spatial
+    return tuple((other,) for other in seed.relations["adjacent"][address])
 ```
 
 This supports `(t, v)` coordinate spaces, irregular adjacencies, and other
 address relationships without introducing semantic coordinate types. The
-Neighborhood returns coordinates; it does not return graph nodes or region
-objects. `ca.neighborhoods.relation(name)` provides this common construction
-using the generic relation-following helper from `ca.selector`.
+Neighborhood accepts and returns spatial addresses; the resolver preserves the
+current explicit time when it forms full State coordinates. It does not return
+graph nodes or region objects. `ca.neighborhoods.relation(name)` provides this
+common construction using the generic relation-following helper from
+`ca.selector`.
 
 ## Division of responsibility
 
@@ -95,8 +97,9 @@ encoded in Alphabet values and interpreted by Rule.
 
 For each realized source coordinate, execution:
 
-1. asks Neighborhood for ordered addresses;
-2. resolves those addresses through Space;
+1. gives Neighborhood the source's spatial address;
+2. restores the current time and resolves the selected addresses through
+   Space;
 3. gathers their values from the complete current State;
 4. calls the exact Rule with those ordered values.
 

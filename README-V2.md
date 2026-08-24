@@ -82,14 +82,13 @@ This anonymous example uses a finite t+1D coordinate space. It is a fixture,
 not a canonical preset.
 
 ```python
-from ca import Seed, SimpleProgram, Space, Trajectory, rollout
-from ca import spaces
+from ca import Rule, SimpleProgram, Trajectory, rollout
+from ca import seeds, spaces
 
 
-space = Space(
+space = spaces.cartesian(
     axes=("t", "x"),
     boundary=spaces.fixed(0),
-    coordinates=spaces.box_coordinates,
 )
 
 alphabet = (0, 1)
@@ -109,19 +108,10 @@ program = SimpleProgram(
     space=space,
     alphabet=alphabet,
     neighborhood=neighborhood,
-    rule=any_observed_value,
+    rule=Rule(name="any_observed_value", function=any_observed_value),
 )
 
-seed = Seed(
-    shape=(5,),
-    values={
-        (0, 0): 0,
-        (0, 1): 0,
-        (0, 2): 1,
-        (0, 3): 0,
-        (0, 4): 0,
-    },
-)
+seed = seeds.dense((0, 0, 1, 0, 0))
 
 trajectory = Trajectory(program=program, seed=seed)
 episode = rollout(trajectory, limit=2)
@@ -192,16 +182,18 @@ explicit time.
 When adjacency is not a fixed translation, use a small function:
 
 ```python
-def adjacent(source, seed):
-    t, address = source
+def adjacent(spatial, seed):
+    (address,) = spatial
     return tuple(
-        (t, neighbor)
+        (neighbor,)
         for neighbor in seed.relations["adjacent"][address]
     )
 ```
 
-Space resolves selected addresses through the chosen boundary law. Rule then
-receives the ordered observed values.
+Neighborhood callables follow the same rule as offset tuples: they accept and
+return spatial addresses only. The resolver keeps the explicit source time,
+forms full State coordinates, and resolves them through the chosen Space
+boundary law. Rule then receives the ordered observed values.
 
 The package separates two implementation layers without adding another
 SimpleProgram field:
@@ -222,11 +214,12 @@ and every coordinate still receives a value in the next complete slice.
 ## A Rule is already selected
 
 An exhaustive table, totalistic law, or threshold construction may generate
-many Rules. `SimpleProgram.rule` is one exact callable produced by that source.
+many Rules. `SimpleProgram.rule` is one exact stable Rule value produced by that
+source.
 
 For an elementary cellular automaton, the binary Alphabet and ordered
 three-cell Neighborhood determine eight possible inputs. A rules source may
-generate 256 callables, but one SimpleProgram receives one selected table.
+generate 256 Rule values, but one SimpleProgram receives one selected table.
 
 The default Rule has the small execution shape:
 
@@ -280,17 +273,15 @@ genuine choices. When several inputs really do vary, composition remains
 ordinary explicit loops:
 
 ```python
-def programs():
-    for space in spaces():
-        for alphabet in alphabets():
-            for neighborhood in neighborhoods(space):
-                for rule in rules(alphabet, neighborhood):
-                    yield SimpleProgram(
-                        space=space,
-                        alphabet=alphabet,
-                        neighborhood=neighborhood,
-                        rule=rule,
-                    )
+def programs(selected_spaces, numbers):
+    for space in selected_spaces:
+        for rule in rules(numbers):
+            yield SimpleProgram(
+                space=space,
+                alphabet=ALPHABET,
+                neighborhood=NEIGHBORHOOD,
+                rule=rule,
+            )
 ```
 
 A seed preset can independently yield structured or random Seeds over several

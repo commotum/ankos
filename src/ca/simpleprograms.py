@@ -6,7 +6,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from .core import alphabets
-from .core.seeds import Coordinate
 from .core.spaces import Space
 
 
@@ -17,7 +16,7 @@ class SimpleProgram:
     space: Space
     alphabet: object
     neighborhood: object
-    rule: Callable[[tuple[object, ...], Coordinate], object]
+    rule: Callable[[tuple[object, ...]], object]
 
     def __post_init__(self) -> None:
         if not isinstance(self.space, Space):
@@ -27,10 +26,10 @@ class SimpleProgram:
         ):
             raise TypeError("Neighborhood must be an offset tuple or callable")
         if isinstance(self.neighborhood, tuple) and any(
-            not isinstance(offset, tuple) or len(offset) != len(self.space.axes)
+            not isinstance(offset, tuple) or len(offset) != len(self.space.axes) - 1
             for offset in self.neighborhood
         ):
-            raise ValueError("Neighborhood offsets must match Space coordinate rank")
+            raise ValueError("Neighborhood offsets must match Space spatial rank")
         if not callable(self.rule):
             raise TypeError("Rule must be callable")
 

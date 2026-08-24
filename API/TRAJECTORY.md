@@ -53,9 +53,9 @@ Both executions begin with the same immutable Seed State.
 ## Step
 
 `step(trajectory, state)` constructs exactly one complete successor State.
-Trajectory supplies the Seed because Space enumeration, normalization, or
-relation-based Neighborhood selection may need the realized shape/support even
-after the first step.
+Trajectory supplies the Seed because Space enumeration, boundary resolution,
+or relation-based Neighborhood selection may need the realized shape/support
+even after the first step.
 
 The source State is never changed. All returned coordinates have explicit time
 one greater than the source State.
