@@ -2,12 +2,12 @@
 
 ## Definition
 
-A Space is one definite law for coordinates, extents, and boundaries.
+A Space is one definite law for coordinates and boundaries.
 
 It answers three questions:
 
 1. Which coordinate axes does this program use?
-2. How does a Seed realize and enumerate valid addresses on those axes?
+2. How are the spatial addresses realized by a Seed enumerated?
 3. What happens when a Neighborhood reads beyond the realized support?
 
 A Space does not classify the world as a line, grid, tape, graph, tiling, or
@@ -22,23 +22,37 @@ The initial implementation can be a small frozen record:
 @dataclass(frozen=True)
 class Space:
     axes: tuple[str, ...]
-    extent: str
     boundary: object
     coordinates: object
-    normalize: object | None = None
 ```
 
 - `axes` names the coordinate components and always begins with `"t"`.
-- `extent` identifies the selected extent law. It is descriptive data, not a
-  semantic subclass.
 - `coordinates(seed)` enumerates the Seed's realized spatial addresses, without
   their time component.
-- `boundary` is one selected exterior-read law.
-- `normalize(address, seed)`, when required, maps an exterior spatial address
-  back onto realized support.
+- `boundary` is one selected exterior-read law, including any resolution it
+  requires.
 
-The record is intentionally small. Specialized behavior remains in ordinary
-functions.
+There is no descriptive `extent` string: concrete extent is already supplied
+by Seed and behavior is supplied by `coordinates`. There is also no separate
+`normalize` field that must be kept consistent with `boundary`. A periodic
+boundary is itself responsible for wrapping an exterior address.
+
+The record is intentionally small. Generic constructors cover common cases:
+
+```python
+finite_1d = spaces.cartesian(
+    axes=("t", "x"),
+    boundary=spaces.fixed(0),
+)
+
+periodic_2d = spaces.cartesian(
+    axes=("t", "x", "y"),
+    boundary=spaces.periodic(),
+)
+```
+
+These are ordinary functions returning definite Space values, not semantic
+`LineSpace` or `GridSpace` classes.
 
 ## Coordinate forms
 
@@ -101,27 +115,29 @@ Examples include:
 - no exterior resolution (`None`), requiring every selected address to remain
   inside realized support.
 
-A fixed exterior value must be admitted by the Alphabet. Periodic
-normalization uses the realized Seed shape. With `None`, an exterior read is a
-direct error rather than an invented value.
+A fixed exterior value must be admitted by the Alphabet. Periodic resolution
+uses the realized Seed shape. With `None`, an exterior read is a direct error
+rather than an invented value.
 
 Neighborhood is still responsible for selecting the candidate addresses.
 Space is responsible for resolving them. Rule receives only the resulting
 ordered values.
 
-## Plural source
+## Optional plural source
 
-`SPACES` means an ordinary iterable or function yielding definite Space
-values. A future source might vary boundary behavior:
+Use a plural Space source only when the module genuinely varies Space. For
+example, a study may sweep boundary behavior:
 
 ```python
 def spaces():
-    yield Space(..., boundary=fixed(0), ...)
-    yield Space(..., boundary=fixed(1), ...)
-    yield Space(..., boundary="periodic", normalize=wrap)
+    yield spaces.cartesian(("t", "x"), boundary=spaces.fixed(0))
+    yield spaces.cartesian(("t", "x"), boundary=spaces.fixed(1))
+    yield spaces.cartesian(("t", "x"), boundary=spaces.periodic())
 ```
 
 It should not vary concrete dimensions such as 5 versus 11; those variants
 belong to a Seed source.
 
-No Space factory class, domain-kind hierarchy, or parameter solver is needed.
+If a family uses one Space, expose that Space directly. A singleton `spaces()`
+generator adds no information. No Space factory class, domain-kind hierarchy,
+or parameter solver is needed.

@@ -27,10 +27,10 @@ Use the smallest ordinary Python value that expresses each part:
 
 | Name | Representation | Meaning |
 | --- | --- | --- |
-| `SPACE` | small frozen record | Coordinate axes, extent law, and boundary law |
-| `ALPHABET` | `frozenset` or membership function | Values admitted at coordinates |
+| `SPACE` | small frozen record | Coordinate axes, coordinate enumeration, and boundary law |
+| `ALPHABET` | ordered tuple or membership function | Values admitted at coordinates |
 | `NEIGHBORHOOD` | tuple of offsets or address function | Ordered coordinates read for one output coordinate |
-| `RULE` | ordinary named callable | One exact map from observed values to one successor value |
+| `RULE` | small stable callable value | One exact map from observed values to one successor value |
 | `SEED` | small frozen record | Realized shape/support and complete initial values |
 
 Only compositions need their own records:
@@ -91,6 +91,12 @@ Space owns:
 - the law for enumerating or interpreting coordinates;
 - whether an exterior exists and how exterior reads resolve.
 
+The minimal record is `Space(axes, boundary, coordinates)`. It has no inert
+extent label and no separate normalization field that must agree with the
+boundary. Generic functions such as `spaces.cartesian(...)` construct common
+coordinate spaces, and `spaces.periodic()` returns a boundary law that performs
+its own resolution.
+
 Seed owns:
 
 - the realized shape or support;
@@ -120,9 +126,10 @@ the Seed State and then calls `step` exactly `limit` times.
 ## Selection and activity
 
 A Neighborhood selects read addresses. Regular spaces usually use ordered
-offset tuples; relation-driven spaces use a small address function. Space
-resolves any selected address through its boundary law before the Rule sees
-the observed values.
+spatial offset tuples; relation-driven spaces use a small address function.
+Time remains explicit in every State coordinate but is not repeated as a zero
+component in every local offset. Space resolves any selected address through
+its boundary law before the Rule sees the observed values.
 
 `ca.selector` provides shared coordinate mathematics beneath these values:
 predicate composition, metrics, filtering, translation, relation following,
@@ -134,9 +141,10 @@ activity is represented in ordinary Alphabet values and interpreted by the
 Rule. Every realized coordinate still receives a value at the new explicit
 time.
 
-## Plural sources and presets
+## Sources and presets
 
-Plural names mean ordinary iterables or functions that yield singular values:
+Plural names mean ordinary iterables or functions that yield singular values
+when a field actually varies:
 
 ```text
 SPACES        -> one or more definite Space values
@@ -146,19 +154,24 @@ RULES         -> one or more definite Rule callables
 SEEDS         -> one or more definite Seed values
 ```
 
-A preset is a normal Python module containing such functions and explicit
-loops. It is not a `Preset` class, parameter solver, or hidden product engine.
-A program preset may combine the first four sources into
-`SimpleProgram` values. A separate Seed source may then be paired with any
-compatible program to form Trajectories.
+A preset is a normal Python module containing constants, source functions, and
+explicit loops. It is not a `Preset` class, parameter solver, or hidden product
+engine. A one-value Alphabet or Neighborhood remains a constant; it does not
+need a ceremonial singleton generator. A program preset may combine whichever
+fields genuinely vary into `SimpleProgram` values. A separate Seed source may
+then be paired with any compatible program to form Trajectories.
 
 Compatibility is checked where values meet. Sources may accept dependencies
 directly—for example, `neighborhoods(space)` and
 `rules(alphabet, neighborhood)`—instead of encoding a new framework.
 
-`ca.catalog.automata.elementary_ca` is the first concrete implementation.
-It keeps finite width in its Seed source and yields one exact callable for each
-selected Wolfram rule number.
+`ca.catalog.automata.elementary_ca` is the first concrete implementation. It
+accepts a selected compatible Space; keeps the binary Alphabet and ordered
+left/self/right Neighborhood as constants; and exposes genuine Rule and
+SimpleProgram sweeps. Each exact Rule is a small stable callable value rather
+than an identity-less closure. Dense finite Seed construction belongs to the
+generic Seed API, with family-specific initial patterns provided only as
+conveniences.
 
 ## Deferred execution questions
 
@@ -166,5 +179,10 @@ The initial executor advances discrete integer time and accepts a nonnegative
 step `limit`. Wall-clock budgets, solver resources, event-driven time, and
 continuous-time integration are later execution designs. They should not make
 the small discrete kernel more abstract before a concrete family requires it.
+
+The current executor keeps the finite support realized by the Seed fixed while
+constructing each complete successor slice. In particular, current ECA runs
+are finite-width systems under an explicit boundary law, not infinite-tape
+execution.
 
 The detailed contracts are in [API/README.md](API/README.md).

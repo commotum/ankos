@@ -2,38 +2,27 @@
 
 from __future__ import annotations
 
-from ca import Seed, SimpleProgram, Space, Trajectory, rollout
+from ca import Seed, SimpleProgram, Trajectory, rollout, seeds, spaces
 
 
-def _line_coordinates(seed: object) -> tuple[tuple[int], ...]:
-    size = seed.shape[0]
-    return tuple((x,) for x in range(size))
-
-
-def _identity_rule(observed: tuple[object, ...], coordinate: tuple[object, ...]) -> object:
-    del coordinate
+def _identity_rule(observed: tuple[object, ...]) -> object:
     return observed[0]
 
 
 def _program() -> SimpleProgram:
     return SimpleProgram(
-        space=Space(
+        space=spaces.cartesian(
             axes=("t", "x"),
-            extent="finite-from-seed",
-            boundary=("fixed", 0),
-            coordinates=_line_coordinates,
+            boundary=spaces.fixed(0),
         ),
-        alphabet=frozenset({0, 1}),
-        neighborhood=((0, 0),),
+        alphabet=(0, 1),
+        neighborhood=((0,),),
         rule=_identity_rule,
     )
 
 
 def _seed(values: list[int]) -> Seed:
-    return Seed(
-        shape=(len(values),),
-        values={(0, x): value for x, value in enumerate(values)},
-    )
+    return seeds.dense(values)
 
 
 def test_one_program_accepts_two_realized_seed_shapes() -> None:
@@ -58,6 +47,10 @@ def test_one_program_accepts_two_realized_seed_shapes() -> None:
         (1, 3): 0,
         (1, 4): 0,
     }
+
+    delayed = seeds.dense([1, 0], time=7)
+    assert delayed.shape == (2,)
+    assert dict(delayed.values) == {(7, 0): 1, (7, 1): 0}
 
 
 def test_seed_detaches_mutable_input_state_and_relations() -> None:
@@ -106,17 +99,15 @@ def test_trajectory_rejects_values_outside_alphabet() -> None:
 def test_program_rejects_neighborhood_offsets_with_wrong_rank() -> None:
     try:
         SimpleProgram(
-            space=Space(
+            space=spaces.cartesian(
                 axes=("t", "x"),
-                extent="finite-from-seed",
-                boundary=("fixed", 0),
-                coordinates=_line_coordinates,
+                boundary=spaces.fixed(0),
             ),
-            alphabet=frozenset({0, 1}),
-            neighborhood=((0, 0, 1),),
+            alphabet=(0, 1),
+            neighborhood=((0, 1),),
             rule=_identity_rule,
         )
     except ValueError as error:
-        assert "match Space coordinate rank" in str(error)
+        assert "rank" in str(error)
     else:
         raise AssertionError("a wrong-rank Neighborhood was accepted")

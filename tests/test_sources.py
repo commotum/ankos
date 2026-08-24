@@ -4,49 +4,42 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-from ca import Seed, SimpleProgram, Space, Trajectory, rollout, spaces
+from ca import Seed, SimpleProgram, Space, Trajectory, rollout, seeds, spaces
 
 
 def spaces_source() -> Iterator[Space]:
-    yield Space(
+    yield spaces.cartesian(
         axes=("t", "x"),
-        extent="finite-from-seed",
         boundary=spaces.fixed(0),
-        coordinates=spaces.box_coordinates,
     )
-    yield Space(
+    yield spaces.cartesian(
         axes=("t", "x"),
-        extent="finite-from-seed",
-        boundary="periodic",
-        coordinates=spaces.box_coordinates,
-        normalize=spaces.box_wrap,
+        boundary=spaces.periodic(),
     )
 
 
-def alphabets_source() -> Iterator[frozenset[int]]:
-    yield frozenset({0, 1})
-    yield frozenset({0, 1, 2})
+def alphabets_source() -> Iterator[tuple[int, ...]]:
+    yield (0, 1)
+    yield (0, 1, 2)
 
 
 def neighborhoods_source(space: Space) -> Iterator[tuple[tuple[int, ...], ...]]:
     if space.axes != ("t", "x"):
         return
-    yield ((0, 0),)
-    yield ((0, -1), (0, 0))
+    yield ((0,),)
+    yield ((-1,), (0,))
 
 
 def rules_source(
-    alphabet: frozenset[int],
+    alphabet: tuple[int, ...],
     neighborhood: tuple[tuple[int, ...], ...],
 ) -> Iterator[object]:
     del alphabet, neighborhood
 
-    def first(observed: tuple[object, ...], coordinate: tuple[object, ...]) -> object:
-        del coordinate
+    def first(observed: tuple[object, ...]) -> object:
         return observed[0]
 
-    def largest(observed: tuple[object, ...], coordinate: tuple[object, ...]) -> object:
-        del coordinate
+    def largest(observed: tuple[object, ...]) -> object:
         return max(observed)
 
     yield first
@@ -62,18 +55,9 @@ def programs_source() -> Iterator[SimpleProgram]:
 
 
 def seeds_source() -> Iterator[Seed]:
-    yield Seed(
-        shape=(3,),
-        values={(0, 0): 0, (0, 1): 1, (0, 2): 0},
-    )
-    yield Seed(
-        shape=(5,),
-        values={(0, 0): 0, (0, 1): 0, (0, 2): 1, (0, 3): 0, (0, 4): 0},
-    )
-    yield Seed(
-        shape=(3,),
-        values={(0, 0): 0, (0, 1): 2, (0, 2): 0},
-    )
+    yield seeds.dense((0, 1, 0))
+    yield seeds.dense((0, 0, 1, 0, 0))
+    yield seeds.dense((0, 2, 0))
 
 
 def test_plain_sources_yield_fully_selected_values() -> None:
@@ -91,7 +75,7 @@ def test_seed_compatibility_is_decided_when_trajectory_is_formed() -> None:
     programs = tuple(programs_source())
     seeds = tuple(seeds_source())
     binary_program = next(
-        program for program in programs if program.alphabet == frozenset({0, 1})
+        program for program in programs if program.alphabet == (0, 1)
     )
 
     compatible = Trajectory(binary_program, seeds[0])
@@ -105,7 +89,7 @@ def test_seed_compatibility_is_decided_when_trajectory_is_formed() -> None:
         raise AssertionError("an incompatible independently generated Seed was accepted")
 
     ternary_program = next(
-        program for program in programs if program.alphabet == frozenset({0, 1, 2})
+        program for program in programs if program.alphabet == (0, 1, 2)
     )
     assert Trajectory(ternary_program, seeds[2]).seed is seeds[2]
 
@@ -123,4 +107,3 @@ def test_explicit_loops_are_enough_to_form_compatible_trajectories() -> None:
     assert trajectories
     assert rejected
     assert {trajectory.seed.shape for trajectory in trajectories} == {(3,), (5,)}
-

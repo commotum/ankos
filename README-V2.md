@@ -42,10 +42,10 @@ internal organization does not add import ceremony for normal use.
 
 | Value | Minimal representation | Responsibility |
 | --- | --- | --- |
-| Space | small frozen record | Explicit axes, extent law, and boundary |
-| Alphabet | `frozenset` or membership function | Values admitted at coordinates |
+| Space | small frozen record | Explicit axes, coordinate enumeration, and boundary |
+| Alphabet | ordered tuple or membership function | Values admitted at coordinates |
 | Neighborhood | offset tuple or address function | Ordered coordinates read for one output coordinate |
-| Rule | ordinary named callable | Exact map from observed values to a successor value |
+| Rule | small stable callable value | Exact map from observed values to a successor value |
 | Seed | small frozen record | Realized shape/support and complete initial values |
 
 A SimpleProgram contains the first four. Seed stays separate so the same
@@ -88,22 +88,20 @@ from ca import spaces
 
 space = Space(
     axes=("t", "x"),
-    extent="seed-sized finite box",
     boundary=spaces.fixed(0),
     coordinates=spaces.box_coordinates,
 )
 
-alphabet = frozenset({0, 1})
+alphabet = (0, 1)
 
 neighborhood = (
-    (0, -1),
-    (0,  0),
-    (0,  1),
+    (-1,),
+    ( 0,),
+    ( 1,),
 )
 
 
-def any_observed_value(observed, source):
-    del source
+def any_observed_value(observed):
     return int(any(observed))
 
 
@@ -153,9 +151,13 @@ addresses and plain relation mappings; a Neighborhood address function follows
 them. There is no need to make `Graph`, `Vertex`, or tiling classes part of the
 universal API.
 
-Space owns axes, coordinate interpretation, and boundary behavior. Seed owns
-the concrete shape/support. The same periodic t+2D SimpleProgram can therefore
-run on an 11x11 Seed and a 101x57 Seed.
+Space owns axes, coordinate enumeration, and boundary behavior. It does not
+carry a descriptive `extent` field or a separately coordinated normalization
+hook. Generic constructors such as `spaces.cartesian(...)` build the ordinary
+coordinate function, while boundary values such as `spaces.periodic()` own
+their own resolution behavior. Seed owns the concrete shape/support. The same
+periodic t+2D SimpleProgram can therefore run on an 11x11 Seed and a 101x57
+Seed.
 
 ## States are complete immutable time slices
 
@@ -181,8 +183,11 @@ builds the complete successor slice.
 
 ## Neighborhoods select read addresses
 
-A regular local Neighborhood is usually just an ordered offset tuple. Offsets
-include a zero time component so reads remain in the current slice.
+A regular local Neighborhood is usually just an ordered tuple of spatial
+offsets. For a t+1D Space, left/self/right is `((-1,), (0,), (1,))`. The
+executor reads those offsets from the current slice; the Neighborhood does not
+repeat a meaningless zero time displacement. State coordinates still contain
+explicit time.
 
 When adjacency is not a fixed translation, use a small function:
 
@@ -223,15 +228,18 @@ For an elementary cellular automaton, the binary Alphabet and ordered
 three-cell Neighborhood determine eight possible inputs. A rules source may
 generate 256 callables, but one SimpleProgram receives one selected table.
 
-Rule has the small execution shape:
+The default Rule has the small execution shape:
 
 ```python
-def rule(observed, source):
+def rule(observed):
     return one_alphabet_value
 ```
 
-Its Python name can provide a human identifier. A table index can remain
-ordinary attached metadata when useful.
+`ca.core.rules.Rule` is a tiny immutable callable value that gives the function
+a stable name and optional index. This avoids manufacturing a new anonymous
+closure and attaching identity with `setattr` every time a selected Rule is
+requested. Coordinate-aware calling conventions should be added only when a
+concrete family demonstrates that it needs one.
 
 ## Seed is initialization, not dynamics
 
@@ -252,9 +260,10 @@ Compatibility is checked when a program and Seed meet:
 Plain relation data is validated when a relation-based Neighborhood actually
 selects from it.
 
-## Plural sources and presets
+## Sources and presets
 
-Plural names describe ordinary source functions or iterables:
+Plural names describe ordinary source functions or iterables only where real
+variation exists:
 
 ```text
 SPACES        -> SPACE
@@ -264,7 +273,11 @@ RULES         -> RULE
 SEEDS         -> SEED
 ```
 
-A program preset is one normal module with explicit loops:
+A module should not wrap a single constant in a one-item generator merely to
+make every field look uniform. For example, an ECA module can expose one
+`ALPHABET` and one `NEIGHBORHOOD`, while `rules()` and `programs()` enumerate
+genuine choices. When several inputs really do vary, composition remains
+ordinary explicit loops:
 
 ```python
 def programs():
@@ -285,8 +298,11 @@ shapes. Workload code pairs compatible programs and Seeds to make
 Trajectories, then selects a rollout limit to produce Episodes.
 
 Preset is a module convention, not a required class. The first concrete module
-is `ca.catalog.automata.elementary_ca`: it yields exact Wolfram-numbered
-SimplePrograms and separate centered Seeds whose widths are supplied explicitly.
+is `ca.catalog.automata.elementary_ca`. It accepts a selected compatible Space,
+keeps its binary Alphabet and left/self/right Neighborhood as constants, and
+provides real sweeps over exact Wolfram-numbered Rules and SimplePrograms.
+Generic Seed helpers construct dense finite initial rows; a centered impulse is
+only a convenience built from that generic operation.
 
 ## Execution scope
 
@@ -299,6 +315,11 @@ episode = rollout(trajectory, limit=steps)
 
 `limit` is a nonnegative integer number of discrete successor steps. The Seed
 State is included, so an Episode has `limit + 1` States.
+
+This executor currently constructs each successor over the same finite support
+realized by the Seed. Thus the ECA module executes finite-width ECA under the
+selected boundary law. It does not yet claim to execute an infinite integer
+line or dynamically changing support.
 
 Resource budgets, event stopping, solver controls, and non-discrete time are
 intentionally deferred. They should be designed from concrete requirements

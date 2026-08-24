@@ -2,7 +2,7 @@
 
 ## Definition
 
-A Neighborhood is one exact, ordered selection of coordinates read when
+A Neighborhood is one exact, ordered selection of spatial addresses read when
 computing the successor value for a source coordinate.
 
 There are two useful forms:
@@ -30,21 +30,24 @@ For a t+1D three-cell neighborhood:
 
 ```python
 neighborhood = (
-    (0, -1),
-    (0,  0),
-    (0,  1),
+    (-1,),
+    ( 0,),
+    ( 1,),
 )
 ```
 
-The leading zero keeps every read at the current explicit time. Applied at
-`(t, x)`, this selects:
+Neighborhood offsets contain only spatial displacement. Applied at `(t, x)`,
+this selects:
 
 ```text
 (t, x-1), (t, x), (t, x+1)
 ```
 
-Offsets match the complete coordinate rank. Their order is meaningful because
-an exhaustive Rule may distinguish left, self, and right.
+The executor preserves the source time while translating the spatial address.
+Time remains explicit in the resulting State coordinates; it is simply not
+repeated as a meaningless zero in every Neighborhood constant. Offset rank is
+therefore `len(space.axes) - 1`. Order remains meaningful because an exhaustive
+Rule may distinguish left, self, and right.
 
 Regular metric neighborhoods can be constructed without a semantic class:
 
@@ -56,8 +59,7 @@ neighborhood = neighborhoods.ball(
 )
 ```
 
-This returns one definite ordered tuple of offsets, each beginning with a zero
-time displacement.
+This returns one definite ordered tuple of two-component spatial offsets.
 
 ## Address functions
 
@@ -96,22 +98,25 @@ For each realized source coordinate, execution:
 1. asks Neighborhood for ordered addresses;
 2. resolves those addresses through Space;
 3. gathers their values from the complete current State;
-4. calls the exact Rule with those values and the source coordinate.
+4. calls the exact Rule with those ordered values.
 
-The source coordinate is available so one ordinary callable can express a law
-that depends on address or explicit time when a family truly requires it.
+The default Rule contract is deliberately only `observed -> value`. If a
+concrete family later demonstrates that its law requires coordinate or time
+context, that can be added as a focused extension instead of taxing every local
+rule in advance.
 
-## Plural source
+## Optional plural source
 
-`NEIGHBORHOODS` means an iterable or function yielding definite Neighborhood
-values. It may accept Space explicitly because valid offsets and address
-functions depend on coordinate rank:
+Use a plural Neighborhood source only when several Neighborhoods are actually
+being studied. It may accept Space explicitly because valid spatial offsets
+and address functions depend on coordinate rank:
 
 ```python
 def neighborhoods(space):
     if space.axes == ("t", "x"):
-        yield ((0, -1), (0, 0), (0, 1))
+        yield ((-1,), (0,), (1,))
 ```
 
-This is normal Python dependency flow. It does not require a builder protocol
-or a semantic family class.
+For ECA, left/self/right is one fixed Neighborhood, so the catalog module
+exposes it as a constant instead. This is normal Python dependency flow. It
+does not require a builder protocol or a semantic family class.

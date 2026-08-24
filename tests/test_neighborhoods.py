@@ -16,7 +16,7 @@ def _relational_seed(adjacency: dict[str, list[str]]) -> Seed:
 def test_resolve_accepts_offsets_and_address_functions() -> None:
     seed = _relational_seed({"a": ["b"], "b": ["a", "c"], "c": ["b"]})
 
-    assert neighborhoods.resolve(((0, -1), (0, 0), (0, 1)), (4, 10), seed) == (
+    assert neighborhoods.resolve(((-1,), (0,), (1,)), (4, 10), seed) == (
         (4, 9),
         (4, 10),
         (4, 11),
@@ -24,17 +24,17 @@ def test_resolve_accepts_offsets_and_address_functions() -> None:
     assert neighborhoods.resolve(neighborhoods.current, (4, 10), seed) == ((4, 10),)
 
 
-def test_ball_is_a_definite_ordered_neighborhood_with_explicit_time() -> None:
+def test_ball_is_a_definite_ordered_spatial_neighborhood() -> None:
     assert neighborhoods.ball(
         spatial_rank=2,
         radius=1,
         metric=selector.taxicab,
     ) == (
-        (0, -1, 0),
-        (0, 0, -1),
-        (0, 0, 0),
-        (0, 0, 1),
-        (0, 1, 0),
+        (-1, 0),
+        (0, -1),
+        (0, 0),
+        (0, 1),
+        (1, 0),
     )
 
 
