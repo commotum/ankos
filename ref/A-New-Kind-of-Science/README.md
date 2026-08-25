@@ -13,16 +13,16 @@ It contains 29 ordered book documents and their referenced figures:
 Start with [Contents.md](Contents.md). The contents page is repository
 navigation; the book text itself is contained in the linked documents.
 
-Two generated reading aids are kept at the source root:
+Two reading aids are kept at the source root:
 
 - [A-New-Kind-of-Science.md](A-New-Kind-of-Science.md) concatenates all 29
   canonical documents in reading order and rebases their local links.
-- [ANKoS-Atlas.md](ANKoS-Atlas.md) maps the canonical documents and chapter
-  sections back to their individual source files.
+- [ANKoS-Atlas.md](ANKoS-Atlas.md) is an interpretive map of the book: it
+  summarizes its four large movements, every chapter, and every main section.
 
 The 29 documents listed by `Contents.md` remain canonical. The combined source
-and atlas are derived files and should be regenerated after canonical source
-changes rather than edited independently.
+is a generated reading derivative. The atlas is an editorial companion and
+should be checked against the canonical source when that source changes.
 
 Each chapter is stored in its own ordered directory under `CHAPTERS/`. The
 chapter retains its full Markdown filename, and its referenced figures are
