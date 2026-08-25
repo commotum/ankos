@@ -1,12 +1,3 @@
-# A New Kind of Science — Complete Single-File Source
-
-This is a generated reading derivative of the 29 canonical documents listed in [Contents.md](Contents.md). Edit the canonical documents, not this file. Local links have been rebased to this file's directory.
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: FRONT-MATTER/00-Publication-and-Contents.md -->
-
 # STEPHEN WOLFRAM A NEW KIND OF SCIENCE
 
 # STEPHEN WOLFRAM A NEW KIND OF SCIENCE
@@ -101,13 +92,6 @@ Printed in Canada. ♾ Acid-free paper. First edition. First printing.
 </tbody>
 </table>
 
-<!-- END CANONICAL SOURCE: FRONT-MATTER/00-Publication-and-Contents.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: FRONT-MATTER/01-Preface.md -->
-
 ## Preface
 
 Just over twenty years ago I made what at first seemed like a small discovery: a computer experiment of mine showed something I did not expect. But the more I investigated, the more I realized that what I had seen was the beginning of a crack in the very foundations of existing science, and a first clue towards a whole new kind of science.
@@ -180,13 +164,6 @@ To complete a project of the magnitude of this book requires extreme personal fo
 To write this book has taken me more than ten years of almost continuous work, more than a hundred million keystrokes, and more than a hundred mouse miles. I have accumulated tens of gigabytes and hundreds of thousands of pages of *Mathematica* notebooks. I have executed nearly a million lines of *Mathematica* input, and altogether more than a million billion computer operations. But now that the task is finally done—and I have written down at least the main elements of my discoveries so far—I look forward to everything that is now possible.
 
 ![](FRONT-MATTER/_page_14_Picture_0.jpeg)
-
-<!-- END CANONICAL SOURCE: FRONT-MATTER/01-Preface.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md -->
 
 ![](CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/images/_page_16_Picture_0.jpeg)
 
@@ -395,13 +372,6 @@ Doing this certainly required experience in all sorts of different areas of scie
 Often it seemed in retrospect almost bizarre that the conclusions I ended up reaching had never been reached before. But studying the history of each field I could in many cases see how it had been led astray by the lack of some crucial piece of methodology or intuition that had now emerged in the new kind of science I had developed.
 
 When I made my first discoveries about cellular automata in the early 1980s I suspected that I had seen the beginning of something important. But I had no idea just how important it would all ultimately turn out to be. And indeed over the past twenty years I have made more discoveries than I ever thought possible. And the new kind of science that I have spent so much effort building has seemed an ever more central and critical direction for future intellectual development.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science/01-The-Foundations-for-a-New-Kind-of-Science.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md -->
 
 ![](CHAPTERS/02-The-Crucial-Experiment/images/_page_38_Chapter_Opener.jpeg)
 
@@ -666,13 +636,6 @@ But whatever the reasons, the fact remains that, despite many hints over the cou
 It is not uncommon in the history of science that once a general new phenomenon has been identified, one can see that there was already evidence of it much earlier. But the point is that without the framework that comes from knowing the general phenomenon, it is almost inevitable that such evidence will have been ignored.
 
 It is also one of the ironies of progress in science that results which at one time were so unexpected that they were missed despite many hints eventually come to seem almost obvious. And having lived with the results of this chapter for nearly two decades, it is now difficult for me to imagine that things could possibly work in any other way. But the history that I have outlined in this section—like the history of many other scientific discoveries—provides a sobering reminder of just how easy it is to miss what will later seem obvious.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/02-The-Crucial-Experiment/02-The-Crucial-Experiment.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md -->
 
 ![](CHAPTERS/03-The-World-of-Simple-Programs/images/_page_66_Picture_0.jpeg)
 
@@ -1343,13 +1306,6 @@ Yet even after this, there were still many assumptions implicit in my search pro
 A somewhat similar pattern has been repeated for most of the other systems described in this chapter. The main challenge was always to avoid assumptions and set up experiments that were simple and direct enough that they did not miss important new phenomena.
 
 In many cases it took a large number of iterations to work out the right experiments to do. And had it not been for the ease with which I could set up new experiments using *Mathematica*, it is likely that I would never have gotten very far in investigating most of the systems discussed in this chapter. But in the end, after running programs for a total of several years of computer time—corresponding to more than a million billion logical operations—and creating the equivalent of tens of thousands of pages of pictures, I was finally able to find all of the various examples shown in this chapter and the ones that follow.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/03-The-World-of-Simple-Programs/03-The-World-of-Simple-Programs.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md -->
 
 ![](CHAPTERS/04-Systems-Based-on-Numbers/images/_page_130_Chapter_Opener.jpeg)
 
@@ -2087,13 +2043,6 @@ And although there are significant technical difficulties, one finds as the last
 
 It remains much easier to be sure of what is going on in a discrete system than in a continuous one. But I suspect that essentially all of the various phenomena that we have observed in discrete systems in the past several chapters can in fact also be found even in continuous systems with fairly simple rules.
 
-<!-- END CANONICAL SOURCE: CHAPTERS/04-Systems-Based-on-Numbers/04-Systems-Based-on-Numbers.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md -->
-
 ![](CHAPTERS/05-Two-Dimensions-and-Beyond/images/_page_184_Picture_0.jpeg)
 
 ## Two Dimensions and Beyond
@@ -2649,13 +2598,6 @@ A system based on a constraint, in which a complex and largely random pattern is
 So finally this shows that it is indeed possible to force complex behavior to occur in systems based on constraints. But from what we have seen in this section such behavior appears to be quite rare: unlike many of the simple rules that we have discussed in this book, it seems that almost all simple constraints lead only to fairly simple patterns.
 
 Any phenomenon based on rules can always ultimately also be described in terms of constraints. But the results of this section indicate that these descriptions can have to be fairly complicated for complex behavior to occur. So the fact that traditional science and mathematics tends to concentrate on equations that operate like constraints provides yet another reason for their failure to identify the fundamental phenomenon of complexity that I discuss in this book.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/05-Two-Dimensions-and-Beyond/05-Two-Dimensions-and-Beyond.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md -->
 
 ![](CHAPTERS/06-Starting-from-Randomness/images/_page_238_Chapter_Opener.jpeg)
 
@@ -3366,13 +3308,6 @@ Collisions between structures (e) and (o) from page 292.
 ![](CHAPTERS/06-Starting-from-Randomness/images/_page_311_Picture_1.jpeg)
 
 A collision between structures (l) and (i) from page 292. It takes more than 4000 steps for the final outcome involving 8 separate structures to become clear. The height of the picture corresponds to 2000 steps, and the third picture ends at step 4300.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/06-Starting-from-Randomness/06-Starting-from-Randomness.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md -->
 
 ![](CHAPTERS/07-Mechanisms-in-Programs-and-Nature/images/_page_312_Picture_0.jpeg)
 
@@ -4246,13 +4181,6 @@ And so, for example, one might notice that most mechanisms for nesting can at so
 
 So in the end one can indeed view most of the mechanisms that I have discussed in this section as being in some sense genuinely different. Yet as we have seen all of them can be captured by quite simple programs. And in Chapter 12 I will discuss how this is related to the fact that so few fundamentally different types of overall behavior ultimately seem to occur.
 
-<!-- END CANONICAL SOURCE: CHAPTERS/07-Mechanisms-in-Programs-and-Nature/07-Mechanisms-in-Programs-and-Nature.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md -->
-
 ![](CHAPTERS/08-Implications-for-Everyday-Systems/images/_page_378_Picture_0.jpeg)
 
 ## Implications for Everyday Systems
@@ -5022,13 +4950,6 @@ In real markets, it is usually impossible to see in detail what each entity is d
 And as soon as the underlying rule for the cellular automaton is such that information will eventually propagate from one entity to all others—in effect a minimal version of an efficient market hypothesis—it is essentially inevitable that running totals of numbers of cells will exhibit significant randomness.
 
 One can always make the underlying system more complicated—say by having a network of cells, or by allowing different cells to have different and perhaps changing rules. But although this will make it more difficult to recognize definite rules even if one looks at the complete behavior of every element in the system, it does not affect the basic point that there is randomness that can intrinsically be generated by the evolution of the system.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/08-Implications-for-Everyday-Systems/08-Implications-for-Everyday-Systems.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/09-Fundamental-Physics/09-Fundamental-Physics.md -->
 
 ![](CHAPTERS/09-Fundamental-Physics/images/_page_448_Picture_0.jpeg)
 
@@ -6404,13 +6325,6 @@ In its development since the early 1900s quantum theory has produced all sorts o
 
 And all of this supports my strong belief that in the end it will turn out that every detail of our universe does indeed follow rules that can be represented by a very simple program—and that everything we see will ultimately emerge just from running this program.
 
-<!-- END CANONICAL SOURCE: CHAPTERS/09-Fundamental-Physics/09-Fundamental-Physics.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/10-Processes-of-Perception-and-Analysis/10-Processes-of-Perception-and-Analysis.md -->
-
 ![](CHAPTERS/10-Processes-of-Perception-and-Analysis/images/_page_562_Chapter_Opener.jpeg)
 
 ## Processes of Perception and Analysis
@@ -7425,13 +7339,6 @@ For as I will discuss in Chapter 12 it seems far from inconceivable that some of
 
 Yet whether or not this is so, the capabilities of extraterrestrial intelligence are not in the end directly relevant to an understanding of our own experience of the world. In the future we may well manage to use higher forms of perception and analysis, and as a result our experience of the world will change—no doubt along with certain aspects of our science and mathematics. But for now it is the kinds of methods of perception and analysis that we have discussed in most of this chapter that must form the basis for the conclusions we make about the world.
 
-<!-- END CANONICAL SOURCE: CHAPTERS/10-Processes-of-Perception-and-Analysis/10-Processes-of-Perception-and-Analysis.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/11-The-Notion-of-Computation/11-The-Notion-of-Computation.md -->
-
 ![](CHAPTERS/11-The-Notion-of-Computation/images/_page_652_Picture_0.jpeg)
 
 ## The Notion of Computation
@@ -8305,13 +8212,6 @@ And in fact wherever one looks, the threshold for universality seems to be much 
 ![](CHAPTERS/11-The-Notion-of-Computation/images/_page_729_Figure_1.jpeg)
 
 Emulating the rule 110 cellular automaton using combinators. The rule 110 combinator from the previous page is applied once for each step of rule 110 evolution. The initial state is taken to consist of a single black cell.
-
-<!-- END CANONICAL SOURCE: CHAPTERS/11-The-Notion-of-Computation/11-The-Notion-of-Computation.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: CHAPTERS/12-The-Principle-of-Computational-Equivalence/12-The-Principle-of-Computational-Equivalence.md -->
 
 ![](CHAPTERS/12-The-Principle-of-Computational-Equivalence/images/_page_730_Picture_0.jpeg)
 
@@ -9999,13 +9899,6 @@ And indeed in the end the Principle of Computational Equivalence encapsulates bo
 
 ![](CHAPTERS/12-The-Principle-of-Computational-Equivalence/images/_page_862_Picture_0.jpeg)
 
-<!-- END CANONICAL SOURCE: CHAPTERS/12-The-Principle-of-Computational-Equivalence/12-The-Principle-of-Computational-Equivalence.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md -->
-
 ## General Notes
 
 ■ **Website.** A large amount of additional material related to this book and these notes will progressively be made available through the website www.wolframscience.com. (See also the copyright page at the beginning of the book.)
@@ -10198,13 +10091,6 @@ In most existing fields of science there are so many technicalities to learn and
 
 ■ **Applications.** At the core of this book is a body of ideas and results that define a new kind of basic science. And I have no doubt that in time this will yield a remarkably broad range of applications. And sometimes—particularly in technology—these applications may be quite straightforward and direct. But if the objective is to develop a model for some specific system in nature or elsewhere it is almost inevitable that this will not be easy. For while I believe that the basic science that I develop in this book provides a remarkably powerful new framework, coming up with an actual model requires all sorts of detailed work and analysis. Certainly it would be wonderful if one could just take the ideas and results in this book and somehow immediately use them to create models for all sorts of systems. And indeed—particularly from the examples I give in Chapter 8—there will probably be at least a few cases where this can be done. But most of the time nothing like it will be possible. And instead—just as in any other framework—there will be no choice but first to learn all sorts of details of a system, and then to use judgement and creativity to see which of them are really essential to a model and which are not. (See also page 364.)
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/00-General-Notes/00-General-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md -->
-
 ## The Foundations for a New Kind of Science
 
 ### An Outline of Basic Ideas
@@ -10280,13 +10166,6 @@ Watching the history of the field of complexity theory has made it particularly 
 (Wolfram Research, Inc. was founded in 1987; *Mathematica* 1.0 was released June 23, 1988; the company and successive versions of *Mathematica* continue to be major parts of my life.)
 
 ■ **Detailed history.** See pages 880–882.
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md -->
 
 ## The Crucial Experiment
 
@@ -11204,13 +11083,6 @@ Other significant publications of mine providing relevant summaries were (the da
 
 ![](BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/images/_page_897_Picture_20.jpeg)
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes/02-The-Crucial-Experiment-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md -->
-
 ## The World of Simple Programs
 
 ### More Cellular Automata
@@ -12078,13 +11950,6 @@ Constructs like combinators appear to have almost never been studied in mainstre
 ■ **History of experimental mathematics.** The general idea of finding mathematical results by doing computational experiments has a distinguished, if not widely discussed, history. The method was extensively used, for example, by Carl Friedrich Gauss in the 1800s in his studies of number theory, and presumably by Srinivasa Ramanujan in the early 1900s in coming up with many algebraic identities. The Gibbs phenomenon in Fourier analysis was noticed in 1898 on a mechanical computer constructed by Albert Michelson. Solitons were rediscovered in experiments done around 1954 on an early electronic computer by Enrico Fermi and collaborators. (They had been seen in physical systems by John Scott Russell in 1834, but had not been widely investigated.) The chaos phenomenon was noted in a computer experiment by Edward Lorenz in 1962 (see page 971). Universal behavior in iterated maps (see page 921) was discovered by Mitchell Feigenbaum in 1975 by looking at examples from an electronic calculator. Many aspects of fractals were found by Benoit Mandelbrot in the 1970s using computer graphics. In the 1960s and 1970s a variety of algebraic identities were found using computer algebra, notably by William Gosper. (Starting in the mid-1970s I routinely did computer algebra experiments to find formulas in theoretical physics—though I did not mention this when presenting the formulas.) The idea that as a matter of principle there should be truths in mathematics that can only be reached by some form of inductive reasoning—like in natural science—was discussed by Kurt Gödel in the 1940s and by Gregory Chaitin in the 1970s. But it received little attention. With the release of *Mathematica* in 1988, mathematical experiments began to emerge as a standard element of practical mathematical pedagogy, and gradually also as an approach to be tried in at least some types of mathematical research, especially ones close to number theory. But even now, unlike essentially all other branches of science, mainstream mathematics continues to be entirely dominated by theoretical rather than experimental methods. And even when experiments are done, their purpose is essentially always just to provide another way to look at traditional questions in traditional mathematical systems. What I do in this book—and started in the early 1980s—is, however, rather different: I use computer experiments to look at questions and systems that can be viewed as having a mathematical character, yet have never in the past been considered in any way by traditional mathematics.
 
 ■ **Page 113 · Practicalities.** The investigations described in this chapter were done using *Mathematica*, mostly in 1992. For larger searches, I sometimes created optimized C programs that were controlled via *MathLink* from within *Mathematica*—though with the versions of *Mathematica* that exist today this would now be unnecessary. For my very largest searches, I used *Mathematica* to dispatch programs to a large number of different computers on a network, then had the computers send me email whenever they found interesting results. (See also page 854.)
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes/03-The-World-of-Simple-Programs-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md -->
 
 ## Systems Based on Numbers
 
@@ -13127,13 +12992,6 @@ with n = 4, 6, 8, etc. appear to show similar behavior to the n = 2 equation in 
 
 ■ **“Calculus”.** It is an irony of language that the word “calculus” now associated with continuous systems comes from the Latin word which means a small pebble of the kind used for doing discrete calculations (same root as “calcium”).
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes/04-Systems-Based-on-Numbers-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md -->
-
 ## Two Dimensions and Beyond
 
 ### Introduction
@@ -13891,13 +13749,6 @@ Many Diophantine equations have at most very sparse solutions. And indeed for ex
 
 ■ **Constraints on formulas.** Many standard problems of algebraic computation can be viewed as consisting in finding formulas that satisfy certain constraints. An example is exact solution of algebraic equations. For quadratic equations the standard formula gives solutions for arbitrary coefficients in terms of square roots. Similar formulas in terms of n<sup>th</sup> roots have been known since the 1500s for equations with degrees *n* up to 4, although their *LeafCount* starting at *n* = 1 increases like 6, 25, 183, 718. For higher degrees it is known that such general formulas must involve other functions. For degrees 5 and 6 it was shown in the late 1800s that EllipticTheta or Hypergeometric2F1 are sufficient, although for degrees 5 and 6 respectively the necessary formulas have a LeafCount in the billions. (Sharing common subexpressions yields a LeafCount in the thousands.) (See also page 1129.)
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes/05-Two-Dimensions-and-Beyond-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md -->
-
 ## Starting from Randomness
 
 ### The Emergence of Order
@@ -14563,13 +14414,6 @@ As in other class 4 cellular automata, there are structures in Life which take a
 
 ■ **Other 2D cellular automata.** The general problem of finding persistent structures is much more difficult in 2D than in 1D, and there is no completely general procedure, for example, for finding all structures of any size that have a certain repetition period.
 ■ **Structures in Turing machines.** See page 888.
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes/06-Starting-from-Randomness-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md -->
 
 ## Mechanisms in Programs and Nature
 
@@ -15263,13 +15107,6 @@ When $d > 1$, more complicated behavior is seen for evolution from at least some
 ■ **Structure of algorithms.** The two most common overall frameworks that have traditionally been used in algorithms in computer science are iteration and recursion—and these correspond quite directly to having operations performed respectively in repetitive and nested ways. But while iteration is generally viewed as being quite easy to understand, until recently even recursion was usually considered rather difficult. No doubt the methods of this book will in the future lead to all sorts of algorithms based on much more complex patterns of behavior. (See page 1142.)
 ■ **Origins of localized structures.** Much as with other features of behavior, one can identify several mechanisms that can lead to localized structures. In 1D, localized structures sometimes arise as defects in largely repetitive behavior, or more generally as boundaries between states with different properties—such as the different phases of the repetitive background in rule 110. In higher dimensions a common source—especially in systems that show some level of continuity—are point, line or other topological defects (see page 1045), of which vortices are a typical example.
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes/07-Mechanisms-in-Programs-and-Nature-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md -->
-
 ## Implications for Everyday Systems
 
 ### Issues of Modelling
@@ -15627,13 +15464,6 @@ The observed standard deviation of a price—or essentially so-called volatility
 ■ **Details of trading.** Cynics might suggest that much of the randomness in practical markets is associated with details of trading. For much of the money actually made from markets on an ongoing basis comes from commissions on trades. And if prices quickly settled down to their final values, fewer trades would tend to be made. (Different entities would nevertheless still often need liquidity at different times.)
 
 ■ **Models of markets.** When serious economic theory began in the 1700s arguments tended to be based purely on common sense. But with the work of Léon Walras in the 1870s mathematical models began to become popular. In the early 1900s, common sense again for a while became dominant. But particularly with the development of game theory in the 1940s the notion became established, at least in theoretical economics, that prices represent equilibrium points whose properties can be derived mathematically from requirements of optimality. In practical trading, partly as an outgrowth of theories of business cycles, there had emerged all sorts of elaborate so-called technical analysis in which patterns of price movements were supposed—often on the basis of almost mystical theories—to be indicators of future behavior. In the late 1970s, particularly after the work of Fischer Black and Myron Scholes on options pricing, new models of markets based on methods from statistical physics began to be used, but in these models randomness was taken purely as an assumption. In another direction, it was noticed that dynamic versions of game theory could yield iterated maps and ordinary differential equations which would lead to chaotic behavior in prices, but connections with randomness in actual markets were not established. By the mid-1980s, however, it began to be clear that the whole game-theoretical idea of thinking of markets as collections of rational entities that optimize their positions on the basis of complete information was quite inadequate. Some attempts were made to extend traditional mathematical models, and various highly theoretical analyses were done based on treating entities in the market as universal computers. But by the end of the 1980s, the idea had emerged of doing explicit computer simulations with entities in the market represented by practical programs. (See also page 1105.) Often these programs used fairly sophisticated algorithms intended to mimic human traders, but in competitions between programs simpler algorithms have never seemed to be at much of a disadvantage. The model in the main text is in a sense an ultimate idealization along these lines. It follows a sequence of efforts that I have made since the mid-1980s—though have never considered very satisfactory—to find minimal but accurate models of financial processes.
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes/08-Implications-for-Everyday-Systems-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/09-Fundamental-Physics-Notes/09-Fundamental-Physics-Notes.md -->
 
 ## Fundamental Physics
 
@@ -16634,13 +16464,6 @@ Another way to get violations of Bell’s inequalities is to allow explicit inst
 When set up for pairs of particles, Bell’s inequalities tend just to provide numerical constraints on probabilities. But for triples of particles, it was noticed in the late 1980s that they can give constraints that force probabilities to be 0 or 1, implying that with the assumptions made, certain configurations of measurement results are simply impossible.
 
 In quantum field theory the whole concept of measurement is much less developed than in quantum mechanics—not least because in field theory it is much more difficult to factor out subsystems, and so to avoid having to give explicit descriptions of measuring devices. But at least in axiomatic quantum field theory it is typically assumed that one can somehow measure expectation values of any suitably smeared product of field operators. (It is possible that these could be reconstructed from combinations of idealized scattering experiments). And to get a kind of analog of Bell’s inequalities one can look at correlations defined by such expectation values for field operators at spacelike-separated points (too close in time for light signals to get from one to another). And it then turns out that even in the vacuum state the vacuum fluctuations that are present show nonzero such correlations—an analog of ordinary quantum mechanical entanglement. (In a non-interacting approximation these correlations turn out to be as large as is mathematically possible, but fall off exponentially outside the light cone, with exponents determined by the smallest particle mass or the measurement resolution.) In a sense, however, the presence of such correlations is just a reflection of the idealized way in which the vacuum state is set up—with each field mode determined all at once for the whole system.
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/09-Fundamental-Physics-Notes/09-Fundamental-Physics-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes/10-Processes-of-Perception-and-Analysis-Notes.md -->
 
 ## Processes of Perception and Analysis
 
@@ -17740,13 +17563,6 @@ It is common for animals to move in apparently random ways when they are trying 
 
 ■ **Relativism and postmodernism.** See pages 1131 and 1196.
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes/10-Processes-of-Perception-and-Analysis-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes/11-The-Notion-of-Computation-Notes.md -->
-
 ## The Notion of Computation
 
 ### Computation as a Framework
@@ -18732,13 +18548,6 @@ where there is padding with 0 on either side. With this setup t steps of evoluti
 ■ **Testing universality.** One can tell that a symbolic system is universal if one can find expressions that act like the s and k combinators, so that, for example, for some expression e, e[x][y][z] evolves to x[z][y[z]].
 ■ **Criteria for universality.** See page 1126.
 ■ **Classes of systems.** This chapter has shown that various individual systems with fixed rules exhibit universality when suitable initial conditions are chosen. One can also consider whole classes of systems in which rules as well as initial conditions can be chosen. And then one can say for example that as a class of systems cellular automata are universal, but neighbor-independent substitution systems are not.
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes/11-The-Notion-of-Computation-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes/12-The-Principle-of-Computational-Equivalence-Notes.md -->
 
 ## The Principle of Computational Equivalence
 
@@ -20582,13 +20391,6 @@ Particularly since the work of Jean Piaget in the 1940s, young children are ofte
 ■ **Philosophical implications.** The Principle of Computational Equivalence has implications for many issues long discussed in the field of philosophy. Most important are probably those in epistemology (theory of knowledge). In the past, it has usually been assumed that if we could only build up in our minds an adequate model of the world, then we would immediately know whatever we want about the world. But the Principle of Computational Equivalence now implies that even given a model it may be irreducibly difficult to work out its consequences. In effect, computational irreducibility introduces a new kind of limit to knowledge. And it implies that one needs a criterion more sophisticated than immediate predictability to assess a scientific theory—since when computational irreducibility is present this will inevitably be limited. In the past, it has sometimes been assumed that truths that can be deduced purely by operations like those in logic must somehow always be trivial. But computational irreducibility implies that in general they are not. Indeed it implies that even once the basic laws are known there are still an endless series of questions that are worth investigating in science. It is often assumed that one cannot learn much about the world just by studying purely formal systems—and that one has to rely on empirical input. But the Principle of Computational Equivalence implies that at some level there are inevitably common features across both abstract and natural systems. In ontology (theory of being) the Principle of Computational Equivalence implies that special components are vastly less necessary than might have been thought. For it shows that all sorts of sophisticated characteristics can emerge from the very same kinds of simple components. (My discussion of fundamental physics in Chapter 9 also suggests that no separate entities beyond simple rules are needed to capture space, time or matter.) Arguments in several areas of philosophy involve in effect considering fundamentally different intelligences. But the Principle of Computational Equivalence implies that in fact above a certain threshold there is an ultimate equivalence between possible intelligences. In addition, the Principle of Computational Equivalence implies that all sorts of systems in nature and elsewhere will inevitably exhibit features that in the past have been considered unique to intelligence—and this has consequences for the mind-body problem, the question of free will, and recognition of other minds. It has often been thought that traditional logic—and to some extent mathematics—are somehow fundamentally special and provide in a sense unique foundations. But the Principle of Computational Equivalence implies that in fact there are a huge range of other formal systems, equivalent in their ultimate richness, but different in their details, and in the questions to which they naturally lead. In philosophy of science the Principle of Computational Equivalence forces a new methodology based on formal experiments—that is ultimately the foundation for the whole new kind of science that I describe in this book.
 
 ![](BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes/images/_page_1214_Picture_0.jpeg)
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes/12-The-Principle-of-Computational-Equivalence-Notes.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/Index.md -->
 
 #### Index
 
@@ -38331,13 +38133,6 @@ Particularly since the work of Jean Piaget in the 1940s, young children are ofte
   - and universe as CA, 1026
 - Zygmund series, 918
 
-<!-- END CANONICAL SOURCE: BACK-MATTER/Index.md -->
-
-
----
-
-<!-- BEGIN CANONICAL SOURCE: BACK-MATTER/Colophon.md -->
-
 #### *Colophon*
 
 The original source for this book was created in FrameMaker, processed using an automated build system based on *Mathematica*, and output as PDF. (See also page 852.) The diagrams in the book were created using *Mathematica*, and the text for programs was automatically formatted by *Mathematica*, with both being imported as Encapsulated PostScript. Photographs were enhanced and processed using Photoshop and *Mathematica*. Index manipulation was done using *Mathematica* and IXgen.
@@ -38377,5 +38172,3 @@ All diagrams and most photographs are original to this book. (Original photograp
 For legal notices see the copyright page.
 
 Printed by Kromar Printing Ltd, Winnipeg, Canada.
-
-<!-- END CANONICAL SOURCE: BACK-MATTER/Colophon.md -->
